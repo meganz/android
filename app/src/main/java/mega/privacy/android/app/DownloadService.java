@@ -143,10 +143,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
 
-	private int notificationId = NOTIFICATION_DOWNLOAD;
-	private int notificationIdFinal = NOTIFICATION_DOWNLOAD_FINAL;
-	private String notificationChannelId = NOTIFICATION_CHANNEL_DOWNLOAD_ID;
-	private String notificationChannelName = NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
 	private NotificationCompat.Builder mBuilderCompat;
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
@@ -191,9 +187,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-			mBuilder = new Notification.Builder(DownloadService.this);
-		}
+		mBuilder = new Notification.Builder(DownloadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -221,9 +215,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		try {
-			startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
-					notificationChannelName, mNotificationManager,
-					new NotificationCompat.Builder(DownloadService.this, notificationChannelId),
+			startForeground(NOTIFICATION_DOWNLOAD, createInitialServiceNotification(NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+					NOTIFICATION_CHANNEL_DOWNLOAD_NAME, mNotificationManager,
+					new NotificationCompat.Builder(DownloadService.this, NOTIFICATION_CHANNEL_DOWNLOAD_ID),
 					mBuilder));
 			isForeground = true;
 		} catch (Exception e) {
@@ -235,7 +229,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void stopForeground() {
 		isForeground = false;
 		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
+		mNotificationManager.cancel(NOTIFICATION_DOWNLOAD);
 		stopSelf();
 	}
 
@@ -266,6 +260,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         unregisterReceiver(pauseBroadcastReceiver);
 		rxSubscriptions.clear();
+		stopForeground();
 
 		super.onDestroy();
 	}
@@ -667,12 +662,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (totalDownloads != 1) {
 			logDebug("Show notification");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+				NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 				channel.setShowBadge(true);
 				channel.setSound(null, null);
 				mNotificationManager.createNotificationChannel(channel);
 
-				NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+				NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 				mBuilderCompatO
 						.setSmallIcon(R.drawable.ic_stat_notify)
@@ -683,7 +678,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-				mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 			}
 			else {
 				mBuilderCompat
@@ -697,7 +692,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 				}
 
-				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 			}
 		}
 		else
@@ -774,12 +769,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
 								channel.setSound(null, null);
 								mNotificationManager.createNotificationChannel(channel);
 
-								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
@@ -788,7 +783,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 							}
 							else {
 								mBuilderCompat
@@ -798,7 +793,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 							}
 						}
 					}
@@ -864,12 +859,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
 								channel.setSound(null, null);
 								mNotificationManager.createNotificationChannel(channel);
 
-								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
@@ -878,7 +873,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 							}
 							else {
 								mBuilderCompat
@@ -888,7 +883,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 							}
 						}
 					}
@@ -955,12 +950,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							logDebug("Show notification");
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 								channel.setShowBadge(true);
 								channel.setSound(null, null);
 								mNotificationManager.createNotificationChannel(channel);
 
-								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
@@ -971,7 +966,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 							}
 							else {
 								mBuilderCompat
@@ -985,7 +980,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 								}
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 							}
 						}
 
@@ -1034,12 +1029,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									else{
 										logWarning("No app to url file as text: show notification");
 										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-											NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+											NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 											channel.setShowBadge(true);
 											channel.setSound(null, null);
 											mNotificationManager.createNotificationChannel(channel);
 
-											NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+											NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 											mBuilderCompatO
 													.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1050,7 +1045,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 											mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-											mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+											mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 										}
 										else {
 											mBuilderCompat
@@ -1064,7 +1059,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 												mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 											}
 
-											mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+											mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 										}
 									}
 								}
@@ -1088,12 +1083,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else{
 								logWarning("Exception on processing url file: show notification");
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-									NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+									NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 									channel.setShowBadge(true);
 									channel.setSound(null, null);
 									mNotificationManager.createNotificationChannel(channel);
 
-									NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+									NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 									mBuilderCompatO
 											.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1104,7 +1099,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 									mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-									mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+									mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 								}
 								else {
 									mBuilderCompat
@@ -1118,7 +1113,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 									}
 
-									mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+									mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 								}
 							}
 
@@ -1166,12 +1161,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						logDebug("Show notification");
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-							NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+							NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 							channel.setShowBadge(true);
 							channel.setSound(null, null);
 							mNotificationManager.createNotificationChannel(channel);
 
-							NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+							NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 							mBuilderCompatO
 									.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1182,7 +1177,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 							mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-							mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 						}
 						else {
 							mBuilderCompat
@@ -1196,7 +1191,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 							}
 
-							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 						}
 					}
 				} else {
@@ -1204,12 +1199,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					logDebug("Show notification");
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+						NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 						channel.setShowBadge(true);
 						channel.setSound(null, null);
 						mNotificationManager.createNotificationChannel(channel);
 
-						NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+						NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 						mBuilderCompatO
 								.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1220,7 +1215,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-						mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 					}
 					else {
 						mBuilderCompat
@@ -1234,7 +1229,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 						}
 
-						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 					}
 				}
 			}
@@ -1244,12 +1239,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				logDebug("Show notification");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-					NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+					NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 					channel.setShowBadge(true);
 					channel.setSound(null, null);
 					mNotificationManager.createNotificationChannel(channel);
 
-					NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+					NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 					mBuilderCompatO
 							.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1260,7 +1255,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
 
-					mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 				}
 				else {
 					mBuilderCompat
@@ -1274,7 +1269,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
 					}
 
-					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
 				}
 			}
 		}
@@ -1364,12 +1359,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+				NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_DOWNLOAD_ID, NOTIFICATION_CHANNEL_DOWNLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 				channel.setShowBadge(true);
 				channel.setSound(null, null);
 				mNotificationManager.createNotificationChannel(channel);
 
-				NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+				NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
@@ -1424,14 +1419,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (!isForeground) {
 				logDebug("Starting foreground!");
 				try {
-					startForeground(notificationId, notification);
+					startForeground(NOTIFICATION_DOWNLOAD, notification);
 					isForeground = true;
 				}
 				catch (Exception e){
 					isForeground = false;
 				}
 			} else {
-				mNotificationManager.notify(notificationId, notification);
+				mNotificationManager.notify(NOTIFICATION_DOWNLOAD, notification);
 			}
 		}
 	}
@@ -1771,9 +1766,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
 			transfersManagement.setTransferOverQuotaNotificationShown(true);
+			isForeground = false;
 			stopForeground(true);
+			mNotificationManager.cancel(NOTIFICATION_DOWNLOAD);
 			new TransferOverQuotaNotification().show();
-			mNotificationManager.cancel(notificationId);
 		}
 	}
 
@@ -1786,13 +1782,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
-			logDebug("TYPE_PAUSE_TRANSFERS finished");
-			if (e.getErrorCode() == MegaError.API_OK){
-				cancel();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("TYPE_CANCEL_TRANSFERS finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();
