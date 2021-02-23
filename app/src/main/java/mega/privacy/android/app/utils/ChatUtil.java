@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1270,5 +1271,18 @@ public class ChatUtil {
         } else {
             return messageToUpdate.getTempId() == currentMessage.getTempId();
         }
+    }
+
+    /**
+     * Method to know whether to show mute or unmute options.
+     *
+     * @param context  The Activity context.
+     * @param chatRoom The chat room.
+     * @return True, if it should be shown. False, if not.
+     */
+    public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
+        return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
+                ((chatRoom.isGroup() && chatRoom.isActive()) ||
+                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
     }
 }

@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NAME;
@@ -305,8 +306,20 @@ public class ContactUtil {
      * @param name    The name of the contact.
      */
     public static void openContactInfoActivity(Context context, String name) {
+        openContactInfoActivity(context, name, false);
+    }
+
+    /**
+     * Method to open ContactInfoActivityLollipop.class.
+     *
+     * @param context        Activity context.
+     * @param name           The name of the contact.
+     * @param isChatRoomOpen True, if the chatRoom is already open. False, otherwise.
+     */
+    public static void openContactInfoActivity(Context context, String name, boolean isChatRoomOpen) {
         Intent i = new Intent(context, ContactInfoActivityLollipop.class);
         i.putExtra(NAME, name);
+        i.putExtra(ACTION_CHAT_OPEN, isChatRoomOpen);
         context.startActivity(i);
     }
 

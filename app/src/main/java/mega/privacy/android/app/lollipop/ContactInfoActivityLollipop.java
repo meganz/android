@@ -582,10 +582,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString(NAME);
+
+			//isChatOpen is:
+			//- True when the megaChatApi.openChatRoom() method has already been called from ChatActivityLollipop
+			//  and the changes related to history clearing will be listened from there.
+			//- False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
+			//  This will happen when ContactInfoActivityLollipop is opened from other parts of the app than the Chat room.
+			boolean isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
+
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 			}
-
 			if (chatHandle != -1) {
 				logDebug("From chat!!");
 				fromContacts = false;
@@ -638,7 +645,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			if (chat != null) {
-				if(fromContacts) {
+				if(!isChatOpen) {
 					MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
 				}
 

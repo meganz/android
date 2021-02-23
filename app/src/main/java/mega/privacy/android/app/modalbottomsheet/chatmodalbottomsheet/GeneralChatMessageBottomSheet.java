@@ -394,7 +394,10 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
-                ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0));
+
+                boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() &&
+                        message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0);
+                ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0), isChatRoomOpen);
                 break;
 
             case R.id.option_invite_layout:

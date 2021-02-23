@@ -31,6 +31,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -274,12 +275,22 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     return;
                 }
 
+                long contactHandle = MEGACHAT_INVALID_HANDLE;
+                String contactEmail = null;
                 if (context instanceof ChatActivityLollipop) {
-                    ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0));
+                    contactEmail = message.getMessage().getUserEmail(0);
+                    contactHandle = message.getMessage().getUserHandle(0);
                 } else if (position != -1) {
-                    ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(position));
+                    contactEmail = message.getMessage().getUserEmail(position);
+                    contactHandle = message.getMessage().getUserHandle(position);
                 } else {
                     logWarning("Error - position -1");
+                }
+
+                if (contactHandle != MEGACHAT_INVALID_HANDLE) {
+                    MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                    boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
+                    ContactUtil.openContactInfoActivity(context, contactEmail, isChatRoomOpen);
                 }
                 break;
 

@@ -343,7 +343,10 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-					ContactUtil.openContactInfoActivity(this, c.getMail());
+					MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+					long contactHandle = Long.parseLong(c.getHandle());
+					boolean isChatRoomOpen = chat != null && !chat.isGroup() && contactHandle == chat.getPeerHandle(0);
+					ContactUtil.openContactInfoActivity(this, c.getMail(), isChatRoomOpen);
 				}
 				else{
 					logDebug("The user is not contact");
