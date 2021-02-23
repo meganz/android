@@ -483,6 +483,16 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             .show()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        nodeSaver.handleRequestPermissionsResult(requestCode)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
