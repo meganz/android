@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
@@ -101,7 +102,7 @@ class HomepageFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
 
-            when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
+            when (intent.getIntExtra(ACTION_TYPE, -1)) {
                 GO_OFFLINE -> showOfflineMode()
                 GO_ONLINE -> showOnlineMode()
             }
@@ -611,6 +612,10 @@ class HomepageFragment : Fragment() {
      * @param miniAudioPlayerHeight height of mini audio player
      */
     fun updateFabPosition(psaLayoutHeight: Int, miniAudioPlayerHeight: Int) {
+        if (!isResumed) {
+            return
+        }
+
         val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
         fabMainParams.bottomMargin =
             resources.getDimensionPixelSize(R.dimen.fab_margin_span) + psaLayoutHeight + miniAudioPlayerHeight

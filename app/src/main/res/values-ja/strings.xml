@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -> MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -> 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -> MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -> MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGAは、強力な常時プライバシーを備えたクラウドストレージです。</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF ビューア</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">/</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">ログアウト</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">アップロード</string>
     <string name="action_create_folder" context="Menu item">新しいフォルダを作成する</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">リンク開設</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">リンク開設</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">設定</string>
     <string name="action_search" context="Search button">検索</string>
     <string name="action_search_country" context="Select country page title">地域を選択してください</string>
-    <string name="action_play" context="Search button">プレイ</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">プレイ</string>
     <string name="action_pause" context="Search button">一時停止</string>
     <string name="action_refresh" context="Menu item">リフレッシュ</string>
     <string name="action_sort_by" context="Menu item">ソートする</string>
@@ -205,7 +207,7 @@
     -->
     <string name="cancel_transfer_confirmation">この転送をキャンセルしますか？</string>
     <string name="cancel_all_transfer_confirmation">転送をすべてキャンセルしますか？</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">すべてキャンセル</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">すべてキャンセル</string>
 
     <plurals name="cancel_selected_transfers">
         <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">選択された転送はキャンセルされます。</item>
@@ -227,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">知り合い</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">連絡先 [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B][/B][A]送信した要求[/A]はありません[B]。[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B][/B][A]受信した要求[/A]はありません[B]。[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[A]送信済みの要求[/A]は[B]ありません[/B]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[A]受信済みの要求[/A]は[B]ありません[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">転送</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">アカウント設定</string>
@@ -266,7 +268,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">サイズ</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">最終更新</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">追加時刻</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">追加時刻</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -283,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">無視する</string>
     <string name="contact_decline" context="option to decline a contact invitation">拒否</string>
     <string name="contact_accept" context="option to accept a contact invitation">受け入れる</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">知り合いに関する情報</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">知り合いに関する情報</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -362,7 +364,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">これらリンクは公開されなくなりました。</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">名前を変更</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">リンク開設</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">リンク開設</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開く</string>
     <string name="context_renaming" context="while renaming a file or folder">名前を変更中</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">ファイルの準備</string>
@@ -685,7 +687,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">オフラインのファイルをクリア</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">ダウンロード時にファイルを開く</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">アカウントをキャンセルする</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">アカウントを削除</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">利用している領域 %s</string>
@@ -964,7 +965,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">パスワードのリセット</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">以下にあなたの回復キーを入力してください</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">パスワードが変更済み</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">パスワードを変更しました。</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">古いアカウントを放っておく</string>
     <string name="park_account_button" context="Button to park an account">放置</string>
@@ -1147,12 +1148,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">オンにするまで</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">チャット通知を%s間ミュートします</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">チャット通知を%1$s間ミュートします</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">チャット通知を%1$sの%2$sまでミュートします</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">チャット通知はミュートされています</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">チャット通知を有効にしました</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">%1$sまでミュート</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">お知らせ</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">メッセージ音</string>
@@ -1161,8 +1171,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">通話着信音</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">通知音</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">クリアした後、%sさんもあなたもこのチャットのメッセージを見ることができません。</string>
 
     <string name="general_clear" context="Button to clear the chat history">クリアする</string>
     <!--
@@ -1225,10 +1233,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">退出すると、メッセージを読んだり送信したりできなくなります。</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">グループチャットから離れますか？　</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">この会話のメッセージとメディアはすべてクリアされます。</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">履歴をクリアしますか？　</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">この参加者は既にこのグループチャットに含まれています</string>
 
@@ -1592,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">知り合い</string>
     <string name="attachment_upload_panel_photo">端末から</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">アカウントをキャンセル</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">アカウントをキャンセルすると、アカウントデータ、MEGAの連絡先、または会話にアクセスできなくなります。\nこの操作は元に戻すことはできません。</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">アカウントを削除する</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">アカウントを削除すると、アカウントデータ、MEGAの連絡先、または会話にアクセスできなくなります。\nこの操作は元に戻すことはできません。</string>
     <string name="delete_button" context="menu item">削除</string>
 
     <string name="file_properties_info_info_file">インフォ</string>
@@ -1626,14 +1630,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">自動アップロードを設定する</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">サイレント</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">サイレント</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">メッセージ</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">から</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">新しい共有フォルダ</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">新しいコンタクト要求</string>
-
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">チャット履歴をクリア</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">知り合いを削除</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">チャット通知</string>
@@ -1722,8 +1726,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">新しいファイル</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">ファイル名</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">リンク名</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">リンクURL</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">リンク名</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">リンクURL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">件名</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">コンテンツ</string>
@@ -1740,7 +1744,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">新しいパスワードは古いパスワードと同じにすることはできません</string>
 
     <string name="action_search_by_date" context="Menu item">日付で検索</string>
-    <string name="general_apply" context="title of a button to apply search by date">適用</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">適用</string>
     <string name="general_search_month" context="title of a button to apply search by month">先月</string>
     <string name="general_search_year" context="title of a button to apply search by year">去年</string>
 
@@ -1822,21 +1826,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">期間の設定</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]友人を[/B][A]チャット[/A]に招待し、[B]プライバシーとセキュリティが確保された当社の暗号化プラットフォームをお楽しみください。[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]友人[/B]を[A]チャット[/A]に招待し、[B]プライバシーとセキュリティが確保された当社の暗号化プラットフォームをお楽しみください。[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]カメラアップロード[/A]に[B]メディアがありません[/B][B][/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]ごみ箱[/A]が[B]空[/B][B]です。[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]カメラアップロード[/A]に[B]メディアがありません[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]ごみ箱[/A]は[B]空[/B]です。</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B][/B][A]受信箱[/A]にファイルはありません[B]。[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B][/B][A]クラウドドライブ[/A]にファイルはありません[B]。[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]オフライン[/A]の[B]ファイルはありません[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]受信箱[/A]に[B]ファイルはありません[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]クラウドドライブ[/A]に[B]ファイルはありません[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]オフライン用に保存されたファイル[/A]は[B]ありません[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B][/B][A]連絡先はありません[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[B]会話[/B]が[A]ありません[/A]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[B]会話[/B]を[A]読み込み中&#8230;[/A]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B][/B][A]受信共有フォルダ[/A]はありません[B]。[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B][/B][A]送信共有フォルダ[/A]はありません[B]。[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]受信共有フォルダ[/A]は[B]ありません[/B]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]送信共有フォルダ[/A]は[B]ありません[/B]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]公開リンク[/A][B]はありません[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送信済みリクエスト</string>
@@ -2044,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">新しいコンタクト要求</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">「%s」に向けてメッセージを書き込みます&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]有効な[/B][A]転送が[/A][B]ありません。[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]完了した[/B][A]転送が[/A][B]ありません。[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]空の[/B][A]フォルダ[/A][B]。[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">有効な[A]転送[/A]は[B]ありません。[/B]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">完了した[A]転送[/A]は[B]ありません。[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]フォルダ[/A]は[B]空[/B]です</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">「%s」に向けてメッセージを書き込みます&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">%sに向けてメッセージを書き込みます&#8230;</string>
@@ -2408,8 +2412,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">動画を圧縮中 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">無効なフォルダが選択されました</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1個のフォルダ。1個のファイル</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1個のフォルダ。%1$d個のファイル</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1個のフォルダ・1個のファイル</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1個のフォルダ・%1$d個のファイル</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">ファイル%dこ</item>
@@ -2422,8 +2426,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d個のフォルダ。1個のファイル</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d個のフォルダ。%2$d個のファイル</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d個のフォルダ・1個のファイル</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d個のフォルダ・%2$d個のファイル</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B]さんが%2$sと%3$sを追加しました[/B]</string>
@@ -2462,7 +2466,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL鍵エラー</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGAはSSL経由では安全に接続できません。あなたは追加要件を伴うWi-Fiを使っているかもしれません。</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B][/B][A]通知[/A][B]がありません。[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]通知[/A]は[B]ありません[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">MEGAをセットアップ</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGAはあなたの写真、メディア、ファイルをあなたがご友人と共有したり、暗号化されたメッセージを交換したり、安全な通話を行うことができるように、それらへのアクセスを必要とします。</string>
@@ -2505,7 +2509,7 @@
     <string name="label_yesterday" context="label yesterday">昨日</string>
     <string name="label_tomorrow" context="label tomorrow">明日</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]共有ファイル[/A]が[B]ありません[/B][B]。[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]共有ファイル[/A]は[B]ありません[/B]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$sさんが通話に参加しました</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$sさんが通話から抜けました</string>
@@ -2589,8 +2593,8 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%dバージョンは削除されていません</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%dバージョンは削除されていません</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%dバージョンは削除されていません</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%dバージョンは削除されていません</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">あなたはMEGAの連絡先がありません。連絡先セクションからご友人をご招待ください。</string>
@@ -2832,7 +2836,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]すぐに行動してデータを保存する必要があります。[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1日</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1日</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d日</item>
     </plurals>
 
@@ -2900,6 +2904,57 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">反応の上限(%d)に達しました。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">このメッセージは、反応の上限（%d）に達しました。</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">チャット履歴をクリア</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">無効</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">以下より古いメッセージを自動的に削除：</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">１年</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">時</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">時</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">日</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">日</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">週</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">月</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">月</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">か月</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1時間</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">１ヶ月</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">転送を選択</string>
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">転送「%1$s」の優先順位の変更に失敗しました。</string>

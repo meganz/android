@@ -30,6 +30,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -274,15 +275,22 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     return;
                 }
 
+                long contactHandle = MEGACHAT_INVALID_HANDLE;
                 i = new Intent(context, ContactInfoActivityLollipop.class);
                 if (context instanceof ChatActivityLollipop) {
                     i.putExtra(NAME, message.getMessage().getUserEmail(0));
+                    contactHandle = message.getMessage().getUserHandle(0);
                 } else if (position != -1) {
                     i.putExtra(NAME, message.getMessage().getUserEmail(position));
+                    contactHandle = message.getMessage().getUserHandle(position);
                 } else {
                     logWarning("Error - position -1");
                 }
 
+                MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                if (chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0)) {
+                    i.putExtra(ACTION_CHAT_OPEN, true);
+                }
                 context.startActivity(i);
                 break;
 

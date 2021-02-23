@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 //Listener for  multiselect
@@ -32,6 +33,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
     int counter = 0;
     int error = 0;
     int errorBusiness = 0;
+    int errorExist= 0;
     int max_items = 0;
     int actionListener = -1;
     String message;
@@ -69,7 +71,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
         if (e.getErrorCode() != MegaError.API_OK){
             if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
                 errorBusiness++;
+            } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+                errorExist++;
             }
+
             error++;
         }
         int requestType = request.getType();
@@ -227,11 +232,17 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     }
                     else if (request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
                         logDebug("Invite contact request finished");
-                        if(error>0){
-                            message = context.getString(R.string.number_no_invite_contact_request, max_items-error, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_invite_contact_request, max_items);
+                        if (errorExist > 0) {
+                            message = getString(R.string.number_existing_invite_contact_request, errorExist);
+                            int success = max_items - error;
+
+                            if (success > 0) {
+                                message += "\n" + getString(R.string.number_correctly_invite_contact_request, success);
+                            }
+                        } else if (error > 0) {
+                            message = getString(R.string.number_no_invite_contact_request, max_items - error, error);
+                        } else {
+                            message = getString(R.string.number_correctly_invite_contact_request, max_items);
                         }
                     }
                     break;

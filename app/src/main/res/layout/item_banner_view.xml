@@ -19,8 +19,8 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="8dp"
         android:layout_marginVertical="12dp"
-        app:fadeDuration="0"
         app:actualImageScaleType="fitCenter"
+        app:fadeDuration="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/guideline_vertical"
@@ -41,16 +41,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginVertical="3dp"
         android:fontFamily="Roboto"
+        android:maxLines="3"
         android:singleLine="false"
         android:text="TextView"
         android:textColor="@color/file_properties_text_available"
-        android:textSize="13sp"
+        app:autoSizeMaxTextSize="13sp"
+        app:autoSizeMinTextSize="10sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
         app:layout_constraintStart_toStartOf="@+id/textView_title"
         app:layout_constraintTop_toBottomOf="@id/textView_title" />

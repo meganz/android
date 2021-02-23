@@ -3174,6 +3174,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.pinnedContactLocationInfoText.setVisibility(View.VISIBLE);
             holder.pinnedContactLocationInfoText.setText(location);
 
+            holder.forwardContactRichLinks.setVisibility(View.GONE);
+            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+            holder.forwardContactFile.setVisibility(View.GONE);
+            holder.forwardContactContact.setVisibility(View.GONE);
+
             if (bitmapImage != null) {
                 holder.previewContactLocation.setImageBitmap(bitmapImage);
             }

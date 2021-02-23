@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro léger</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visualiseur de PDF MEGA</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Déconnexion</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Téléverser</string>
     <string name="action_create_folder" context="Menu item">Créer un nouveau dossier</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Ouvrir un lien</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Ouvrir un lien</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">Paramètres</string>
     <string name="action_search" context="Search button">Recherche</string>
     <string name="action_search_country" context="Select country page title">Choisir votre région</string>
-    <string name="action_play" context="Search button">Lire</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">Lire</string>
     <string name="action_pause" context="Search button">Mettre en pause</string>
     <string name="action_refresh" context="Menu item">Actualiser</string>
     <string name="action_sort_by" context="Menu item">Trier par</string>
@@ -205,7 +207,7 @@
     -->
     <string name="cancel_transfer_confirmation">Supprimer ce transfert ?</string>
     <string name="cancel_all_transfer_confirmation">Supprimer tous les transferts ?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Tout annuler</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">Tout annuler</string>
 
     <plurals name="cancel_selected_transfers">
         <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">Le transfert sélectionné sera annulé.</item>
@@ -227,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacts</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Il n\'y a aucune [/B][A]demande envoyée[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Il n\'y a aucune [/B][A]demande reçue[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Il n\'y a aucune [/B][A]demande envoyée[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Il n\'y a aucune [/B][A]demande reçue[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferts</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Mon compte</string>
@@ -266,7 +268,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">Taille</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">Dernière modification</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Ajouté</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">Ajouté</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -283,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorer</string>
     <string name="contact_decline" context="option to decline a contact invitation">Refuser</string>
     <string name="contact_accept" context="option to accept a contact invitation">Accepter</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Renseignements sur le contact</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Renseignements sur le contact</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -362,7 +364,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Ces liens ne seront plus accessibles publiquement.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renommer</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Ouvrir un lien</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Ouvrir un lien</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Ouvrir</string>
     <string name="context_renaming" context="while renaming a file or folder">Renommage</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Préparation du fichier</string>
@@ -659,7 +661,7 @@
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi seulement</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou données mobiles</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Les téléversements de l\'appareil photo sont en cours</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Souhaitez-vous arrêter les téléversements de l\'appareil photo ?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Voulez-vous arrêter les téléversements de l\'appareil photo ?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
@@ -685,7 +687,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Vider les fichiers Hors ligne</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Ouvrir le fichier une fois téléchargé</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Annuler votre compte</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Supprimer le compte</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">%s utilisés actuellement</string>
@@ -964,7 +965,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Réinitialisation du mot de passe</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Veuillez saisir votre clé de récupération ci-dessous</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Le mot de passe a été changé</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Votre mot de passe a été changé.</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Remiser le compte</string>
     <string name="park_account_button" context="Button to park an account">Remiser</string>
@@ -1023,7 +1024,7 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user’s account">Modifier</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Définir une date d\'expiration</string>
-    <string name="title_set_password_protection" context="Title of the dialog to get link with password">Définir la protection par mot de passe</string>
+    <string name="title_set_password_protection" context="Title of the dialog to get link with password">Définir une protection par mot de passe</string>
     <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(PRO SEULEMENT)</string>
     <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">Définir un mot de passe</string>
     <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">Saisissez un mot de passe</string>
@@ -1100,7 +1101,7 @@
     <string name="get_started_button" context="Button to start using the chat">Get started</string>
     -->
 
-    <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invitez vos amis à se joindre à vous sur le dialogue en ligne et profitez de notre plateforme chiffrée assurant confidentialité et sécurité.</string>
+    <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invitez vos amis à se joindre à vous sur le dialogue en ligne et profitez de notre plateforme chiffrée en toute confidentialité et sécurité.</string>
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1147,12 +1148,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Jusqu\'à ce que je les réactive</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Les notifications de la conversation seront mises en sourdine pendant %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Les notifications de la conversation seront mises en sourdine jusqu\'à %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Les notifications de la conversation seront mises en sourdine jusqu\'à %1$s à %2$s</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Les notifications des conversations sont en sourdine</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Les notifications de la conversation sont activées</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mettre en sourdine as jusqu\'à %1$s</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications </string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Son des messages</string>
@@ -1161,8 +1171,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Sonnerie d\'appel</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Son des notifications</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Une fois qu\'elle sera effacée, ni %s ni vous ne pourrez voir les messages de cette conversation.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Effacer</string>
     <!--
@@ -1225,10 +1233,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">Si vous quittez cette conversation, vous ne pourrez plus  lire les messages ni en envoyer.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Quitter cette conversation de groupe ?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">Tous les messages et médias de cette conversation seront effacés.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Effacer l\'historique ?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">Ce participant fait déjà partie de cette conversation de groupe</string>
 
@@ -1348,7 +1352,7 @@
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Espace de stockage</string>
     <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">de quota de transfert</string>
 
-    <string name="available_space" context="Label in section the storage tab in My Account Section">Disponible</string>
+    <string name="available_space" context="Label in section the storage tab in My Account Section">Libre</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">non disponible</string>
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Aucun cycle de facturation</string>
@@ -1592,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">De l\'appareil</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Annuler le compte</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Si vous annulez votre compte, vous ne pourrez ni accéder aux données de votre compte, ni à vos contacts, ni à vos conversations MEGA.\nVous ne pourrez pas annuler cette action.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Supprimer le compte</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Si vous annulez votre compte, vous ne pourrez ni accéder aux données de votre compte, ni à vos contacts, ni à vos conversations sur MEGA.\nVous ne pourrez pas annuler cette action.</string>
     <string name="delete_button" context="menu item">Supprimer</string>
 
     <string name="file_properties_info_info_file">Renseignements</string>
@@ -1626,14 +1630,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Configurer les téléversements automatiques</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Silencieux</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">Silencieux</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">messages</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">à partir de</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nouveau dossier partagé</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Nouvelle demande de contact</string>
-
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Effacer l\'historique de la conversation</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Supprimer le contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Notifications de conversation</string>
@@ -1670,7 +1674,7 @@
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Prime d\'inscription</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Installer l\'appli MEGA pour ordinateur</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Quota de base du compte</string>
-    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Il n\'y a aucun fichier dans Téléversements de l\'appareil photo</string>
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Aucun fichier dans Téléversements de l\'appareil photo</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d j restants</string>
     <string name="expired_label" context="State to indicate something has expired (achivements of business status account for instance)">Expiré</string>
 
@@ -1722,8 +1726,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">Nouveau fichier</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">Nom du fichier</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Nom du lien</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">URL du lien</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Nom du lien</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">URL du lien</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">OBJET</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTENU</string>
@@ -1740,7 +1744,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Le nouveau mot de passe ne peut pas être identique à l\'ancien</string>
 
     <string name="action_search_by_date" context="Menu item">Chercher par date</string>
-    <string name="general_apply" context="title of a button to apply search by date">Appliquer</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">Appliquer</string>
     <string name="general_search_month" context="title of a button to apply search by month">Le dernier mois</string>
     <string name="general_search_year" context="title of a button to apply search by year">La dernière année</string>
 
@@ -1822,21 +1826,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Définir la période</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée assurant confidentialité et sécurité.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée en toute confidentialité et sécurité.[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Il n\'y a aucun média dans [/B][A]Téléversements de l\'appareil photo[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Corbeille [/A][B]vide[/B][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Aucun média dans [/B][A]Téléversements de l\'appareil photo[/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]La corbeille[/A] [B]est vide[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Il n\'y a aucun fichier dans votre [/B][A]boîte de réception[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Il n\'y a aucun ficher [/B][A]dans votre disque nuagique[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Il n\'y a aucun fichier [/B][A]Hors ligne[/A]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Aucun fichier dans votre [/B][A]boîte de réception[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Aucun fichier [/B][A]dans votre disque nuagique[/A]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Il n\'y a aucun fichier enregistré [/B][A]Hors ligne[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Il n\'y a aucun [/B][A]contact[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Il n\'y a aucune[/A] [B]conversation[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Chargement des[/A] [B]conversations&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Il n\'y a aucun [/B][A]dossier partagé entrant[/A][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Il n\'y a aucun [/B][A]dossier partagé sortant[/A][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Il n\'y a aucun [/B][A]dossier partagé entrant[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Il n\'y a aucun [/B][A]dossier partagé sortant[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Il n\'y a aucun [/B][A]lien public[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Demandes envoyées</string>
@@ -2044,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nouvelle demande de contact</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Rédigez un message pour « %s »&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]actif.[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]terminé.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Le dossier[/A] [B]est vide[/B][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert actif[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert terminé[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Le dossier[/A] [B]est vide[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Rédigez un message pour « %s »&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Rédigez un message pour %s&#8230;</string>
@@ -2408,8 +2412,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">Compression des vidéos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Un dossier invalide a été sélectionné</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier. 1 fichier</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier. %1$d fichiers</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier · 1 fichier</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier · %1$d fichiers</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d fichier</item>
@@ -2422,8 +2426,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d dossiers. 1 fichier</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d dossiers. %2$d fichiers</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d dossiers · 1 fichier</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d dossiers · %2$d fichiers</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] a ajouté %2$s et %3$s[/B]</string>
@@ -2462,7 +2466,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Erreur de clé SSL</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA n\'arrive pas à se connecter de façon sécurisée par SSL. Vous vous trouvez peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Il n\'y a aucune [/B][A]notification[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Il n\'y a aucune [/B][A]notification[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Configurer MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA a besoin d\'accéder à vos photos, à vos médias et à vos fichiers afin que vous puissiez les partager avec des amis, échanger des messages chiffrés et faire des appels chiffrés.</string>
@@ -2505,7 +2509,7 @@
     <string name="label_yesterday" context="label yesterday">Hier</string>
     <string name="label_tomorrow" context="label tomorrow">demain</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Il n\'y a aucun [/B][A]fichier partagé[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Il n\'y a aucun [/B][A]fichier partagé[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s s\'est joint à l\'appel</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s a quitté l\'appel</string>
@@ -2589,11 +2593,11 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d version n\'a pas été supprimée</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d versions n\'ont pas été supprimées</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%d version n\'a pas été supprimée</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%d versions n\'ont pas été supprimées</item>
     </plurals>
 
-    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Vous n\'avez aucun contact MEGA. Veuillez inviter des amis dans la section Contacts.</string>
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Vous n\'avez aucun contact sur MEGA. Veuillez inviter des amis dans la section Contacts.</string>
     <string name="invite_more" context="Invite button for chat top cell">Inviter quelqu\'un d\'autre</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Vous détenez les clés</string>
@@ -2832,7 +2836,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Vous devez agir immédiatement afin de sauver vos donneés.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 jour</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1 jour</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d jours</item>
     </plurals>
 
@@ -2900,6 +2904,57 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Effacer l\'historique de la conversation</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Désactivé</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Supprimer automatiquement les messages de plus de :</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 an</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">heure</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">heures</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">jour</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">jours</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">semaine</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">semaines</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">mois</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">mois</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 heure</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 mois</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Sélectionner des transferts</string>
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">Échec de changement de priorité du transfert « %1$s »</string>
