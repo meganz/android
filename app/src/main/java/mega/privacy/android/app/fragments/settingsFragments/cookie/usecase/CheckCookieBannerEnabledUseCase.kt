@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
@@ -19,27 +18,25 @@ class CheckCookieBannerEnabledUseCase @Inject constructor(
      */
     fun check(): Single<Boolean> =
         Single.create { emitter ->
-            val listener = object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-                    if (emitter.isDisposed) {
-                        megaApi.removeRequestListener(this)
-                    }
-                }
+            megaApi.getMiscFlags(object : MegaRequestListenerInterface {
+                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
 
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-                    if (emitter.isDisposed) {
-                        megaApi.removeRequestListener(this)
-                    }
-                }
+                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
                 override fun onRequestFinish(
                     api: MegaApiJava,
                     request: MegaRequest,
                     error: MegaError
                 ) {
+                    if (emitter.isDisposed) return
+
                     when (error.errorCode) {
-                        MegaError.API_OK, MegaError.API_EACCESS -> emitter.onSuccess(api.isCookieBannerEnabled)
-                        else -> emitter.onError(error.toThrowable())
+                        MegaError.API_OK, MegaError.API_EACCESS -> {
+                            emitter.onSuccess(api.isCookieBannerEnabled)
+                        }
+                        else -> {
+                            emitter.onError(error.toThrowable())
+                        }
                     }
                 }
 
@@ -50,12 +47,6 @@ class CheckCookieBannerEnabledUseCase @Inject constructor(
                 ) {
                     logError(error.toThrowable().stackTraceToString())
                 }
-            }
-
-            megaApi.getMiscFlags(listener)
-
-            emitter.setDisposable(Disposable.fromAction {
-                megaApi.removeRequestListener(listener)
             })
         }
 }

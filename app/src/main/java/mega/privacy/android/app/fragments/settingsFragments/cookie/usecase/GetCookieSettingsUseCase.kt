@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -23,24 +22,18 @@ class GetCookieSettingsUseCase @Inject constructor(
      */
     fun get(): Single<Set<CookieType>> =
         Single.create { emitter ->
-            val listener = object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-                    if (emitter.isDisposed) {
-                        megaApi.removeRequestListener(this)
-                    }
-                }
+            megaApi.getCookieSettings(object : MegaRequestListenerInterface {
+                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
 
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-                    if (emitter.isDisposed) {
-                        megaApi.removeRequestListener(this)
-                    }
-                }
+                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
                 override fun onRequestFinish(
                     api: MegaApiJava,
                     request: MegaRequest,
                     error: MegaError
                 ) {
+                    if (emitter.isDisposed) return
+
                     when (error.errorCode) {
                         MegaError.API_OK -> {
                             val result = mutableSetOf<CookieType>()
@@ -70,12 +63,6 @@ class GetCookieSettingsUseCase @Inject constructor(
                 ) {
                     logError(error.toThrowable().stackTraceToString())
                 }
-            }
-
-            megaApi.getCookieSettings(listener)
-
-            emitter.setDisposable(Disposable.fromAction {
-                megaApi.removeRequestListener(listener)
             })
         }
 
