@@ -752,22 +752,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					? totalUploadsCompleted
 					: totalUploadsCompleted + 1;
 
+			int videosCompressed = getVideosCompressed();
+
 			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
 				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_paused_notification,
 						totalUploads, inProgress, totalUploads);
-			} else if (thereAreChatUploads()) {
+			} else if (thereAreChatUploads() || videosCompressed == mapVideoDownsampling.size()) {
 				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification,
 						totalUploads, inProgress, totalUploads);
 			} else {
-				inProgress = 1;
-
-				for (Integer percentage : mapVideoDownsampling.values()) {
-					if (percentage == 100) {
-						inProgress++;
-					}
-				}
-
-				message = StringResourcesUtils.getString(R.string.title_compress_video, inProgress, mapVideoDownsampling.size());
+				message = StringResourcesUtils.getString(R.string.title_compress_video,
+						videosCompressed + 1, mapVideoDownsampling.size());
 			}
 		}
 
@@ -1566,5 +1561,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		return false;
+	}
+
+	/**
+	 * Gets the number of videos already compressed.
+	 *
+	 * @return Number of videos already compressed.
+	 */
+	private int getVideosCompressed() {
+		int videosCompressed = 0;
+
+		for (Integer percentage : mapVideoDownsampling.values()) {
+			if (percentage == 100) {
+				videosCompressed++;
+			}
+		}
+
+		return videosCompressed;
 	}
 }
