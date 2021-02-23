@@ -98,16 +98,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private NotificationCompat.Builder mBuilderCompat;
 	private NotificationManager mNotificationManager;
 
-	private int notificationIdForFileUpload = NOTIFICATION_UPLOAD;
-	private int notificationIdFinalForFileUpload = NOTIFICATION_UPLOAD_FINAL;
-	private String notificationChannelIdForFileUpload = NOTIFICATION_CHANNEL_UPLOAD_ID;
-	private String notificationChannelNameForFileUpload = NOTIFICATION_CHANNEL_UPLOAD_NAME;
-
-    private int notificationIdForFolderUpload = NOTIFICATION_UPLOAD_FOLDER;
-    private int notificationIdFinalForFolderUpload = NOTIFICATION_UPLOAD_FINAL_FOLDER;
-    private String notificationChannelIdForFolderUpload = NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER;
-    private String notificationChannelNameForFolderUpload = NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER;
-
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
     private HashMap<Integer, MegaTransfer> mapProgressFolderTransfers;
     private static int totalFileUploadsCompleted = 0;
@@ -188,11 +178,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         try {
-            startForeground(notificationIdForFileUpload,
-                    createInitialServiceNotification(notificationChannelIdForFileUpload,
-                            notificationChannelNameForFileUpload,
+            startForeground(NOTIFICATION_UPLOAD,
+                    createInitialServiceNotification(NOTIFICATION_CHANNEL_UPLOAD_ID,
+                            NOTIFICATION_CHANNEL_UPLOAD_NAME,
                             mNotificationManager,
-                            new NotificationCompat.Builder(UploadService.this, notificationChannelIdForFileUpload),
+                            new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID),
                             mBuilder));
 
             isForeground = true;
@@ -205,8 +195,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void stopForeground() {
         isForeground = false;
         stopForeground(true);
-        mNotificationManager.cancel(notificationIdForFileUpload);
-        mNotificationManager.cancel(notificationIdForFolderUpload);
+        mNotificationManager.cancel(NOTIFICATION_UPLOAD);
+        mNotificationManager.cancel(NOTIFICATION_UPLOAD_FOLDER);
         stopSelf();
     }
 
@@ -226,6 +216,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
+        stopForeground();
 
 		super.onDestroy();
 	}
@@ -303,7 +294,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     } else if (totalFileUploads == 0) {
                         isForeground = false;
                         stopForeground(true);
-                        mNotificationManager.cancel(notificationIdForFileUpload);
+                        mNotificationManager.cancel(NOTIFICATION_UPLOAD);
                     }
 
                     launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
@@ -456,6 +447,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -465,6 +457,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -509,7 +502,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 size = getString(R.string.general_total_size,totalBytes);
             }
 
-            notifyNotification(notificationTitle,size,notificationIdFinalForFileUpload,notificationChannelIdForFileUpload,notificationChannelNameForFileUpload);
+            notifyNotification(notificationTitle,size,NOTIFICATION_UPLOAD_FINAL,NOTIFICATION_CHANNEL_UPLOAD_ID,NOTIFICATION_CHANNEL_UPLOAD_NAME);
         }
     }
 
@@ -534,7 +527,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 notificationSubTitle = getString(R.string.general_total_size,totalBytes);
             }
 
-            notifyNotification(notificationTitle,notificationSubTitle,notificationIdFinalForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
+            notifyNotification(notificationTitle,notificationSubTitle,NOTIFICATION_UPLOAD_FINAL_FOLDER,NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER,NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
         }
     }
 
@@ -650,10 +643,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
-        if(isFolderTransfer){
-            notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
-        }else{
-            notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFileUpload,notificationChannelIdForFileUpload,notificationChannelNameForFileUpload);
+        if (isFolderTransfer) {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
+        } else {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
         }
     }
 
@@ -1098,11 +1091,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logDebug("showStorageOverQuotaNotification");
 		String notificationChannelId,notificationChannelName;
 		if(isFolderTransfer){
-            notificationChannelId = notificationChannelIdForFolderUpload;
-            notificationChannelName = notificationChannelNameForFolderUpload;
+            notificationChannelId = NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER;
+            notificationChannelName = NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER;
         }else{
-            notificationChannelId = notificationChannelIdForFileUpload;
-            notificationChannelName = notificationChannelNameForFileUpload;
+            notificationChannelId = NOTIFICATION_CHANNEL_UPLOAD_ID;
+            notificationChannelName = NOTIFICATION_CHANNEL_UPLOAD_NAME;
         }
 
 		String contentText = getString(R.string.download_show_info);

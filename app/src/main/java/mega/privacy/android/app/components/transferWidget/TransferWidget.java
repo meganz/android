@@ -68,7 +68,7 @@ public class TransferWidget {
      */
     public void update(int transferType) {
         if (context instanceof ManagerActivityLollipop) {
-            if (ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+            if (((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);
             }
 
@@ -83,7 +83,7 @@ public class TransferWidget {
         if (getPendingTransfers() > 0 && !transfersManagement.shouldShowNetWorkWarning()) {
             setProgress(getProgress(), transferType);
             updateState();
-        } else if (transfersManagement.shouldShowNetWorkWarning()
+        } else if ((getPendingTransfers() > 0 && transfersManagement.shouldShowNetWorkWarning())
                 || transfersManagement.thereAreFailedTransfers()) {
             setFailedTransfers();
         } else {
@@ -97,7 +97,7 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.getDrawerItem();
+        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
 
         return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.CONTACTS

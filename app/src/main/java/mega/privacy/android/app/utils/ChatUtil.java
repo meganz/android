@@ -75,6 +75,7 @@ import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
@@ -1258,6 +1259,34 @@ public class ChatUtil {
                         -> chatManagementCallback.confirmLeaveChats(chats))
                 .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                 .show();
+    }
+
+    /**
+     * Method to compare if the current message is the same message that needs to be updated.     *
+     *
+     * @param messageToUpdate The message to be updated.
+     * @param currentMessage  The current message.
+     * @return True, if it is the same. False, if not.
+     */
+    public static boolean isItSameMsg(MegaChatMessage messageToUpdate, MegaChatMessage currentMessage) {
+        if (messageToUpdate.getMsgId() != MEGACHAT_INVALID_HANDLE) {
+            return messageToUpdate.getMsgId() == currentMessage.getMsgId();
+        } else {
+            return messageToUpdate.getTempId() == currentMessage.getTempId();
+        }
+    }
+
+    /**
+     * Method to know whether to show mute or unmute options.
+     *
+     * @param context  The Activity context.
+     * @param chatRoom The chat room.
+     * @return True, if it should be shown. False, if not.
+     */
+    public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
+        return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
+                ((chatRoom.isGroup() && chatRoom.isActive()) ||
+                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
     }
 
     /**

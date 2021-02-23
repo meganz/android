@@ -833,15 +833,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     public void showGroupInfoActivity(){
         logDebug("showGroupInfoActivity");
-        if(chatRoom.isGroup()){
-            Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }else{
-            Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }
+        Intent i = new Intent(this,
+                chatRoom.isGroup() ? GroupChatInfoActivityLollipop.class : ContactInfoActivityLollipop.class);
+        i.putExtra(HANDLE, chatRoom.getChatId());
+        i.putExtra(ACTION_CHAT_OPEN, true);
+        this.startActivity(i);
     }
 
     @Override
@@ -1566,7 +1562,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         megaChatApi.closeChatRoom(idChat, this);
-
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
             return true;
@@ -2290,6 +2285,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 unMuteMenuItem.setVisible(true);
             }
 
+            if(!shouldMuteOrUnmuteOptionsBeShown(this, chatRoom)){
+                unMuteMenuItem.setVisible(false);
+                muteMenuItem.setVisible(false);
+            }
+
             checkSelectOption();
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
@@ -2301,8 +2301,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
-                muteMenuItem.setVisible(false);
-                unMuteMenuItem.setVisible(false);
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -2335,7 +2333,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 int permission = chatRoom.getOwnPrivilege();
                 logDebug("Permission in the chat: " + permission);
                 if (chatRoom.isGroup()) {
-
                     if (permission == MegaChatRoom.PRIV_MODERATOR) {
 
                         inviteMenuItem.setVisible(true);
@@ -2510,17 +2507,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
-
-                if(chatRoom.isGroup()){
-                    Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
-                else{
-                    Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
+                showGroupInfoActivity();
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
@@ -6445,7 +6432,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
-        if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
+        if (isItSameMsg(messageToUpdate.getMessage(), msg.getMessage())) {
             logDebug("The internal index not change");
 
             if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
