@@ -177,7 +177,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             when (dest.id) {
-                R.id.audio_player -> {
+                R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
                 }
@@ -264,15 +264,15 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 toggleAllMenuItemsVisibility(false)
                 searchMenuItem?.isVisible = true
             }
-            R.id.audio_player, R.id.track_info -> {
+            R.id.main_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
                     toggleAllMenuItemsVisibility(false)
 
                     optionsMenu?.findItem(R.id.properties)?.isVisible =
-                        currentFragment == R.id.audio_player
+                        currentFragment == R.id.main_player
 
                     optionsMenu?.findItem(R.id.share)?.isVisible =
-                        currentFragment == R.id.audio_player
+                        currentFragment == R.id.main_player
 
                     return
                 }
@@ -299,10 +299,10 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 optionsMenu?.findItem(R.id.save_to_device)?.isVisible = true
 
                 optionsMenu?.findItem(R.id.properties)?.isVisible =
-                    currentFragment == R.id.audio_player
+                    currentFragment == R.id.main_player
 
                 optionsMenu?.findItem(R.id.share)?.isVisible =
-                    currentFragment == R.id.audio_player && showShareOption(
+                    currentFragment == R.id.main_player && showShareOption(
                         adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
                     )
 
