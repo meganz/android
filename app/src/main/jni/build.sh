@@ -72,6 +72,13 @@ ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
 ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
 
+CRASHLYTICS=crashlytics
+CRASHLYTICS_DOWNLOAD_URL=https://raw.githubusercontent.com/firebase/firebase-android-sdk/master/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
+CRASHLYTICS_DOWNLOAD_URL_C=https://raw.githubusercontent.com/firebase/firebase-android-sdk/8f02834e94f8b24a7cf0f777562cad73c6b9a40f/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
+CRASHLYTICS_SOURCE_FILE=crashlytics.h
+CRASHLYTICS_SOURCE_FILE_C=crashlyticsC.h
+CRASHLYTICS_DEST_PATH=mega/sdk/third_party
+
 SODIUM=sodium
 SODIUM_VERSION=1.0.18
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
@@ -218,6 +225,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL}
     rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
     rm -rf ${CURL}/ares
+    rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
+    rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
@@ -239,6 +248,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL_SOURCE_FILE}
     rm -rf ${CURL}/${ARES_SOURCE_FILE}
     rm -rf ${CURL}/${CURL_SOURCE_FILE}.ready
+    rm -rf ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
@@ -381,6 +391,19 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
 echo "* cURL with c-ares is ready"
+
+echo "* Setting up crashlytics"
+if [ ! -f ${CURL_SOURCE_FOLDER}/crashlytics.ready ]; then
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
+
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch; then
+        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch
+    fi
+
+    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
+fi
+echo "* crashlytics is ready"
 
 echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
