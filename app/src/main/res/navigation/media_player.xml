@@ -2,10 +2,10 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/audio_player"
-    app:startDestination="@id/audio_player">
+    android:id="@+id/media_player"
+    app:startDestination="@id/main_player">
     <fragment
-        android:id="@+id/audio_player"
+        android:id="@+id/main_player"
         android:name="mega.privacy.android.app.mediaplayer.MediaPlayerFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_player">

@@ -22,7 +22,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
+import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -56,7 +56,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    private lateinit var binding: ActivityAudioPlayerBinding
+    private lateinit var binding: ActivityMediaPlayerBinding
     private val viewModel: MediaPlayerViewModel by viewModels()
 
     private lateinit var actionBar: ActionBar
@@ -117,7 +117,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             nodeSaver.restoreState(savedInstanceState)
         }
 
-        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         changeStatusBarColor(this, window, R.color.black)
 
@@ -184,7 +184,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             when (dest.id) {
-                R.id.audio_player -> {
+                R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
                 }
@@ -271,15 +271,15 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 toggleAllMenuItemsVisibility(false)
                 searchMenuItem?.isVisible = true
             }
-            R.id.audio_player, R.id.track_info -> {
+            R.id.main_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
                     toggleAllMenuItemsVisibility(false)
 
                     optionsMenu?.findItem(R.id.properties)?.isVisible =
-                        currentFragment == R.id.audio_player
+                        currentFragment == R.id.main_player
 
                     optionsMenu?.findItem(R.id.share)?.isVisible =
-                        currentFragment == R.id.audio_player
+                        currentFragment == R.id.main_player
 
                     return
                 }
@@ -306,10 +306,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 optionsMenu?.findItem(R.id.save_to_device)?.isVisible = true
 
                 optionsMenu?.findItem(R.id.properties)?.isVisible =
-                    currentFragment == R.id.audio_player
+                    currentFragment == R.id.main_player
 
                 optionsMenu?.findItem(R.id.share)?.isVisible =
-                    currentFragment == R.id.audio_player && showShareOption(
+                    currentFragment == R.id.main_player && showShareOption(
                         adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
                     )
 
