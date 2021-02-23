@@ -922,36 +922,36 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	void setColorFilterWhite () {
         int color = ContextCompat.getColor(this,R.color.white_alpha_087);
-		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
 
-		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		toolbar.setOverflowIcon(drawableDots);
 
 		if (shareMenuItem != null) {
-			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			shareMenuItem.setIcon(drawableShare);
 		}
 		if (sendFileMenuItem != null) {
-			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			sendFileMenuItem.setIcon(drawableSend);
 		}
 	}
 
 	void setColorFilterBlack () {
         int color = ContextCompat.getColor(this,R.color.grey_087_white_087);
-		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
 
-		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		toolbar.setOverflowIcon(drawableDots);
 
 		if (shareMenuItem != null) {
-			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			shareMenuItem.setIcon(drawableShare);
 		}
 		if (sendFileMenuItem != null) {
-			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			sendFileMenuItem.setIcon(drawableSend);
 		}
 	}
@@ -2130,7 +2130,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         error_layout.setVisibility(View.GONE);
         
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2147,7 +2147,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
                 }
             }
         });
@@ -2161,7 +2161,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					logDebug("actionId is IME_ACTION_DONE");
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2204,7 +2204,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             {
                 String value = input.getText().toString().trim();
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
