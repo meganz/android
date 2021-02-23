@@ -18,7 +18,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -662,8 +661,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
         Window window = getWindow();
         window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

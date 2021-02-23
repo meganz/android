@@ -12,7 +12,6 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
         android:fitsSystemWindows="true">
 
         <RelativeLayout
@@ -72,7 +71,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:background="@android:color/transparent"
                     android:visibility="gone">
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -96,8 +94,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:background="@android:color/transparent">
+                    android:layout_alignParentEnd="true">
 
                     <FrameLayout
                         android:id="@+id/full_screen_fragment"
@@ -407,8 +404,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="60dp"
                     android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="110dp"
-                    android:background="@android:color/transparent">
+                    android:layout_marginBottom="110dp">
 
                     <FrameLayout
                         android:id="@+id/small_camera_fragment"
@@ -592,7 +588,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginEnd="36dp"
-                    android:background="@android:color/transparent"
                     android:gravity="bottom|center_horizontal">
 
                     <!-- VIDEO -->
