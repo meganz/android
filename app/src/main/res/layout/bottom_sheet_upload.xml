@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/upload_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -113,7 +114,8 @@
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <ImageView
                     android:id="@+id/scan_document"
@@ -123,19 +125,20 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_b_scan_document"
+                    android:src="@drawable/ic_scan_document"
                     android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/scan_document_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/menu_scan_document"
                     android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    />
             </LinearLayout>
 
             <LinearLayout

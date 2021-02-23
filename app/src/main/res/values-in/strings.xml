@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA menyediakan penyimpanan dan chat cloud terenkripsi yang dikendalikan oleh pengguna melalui browser web standar, bersama dengan aplikasi khusus untuk perangkat seluler. Tidak seperti penyedia penyimpanan cloud lainnya, data Anda dienkripsi dan didekripsi oleh perangkat klien Anda saja dan tidak pernah oleh kami.\n\nUnggah file Anda dari ponsel cerdas atau tablet kemudian cari, simpan, unduh, streaming, lihat, bagikan, ubah nama atau hapus file Anda kapan saja, dari perangkat apa pun, di mana saja. Bagikan folder dengan kontak Anda dan lihat pembaruan mereka secara real time. Proses enkripsi berarti kita tidak dapat mengakses atau mereset kata sandi Anda sehingga Anda HARUS mengingatnya (kecuali Anda telah memulihkan Recovery Key) atau Anda akan kehilangan akses ke file tersimpan Anda.\n\nEnd-to-end yang dienkripsi pengguna Obrolan video MEGA memungkinkan privasi total, dan telah tersedia melalui peramban sejak 2016. Aplikasi ini telah diperluas ke aplikasi seluler kami, dengan riwayat obrolan dapat diakses di beberapa perangkat. Pengguna juga dapat dengan mudah menambahkan file ke obrolan dari MEGA Cloud Drive mereka.\n\nMEGA menawarkan penyimpanan gratis 50 GB yang murah hati untuk semua pengguna terdaftar dengan pencapaian bonus, dan menawarkan paket berbayar dengan batas yang jauh lebih tinggi:\n\n\nLangganan Pro Lite: 4,99 € per bulan atau 49,99 € per tahun memberi Anda 400 GB ruang penyimpanan dan 1 TB kuota transfer per bulan.\nLangganan Pro I: 9,99 € per bulan atau 99,99 € per tahun memberi Anda 2 TB ruang penyimpanan dan 2 TB kuota transfer per bulan.\nLangganan Pro II: 19,99 € per bulan atau 199,99 € per tahun memberi Anda 8 TB ruang penyimpanan dan 8 TB kuota transfer per bulan.\nLangganan Pro III: 29,99 € per bulan atau 299,99 € per tahun memberi Anda 16 TB ruang penyimpanan dan 16 TB kuota transfer per bulan.\n\nLangganan diperbarui secara otomatis untuk periode langganan berturut-turut dengan durasi yang sama dan pada harga yang sama dengan periode awal yang dipilih. Untuk mengelola langganan Anda, cukup klik ikon Play Store di perangkat seluler Anda, masuk dengan Google ID Anda (jika Anda belum melakukannya) lalu klik aplikasi MEGA. Anda akan dapat mengelola langganan Anda di sana.\n\nIzin Aplikasi:\nWRITE_EXTERNAL_STORAGE -> Unduh file Anda dari MEGA ke perangkat Anda dan unggah file dari perangkat Anda ke MEGA\nCAMERA -> Ambil gambar dan unggah foto Anda ke MEGA\nREAD_CONTACTS -> Tambah dengan mudah kontak dari perangkat Anda sebagai kontak MEGA\nRECORD_AUDIO dan CAPTURE_VIDEO_OUTPUT (mikrofon dan kamera) -> MEGA menyediakan untuk panggilan audio / video terenkripsi end-to-end\n\n\nUntuk meningkatkan kepercayaan pengguna terhadap sistem MEGA, semua kode sisi klien diterbitkan, sehingga peneliti keamanan yang tertarik dapat mengevaluasi proses enkripsi. Kode aplikasi seluler kami berada di: https://github.com/meganz/android\n\nUntuk info lebih lanjut, silakan periksa situs web kami:\nLihat https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA adalah penyimpanan Cloud dengan perlindungan privasi yang sangat kuat</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">dari</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Keluar</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Unggah</string>
     <string name="action_create_folder" context="Menu item">Buat folder baru</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Buka link</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Buka link</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">Pengaturan</string>
     <string name="action_search" context="Search button">Cari</string>
     <string name="action_search_country" context="Select country page title">Pilih negara</string>
-    <string name="action_play" context="Search button">Mulai</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">Mulai</string>
     <string name="action_pause" context="Search button">Hentikan sementara</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
     <string name="action_sort_by" context="Menu item">URUTKAN BERDASAR</string>
@@ -205,7 +207,7 @@
     -->
     <string name="cancel_transfer_confirmation">Batalkan pemindahan ini?</string>
     <string name="cancel_all_transfer_confirmation">Batalkan semua pemindahan?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Batalkan semua</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">Batalkan semua</string>
 
     <plurals name="cancel_selected_transfers">
         <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">Transfer yang dipilih akan dibatalkan.</item>
@@ -227,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Kontak</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Kontak [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Tidak [/B] ada [A]request yang terkirim[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Tidak [/B]ada [A]request yang diterima[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Tidak [/B] ada [A]request yang terkirim[/A][B].[/B]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Tidak [/B]ada [A]request yang diterima[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Pemindahan</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Akun Saya</string>
@@ -266,7 +268,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">Ukuran</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">Terakhir dimodifikasi</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Ditambahkan</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">Ditambahkan</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -283,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Abaikan</string>
     <string name="contact_decline" context="option to decline a contact invitation">Tolak</string>
     <string name="contact_accept" context="option to accept a contact invitation">Terima</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Kontak info</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Kontak info</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -362,7 +364,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Tautan ini tidak akan tersedia untuk umum lagi.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Ubah nama</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Buka link</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Buka link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Bukan</string>
     <string name="context_renaming" context="while renaming a file or folder">Mengubah nama</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Mempersiapkan file</string>
@@ -685,7 +687,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Hapus File Offilne</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Buka file saat diunduh</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Hapus akun anda</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Hapus akun</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Sekarang memakai %s</string>
@@ -964,7 +965,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Reset password</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Masukkan Recovery Key Anda di bawah ini</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Password terubah!</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Kata sandi anda telah dirubah.</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Parkir akun</string>
     <string name="park_account_button" context="Button to park an account">Parkir</string>
@@ -1147,12 +1148,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Sampai saya menyalakannya kembali</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Notifikasi obrolan akan dimatikan untuk %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Notifikasi obrolan akan dimatikan hingga %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Notifikasi obrolan akan dimatikan hingga %1$s pukul %2$s</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Notifikasi obrolan mati</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Notifikasi obrolan nyala</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Matikan hingga %1$s</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Pemberitahuan</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Pesan suara</string>
@@ -1161,8 +1171,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Nada dering panggilan</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Suara notifikasi</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Setelah dibersihkan, tidak ada %s atau Anda akan dapat melihat pesan obrolan ini.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Hapus</string>
     <!--
@@ -1225,10 +1233,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">Jika Anda pergi, Anda tidak akan lagi memiliki akses untuk membaca atau mengirim pesan.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Tinggalkan group chat?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">Semua pesan dan media dalam percakapan ini akan dihapus.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Hapus riwayat?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">Peserta sudah masuk dalam obrolan kelompok ini</string>
 
@@ -1592,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">Kontak</string>
     <string name="attachment_upload_panel_photo">Dari perangkat</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Batalkan akun</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Jika Anda membatalkan akun Anda, Anda tidak akan dapat mengakses data akun Anda, kontak atau percakapan MEGA Anda. \n Anda tidak akan dapat membatalkan tindakan ini.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Batalkan akun</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Jika Anda membatalkan akun Anda, Anda tidak akan dapat mengakses data akun Anda, kontak atau percakapan MEGA Anda. \n Anda tidak akan dapat membatalkan tindakan ini.</string>
     <string name="delete_button" context="menu item">Hapus</string>
 
     <string name="file_properties_info_info_file">Info</string>
@@ -1626,14 +1630,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Set up upload otomatis</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Diam</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">Diam</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">pesan</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">mulai dari</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Folder Berbagi baru</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Kontak request baru</string>
-
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Hapus riwayat ngobrol</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Hapus kontak</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Notifikasi Chat</string>
@@ -1722,8 +1726,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">File baru</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">Nama file</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Link nama</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">Link URL</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Link nama</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Link URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">SUBYEK</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">KONTEN</string>
@@ -1740,7 +1744,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Kata sandi baru tidak bisa sama dengan kata sandi lama</string>
 
     <string name="action_search_by_date" context="Menu item">Cari berdasarkan tanggal</string>
-    <string name="general_apply" context="title of a button to apply search by date">Terapkan</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">Terapkan</string>
     <string name="general_search_month" context="title of a button to apply search by month">Bulan lalu</string>
     <string name="general_search_year" context="title of a button to apply search by year">Tahun lalu</string>
 
@@ -2044,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Kontak request baru</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Tidak aktif[/B][A] Transfer[/A][B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Tidak menyelesaikan[/B][A] Transfer[/A][B].[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Kosongkan[/B][A] Folder [/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Tidak aktif[/B][A] Transfer[/A][B].[/B]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Tidak menyelesaikan[/B][A] Transfer[/A][B].[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]Kosongkan[/B][A] Folder [/A][B].[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Tulis pesan ke %s&#8230;</string>
@@ -2589,8 +2593,8 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d versi tidak dihapus</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d versi tidak dihapus</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%d versi tidak dihapus</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%d versi tidak dihapus</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Anda tidak memiliki kontak MEGA. Silakan undang teman dari bagian Kontak.</string>
@@ -2832,7 +2836,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Anda harus segera bertindak untuk menyimpan data anda.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 hari</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1 hari</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d hari</item>
     </plurals>
 
@@ -2900,6 +2904,57 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Anda telah mencapai batas maksimum %d reaksi.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Pesan ini telah mencapai batas maksimum %d reaksi.</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Hapus riwayat ngobrol</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Membatalkan</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Secara otomatis menghapus pesan yang lebih lama dari:</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 tahun</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">jam</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">jam</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">Hari</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">hari</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">minggu</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">minggu</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">Bulan</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">bulan</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 jam</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 bulan</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Pilih transfer</string>
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">Perubahan prioritas transfer \'%1$s\' gagal.</string>
