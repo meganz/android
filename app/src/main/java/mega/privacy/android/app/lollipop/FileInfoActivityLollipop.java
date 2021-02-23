@@ -329,6 +329,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private int currentColorFilter;
+    private boolean pendingToSetIconsColorFilter;
 
     private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
@@ -901,20 +902,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         setIconResource();
 
-        if(savedInstanceState != null){
-            long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
-            if(handle == INVALID_HANDLE || node == null){
-                return;
-            }
-            ArrayList<MegaShare> list = megaApi.getOutShares(node);
-            for (MegaShare share: list) {
-                if(handle == share.getNodeHandle()){
-                    selectedShare = share;
-                    break;
-                }
-            }
-        }
-
         registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
@@ -943,6 +930,20 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             /*Folder*/
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
             setActionBarDrawablesColorFilter(Color.BLACK);
+        }
+
+        if(savedInstanceState != null){
+            long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
+            if(handle == INVALID_HANDLE || node == null){
+                return;
+            }
+            ArrayList<MegaShare> list = megaApi.getOutShares(node);
+            for (MegaShare share: list) {
+                if(handle == share.getNodeHandle()){
+                    selectedShare = share;
+                    break;
+                }
+            }
         }
 	}
 
@@ -1029,6 +1030,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat);
 
+        if (pendingToSetIconsColorFilter) {
+            setIconsColorFilter();
+        }
+
         if (adapterType != OFFLINE_ADAPTER) {
             MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
@@ -1038,19 +1043,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                     deleteMenuItem.setVisible(true);
                 } else {
-                    sendToChatMenuItem.setVisible(!node.isFolder());
-
-                    if (node.isExported()) {
-                        editLinkMenuItem.setVisible(true);
-                        removeLinkMenuItem.setVisible(true);
-                    } else {
-                        getLinkMenuItem.setVisible(true);
+                    if (!node.isFolder()) {
+                        sendToChatMenuItem.setVisible(true);
+                        sendToChatMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                     }
 
                     if (from == FROM_INCOMING_SHARES) {
                         downloadMenuItem.setVisible(true);
                         downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                         leaveMenuItem.setVisible(firstIncomingLevel);
+                        leaveMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                         copyMenuItem.setVisible(true);
 
                         switch (megaApi.getAccess(node)) {
@@ -1066,7 +1068,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     } else {
                         downloadMenuItem.setVisible(true);
-                        shareMenuItem.setVisible(node.isFolder());
+
+                        if (node.isFolder()) {
+                            shareMenuItem.setVisible(true);
+                            shareMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        }
+
+                        if (node.isExported()) {
+                            editLinkMenuItem.setVisible(true);
+                            removeLinkMenuItem.setVisible(true);
+                            removeLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        } else {
+                            getLinkMenuItem.setVisible(true);
+                            getLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        }
+
                         rubbishMenuItem.setVisible(true);
                         renameMenuItem.setVisible(true);
                         moveMenuItem.setVisible(true);
@@ -1089,39 +1105,49 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             return;
         }
 
+        currentColorFilter = color;
+
         upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         aB.setHomeAsUpIndicator(upArrow);
 
         drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(drawableDots);
 
+        setIconsColorFilter();
+    }
+
+    /**
+     * Sets the toolbar icons color.
+     */
+    public void setIconsColorFilter() {
         if (removeLinkMenuItem == null || getLinkMenuItem == null || downloadMenuItem == null
                 || shareMenuItem == null || leaveMenuItem == null || copyMenuItem == null
                 || sendToChatMenuItem == null) {
+            pendingToSetIconsColorFilter = true;
             return;
         }
 
-        currentColorFilter = color;
+        pendingToSetIconsColorFilter = false;
 
-        drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableRemoveLink.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         removeLinkMenuItem.setIcon(drawableRemoveLink);
 
-        drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableLink.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         getLinkMenuItem.setIcon(drawableLink);
 
-        drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableDownload.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         downloadMenuItem.setIcon(drawableDownload);
 
-        drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableShare.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         shareMenuItem.setIcon(drawableShare);
 
-        drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableLeave.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         leaveMenuItem.setIcon(drawableLeave);
 
-        drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableCopy.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         copyMenuItem.setIcon(drawableCopy);
 
-        drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableChat.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_ATOP);
         sendToChatMenuItem.setIcon(drawableChat);
     }
 
