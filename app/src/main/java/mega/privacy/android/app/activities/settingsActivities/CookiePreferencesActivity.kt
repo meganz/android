@@ -18,7 +18,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
         super.onCreate(savedInstanceState)
         unregisterReceiver(cookieSettingsReceiver) // Don't need to show the confirmation snackbar here
 
-        setTitle(getString(R.string.settings_about_cookie_settings))
+        setTitle(R.string.settings_about_cookie_settings)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         replaceFragment(CookieSettingsFragment())

@@ -41,7 +41,7 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTitle(getString(R.string.settings_advanced_features));
+        setTitle(R.string.settings_advanced_features);
 
         sttAdvanced = new SettingsAdvancedFragment();
         replaceFragment(sttAdvanced);

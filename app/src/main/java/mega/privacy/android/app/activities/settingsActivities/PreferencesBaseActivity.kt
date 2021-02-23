@@ -2,12 +2,14 @@ package mega.privacy.android.app.activities.settingsActivities
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.lollipop.PinActivityLollipop
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
 
@@ -38,8 +40,9 @@ open class PreferencesBaseActivity : PinActivityLollipop() {
         return true
     }
 
-    protected fun setTitle(title: String) {
-        supportActionBar?.title = title.toUpperCase(Locale.getDefault())
+    override fun setTitle(@StringRes titleId: Int) {
+        supportActionBar?.title = StringResourcesUtils.getString(titleId)
+            .toUpperCase(Locale.getDefault())
     }
 
     protected fun replaceFragment(fragment: SettingsBaseFragment) {

@@ -13,7 +13,7 @@ public class DownloadPreferencesActivity extends PreferencesBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTitle(getString(R.string.download_location));
+        setTitle(R.string.download_location);
 
         sttDownload = new DownloadSettingsFragment();
         replaceFragment(sttDownload);

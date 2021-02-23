@@ -123,7 +123,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTitle(getString(R.string.section_photo_sync));
+        setTitle(R.string.section_photo_sync);
         sttCameraUploads = new SettingsCameraUploadsFragment();
         replaceFragment(sttCameraUploads);
 
