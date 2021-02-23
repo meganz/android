@@ -167,6 +167,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
@@ -6738,6 +6739,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             if (pendingMsg.getTransferTag() != INVALID_ID) {
                 MegaTransfer transfer = megaApi.getTransferByTag(pendingMsg.getTransferTag());
+                if (transfer == null) {
+                    transfer = findTransferFromPendingMessage(pendingMsg);
+                }
 
                 if (transfer == null || transfer.getState() == MegaTransfer.STATE_FAILED) {
                     dbH.updatePendingMessageOnTransferFinish(pendingMsg.getId(), INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
@@ -6753,6 +6757,44 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             appendMessagePosition(msg);
         }
+    }
+
+    /**
+     * If a transfer has been resumed, its tag is not the same as the initial one.
+     * This method gets the transfer with the new tag if exists with the pending message identifier.
+     *
+     * @param pendingMsg Pending message from which the transfer has to be found.
+     * @return The transfer if exist, null otherwise.
+     */
+    private MegaTransfer findTransferFromPendingMessage(PendingMessageSingle pendingMsg) {
+        if (megaApi.getNumPendingUploads() == 0) {
+            logDebug("There is not any upload in progress.");
+            return null;
+        }
+
+        MegaTransferData transferData = megaApi.getTransferData(null);
+        if (transferData == null) {
+            logDebug("transferData is null.");
+            return null;
+        }
+
+        for (int i = 0; i < transferData.getNumUploads(); i++) {
+            MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+            if (transfer == null) {
+                continue;
+            }
+
+            String data = transfer.getAppData();
+            if (isTextEmpty(data) || !data.contains(APP_DATA_CHAT) || data.contains(APP_DATA_VOICE_CLIP)) {
+                continue;
+            }
+
+            if (pendingMsg.getId() == getPendingMessageIdFromAppData(data)) {
+                return transfer;
+            }
+        }
+
+        return null;
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow, int currentIndex){

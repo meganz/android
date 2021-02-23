@@ -1524,19 +1524,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	/**
-	 * Gets the identifier of a pending message from the appData of its transfer.
-	 *
-	 * @param appData AppData of the transfer in question.
-	 * @return The identifier of the pending message.
-	 */
-	private long getPendingMessageIdFromAppData(String appData) {
-		String[] parts = appData.split(APP_DATA_INDICATOR);
-		String idFound = parts[parts.length - 1];
-
-		return Long.parseLong(idFound);
-	}
-
-	/**
 	 * Checks if there are chat uploads in progress, regardless of the voice clips.
 	 * @return True if there are chat uploads in progress, false otherwise.
 	 */
