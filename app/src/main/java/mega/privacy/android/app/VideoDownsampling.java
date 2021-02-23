@@ -412,8 +412,15 @@ public class VideoDownsampling {
                     videoDecoder.queueInputBuffer(decoderInputBufferIndex,0, size, presentationTime, videoExtractor.getSampleFlags());
                 }
                 videoExtractorDone = !videoExtractor.advance();
-                if (videoExtractorDone)
-                    videoDecoder.queueInputBuffer(decoderInputBufferIndex,0, 0, 0,  MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                if (videoExtractorDone) {
+                    decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(-1);
+                    videoDecoder.queueInputBuffer(
+                            decoderInputBufferIndex,
+                            0,
+                            0,
+                            0,
+                            MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                }
                 break;
             }
 
@@ -431,8 +438,15 @@ public class VideoDownsampling {
                     audioDecoder.queueInputBuffer(decoderInputBufferIndex, 0, size, presentationTime, audioExtractor.getSampleFlags());
 
                 audioExtractorDone = !audioExtractor.advance();
-                if (audioExtractorDone)
-                    audioDecoder.queueInputBuffer(decoderInputBufferIndex, 0, 0,0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                if (audioExtractorDone) {
+                    decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(-1);
+                    audioDecoder.queueInputBuffer(
+                            decoderInputBufferIndex,
+                            0,
+                            0,
+                            0,
+                            MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                }
 
                 break;
             }

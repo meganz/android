@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
 import android.view.View
+import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.activities.WebViewActivity
@@ -66,7 +67,7 @@ class PsaViewHolder(
      *
      * @return if the PSA view is visible
      */
-    fun visible() = binding.root.visibility == View.VISIBLE
+    fun visible() = binding.root.isVisible
 
     /**
      * Get height of the PSA view.

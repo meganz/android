@@ -50,7 +50,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -89,21 +88,6 @@ public class ChatController {
         }
     }
 
-    public void leaveChat(MegaChatRoom chat){
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.leaveChat(chat.getChatId(), (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            context.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_LEFT_CHAT)
-                    .setAction(ACTION_LEFT_CHAT)
-                    .putExtra(CHAT_ID, chat.getChatId()));
-            ((GroupChatInfoActivityLollipop) context).finish();
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);
-        }
-    }
-
     public void selectChatsToAttachContact(MegaUser contact){
         logDebug("selectChatsToAttachContact");
 
@@ -133,18 +117,6 @@ public class ChatController {
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-    }
-
-    public void leaveChat(long chatId){
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.leaveChat(chatId, (GroupChatInfoActivityLollipop) context);
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.leaveChat(chatId, (ChatActivityLollipop) context);
         }
     }
 
@@ -336,7 +308,7 @@ public class ChatController {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                showSnackbar(context, getCorrectStringDependingOnCalendar(option));
                 break;
 
             default:

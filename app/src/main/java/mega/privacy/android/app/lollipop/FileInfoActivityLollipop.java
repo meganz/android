@@ -87,6 +87,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.LocationInfo;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1747,9 +1748,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			int stringMessageID;
-            if (getPrimaryFolderHandle() == handle) {
+            if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
                 stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
-            } else if (getSecondaryFolderHandle() == handle) {
+            } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
                 stringMessageID = R.string.confirmation_move_mu_folder_to_rubbish;
             } else {
                 stringMessageID = R.string.confirmation_move_to_rubbish;
@@ -2694,7 +2695,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             String megaUser = listContacts.get(position).getUser();
             MegaUser contact = megaApi.getContact(megaUser);
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                Intent i = new Intent(this,ContactInfoActivityLollipop.class);
+                Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, megaUser);
                 startActivity(i);
             }

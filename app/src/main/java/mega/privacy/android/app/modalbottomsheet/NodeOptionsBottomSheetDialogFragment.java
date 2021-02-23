@@ -96,13 +96,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
             if (context instanceof ManagerActivityLollipop) {
-                drawerItem = ManagerActivityLollipop.getDrawerItem();
+                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
             }
             mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
         } else {
             if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
-                drawerItem = ManagerActivityLollipop.getDrawerItem();
+                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
             }
         }
 

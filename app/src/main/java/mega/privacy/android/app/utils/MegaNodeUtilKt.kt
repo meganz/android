@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -15,6 +14,7 @@ import mega.privacy.android.app.listeners.RenameNodeListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -208,13 +208,13 @@ class MegaNodeUtilKt {
                 val location = when {
                     grandParentName != null
                             && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR -> {
-                        app.getString(R.string.section_saved_for_offline_new)
+                        getString(R.string.section_saved_for_offline_new)
                     }
                     parentName == OfflineUtils.OFFLINE_DIR -> {
-                        app.getString(R.string.section_saved_for_offline_new)
+                        getString(R.string.section_saved_for_offline_new)
                     }
                     else -> {
-                        parentName + " (" + app.getString(R.string.section_saved_for_offline_new) + ")"
+                        parentName + " (" + getString(R.string.section_saved_for_offline_new) + ")"
                     }
                 }
 
@@ -232,24 +232,24 @@ class MegaNodeUtilKt {
                 val location = when {
                     fromIncomingShare -> {
                         if (parent != null) {
-                            parent.name + " (" + app.getString(R.string.tab_incoming_shares) + ")"
+                            parent.name + " (" + getString(R.string.tab_incoming_shares) + ")"
                         } else {
-                            app.getString(R.string.tab_incoming_shares)
+                            getString(R.string.tab_incoming_shares)
                         }
                     }
                     parent == null -> {
-                        app.getString(R.string.tab_incoming_shares)
+                        getString(R.string.tab_incoming_shares)
                     }
                     inCloudDrive -> {
                         if (topAncestor.handle == parent.handle) {
-                            getTranslatedNameForParentNode(megaApi, app, topAncestor)
+                            getTranslatedNameForParentNode(megaApi, topAncestor)
                         } else {
                             parent.name + " (" +
-                                    getTranslatedNameForParentNode(megaApi, app, topAncestor) + ")"
+                                    getTranslatedNameForParentNode(megaApi, topAncestor) + ")"
                         }
                     }
                     else -> {
-                        parent.name + " (" + app.getString(R.string.tab_incoming_shares) + ")"
+                        parent.name + " (" + getString(R.string.tab_incoming_shares) + ")"
                     }
                 }
 
@@ -302,13 +302,12 @@ class MegaNodeUtilKt {
 
         private fun getTranslatedNameForParentNode(
             megaApi: MegaApiAndroid,
-            context: Context,
             parent: MegaNode
         ): String {
             return when (parent.handle) {
-                megaApi.rootNode.handle -> context.getString(R.string.section_cloud_drive)
-                megaApi.rubbishNode.handle -> context.getString(R.string.section_rubbish_bin)
-                megaApi.inboxNode.handle -> context.getString(R.string.section_inbox)
+                megaApi.rootNode.handle -> getString(R.string.section_cloud_drive)
+                megaApi.rubbishNode.handle -> getString(R.string.section_rubbish_bin)
+                megaApi.inboxNode.handle -> getString(R.string.section_inbox)
                 else -> parent.name
             }
         }

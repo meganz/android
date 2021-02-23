@@ -125,6 +125,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
+        private int currentTab;
+
+        public BaseActionBarCallBack (int currentTab) {
+            this.currentTab = currentTab;
+        }
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -132,6 +137,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             inflater.inflate(R.menu.cloud_storage_action, menu);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.hideFabButton();
+                managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
                 managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
@@ -246,6 +252,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             adapter.setMultipleSelect(false);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.showFabButton();
+                managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
                 managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }

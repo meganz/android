@@ -29,6 +29,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
@@ -39,7 +40,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaTransfer.STATE_COMPLETING;
 
 
-public class TransfersFragmentLollipop extends TransfersBaseFragment implements MegaTransfersLollipopAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionInterface, MoveTransferInterface {
+public class TransfersFragmentLollipop extends TransfersBaseFragment implements MegaTransfersLollipopAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionCallback, MoveTransferInterface {
 
 	private MegaTransfersLollipopAdapter adapter;
 
@@ -445,6 +446,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	@Override
 	public boolean areAllTransfersSelected() {
 		return adapter != null && adapter.getSelectedItemsCount() == adapter.getItemCount();
+	}
+
+	@Override
+	public void hideTabs(boolean hide) {
+		managerActivity.hideTabs(hide, PENDING_TAB);
 	}
 
 	@Override

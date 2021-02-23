@@ -64,6 +64,8 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -236,6 +238,16 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
+
+    @Override
+    public void scanDocument() {
+        String[] saveDestinations = {
+				StringResourcesUtils.getString(R.string.section_cloud_drive),
+				StringResourcesUtils.getString(R.string.section_chat)
+        };
+        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
+        startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
+    }
 
 	@Override
 	public void showNewFolderDialog() {
@@ -1151,8 +1163,20 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			} else {
 				logWarning("TAKE_PHOTO_CODE--->ERROR!");
 			}
-
-		}
+        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
+            if (resultCode == RESULT_OK) {
+                String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
+                Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
+                if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
+                } else {
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                }
+                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
+                fileIntent.setType(intent.getType());
+                startActivity(fileIntent);
+            }
+        }
 	}
 
 	public void onIntentProcessed(List<ShareInfo> infos) {
