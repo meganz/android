@@ -4006,26 +4006,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return pendMsg;
 	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage   Identifier of the pending message.
+	 * @param transferTag Identifier of the transfer.
+	 */
 	public void updatePendingMessageOnTransferStart(long idMessage, int transferTag) {
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag);
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_UPLOADING);
-		String where = KEY_ID + "=" +idMessage;
-
-		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-        logDebug("Rows updated: " + rows);
+		updatePendingMessage(idMessage, transferTag, INVALID_OPTION, PendingMessageSingle.STATE_UPLOADING);
 	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage  Identifier of the pending message.
+	 * @param nodeHandle Handle of the node already uploaded.
+	 * @param state      State of the pending message.
+	 */
 	public void updatePendingMessageOnTransferFinish(long idMessage, String nodeHandle, int state) {
+		updatePendingMessage(idMessage, INVALID_ID, nodeHandle, state);
+	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage   Identifier of the pending message.
+	 * @param transferTag Identifier of the transfer.
+	 * @param nodeHandle  Handle of the node already uploaded.
+	 * @param state       State of the pending message.
+	 */
+	public void updatePendingMessage(long idMessage, int transferTag, String nodeHandle, int state) {
 		ContentValues values = new ContentValues();
+
+		if (transferTag != INVALID_ID) {
+			values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag);
+		}
+
 		values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle));
 		values.put(KEY_PENDING_MSG_STATE, state);
-		String where = KEY_ID + "=" +idMessage;
+		String where = KEY_ID + "=" + idMessage;
 
-		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-        logDebug("Rows updated: " + rows);
+		db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
 	}
 
 	public void updatePendingMessageOnAttach(long idMessage, String temporalId, int state) {

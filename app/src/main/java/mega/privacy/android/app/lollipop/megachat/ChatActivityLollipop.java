@@ -6744,14 +6744,15 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 }
 
                 if (transfer == null || transfer.getState() == MegaTransfer.STATE_FAILED) {
-                    dbH.updatePendingMessageOnTransferFinish(pendingMsg.getId(), INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
+                    int tag = transfer != null ? transfer.getTag() : INVALID_ID;
+                    dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
                     pendingMsg.setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
                 } else if (transfer.getState() == MegaTransfer.STATE_COMPLETED || transfer.getState() == MegaTransfer.STATE_CANCELLED) {
-                    dbH.updatePendingMessageOnTransferFinish(pendingMsg.getId(), INVALID_OPTION, PendingMessageSingle.STATE_SENT);
+                    dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageSingle.STATE_SENT);
                     continue;
                 }
             } else if (pendingMsg.getState() == PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER) {
-                dbH.updatePendingMessageOnTransferFinish(pendingMsg.getId(), INVALID_OPTION, PendingMessageSingle.STATE_PREPARING);
+                dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageSingle.STATE_PREPARING);
                 pendingMsg.setState(PendingMessageSingle.STATE_PREPARING);
             }
 
