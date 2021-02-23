@@ -22,6 +22,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import javax.inject.Inject
 
@@ -36,13 +37,29 @@ class CookieDialogHandler @Inject constructor(
 
     private val disposable = CompositeDisposable()
     private var dialog: AlertDialog? = null
+    private var hasBeenPaused = false
 
     /**
-     * Show cookie dialog if needed based on SDK flag and existing cookie settings.
+     * Show cookie dialog if needed.
      *
      * @param context   View context for the Dialog to be shown.
      */
     fun showDialogIfNeeded(context: Context) {
+        checkDialogSettings { showDialog ->
+            if (showDialog) {
+                createDialog(context)
+            } else {
+                dialog?.dismiss()
+            }
+        }
+    }
+
+    /**
+     * Check SDK flag and existing cookie settings.
+     *
+     * @param action    Action to be invoked with the Boolean result
+     */
+    private fun checkDialogSettings(action: (Boolean) -> Unit) {
         disposable.clear()
 
         checkCookieBannerEnabledUseCase.check()
@@ -51,7 +68,7 @@ class CookieDialogHandler @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { showDialog ->
-                    if (showDialog) createDialog(context)
+                    action.invoke(showDialog)
                 },
                 onError = { error ->
                     LogUtil.logError(error.message)
@@ -66,16 +83,16 @@ class CookieDialogHandler @Inject constructor(
         dialog = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
-            .setPositiveButton(R.string.preference_cookies_accept) { _, _ ->
+            .setPositiveButton(StringResourcesUtils.getString(R.string.preference_cookies_accept)) { _, _ ->
                 acceptAllCookies(context)
             }
-            .setNegativeButton(R.string.settings_about_cookie_settings) { _, _ ->
+            .setNegativeButton(StringResourcesUtils.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
             }
             .create()
             .apply {
                 setOnShowListener {
-                    val message = context.getString(R.string.dialog_cookie_alert_message)
+                    val message = StringResourcesUtils.getString(R.string.dialog_cookie_alert_message)
                         .replace("[A]", "<a href='https://mega.nz/cookie'>")
                         .replace("[/A]", "</a>")
                         .toSpannedHtmlText()
@@ -102,6 +119,22 @@ class CookieDialogHandler @Inject constructor(
                     LogUtil.logError(error.message)
                 }
             )
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onResume() {
+        if (hasBeenPaused) {
+            checkDialogSettings { showDialog ->
+                if (!showDialog) dialog?.dismiss()
+            }
+
+            hasBeenPaused = false
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPause() {
+        hasBeenPaused = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

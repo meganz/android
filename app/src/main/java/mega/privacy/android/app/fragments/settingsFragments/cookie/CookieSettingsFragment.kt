@@ -19,6 +19,7 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.*
+import mega.privacy.android.app.utils.StringResourcesUtils
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment() {
@@ -68,15 +69,15 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
 
-        thirdPartyCookiesPreference.setSummaryText(getString(R.string.preference_cookies_thirdparty_summary))
-        thirdPartyCookiesPreference.setClickableText(getString(R.string.action_more_information)) {
+        thirdPartyCookiesPreference.setSummaryText(StringResourcesUtils.getString(R.string.preference_cookies_thirdparty_summary))
+        thirdPartyCookiesPreference.setClickableText(StringResourcesUtils.getString(R.string.action_more_information)) {
             showThirdPartyInfoDialog()
         }
 
-        policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
+        policiesPreference.setButton1(StringResourcesUtils.getString(R.string.preference_cookies_policies_cookie)) {
             openBrowser("https://mega.nz/cookie".toUri())
         }
-        policiesPreference.setButton2(getString(R.string.preference_cookies_policies_privacy)) {
+        policiesPreference.setButton2(StringResourcesUtils.getString(R.string.preference_cookies_policies_privacy)) {
             openBrowser("https://mega.nz/privacy".toUri())
         }
     }
