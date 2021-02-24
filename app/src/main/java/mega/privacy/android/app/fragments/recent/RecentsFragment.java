@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -140,7 +141,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
-        String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
+        String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
