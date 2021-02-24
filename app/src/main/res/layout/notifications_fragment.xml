@@ -33,7 +33,7 @@
                 android:fontFamily="sans-serif"
                 android:textAllCaps="true"
                 android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
 
