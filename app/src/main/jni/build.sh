@@ -29,7 +29,7 @@ if [ ! -d "${ANDROID_HOME}" ]; then
     echo "* ANDROID_HOME not set. Please download Android SDK and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk to point to your Android SDK installation path and try again."
     exit 1
 fi
-if [ ! -d "${ANDROID_HOME}" ]; then
+if [ ! -d "${JAVA_HOME}" ]; then
     echo "* JAVA_HOME not set. Please download JDK and export JAVA_HOME variable or create a link at ${HOME}/android-jdk to point to your JDK installation path and try again."
     exit 1
 fi
@@ -393,7 +393,7 @@ fi
 echo "* cURL with c-ares is ready"
 
 echo "* Setting up crashlytics"
-if [ ! -f ${CURL_SOURCE_FOLDER}/crashlytics.ready ]; then
+if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
     wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
     wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
 
