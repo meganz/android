@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:fontFamily="sans-serif"
+            android:textAllCaps="true"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             tools:text="@string/context_empty_offline" />

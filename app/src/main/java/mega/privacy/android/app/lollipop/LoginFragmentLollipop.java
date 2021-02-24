@@ -1520,6 +1520,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 logDebug("Click on button_login_login");
                 loginClicked = true;
                 backWhileLogin = false;
+                LoginActivityLollipop.isBackFromLoginPage = false;
                 onLoginClick(v);
                 break;
             }
