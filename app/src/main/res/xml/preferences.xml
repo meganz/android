@@ -104,7 +104,12 @@
 		android:title="@string/settings_help"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
-
+		<androidx.preference.Preference
+			android:key="settings_help_centre"
+			android:title="@string/settings_help_centre"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
 		<androidx.preference.Preference
 			android:key="settings_help_send_feedback"
 			android:title="@string/settings_help_preference"
