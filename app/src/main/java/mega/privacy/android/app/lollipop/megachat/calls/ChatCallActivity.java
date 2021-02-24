@@ -1837,7 +1837,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-        anotherCallTitle.setText(anotherChat.getTitle());
+        anotherCallTitle.setText(getTitleChat(anotherChat));
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
         anotherCallSubtitle.setAlpha(1f);
         if (isOnHold) {

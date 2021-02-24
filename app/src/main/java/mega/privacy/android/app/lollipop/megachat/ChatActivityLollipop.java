@@ -1582,7 +1582,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         setPreviewersView();
-        titleToolbar.setText(chatRoom.getTitle());
+        titleToolbar.setText(getTitleChat(chatRoom));
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
         muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
@@ -7604,7 +7604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                         if (initChat()) {
                             //Chat successfully initialized, now can rejoin
                             setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-                            titleToolbar.setText(chatRoom.getTitle());
+                            titleToolbar.setText(getTitleChat(chatRoom));
                             groupalSubtitleToolbar.setText(null);
                             setGroupalSubtitleToolbarVisibility(false);
 
