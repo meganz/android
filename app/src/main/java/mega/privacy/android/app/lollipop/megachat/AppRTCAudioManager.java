@@ -343,7 +343,7 @@ public class AppRTCAudioManager {
                 .build();
 
         logDebug("Vibration begins");
-        vibrator.vibrate(pattern, 2, audioAttributes);
+        vibrator.vibrate(pattern, 0, audioAttributes);
     }
 
     /**
