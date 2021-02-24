@@ -2309,7 +2309,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					// we need update fragmentLayout's layout params when player view is closed.
 					if (bNV.getVisibility() == View.VISIBLE) {
 						showBNVImmediate();
-						updateHomepageFabPosition();
 					}
 				});
 
@@ -6305,7 +6304,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.setShouldVisible(shouldVisible);
 
-			updateHomepageFabPosition();
+			handler.post(this::updateHomepageFabPosition);
 
 			return miniAudioPlayerController.visible();
 		}
@@ -7128,13 +7127,17 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@SuppressWarnings("unchecked")
     public <F extends Fragment> F getFragmentByType(Class<F> fragmentClass) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
+        Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (navHostFragment == null) {
+        	return null;
+		}
+
         for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
             if (fragment.getClass() == fragmentClass) {
                 return (F) fragment;
             }
         }
+
         return null;
     }
 
