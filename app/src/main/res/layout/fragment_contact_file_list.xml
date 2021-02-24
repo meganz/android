@@ -27,7 +27,7 @@
                 android:layout_below="@id/contact_file_list_empty_image"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/standard_margin"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
 
     </RelativeLayout>
 

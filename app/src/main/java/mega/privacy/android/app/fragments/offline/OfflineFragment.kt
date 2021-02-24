@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -268,7 +269,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
-        var textToShow = getString(R.string.context_empty_offline).toUpperCase()
+        var textToShow = StringResourcesUtils.getString(R.string.context_empty_offline)
 
         try {
             textToShow = textToShow.replace(

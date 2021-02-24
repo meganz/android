@@ -55,8 +55,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_gravity="center_horizontal"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
-
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
         </LinearLayout>
 
         <include layout="@layout/item_call_in_progress_layout"

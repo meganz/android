@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/folder_link_list_empty_image"
                     android:layout_centerHorizontal="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
             </RelativeLayout>
 
         </RelativeLayout>

@@ -174,7 +174,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
 
                 <Button
                     android:id="@+id/invite_button"

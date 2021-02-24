@@ -40,8 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/empty_image_view_node_history"
             android:layout_centerHorizontal="true"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
-            android:textSize="18sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
 
     <LinearLayout

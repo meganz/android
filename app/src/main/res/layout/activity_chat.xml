@@ -433,7 +433,7 @@
                         android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
                         android:text="@string/chat_loading_messages"
-                        android:textSize="18sp" />
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
                 </RelativeLayout>
 
                 <!-- Layout with chat content -->

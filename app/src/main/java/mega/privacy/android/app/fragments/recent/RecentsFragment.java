@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -148,7 +149,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             emptyImage.setImageResource(R.drawable.empty_recents_portrait);
         }
 
-        String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
+        String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
+
         try {
             textToShow = textToShow.replace("[A]","<font color=\'"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
