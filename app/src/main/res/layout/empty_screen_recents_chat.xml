@@ -37,8 +37,9 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_marginTop="12dp"
+                android:maxWidth="300dp"
                 android:textColor="@color/secondary_text"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/empty_text_chat_recent"
@@ -46,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/adapters_background"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/invite_button"

@@ -30,6 +30,8 @@ object PsaManager : LifecycleObserver {
     private val application = MegaApplication.getInstance()
     private val megaApi = application.megaApi
 
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
+
     private var getPsaDisposable: Disposable? = null
     private var processLifecycleObserved = false
 
@@ -71,19 +73,18 @@ object PsaManager : LifecycleObserver {
         rescheduleOnForeground = false
         doStopChecking()
 
-        PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance())
-            .edit()
-            .remove(LAST_PSA_CHECK_TIME_KEY)
-            .apply()
+        // If user logout while there is a PSA displaying (not shown yet), if we don't
+        // reset mutablePsa, it will be displayed in LoginActivity again, which is not
+        // desired.
+        mutablePsa.value = null
+
+        preferences.edit().remove(LAST_PSA_CHECK_TIME_KEY).apply()
     }
 
     private fun doStartChecking() {
         if (getPsaDisposable != null) {
             return
         }
-
-        val preferences =
-            PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance())
 
         val timeSinceLastCheck =
             System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
@@ -118,7 +119,9 @@ object PsaManager : LifecycleObserver {
                     ) {
                         super.onRequestFinish(api, request, e)
 
-                        if (e.errorCode == MegaError.API_OK) {
+                        // API response may arrive after stopChecking, in this case we shouldn't
+                        // emit PSA anymore.
+                        if (e.errorCode == MegaError.API_OK && getPsaDisposable != null) {
                             mutablePsa.value = Psa(
                                 request.number.toInt(), request.name, request.text, request.file,
                                 request.password, request.link, request.email
