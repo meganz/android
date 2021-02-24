@@ -113,6 +113,15 @@ class MediaPlayerFragment : Fragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        if (playerService?.viewModel?.audioPlayer == false) {
+            playerService?.exoPlayer?.playWhenReady = false
+            videoPlayerPausedForPlaylist = true
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -180,9 +189,6 @@ class MediaPlayerFragment : Fragment() {
             // we need setup control buttons again, because reset player would reset
             // PlayerControlView
             viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
-                playerService?.exoPlayer?.playWhenReady = false
-                videoPlayerPausedForPlaylist = true
-
                 findNavController().navigate(R.id.action_player_to_playlist)
             }
         }
