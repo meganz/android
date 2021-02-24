@@ -80,6 +80,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -811,15 +812,11 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void showGroupInfoActivity(){
         logDebug("showGroupInfoActivity");
-        if(chatRoom.isGroup()){
-            Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }else{
-            Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }
+        Intent i = new Intent(this,
+                chatRoom.isGroup() ? GroupChatInfoActivityLollipop.class : ContactInfoActivityLollipop.class);
+        i.putExtra(HANDLE, chatRoom.getChatId());
+        i.putExtra(ACTION_CHAT_OPEN, true);
+        this.startActivity(i);
     }
 
     @Override
@@ -1541,7 +1538,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
 
         megaChatApi.closeChatRoom(idChat, this);
-
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
             return true;
@@ -2265,6 +2261,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                 unMuteMenuItem.setVisible(true);
             }
 
+            if(!shouldMuteOrUnmuteOptionsBeShown(this, chatRoom)){
+                unMuteMenuItem.setVisible(false);
+                muteMenuItem.setVisible(false);
+            }
+
             checkSelectOption();
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
@@ -2276,8 +2277,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
-                muteMenuItem.setVisible(false);
-                unMuteMenuItem.setVisible(false);
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -2310,7 +2309,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                 int permission = chatRoom.getOwnPrivilege();
                 logDebug("Permission in the chat: " + permission);
                 if (chatRoom.isGroup()) {
-
                     if (permission == MegaChatRoom.PRIV_MODERATOR) {
 
                         inviteMenuItem.setVisible(true);
@@ -2485,17 +2483,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
-
-                if(chatRoom.isGroup()){
-                    Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
-                else{
-                    Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
+                showGroupInfoActivity();
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
@@ -6428,7 +6416,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
 
         AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
-        if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
+        if (isItSameMsg(messageToUpdate.getMessage(), msg.getMessage())) {
             logDebug("The internal index not change");
 
             if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
@@ -9078,7 +9066,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             e.printStackTrace();
         }
 
-        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, MegaApplication.USER_AGENT, path);
+        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path);
 
         megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
         megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);

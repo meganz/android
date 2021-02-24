@@ -84,8 +84,10 @@ public class TransfersManagementActivity extends PasscodeActivity {
         transfersWidget = new TransferWidget(this, transfersWidgetLayout);
         transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
             if (context instanceof ManagerActivityLollipop) {
-                ManagerActivityLollipop.setDrawerItem(ManagerActivityLollipop.DrawerItem.TRANSFERS);
-                ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.getDrawerItem());
+                ((ManagerActivityLollipop) context)
+                        .setDrawerItem(ManagerActivityLollipop.DrawerItem.TRANSFERS);
+                ((ManagerActivityLollipop) context)
+                        .selectDrawerItemLollipop(((ManagerActivityLollipop) context).getDrawerItem());
             } else {
                 openTransfersSection();
             }

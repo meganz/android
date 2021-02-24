@@ -85,6 +85,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.CameraUploadUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -723,11 +724,11 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 }
                 else {
                     String offlineLocation = file.getParentFile().getParentFile().getName() + '/' + location;
-                    if (offlineLocation.equals(OFFLINE_DIR)){
-                        locationTextView.setText(getResources().getString(R.string.section_saved_for_offline_new));
-                    }
-                    else {
-                        locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline_new) +")");
+                    if (offlineLocation.equals(OFFLINE_DIR)) {
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.section_saved_for_offline_new));
+                    } else {
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.location_label,
+                                location, StringResourcesUtils.getString(R.string.section_saved_for_offline)));
                     }
                 }
                 logDebug("Path: " + file.getAbsolutePath() + ", Size: " + file.length());
@@ -808,11 +809,12 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 MegaNode parent = nC.getParent(node);
                 if (from == FROM_INCOMING_SHARES){
                     fragmentHandle = -1;
-                    if (megaApi.getParentNode(node) != null){
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
-                    }
-                    else {
-                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
+                    if (megaApi.getParentNode(node) != null) {
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.location_label,
+                                megaApi.getParentNode(node).getName(),
+                                StringResourcesUtils.getString(R.string.tab_incoming_shares)));
+                    } else {
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.tab_incoming_shares));
                     }
                 }
                 else{
@@ -826,21 +828,22 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                         fragmentHandle = megaApi.getInboxNode().getHandle();
                     }
 
-                    if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
-                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
-                    }
-                    else if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                    if (megaApi.getParentNode(node) == null) { // It is because of the parent node is Incoming Shares
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.tab_incoming_shares));
+                    } else if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
                             parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
-                            parent.getHandle() == megaApi.getInboxNode().getHandle()){
-                        if (megaApi.getParentNode(node).getHandle() == parent.getHandle()){
+                            parent.getHandle() == megaApi.getInboxNode().getHandle()) {
+                        if (megaApi.getParentNode(node).getHandle() == parent.getHandle()) {
                             locationTextView.setText(getTranslatedNameForParentNodes(parent.getHandle()));
+                        } else {
+                            locationTextView.setText(StringResourcesUtils.getString(R.string.location_label,
+                                    megaApi.getParentNode(node).getName(),
+                                    getTranslatedNameForParentNodes(parent.getHandle())));
                         }
-                        else {
-                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getTranslatedNameForParentNodes(parent.getHandle()) +")");
-                        }
-                    }
-                    else {
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
+                    } else {
+                        locationTextView.setText(StringResourcesUtils.getString(R.string.location_label,
+                                megaApi.getParentNode(node).getName(),
+                                StringResourcesUtils.getString(R.string.tab_incoming_shares)));
                     }
                 }
 
@@ -3035,7 +3038,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             String megaUser = listContacts.get(position).getUser();
             MegaUser contact = megaApi.getContact(megaUser);
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                Intent i = new Intent(this,ContactInfoActivityLollipop.class);
+                Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, megaUser);
                 startActivity(i);
             }

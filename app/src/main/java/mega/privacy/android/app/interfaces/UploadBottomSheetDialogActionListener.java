@@ -11,5 +11,7 @@ public interface UploadBottomSheetDialogActionListener {
 
     void takePictureAndUpload();
 
+    void scanDocument();
+
     void showNewFolderDialog();
 }

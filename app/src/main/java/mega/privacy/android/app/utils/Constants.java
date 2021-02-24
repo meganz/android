@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
+    public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -81,6 +82,8 @@ public class Constants {
     public static final String EXTRA_LINK = "EXTRA_LINK";
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
+
+    public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
@@ -286,7 +289,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
     public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
-    public static final String INTENT_EXTRA_KEY_ACTION_TYPE = "actionType";
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
@@ -561,6 +563,7 @@ public class Constants {
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
+    public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
     public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;

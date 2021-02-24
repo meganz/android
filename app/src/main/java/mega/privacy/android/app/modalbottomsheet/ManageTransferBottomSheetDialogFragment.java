@@ -156,6 +156,11 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_view_layout:
+                if (transfer.getType() == TYPE_UPLOAD && !isOnline(context)) {
+                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                    break;
+                }
+
                 managerActivity.openTransferLocation(transfer);
                 break;
 
