@@ -218,7 +218,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
             }
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderOthers);
+            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderCloud);
         }
     }
 
