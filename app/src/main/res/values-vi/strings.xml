@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Hộp Thư</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Lưu về Ngoại Tuyến</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Ngoại tuyến</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Đang tải danh bạ từ điện thoại&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d lời mời đã được gửi đi thành công.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d lời mời đã được gửi đi thành công nhưng có %2$d lời mời còn lại chưa gửi được.</string>
 
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">Giá từ</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Thư mục chia sẻ mới</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Xóa lịch sử nội dung chát</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Xóa lịch sử nội dung chát</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Xóa tên liên lạc</string>
 
@@ -2877,7 +2879,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Chứng thực của %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Văn bản</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Văn bản</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Tài Liệu</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Cuộc Chát Mới</string>
@@ -3020,4 +3022,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Chính Sách Quyền Riêng Tư</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Chính Sách Cookie</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Luôn Bật</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 </resources>

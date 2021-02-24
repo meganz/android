@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">In arrivo</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvato in locale</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Caricamento dei contatti&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d richieste di invito inviate con successo.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d richieste di invito inviate con successo ma %2$d richieste non sono state inviate.</string>
 
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">a partire da</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nuova cartella condivisa</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Nuova richiesta di contatto</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Pulisci la chat</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Pulisci la chat</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Rimuovi contatto</string>
 
@@ -1831,16 +1833,16 @@
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Nessun media nei [/B][A] Caricamenti della fotocamera [/A]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Svuota il [/B][A]Cestino[/A]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Nessun file nel tuo[/B] [A]Inbox[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A][B].[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Nessun file nel tuo[/B] [A]Inbox[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Nessun file[/B] [A]salvato per l\'offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Nessun[/B] [A]contatto[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Nessuna[/A] [B]Conversazione[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A] Caricamento delle[/A] [B]Conversazioni&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Nessuna[/B] [A]cartella condivisa in entrata[/A][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Nessuna[/B] [A]cartella condivisa in uscita[/A][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Nessuna[/B] [A]cartella condivisa in entrata[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Nessuna[/B] [A]cartella condivisa in uscita[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Nessun[/B] [A]link pubblico[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Richieste inviate</string>
@@ -2050,7 +2052,7 @@
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a "%s"&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Nessun[/B] [A]trasferimento[/A] [B]attivo.[/B]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Nessun[/B] [A]trasferimento[/A] [B]completato.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Cartella[/A] [B]vuota[/B][B].[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Cartella[/A] [B]vuota[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrivi messaggio a %s&#8230;</string>
@@ -2304,7 +2306,7 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">L\'anteprima della chat non è più disponibile. Se lasci l\'anteprima, non potrai aprirla di nuovo.</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A] [B]ha attivato la rotazione della chiave di criptazione.[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A] [B]ha attivato la rotazione della Chiave di criptazione.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Questa conversazione non è più disponibile.</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Link della chat non valido</string>
@@ -2466,7 +2468,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Errore della chiave SSL</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA non riesce a connettersi in sicurezza tramite SSL. Potresti essere collegato ad un WiFi pubblico che richiede requisiti addizionali.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nessuna[/B] [A]notifica[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nessuna[/B] [A]notifica[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Imposta MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA ha bisogno di accedere alle tue foto, media e file per permetterti di condividerli con amici, scambiare messaggi criptati ed effettuare chiamate sicure.</string>
@@ -2509,7 +2511,7 @@
     <string name="label_yesterday" context="label yesterday">Ieri</string>
     <string name="label_tomorrow" context="label tomorrow">Domani</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Nessun[/B] [A]file condiviso[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Nessun[/B] [A]file condiviso[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s si è unito alla chiamata</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s ha abbandonato la chiamata</string>
@@ -2877,7 +2879,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenziali di %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Documenti</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Documenti</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documenti</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nuova chat</string>
@@ -3020,4 +3022,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Policy sui Cookie</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Sempre attivi</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 </resources>
