@@ -3,8 +3,6 @@ package mega.privacy.android.app.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface.BUTTON_POSITIVE
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -13,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColorStateList
+import androidx.core.widget.doAfterTextChanged
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
@@ -216,27 +215,7 @@ class MegaNodeDialogUtil {
                     }
                 }
 
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                        quitDialogError(activity, typeText, errorText)
-                    }
-                })
+                doAfterTextChanged { quitDialogError(activity, typeText, errorText) }
 
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
