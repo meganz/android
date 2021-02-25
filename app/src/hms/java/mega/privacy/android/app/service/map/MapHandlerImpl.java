@@ -64,22 +64,18 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
+                if (locationResult == null || locationResult.getLastLocation() == null) {
                     logWarning("locationResult is null");
                     return;
                 }
 
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        lastLocation = location;
-                        onGetLastLocation(location.getLatitude(), location.getLongitude());
+                lastLocation = locationResult.getLastLocation();
+                onGetLastLocation(lastLocation.getLatitude(), lastLocation.getLongitude());
 
-                        if (!activity.isFullScreenEnabled()) {
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(location.getLatitude(), location.getLongitude()),
-                                    DEFAULT_ZOOM));
-                        }
-                    }
+                if (!activity.isFullScreenEnabled()) {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                            DEFAULT_ZOOM));
                 }
             }
         };
