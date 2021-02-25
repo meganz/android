@@ -52,13 +52,16 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.COPY;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
@@ -341,27 +344,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
 
-		
-		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
-			if (((FileExplorerActivityLollipop)context).getDeepBrowserTree() > 0){
-				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-				if(parent != null){
-					if(parent.getHandle() == parentHandle) {
-						activateButton(false);
-					}else{
-						activateButton(true);
-					}
-				}else{
-					activateButton(true);
-				}
+		if (modeCloud == MOVE || modeCloud == COPY) {
+			optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE ? R.string.context_move
+					: R.string.context_copy).toUpperCase(Locale.getDefault()));
+
+			if (((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
+				checkCopyMoveButton();
 			}
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
+		} else if (modeCloud == FileExplorerActivityLollipop.UPLOAD) {
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
@@ -581,7 +572,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		recyclerView.scrollToPosition(0);
 
-		if (modeCloud == FileExplorerActivityLollipop.COPY){
+		if (modeCloud == COPY || modeCloud == MOVE){
 			activateButton(true);
 		}
 	}
@@ -630,14 +621,11 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			setNodes(megaApi.getChildren(nodes.get(position), order));
 			recyclerView.scrollToPosition(0);
 
-			if (adapter.getItemCount() == 0 && modeCloud == FileExplorerActivityLollipop.COPY) {
-				activateButton(true);
-			} else if (modeCloud == FileExplorerActivityLollipop.COPY && ((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
-				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-				if (parent != null && parent.getHandle() == parentHandle) {
-					activateButton(false);
-				} else {
+			if (modeCloud == COPY || modeCloud == MOVE) {
+				if (adapter.getItemCount() == 0) {
 					activateButton(true);
+				} else if (((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
+					checkCopyMoveButton();
 				}
 			}
 		}
@@ -705,24 +693,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 				setParentHandle(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, order);
+				setNodes(nodes);
 
-				if (modeCloud == FileExplorerActivityLollipop.COPY){
-					if (((FileExplorerActivityLollipop)context).getDeepBrowserTree() > 0){
-						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-						if(parent != null){
-							if(parent.getHandle() == parentHandle) {
-								activateButton(false);
-							}else{
-								activateButton(true);
-							}
-						}else{
-							activateButton(true);
-
-						}
-					}
+				if (modeCloud == COPY || modeCloud == MOVE) {
+					checkCopyMoveButton();
 				}
 
-				setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
@@ -1002,5 +978,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	public boolean isFolderEmpty() {
 		return adapter == null || adapter.getItemCount() <= 0;
+	}
+
+	/**
+	 * Checks if copy or move button should be shown or hidden depending on the current navigation level.
+	 * Shows it if the current navigation level is not the parent of moving/copying nodes.
+	 * Hides it otherwise.
+	 */
+	private void checkCopyMoveButton() {
+		MegaNode parentMove = ((FileExplorerActivityLollipop) context).parentMoveCopy();
+		activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
 	}
 }
