@@ -53,6 +53,8 @@ class AudioPlayerFragment : Fragment() {
 
     private var playlistObserved = false
 
+    private var delayHideToolbarCanceled = false
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
         }
@@ -100,11 +102,7 @@ class AudioPlayerFragment : Fragment() {
 
         tryObservePlaylist()
 
-        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
-            if (isResumed) {
-                hideToolbar()
-            }
-        }
+        delayHideToolbar()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,6 +119,11 @@ class AudioPlayerFragment : Fragment() {
         val service = playerService
         if (service != null) {
             setupPlayer(service)
+        }
+
+        if (!toolbarVisible) {
+            showToolbar()
+            delayHideToolbar()
         }
     }
 
@@ -192,6 +195,8 @@ class AudioPlayerFragment : Fragment() {
             if (toolbarVisible) {
                 hideToolbar()
             } else {
+                delayHideToolbarCanceled = true
+
                 showToolbar()
             }
         }
@@ -344,6 +349,16 @@ class AudioPlayerFragment : Fragment() {
 
     private fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
         playlist.isEnabled = playlistItems.size > AudioPlayerService.SINGLE_PLAYLIST_SIZE
+    }
+
+    private fun delayHideToolbar() {
+        delayHideToolbarCanceled = false
+
+        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
+            if (isResumed && !delayHideToolbarCanceled) {
+                hideToolbar()
+            }
+        }
     }
 
     private fun hideToolbar() {
