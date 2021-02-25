@@ -4864,9 +4864,15 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if(nodeList.size()==1){
                                     MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
-                                    if (MimeTypeList.typeForName(node.getName()).isImage() && node.hasPreview()){
-                                        logDebug("Show full screen viewer");
-                                        showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
+                                    if (MimeTypeList.typeForName(node.getName()).isImage()){
+                                        if(node.hasPreview()){
+                                            logDebug("Show full screen viewer");
+                                            showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
+                                        }
+                                        else{
+                                            logDebug("Image without preview - show node attachment panel for one node");
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                        }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
                                         logDebug("isFile:isVideoReproducibleOrIsAudio");
@@ -4974,11 +4980,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                             logDebug("opusFile ");
                                             mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
                                         }
-                                        if(internalIntent){
+
+                                        if(internalIntent || isIntentAvailable(this, mediaIntent)){
                                             startActivity(mediaIntent);
-                                        } else if (isIntentAvailable(this, mediaIntent)) {
-                                            logDebug("externalIntent");
-                                            startActivity(mediaIntent);
+                                        } else {
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                         overridePendingTransition(0,0);
                                         if (adapter != null) {
@@ -5066,10 +5072,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                         }
                                         pdfIntent.putExtra("HANDLE", node.getHandle());
 
-                                        if (isIntentAvailable(this, pdfIntent)){
+                                        if (isIntentAvailable(this, pdfIntent)) {
                                             startActivity(pdfIntent);
+                                        } else {
+                                            logWarning("noAvailableIntent");
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                         overridePendingTransition(0,0);
+                                    } else {
+                                        logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
+                                        showGeneralChatMessageBottomSheet(m, positionInMessages);
                                     }
                                 }
                             }

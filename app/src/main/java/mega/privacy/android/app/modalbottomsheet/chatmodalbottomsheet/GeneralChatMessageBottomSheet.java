@@ -229,12 +229,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
 
-            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT &&
-                    (MimeTypeList.typeForName(node.getName()).isVideoReproducible() ||
-                            MimeTypeList.typeForName(node.getName()).isVideo() ||
-                            MimeTypeList.typeForName(node.getName()).isAudio()
-                            || MimeTypeList.typeForName(node.getName()).isImage() ||
-                            MimeTypeList.typeForName(node.getName()).isPdf()) ? View.VISIBLE : View.GONE);
+            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
             optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
             optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
