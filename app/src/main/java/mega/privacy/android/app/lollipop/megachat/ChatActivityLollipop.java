@@ -4871,7 +4871,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                         }
                                         else{
                                             logDebug("Image without preview - open with");
-                                            openWith(node);
+                                            openWith(this, node);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -4984,7 +4984,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                         if(internalIntent || isIntentAvailable(this, mediaIntent)){
                                             startActivity(mediaIntent);
                                         } else {
-                                            openWith(node);
+                                            openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
                                         if (adapter != null) {
@@ -5076,12 +5076,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                             startActivity(pdfIntent);
                                         } else {
                                             logWarning("noAvailableIntent");
-                                            openWith(node);
+                                            openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
                                     } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        openWith(node);
+                                        openWith(this, node);
                                     }
                                 }
                             }

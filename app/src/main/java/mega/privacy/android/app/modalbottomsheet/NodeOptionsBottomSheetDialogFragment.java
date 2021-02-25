@@ -1115,7 +1115,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_open_with_layout:
-                openWith(node);
+                openWith(context, node);
                 break;
 
             case R.id.option_restore_layout:

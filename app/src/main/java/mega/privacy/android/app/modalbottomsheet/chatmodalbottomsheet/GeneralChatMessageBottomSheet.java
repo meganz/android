@@ -351,7 +351,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                openWith(node);
+                openWith(context, node);
                 break;
 
             case R.id.forward_layout:

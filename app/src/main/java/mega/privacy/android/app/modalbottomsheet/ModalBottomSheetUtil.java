@@ -14,6 +14,7 @@ import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -21,10 +22,11 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class ModalBottomSheetUtil {
 
-    public static void openWith(MegaNode node) {
+    public static void openWith(Context context, MegaNode node) {
         if (node == null) {
             logWarning("Node is null");
             return;
@@ -74,7 +76,7 @@ public class ModalBottomSheetUtil {
             mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             app.startActivity(mediaIntent);
         } else {
-            Toast.makeText(app, app.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            Util.showSnackbar(context, getString(R.string.intent_not_available_file));
         }
     }
 
