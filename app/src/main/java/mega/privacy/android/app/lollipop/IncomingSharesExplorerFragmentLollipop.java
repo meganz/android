@@ -572,7 +572,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		recyclerView.scrollToPosition(0);
 
-		if (modeCloud == COPY){
+		if (modeCloud == COPY || modeCloud == MOVE){
 			activateButton(true);
 		}
 	}
@@ -693,13 +693,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 				setParentHandle(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, order);
+				setNodes(nodes);
 
-				if (((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0
-						&& (modeCloud == COPY || modeCloud == MOVE)) {
+				if (modeCloud == COPY || modeCloud == MOVE) {
 					checkCopyMoveButton();
 				}
 
-				setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
