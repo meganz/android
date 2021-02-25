@@ -4610,7 +4610,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.transparentCoatingPortrait.setVisibility(View.GONE);
         holder.uploadingProgressBarPort.setVisibility(View.GONE);
         holder.errorUploadingPortrait.setVisibility(View.GONE);
-        holder.forwardOwnPortrait.setVisibility(View.GONE);
 
         holder.previewFrameLand.setVisibility(View.GONE);
         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -4622,12 +4621,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.transparentCoatingLandscape.setVisibility(View.GONE);
         holder.uploadingProgressBarLand.setVisibility(View.GONE);
         holder.errorUploadingLandscape.setVisibility(View.GONE);
-        holder.forwardOwnLandscape.setVisibility(View.GONE);
 
         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
         holder.errorUploadingFile.setVisibility(View.GONE);
         holder.retryAlert.setVisibility(View.GONE);
-        holder.forwardOwnFile.setVisibility(View.GONE);
 
         holder.contentContactMessageFileThumb.setVisibility(View.GONE);
         holder.contentContactMessageFileName.setVisibility(View.GONE);
@@ -4640,7 +4637,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
         holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
-        holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
 
         holder.contentContactMessageThumbLand.setVisibility(View.GONE);
         holder.contentContactMessageThumbLand.setImageBitmap(null);
@@ -4648,10 +4644,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
         holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
-        holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
         holder.contentContactMessageFile.setVisibility(View.GONE);
-        holder.forwardContactFile.setVisibility(View.GONE);
     }
 
     /**
