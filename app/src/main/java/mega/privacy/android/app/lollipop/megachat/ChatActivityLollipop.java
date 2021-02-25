@@ -4870,8 +4870,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                             showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
                                         }
                                         else{
-                                            logDebug("Image without preview - show node attachment panel for one node");
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                            logDebug("Image without preview - open with");
+                                            openWith(node);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -4984,7 +4984,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                         if(internalIntent || isIntentAvailable(this, mediaIntent)){
                                             startActivity(mediaIntent);
                                         } else {
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                            openWith(node);
                                         }
                                         overridePendingTransition(0,0);
                                         if (adapter != null) {
@@ -5076,12 +5076,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                             startActivity(pdfIntent);
                                         } else {
                                             logWarning("noAvailableIntent");
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                            openWith(node);
                                         }
                                         overridePendingTransition(0,0);
                                     } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                        openWith(node);
                                     }
                                 }
                             }
