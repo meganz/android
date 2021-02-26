@@ -32,6 +32,7 @@ public class CreateChatListener extends ChatBaseListener {
     public static final int SEND_MESSAGES = 6;
     public static final int SEND_FILE_EXPLORER_CONTENT = 7;
     public static final int SEND_LINK = 8;
+    public static final int CONFIGURE_DND = 9;
 
     private int counter;
     private int error;
@@ -118,7 +119,7 @@ public class CreateChatListener extends ChatBaseListener {
 
         switch (action) {
             case SEND_FILE:
-                if (usersNoChat.size() == error && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send files fail
                     if (context instanceof ManagerActivityLollipop || context instanceof ContactInfoActivityLollipop) {
                         message = context.getResources().getString(R.string.number_no_sent, error);
@@ -134,7 +135,7 @@ public class CreateChatListener extends ChatBaseListener {
 
             case START_AUDIO_CALL:
             case START_VIDEO_CALL:
-                if (e.getErrorCode() != MegaError.API_OK) {
+                if (errorCreatingChat()) {
                     showSnackbar(context, context.getString(R.string.create_chat_error));
                 } else {
                     MegaApplication.setUserWaitingForCall(usersNoChat.get(0).getHandle());
@@ -143,7 +144,7 @@ public class CreateChatListener extends ChatBaseListener {
                 break;
 
             case SEND_FILES:
-                if ((usersNoChat.size() == error) && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send files fail; Show error
                     showSnackbar(context, context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter));
                 } else {
@@ -153,7 +154,7 @@ public class CreateChatListener extends ChatBaseListener {
                 break;
 
             case SEND_CONTACTS:
-                if ((usersNoChat.size() == error) && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send contacts fail; Show error
                     showSnackbar(context, context.getResources().getQuantityString(R.plurals.num_contacts_not_send, handles.length, totalCounter));
                 } else {
@@ -162,7 +163,7 @@ public class CreateChatListener extends ChatBaseListener {
                 break;
 
             case SEND_MESSAGES:
-                if ((usersNoChat.size() == error) && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send messages fail; Show error
                     showSnackbar(context, context.getResources().getQuantityString(R.plurals.num_messages_not_send, handles.length, totalCounter));
                 } else {
@@ -177,7 +178,7 @@ public class CreateChatListener extends ChatBaseListener {
                 break;
 
             case SEND_FILE_EXPLORER_CONTENT:
-                if ((usersNoChat.size() == error) && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send messages fail; Show error
                     showSnackbar(context, context.getResources().getString(R.string.content_not_send, totalCounter));
                 } else {
@@ -189,13 +190,33 @@ public class CreateChatListener extends ChatBaseListener {
                 break;
 
             case SEND_LINK:
-                if (usersNoChat.size() == error && (chats == null || chats.isEmpty())) {
+                if (errorCreatingChat()) {
                     //All send messages fail; Show error
-                    showSnackbar(context, context.getResources().getString(R.string.content_not_send, totalCounter));
+                    showSnackbar(context, context.getString(R.string.create_chat_error));
                 } else {
                     ChatController.sendLinkToChats(context, getChatHandles(), link, key, password);
                 }
+                break;
+
+            case CONFIGURE_DND:
+                if (errorCreatingChat()) {
+                    showSnackbar(context, context.getString(R.string.create_chat_error));
+                } else {
+                    if (context instanceof ContactInfoActivityLollipop) {
+                        ((ContactInfoActivityLollipop) context).chatCreated(chats.get(0));
+                    }
+                }
+                break;
         }
+    }
+
+    /**
+     * Method to check if there has been error in creating the chat/chats.
+     *
+     * @return True, if there has been an error. False, otherwise.
+     */
+    private boolean errorCreatingChat() {
+        return usersNoChat.size() == error && (chats == null || chats.isEmpty());
     }
 
     private long[] getChatHandles() {

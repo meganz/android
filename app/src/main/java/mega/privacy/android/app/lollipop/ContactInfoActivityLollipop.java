@@ -175,6 +175,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     private String newMuteOption = null;
 
     boolean startVideo = false;
+    private boolean isChatOpen;
 
 	private RelativeLayout verifyCredentialsLayout;
 	private TextView verifiedText;
@@ -580,7 +581,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			removeContactChatLayout = findViewById(R.id.chat_contact_properties_remove_contact_layout);
 			removeContactChatLayout.setOnClickListener(this);
 
-			chatHandle = extras.getLong("handle",-1);
+			chatHandle = extras.getLong(HANDLE, MEGACHAT_INVALID_HANDLE);
 			userEmailExtra = extras.getString(NAME);
 
 			//isChatOpen is:
@@ -588,7 +589,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//  and the changes related to history clearing will be listened from there.
 			//- False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
 			//  This will happen when ContactInfoActivityLollipop is opened from other parts of the app than the Chat room.
-			boolean isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
+			isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
 
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
@@ -623,59 +624,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				} else {
 					withoutNickname(userEmailExtra);
 					chat = null;
-
-				}
-
-				if (chat != null) {
-					chatHandle = chat.getChatId();
-					if (chatHandle == -1) {
-						notificationsLayout.setVisibility(View.GONE);
-						dividerNotificationsLayout.setVisibility(View.GONE);
-
-						sharedFilesLayout.setVisibility(View.GONE);
-						dividerSharedFilesLayout.setVisibility(View.GONE);
-					}
-				} else {
-					notificationsLayout.setVisibility(View.GONE);
-					dividerNotificationsLayout.setVisibility(View.GONE);
-
-					sharedFilesLayout.setVisibility(View.GONE);
-					dividerSharedFilesLayout.setVisibility(View.GONE);
 				}
 			}
 
-			if (chat != null) {
-				if(!isChatOpen) {
-					MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
-				}
-
-				updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chat.getChatId()));
-			} else {
-				retentionTimeText.setVisibility(View.GONE);
-			}
-
+			updateUI();
 			updateVerifyCredentialsLayout();
 			checkScreenRotationToShowCall();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
-				setAvatar();
-
 				if(user!=null){
 					sharedFoldersLayout.setVisibility(View.VISIBLE);
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
 
 					ArrayList<MegaNode> nodes = megaApi.getInShares(user);
-                    setFoldersButtonText(nodes);
+					setFoldersButtonText(nodes);
 					emailText.setText(user.getEmail());
-
-					if (chat != null) {
-						manageChatLayout.setVisibility(View.VISIBLE);
-						dividerClearChatLayout.setVisibility(View.VISIBLE);
-					} else {
-						manageChatLayout.setVisibility(View.GONE);
-						dividerClearChatLayout.setVisibility(View.GONE);
-					}
 
 					shareContactLayout.setVisibility(View.VISIBLE);
 					dividerShareContactLayout.setVisibility(View.VISIBLE);
@@ -691,11 +655,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					if (chat != null) {
 						emailText.setText(user.getEmail());
-						manageChatLayout.setVisibility(View.VISIBLE);
-						dividerClearChatLayout.setVisibility(View.VISIBLE);
-					} else {
-						manageChatLayout.setVisibility(View.GONE);
-						dividerClearChatLayout.setVisibility(View.GONE);
 					}
 
 					shareContactLayout.setVisibility(View.VISIBLE);
@@ -711,8 +670,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
-				manageChatLayout.setVisibility(View.GONE);
-				dividerClearChatLayout.setVisibility(View.GONE);
 
 				shareContactLayout.setVisibility(View.GONE);
 				dividerShareContactLayout.setVisibility(View.GONE);
@@ -720,10 +677,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				chatOptionsLayout.setVisibility(View.VISIBLE);
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
-
-			checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
-			notificationsLayout.setVisibility(View.VISIBLE);
-			dividerNotificationsLayout.setVisibility(View.VISIBLE);
 
 		} else {
 			logWarning("Extras is NULL");
@@ -1302,11 +1255,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.chat_contact_properties_layout:
-				if (notificationsSwitch.isChecked()) {
-					createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
-				} else {
-					MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
-				}
+				chatNotificationsClicked();
 				break;
 
 			case R.id.chat_contact_properties_chat_files_shared_layout:{
@@ -1903,6 +1852,77 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             }
 		}
 		isShareFolderExpanded = !isShareFolderExpanded;
+	}
+
+	/**
+	 * Update UI elements if chat exists.
+	 */
+	private void updateUI() {
+		if (chat == null || chat.getChatId() == MEGACHAT_INVALID_HANDLE) {
+			notificationsLayout.setVisibility(View.GONE);
+			dividerNotificationsLayout.setVisibility(View.GONE);
+			sharedFilesLayout.setVisibility(View.GONE);
+			dividerSharedFilesLayout.setVisibility(View.GONE);
+			manageChatLayout.setVisibility(View.GONE);
+			dividerClearChatLayout.setVisibility(View.GONE);
+			retentionTimeText.setVisibility(View.GONE);
+		} else {
+			chatHandle = chat.getChatId();
+
+			if (!isChatOpen) {
+				MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
+			}
+
+			updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chatHandle));
+
+			if(isOnline(this)){
+				manageChatLayout.setVisibility(View.VISIBLE);
+				dividerClearChatLayout.setVisibility(View.VISIBLE);
+			}else{
+				manageChatLayout.setVisibility(View.GONE);
+				dividerClearChatLayout.setVisibility(View.GONE);
+			}
+		}
+
+		checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+		notificationsLayout.setVisibility(View.VISIBLE);
+		dividerNotificationsLayout.setVisibility(View.VISIBLE);
+	}
+
+	/**
+	 * Method that makes the necessary updates when the chat has been created.
+	 *
+	 * @param newChat The created chat.
+	 */
+	public void chatCreated(MegaChatRoom newChat) {
+		if (newChat != null && newChat.getChatId() != MEGACHAT_INVALID_HANDLE) {
+			chat = newChat;
+			updateUI();
+			chatNotificationsClicked();
+		}
+	}
+
+	/**
+	 * Make the necessary actions when clicking on the Chat Notifications layout.
+	 */
+	private void chatNotificationsClicked() {
+		if (chatHandle == MEGACHAT_INVALID_HANDLE) {
+			logDebug("The chat doesn't exist, create it");
+			ArrayList<MegaChatRoom> chats = new ArrayList<>();
+			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+			usersNoChat.add(user);
+			CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.CONFIGURE_DND);
+			MegaChatPeerList peers = MegaChatPeerList.createInstance();
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, listener);
+		} else {
+			logDebug("The chat exists");
+			if (notificationsSwitch.isChecked()) {
+				createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
+			} else {
+				MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
+			}
+		}
 	}
     
     public void showOptionsPanel(MegaNode node){
