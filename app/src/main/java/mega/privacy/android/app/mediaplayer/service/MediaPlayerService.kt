@@ -22,10 +22,10 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
@@ -33,7 +33,7 @@ import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MediaPlayerService : LifecycleService(), LifecycleObserver {
+open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
     @MegaApi
     @Inject
@@ -76,9 +76,11 @@ class MediaPlayerService : LifecycleService(), LifecycleObserver {
         OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                    exoPlayer.playWhenReady = false
-                    needPlayWhenGoForeground = false
-                    needPlayWhenReceiveResumeCommand = false
+                    if (exoPlayer.playWhenReady) {
+                        exoPlayer.playWhenReady = false
+                        needPlayWhenGoForeground = false
+                        needPlayWhenReceiveResumeCommand = false
+                    }
                 }
             }
         }
@@ -407,7 +409,7 @@ class MediaPlayerService : LifecycleService(), LifecycleObserver {
          */
         @JvmStatic
         fun pauseAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, MediaPlayerService::class.java)
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
             context.startService(audioPlayerIntent)
         }
@@ -419,7 +421,7 @@ class MediaPlayerService : LifecycleService(), LifecycleObserver {
          */
         @JvmStatic
         fun resumeAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, MediaPlayerService::class.java)
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_RESUME)
             context.startService(audioPlayerIntent)
         }
@@ -444,7 +446,7 @@ class MediaPlayerService : LifecycleService(), LifecycleObserver {
          */
         @JvmStatic
         fun stopAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, MediaPlayerService::class.java)
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
             context.startService(audioPlayerIntent)
         }

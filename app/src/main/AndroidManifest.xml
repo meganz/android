@@ -582,10 +582,8 @@
             android:exported="false" >
         </service>
 
-        <service
-            android:name=".mediaplayer.service.MediaPlayerService"
-            android:exported="false" >
-        </service>
+        <service android:name=".mediaplayer.service.AudioPlayerService" android:exported="false" />
+        <service android:name=".mediaplayer.service.VideoPlayerService" android:exported="false" />
 
         <service
             android:name=".jobservices.CameraUploadsService"

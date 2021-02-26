@@ -32,8 +32,10 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -136,6 +138,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         val isAudioPlayer = isAudioPlayer(intent)
 
+        if (!isAudioPlayer) {
+            MediaPlayerService.pauseAudioPlayer(this)
+        }
+
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(if (isAudioPlayer) binding.root else dragToExit.wrapContentView(binding.root))
         changeStatusBarColor(this, window, R.color.black)
@@ -149,7 +155,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         setupToolbar()
         setupNavDestListener()
 
-        val playerServiceIntent = Intent(this, MediaPlayerService::class.java)
+        val playerServiceIntent = Intent(
+            this,
+            if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
+        )
 
         playerServiceIntent.putExtras(extras)
 
@@ -252,6 +261,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         }
 
         nodeSaver.destroy()
+
+        if (!isAudioPlayer(intent)) {
+            MediaPlayerService.resumeAudioPlayer(this)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -16,10 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.mediaplayer.service.CallAwareControlDispatcher
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared
@@ -87,7 +85,11 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val playerServiceIntent = Intent(requireContext(), MediaPlayerService::class.java)
+        val isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
+        val playerServiceIntent = Intent(
+            requireContext(),
+            if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
+        )
         playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }

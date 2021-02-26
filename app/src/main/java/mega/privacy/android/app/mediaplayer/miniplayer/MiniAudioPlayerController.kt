@@ -14,10 +14,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.mediaplayer.service.CallAwareControlDispatcher
-import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 
@@ -74,7 +71,7 @@ class MiniAudioPlayerController(
         if (!serviceBound && it) {
             serviceBound = true
 
-            val playerServiceIntent = Intent(context, MediaPlayerService::class.java)
+            val playerServiceIntent = Intent(context, AudioPlayerService::class.java)
             playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
             context.bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
         } else if (!it) {

@@ -21,9 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
-import mega.privacy.android.app.mediaplayer.service.CallAwareControlDispatcher
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -96,7 +94,11 @@ class MediaPlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val playerServiceIntent = Intent(requireContext(), MediaPlayerService::class.java)
+        val isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
+        val playerServiceIntent = Intent(
+            requireContext(),
+            if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
+        )
         playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
