@@ -321,7 +321,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }
 
         datePickerDialog = new MaterialStyledDatePickerDialog(this,
-                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Picker_Date_Calendar,
+                R.style.Widget_Mega_DatePickerDialog,
                 this, year, month, day);
         datePickerDialog.show();
     }

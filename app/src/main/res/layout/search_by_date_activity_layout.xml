@@ -67,7 +67,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -160,7 +160,7 @@
                     android:layout_below="@+id/title_text_view_from"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -214,7 +214,7 @@
                     android:layout_below="@+id/title_text_view_to"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>

@@ -136,11 +136,4 @@
         <attr name="name" format="string"/>
     </declare-styleable>
 
-    <!-- =================== Dark Mode refactor start ========================== -->
-
-<!--    &lt;!&ndash; "Login" screen background, Light: #F4F4F4, Dark: ?attr/colorBackground &ndash;&gt;-->
-<!--    <attr name="greyBackgroundColor" format="color"/>-->
-
-    <!-- "Password visibility icon" color -->
-    <attr name="greyIconColor" format="color"/>
 </resources>

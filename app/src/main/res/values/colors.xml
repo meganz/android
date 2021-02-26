@@ -2,8 +2,7 @@
 <resources>
     <!-- General color names, the suffix numbers are defined
     in Mega Invision(https://projects.invisionapp.com/d/main#/console/20328430/433152493/preview),
-    not the values from Material design. Some colors cannot be found in the table (e.g. red_390),
-     The "390" is simply deduced from the relative color saturation against red_400 -->
+    not the values from Material design.  -->
     <color name="white">#FFFFFF</color>
 
     <color name="white_alpha_005">#0DFFFFFF</color>
