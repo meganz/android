@@ -6090,8 +6090,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     logDebug("CONTAINS_META_GEOLOCATION");
                 }
 
-                resultModify = modifyMessageReceived(androidMsg, false);
-                logDebug("resultModify: " + resultModify);
+                logDebug("resultModify: " + modifyMessageReceived(androidMsg, false));
             }
 
             return;
@@ -6130,25 +6129,20 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     checkMegaLink(msg);
                 }
 
-                resultModify = modifyMessageReceived(androidMsg, true);
-                logDebug("resultModify: " + resultModify);
-
+                logDebug("resultModify: " + modifyMessageReceived(androidMsg, true));
                 return;
             } else if (msg.getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) {
                 logDebug("STATUS_SERVER_REJECTED: " + msg.getStatus());
                 deleteMessage(msg, true);
             } else {
-                logDebug("Status: " + msg.getStatus() + "Timestamp: " + msg.getTimestamp());
-                resultModify = modifyMessageReceived(androidMsg, false);
-                logDebug("resultModify: " + resultModify);
-
+                logDebug("Status: " + msg.getStatus() + "Timestamp: " + msg.getTimestamp()
+                        + "resultModify: " + modifyMessageReceived(androidMsg, false));
                 return;
             }
         }
 
         if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_TIMESTAMP)) {
-            resultModify = modifyMessageReceived(androidMsg, false);
-            logDebug("resultModify: " + resultModify);
+            logDebug("Timestamp change. ResultModify: " + modifyMessageReceived(androidMsg, true));
         }
     }
 
