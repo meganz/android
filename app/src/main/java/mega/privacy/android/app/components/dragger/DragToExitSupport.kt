@@ -12,7 +12,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -289,25 +288,25 @@ class DragToExitSupport(
          * Observe drag support events, including thumbnail visibility event, scroll event.
          *
          * @param lifecycleOwner LifecycleOwner
-         * @param rv the RecyclerView
-         * @param thumbnailGetter DragThumbnailGetter
+         * @param rv the RecyclerView, its adapter should implements DragThumbnailGetter interface
          */
         fun observeDragSupportEvents(
             lifecycleOwner: LifecycleOwner,
-            rv: RecyclerView,
-            thumbnailGetter: DragThumbnailGetter
+            rv: RecyclerView
         ) {
             LiveEventBus.get(
                 EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
             ).observe(lifecycleOwner) {
                 logDebug("EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY $it")
 
+                val thumbnailGetter = rv.adapter as? DragThumbnailGetter ?: return@observe
+
                 if (it.previousHiddenHandle != INVALID_HANDLE) {
                     val thumbnail = getThumbnail(rv, thumbnailGetter, it.previousHiddenHandle)
                     logDebug("previous thumbnail $thumbnail")
 
                     if (thumbnail != null) {
-                        thumbnail.isVisible = true
+                        thumbnail.visibility = View.VISIBLE
                     }
                 }
 
@@ -315,7 +314,7 @@ class DragToExitSupport(
                 logDebug("current thumbnail $thumbnail")
 
                 if (thumbnail != null) {
-                    thumbnail.isVisible = it.visible
+                    thumbnail.visibility = if (it.visible) View.VISIBLE else View.INVISIBLE
 
                     val location = getThumbnailLocation(thumbnail)
                     if (!it.visible && location != null) {
@@ -329,6 +328,8 @@ class DragToExitSupport(
             LiveEventBus.get(
                 EVENT_DRAG_TO_EXIT_SCROLL, Long::class.java
             ).observe(lifecycleOwner) {
+                val thumbnailGetter = rv.adapter as? DragThumbnailGetter ?: return@observe
+
                 val position = thumbnailGetter.getNodePosition(it)
                 logDebug("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")
 

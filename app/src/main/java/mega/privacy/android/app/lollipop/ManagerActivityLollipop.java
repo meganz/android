@@ -1283,37 +1283,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 									break;
 							}
 						}
-					} else if (adapterType == AUDIO_BROWSE_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
-						long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
-						if (mHomepageSearchable != null) {
-							AudioFragment fragment = (AudioFragment)mHomepageSearchable;
-							switch (actionType) {
-								case SCROLL_TO_POSITION:
-									fragment.scrollToPhoto(handle);
-									break;
-								case UPDATE_IMAGE_DRAG:
-									fragment.hideDraggingThumbnail(handle);
-									break;
-								default:
-									break;
-							}
-						}
-					}  else if (adapterType == VIDEO_BROWSE_ADAPTER || adapterType == VIDEO_SEARCH_ADAPTER) {
-                        long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
-                        if (mHomepageSearchable != null) {
-                            VideoFragment fragment = (VideoFragment)mHomepageSearchable;
-                            switch (actionType) {
-                                case SCROLL_TO_POSITION:
-                                    fragment.scrollToPhoto(handle);
-                                    break;
-                                case UPDATE_IMAGE_DRAG:
-                                    fragment.hideDraggingThumbnail(handle);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+					} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
                         long handle = intent.getLongExtra("handle", INVALID_HANDLE);
                         RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
                         if(fragment != null) {

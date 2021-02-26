@@ -20,7 +20,7 @@ class OfflineAdapter(
 
     fun getOfflineNodes(): List<MegaOffline> = currentList.map { it.node }
 
-    override fun getNodePosition(handle: Long): Int =
+    override fun getNodePosition(handle: Long) =
         currentList.indexOfFirst { it.node.handle == handle.toString() }
 
     override fun getThumbnail(viewHolder: ViewHolder) = when (viewHolder) {

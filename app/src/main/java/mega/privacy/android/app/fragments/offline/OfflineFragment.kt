@@ -149,7 +149,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             setViewModelDisplayParam(viewModel.path)
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!, adapter!!)
+        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!)
     }
 
     private fun setViewModelDisplayParam(path: String) {
