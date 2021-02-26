@@ -1,16 +1,20 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -21,6 +25,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
 import mega.privacy.android.app.di.MegaApi
@@ -41,8 +46,10 @@ import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.getFragmentFromNavHost
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -73,6 +80,11 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private val nodeAttacher = MegaAttacher(this)
     private val nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
 
+    private val dragToExit = DragToExitSupport(this, this::onDragActivated) {
+        finish()
+        overridePendingTransition(0, android.R.anim.fade_out)
+    }
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
         }
@@ -92,10 +104,15 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                         refreshMenuOptionsVisibility(currentFragment)
                     }
                 }
+
+                service.service.metadata.observe(this@MediaPlayerActivity) {
+                    dragToExit.nodeChanged(service.service.viewModel.playingHandle)
+                }
             }
         }
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -117,9 +134,13 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             nodeSaver.restoreState(savedInstanceState)
         }
 
+        val isAudioPlayer = isAudioPlayer(intent)
+
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(if (isAudioPlayer) binding.root else dragToExit.wrapContentView(binding.root))
         changeStatusBarColor(this, window, R.color.black)
+
+        dragToExit.observeThumbnailLocation(this)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -134,7 +155,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         if (rebuildPlaylist) {
             playerServiceIntent.setDataAndType(intent.data, intent.type)
-            if (isAudioPlayer(intent)) {
+            if (isAudioPlayer) {
                 startForegroundService(this, playerServiceIntent)
             } else {
                 startService(playerServiceIntent)
@@ -146,6 +167,25 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         viewModel.itemToRemove.observe(this) {
             playerService?.viewModel?.removeItem(it)
+        }
+
+        if (savedInstanceState == null && !isAudioPlayer) {
+            // post to next UI cycle so that MediaPlayerFragment's onCreateView is called
+            post {
+                getFragmentFromNavHost(R.id.nav_host_fragment, MediaPlayerFragment::class.java)
+                    ?.runEnterAnimation(dragToExit)
+            }
+        }
+
+        if (isAudioPlayer) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            window.statusBarColor = ContextCompat.getColor(this, android.R.color.black)
         }
     }
 
@@ -371,7 +411,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.properties -> {
-                if (service.viewModel.audioPlayer) {
+                if (!isVideoPlayer()) {
                     val uri =
                         service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return true
                     navController.navigate(
@@ -541,23 +581,45 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         searchMenuItem?.collapseActionView()
     }
 
-    fun hideToolbar() {
-        binding.toolbar.animate()
-            .translationY(-binding.toolbar.measuredHeight.toFloat())
-            .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
-            .start()
+    fun hideToolbar(animate: Boolean = true) {
+        if (animate) {
+            binding.toolbar.animate()
+                .translationY(-binding.toolbar.measuredHeight.toFloat())
+                .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
+                .start()
+        } else {
+            binding.toolbar.animate().cancel()
+            binding.toolbar.translationY = -binding.toolbar.measuredHeight.toFloat()
+        }
+
+        if (isVideoPlayer()) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
     }
 
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
             binding.toolbar.animate()
                 .translationY(0F)
-                .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
+                .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
             binding.toolbar.animate().cancel()
             binding.toolbar.translationY = 0F
         }
+
+        if (isVideoPlayer()) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+    }
+
+    fun setDraggable(draggable: Boolean) {
+        dragToExit.setDraggable(draggable)
+    }
+
+    private fun onDragActivated(activated: Boolean) {
+        getFragmentFromNavHost(R.id.nav_host_fragment, MediaPlayerFragment::class.java)
+            ?.onDragActivated(dragToExit, activated)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
@@ -572,6 +634,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }
+
+    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
 
     companion object {
         fun isAudioPlayer(intent: Intent?): Boolean {

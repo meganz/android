@@ -424,8 +424,9 @@
 
         <activity
             android:name=".mediaplayer.MediaPlayerActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.Swipe.BackFullScreen"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"

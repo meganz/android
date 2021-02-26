@@ -1,11 +1,11 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
@@ -16,38 +16,17 @@ class OfflineAdapter(
     var isList: Boolean,
     private val sortByHeaderViewModel: SortByHeaderViewModel,
     private val listener: OfflineAdapterListener
-) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()) {
+) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()), DragThumbnailGetter {
 
     fun getOfflineNodes(): List<MegaOffline> = currentList.map { it.node }
 
-    fun getNodePosition(handle: Long): Int =
+    override fun getNodePosition(handle: Long): Int =
         currentList.indexOfFirst { it.node.handle == handle.toString() }
 
-    fun setThumbnailVisibility(holder: ViewHolder, visibility: Int) {
-        if (holder is OfflineGridFileViewHolder) {
-            holder.getThumbnailView().visibility = visibility
-        } else if (holder is OfflineListViewHolder) {
-            holder.getThumbnailView().visibility = visibility
-        }
-    }
-
-    fun getThumbnailLocationOnScreen(holder: ViewHolder): IntArray? {
-        var thumbnail: View? = null
-
-        if (holder is OfflineGridFileViewHolder) {
-            thumbnail = holder.getThumbnailView()
-        } else if (holder is OfflineListViewHolder) {
-            thumbnail = holder.getThumbnailView()
-        }
-
-        if (thumbnail == null) {
-            return null
-        }
-
-        val topLeft = IntArray(2)
-        thumbnail.getLocationOnScreen(topLeft)
-
-        return intArrayOf(topLeft[0], topLeft[1], thumbnail.width, thumbnail.height)
+    override fun getThumbnail(viewHolder: ViewHolder) = when (viewHolder) {
+        is OfflineGridFileViewHolder -> viewHolder.getThumbnailView()
+        is OfflineListViewHolder -> viewHolder.getThumbnailView()
+        else -> null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OfflineViewHolder {

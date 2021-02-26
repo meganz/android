@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.dragger.ViewAnimator;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -87,7 +88,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
-		SnackbarShower {
+		SnackbarShower, ViewAnimator.Listener {
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
@@ -1007,7 +1008,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	private View getContainer() {
 		RelativeLayout container = new RelativeLayout(this);
-		draggableView = new DraggableView(this);
+		draggableView = new DraggableView(this, this);
 		if (getIntent() != null) {
 			screenPosition = getIntent().getIntArrayExtra("screenPosition");
 			draggableView.setScreenPosition(screenPosition);
@@ -1077,5 +1078,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void showSnackbar(int type, @Nullable String content, long chatId) {
 		showSnackbar(type, fragmentContainer, content, chatId);
+	}
+
+	@Override
+	public void showPreviousHiddenThumbnail() {
+	}
+
+	@Override
+	public void fadeOutFinish() {
+		finish();
+		overridePendingTransition(0, android.R.anim.fade_out);
 	}
 }

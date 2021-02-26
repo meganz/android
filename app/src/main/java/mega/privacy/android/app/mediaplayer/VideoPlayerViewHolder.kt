@@ -5,10 +5,10 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 
 class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
 
@@ -33,9 +33,9 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
         binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
     }
 
-    fun hideController() {
-        binding.playerView.hideController()
-    }
+    fun hideController() = binding.playerView.hideController()
+
+    fun showController() = binding.playerView.showController()
 
     fun displayMetadata(metadata: Metadata) {
         trackName.text = metadata.title ?: metadata.nodeName

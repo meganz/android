@@ -138,9 +138,15 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             playerService?.exoPlayer?.seekTo(item.index, 0)
         }
         (requireActivity() as MediaPlayerActivity).closeSearch()
+
+        if (isVideoPlayer()) {
+            (requireActivity() as MediaPlayerActivity).onBackPressed()
+        }
     }
 
     override fun removeItem(item: PlaylistItem) {
         playerService?.viewModel?.removeItem(item.nodeHandle)
     }
+
+    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
 }

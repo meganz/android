@@ -70,6 +70,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.dragger.ViewAnimator;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
@@ -121,7 +122,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
-		SnackbarShower {
+		SnackbarShower, ViewAnimator.Listener {
 
 	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
 			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -237,7 +238,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onDestroy(){
 
-		setImageDragVisibility(View.VISIBLE);
+		showPreviousHiddenThumbnail();
 
 		if(megaApi != null){
 			megaApi.removeRequestListener(this);
@@ -1165,7 +1166,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 	}
 
-	public void setImageDragVisibility(int visibility){
+	@Override
+	public void showPreviousHiddenThumbnail(){
+		int visibility = View.VISIBLE;
+
 		logDebug("Visibility: " + visibility);
 		if (adapterType == RUBBISH_BIN_ADAPTER){
 			if (RubbishBinFragmentLollipop.imageDrag != null){
@@ -1244,6 +1248,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
                 callback.setVisibility(visibility);
             }
         }
+	}
+
+	@Override
+	public void fadeOutFinish() {
+		finish();
+		overridePendingTransition(0, android.R.anim.fade_out);
 	}
 
 	void getLocationOnScreen(int[] location){
@@ -2311,7 +2321,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
-		setImageDragVisibility(View.VISIBLE);
+		showPreviousHiddenThumbnail();
 		super.onBackPressed();
 	}
 
@@ -2392,7 +2402,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	private View getContainer() {
 		RelativeLayout container = new RelativeLayout(this);
-		draggableView = new DraggableView(this);
+		draggableView = new DraggableView(this, this);
 		if (getIntent() != null) {
 			screenPosition = getIntent().getIntArrayExtra("screenPosition");
 			draggableView.setScreenPosition(screenPosition);

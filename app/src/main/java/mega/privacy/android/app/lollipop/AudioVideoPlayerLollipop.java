@@ -99,6 +99,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.ViewAnimator;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -165,7 +166,7 @@ import static mega.privacy.android.app.utils.Util.*;
  */
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaTransferListenerInterface, DraggableView.DraggableListener,
-        SnackbarShower {
+        SnackbarShower, ViewAnimator.Listener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
 
@@ -1530,7 +1531,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         sendBroadcast(intent);
     }
 
-    public void setImageDragVisibility(int visibility){
+    @Override
+    public void showPreviousHiddenThumbnail(){
+        int visibility = View.VISIBLE;
+
         if (adapterType == RUBBISH_BIN_ADAPTER){
             if (RubbishBinFragmentLollipop.imageDrag != null){
                 RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
@@ -1613,6 +1617,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 callback.setVisibility(visibility);
             }
         }
+    }
+
+    @Override
+    public void fadeOutFinish() {
+        finish();
+        overridePendingTransition(0, android.R.anim.fade_out);
     }
 
     void getLocationOnScreen(int[] location){
@@ -3287,7 +3297,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     protected void onDestroy() {
         logDebug("onDestroy()");
 
-        setImageDragVisibility(View.VISIBLE);
+        showPreviousHiddenThumbnail();
 
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
@@ -3460,7 +3470,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             unregisterReceiver(receiver);
             unregisterReceiver(receiverToFinish);
 
-            setImageDragVisibility(View.VISIBLE);
+            showPreviousHiddenThumbnail();
         }
         else {
             if (querySearch.equals("")){
@@ -3487,7 +3497,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private View getContainer() {
         RelativeLayout container = new RelativeLayout(this);
-        draggableView = new DraggableView(this);
+        draggableView = new DraggableView(this, this);
         if (getIntent() != null) {
             screenPosition = getIntent().getIntArrayExtra("screenPosition");
             draggableView.setScreenPosition(screenPosition);

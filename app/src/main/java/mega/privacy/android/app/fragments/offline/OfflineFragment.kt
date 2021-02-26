@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
@@ -32,14 +31,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
@@ -49,14 +48,13 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
-import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -72,34 +70,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     private var adapter: OfflineAdapter? = null
     private var actionMode: ActionMode? = null
 
-    private val receiverUpdatePosition = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) {
-                return
-            }
-
-            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0) == OFFLINE_ADAPTER
-            ) {
-                val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
-
-                when (intent.getIntExtra(ACTION_TYPE, -1)) {
-                    SCROLL_TO_POSITION -> {
-                        scrollToNode(handle)
-                    }
-                    UPDATE_IMAGE_DRAG -> {
-                        hideDraggingThumbnail(handle)
-                    }
-                }
-            }
-        }
-    }
     private val receiverRefreshOffline = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             refreshNodes()
         }
     }
-
-    private var draggingNodeHandle = INVALID_HANDLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,12 +129,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        requireContext().registerReceiver(
-            receiverUpdatePosition,
-            IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
-        )
-
+    ): View {
         binding = FragmentOfflineBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -179,7 +149,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             setViewModelDisplayParam(viewModel.path)
         }
 
-        setupDraggingThumbnailCallback()
+        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!, adapter!!)
     }
 
     private fun setViewModelDisplayParam(path: String) {
@@ -194,7 +164,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         super.onDestroyView()
 
         viewModel.clearEmptySearchQuery()
-        requireContext().unregisterReceiver(receiverUpdatePosition)
     }
 
     private fun setupView() {
@@ -551,16 +520,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
-                val screenPosition = getThumbnailScreenPosition(position)
-                if (screenPosition != null) {
-                    intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
-                }
+
+                putThumbnailLocation(intent, recyclerView!!, position, adapter!!)
+
                 intent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
                 )
 
-                draggingNodeHandle = node.node.handle.toLong()
-                setupDraggingThumbnailCallback()
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }
@@ -590,10 +556,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
-                val screenPosition = getThumbnailScreenPosition(position)
-                if (screenPosition != null) {
-                    mediaIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
-                }
+                putThumbnailLocation(mediaIntent, recyclerView!!, position, adapter!!)
 
                 mediaIntent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
@@ -613,8 +576,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
 
                 if (internalIntent) {
-                    draggingNodeHandle = node.node.handle.toLong()
-                    setupDraggingThumbnailCallback()
                     startActivity(mediaIntent)
                     requireActivity().overridePendingTransition(0, 0)
                 } else if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
@@ -653,15 +614,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
-                val screenPosition = getThumbnailScreenPosition(position)
-                if (screenPosition != null) {
-                    pdfIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
-                }
+                putThumbnailLocation(pdfIntent, recyclerView!!, position, adapter!!)
 
                 if (setLocalIntentParams(context, node.node, pdfIntent, file.absolutePath, false)) {
                     pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    draggingNodeHandle = node.node.handle.toLong()
-                    setupDraggingThumbnailCallback()
                     startActivity(pdfIntent)
                     requireActivity().overridePendingTransition(0, 0)
                 }
@@ -674,11 +630,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 openFile(file)
             }
         }
-    }
-
-    private fun getThumbnailScreenPosition(position: Int): IntArray? {
-        val viewHolder = recyclerView?.findViewHolderForLayoutPosition(position) ?: return null
-        return adapter?.getThumbnailLocationOnScreen(viewHolder)
     }
 
     private fun openFile(file: File) {
@@ -747,25 +698,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     fun searchMode() = viewModel.searchMode()
 
-    fun scrollToNode(handle: Long) {
-        logDebug("scrollToNode, handle $handle")
-        val position = adapter?.getNodePosition(handle) ?: return
-        logDebug("scrollToNode, handle $handle, position $position")
-
-        if (position != INVALID_POSITION) {
-            recyclerView?.scrollToPosition(position)
-            notifyThumbnailLocationOnScreen()
-        }
-    }
-
-    fun hideDraggingThumbnail(handle: Long) {
-        logDebug("hideDraggingThumbnail: $handle")
-        setDraggingThumbnailVisibility(draggingNodeHandle, View.VISIBLE)
-        setDraggingThumbnailVisibility(handle, View.GONE)
-        draggingNodeHandle = handle
-        notifyThumbnailLocationOnScreen()
-    }
-
     fun refreshNodes() {
         viewModel.loadOfflineNodes()
     }
@@ -800,48 +732,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         super.onSaveInstanceState(outState)
 
         viewModel.skipNextAutoScroll = true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
-        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
-        PdfViewerActivityLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
-    }
-
-    private fun setupDraggingThumbnailCallback() {
-        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
-            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
-        )
-        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
-            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
-        )
-        PdfViewerActivityLollipop.addDraggingThumbnailCallback(
-            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
-        )
-    }
-
-    private fun setDraggingThumbnailVisibility(
-        handle: Long,
-        visibility: Int
-    ) {
-        val position = adapter?.getNodePosition(handle) ?: return
-        val viewHolder: ViewHolder =
-            recyclerView?.findViewHolderForLayoutPosition(position) ?: return
-        adapter?.setThumbnailVisibility(viewHolder, visibility)
-    }
-
-    private fun notifyThumbnailLocationOnScreen() {
-        val position = adapter?.getNodePosition(draggingNodeHandle) ?: return
-        val viewHolder: ViewHolder =
-            recyclerView?.findViewHolderForLayoutPosition(position) ?: return
-        val res = adapter?.getThumbnailLocationOnScreen(viewHolder) ?: return
-
-        res[0] += res[2] / 2
-        res[1] += res[3] / 2
-        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, res)
-        requireContext().sendBroadcast(intent)
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -903,27 +793,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         checkScroll()
     }
 
-    private class OfflineDraggingThumbnailCallback constructor(fragment: OfflineFragment) :
-        DraggingThumbnailCallback {
-        private val fragmentRef = WeakReference(fragment)
-        override fun setVisibility(visibility: Int) {
-            val fragment = fragmentRef.get()
-            fragment?.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility)
-        }
-
-        override fun getLocationOnScreen(location: IntArray) {
-            val fragment = fragmentRef.get()
-
-            if (fragment != null) {
-                val position =
-                    fragment.adapter?.getNodePosition(fragment.draggingNodeHandle) ?: return
-                val viewHolder =
-                    fragment.recyclerView?.findViewHolderForLayoutPosition(position) ?: return
-                val res = fragment.adapter?.getThumbnailLocationOnScreen(viewHolder) ?: return
-                System.arraycopy(res, 0, location, 0, 2)
-            }
-        }
-    }
 
     companion object {
         const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"

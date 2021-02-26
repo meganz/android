@@ -729,6 +729,8 @@ public class Constants {
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
+    public static final int LOCATION_INDEX_WIDTH = 2;
+    public static final int LOCATION_INDEX_HEIGHT = 3;
 
     public static final String OFFLINE_ROOT = "/";
 
@@ -748,7 +750,7 @@ public class Constants {
     public static final long AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS = 3000;
     public static final long AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS = 200;
     public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
-    public static final long AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
+    public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
 
     public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
 
@@ -765,6 +767,10 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+
+    public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
+    public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
+    public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";

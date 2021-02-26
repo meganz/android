@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
@@ -17,11 +18,12 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.mediaplayer.service.CallAwareControlDispatcher
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
+import mega.privacy.android.app.mediaplayer.service.CallAwareControlDispatcher
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -36,6 +38,8 @@ class MediaPlayerFragment : Fragment() {
 
     private var playlistObserved = false
     private var videoPlayerPausedForPlaylist = false
+
+    private var delayHideToolbarCanceled = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -83,7 +87,10 @@ class MediaPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tryObservePlaylist()
-        delayHideToolbar()
+
+        if (!isVideoPlayer()) {
+            delayHideToolbar()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,12 +118,16 @@ class MediaPlayerFragment : Fragment() {
             playerService?.exoPlayer?.playWhenReady = true
             videoPlayerPausedForPlaylist = false
         }
+
+        if (isVideoPlayer()) {
+            (requireActivity() as MediaPlayerActivity).setDraggable(true)
+        }
     }
 
     override fun onPause() {
         super.onPause()
 
-        if (playerService?.viewModel?.audioPlayer == false) {
+        if (isVideoPlayer()) {
             playerService?.exoPlayer?.playWhenReady = false
             videoPlayerPausedForPlaylist = true
         }
@@ -189,6 +200,8 @@ class MediaPlayerFragment : Fragment() {
             // we need setup control buttons again, because reset player would reset
             // PlayerControlView
             viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
+                (requireActivity() as MediaPlayerActivity).setDraggable(false)
+
                 findNavController().navigate(R.id.action_player_to_playlist)
             }
         }
@@ -226,6 +239,8 @@ class MediaPlayerFragment : Fragment() {
             if (toolbarVisible) {
                 hideToolbar()
             } else {
+                delayHideToolbarCanceled = true
+
                 showToolbar()
             }
         }
@@ -240,20 +255,21 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun delayHideToolbar() {
+        delayHideToolbarCanceled = false
+
         runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
-            if (isResumed) {
+            if (isResumed && !delayHideToolbarCanceled) {
                 hideToolbar()
 
-                audioPlayerVH?.hideController()
                 videoPlayerVH?.hideController()
             }
         }
     }
 
-    private fun hideToolbar() {
+    private fun hideToolbar(animate: Boolean = true) {
         toolbarVisible = false
 
-        (requireActivity() as MediaPlayerActivity).hideToolbar()
+        (requireActivity() as MediaPlayerActivity).hideToolbar(animate)
     }
 
     private fun showToolbar() {
@@ -261,4 +277,42 @@ class MediaPlayerFragment : Fragment() {
 
         (requireActivity() as MediaPlayerActivity).showToolbar()
     }
+
+    fun runEnterAnimation(dragToExit: DragToExitSupport) {
+        val binding = videoPlayerVH?.binding ?: return
+
+        dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
+            if (it) {
+                hideToolbar(false)
+                videoPlayerVH?.hideController()
+
+                binding.root.setBackgroundColor(Color.TRANSPARENT)
+            } else {
+                showToolbar()
+                videoPlayerVH?.showController()
+
+                binding.root.setBackgroundColor(Color.BLACK)
+
+                delayHideToolbar()
+            }
+        }
+    }
+
+    fun onDragActivated(dragToExit: DragToExitSupport, activated: Boolean) {
+        if (activated) {
+            hideToolbar(false)
+            videoPlayerVH?.hideController()
+
+            videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
+
+            val videoSurfaceView = videoPlayerVH?.binding?.playerView?.videoSurfaceView ?: return
+            dragToExit.setCurrentView(videoSurfaceView)
+        } else {
+            runDelay(300L) {
+                videoPlayerVH?.binding?.root?.setBackgroundColor(Color.BLACK)
+            }
+        }
+    }
+
+    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
 }
