@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -192,15 +193,15 @@ public class CreateChatListener extends ChatBaseListener {
             case SEND_LINK:
                 if (errorCreatingChat()) {
                     //All send messages fail; Show error
-                    showSnackbar(context, context.getString(R.string.create_chat_error));
+                    showSnackbar(context, getString(R.string.content_not_send, totalCounter));
                 } else {
                     ChatController.sendLinkToChats(context, getChatHandles(), link, key, password);
                 }
                 break;
 
             case CONFIGURE_DND:
-                if (errorCreatingChat()) {
-                    showSnackbar(context, context.getString(R.string.create_chat_error));
+                if (!errorCreatingChat()) {
+                    showSnackbar(context, getString(R.string.mute_notifications_dialog_not_open));
                 } else {
                     if (context instanceof ContactInfoActivityLollipop) {
                         ((ContactInfoActivityLollipop) context).chatCreated(chats.get(0));
