@@ -34,8 +34,8 @@ import java.util.*
  */
 class DragToExitSupport(
     private val context: Context,
-    private val dragActivated: (Boolean) -> Unit,
-    private val fadeOutFinishCallback: () -> Unit
+    private val dragActivated: ((Boolean) -> Unit)?,
+    private val fadeOutFinishCallback: (() -> Unit)?
 ) : DraggableView.DraggableListener, ViewAnimator.Listener {
     private var draggableView: DraggableView? = null
     private var ivShadow: ImageView? = null
@@ -228,7 +228,7 @@ class DragToExitSupport(
     }
 
     override fun onDragActivated(activated: Boolean) {
-        dragActivated(activated)
+        dragActivated?.invoke(activated)
     }
 
     override fun showPreviousHiddenThumbnail() {
@@ -238,7 +238,7 @@ class DragToExitSupport(
     }
 
     override fun fadeOutFinish() {
-        fadeOutFinishCallback()
+        fadeOutFinishCallback?.invoke()
     }
 
     companion object {
