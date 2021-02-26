@@ -443,7 +443,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), uploadPath);
-		} else if (MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)) {
+		} else if (MimeTypeList.typeForName(file.getName()).isMp4Video() && !sendOriginalAttachments) {
 			logDebug("DATA connection is Mp4Video");
 
 			try {
@@ -479,8 +479,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 
 				if (outFile == null) {
-					pendingMessages.addAll(pendingMsgs);
-					startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+					addPendingMessagesAndStartUpload(pendingMsg.getId(), type,
+							fileNames.get(pendingMsg.getName()), pendingMsg.getFilePath(), pendingMsgs);
 				} else {
 					totalVideos++;
 					numberVideosPending++;
@@ -501,18 +501,33 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			} catch (Throwable throwable) {
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
-				pendingMessages.addAll(pendingMsgs);
-				startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+				addPendingMessagesAndStartUpload(pendingMsg.getId(), type,
+						fileNames.get(pendingMsg.getName()), pendingMsg.getFilePath(), pendingMsgs);
 			}
 		} else {
-			pendingMessages.addAll(pendingMsgs);
-			startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+			addPendingMessagesAndStartUpload(pendingMsg.getId(), type,
+					fileNames.get(pendingMsg.getName()), pendingMsg.getFilePath(), pendingMsgs);
 		}
 
 		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 				&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
 			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
 		}
+	}
+
+	/**
+	 * Adds pending messages to general list and starts the upload.
+	 *
+	 * @param idPendingMessage Identifier of pending message.
+	 * @param type             Type of upload file.
+	 * @param fileName         Name of the file if set, null otherwise.
+	 * @param localPath        Local path of the file to upload.
+	 * @param pendingMsgs	   List of pending Messages.
+	 */
+	private void addPendingMessagesAndStartUpload(long idPendingMessage, String type, String fileName,
+												  String localPath, ArrayList<PendingMessageSingle> pendingMsgs) {
+		pendingMessages.addAll(pendingMsgs);
+		startUpload(idPendingMessage, type, fileName, localPath);
 	}
 
 	/**
