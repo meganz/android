@@ -2578,7 +2578,6 @@
 
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
-    <string name="mute_notifications_dialog_not_open" context="Alert shown when mute notifications dialog have not been open because of any error occurs">Mute notifications dialog was not opened</string>
 
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>

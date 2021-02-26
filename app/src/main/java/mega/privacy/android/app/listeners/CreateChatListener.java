@@ -201,7 +201,7 @@ public class CreateChatListener extends ChatBaseListener {
 
             case CONFIGURE_DND:
                 if (errorCreatingChat()) {
-                    showSnackbar(context, getString(R.string.mute_notifications_dialog_not_open));
+                    showSnackbar(context, getString(R.string.general_text_error));
                 } else {
                     if (context instanceof ContactInfoActivityLollipop) {
                         ((ContactInfoActivityLollipop) context).chatCreated(chats.get(0));
