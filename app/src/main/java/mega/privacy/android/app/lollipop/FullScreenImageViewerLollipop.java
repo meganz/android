@@ -90,6 +90,7 @@ import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -2237,6 +2238,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
             if(adapterType == FILE_LINK_ADAPTER){
 				if (nC == null) {
 					nC = new NodeController(this);

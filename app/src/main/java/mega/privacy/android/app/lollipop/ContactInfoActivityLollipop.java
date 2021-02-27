@@ -84,6 +84,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1519,6 +1520,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             logDebug("size: "+size);
             long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
             logDebug("hashes size: "+hashes.length);
+
+			Util.storeDownloadLocationIfNeeded(parentPath);
 
             boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
