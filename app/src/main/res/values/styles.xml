@@ -217,16 +217,15 @@
     <!-- For date picker dialog -->
     <style name="Widget.Mega.DatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Calendar">
         <item name="android:datePickerStyle">@style/Widget.Mega.DatePicker</item>
-
+        <item name="android:background">@color/white_grey_800</item>
     </style>
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
-        <item name="android:headerBackground">?attr/colorSecondary</item>
-        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Primary</item>
+        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
     </style>
 
-    <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Primary">
-        <item name="android:textColor">?attr/colorPrimary</item>
+    <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary">
+        <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
     <!--======= Legacy styles(may not be best practice, keep them just for quick development, some are slightly modified) ========= -->

@@ -38,7 +38,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:textAllCaps="true"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
         </RelativeLayout>
         
         <RelativeLayout
@@ -118,7 +118,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:textAllCaps="true"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
         </RelativeLayout>
 
         <RelativeLayout

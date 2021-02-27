@@ -199,6 +199,9 @@
     <!-- Two factor authentication credentials background -->
     <color name="grey_020_grey_800">@color/grey_800</color>
 
+    <!-- Date picker background color -->
+    <color name="white_grey_800">@color/grey_800</color>
+
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
 
