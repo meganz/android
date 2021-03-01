@@ -330,6 +330,8 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
             }
 
             override fun onFailure(call: Call<GiphyResponse>, t: Throwable) {
+                if (call.isCanceled) return
+
                 logError("GiphyResponse failed: " + t.message)
                 checkIfShouldShowDownServerState()
             }

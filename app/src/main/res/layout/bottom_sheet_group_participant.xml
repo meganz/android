@@ -5,14 +5,12 @@
     android:id="@+id/participant_item_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/group_participants_chat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:orientation="vertical"
         android:padding="0dp">
 
