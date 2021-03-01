@@ -294,7 +294,7 @@
                 android:layout_marginBottom="14dp"
                 android:backgroundTint="@color/drawer_upgrade_button_background_selector"
                 android:text="@string/my_account_upgrade_pro"
-                android:textColor="@color/teal_300_dark_grey" />
+                android:textColor="@color/white_dark_grey" />
 
         </LinearLayout>
 
