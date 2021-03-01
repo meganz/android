@@ -383,7 +383,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
-	TextView addPhoneNumberButton;
+	Button addPhoneNumberButton;
 	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
@@ -475,7 +475,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private AlertDialog reconnectDialog;
 
-	private LinearLayout navigationDrawerAddPhoneContainer;
+	private RelativeLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
     float elevation = 0;
@@ -2370,7 +2370,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
 
-        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton = findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
