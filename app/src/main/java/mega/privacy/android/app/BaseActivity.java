@@ -634,7 +634,25 @@ public class BaseActivity extends AppCompatActivity {
      * @param s Text to shown in the snackbar
      */
     public void showSnackbar (int type, View view, String s) {
-        showSnackbar(type, view, s, -1);
+        showSnackbar(type, view, s, MEGACHAT_INVALID_HANDLE);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type   There are three possible values to this param:
+     *               - SNACKBAR_TYPE: creates a simple snackbar
+     *               - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *               - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *               - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *               - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view   Layout where the snackbar is going to show.
+     * @param s      Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     */
+    public void showSnackbar(int type, View view, String s, long idChat) {
+        showSnackbar(type, view, s, idChat, null);
     }
 
     /**
@@ -644,12 +662,15 @@ public class BaseActivity extends AppCompatActivity {
      *            - SNACKBAR_TYPE: creates a simple snackbar
      *            - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
      *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *            - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *            - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     * @param userEmail Email of the user to be invited.
      */
-    public void showSnackbar (int type, View view, String s, long idChat) {
+    public void showSnackbar (int type, View view, String s, long idChat, String userEmail) {
         logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -708,12 +729,17 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
-                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
 
             case PERMISSIONS_TYPE:
                 snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
+
+            case INVITE_CONTACT_TYPE:
+                snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
         }

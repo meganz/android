@@ -85,6 +85,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.CameraUploadUtil;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -3038,11 +3039,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             String megaUser = listContacts.get(position).getUser();
             MegaUser contact = megaApi.getContact(megaUser);
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, megaUser);
-                startActivity(i);
+                ContactUtil.openContactInfoActivity(this, megaUser);
             }
-
         }
     }
 

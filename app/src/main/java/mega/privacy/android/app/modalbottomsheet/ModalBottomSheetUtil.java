@@ -18,6 +18,7 @@ import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -25,6 +26,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
@@ -38,7 +41,7 @@ public class ModalBottomSheetUtil {
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
 
-    public static void openWith(MegaNode node) {
+    public static void openWith(Context context, MegaNode node) {
         if (node == null) {
             logWarning("Node is null");
             return;
@@ -78,7 +81,7 @@ public class ModalBottomSheetUtil {
 
             String url = megaApi.httpServerGetLocalLink(node);
             if (url == null) {
-                Toast.makeText(app, app.getResources().getString(R.string.error_open_file_with), Toast.LENGTH_LONG).show();
+                Util.showSnackbar(context, getString(R.string.error_open_file_with));
             } else {
                 mediaIntent.setDataAndType(Uri.parse(url), mimeType);
             }
@@ -88,7 +91,7 @@ public class ModalBottomSheetUtil {
             mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             app.startActivity(mediaIntent);
         } else {
-            Toast.makeText(app, app.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            Util.showSnackbar(context, getString(R.string.intent_not_available_file));
         }
     }
 
