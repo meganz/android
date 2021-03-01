@@ -47,7 +47,6 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -356,7 +355,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             if (thumb != null) {
                 setImageParams(holder.imageView, 36, MARGIN_LEFT_WITH_THUMBNAIL);
                 holder.imageView.setImageBitmap(
-                        ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+                        ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
             }
         }
     }

@@ -11,7 +11,6 @@ import androidx.core.content.FileProvider;
 
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -35,7 +34,6 @@ import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class ModalBottomSheetUtil {
 
-    public static final int THUMB_ROUND_DP = 4;
     public static final int THUMB_SIZE_DP = 36;
     public static final int THUMB_MARGIN_DP = 18;
     public static final int ICON_SIZE_DP = 48;
@@ -134,7 +132,7 @@ public class ModalBottomSheetUtil {
             params.height = params.width = dp2px(THUMB_SIZE_DP);
             int margin = dp2px(THUMB_MARGIN_DP);
             params.setMargins(margin, margin, margin, margin);
-            nodeThumb.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_ROUND_DP)));
+            nodeThumb.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
         } else {
             params.height = params.width = dp2px(ICON_SIZE_DP);
             int margin = dp2px(ICON_MARGIN_DP);

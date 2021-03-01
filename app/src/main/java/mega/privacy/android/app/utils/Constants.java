@@ -583,6 +583,7 @@ public class Constants {
     public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
     public static final int AVATAR_SIZE = 150;
+    public static final float THUMB_CORNER_RADIUS_DP = 4;
 
     public static final String SEPARATOR = File.separator;
 
