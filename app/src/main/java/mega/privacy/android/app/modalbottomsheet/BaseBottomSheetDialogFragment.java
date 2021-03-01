@@ -86,9 +86,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = new CustomBottomSheetDialog(context, getTheme());
-        ColorUtils.setStatusBarTextColor(dialog.getContext(), dialog.getWindow());
-        return dialog;
+        return new CustomBottomSheetDialog(context, getTheme());
     }
 
     /**
