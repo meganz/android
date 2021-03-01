@@ -4,6 +4,7 @@ package mega.privacy.android.app.fcm;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_MOVE_TO_CHAT_SECTION;
 
 public class KeepAliveService extends Service {
 
@@ -36,8 +41,16 @@ public class KeepAliveService extends Service {
     }
 
     public void createNotification(int smallIcon,String title) {
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE)
+                .putExtra(EXTRA_MOVE_TO_CHAT_SECTION, true)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, RETRIEVING_MSG_CHANNEL_ID);
         mBuilder.setSmallIcon(smallIcon)
+                .setContentIntent(pendingIntent)
                 .setContentText(title)
                 .setAutoCancel(false);
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);

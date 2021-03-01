@@ -650,12 +650,15 @@
 
         <activity
             android:name=".lollipop.megachat.MapsActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_maps"
-            android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.Megaactionbar">
+            android:theme="@style/Theme.Megaactionbar"
+            android:windowSoftInputMode="adjustNothing">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="mega.privacy.android.app.lollipop.PinActivityLollipop" />
+
         </activity>
 
         <activity

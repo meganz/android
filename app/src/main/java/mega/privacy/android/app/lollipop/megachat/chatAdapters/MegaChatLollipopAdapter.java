@@ -89,6 +89,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1578,11 +1579,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
 
-                    logDebug("State of the message: " + message.getPendingMessage().getState());
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
-                        ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
-                    } else if (!areTransfersPaused){
-                        ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
+                    PendingMessageSingle pendingMsg = message.getPendingMessage();
+                    logDebug("State of the message: " + pendingMsg.getState());
+
+                    String state = null;
+
+                    switch (pendingMsg.getState()) {
+                        case PendingMessageSingle.STATE_ERROR_UPLOADING:
+                        case PendingMessageSingle.STATE_ERROR_ATTACHING:
+                            state = StringResourcesUtils.getString(R.string.attachment_uploading_state_error);
+                            break;
+
+                        case PendingMessageSingle.STATE_COMPRESSING:
+                            state = StringResourcesUtils.getString(R.string.attachment_uploading_state_compressing);
+                            break;
+
+                        default:
+                            if (!areTransfersPaused) {
+                                state = StringResourcesUtils.getString(R.string.attachment_uploading_state_uploading);
+                            }
+                    }
+
+                    if (state != null) {
+                        ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(state);
                     }
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setVisibility(areTransfersPaused ? View.GONE : View.VISIBLE);
@@ -3172,6 +3191,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.pinnedContactLocationLayout.setVisibility(View.VISIBLE);
             holder.pinnedContactLocationInfoText.setVisibility(View.VISIBLE);
             holder.pinnedContactLocationInfoText.setText(location);
+
+            holder.forwardContactRichLinks.setVisibility(View.GONE);
+            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+            holder.forwardContactFile.setVisibility(View.GONE);
+            holder.forwardContactContact.setVisibility(View.GONE);
 
             if (bitmapImage != null) {
                 holder.previewContactLocation.setImageBitmap(bitmapImage);

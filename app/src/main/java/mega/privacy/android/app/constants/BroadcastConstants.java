@@ -20,6 +20,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_TRANSFER_FINISH = "INTENT_TRANSFER_FINISH";
     public static final String BROADCAST_ACTION_REENABLE_CU_PREFERENCE = "BROADCAST_ACTION_REENABLE_CU_PREFERENCE";
     public static final String BROADCAST_ACTION_UPDATE_HISTORY_BY_RT = "ACTION_UPDATE_HISTORY_BY_RT";
+    public static final String BROADCAST_ACTION_CHAT_TRANSFER_START = "INTENT_CHAT_TRANSFER_START";
     public static final String BROADCAST_ACTION_COOKIE_SETTINGS_SAVED = "BROADCAST_ACTION_COOKIE_SETTINGS_SAVED";
 
     //    Broadcasts' actions
@@ -92,6 +93,7 @@ public class BroadcastConstants {
     public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";
     public static final String DAYS_COUNT = "DAYS_COUNT";
     public static final String KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE";
-
     public static final String RETENTION_TIME = "RETENTION_TIME";
+    public static final String PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
+
 }
