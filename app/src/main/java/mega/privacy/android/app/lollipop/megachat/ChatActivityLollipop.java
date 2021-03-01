@@ -6037,8 +6037,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID " + msg.getMsgId());
 
-        int resultModify;
-
         if (msg.isDeleted()) {
             if (adapter != null) {
                 adapter.stopPlaying(msg.getMsgId());
@@ -6053,9 +6051,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)) {
             logDebug("Change access of the message. One attachment revoked, modify message");
 
-            resultModify = modifyMessageReceived(androidMsg, false);
-
-            if (resultModify == INVALID_VALUE) {
+            if (modifyMessageReceived(androidMsg, false) == INVALID_VALUE) {
                 int firstIndexShown = messages.get(0).getMessage().getMsgIndex();
                 logDebug("Modify result is -1. The first index is: " + firstIndexShown
                         + " the index of the updated message: " + msg.getMsgIndex());
@@ -6080,10 +6076,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
             } else {
                 disableMultiselection();
 
-                if (msg.isDeleted()) {
-                    logDebug("Message deleted!!");
-                }
-
                 checkMegaLink(msg);
 
                 if (msg.getContainsMeta() != null && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
@@ -6107,9 +6099,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Modify my message and node attachment. The id of my pending message is: " + idMsg);
 
                 if (idMsg != INVALID_VALUE) {
-                    resultModify = modifyAttachmentReceived(androidMsg, idMsg);
-
-                    if (resultModify == INVALID_VALUE) {
+                    if (modifyAttachmentReceived(androidMsg, idMsg) == INVALID_VALUE) {
                         logWarning("Node attachment message not in list -> resultModify -1");
                     } else {
                         dbH.removePendingMessageById(idMsg);
