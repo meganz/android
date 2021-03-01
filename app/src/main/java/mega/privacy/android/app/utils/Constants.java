@@ -563,6 +563,7 @@ public class Constants {
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
+    public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
     public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
@@ -748,4 +749,8 @@ public class Constants {
     public static final String INVALID_NON_NULL_VALUE = "-1";
 
     public static final String STRING_SEPARATOR = " · ";
+
+    public static final int NOT_OVERQUOTA_STATE = 0;
+    public static final int OVERQUOTA_STORAGE_STATE = 1;
+    public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 }

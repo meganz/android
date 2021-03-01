@@ -79,10 +79,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 
-    private static final int NOT_OVERQUOTA_STATE = 0;
-    private static final int OVERQUOTA_STORAGE_STATE = 1;
-    private static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
-
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
 	private int childUploadFailed = 0;
