@@ -19,6 +19,8 @@ class CustomBottomSheetDialog(context: Context, theme: Int) : BottomSheetDialog(
         val isPortraitMode = resources.configuration.orientation == ORIENTATION_PORTRAIT
 
         window?.setLayout(if (isPortraitMode) width else height, MATCH_PARENT)
+
+        // Set navigation bar background with light grey to make navigation buttons visible under light mode.
         if (!Util.isDarkMode(context)) {
             window?.navigationBarColor = ContextCompat.getColor(context, R.color.white_alpha_070)
         }
