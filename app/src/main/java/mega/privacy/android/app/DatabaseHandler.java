@@ -27,7 +27,6 @@ import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.sync.Backup;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
-import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
@@ -3347,7 +3346,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param value      Value to set.
 	 */
 	private void setStringValue(String tableName, String columnName, String value) {
-		if(TextUtil.isTextEmpty(value)) {
+		if(isTextEmpty(value)) {
 			logWarning("Set " + columnName + " with empty value!");
 		}
 
