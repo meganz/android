@@ -754,7 +754,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private MenuItem retryTransfers;
 	private MenuItem clearCompletedTransfers;
 	private MenuItem scanQRcodeMenuItem;
-	private MenuItem rubbishBinMenuItem;
 	private MenuItem returnCallMenuItem;
 
 	private Chronometer chronometerMenuItem;
@@ -2362,6 +2361,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		findViewById(R.id.offline_section).setOnClickListener(this);
 		transfersSection = findViewById(R.id.transfers_section);
 		transfersSection.setOnClickListener(this);
+		findViewById(R.id.rubbish_bin_section).setOnClickListener(this);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
@@ -6748,7 +6748,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
-		rubbishBinMenuItem = menu.findItem(R.id.action_menu_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
@@ -6794,7 +6793,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (isOnline(this)) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
-					rubbishBinMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
 					addMenuItem.setEnabled(true);
@@ -6826,7 +6824,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				case CAMERA_UPLOADS:
 				case MEDIA_UPLOADS:
 					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					rubbishBinMenuItem.setVisible(true);
 
 					updateCuFragmentOptionsMenu();
 					break;
@@ -6844,7 +6841,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				case SHARED_ITEMS:
 					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
 						addMenuItem.setEnabled(true);
-						rubbishBinMenuItem.setVisible(true);
 
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
@@ -6870,8 +6866,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 							}
 						}
 					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						rubbishBinMenuItem.setVisible(true);
-
 						if (parentHandleOutgoing != INVALID_HANDLE) {
 							addMenuItem.setVisible(true);
 							createFolderMenuItem.setVisible(true);
@@ -6884,8 +6878,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 							searchMenuItem.setVisible(true);
 						}
 					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
-						rubbishBinMenuItem.setVisible(true);
-
 						if (isLinksAdded() && lF.getItemCount() > 0) {
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
@@ -6919,20 +6911,16 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					if (searchExpand) {
 						openSearchView();
 						sFLol.checkSelectMode();
-					} else {
-						rubbishBinMenuItem.setVisible(true);
-						if (getSearchFragment() != null
-								&& getSearchFragment().getNodes() != null
-								&& getSearchFragment().getNodes().size() > 0) {
-							sortByMenuItem.setVisible(true);
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-						}
+					} else if (getSearchFragment() != null
+							&& getSearchFragment().getNodes() != null
+							&& getSearchFragment().getNodes().size() > 0) {
+						sortByMenuItem.setVisible(true);
+						thumbViewMenuItem.setVisible(true);
+						setGridListIcon();
 					}
 					break;
 
 				case ACCOUNT:
-					rubbishBinMenuItem.setVisible(true);
 					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
 						refreshMenuItem.setVisible(true);
 						killAllSessions.setVisible(true);
@@ -7002,9 +6990,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			} else {
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-					if (isOnline(this)) {
-						rubbishBinMenuItem.setVisible(true);
-					}
 				}
 			}
 		}
@@ -7038,7 +7023,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void updateFullscreenOfflineFragmentOptionMenu(boolean openSearchView) {
-    	if (rubbishBinMenuItem == null || fullscreenOfflineFragment == null) {
+    	if (fullscreenOfflineFragment == null) {
     		return;
 		}
 
@@ -7046,8 +7031,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			openSearchView();
 		} else if (!searchExpand) {
 			if (isOnline(this)) {
-				rubbishBinMenuItem.setVisible(true);
-
 				if (fullscreenOfflineFragment.getItemCount() > 0
 						&& !fullscreenOfflineFragment.searchMode()) {
 					searchMenuItem.setVisible(true);
@@ -7407,11 +7390,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	        	return true;
 	        }
-			case R.id.action_menu_rubbish_bin:{
-				drawerItem = DrawerItem.RUBBISH_BIN;
-				selectDrawerItemLollipop(DrawerItem.RUBBISH_BIN);
-				return true;
-			}
+
 	        case R.id.action_select:{
 	        	switch (drawerItem) {
 					case CLOUD_DRIVE:
@@ -7686,7 +7665,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
             sortByMenuItem.setVisible(false);
             unSelectMenuItem.setVisible(false);
             changePass.setVisible(false);
-            rubbishBinMenuItem.setVisible(false);
             clearRubbishBinMenuitem.setVisible(false);
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
@@ -11154,6 +11132,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			case R.id.transfers_section:
 				sectionClicked = true;
 				drawerItem = DrawerItem.TRANSFERS;
+				break;
+
+			case R.id.rubbish_bin_section:
+				sectionClicked = true;
+				drawerItem = DrawerItem.RUBBISH_BIN;
 				break;
 
 			case R.id.settings_section: {

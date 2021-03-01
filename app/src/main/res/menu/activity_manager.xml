@@ -258,14 +258,6 @@
 		android:visible="false"/>
 
 	<item
-		android:id="@+id/action_menu_rubbish_bin"
-		android:orderInCategory="170"
-		android:title="@string/section_rubbish_bin"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never"
-		android:visible="false"/>
-
-	<item
 		android:id="@+id/action_menu_logout"
 		android:orderInCategory="175"
 		android:title="@string/action_logout"
