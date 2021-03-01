@@ -748,6 +748,8 @@ public class Constants {
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
 
+    public static final String STRING_SEPARATOR = " · ";
+
     public static final int NOT_OVERQUOTA_STATE = 0;
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;

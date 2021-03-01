@@ -4,6 +4,7 @@ import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
 import mega.privacy.android.app.R;
 
+import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -84,5 +85,15 @@ public class TextUtil {
         } else {
             return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
         }
+    }
+
+    /**
+     * If the string received is not null, neither empty, adds a STRING_SEPARATOR at the end.
+     *
+     * @param text Initial text without separator.
+     * @return Text with separator.
+     */
+    public static String addStringSeparator(String text) {
+        return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
     }
 }
