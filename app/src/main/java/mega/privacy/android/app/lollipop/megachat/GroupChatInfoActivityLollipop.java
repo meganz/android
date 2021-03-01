@@ -144,7 +144,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
-                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
+
+                if (userHandle != INVALID_HANDLE) {
+                    updateAdapter(userHandle);
+
+                    if (!intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)
+                            && bottomSheetDialogFragment instanceof ParticipantBottomSheetDialogFragment
+                            && isBottomSheetDialogShown(bottomSheetDialogFragment)
+                            && selectedHandleParticipant == userHandle) {
+                        ((ParticipantBottomSheetDialogFragment) bottomSheetDialogFragment).updateContactData();
+                    }
+                }
             }
         }
     };
