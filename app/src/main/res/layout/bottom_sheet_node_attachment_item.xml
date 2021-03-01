@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/node_attachment_bottom_sheet"
     android:layout_width="match_parent"
@@ -13,28 +14,21 @@
         android:layout_gravity="center_vertical"
         android:layout_marginTop="8dp">
 
-        <RelativeLayout
-            android:id="@+id/node_attachment_relative_layout_thumb"
+        <ImageView
+            android:id="@+id/node_attachment_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="12dp">
-
-            <ImageView
-                android:id="@+id/node_attachment_thumbnail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:scaleType="fitCenter" />
-        </RelativeLayout>
+            android:layout_margin="12dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/node_attachment_relative_layout_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="12dp"
-            android:layout_toEndOf="@id/node_attachment_relative_layout_thumb">
+            android:layout_toRightOf="@id/node_attachment_thumbnail">
 
             <TextView
                 android:id="@+id/node_attachment_name_text"

@@ -20,7 +20,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.MimeTypeList.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -29,6 +29,7 @@ import static nz.mega.sdk.MegaTransfer.*;
 
 public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     private static final String TRANSFER_ID = "TRANSFER_ID";
+    private static final int MARGIN_TRANSFER_TYPE_ICON_WITH_THUMBNAIL = -12;
 
     private ManagerActivityLollipop managerActivity;
 
@@ -125,28 +126,18 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
         stateIcon.setLayoutParams(params);
 
-        thumbnail.setImageResource(typeForName(transfer.getFileName()).getIconResourceId());
-
         handle = Long.parseLong(transfer.getNodeHandle());
 
-        if (typeForName(transfer.getFileName()).isImage() || typeForName(transfer.getFileName()).isVideo()) {
-            Bitmap thumb = getThumbnailFromCache(handle);
-            if (thumb == null) {
-                MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(handle);
-                thumb = getThumbnailFromFolder(node, getContext());
-            }
+        Bitmap thumb = getThumbnailFromCache(handle);
+        if (thumb == null) {
+            MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(handle);
+            thumb = getThumbnailFromFolder(node, getContext());
+        }
 
-            if (thumb != null) {
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) thumbnail.getLayoutParams();
-                params1.height = params1.width = dp2px(36, outMetrics);
-                params1.setMargins(54, 0, 18, 0);
-                thumbnail.setLayoutParams(params1);
-
-                RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) type.getLayoutParams();
-                params2.setMargins(0, -12, -12, 0);
-                type.setLayoutParams(params2);
-                thumbnail.setImageBitmap(thumb);
-            }
+        if (setThumbnail(context, thumb, thumbnail, transfer.getFileName())) {
+            RelativeLayout.LayoutParams typeParams = (RelativeLayout.LayoutParams) type.getLayoutParams();
+            typeParams.topMargin = typeParams.rightMargin = MARGIN_TRANSFER_TYPE_ICON_WITH_THUMBNAIL;
+            type.setLayoutParams(typeParams);
         }
 
         dialog.setContentView(contentView);
