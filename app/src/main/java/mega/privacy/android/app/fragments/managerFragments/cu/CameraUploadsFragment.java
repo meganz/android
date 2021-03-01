@@ -708,7 +708,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
             if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, mediaIntent, localPath,
-                        false);
+                        false, mManagerActivity);
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi,
                         mediaIntent);

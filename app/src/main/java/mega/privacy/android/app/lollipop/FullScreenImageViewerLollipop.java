@@ -748,7 +748,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			case R.id.full_image_viewer_download: {
 				switch (adapterType) {
 					case OFFLINE_ADAPTER:
-						nodeSaver.saveOfflineNode(mOffListImages.get(positionG));
+						nodeSaver.saveOfflineNode(mOffListImages.get(positionG), true);
 						break;
 					case ZIP_ADAPTER:
 						// don't have this option

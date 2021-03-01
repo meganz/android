@@ -2241,7 +2241,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					// we need update fragmentLayout's layout params when player view is closed.
 					if (bNV.getVisibility() == View.VISIBLE) {
 						showBNVImmediate();
-						updateHomepageFabPosition();
 					}
 				});
 
@@ -6239,7 +6238,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.setShouldVisible(shouldVisible);
 
-			updateHomepageFabPosition();
+			handler.post(this::updateHomepageFabPosition);
 
 			return miniAudioPlayerController.visible();
 		}
@@ -7061,13 +7060,17 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@SuppressWarnings("unchecked")
     public <F extends Fragment> F getFragmentByType(Class<F> fragmentClass) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
+        Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (navHostFragment == null) {
+        	return null;
+		}
+
         for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
             if (fragment.getClass() == fragmentClass) {
                 return (F) fragment;
             }
         }
+
         return null;
     }
 
@@ -7660,7 +7663,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
     private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
-            upgradeAccountMenuItem.setVisible(false);
+			doNotDisturbMenuItem.setVisible(false);
+			upgradeAccountMenuItem.setVisible(false);
             cancelAllTransfersMenuItem.setVisible(false);
             clearCompletedTransfers.setVisible(false);
             pauseTransfersMenuIcon.setVisible(false);
@@ -10339,7 +10343,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * @param nodes nodes to save
 	 */
 	public void saveOfflineNodesToDevice(List<MegaOffline> nodes) {
-		nodeSaver.saveOfflineNodes(nodes);
+		nodeSaver.saveOfflineNodes(nodes, false);
 	}
 
 	/**
@@ -10798,6 +10802,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				iFLol.getRecyclerView().invalidate();
 			}
 		}
+
+		refreshSearch();
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
@@ -10810,6 +10816,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		this.setOrderOthers(newOrderOthers);
 
 		refreshSharesPageAdapter();
+
+		refreshSearch();
 	}
 
 	public void selectSortUploads(int orderCamera) {
@@ -14833,54 +14841,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				updateFabPositionAndShow(true);
 				break;
 
-			case SEARCH:
-				if (shouldShowFabWhenSearch()) {
-					updateFabPositionAndShow(false);
-				} else {
-					hideFabButton();
-				}
-				break;
-
 			default:
 				hideFabButton();
-		}
-	}
-
-	private boolean shouldShowFabWhenSearch() {
-		if (searchDrawerItem == null) {
-			return false;
-		}
-
-		switch (searchDrawerItem) {
-			case RUBBISH_BIN:
-			case INBOX:
-				return false;
-			case CLOUD_DRIVE:
-				return true;
-			case SHARED_ITEMS:
-				if (isFirstNavigationLevel()) return false;
-
-				if (searchSharedTab == INCOMING_TAB) {
-					if (parentHandleIncoming == INVALID_HANDLE) return false;
-
-					MegaNode node;
-					if (parentHandleSearch == INVALID_HANDLE) {
-						node = megaApi.getNodeByHandle(parentHandleIncoming);
-					} else {
-						node = megaApi.getNodeByHandle(parentHandleSearch);
-					}
-					if (node == null) return false;
-
-					int accessLevel = megaApi.getAccess(node);
-					if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
-						return true;
-					}
-				} else if ((searchSharedTab == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
-						|| (searchSharedTab == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
-					return true;
-				}
-			default:
-				return false;
 		}
 	}
 

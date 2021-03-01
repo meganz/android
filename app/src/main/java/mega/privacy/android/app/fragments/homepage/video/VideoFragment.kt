@@ -401,7 +401,8 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val localPath = FileUtil.getLocalFile(context, file.name, file.size)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-            FileUtil.setLocalIntentParams(context, node, intent, localPath, false)
+            FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
+                requireActivity() as ManagerActivityLollipop)
         } else {
             FileUtil.setStreamingIntentParams(context, node, megaApi, intent)
         }

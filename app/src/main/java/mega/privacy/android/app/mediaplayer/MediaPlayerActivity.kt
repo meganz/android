@@ -413,7 +413,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         when (item.itemId) {
             R.id.save_to_device -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    nodeSaver.saveOfflineNode(playingHandle)
+                    nodeSaver.saveOfflineNode(playingHandle, true)
                 } else {
                     nodeSaver.saveHandle(
                         playingHandle,

@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -580,9 +581,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
 				}
-				Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-				intent.putExtra(NAME, myEmail);
-				startActivity(intent);
+				ContactUtil.openContactInfoActivity(context, myEmail);
 				break;
 			}
 		}
@@ -1102,9 +1101,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 		else{
-			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-			i.putExtra(NAME, visibleContacts.get(position).getMegaUser().getEmail());
-			startActivity(i);
+			ContactUtil.openContactInfoActivity(context, visibleContacts.get(position).getMegaUser().getEmail());
 		}
     }
 	

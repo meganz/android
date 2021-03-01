@@ -284,6 +284,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+    public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
@@ -509,6 +510,7 @@ public class Constants {
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
+    public static final int INVITE_CONTACT_TYPE = 5;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -774,4 +776,10 @@ public class Constants {
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
+
+    public static final String STRING_SEPARATOR = " · ";
+
+    public static final int NOT_OVERQUOTA_STATE = 0;
+    public static final int OVERQUOTA_STORAGE_STATE = 1;
+    public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 }

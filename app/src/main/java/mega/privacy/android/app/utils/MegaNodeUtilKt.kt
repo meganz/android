@@ -2,25 +2,35 @@ package mega.privacy.android.app.utils
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.CopyNodeListener
 import mega.privacy.android.app.listeners.MoveNodeListener
 import mega.privacy.android.app.listeners.RenameNodeListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.*
+
 
 class MegaNodeUtilKt {
     companion object {
@@ -309,6 +319,146 @@ class MegaNodeUtilKt {
                 megaApi.rubbishNode.handle -> getString(R.string.section_rubbish_bin)
                 megaApi.inboxNode.handle -> getString(R.string.section_inbox)
                 else -> parent.name
+            }
+        }
+
+        /**
+         * Auto play a node when it's downloaded.
+         *
+         * @param context Android context
+         * @param autoPlayInfo auto play info
+         * @param activityLauncher interface to launch activity
+         * @param snackbarShower interface to show snackbar
+         */
+        @JvmStatic
+        fun autoPlayNode(
+            context: Context,
+            autoPlayInfo: AutoPlayInfo,
+            activityLauncher: ActivityLauncher,
+            snackbarShower: SnackbarShower
+        ) {
+            val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
+            when {
+                mime.isZip -> {
+                    val zipFile = File(autoPlayInfo.localPath)
+
+                    val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+                    intentZip.putExtra(
+                        ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.absolutePath
+                    )
+                    intentZip.putExtra(
+                        ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, autoPlayInfo.nodeHandle
+                    )
+
+                    activityLauncher.launchActivity(intentZip)
+                }
+                mime.isPdf -> {
+                    val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
+                    pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
+
+                    if (!setLocalIntentParams(
+                            context, autoPlayInfo.nodeName, pdfIntent, autoPlayInfo.localPath,
+                            false, snackbarShower
+                        )
+                    ) {
+                        return
+                    }
+
+                    pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+                    pdfIntent.putExtra(INTENT_EXTRA_KEY_IS_URL, false)
+
+                    activityLauncher.launchActivity(pdfIntent)
+                }
+                mime.isVideoReproducible || mime.isAudio -> {
+                    val mediaIntent: Intent
+                    val internalIntent: Boolean
+                    var opusFile = false
+                    if (mime.isVideoNotSupported || mime.isAudioNotSupported
+                    ) {
+                        mediaIntent = Intent(Intent.ACTION_VIEW)
+                        internalIntent = false
+                        val parts = autoPlayInfo.nodeName.split("\\.")
+                        if (parts.size > 1 && parts.last() == "opus") {
+                            opusFile = true
+                        }
+                    } else {
+                        internalIntent = true
+                        mediaIntent = getMediaIntent(context, autoPlayInfo.nodeName)
+                    }
+                    mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+                    mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
+
+                    if (!setLocalIntentParams(
+                            context, autoPlayInfo.nodeName, mediaIntent, autoPlayInfo.localPath,
+                            false, snackbarShower
+                        )
+                    ) {
+                        return
+                    }
+
+                    mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    if (opusFile) {
+                        mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
+                    }
+                    if (internalIntent) {
+                        activityLauncher.launchActivity(mediaIntent)
+                    } else {
+                        if (isIntentAvailable(context, mediaIntent)) {
+                            activityLauncher.launchActivity(mediaIntent)
+                        } else {
+                            sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
+                        }
+                    }
+                }
+                else -> {
+                    try {
+                        val viewIntent = Intent(Intent.ACTION_VIEW)
+
+                        if (!setLocalIntentParams(
+                                context, autoPlayInfo.nodeName, viewIntent,
+                                autoPlayInfo.localPath, false, snackbarShower
+                            )
+                        ) {
+                            return
+                        }
+
+                        viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        if (isIntentAvailable(context, viewIntent)) {
+                            activityLauncher.launchActivity(viewIntent)
+                        } else {
+                            sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
+                        }
+                    } catch (e: Exception) {
+                        snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
+                    }
+                }
+            }
+        }
+
+        private fun sendFile(
+            context: Context,
+            autoPlayInfo: AutoPlayInfo,
+            activityLauncher: ActivityLauncher,
+            snackbarShower: SnackbarShower
+        ) {
+            snackbarShower.showSnackbar(getString(R.string.intent_not_available))
+
+            val intentShare = Intent(Intent.ACTION_SEND)
+
+            if (!setLocalIntentParams(
+                    context, autoPlayInfo.nodeName, intentShare,
+                    autoPlayInfo.localPath, false, snackbarShower
+                )
+            ) {
+                return
+            }
+
+            intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            if (isIntentAvailable(context, intentShare)) {
+                activityLauncher.launchActivity(intentShare)
             }
         }
     }

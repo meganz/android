@@ -3073,7 +3073,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void downloadFile() {
         if (adapterType == OFFLINE_ADAPTER) {
-            nodeSaver.saveOfflineNode(mediaOffList.get(currentWindowIndex));
+            nodeSaver.saveOfflineNode(mediaOffList.get(currentWindowIndex), true);
         } else if (adapterType == FILE_LINK_ADAPTER) {
             nodeSaver.saveNode(currentDocument, false, false, true, true);
         } else if (fromChat) {

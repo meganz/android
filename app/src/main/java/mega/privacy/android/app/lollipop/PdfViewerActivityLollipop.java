@@ -880,7 +880,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (type == OFFLINE_ADAPTER) {
             MegaOffline node = dbH.findByHandle(handle);
             if (node != null) {
-                nodeSaver.saveOfflineNode(node);
+                nodeSaver.saveOfflineNode(node, true);
             }
         } else if (type == FILE_LINK_ADAPTER) {
             nodeSaver.saveNode(currentDocument, false, false, true, true);

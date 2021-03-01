@@ -47,6 +47,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -133,7 +134,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
-        String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
+        String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
@@ -352,7 +353,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }
@@ -367,7 +369,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent = new Intent(Intent.ACTION_VIEW);
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath);
+                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath,
+                        (ManagerActivityLollipop) requireActivity());
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -375,7 +378,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }

@@ -180,6 +180,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logDebug("onViewCreated");
+
+        // Init QR code setting
+        megaApi.getContactLinksOption((ManagerActivityLollipop) context);
+
         listView = view.findViewById(android.R.id.list);
         if (((ManagerActivityLollipop) context).openSettingsStorage) {
             goToCategoryStorage();

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -78,6 +79,12 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        return new CustomBottomSheetDialog(context, getTheme());
     }
 
     /**
