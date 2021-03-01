@@ -7673,7 +7673,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
     private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
-            upgradeAccountMenuItem.setVisible(false);
+			doNotDisturbMenuItem.setVisible(false);
+			upgradeAccountMenuItem.setVisible(false);
             cancelAllTransfersMenuItem.setVisible(false);
             clearCompletedTransfers.setVisible(false);
             pauseTransfersMenuIcon.setVisible(false);
