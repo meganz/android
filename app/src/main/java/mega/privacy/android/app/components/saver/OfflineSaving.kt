@@ -22,7 +22,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
 
 @Parcelize
-class OfflineSaving(private val totalSize: Long, private val nodes: List<MegaOffline>) : Saving() {
+class OfflineSaving(
+    private val totalSize: Long, private val nodes: List<MegaOffline>,
+    private val fromMediaViewer: Boolean,
+) : Saving() {
 
     override fun totalSize() = totalSize
 
@@ -46,12 +49,14 @@ class OfflineSaving(private val totalSize: Long, private val nodes: List<MegaOff
         return false
     }
 
+    override fun fromMediaViewer() = fromMediaViewer
+
     override fun doDownload(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
         snackbarShower: SnackbarShower,
-    ) {
+    ): AutoPlayInfo {
         val context = MegaApplication.getInstance()
 
         var totalFiles = 0
@@ -80,6 +85,14 @@ class OfflineSaving(private val totalSize: Long, private val nodes: List<MegaOff
             }
             snackbarShower.showSnackbar(message)
         }
+
+        if (nodes.size != 1 || nodes[0].isFolder) {
+            return AutoPlayInfo.NO_AUTO_PLAY
+        }
+
+        return AutoPlayInfo(
+            nodes[0].name, nodes[0].handle.toLong(), getOfflineFile(context, nodes[0]).absolutePath
+        )
     }
 
     private fun doDownload(

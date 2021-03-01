@@ -389,7 +389,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }
@@ -404,7 +405,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent = new Intent(Intent.ACTION_VIEW);
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath);
+                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath,
+                        (ManagerActivityLollipop) requireActivity());
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -415,7 +417,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }

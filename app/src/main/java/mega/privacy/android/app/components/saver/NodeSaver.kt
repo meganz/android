@@ -28,11 +28,13 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
@@ -73,33 +75,45 @@ class NodeSaver(
      * Save an offline node into device.
      *
      * @param handle handle of the offline node to save
+     * @param fromMediaViewer whether this download is from media viewer
      */
-    fun saveOfflineNode(handle: Long) {
+    fun saveOfflineNode(
+        handle: Long,
+        fromMediaViewer: Boolean = false
+    ) {
         val node = dbHandler.findByHandle(handle) ?: return
-        saveOfflineNodes(listOf(node))
+        saveOfflineNodes(listOf(node), fromMediaViewer)
     }
 
     /**
      * Save an offline node into device.
      *
      * @param node the offline node to save
+     * @param fromMediaViewer whether this download is from media viewer
      */
-    fun saveOfflineNode(node: MegaOffline) {
-        saveOfflineNodes(listOf(node))
+    fun saveOfflineNode(
+        node: MegaOffline,
+        fromMediaViewer: Boolean = false
+    ) {
+        saveOfflineNodes(listOf(node), fromMediaViewer)
     }
 
     /**
      * Save offline nodes into device.
      *
      * @param nodes the offline nodes to save
+     * @param fromMediaViewer whether this download is from media viewer
      */
-    fun saveOfflineNodes(nodes: List<MegaOffline>) {
+    fun saveOfflineNodes(
+        nodes: List<MegaOffline>,
+        fromMediaViewer: Boolean = false
+    ) {
         save {
             var totalSize = 0L
             for (node in nodes) {
                 totalSize += getTotalSize(getOfflineFile(app, node))
             }
-            OfflineSaving(totalSize, nodes)
+            OfflineSaving(totalSize, nodes, fromMediaViewer)
         }
     }
 
@@ -347,9 +361,9 @@ class NodeSaver(
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
 
                 val message = if (resultCode != Activity.RESULT_OK) {
-                    app.getString(R.string.download_requires_permission)
+                    getString(R.string.download_requires_permission)
                 } else {
-                    app.getString(R.string.no_external_SD_card_detected)
+                    getString(R.string.no_external_SD_card_detected)
                 }
 
                 snackbarShower.showSnackbar(message)
@@ -473,7 +487,7 @@ class NodeSaver(
         prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
-        intent.putExtra(EXTRA_BUTTON_PREFIX, app.getString(R.string.general_select))
+        intent.putExtra(EXTRA_BUTTON_PREFIX, getString(R.string.general_select))
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
         intent.setClass(app, FileStorageActivityLollipop::class.java)
 
@@ -525,7 +539,7 @@ class NodeSaver(
         }
 
         showConfirmationDialog(
-            app.getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
+            getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
@@ -549,7 +563,7 @@ class NodeSaver(
         }
 
         showConfirmationDialog(
-            app.getString(R.string.alert_no_app, saving.unsupportedFileName)
+            getString(R.string.alert_no_app, saving.unsupportedFileName)
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
@@ -581,18 +595,28 @@ class NodeSaver(
         val sdCardOperator = SDCardOperator.initSDCardOperator(app, parentPath)
         if (sdCardOperator == null) {
             requestLocalFolder(
-                app.getString(R.string.no_external_SD_card_detected),
+                getString(R.string.no_external_SD_card_detected),
                 activityLauncher
             )
             return
         }
 
-        saving.doDownload(
+        val autoPlayInfo = saving.doDownload(
             parentPath,
             SDCardOperator.isSDCardPath(parentPath),
             sdCardOperator,
             snackbarShower
         )
+
+        if (!autoPlayInfo.couldAutoPlay || dbHandler.autoPlayEnabled != true.toString()) {
+            return
+        }
+
+        if (saving.fromMediaViewer()) {
+            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
+        } else {
+            autoPlayNode(app, autoPlayInfo, activityLauncher, snackbarShower)
+        }
     }
 
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {

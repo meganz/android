@@ -24,6 +24,8 @@ abstract class Saving : Parcelable {
      */
     abstract fun hasUnsupportedFile(context: Context): Boolean
 
+    abstract fun fromMediaViewer(): Boolean
+
     /**
      * The final step to download a node into a file.
      *
@@ -32,13 +34,14 @@ abstract class Saving : Parcelable {
      * @param sdCardOperator SDCardOperator used when download to external sdcard,
      * will be null if download to internal storage
      * @param snackbarShower interface to show snackbar
+     * @return info about auto play
      */
     abstract fun doDownload(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
         snackbarShower: SnackbarShower
-    )
+    ): AutoPlayInfo
 
     companion object {
         val NOTHING = object : Saving() {
@@ -46,13 +49,14 @@ abstract class Saving : Parcelable {
 
             override fun hasUnsupportedFile(context: Context): Boolean = false
 
+            override fun fromMediaViewer() = false
+
             override fun doDownload(
                 parentPath: String,
                 externalSDCard: Boolean,
                 sdCardOperator: SDCardOperator?,
                 snackbarShower: SnackbarShower
-            ) {
-            }
+            ) = AutoPlayInfo.NO_AUTO_PLAY
 
             override fun describeContents(): Int {
                 return 0

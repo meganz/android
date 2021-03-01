@@ -457,7 +457,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             val paramsSetSuccessfully =
                 if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
+                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
+                        requireActivity() as ManagerActivityLollipop)
                 } else {
                     FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
                 }

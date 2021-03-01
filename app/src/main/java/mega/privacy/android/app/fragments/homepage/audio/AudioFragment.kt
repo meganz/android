@@ -239,7 +239,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val localPath = getLocalFile(context, file.name, file.size)
         var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
-            setLocalIntentParams(activity, node, intent, localPath, false)
+            setLocalIntentParams(activity, node, intent, localPath, false,
+                requireActivity() as ManagerActivityLollipop)
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent)
         }

@@ -55,12 +55,14 @@ class MegaNodeSaving(
         return false
     }
 
+    override fun fromMediaViewer() = fromMediaViewer
+
     override fun doDownload(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
         snackbarShower: SnackbarShower,
-    ) {
+    ): AutoPlayInfo {
         val app = MegaApplication.getInstance()
         val megaApi = if (isFolderLink) app.megaApiFolder else app.megaApi
         val dbHandler = DatabaseHandler.getDbHandler(app)
@@ -68,6 +70,8 @@ class MegaNodeSaving(
         var numberOfNodesAlreadyDownloaded = 0
         var numberOfNodesPending = 0
         var emptyFolders = 0
+
+        var theOnlyLocalFilePath = ""
 
         for (node in nodes) {
             val dlFiles = HashMap<MegaNode, String>()
@@ -105,7 +109,7 @@ class MegaNodeSaving(
                     File(
                         destDir,
                         app.megaApi.escapeFsIncompatible(
-                            document.name, destDir.absolutePath + Constants.SEPARATOR
+                            document.name, destDir.absolutePath + SEPARATOR
                         )
                     )
                 } else {
@@ -117,6 +121,8 @@ class MegaNodeSaving(
                     && isFileDownloadedLatest(destFile, document)
                 ) {
                     numberOfNodesAlreadyDownloaded++
+
+                    theOnlyLocalFilePath = destFile.absolutePath
                 } else {
                     numberOfNodesPending++
 
@@ -175,5 +181,11 @@ class MegaNodeSaving(
         }
 
         snackbarShower.showSnackbar(message)
+
+        if (nodes.size != 1 || nodes[0].isFolder || numberOfNodesAlreadyDownloaded != 1) {
+            return AutoPlayInfo.NO_AUTO_PLAY
+        }
+
+        return AutoPlayInfo(nodes[0].name, nodes[0].handle, theOnlyLocalFilePath)
     }
 }

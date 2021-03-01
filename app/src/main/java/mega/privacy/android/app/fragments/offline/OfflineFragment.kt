@@ -39,18 +39,15 @@ import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
+import mega.privacy.android.app.lollipop.*
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -602,7 +599,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 if (!setLocalIntentParams(
                         context, node.node, mediaIntent, file.absolutePath,
-                        false
+                        false, requireActivity() as ManagerActivityLollipop
                     )
                 ) {
                     return
@@ -631,7 +628,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     val intentShare = Intent(Intent.ACTION_SEND)
                     if (setLocalIntentParams(
                             context, node.node, intentShare, file.absolutePath,
-                            false
+                            false, requireActivity() as ManagerActivityLollipop
                         )
                     ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -658,7 +655,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     pdfIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
                 }
 
-                if (setLocalIntentParams(context, node.node, pdfIntent, file.absolutePath, false)) {
+                if (setLocalIntentParams(
+                        context, node.node, pdfIntent, file.absolutePath, false,
+                        requireActivity() as ManagerActivityLollipop
+                    )
+                ) {
                     pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     draggingNodeHandle = node.node.handle.toLong()
                     setupDraggingThumbnailCallback()
@@ -685,7 +686,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("openFile")
         val viewIntent = Intent(Intent.ACTION_VIEW)
 
-        if (!setLocalIntentParams(context, file.name, viewIntent, file.absolutePath, false)) {
+        if (!setLocalIntentParams(
+                context, file.name, viewIntent, file.absolutePath, false,
+                requireActivity() as ManagerActivityLollipop
+            )
+        ) {
             return
         }
 
@@ -696,7 +701,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         } else {
             val intentShare = Intent(Intent.ACTION_SEND)
 
-            if (!setLocalIntentParams(context, file.name, intentShare, file.absolutePath, false)) {
+            if (!setLocalIntentParams(
+                    context, file.name, intentShare, file.absolutePath, false,
+                    requireActivity() as ManagerActivityLollipop
+                )
+            ) {
                 return
             }
 

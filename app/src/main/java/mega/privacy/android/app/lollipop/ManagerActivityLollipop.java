@@ -10398,7 +10398,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * @param nodes nodes to save
 	 */
 	public void saveOfflineNodesToDevice(List<MegaOffline> nodes) {
-		nodeSaver.saveOfflineNodes(nodes);
+		nodeSaver.saveOfflineNodes(nodes, false);
 	}
 
 	/**
