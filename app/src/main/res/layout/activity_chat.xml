@@ -487,13 +487,14 @@
                         android:id="@+id/empty_text_chat_recent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@null"
                         android:layout_below="@id/empty_image_view_chat"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
+                        android:background="@null"
                         android:text="@string/chat_loading_messages"
+                        android:textAllCaps="true"
                         android:textColor="@color/adapters_background"
-                        android:textSize="18sp" />
+                        android:textSize="14sp" />
                 </RelativeLayout>
 
                 <!-- Layout with chat content -->

@@ -58,8 +58,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/folder_link_list_empty_image"
                     android:layout_centerHorizontal="true"
+                    android:textAllCaps="true"
                     android:textColor="@color/text_secondary"
-                    android:textSize="18sp" />
+                    android:textSize="14sp" />
             </RelativeLayout>
 
         </RelativeLayout>
