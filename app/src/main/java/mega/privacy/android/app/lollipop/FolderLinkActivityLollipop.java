@@ -81,6 +81,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -942,7 +943,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			logDebug("URL: " + url + "___SIZE: " + size);
-	
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
 			downloadTo (parentPath, url, size, hashes);
 		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 

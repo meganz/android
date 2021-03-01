@@ -3346,6 +3346,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param value      Value to set.
 	 */
 	private void setStringValue(String tableName, String columnName, String value) {
+		if(isTextEmpty(value)) {
+			logWarning("Set " + columnName + " with empty value!");
+		}
+
 		String selectQuery = "SELECT * FROM " + tableName;
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
