@@ -171,7 +171,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 		if (node.isFolder()) {
 			params.height = params.width = dp2px(ICON_SIZE_DP);
-			params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
+			int margin = dp2px(ICON_MARGIN_DP);
+			params.setMargins(margin, margin, margin, margin);
 
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
@@ -241,16 +242,19 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						} //Too many AsyncTasks
 					}
 				}
+				int margin;
 
 				if (thumb != null) {
 					params.height = params.width = dp2px(THUMB_SIZE_DP);
-					params.setMargins(dp2px(THUMB_MARGIN_DP), 0, 0, 0);
+					margin = dp2px(THUMB_MARGIN_DP);
 					holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
 				} else {
 					params.height = params.width = dp2px(ICON_SIZE_DP);
-					params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
+					margin = dp2px(ICON_MARGIN_DP);
 					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 				}
+
+				params.setMargins(margin, margin, margin, margin);
 			}
 		}
 
