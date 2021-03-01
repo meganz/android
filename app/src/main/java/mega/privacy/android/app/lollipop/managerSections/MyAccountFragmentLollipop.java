@@ -522,7 +522,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (myAccountInfo.getSubscriptionRenewTime() > 0) {
 					businessAccountRenewsText.setVisibility(View.VISIBLE);
 					businessAccountRenewsDateText.setVisibility(View.VISIBLE);
-					businessAccountRenewsDateText.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+					businessAccountRenewsDateText.setText(formatDate(myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
 				} else {
 					businessAccountRenewsText.setVisibility(View.GONE);
 					businessAccountRenewsDateText.setVisibility(View.GONE);
@@ -589,12 +589,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			expiryRenewLayout.setVisibility(View.VISIBLE);
 			expiryRenewSeparator.setVisibility(View.VISIBLE);
 			expiryRenewText.setText(getString(R.string.renews_on));
-			expiryRenewDate.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+			expiryRenewDate.setText(formatDate(myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
 		} else if (myAccountInfo.getProExpirationTime() > 0) {
 			expiryRenewLayout.setVisibility(View.VISIBLE);
 			expiryRenewSeparator.setVisibility(View.VISIBLE);
 			expiryRenewText.setText(getString(R.string.expires_on));
-			expiryRenewDate.setText(formatDate(context, myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
+			expiryRenewDate.setText(formatDate(myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
 		} else {
 			expiryRenewLayout.setVisibility(View.GONE);
 			expiryRenewSeparator.setVisibility(View.GONE);

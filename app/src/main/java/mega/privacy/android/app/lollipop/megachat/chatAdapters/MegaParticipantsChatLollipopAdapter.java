@@ -306,10 +306,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
 
-                String title = getChat().getTitle();
+                String title = getTitleChat(getChat());
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
-                holderHeader.infoTitleChatText.setText(getChat().getTitle());
+                holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
