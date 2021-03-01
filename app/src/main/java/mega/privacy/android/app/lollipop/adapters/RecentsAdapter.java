@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +19,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -41,7 +45,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHolderBucket> implements View.OnClickListener, SectionTitleProvider {
+public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHolderBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
 
     private Object fragment;
     private Context context;
@@ -91,6 +95,36 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         public ViewHolderBucket(View itemView) {
             super(itemView);
         }
+    }
+
+    @Override
+    public int getNodePosition(long handle) {
+        for (int i = 0; i < recentsItems.size(); i++) {
+            MegaRecentActionBucket bucket = recentsItems.get(i).getBucket();
+            if (bucket == null) {
+                continue;
+            }
+            MegaNodeList nodes = bucket.getNodes();
+            if (nodes == null || nodes.size() < 1) {
+                continue;
+            }
+            MegaNode node = nodes.get(0);
+            if (node != null && node.getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
+    }
+
+    @Nullable
+    @Override
+    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolderBucket) {
+            return ((ViewHolderBucket) viewHolder).imageThumbnail;
+        }
+
+        return null;
     }
 
     @Override
@@ -311,10 +345,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 break;
             }
             case R.id.item_bucket_layout: {
-                MegaNodeList nodeList = getMegaNodeListOfItem(item);
-                if (nodeList == null) break;
-                if (nodeList.size() == 1) {
-                    ((RecentsFragment) fragment).openFile(node, false, v.findViewById(R.id.thumbnail_view));
+                if (node != null) {
+                    ((RecentsFragment) fragment).openFile(holder.getAdapterPosition(), node, false);
                     break;
                 }
                 MegaRecentActionBucket bucket = item.getBucket();
@@ -369,45 +401,5 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 || position < 0 || position >= recentsItems.size()) return "";
 
         return recentsItems.get(position).getDate();
-    }
-
-    private int[] getNodePosition(long handle) {
-        int position = INVALID_POSITION;
-        int subListPosition = INVALID_POSITION;
-        for (int i = 0; i < recentsItems.size(); i++) {
-            MegaRecentActionBucket bucket = recentsItems.get(i).getBucket();
-            if (bucket == null) {
-                continue;
-            }
-            MegaNodeList nodes = bucket.getNodes();
-            if (nodes == null) {
-                continue;
-            }
-            MegaNode node = nodes.get(0);
-            if (node != null && node.getHandle() == handle) {
-                position = i;
-                break;
-            }
-        }
-        return new int[]{position, subListPosition};
-    }
-
-    public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
-        if (recentsItems == null || recentsItems.isEmpty()) {
-            return null;
-        }
-
-        int[] positions = getNodePosition(handle);
-        if (positions[0] == INVALID_POSITION) {
-            return null;
-        }
-
-        RecyclerView.ViewHolder viewHolder
-                = recyclerView.findViewHolderForLayoutPosition(positions[0]);
-        if (viewHolder instanceof ViewHolderBucket) {
-            return ((ViewHolderBucket) viewHolder).imageThumbnail;
-        }
-
-        return null;
     }
 }

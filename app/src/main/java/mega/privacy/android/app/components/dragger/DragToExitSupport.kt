@@ -252,6 +252,7 @@ class DragToExitSupport(
          * @param position the adapter position of opening node
          * @param thumbnailGetter DragThumbnailGetter
          */
+        @JvmStatic
         fun putThumbnailLocation(
             launchIntent: Intent,
             rv: RecyclerView,
@@ -270,6 +271,7 @@ class DragToExitSupport(
          * @param thumbnail the thumbnail view
          * @return thumbnail location on screen
          */
+        @JvmStatic
         fun getThumbnailLocation(thumbnail: View?): IntArray? {
             if (thumbnail == null) {
                 return null
@@ -290,6 +292,7 @@ class DragToExitSupport(
          * @param lifecycleOwner LifecycleOwner
          * @param rv the RecyclerView, its adapter should implements DragThumbnailGetter interface
          */
+        @JvmStatic
         fun observeDragSupportEvents(
             lifecycleOwner: LifecycleOwner,
             rv: RecyclerView

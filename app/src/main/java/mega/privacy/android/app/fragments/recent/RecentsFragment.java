@@ -53,6 +53,8 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -61,8 +63,6 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
-
-    public static ImageView imageDrag;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -107,12 +107,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         super.onStop();
 
         ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentClosed(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        imageDrag = null;
     }
 
     @Override
@@ -179,6 +173,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         super.onViewCreated(view, savedInstanceState);
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
+
+        observeDragSupportEvents(getViewLifecycleOwner(), listView);
     }
 
     @Override
@@ -320,34 +316,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         return nodeHandles;
     }
 
-    public ImageView getImageDrag(long handle) {
-        return adapter.getThumbnailView(listView, handle);
-    }
-
-    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail) {
-        imageDrag = thumbnail;
-
-        int[] screenPosition = null;
-        if (thumbnail != null) {
-            screenPosition = new int[4];
-
-            int[] loc = new int[2];
-            thumbnail.getLocationOnScreen(loc);
-
-            screenPosition[0] = loc[0];
-            screenPosition[1] = loc[1];
-            screenPosition[2] = thumbnail.getWidth();
-            screenPosition[3] = thumbnail.getHeight();
-        }
-
+    public void openFile(int index, MegaNode node, boolean isMedia) {
         Intent intent = null;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-            }
             intent.putExtra(HANDLE, node.getHandle());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
@@ -369,17 +343,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-                int[] screenPositionForSwipeDismiss = new int[]{
-                        screenPosition[0] + screenPosition[2] / 2,
-                        screenPosition[1] + screenPosition[3] / 2,
-                        screenPosition[2],
-                        screenPosition[3]
-                };
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS, screenPositionForSwipeDismiss);
-
-            }
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
@@ -410,9 +373,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-            }
 
             if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
@@ -429,6 +389,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         }
 
         if (paramsSetSuccessfully) {
+            putThumbnailLocation(intent, listView, index, adapter);
+
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;

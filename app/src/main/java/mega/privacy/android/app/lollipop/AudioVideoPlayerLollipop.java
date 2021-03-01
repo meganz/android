@@ -120,7 +120,6 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -1609,8 +1608,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (LinksFragment.imageDrag != null){
                 LinksFragment.imageDrag.setVisibility(visibility);
             }
-        } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
-            RecentsFragment.imageDrag.setVisibility(visibility);
         } else if (adapterType == RECENTS_BUCKET_ADAPTER) {
             DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
             if (callback != null) {
@@ -1700,8 +1697,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (LinksFragment.imageDrag != null){
                 LinksFragment.imageDrag.getLocationOnScreen(location);
             }
-        } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null){
-            RecentsFragment.imageDrag.getLocationOnScreen(location);
         } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
             DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
             if (callback != null) {

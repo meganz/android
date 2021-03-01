@@ -85,7 +85,6 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -1233,8 +1232,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.setVisibility(visibility);
 			}
-		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
-			RecentsFragment.imageDrag.setVisibility(visibility);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
 			DraggingThumbnailCallback callback
 					= DRAGGING_THUMBNAIL_CALLBACKS.get(PhotosFragment.class);
@@ -1320,8 +1317,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.getLocationOnScreen(location);
 			}
-		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
-			RecentsFragment.imageDrag.getLocationOnScreen(location);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
 			DraggingThumbnailCallback callback
 					= DRAGGING_THUMBNAIL_CALLBACKS.get(PhotosFragment.class);
