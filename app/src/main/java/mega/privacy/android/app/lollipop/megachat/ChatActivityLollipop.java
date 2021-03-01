@@ -762,6 +762,17 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
+    private final BroadcastReceiver joinedSuccessfullyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_JOINED_SUCCESSFULLY.equals(intent.getAction())) {
+                return;
+            }
+
+            joiningOrLeaving = false;
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -879,6 +890,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         IntentFilter closeChatFilter = new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT);
         closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
         registerReceiver(closeChatReceiver, closeChatFilter);
+
+        registerReceiver(joinedSuccessfullyReceiver,
+                new IntentFilter(BROADCAST_ACTION_JOINED_SUCCESSFULLY));
 
         changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
@@ -7811,6 +7825,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
+        unregisterReceiver(joinedSuccessfullyReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
