@@ -1727,6 +1727,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
 
     <string name="settings_help" context="Menu item">Help</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Help Centre</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Send Feedback</string>
     <string name="setting_feedback_subject" context="mail subject">Android feedback</string>
     <string name="setting_feedback_body" context="mail body">Please write your feedback here:</string>

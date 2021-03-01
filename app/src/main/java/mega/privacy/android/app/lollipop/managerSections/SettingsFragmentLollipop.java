@@ -65,6 +65,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory storageCategory;
     private Preference nestedDownloadLocation;
     private Preference fileManagementPrefence;
+    private Preference helpHelpCentre;
     private Preference helpSendFeedback;
     private PreferenceCategory aboutCategory;
     private Preference aboutPrivacy;
@@ -105,6 +106,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         advancedPreference = findPreference(KEY_SECURITY_ADVANCED);
         advancedPreference.setOnPreferenceClickListener(this);
 
+        helpHelpCentre = findPreference(KEY_HELP_CENTRE);
+        helpHelpCentre.setOnPreferenceClickListener(this);
         helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
         helpSendFeedback.setOnPreferenceClickListener(this);
 
@@ -275,6 +278,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             case KEY_SECURITY_ADVANCED:
                 startActivity(new Intent(context, AdvancedPreferencesActivity.class));
+                break;
+
+            case KEY_HELP_CENTRE:
+                viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setData(Uri.parse("https://mega.nz/help/client/android"));
+                startActivity(viewIntent);
                 break;
 
             case KEY_HELP_SEND_FEEDBACK:
