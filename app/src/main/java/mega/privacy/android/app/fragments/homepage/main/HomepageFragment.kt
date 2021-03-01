@@ -612,7 +612,7 @@ class HomepageFragment : Fragment() {
      * @param miniAudioPlayerHeight height of mini audio player
      */
     fun updateFabPosition(psaLayoutHeight: Int, miniAudioPlayerHeight: Int) {
-        if (!isResumed) {
+        if (!this::fabMain.isInitialized) {
             return
         }
 

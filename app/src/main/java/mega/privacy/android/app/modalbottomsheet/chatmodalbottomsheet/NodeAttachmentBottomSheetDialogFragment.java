@@ -3,9 +3,7 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,12 +28,12 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -189,33 +187,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     }
 
     private void showSingleNodeSelected() {
-        if (node.hasThumbnail()) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.setMargins(20, 0, 12, 0);
-            nodeThumb.setLayoutParams(params1);
-
-            Bitmap thumb = getThumbnailFromCache(node);
-            if (thumb != null) {
-                nodeThumb.setImageBitmap(thumb);
-            } else {
-                thumb = getThumbnailFromFolder(node, context);
-                if (thumb != null) {
-                    nodeThumb.setImageBitmap(thumb);
-                } else {
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                }
-            }
-        } else {
-            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-        }
-
+        setNodeThumbnail(context, node, nodeThumb);
         nodeName.setText(node.getName());
-
-        long nodeSize = node.getSize();
-        nodeInfo.setText(getSizeString(nodeSize));
-
+        nodeInfo.setText(getSizeString(node.getSize()));
         optionView.setVisibility(View.GONE);
     }
 

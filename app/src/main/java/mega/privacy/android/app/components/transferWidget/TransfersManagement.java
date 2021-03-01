@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
@@ -25,6 +26,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;

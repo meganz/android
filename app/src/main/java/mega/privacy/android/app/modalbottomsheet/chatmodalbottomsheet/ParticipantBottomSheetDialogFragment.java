@@ -17,6 +17,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -221,9 +222,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.contact_info_group_participants_chat_layout:
-                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, chatC.getParticipantEmail(participantHandle));
-                context.startActivity(i);
+                ContactUtil.openContactInfoActivity(context, chatC.getParticipantEmail(participantHandle));
                 dismissAllowingStateLoss();
                 break;
 
