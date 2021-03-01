@@ -15023,54 +15023,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				updateFabPositionAndShow(true);
 				break;
 
-			case SEARCH:
-				if (shouldShowFabWhenSearch()) {
-					updateFabPositionAndShow(false);
-				} else {
-					hideFabButton();
-				}
-				break;
-
 			default:
 				hideFabButton();
-		}
-	}
-
-	private boolean shouldShowFabWhenSearch() {
-		if (searchDrawerItem == null) {
-			return false;
-		}
-
-		switch (searchDrawerItem) {
-			case RUBBISH_BIN:
-			case INBOX:
-				return false;
-			case CLOUD_DRIVE:
-				return true;
-			case SHARED_ITEMS:
-				if (isFirstNavigationLevel()) return false;
-
-				if (searchSharedTab == INCOMING_TAB) {
-					if (parentHandleIncoming == INVALID_HANDLE) return false;
-
-					MegaNode node;
-					if (parentHandleSearch == INVALID_HANDLE) {
-						node = megaApi.getNodeByHandle(parentHandleIncoming);
-					} else {
-						node = megaApi.getNodeByHandle(parentHandleSearch);
-					}
-					if (node == null) return false;
-
-					int accessLevel = megaApi.getAccess(node);
-					if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
-						return true;
-					}
-				} else if ((searchSharedTab == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
-						|| (searchSharedTab == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
-					return true;
-				}
-			default:
-				return false;
 		}
 	}
 
