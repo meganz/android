@@ -101,6 +101,7 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
     <style name="PreferencesScreen" parent="Theme.Megaactionbar">
@@ -141,6 +142,7 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
     <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">

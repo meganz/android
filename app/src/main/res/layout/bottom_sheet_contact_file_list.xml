@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_file_list_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -14,29 +14,21 @@
         android:layout_marginTop="8dp"
         android:layout_gravity="center_vertical" >
 
-        <RelativeLayout
-            android:id="@+id/contact_file_list_relative_layout_thumb"
+        <ImageView
+            android:id="@+id/contact_file_list_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp">
-
-            <ImageView
-                android:id="@+id/contact_file_list_thumbnail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:scaleType="fitCenter" />
-
-        </RelativeLayout>
+            android:layout_margin="12dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/contact_file_list_relative_layout_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/contact_file_list_relative_layout_thumb"
-            android:layout_marginLeft="12dp">
+            android:layout_toEndOf="@id/contact_file_list_thumbnail">
 
             <TextView
                 android:id="@+id/contact_file_list_name_text"
@@ -58,7 +50,6 @@
                 android:layout_below="@+id/contact_file_list_name_text"
                 android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
