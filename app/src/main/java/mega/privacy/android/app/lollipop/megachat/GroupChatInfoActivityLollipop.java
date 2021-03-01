@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -344,6 +345,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private void updateAdapter(long contactHandle) {
         chat = megaChatApi.getChatRoom(chatHandle);
+
+        if (contactHandle == megaChatApi.getMyUserHandle()) {
+            int pos = participants.size() - 1;
+            participants.get(pos).setFullName(StringResourcesUtils.getString(R.string.chat_me_text_bracket, megaChatApi.getMyFullname()));
+            adapter.updateParticipant(pos, participants);
+            return;
+        }
+
         for (MegaChatParticipant participant : participants) {
             if (participant.getHandle() == contactHandle) {
                 int pos = participants.indexOf(participant);
