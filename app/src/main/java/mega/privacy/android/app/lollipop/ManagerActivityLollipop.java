@@ -10759,6 +10759,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				iFLol.getRecyclerView().invalidate();
 			}
 		}
+
+		refreshSearch();
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
@@ -10771,6 +10773,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		this.setOrderOthers(newOrderOthers);
 
 		refreshSharesPageAdapter();
+
+		refreshSearch();
 	}
 
 	public void selectSortUploads(int orderCamera) {
