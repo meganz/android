@@ -166,6 +166,9 @@
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
+    <!-- Tint color for login page MEGA LOGO -->
+    <color name="red_600_white_087">@color/red_600</color>
+
     <color name="red_600_red_400">@color/red_600</color>
 
     <color name="red_500_red_300">@color/red_500</color>
