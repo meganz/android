@@ -38,7 +38,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 
@@ -162,8 +162,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		
 		MegaNode node = (MegaNode) getItem(position);
 		holder.document = node.getHandle();
-		Bitmap thumb = null;
-		
 		holder.textViewFileName.setText(node.getName());
 		
 		setViewAlpha(holder.imageView, 1);
@@ -255,176 +253,48 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					}
 				}
 			}
-		}
-		else{
+		} else {
 			holder.permissionsIcon.setVisibility(View.GONE);
 
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(getSizeString(nodeSize));
 
-//			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-//			RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-//			params3.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-//			params3.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-//			params3.setMargins(0, 0, 0, 0);
-//			holder.imageView.setLayoutParams(params3);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 
-			if(!multipleSelect){
-				logDebug("Not multiselect");
-				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				params.setMargins(0, 0, 0, 0);
-				holder.imageView.setLayoutParams(params);
-
+			if (multipleSelect && isItemChecked(position)) {
+				params.height = params.width = dp2px(ICON_SIZE_DP);
+				params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+				holder.imageView.setImageResource(R.drawable.ic_select_folder);
+			} else {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 
+				Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 
-				if (node.hasThumbnail()){
+				if (thumb == null) {
+					thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
 
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-					params1.setMargins(left, 0, 0, 0);
-					holder.imageView.setLayoutParams(params1);
-
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-					if (thumb != null){
-						holder.imageView.setImageBitmap(thumb);
+					if (thumb == null) {
+						try {
+							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaProvider(node, context, holder, megaApi, this);
+						} catch (Exception e) {
+							logWarning("Exception getting thumbnail.", e);
+						} //Too many AsyncTasks
 					}
-					else{
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-						if (thumb != null){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							try{
-								thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaProvider(node, context, holder, megaApi, this);
-							}
-							catch(Exception e){} //Too many AsyncTasks
+				}
 
-							if (thumb != null){
-								holder.imageView.setImageBitmap(thumb);
-							}
-						}
-					}
-				}else{
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-					if (thumb != null){
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
-						holder.imageView.setLayoutParams(params1);
-
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-						if (thumb != null){
-							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-							params1.setMargins(left, 0, 0, 0);
-
-							holder.imageView.setLayoutParams(params1);
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							try{
-								ThumbnailUtilsLollipop.createThumbnailProviderLollipop(context, node, holder, megaApi, this);
-							}
-							catch(Exception e){}//Too many AsyncTasks
-						}
-					}
+				if (thumb != null) {
+					params.height = params.width = dp2px(THUMB_SIZE_DP);
+					params.setMargins(dp2px(THUMB_MARGIN_DP), 0, 0, 0);
+					holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
+				} else {
+					params.height = params.width = dp2px(ICON_SIZE_DP);
+					params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
+					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 				}
 			}
-			else{
-				logDebug("MultiSelection ON");
-				if(this.isItemChecked(position)){
-					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-					paramsMultiselect.setMargins(0, 0, 0, 0);
-					holder.imageView.setLayoutParams(paramsMultiselect);
 
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-					holder.imageView.setImageResource(R.drawable.ic_select_folder);
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-
-					if (node.hasThumbnail()){
-
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
-
-						holder.imageView.setLayoutParams(params1);
-
-						thumb = getThumbnailFromCache(node);
-						if (thumb != null){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							thumb = getThumbnailFromFolder(node, context);
-							if (thumb != null){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								try{
-									thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaProvider(node, context, holder, megaApi, this);
-								}
-								catch(Exception e){} //Too many AsyncTasks
-
-								if (thumb != null){
-									holder.imageView.setImageBitmap(thumb);
-								}
-							}
-						}
-					}else{
-						thumb = getThumbnailFromCache(node);
-						if (thumb != null){
-
-							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-							params1.setMargins(left, 0, 0, 0);
-							holder.imageView.setLayoutParams(params1);
-
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							thumb = getThumbnailFromFolder(node, context);
-							if (thumb != null){
-								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-								params1.setMargins(left, 0, 0, 0);
-								holder.imageView.setLayoutParams(params1);
-
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-								try{
-									ThumbnailUtilsLollipop.createThumbnailProviderLollipop(context, node, holder, megaApi, this);
-								}
-								catch(Exception e){}//Too many AsyncTasks
-							}
-						}
-					}
-				}
-			}
+			holder.imageView.setLayoutParams(params);
 		}
 	}
 

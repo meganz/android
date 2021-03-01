@@ -34,11 +34,6 @@ import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class ModalBottomSheetUtil {
 
-    public static final int THUMB_SIZE_DP = 36;
-    public static final int THUMB_MARGIN_DP = 18;
-    public static final int ICON_SIZE_DP = 48;
-    public static final int ICON_MARGIN_DP = 12;
-
     public static void openWith(Context context, MegaNode node) {
         if (node == null) {
             logWarning("Node is null");
