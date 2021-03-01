@@ -37,7 +37,6 @@ class CookieDialogHandler @Inject constructor(
 
     private val disposable = CompositeDisposable()
     private var dialog: AlertDialog? = null
-    private var hasBeenPaused = false
 
     /**
      * Show cookie dialog if needed.
@@ -121,20 +120,13 @@ class CookieDialogHandler @Inject constructor(
             )
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
-        if (hasBeenPaused) {
+        if (dialog?.isShowing == true) {
             checkDialogSettings { showDialog ->
                 if (!showDialog) dialog?.dismiss()
             }
-
-            hasBeenPaused = false
         }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onPause() {
-        hasBeenPaused = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
