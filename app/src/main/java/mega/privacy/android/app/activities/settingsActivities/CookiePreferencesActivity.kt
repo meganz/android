@@ -43,7 +43,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
             .setPositiveButton(StringResourcesUtils.getString(R.string.save_action)) { _: DialogInterface, _: Int ->
                 saveCookieSettings()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
             .create()
             .show()
     }

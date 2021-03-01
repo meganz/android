@@ -130,7 +130,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
 
             MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
                 .setView(R.layout.dialog_cookie_thirdparty)
-                .setPositiveButton(android.R.string.yes, null)
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes), null)
                 .setOnDismissListener { isThirdPartyDialogShowing = false }
                 .create()
                 .show()
