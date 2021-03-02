@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
@@ -13,13 +12,13 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.datepicker.MaterialStyledDatePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,6 +28,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -38,7 +38,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.activities.GetLinkActivity.COPYRIGHT_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -83,8 +82,6 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
 
     ActionBar aB;
     Toolbar tB;
-
-    public int visibleFragment= COPYRIGHT_FRAGMENT;
 
     static SearchByDateActivityLollipop searchByDateActivity;
 
@@ -144,13 +141,6 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
 
         setContentView(R.layout.search_by_date_activity_layout);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
-
         fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_search_date);
 
         tB = (Toolbar) findViewById(R.id.toolbar_search);
@@ -164,7 +154,6 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
         aB = getSupportActionBar();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setTitle(getString(R.string.action_search_by_date));
         aB.setSubtitle(null);
 
@@ -198,8 +187,6 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
         textViewTo.setText(weekDay);
 
         buttonApply.setEnabled(false);
-        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
-        buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 
         selectedDate = new long[5];
         selectedDate[0]=0;
@@ -312,6 +299,7 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
         return sdf.format(cal.getTime());
     }
 
+    @SuppressLint("RestrictedApi")
     public void showDatePicker(String element){
 
         Calendar cal = Calendar.getInstance();
@@ -333,7 +321,9 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
             day = cal.get(Calendar.DAY_OF_MONTH);
         }
 
-        datePickerDialog = new DatePickerDialog(this, this, year, month, day);
+        datePickerDialog = new MaterialStyledDatePickerDialog(this,
+                R.style.Widget_Mega_DatePickerDialog,
+                this, year, month, day);
         datePickerDialog.show();
     }
 
@@ -356,95 +346,89 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
         if(option.equals("day")){
             tsDay = ts;
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
             relativeLayoutDay.setEnabled(true);
             textViewDay.setText(date);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            textViewDay.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             removeDay.setVisibility(View.VISIBLE);
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
 
             relativeLayoutFrom.setEnabled(false);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(false);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodTo.setVisibility(View.GONE);
 
         }else if (option.equals("from")){
             tsFrom = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
 
             if((tsTo == 0) || (tsTo > ts)){
 
                 textViewFrom.setText(date);
-                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+                textViewFrom.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
                 removePeriodFrom.setVisibility(View.VISIBLE);
                 optionPeriodFrom = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewFrom.setText(weekDay);
-                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
                 removePeriodFrom.setVisibility(View.GONE);
             }
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removeDay.setVisibility(View.GONE);
 
         }else if(option.equals("to")){
             tsTo = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
 
             if((tsFrom ==0 ) || (tsFrom < ts)){
 
                 textViewTo.setText(date);
-                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+                textViewTo.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
                 removePeriodTo.setVisibility(View.VISIBLE);
                 optionPeriodTo = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewTo.setText(weekDay);
-                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
                 removePeriodTo.setVisibility(View.GONE);
             }
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removeDay.setVisibility(View.GONE);
         }
 
         buttonLastMonth.setEnabled(false);
-        buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
 
         buttonLastYear.setEnabled(false);
-        buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
 
         if(((optionPeriodFrom == true) && (optionPeriodTo == true))|| (option.equals(("day")))){
             buttonApply.setEnabled(true);
-            buttonApply.setTextColor(ContextCompat.getColor(this, R.color.white));
-            buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
         }else{
             buttonApply.setEnabled(false);
-            buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
-            buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         }
 
     }
@@ -458,70 +442,62 @@ public class SearchByDateActivityLollipop extends PasscodeActivity implements Me
             tsDay = 0;
 
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removeDay.setVisibility(View.GONE);
 
             buttonLastMonth.setEnabled(true);
-            buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.black));
 
             buttonLastYear.setEnabled(true);
-            buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black));
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
 
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodTo.setVisibility(View.GONE);
 
         }else if(element.equals("from")){
             optionPeriodFrom = false;
             tsFrom = 0;
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodFrom.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
-                buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.black));
 
                 buttonLastYear.setEnabled(true);
-                buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black));
             }
 
         }else if(element.equals("to")){
             optionPeriodTo = false;
             tsTo = 0;
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             removePeriodTo.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
 
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
+                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
-                buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.black));
 
                 buttonLastYear.setEnabled(true);
-                buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black));
             }
         }
 
         buttonApply.setEnabled(false);
-        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
-        buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
     }
 
     public void applySelection(){

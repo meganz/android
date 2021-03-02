@@ -12,10 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:theme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle" />
+        android:minHeight="?attr/actionBarSize" />
 
     <ScrollView
         android:id="@+id/passcode_scroll_view"
@@ -35,7 +32,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:text="@string/unlock_pin_title"
-                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +96,6 @@
                 android:imeOptions="actionDone|flagNoFullscreen"
                 android:importantForAutofill="no"
                 android:inputType="textPassword"
-                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -144,7 +139,7 @@
 
             <Button
                 android:id="@+id/logout_button"
-                style="@style/AccentBorderBackgroundButton"
+                style="@style/Widget.Mega.Button.Transparent"
                 android:layout_marginTop="92dp"
                 android:text="@string/action_logout"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -153,7 +148,7 @@
 
             <Button
                 android:id="@+id/passcode_options_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="@style/Widget.Mega.Button.Transparent"
                 android:layout_marginBottom="40dp"
                 android:text="@string/settings_passcode_option"
                 app:layout_constraintBottom_toBottomOf="parent"

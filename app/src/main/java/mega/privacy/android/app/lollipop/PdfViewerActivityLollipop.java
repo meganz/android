@@ -58,6 +58,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
@@ -104,6 +105,7 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -160,9 +162,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
     MegaApiAndroid megaApi;
     MegaApiAndroid megaApiFolder;
     MegaChatApiAndroid megaChatApi;
-    MegaPreferences prefs = null;
 
-    private AlertDialog alertDialogTransferOverquota;
     public ProgressBar progressBar;
 
     public static boolean loading = true;
@@ -224,7 +224,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
     NodeController nC;
     private OfflineNodeSaver offlineNodeSaver;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private RelativeLayout bottomLayout;
@@ -273,10 +273,21 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
     }
 
     @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
+    }
+
+    @Override
     public void onCreate (Bundle savedInstanceState){
         logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        Window window = getWindow();
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         pdfViewerActivityLollipop = this;
 
@@ -505,11 +516,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
         actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
@@ -623,7 +629,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                                 aB.hide();
                             }
                         }).start();
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 bottomLayout.animate().translationY(220).setDuration(0).start();
                 uploadContainer.animate().translationY(220).setDuration(0).start();
                 pageNumber.animate().translationY(0).setDuration(0).start();
@@ -812,17 +817,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
             aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-            }
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
 
             bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
             fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
@@ -1190,7 +1184,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         toolbarVisible = true;
         aB.show();
         if(tB != null) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
@@ -1207,7 +1200,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         logDebug("Duration: " + duration);
         toolbarVisible = false;
         if(tB != null) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(-220).setDuration(duration).withEndAction(new Runnable() {
                 @Override
                 public void run() {
@@ -1219,7 +1211,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
             pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             aB.hide();
         }
     }
@@ -1262,7 +1253,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
         downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
         chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
-        chatMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
@@ -1273,7 +1263,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
         importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
         saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
-        saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
         if (!inside){
@@ -1748,13 +1737,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setMessage(R.string.confirmation_delete_one_attachment);
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1841,13 +1824,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         };
 
         if (moveToRubbish){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_move_to_rubbish);
             builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
         }
         else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_delete_from_mega);
             builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1909,7 +1892,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
@@ -1961,7 +1944,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
 
-        error_icon.setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning));
+        error_icon.setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.red_600));
 
         final TextView textError = new TextView(PdfViewerActivityLollipop.this);
         error_layout.addView(textError);
@@ -1973,12 +1956,12 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
         textError.setLayoutParams(params_text_error);
 
-        textError.setTextColor(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning));
+        textError.setTextColor(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.red_600));
 
         error_layout.setVisibility(View.GONE);
 
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1995,7 +1978,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                 if (error_layout.getVisibility() == View.VISIBLE) {
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -2008,7 +1991,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2016,7 +1999,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                     } else {
                         boolean result = matches(regex, value);
                         if (result) {
-                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
                             error_layout.setVisibility(View.VISIBLE);
                             input.requestFocus();
@@ -2032,7 +2015,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                 return false;
             }
         });
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -2053,7 +2036,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2061,7 +2044,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                 String value = input.getText().toString().trim();
 
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2069,7 +2052,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
                 else{
                     boolean result=matches(regex, value);
                     if(result){
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2162,8 +2145,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
     }
 
     public void showRemoveLink(){
-        androidx.appcompat.app.AlertDialog removeLinkDialog;
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        AlertDialog removeLinkDialog;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -2343,6 +2326,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            Util.storeDownloadLocationIfNeeded(parentPath);
+
             if (type == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);
@@ -2576,15 +2561,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
             if (e.getErrorCode() == MegaError.API_OK){
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-                }
-
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();
                 String myUserHandle = "";
@@ -2906,7 +2882,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2914,7 +2890,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2950,7 +2926,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2958,7 +2934,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2999,7 +2975,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3007,7 +2983,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity implements MegaG
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 

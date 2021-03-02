@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,13 +18,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -86,6 +87,7 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -227,7 +229,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     private String confirmDeleteMail;
 
     private RelativeLayout mailError;
-    private Drawable editTextBackground;
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
     private RelativeLayout scanQRButton;
@@ -843,7 +844,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         protected void onPostExecute(final Integer type) {
             logDebug("onPostExecute QueryIfContactSouldBeAddedTask");
             if (showDialog) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(addContactActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(addContactActivityLollipop, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                 builder.setCancelable(false);
 
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -1008,18 +1009,17 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 showHeader(false);
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
             }
             else {
@@ -1099,18 +1099,17 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             if (adapterMEGA.getItemCount() == 0) {
                 String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
                 showHeader(false);
                 recyclerViewList.setVisibility(View.GONE);
@@ -1143,9 +1142,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         if (adapterShareHeader.getItemCount() == 0){
             String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
             try{
-                textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             }
             catch (Exception e){}
@@ -1204,15 +1207,11 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_add_contact, menu);
 
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -1229,9 +1228,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 return false;
             }
         });
-
-        ImageView closeIcon = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
-        closeIcon.setImageDrawable(mutateIcon(this, R.drawable.ic_close_white, R.color.black));
 
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -1282,7 +1278,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         });
 
         scanQrMenuItem = menu.findItem(R.id.action_scan_qr);
-        scanQrMenuItem.setIcon(mutateIcon(this, R.drawable.ic_action_scan_qr, R.color.black));
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && contactType != CONTACT_TYPE_MEGA) {
             scanQrMenuItem.setVisible(true);
@@ -1292,7 +1287,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         }
 
         inviteContactMenuItem = menu.findItem(R.id.action_invite_contact);
-        inviteContactMenuItem.setIcon(mutateIcon(this, R.drawable.ic_add_contact, R.color.black));
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && contactType == CONTACT_TYPE_MEGA && !createNewGroup && !comesFromChat && !onNewGroup) {
             inviteContactMenuItem.setVisible(true);
@@ -1302,7 +1296,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         }
 
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
-        sendInvitationMenuItem.setIcon(mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
         setSendInvitationVisibility();
 
         if (searchExpand && searchMenuItem != null) {
@@ -1572,8 +1565,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             }
         }
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -1642,7 +1633,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
         }
-        editTextBackground = typeContactEditText.getBackground().mutate().getConstantState().newDrawable();
         typeContactEditText.addTextChangedListener(this);
         typeContactEditText.setOnEditorActionListener(this);
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -1744,9 +1734,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         emptyImageView = (ImageView) findViewById(R.id.add_contact_list_empty_image);
         emptyTextView = (TextView) findViewById(R.id.add_contact_list_empty_text);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-        }
-        else {
+            emptyImageView.setImageResource(R.drawable.empty_contacts_portrait);
+        } else {
             // auto scroll to the bottom to show the invite button
             final ScrollView scrollView = findViewById(R.id.scroller);
             new Handler().postDelayed(new Runnable() {
@@ -1755,7 +1744,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                     scrollView.fullScroll(View.FOCUS_DOWN);
                 }
             }, 100);
-            emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+            emptyImageView.setImageResource(R.drawable.empty_contacts_landscape);
         }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
         emptySubTextView = (TextView) findViewById(R.id.add_contact_list_empty_subtext);
@@ -2018,10 +2007,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             typeContactEditText.setLayoutParams(params);
         }
         mailError.setVisibility(View.VISIBLE);
-        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-        Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
-        background.setColorFilter(porterDuffColorFilter);
-        typeContactEditText.setBackground(background);
+
+        ColorUtils.setErrorAwareInputAppearance(typeContactEditText, true);
     }
 
     private void quitError(){
@@ -2034,7 +2021,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             params.setMargins(dp2px(18, outMetrics), dp2px(0, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
-        typeContactEditText.setBackground(editTextBackground);
+
+        ColorUtils.setErrorAwareInputAppearance(typeContactEditText, false);
     }
 
     private void addShareContact (ShareContactInfo contact) {
@@ -2076,9 +2064,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -2126,9 +2118,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -2187,9 +2183,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -2804,7 +2804,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private void showConfirmationDeleteFromChat (final MegaContactAdapter contact) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -3267,7 +3267,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 
         if((getChatLinkBox.isChecked() || createNewChatLink) && (chatTitle == null || chatTitle.trim().isEmpty())){
-            new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal)
+            new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setTitle(getString(R.string.enter_group_name))
                     .setMessage(getString(R.string.alert_enter_group_name))
                     .setPositiveButton(getString(R.string.general_ok), null)

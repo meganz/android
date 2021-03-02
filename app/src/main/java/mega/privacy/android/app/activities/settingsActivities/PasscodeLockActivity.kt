@@ -75,8 +75,6 @@ class PasscodeLockActivity : BaseActivity() {
 
         screenOrientation = resources.configuration.orientation
 
-        window.statusBarColor = ContextCompat.getColor(this, R.color.lollipop_dark_primary_color)
-
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

@@ -6,13 +6,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -43,6 +45,8 @@ import mega.privacy.android.app.lollipop.CheckScrollInterface;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -92,9 +96,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     //Empty screen
     private TextView emptyTextView;
     private LinearLayout emptyLayout;
-    private TextView emptyTextViewInvite;
     private ImageView emptyImageView;
-    private Button inviteButton;
     private RelativeLayout contentLayout;
     private ProgressBar progressBar;
 
@@ -185,7 +187,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
-        listView.setItemAnimator(new DefaultItemAnimator());
+        listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.setClipToPadding(false);
         listView.setPadding(0,scaleHeightPx(8, outMetrics),0, 0);
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -197,40 +199,31 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         });
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
-        String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+        String textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'" +
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[B]", "<font color=\'" +
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
+                    + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         }
         catch (Exception e){}
-        Spanned resultB = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultB = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            resultB = Html.fromHtml(textToShow);
-        }
+        Spanned resultB = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(resultB);
-
-        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, scaleHeightPx(50, outMetrics), 0, scaleHeightPx(24, outMetrics));
-        emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
         emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+        emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
 
         mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
-        inviteButton = v.findViewById(R.id.invite_button);
-        inviteButton.setVisibility(View.GONE);
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -288,20 +281,34 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         boolean canScroll = listView.canScrollVertically(-1);
         boolean addLayoutVisible = (addLayout != null && addLayout.getVisibility() == View.VISIBLE);
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
         if (context instanceof FileExplorerActivityLollipop) {
-            if (addLayoutVisible) {
-                addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
+            if (addLayoutVisible && canScroll) {
+                if (Util.isDarkMode(context)) {
+                    addLayout.setBackgroundColor(ColorUtils.getColorForElevation(context, elevation));
+                } else {
+                    addLayout.setElevation(elevation);
+                }
+            } else {
+                if (Util.isDarkMode(context)) {
+                    addLayout.setBackgroundColor(android.R.color.transparent);
+                } else {
+                    addLayout.setElevation(0);
+                }
             }
-            ((FileExplorerActivityLollipop) context).changeActionBarElevation(
-                    canScroll && !addLayoutVisible, CHAT_FRAGMENT);
+
+            ((FileExplorerActivityLollipop) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
-            addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
+            addLayout.setElevation(canScroll ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
+
+            Toolbar tB = ((ChatExplorerActivity) context).findViewById(R.id.toolbar_chat_explorer);
+            Util.changeToolBarElevationForDarkMode((ChatExplorerActivity) context, tB, canScroll);
         }
     }
 
     private void showConnecting() {
-        String textToShow = String.format(context.getString(R.string.chat_connecting));
+        String textToShow = context.getString(R.string.chat_connecting);
         emptyTextView.setText(textToShow);
     }
 

@@ -1,253 +1,389 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="free_account">#2BB200</color>
-    <color name="lite_account">#FFA500</color>
-    <color name="pro_account">#F0373A</color>
-    <color name="business_account">#2BA6DE</color>
-
-	<color name="pressed_mega">#CCcc0000</color>
-    <color name="text_tab_alpha">#99ffffff</color>
-    <color name="text_secondary">#7a7a7a</color>
-    <color name="separator_grey">#10000000</color>
-    <color name="background_secondary">#eeeeee</color>
-    <color name="background_create_account">#f4f4f4</color>
-    <color name="mega">#d90007</color>
-    <color name="mega_transparency">#CCdb0605</color>
-    <color name="text_login">#FF000000</color>
-    <color name="transparency_white">#80FFFFFF</color>
-    <color name="used_space_warning">#ffb800</color>
-    <color name="used_space_exceed">#d52400</color>
-    <color name="transfer_progress">#cccccc</color>
-    <color name="navigation_drawer_mail">#858585</color>
-    <color name="navigation_drawer_text">#d2d2d2</color>
-    <color name="navigation_drawer_background_odd">#292929</color>
-    <color name="navigation_drawer_background">#222222</color>
-    <color name="color_navigation_drawer_selected">#1AFFFFFF</color> 
-    <color name="file_list_first_row">#000000</color>
-    <color name="file_list_second_row">#848484</color>
-    <color name="file_list_selected_row">#1A000000</color>
-    <color name="new_file_list_selected_row">#0A000000</color>
-    <color name="new_multiselect_color">#1A0ABFA5</color>
-    <color name="border_file_properties">#cccccc</color>
-    <color name="file_properties_text_available">#666666</color>
-    <color name="grey_info_menu">#999999</color>
-    <color name="grid_item_border">#d4d4d4</color>
-    <color name="grid_item_separator">#e5e5e5</color>
-    <color name="contact_properties_content_detailed">#9a9a9a</color>
-    <color name="contact_properties_info_menu">#404040</color>
-    <color name="contact_list_second_row">#848484</color>
-    <color name="photo_sync_month_text">#787878</color>
-    <color name="switch_selector_layout">#555555</color>
-    <color name="color_default_avatar_phone">#777777</color>
- 	<color name="content_text_folder">#80333333</color>
- 	<color name="content_text_background">#f4f4f4</color>
- 	<color name="adapters_background">#333333</color>
- 	<color name="file_properties_bottom">#292929</color>
-
-    <color name="new_background_fragment">#F7F7F7</color>
-
- 	<color name="lollipop_primary_color">#d90007</color>
- 	<color name="lollipop_dark_primary_color">#b4070c</color>
- 	<color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
-    
- <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
-    
-    <color name="green_free_account">#31B404</color>
-
-    <color name="transparent_white">#CCFFFFFF</color>
+    <!-- General color names, the suffix numbers are defined
+    in Mega Invision(https://projects.invisionapp.com/d/main#/console/20328430/433152493/preview),
+    not the values from Material design.  -->
     <color name="white">#FFFFFF</color>
+
+    <color name="white_alpha_005">#0DFFFFFF</color>
+    <color name="white_alpha_008">#14FFFFFF</color>
+    <color name="white_alpha_009">#16FFFFFF</color>
+    <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_015">#26FFFFFF</color>
+    <color name="white_alpha_016">#29FFFFFF</color>
+    <color name="white_alpha_018">#2EFFFFFF</color>
+    <color name="white_alpha_020">#33FFFFFF</color>
+    <color name="white_alpha_023">#3AFFFFFF</color>
+    <color name="white_alpha_030">#4DFFFFFF</color>
+    <color name="white_alpha_033">#54FFFFFF</color>
+    <color name="white_alpha_038">#60FFFFFF</color>
+    <color name="white_alpha_045">#73FFFFFF</color>
+    <color name="white_alpha_050">#80FFFFFF</color>
+    <color name="white_alpha_054">#89FFFFFF</color>
+    <color name="white_alpha_060">#99FFFFFF</color>
+    <color name="white_alpha_070">#B3FFFFFF</color>
+    <color name="white_alpha_080">#CCFFFFFF</color>
+    <color name="white_alpha_087">#DDFFFFFF</color>
+
     <color name="black">#000000</color>
-    <color name="orange">#FFFFBB33</color>
-    <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_grey">#8d8d8d</color>
-    <color name="filter_icon">#8d8d94</color>
-    <color name="upgrade_white">#b9ffffff</color>
-    <color name="delete_account">#ff333a</color>
-    <color name="ic_mic_read_message">#9e9e9e</color>
-    <color name="ic_mic_unread_message">#00bfa5</color>
+    <color name="black_87_opacity">#DE000000</color>
+    <color name="dark_grey">#121212</color>
+    <color name="dark_grey_alpha_050">#80121212</color>
+    <color name="dark_grey_alpha_054">#89121212</color>
 
-    <color name="primary_text">#de000000</color>
-    <color name="secondary_text">#8a000000</color>
-    <color name="forgot_pass_text">#91000000</color>
-        
-    <color name="tab_pressed">#ee0008</color>
+    <color name="grey_010">#FAFAFA</color>
+    <color name="grey_020">#F5F5F5</color>
+    <color name="grey_050">#EEEEEE</color>
+    <color name="grey_100">#E0E0E0</color>
+    <color name="grey_200">#BDBDBD</color>
+    <color name="grey_300">#9E9E9E</color>
+    <color name="grey_400">#929292</color>
+    <color name="grey_500">#757575</color>
+    <color name="grey_600">#6C6C6C</color>
+    <color name="grey_700">#4F4F4F</color>
+    <color name="grey_800">#2E2E2E</color>
+    <color name="grey_900">#212121</color>
 
-    <color name="transparent_black">#80000000</color>
-    <color name="transparent_mega">#80db0605</color>
-    
-    <color name="delimiterColor">#e6e6e6</color>
-    <color name="contactSelected">#1A00BFA5</color>
-    <color name="accentColor">#FF00BFA5</color>
-    <color name="accentColorTransparent">#5900BFA5</color>
-    <color name="accentColorLight">#9900BFA5</color>
-    <color name="accentColorDark">#FF009884</color>
-    <color name="textGrey">#6d6f70</color> 
+    <color name="grey_100_alpha_060">#99E0E0E0</color>
+    <color name="grey_300_alpha_026">#429E9E9E</color>
+    <color name="grey_600_alpha_085">#D96C6C6C</color>
+    <color name="grey_700_alpha_026">#424F4F4F</color>
 
-    <color name="filePropertiesToolBar">#2284b1</color>
+    <color name="grey_alpha_003">#08000000</color>
+    <color name="grey_alpha_005">#0D000000</color>
+    <color name="grey_alpha_006">#0F000000</color>
+    <color name="grey_alpha_012">#1E000000</color>
+    <color name="grey_alpha_016">#29000000</color>
+    <color name="grey_alpha_020">#33000000</color>
+    <color name="grey_alpha_026">#42000000</color>
+    <color name="grey_alpha_033">#54000000</color>
+    <color name="grey_alpha_038">#60000000</color>
+    <color name="grey_alpha_045">#73000000</color>
+    <color name="grey_alpha_050">#80000000</color>
+    <color name="grey_alpha_054">#8A000000</color>
+    <color name="grey_alpha_060">#99000000</color>
+    <color name="grey_alpha_070">#B3000000</color>
+    <color name="grey_alpha_087">#DD000000</color>
 
-	<color name="tour_bar_grey">#dddddd</color>
-	<color name="tour_bar_red">#cc0000</color>
+    <color name="teal_050">#DCF4F0</color>
+    <color name="teal_100">#A9E3D8</color>
+    <color name="teal_200">#6DD2BF</color>
+    <color name="teal_300">#00BFA5</color>
+    <color name="teal_400">#00B092</color>
+    <color name="teal_500">#00A07F</color>
+    <color name="teal_600">#009372</color>
 
-    <color name="small_letter_upgrade_account">#8a333333</color>
+    <color name="teal_200_alpha_038">#616DD2BF</color>
 
-    <color name="chat_background">#08000000</color>
-    <color name="message_background">#0f000000</color>
+    <color name="teal_300_alpha_006">#0F00B092</color>
+    <color name="teal_300_alpha_038">#6100BFA5</color>
+    <color name="teal_300_alpha_050">#8000BFA5</color>
+    <color name="teal_300_alpha_090">#E600BFA5</color>
 
-    <color name="chat_sliding_panel_separator">#dcdcdcdc</color>
-    <color name="gradient_avatar_chat">#44000000</color>
+    <color name="teal_400_alpha_036">#5C00B092</color>
+    <color name="teal_400_alpha_050">#8000B092</color>
+    <color name="teal_400_alpha_090">#E600B092</color>
+    <color name="teal_500_alpha_040">#6600B092</color>
 
-    <color name="status_connected">#13e03c</color>
-    <color name="status_busy">#eb4444</color>
+    <color name="red_300">#F46762</color>
+    <color name="red_400">#FD3E38</color>
+    <color name="red_500">#FF2310</color>
+    <color name="red_600">#F30C14</color>
+    <color name="red_800">#D50004</color>
+    <color name="red_900">#C70000</color>
 
-    <color name="participants_layout">#f2f2f2</color>
-    <color name="status_invisible_layout">#bfbfbf</color>
+    <color name="red_600_alpha_038">#60F30C14</color>
+    <color name="red_300_alpha_038">#60F46762</color>
+    <color name="red_900_alpha_080">#CCC70000</color>
+    <color name="red_400_alpha_080">#CCFD3E38</color>
 
-    <color name="sliding_panel_separator">#dcdcdcdc</color>
+    <color name="yellow_300">#FFEF67</color>
+    <color name="yellow_600">#FFD300</color>
 
-    <color name="fab_mask">#D96B6B6B</color>
+    <color name="orange_300">#FFB640</color>
+    <color name="orange_400">#FFA500</color>
 
-    <color name="login_warning">#FFFF333A</color>
-    <color name="login_title">#FFD90007</color>
+    <color name="green_300">#78CC64</color>
+    <color name="green_400">#56C13E</color>
+    <color name="green_500">#31B500</color>
 
-    <color name="copyright_text">#FF333333</color>
+    <color name="jade_300">#4DB6AC</color>
+    <color name="jade_600">#00897B</color>
 
-    <color name="transparent_transparent_black">#35000000</color>
-    <color name="status_bar_login">#33000000</color>
-    <color name="less_transparent_white">#80FFFFFF</color>
+    <color name="salmon_300">#F37476</color>
+    <color name="salmon_400">#FF5252</color>
+    <color name="salmon_700">#E42930</color>
 
-    <color name="grey_my_account_background">#FFF9F9F9</color>
-    <color name="grey_my_account_separator">#80FFFFFF</color>
+    <color name="lime_green_200">#A9F2A5</color>
+    <color name="lime_green_300">#7FEC7E</color>
+    <color name="lime_green_500">#13E03C</color>
 
-    <color name="grey_achievements_background">#E6FFFFFF</color>
-    <color name="grey_achievements_title">#FF777777</color>
+    <color name="dark_blue_200">#85D2ED</color>
+    <color name="dark_blue_300">#5AC0E6</color>
+    <color name="dark_blue_400">#3FB2E2</color>
+    <color name="dark_blue_500">#2BA6DE</color>
 
-    <color name="grey_achievements_invite_friends">#FF666666</color>
-    <color name="grey_achievements_invite_friends_sub">#FF999999</color>
+    <color name="blue_300">#00C0FD</color>
+    <color name="blue_200">#61D2FF</color>
 
-    <color name="blue_unlocked_rewards">#FF2BA6DE</color>
-    <color name="green_unlocked_rewards">#FF31B500</color>
+    <color name="amber_700">#FFA003</color>
+    <color name="amber_600">#FFB300</color>
+    <color name="amber_300">#FFD54F</color>
 
-    <color name="grey_text_chip">#FF535353</color>
-    <color name="grey_background_chip">#FFE0E0E0</color>
-    <color name="invite_button_deactivated">#424F4F4F</color>
+    <!-- For business admin account expired background color -->
+    <color name="old_pink_800">#B00E5E</color>
+    <color name="old_pink_900">#8A0955</color>
 
-    <color name="very_transparent_black">#40000000</color>
-    <color name="very_very_transparent_black">#10000000</color>
-    <color name="scroll_bubble">#90727272</color>
-    <color name="scroll_handle">#90d90007</color>
-    <color name="camera_uploads_list_view">#FFF5F5F5</color>
-    <color name="transparent_black2">#99000000</color>
+    <color name="purple_200">#CE91D3</color>
+    <color name="purple_300">#B965C1</color>
 
-    <color name="background_chat">#FFFFFFFF</color>
-    <color name="disable_fab_chat_call">#444444</color>
-    <color name="disable_fab_invite_contact">#A9E3D8</color>
+    <!-- ======================== Color pair: light_dark ================== -->
 
-	<color name="disabled_radio_button_label">#FF8C8F90</color>
-    <color name="pass_weak">#FFFFD300</color>
-    <color name="pass_good">#FF13E03C</color>
+    <color name="black_white">@color/black</color>
 
-    <color name="color_background_versions">#FFF2F2F2</color>
+    <!-- The list item divider; Stroke color (Grid item border color);
+         The underline color of TextInputLayout when unfocused -->
+    <color name="grey_012_white_012">@color/grey_alpha_012</color>
+    <!-- The "eye" icon -->
+    <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
+    <!--  Same as colorOnSecondary  -->
+    <color name="white_087_dark_grey">@color/white_alpha_087</color>
 
-    <color name="black_p50">#9f000000</color>
+    <!-- Same as colorError -->
+    <color name="red_900_red_400">@color/red_900</color>
 
-    <color name="turn_on_notifications_background">#FF00A38C</color>
-    <color name="turn_on_notifications_statusbar">#FF008270</color>
-    <color name="call_on_hold_banner">#60008270</color>
+    <!-- Notification badge -->
+    <color name="white_dark_grey">@color/white</color>
 
-    <color name="turn_on_notifications_text">#B3000000</color>
+    <!-- Turn on camera uploads button text, action mode bar color -->
+    <color name="teal_300_dark_grey">@color/teal_300</color>
 
+    <!-- icon tint for FAB above images or scrim -->
+    <color name="teal_300_black">@color/teal_300</color>
+    <!-- background tint for FAB above images or scrim -->
+    <color name="white_teal_200">@color/white</color>
 
-    <color name="color_background_jump_to_least">#80000000</color>
+    <!-- Primary red -->
+    <color name="red_600_red_300">@color/red_600</color>
 
-    <color name="color_background_new_messages">#FFF7F7F7</color>
-    <color name="color_text_new_messages">#B3000000</color>
-    <color name="message_background_2">#ffEDE9E8</color>
-    <color name="message_background_3">#FFE4EBEA</color>
-    <color name="shape_page_number">#E600BFA5</color>
-    <color name="file_playlist_playing">#FFF2FCFA</color>
-    <color name="background_button_white">#FFFAFAFA</color>
-    <color name="border_button_white">#FFE1E1E1</color>
-    <color name="add_contact_icons">#FF707070</color>
-    <color name="user_layer_group_call">#8000BFA5</color>
+    <!-- Tint color for login page MEGA LOGO -->
+    <color name="red_600_white_087">@color/red_600</color>
 
-    <color name="emoji_icons">#61000000</color>
-    <color name="emoji_background">#FFECEFF1</color>
+    <color name="red_600_red_400">@color/red_600</color>
 
-    <color name="dark_primary_color">#FFF30C14</color>
-    <color name="dark_primary_color_secondary">#FFD50004</color>
-    <color name="status_bar_search">#FFCCCCCC</color>
-    <color name="status_bar_sms_verification">#40B0D7</color>
-    <color name="status_bar_navigation_view">#FF33CCB7</color>
-    <color name="white_50_opacity">#80FFFFFF</color>
-    <color name="white_15_opacity">#26FFFFFF</color>
-    <color name="black_15_opacity">#26000000</color>
-    <color name="accent_color_30_opacity">#4D00BFA5</color>
+    <color name="red_500_red_300">@color/red_500</color>
 
-    <color name="yellow_notif_shares">#FFFFA500</color>
-    <color name="green_notif_contacts">#FF00897B</color>
+    <color name="red_900_080_red_400_080">@color/red_900_alpha_080</color>
 
-    <!-- DIALOGS -->
-    <color name="dialog_title">#FF333333</color>
-    <color name="dialog_text">#FF666666</color>
+    <!-- Solid color. e.g. Grid item background -->
+    <color name="white_white_005">?android:attr/colorBackground</color>
 
-    <color name="permissions_image_adapter">#FFEEEEEE</color>
+    <!-- chat room message loading image tint  -->
+    <color name="grey_005_white_008">@color/grey_alpha_005</color>
 
-    <color name="statusbar_tour_1">#FFCC6B6B</color>
-    <color name="statusbar_tour_2">#FF42A6BF</color>
-    <color name="statusbar_tour_3">#FFCC7300</color>
-    <color name="statusbar_tour_4">#FF00948C</color>
+    <!-- chat reaction add/own emoji background fill -->
+    <color name="grey_003_white_018">@color/grey_alpha_003</color>
 
-    <color name="business_alert_background">#FFF6F6F6</color>
-    <color name="expired_red">#FFE1000F</color>
-    <color name="grace_yellow">#FFF29907</color>
-    <color name="expired_business_admin_statusbar">#825572</color>
-    <color name="expired_business_user_statusbar">#29A6D1</color>
-    <color name="expired_business_admin">#966B87</color>
-    <color name="expired_business_user">#44BCE6</color>
-    <color name="business_color">#2BA6DE</color>
+    <!-- chat reaction add/own emoji background border -->
+    <color name="grey_012_white_015">@color/grey_alpha_012</color>
 
-    <color name="black_12_alpha">#1F000000</color>
-    <color name="black_40_alpha">#66000000</color>
-    <color name="black_54_alpha">#89000000</color>
+    <!-- chat reaction contact emoji background fill -->
+    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>
 
-    <color name="red_alert">#FF6464</color>
-    <color name="status_bar_red_alert">#CF4949</color>
+    <!-- chat reaction contact emoji background border -->
+    <color name="teal_300_teal_600">@color/teal_300</color>
 
-    <color name="reconnecting_bar">#FFF5A623</color>
-    <color name="voice_clip_bubble">#323232</color>
-    <color name="background_recording">#78252525</color>
+    <!-- chat unread message background -->
+    <color name="grey_020_grey_700">@color/grey_020</color>
 
-    <color name="light_toolbar_title">#A8A8A8</color>
-    <color name="giphy_search_text">#121212</color>
-    <color name="giphy_loading_background">#ECECEC</color>
+    <!-- chat room voice clip SeekBar progressBackgroundTint -->
+    <color name="white_018_white_038">@color/white_alpha_018</color>
 
-    <color name="border_avatar_call">#4DFFFFFF</color>
-    
-    <color name="background_own_reaction_added">#0F00BFA5</color>
+    <!-- Drawer item disabled text color, same to textColorHint  -->
+    <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
-    <color name="error_color">#C70000</color>
-    <color name="failed_attempts">#F30C14</color>
+    <!-- Bottom navigation menu disabled tint color  -->
+    <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
-    <color name="pressed_color">#E7E7E7</color>
+    <!-- Record voice clip audio level indicator -->
+    <color name="white_045_grey_045">@color/white_alpha_045</color>
+
+    <!-- Chat observer layout background -->
+    <color name="grey_050_white_050">@color/grey_alpha_050</color>
+
+    <!-- Chat sending location overlay -->
+    <color name="white_050_grey_050">@color/white_alpha_050</color>
+
+    <!-- Same to textColorPrimary -->
+    <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- call in progress text color -->
+    <color name="white_087_grey_087">@color/white_alpha_087</color>
+
+    <!-- Turn on notification title text color -->
+    <color name="white_grey_087">@color/white</color>
+
+    <!-- Turn on notification subtitle text color -->
+    <color name="grey_087_grey_070">@color/grey_alpha_087</color>
+
+    <!-- Turn on notification bullet text color -->
+    <color name="grey_900_grey_700">@color/grey_900</color>
+
+    <!-- Same to textColorSecondary -->
+    <color name="grey_054_white_054">@color/grey_alpha_054</color>
+
+    <color name="grey_054_white_087">@color/grey_alpha_054</color>
+
+    <color name="white_black">@color/white</color>
+
+    <!-- Date picker background color -->
+    <color name="white_grey_800">@color/white</color>
+
+    <!-- Emoji keyboard background -->
+    <color name="grey_010_grey_800">@color/grey_010</color>
+
+    <!-- Giphy loading placeholder -->
+    <color name="grey_050_grey_800">@color/grey_050</color>
+
+    <!-- Chat message unselected icon tint -->
+    <color name="grey_600_white_087">@color/grey_600</color>
+
+    <!-- Chat message forward icon tint -->
+    <color name="grey_200_grey_500">@color/grey_200</color>
+
+    <!-- Chat management message name, e.g. Tom created a chat link, "Tom" is the name -->
+    <color name="grey_900_grey_100">@color/grey_900</color>
+
+    <!-- Chat management message text, e.g. Tom created a chat link, "created a chat link" is the text -->
+    <color name="grey_500_grey_400">@color/grey_500</color>
+
+    <!-- Business account management container-->
+    <color name="grey_020_white_012">@color/grey_020</color>
+
+    <!-- Background color of Achievements screen and bottom navigation bar -->
+    <color name="grey_020_dark_grey">@color/grey_020</color>
+
+    <!-- SMSVerificationActivity background and status bar -->
+    <color name="blue_400_blue_200">@color/dark_blue_400</color>
+
+    <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
+    <!-- password strength -->
+    <!-- Weak -->
+    <color name="yellow_600_yellow_300">@color/yellow_600</color>
+    <!-- Medium -->
+    <color name="green_500_green_400">@color/green_500</color>
+    <!-- Good -->
+    <color name="lime_green_500_200">@color/lime_green_500</color>
+    <!-- Strong -->
+    <color name="dark_blue_500_200">@color/dark_blue_500</color>
+
+    <!-- Colors for empty content hint text. Must be non-alpha colors, for
+      <font color=""> doesn't support alpha -->
+    <color name="grey_300_grey_600">@color/grey_300</color>
+
+    <!-- app drawer related related colors -->
+    <color name="grey_010_white_087">@color/grey_010</color>
+    <color name="teal_300_grey_087">@color/teal_300</color>
+
+    <!-- transfer over quota progress -->
+    <color name="amber_700_amber_300">@color/amber_700</color>
 
     <color name="homepage_background">#EEF2F1</color>
 
-    <color name="homepage_title">#dd000000</color>
-    <color name="homepage_content">#89000000</color>
-    <color name="homepage_fab_label_text_color">#ff373737</color>
+    <color name="new_multiselect_color">#1A0ABFA5</color>
 
-    <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+    <color name="lite_account">#FFA500</color>
 
-    <!-- NODE LABELS -->
-    <color name="label_red">#FF625D</color>
-    <color name="label_orange">#F9A646</color>
-    <color name="label_yellow">#F4CE4A</color>
-    <color name="label_green">#6DCB50</color>
-    <color name="label_blue">#4BB8F3</color>
-    <color name="label_purple">#D088E1</color>
-    <color name="label_grey">#A4A4A7</color>
+    <!-- chat status color -->
+    <!-- Offline -->
+    <color name="grey_700_grey_300">@color/grey_700</color>
 
-    <color name="accentColorDisabled">#6100BFA5</color>
+    <!-- homepage upload FAB tint -->
+    <color name="grey_900_grey_050">@color/grey_900</color>
 
+    <!-- Available offline disabled text color -->
+    <color name="grey_700_026_grey_300_026">@color/grey_700_alpha_026</color>
+
+    <!-- Busy -->
+    <color name="salmon_700_salmon_300">@color/salmon_700</color>
+    <!-- Away -->
+    <color name="orange_400_orange_300">@color/orange_400</color>
+    <!-- Online -->
+    <color name="lime_green_500_300">@color/lime_green_500</color>
+
+    <!-- Chat contact text message text color -->
+    <color name="grey_087_white">@color/grey_alpha_087</color>
+
+    <!-- Chat contact file info color -->
+    <color name="grey_054_white">@color/grey_alpha_054</color>
+
+    <!-- Chat contact reaction emoji count text color -->
+    <color name="teal_300_white">@color/teal_300</color>
+
+    <!-- Chat reaction add icon tint color -->
+    <color name="grey_026_white_038">@color/grey_alpha_026</color>
+
+    <!-- chat own text message background -->
+    <color name="teal_500_teal_400_090">@color/teal_500</color>
+    <!-- chat own text message background, sending -->
+    <color name="teal_500_040_teal_400_036">@color/teal_500_alpha_040</color>
+
+    <!-- chat contact text message background -->
+    <color name="grey_100_060_white_023">@color/grey_100_alpha_060</color>
+
+    <!--Info Achievements title background -->
+    <color name="white_transparent">@color/white</color>
+
+    <!-- Same to colorSecondary -->
+    <color name="teal_300_teal_200">@color/teal_300</color>
+
+    <!-- Error text highlight color (selection background) -->
+    <color name="teal_100_teal_050">@color/teal_100</color>
+
+    <!-- Turn on notification screen background -->
+    <color name="teal_500_teal_400">@color/teal_500</color>
+
+    <!-- "Contact" title in Notifications Screen -->
+    <color name="jade_600_jade_300">@color/jade_600</color>
+
+    <!--    Mask color for current plan-->
+    <color name="white_054_dark_grey_054">@color/white_alpha_054</color>
+
+    <color name="white_050_dark_grey_050">@color/white_alpha_050</color>
+
+    <!--  Upgrade account mask color  -->
+    <color name="grey_020_white_020">@color/grey_alpha_020</color>
+
+    <!-- Two factor authentication credentials background -->
+    <color name="grey_020_grey_800">@color/grey_020</color>
+
+    <!-- For disabled borderless button-->
+    <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
+
+    <!-- Label red -->
+    <color name="salmon_400_salmon_300">@color/salmon_400</color>
+    <!-- Label green -->
+    <color name="green_400_green_300">@color/green_400</color>
+    <!-- Label blue -->
+    <color name="blue_300_blue_200">@color/blue_300</color>
+    <!-- Label purple -->
+    <color name="purple_300_purple_200">@color/purple_300</color>
+    <!-- Storage progress bar warning -->
+    <color name="amber_600_amber_300">@color/amber_600</color>
+    <!-- Same as progress bar trackColor -->
+    <color name="grey_012_white_023">@color/grey_alpha_012</color>
+    <!-- For drawing QR code -->
+    <color name="dark_grey_white">@color/dark_grey</color>
+
+    <!-- For action mode under dark mode only, same as getColorForElevation() with 4dp elevation -->
+    <color name="action_mode_background">#282828</color>
+
+    <!-- For fast scroller -->
+    <color name="scroll_bubble">#90727272</color>
+
+    <color name="scroll_handle">#90d90007</color>
+
+    <!-- notification -->
+    <color name="mega">#d90007</color>
 </resources>

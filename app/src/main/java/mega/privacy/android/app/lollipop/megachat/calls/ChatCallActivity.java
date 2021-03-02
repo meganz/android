@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -194,7 +195,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         inflater.inflate(R.menu.call_action, menu);
         cameraSwapMenuItem = menu.findItem(R.id.cab_menu_camera_swap);
         cameraSwapMenuItem.setEnabled(true);
-        cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
+        cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -654,7 +655,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     };
 
     @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Window window = getWindow();
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
         super.onCreate(savedInstanceState);
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
@@ -688,7 +701,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
@@ -849,25 +861,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             chatId = extras.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-            }
-
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD) {
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
-
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_video_off));
-            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
-            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             onHoldFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_call_hold_fab));
-            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_300)));
             microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_record_audio_w));
 
             initialUI(chatId);
@@ -1183,7 +1183,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void hideReconnecting() {
         if (!reconnectingLayout.isShown()) return;
         logDebug("Hidding Reconnecting bar and showing You are back bar");
-        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_300));
         reconnectingText.setText(getString(R.string.connected_message));
         reconnectingLayout.setAlpha(1);
         reconnectingLayout.setVisibility(View.VISIBLE);
@@ -1207,7 +1207,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
 
-        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
+        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
         reconnectingLayout.setAlpha(1);
@@ -1222,7 +1222,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateInfoUsersBar(String text) {
         logDebug("updateInfoUsersBar");
         infoUsersBar.setText(text);
-        infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+        infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_300));
         infoUsersBar.setAlpha(1);
         infoUsersBar.setVisibility(View.VISIBLE);
         infoUsersBar.animate().alpha(0).setDuration(INFO_ANIMATION);
@@ -1388,7 +1388,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             answerCallFAB.show();
             linearArrowCall.setVisibility(View.GONE);
             relativeVideo.setVisibility(View.VISIBLE);
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_300)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
             if(!videoFAB.isShown()) videoFAB.show();
 
@@ -1674,11 +1674,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateVideoFABStatus() {
         if (callChat.hasLocalVideo() || callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
             //Enable video FAB
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_300)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
         } else {
             //Disable video FAB
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
         }
     }
@@ -1695,10 +1695,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
 
         if (isSpeakerOn) {
-            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_300)));
             speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
         } else {
-            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
     }
@@ -1709,11 +1709,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateMicroFABStatus() {
         if (callChat.hasLocalAudio()) {
             //Enable video FAB
-            microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_300)));
             microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_record_audio_w));
         } else {
             //Disable video FAB
-            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_700)));
             microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_mic_off));
         }
     }
@@ -1837,12 +1837,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-        anotherCallTitle.setText(anotherChat.getTitle());
+        anotherCallTitle.setText(getTitleChat(anotherChat));
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
         anotherCallSubtitle.setAlpha(1f);
         if (isOnHold) {
             anotherCallLayout.setAlpha(0.9f);
-            anotherCallLayoutLayer.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_black2));
+            anotherCallLayoutLayer.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_060));
         } else {
             anotherCallLayout.setAlpha(1f);
             anotherCallLayoutLayer.setBackgroundColor(Color.TRANSPARENT);
@@ -1857,12 +1857,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void updateOnHoldFabButton(MegaChatCall callOnHold) {
         if (callOnHold != null) {
-            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.disable_fab_chat_call)));
+            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.grey_700)));
             onHoldFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_swap));
         } else {
             onHoldFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_hold_fab));
             onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(callChat.isOnHold() ||
-                    isSessionOnHold(chat.getChatId()) ? R.color.accentColor : R.color.disable_fab_chat_call)));
+                    isSessionOnHold(chat.getChatId()) ? R.color.teal_300 : R.color.grey_700)));
         }
     }
 
@@ -2898,7 +2898,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if (participantsWithPoorConnection == totalParticipants) {
             if (reconnectingLayout.getVisibility() != View.VISIBLE) {
-                reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
+                reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
                 reconnectingText.setText(getString(R.string.poor_internet_connection_message));
                 reconnectingLayout.setVisibility(View.VISIBLE);
                 reconnectingLayout.setAlpha(1);

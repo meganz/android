@@ -4,20 +4,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
+
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
@@ -29,8 +28,10 @@ import java.util.Locale;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CountryCodePickerActivityLollipop extends PasscodeActivity implements CountryListAdapter.CountrySelectedCallback {
@@ -49,7 +50,7 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
 
     private DisplayMetrics outMetrics;
 
-    private Toolbar toolbar;
+    private MaterialToolbar toolbar;
     private String searchInput;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private ArrayList<String> receivedCountryCodes;
@@ -66,7 +67,6 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
 
-        changeStatusBarColor();
         if (countries == null) {
             countries = loadCountries();
         }
@@ -78,11 +78,7 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(recyclerView.canScrollVertically(-1)) {
-                    changeActionBarElevation(true);
-                } else {
-                    changeActionBarElevation(false);
-                }
+                Util.changeActionBarElevation(CountryCodePickerActivityLollipop.this, abL, recyclerView.canScrollVertically(-1));
             }
         });
         adapter = new CountryListAdapter(countries);
@@ -97,38 +93,10 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
         actionBar.setTitle(getString(R.string.action_search_country).toUpperCase());
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(Util.mutateIcon(this,R.drawable.ic_arrow_back_white,R.color.black));
+        actionBar.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
     
         if(savedInstanceState != null){
             searchInput = savedInstanceState.getString(SAVED_QUERY_STRING);
-        }
-    }
-
-    private void changeStatusBarColor() {
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this,R.color.status_bar_search));
-    }
-
-    public void changeActionBarElevation(boolean withElevation) {
-        if(withElevation) {
-            final float elevation = Util.dp2px(4,outMetrics);
-            abL.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    abL.setElevation(elevation);
-                }
-            },100);
-        } else {
-            abL.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    abL.setElevation(0);
-                }
-            },100);
         }
     }
 
@@ -137,7 +105,6 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_country_picker,menu);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(Util.mutateIcon(this,R.drawable.ic_menu_search,R.color.black));
         SearchView searchView = (SearchView)searchMenuItem.getActionView();
         if (searchView != null) {
             searchView.setIconifiedByDefault(true);
@@ -145,8 +112,6 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
 
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setTextColor(ContextCompat.getColor(this,R.color.black));
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this,R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         if (searchInput != null) {
             searchMenuItem.expandActionView();

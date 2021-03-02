@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     tools:context=".FileBrowserListFragment" >
 
     <androidx.recyclerview.widget.RecyclerView
@@ -33,10 +32,8 @@
                 android:id="@+id/contact_list_empty_text_first"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:layout_gravity="center_horizontal"
-                android:fontFamily="sans-serif"
-                android:textSize="14sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary"
+                android:layout_gravity="center_horizontal"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -45,12 +42,9 @@
                 android:layout_marginLeft="34dp"
                 android:layout_marginTop="11dp"
                 android:layout_marginRight="34dp"
-                android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
-                android:lineSpacingExtra="3.5sp"
                 android:text="@string/invite_contacts_to_start_chat"
-                android:textColor="#9F9F9F"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
         </LinearLayout>
     </RelativeLayout>
 

@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.view.LayoutInflater
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.databinding.BottomSheetPasscodeOptionsBinding
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 
 class PasscodeOptionsBottomSheetDialogFragment(var passcodeType: String) :
@@ -54,7 +54,7 @@ class PasscodeOptionsBottomSheetDialogFragment(var passcodeType: String) :
     }
 
     private fun setSelectedColor(text: TextView) =
-        text.setTextColor(ContextCompat.getColor(context, R.color.accentColor))
+        text.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary))
 
     private fun changePasscodeType(type: String) {
         (requireActivity() as PasscodeLockActivity).setPasscodeType(type)

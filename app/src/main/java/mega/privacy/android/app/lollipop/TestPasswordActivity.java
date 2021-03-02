@@ -30,6 +30,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -95,8 +96,6 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
         logout = getIntent().getBooleanExtra("logout", false);
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         passwordReminderLayout = findViewById(R.id.password_reminder_layout);
         passwordReminderCloseButton = findViewById(R.id.password_reminder_close_image_button);
         passwordReminderCloseButton.setOnClickListener(this);
@@ -131,7 +130,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             passwordReminderCloseButton.setVisibility(View.VISIBLE);
             dialogTest.setText(R.string.remember_pwd_dialog_text_logout);
             passwordReminderDismissButton.setText(R.string.proceed_to_logout);
-            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             testPasswordDismissButton.setVisibility(View.GONE);
             proceedToLogout.setVisibility(View.VISIBLE);
         }
@@ -139,7 +138,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             passwordReminderCloseButton.setVisibility(View.GONE);
             dialogTest.setText(R.string.remember_pwd_dialog_text);
             passwordReminderDismissButton.setText(R.string.general_dismiss);
-            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            passwordReminderDismissButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             testPasswordDismissButton.setVisibility(View.VISIBLE);
             proceedToLogout.setVisibility(View.GONE);
         }
@@ -175,7 +174,9 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             }
         });
 
-        passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+        passwordLayout.setEndIconVisible(false);
+        passwordText.setOnFocusChangeListener((v1, hasFocus) ->
+                passwordLayout.setEndIconVisible(hasFocus));
 
         if (testingPassword) {
             setTestPasswordLayout();
@@ -228,7 +229,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         passwordLayout.setError(null);
         passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
         passwordErrorImage.setVisibility(View.GONE);
-        testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+        testPasswordbackupRecoveryKeyButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
         confirmPasswordButton.setEnabled(true);
         confirmPasswordButton.setAlpha(1F);
     }
@@ -240,24 +241,24 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
         if (correct){
             passwordLayout.setError(getString(R.string.test_pwd_accepted));
-            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium);
-            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium);
+            passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
+            passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_accept_test);
-            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP));
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_500_green_400), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);
-            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            testPasswordbackupRecoveryKeyButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             passwordText.setEnabled(false);
             passwordReminderSucceeded();
         }
         else {
             counter++;
             passwordLayout.setError(getString(R.string.test_pwd_wrong));
-            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
-            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError);
+            passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
+            passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
-            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP));
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);
-            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             if (counter == 3) {
                 Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
                 intent.putExtra("logout", isLogout());

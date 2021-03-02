@@ -51,7 +51,7 @@ class PasscodeUtil @Inject constructor(
      */
     fun showRequirePasscodeDialog(): AlertDialog {
         val dialogBuilder =
-            MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         dialogBuilder.setTitle(getString(R.string.settings_require_passcode))
 
         val options = ArrayList<String>()
@@ -168,9 +168,9 @@ class PasscodeUtil @Inject constructor(
     private fun enableOrDisableDialogButton(enable: Boolean, button: Button) {
         button.isEnabled = enable
         button.setTextColor(
-            ContextCompat.getColor(
+            ColorUtils.getThemeColor(
                 context,
-                if (enable) R.color.accentColor else R.color.accentColorDisabled
+                if (enable) R.attr.colorSecondary else R.color.teal_300_alpha_038
             )
         )
     }

@@ -2,8 +2,27 @@
 <androidx.preference.PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:key="general_preference_screen"
-	android:background="@color/white">
+	android:key="general_preference_screen">
+
+	<androidx.preference.PreferenceCategory
+		android:key="settings_appearance"
+		android:title="@string/settings_appearance"
+		app:allowDividerAbove="false"
+		app:allowDividerBelow="false">
+
+		<androidx.preference.ListPreference
+			android:key="settings_appearance_color_theme"
+			android:title="@string/set_color_theme_label"
+			app:defaultValue="default"
+			android:defaultValue="default"
+			app:entries="@array/theme_list_array"
+			app:entryValues="@array/theme_entry_array"
+			app:useSimpleSummaryProvider="true"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
 		android:key="settings_features"
@@ -104,7 +123,12 @@
 		android:title="@string/settings_help"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
-
+		<androidx.preference.Preference
+			android:key="settings_help_centre"
+			android:title="@string/settings_help_centre"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
 		<androidx.preference.Preference
 			android:key="settings_help_send_feedback"
 			android:title="@string/settings_help_preference"

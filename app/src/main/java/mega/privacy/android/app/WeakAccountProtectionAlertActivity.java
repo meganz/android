@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,6 +10,10 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
@@ -43,8 +46,6 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
         app.setIsBlockedDueToWeakAccount(true);
 
         setContentView(R.layout.activity_weak_account_protection_alert);
-
-        getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_red_alert));
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout);
 
@@ -143,7 +144,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
     private void showInfoDialog() {
         if (infoDialog != null && infoDialog.isShowing()) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_locked_accounts, null);
         builder.setView(v);

@@ -30,6 +30,7 @@ import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -83,13 +84,9 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         binding = ActivityGiphyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor =
-            ContextCompat.getColor(applicationContext, R.color.dark_primary_color)
-
         setSupportActionBar(binding.giphyToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_grey)
         binding.giphyToolbar.title = getString(R.string.search_giphy_title)
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
@@ -112,9 +109,9 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         var emptyTextSearch = getString(R.string.empty_search_giphy)
 
         try {
-            endOfList = endOfList.replace("[A]", "<font color=\'#999999\'>")
+            endOfList = endOfList.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.grey_300_grey_600)}'>")
             endOfList = endOfList.replace("[/A]", "</font>")
-            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color=\'#000000\'>")
+            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.black_white)}'>")
             emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)
@@ -329,6 +326,8 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
             }
 
             override fun onFailure(call: Call<GiphyResponse>, t: Throwable) {
+                if (call.isCanceled) return
+
                 logError("GiphyResponse failed: " + t.message)
                 checkIfShouldShowDownServerState()
             }
@@ -396,12 +395,6 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
         val searchAutoComplete =
             searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
-        searchAutoComplete.setTextColor(
-            ContextCompat.getColor(
-                applicationContext,
-                R.color.giphy_search_text
-            )
-        )
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
