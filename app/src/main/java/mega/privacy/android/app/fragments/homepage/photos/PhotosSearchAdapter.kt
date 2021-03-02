@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -14,7 +16,18 @@ class PhotosSearchAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel
 ) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
-    SectionTitleProvider {
+    SectionTitleProvider, DragThumbnailGetter {
+
+    override fun getNodePosition(handle: Long) =
+        currentList.indexOfFirst { it.node?.handle == handle }
+
+    override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? {
+        if (viewHolder is PhotoViewHolder && viewHolder.binding is ItemNodeListBinding) {
+            return viewHolder.binding.thumbnail
+        }
+
+        return null
+    }
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type

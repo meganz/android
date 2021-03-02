@@ -138,15 +138,15 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         val isAudioPlayer = isAudioPlayer(intent)
 
-        if (!isAudioPlayer) {
-            MediaPlayerService.pauseAudioPlayer(this)
-        }
-
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(if (isAudioPlayer) binding.root else dragToExit.wrapContentView(binding.root))
         changeStatusBarColor(this, window, R.color.black)
 
-        dragToExit.observeThumbnailLocation(this)
+        if (!isAudioPlayer) {
+            MediaPlayerService.pauseAudioPlayer(this)
+
+            dragToExit.observeThumbnailLocation(this)
+        }
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -265,6 +265,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         if (!isAudioPlayer(intent)) {
             MediaPlayerService.resumeAudioPlayer(this)
         }
+
+        dragToExit.showPreviousHiddenThumbnail()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

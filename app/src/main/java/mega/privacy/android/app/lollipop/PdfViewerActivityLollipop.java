@@ -182,7 +182,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     // it's only used for enter animation
-    private final DragToExitSupport dragToExitSupport = new DragToExitSupport(this, null, null);
+    private final DragToExitSupport dragToExit = new DragToExitSupport(this, null, null);
 
     NodeController nC;
     private DisplayMetrics outMetrics;
@@ -709,7 +709,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     private void runEnterAnimation(Intent intent) {
-        dragToExitSupport.runEnterAnimation(intent, pdfView, animationStart -> {
+        dragToExit.runEnterAnimation(intent, pdfView, animationStart -> {
             if (animationStart) {
                 if (aB != null && aB.isShowing()) {
                     if(tB != null) {

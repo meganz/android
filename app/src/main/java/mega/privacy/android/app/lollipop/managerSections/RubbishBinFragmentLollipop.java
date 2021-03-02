@@ -722,7 +722,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
 					putThumbnailLocation(intent, recyclerView, position, adapter);
+
 					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}

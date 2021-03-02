@@ -519,6 +519,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
+                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle)
                 putThumbnailLocation(intent, recyclerView!!, position, adapter!!)
 
                 intent.putExtra(

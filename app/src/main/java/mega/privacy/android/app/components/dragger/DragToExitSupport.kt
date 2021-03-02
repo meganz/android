@@ -225,8 +225,12 @@ class DragToExitSupport(
         draggableView?.draggable = draggable
     }
 
-    fun setCurrentView(currentView: View) {
+    fun setCurrentView(currentView: View?) {
         draggableView?.currentView = currentView
+    }
+
+    fun setNormalizedScale(normalizedScale: Float) {
+        draggableView?.normalizedScale = normalizedScale
     }
 
     override fun onViewPositionChanged(fractionScreen: Float) {

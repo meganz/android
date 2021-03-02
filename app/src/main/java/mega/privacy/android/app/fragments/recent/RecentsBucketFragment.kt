@@ -296,7 +296,10 @@ class RecentsBucketFragment : BaseFragment() {
         val intent = Intent(activity, FullScreenImageViewerLollipop::class.java)
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         putThumbnailLocation(intent, listView, index, adapter!!)
+
         intent.putExtra(HANDLE, node.handle)
         intent.putExtra(NODE_HANDLES, getNodesHandles(true))
 

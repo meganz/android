@@ -36,9 +36,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
@@ -52,12 +50,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -68,18 +65,13 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
-import mega.privacy.android.app.components.dragger.DraggableView;
-import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.components.dragger.ViewAnimator;
+import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -97,7 +89,6 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -111,17 +102,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
-		SnackbarShower, ViewAnimator.Listener {
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		SnackbarShower {
 
-	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
-			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
-
-	int[] screenPosition;
-	int mLeftDelta;
-	int mTopDelta;
-	float mWidthScale;
-	float mHeightScale;
 	int placeholderCount;
 
 	private DisplayMetrics outMetrics;
@@ -146,6 +129,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
 			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+	private final DragToExitSupport dragToExit
+			= new DragToExitSupport(this, this::onDragActivated, () -> {
+		finish();
+		overridePendingTransition(0, android.R.anim.fade_out);
+
+		return null;
+	});
 
 	NodeController nC;
 	boolean isFileLink;
@@ -174,7 +164,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private RelativeLayout bottomLayout;
 	private ExtendedViewPager viewPager;
 
-	static FullScreenImageViewerLollipop fullScreenImageViewer;
+	private FullScreenImageViewerLollipop fullScreenImageViewer;
     private MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
@@ -207,40 +197,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
 
-	public DraggableView draggableView;
-	public static int screenHeight;
-	int screenWidth;
 	RelativeLayout relativeImageViewerLayout;
-	ImageView ivShadow;
 
 	ArrayList<File> zipFiles = new ArrayList<>();
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
-	public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
-		DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
-	}
-
-	public static void removeDraggingThumbnailCallback(Class<?> clazz) {
-		DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
-	}
-
 	@Override
 	public void onDestroy(){
-
-		showPreviousHiddenThumbnail();
-
 		if(megaApi != null){
 			megaApi.removeRequestListener(this);
 			megaApi.removeGlobalListener(this);
 		}
 
-		unregisterReceiver(receiver);
 		unregisterReceiver(receiverToFinish);
 
-		DRAGGING_THUMBNAIL_CALLBACKS.clear();
-
 		nodeSaver.destroy();
+
+		dragToExit.showPreviousHiddenThumbnail();
 
 		super.onDestroy();
 	}
@@ -654,8 +628,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Display display = getWindowManager().getDefaultDisplay();
 				DisplayMetrics outMetrics = new DisplayMetrics();
 				display.getMetrics(outMetrics);
-				screenHeight = outMetrics.heightPixels;
-				screenWidth = outMetrics.widthPixels;
 				float density = getResources().getDisplayMetrics().density;
 
 				float scaleW = getScaleW(outMetrics, density);
@@ -784,23 +756,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		logDebug("onCreate");
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_full_screen_image_viewer);
+		setContentView(dragToExit.wrapContentView(R.layout.activity_full_screen_image_viewer));
+
+		dragToExit.observeThumbnailLocation(this);
 
 		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
-
-		draggableView.setViewAnimator(new ExitViewAnimator<>());
 
 		handler = new Handler();
 		fullScreenImageViewer = this;
 
-		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
 		registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
-
 
 		appBarLayout = findViewById(R.id.app_bar);
 
@@ -1098,35 +1068,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		viewPager.addOnPageChangeListener(this);
 
 		if (savedInstanceState == null) {
-			ViewTreeObserver observer = viewPager.getViewTreeObserver();
-			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-				@Override
-				public boolean onPreDraw() {
+			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
+				if (animationStart) {
+					updateViewForAnimation();
+				} else {
+					showActionBar();
 
-					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
-					int[] location = new int[2];
-					viewPager.getLocationOnScreen(location);
-					int[] getlocation = new int[2];
-					getLocationOnScreen(getlocation);
-					if (screenPosition != null){
-						mLeftDelta = getlocation[0] - location[0];
-						mTopDelta = getlocation[1] - location[1];
+					fragmentContainer.setBackgroundColor(BLACK);
+					relativeImageViewerLayout.setBackgroundColor(BLACK);
+					appBarLayout.setBackgroundColor(BLACK);
 
-						mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
-						mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
+					long currentHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE,
+							INVALID_HANDLE);
+					if (currentHandle != INVALID_HANDLE) {
+						dragToExit.nodeChanged(currentHandle);
 					}
-					else {
-						mLeftDelta = (screenWidth/2) - location[0];
-						mTopDelta = (screenHeight/2) - location[1];
-
-						mWidthScale = (float) (screenWidth/4) / viewPager.getWidth();
-						mHeightScale = (float) (screenHeight/4) / viewPager.getHeight();
-					}
-
-					runEnterAnimation();
-
-					return true;
 				}
+
+				return null;
 			});
 		} else {
 			nodeAttacher.restoreState(savedInstanceState);
@@ -1156,121 +1115,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 	}
 
-	@Override
-	public void showPreviousHiddenThumbnail(){
-	}
-
-	@Override
-	public void fadeOutFinish() {
-		finish();
-		overridePendingTransition(0, android.R.anim.fade_out);
-	}
-
-	void getLocationOnScreen(int[] location){
-	}
-
-	public void runEnterAnimation() {
-		logDebug("runEnterAnimation");
-		final long duration = 400;
-		if (aB != null && aB.isShowing()) {
-			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(0)
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								aB.hide();
-							}
-						}).start();
-				bottomLayout.animate().translationY(220).setDuration(0).start();
-			} else {
-				aB.hide();
-			}
-		}
-
-		fragmentContainer.setBackgroundColor(TRANSPARENT);
-		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-		appBarLayout.setBackgroundColor(TRANSPARENT);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			fragmentContainer.setElevation(0);
-			relativeImageViewerLayout.setElevation(0);
-			appBarLayout.setElevation(0);
-
-		}
-
-		viewPager.setPivotX(0);
-		viewPager.setPivotY(0);
-		viewPager.setScaleX(mWidthScale);
-		viewPager.setScaleY(mHeightScale);
-		viewPager.setTranslationX(mLeftDelta);
-		viewPager.setTranslationY(mTopDelta);
-
-		ivShadow.setImageAlpha(0);
-
-		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
-			@Override
-			public void run() {
-				showActionBar();
-				fragmentContainer.setBackgroundColor(BLACK);
-				relativeImageViewerLayout.setBackgroundColor(BLACK);
-				appBarLayout.setBackgroundColor(BLACK);
-			}
-		});
-
-		ivShadow.animate().setDuration(duration).alpha(1);
-	}
-
-	public void updateCurrentImage(){
-	    if (adapterType == OFFLINE_ADAPTER){
-	        String name = mOffListImages.get(positionG).getName();
-            for (int i=0; i<mOffList.size(); i++){
-				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
-                if (mOffList.get(i).getName().equals(name)){
-                    getImageView(i, Long.parseLong(mOffList.get(i).getHandle()));
-                    break;
-                }
-            }
-		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
-				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
-				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
-			Long handle = adapterMega.getImageHandle(positionG);
-			getImageView(0, handle);
-		}
-		else if (adapterType == ZIP_ADAPTER) {
-			String name = new File(paths.get(positionG)).getName();
-			for (int i = 0; i< zipFiles.size(); i++) {
-				if (zipFiles.get(i).getName().equals(name)) {
-					getImageView(i, -1);
-				}
-			}
-		}
-        else {
-            Long handle = adapterMega.getImageHandle(positionG);
-            ArrayList<MegaNode> listNodes;
-            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
-            	listNodes = megaApi.getPublicLinks(orderGetChildren);
-			} else {
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-				listNodes = megaApi.getChildren(parentNode, orderGetChildren);
-			}
-            for (int i=0; i<listNodes.size(); i++){
-                if (listNodes.get(i).getHandle() == handle){
-                    getImageView(i, handle);
-                    break;
-                }
-            }
-        }
-	}
-
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null){
-				screenPosition = intent.getIntArrayExtra("screenPosition");
-				draggableView.setScreenPosition(screenPosition);
-			}
-		}
-	};
-
 	private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1280,16 +1124,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	};
 
-	public void getImageView (int i, long handle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
-		intent.putExtra("position", i);
-		intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
-		intent.putExtra("adapterType", adapterType);
-        intent.putExtra("placeholder",placeholderCount);
-		intent.putExtra("handle", handle);
-		sendBroadcast(intent);
-	}
-
 	public void updateScrollPosition(){
 		logDebug("updateScrollPosition");
 	    if (adapterType == OFFLINE_ADAPTER){
@@ -1297,22 +1131,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
             for (int i=0; i<mOffList.size(); i++){
 				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
-                if (mOffList.get(i).getName().equals(name)){
-                    scrollToPosition(i, Long.parseLong(mOffList.get(i).getHandle()));
+                if (mOffList.get(i).getName().equals(name)) {
+                	dragToExit.nodeChanged(Long.parseLong(mOffList.get(i).getHandle()));
                     break;
                 }
             }
 		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
 				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
 				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
-			Long handle = adapterMega.getImageHandle(positionG);
-			scrollToPosition(0, handle);
+			dragToExit.nodeChanged(adapterMega.getImageHandle(positionG));
 		}
 		else if (adapterType == ZIP_ADAPTER) {
 			String name = new File(paths.get(positionG)).getName();
 			for (int i = 0; i< zipFiles.size(); i++) {
 				if (zipFiles.get(i).getName().equals(name)) {
-					scrollToPosition(i, -1);
+					dragToExit.nodeChanged(name.hashCode());
 				}
 			}
 		}
@@ -1328,32 +1161,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    scrollToPosition(i, handle);
+					dragToExit.nodeChanged(handle);
                     break;
                 }
             }
         }
 	}
 
-	void scrollToPosition (int i, long handle) {
-		getImageView(i, handle);
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
-		intent.putExtra("position", i);
-		intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
-		intent.putExtra("adapterType", adapterType);
-		intent.putExtra("handle", handle);
-        intent.putExtra("placeholder",placeholderCount );
-		sendBroadcast(intent);
-	}
-
 	@Override
 	public void onPageSelected(int position) {
-		return;
 	}
 
 	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-		return;
 	}
 
 	@Override
@@ -2151,13 +1971,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	public void onBackPressed() {
-		logDebug("onBackPressed");
-		showPreviousHiddenThumbnail();
-		super.onBackPressed();
-	}
-
-	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
 	}
@@ -2220,85 +2033,56 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
-	@Override
-	public void onViewPositionChanged(float fractionScreen) {
-		ivShadow.setAlpha(1 - fractionScreen);
+	public void setNormalizedScale(float normalizedScale) {
+		dragToExit.setNormalizedScale(normalizedScale);
 	}
 
-	@Override
-	public void setContentView(int layoutResID) {
-		super.setContentView(getContainer());
-		View view = LayoutInflater.from(this).inflate(layoutResID, null);
-		draggableView.addView(view);
+	public void setDraggable(boolean draggable) {
+		dragToExit.setDraggable(draggable);
 	}
 
-	private View getContainer() {
-		RelativeLayout container = new RelativeLayout(this);
-		draggableView = new DraggableView(this, this);
-		if (getIntent() != null) {
-			screenPosition = getIntent().getIntArrayExtra("screenPosition");
-			draggableView.setScreenPosition(screenPosition);
-		}
-		draggableView.setDraggableListener(this);
-		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-		container.addView(ivShadow, params);
-		container.addView(draggableView);
-		return container;
-	}
-
-	@Override
-	public void onDragActivated(boolean activated) {
+	private Unit onDragActivated(boolean activated) {
 		logDebug("activated: " + activated);
 
 		if (activated) {
-			updateCurrentImage();
-			if (aB != null && aB.isShowing()) {
-				if(tB != null) {
-					tB.animate().translationY(-220).setDuration(0)
-							.withEndAction(new Runnable() {
-								@Override
-								public void run() {
-									aB.hide();
-								}
-							}).start();
-					bottomLayout.animate().translationY(220).setDuration(0).start();
-				} else {
-					aB.hide();
-				}
-			}
-			fragmentContainer.setBackgroundColor(TRANSPARENT);
-			relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-			appBarLayout.setBackgroundColor(TRANSPARENT);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				fragmentContainer.setElevation(0);
-				relativeImageViewerLayout.setElevation(0);
-				appBarLayout.setElevation(0);
-
-			}
+			updateViewForAnimation();
 
 			if (adapterType == OFFLINE_ADAPTER){
-				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
+				dragToExit.setCurrentView(adapterOffline.getVisibleImage(positionG));
+			} else if (adapterType == ZIP_ADAPTER) {
+				dragToExit.setCurrentView(adapterOffline.getVisibleImage(positionG));
+			} else {
+				dragToExit.setCurrentView(adapterMega.getVisibleImage(positionG));
 			}
-			else if (adapterType == ZIP_ADAPTER) {
-				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
-			}
-			else {
-				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
-			}
-		}
-		else {
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-//					showActionBar();
-					fragmentContainer.setBackgroundColor(BLACK);
-					relativeImageViewerLayout.setBackgroundColor(BLACK);
-					appBarLayout.setBackgroundColor(BLACK);
-				}
+		} else {
+			handler.postDelayed(() -> {
+				fragmentContainer.setBackgroundColor(BLACK);
+				relativeImageViewerLayout.setBackgroundColor(BLACK);
+				appBarLayout.setBackgroundColor(BLACK);
 			}, 300);
 		}
+
+		return null;
+	}
+
+	private void updateViewForAnimation() {
+		if (aB != null && aB.isShowing()) {
+			if(tB != null) {
+				tB.animate().translationY(-220).setDuration(0)
+						.withEndAction(() -> aB.hide()).start();
+				bottomLayout.animate().translationY(220).setDuration(0).start();
+			} else {
+				aB.hide();
+			}
+		}
+
+		fragmentContainer.setBackgroundColor(TRANSPARENT);
+		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+		appBarLayout.setBackgroundColor(TRANSPARENT);
+
+		fragmentContainer.setElevation(0);
+		relativeImageViewerLayout.setElevation(0);
+		appBarLayout.setElevation(0);
 	}
 
 	public boolean isFolderLink () {

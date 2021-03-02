@@ -638,7 +638,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 
 			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+
+			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
 			putThumbnailLocation(intent, recyclerView, position, adapter);
+
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {

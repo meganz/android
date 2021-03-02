@@ -735,7 +735,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
 					putThumbnailLocation(intent, recyclerView, position, adapter);
+
 					manageNodes(intent);
 					startActivity(intent);
 					getActivity().overridePendingTransition(0,0);

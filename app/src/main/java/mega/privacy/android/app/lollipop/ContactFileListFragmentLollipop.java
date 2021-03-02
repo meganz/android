@@ -543,7 +543,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					} else {
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, contactNodes.get(position).getHandle());
 					putThumbnailLocation(intent, listView, position, adapter);
+
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}

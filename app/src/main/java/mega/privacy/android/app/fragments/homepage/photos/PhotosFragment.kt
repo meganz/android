@@ -24,6 +24,9 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
@@ -31,13 +34,11 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import java.lang.ref.WeakReference
 import java.util.*
 
 @AndroidEntryPoint
@@ -56,8 +57,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
-
-    private var draggingPhotoHandle = INVALID_HANDLE
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
@@ -83,7 +82,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
-        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -92,6 +90,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
         }
+
+        observeDragSupportEvents(viewLifecycleOwner, listView)
     }
 
     private fun setupEmptyHint() {
@@ -137,12 +137,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             }
         })
     }
-
-    private fun setupDraggingThumbnailCallback() =
-        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
-            PhotosFragment::class.java,
-            PhotosDraggingThumbnailCallback(WeakReference(this))
-        )
 
     /**
      * Only refresh the list items of uiDirty = true
@@ -258,7 +252,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView = if (viewModel.searchMode) {
-                        itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color))
+                        itemView.setBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.new_multiselect_color
+                            )
+                        )
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         // Draw the green outline for the thumbnail view at once
@@ -391,15 +390,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
             }
 
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
+            (listView.adapter as? DragThumbnailGetter)?.let {
+                putThumbnailLocation(intent, listView, nodeItem.index, it)
+            }
 
-            setupDraggingThumbnailCallback()
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
-
-            nodeItem.node?.let { node ->
-                draggingPhotoHandle = node.handle
-            }
         }
     }
 
@@ -407,66 +404,5 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         super.onSaveInstanceState(outState)
 
         viewModel.skipNextAutoScroll = true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(PhotosFragment::class.java)
-    }
-
-    /** All below methods are for supporting functions of FullScreenImageViewer */
-
-    fun scrollToPhoto(handle: Long) {
-        val position = viewModel.getItemPositionByHandle(handle)
-        if (position == INVALID_POSITION) return
-
-        listView.scrollToPosition(position)
-        notifyThumbnailLocationOnScreen()
-    }
-
-    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
-        val thumbnailView = getThumbnailViewByHandle(draggingPhotoHandle) ?: return null
-        return thumbnailView.getLocationAndDimen()
-    }
-
-    private fun notifyThumbnailLocationOnScreen() {
-        val location = getDraggingThumbnailLocationOnScreen() ?: return
-        location[0] += location[2] / 2
-        location[1] += location[3] / 2
-
-        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        context.sendBroadcast(intent)
-    }
-
-    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
-        val position = viewModel.getItemPositionByHandle(handle)
-        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
-        return viewHolder.itemView.findViewById(R.id.thumbnail)
-    }
-
-    fun hideDraggingThumbnail(handle: Long) {
-        getThumbnailViewByHandle(draggingPhotoHandle)?.apply { visibility = View.VISIBLE }
-        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
-        draggingPhotoHandle = handle
-        notifyThumbnailLocationOnScreen()
-    }
-
-    companion object {
-        private class PhotosDraggingThumbnailCallback(private val fragmentRef: WeakReference<PhotosFragment>) :
-            DraggingThumbnailCallback {
-
-            override fun setVisibility(visibility: Int) {
-                val fragment = fragmentRef.get() ?: return
-                fragment.getThumbnailViewByHandle(fragment.draggingPhotoHandle)
-                    ?.apply { this.visibility = visibility }
-            }
-
-            override fun getLocationOnScreen(location: IntArray) {
-                val fragment = fragmentRef.get() ?: return
-                val result = fragment.getDraggingThumbnailLocationOnScreen() ?: return
-                result.copyInto(location, 0, 0, 2)
-            }
-        }
     }
 }

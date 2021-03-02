@@ -616,7 +616,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
             putExtras(mediaIntent, cuNode.getIndexForViewer(), position, node);
 
-            mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
 
             boolean paramsSetSuccessfully;
@@ -647,6 +646,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void putExtras(Intent intent, int indexForViewer, int position, MegaNode node) {
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
         intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
+
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {

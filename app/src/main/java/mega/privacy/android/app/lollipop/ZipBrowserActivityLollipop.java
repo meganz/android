@@ -376,6 +376,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 
 		ZipEntry currentNode = zipNodes.get(position);
+		int index = currentNode.getName().lastIndexOf('/');
+		String name = currentNode.getName().substring(index + 1);
 
 		if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
             logDebug("isImage");
@@ -386,7 +388,10 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("offlinePathDirectory", absolutePath);
 			intent.putExtra("orderGetChildren", orderGetChildren);
+
+			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, (long) name.hashCode());
 			putThumbnailLocation(intent, recyclerView, position, adapterList);
+
 			startActivity(intent);
 			overridePendingTransition(0,0);
 		}
@@ -409,8 +414,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 				mediaIntent = getMediaIntent(this, currentFile.getName());
 			}
 
-			int index = currentNode.getName().lastIndexOf('/');
-			String name = currentNode.getName().substring(index+1);
 			mediaIntent.putExtra("FILENAME", name);
 			mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, (long) name.hashCode());
 			mediaIntent.putExtra("path", currentFile.getAbsolutePath());

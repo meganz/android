@@ -328,6 +328,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
             }
 
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            putThumbnailLocation(intent, listView, index, adapter);
+
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
@@ -360,11 +363,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                         (ManagerActivityLollipop) requireActivity());
             }
 
-            if (paramsSetSuccessfully) {
-                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-                if (isOpusFile(node)) {
-                    intent.setDataAndType(intent.getData(), "audio/*");
-                }
+            if (paramsSetSuccessfully && isOpusFile(node)) {
+                intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             intent = new Intent(Intent.ACTION_VIEW);
@@ -385,8 +385,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
                         (ManagerActivityLollipop) requireActivity());
             }
-
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         }
 
         if (intent != null && !isIntentAvailable(context, intent)) {
@@ -395,6 +393,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         }
 
         if (paramsSetSuccessfully) {
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             putThumbnailLocation(intent, listView, index, adapter);
 
             context.startActivity(intent);

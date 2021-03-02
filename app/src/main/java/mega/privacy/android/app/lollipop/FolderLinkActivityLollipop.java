@@ -1284,7 +1284,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					intent.putExtra("isFolderLink", true);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
 					putThumbnailLocation(intent, listView, position, adapterList);
+
 					startActivity(intent);
 					overridePendingTransition(0,0);
 				}

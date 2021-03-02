@@ -495,6 +495,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("isFolderLink", false);
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
