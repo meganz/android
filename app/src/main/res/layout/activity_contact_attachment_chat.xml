@@ -1,63 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/contact_attachment_chat"
-    android:background="@color/white"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_contact_attachment_chat"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        tools:context=".FolderLinkActivityLollipop" />
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" />
 
     <LinearLayout
         android:id="@+id/options_contact_attachment_chat_layout"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/participants_layout"
-        android:gravity="right|center_vertical"
+        android:gravity="end|center_vertical"
         android:orientation="horizontal" >
 
         <Button
+            style="?attr/materialButtonStyle"
             android:id="@+id/contact_attachment_chat_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:gravity="center_vertical|center_horizontal"
-            android:stateListAnimator="@null"
             android:minWidth="0dp"
-            android:layout_marginRight="16dp"
-            android:background="@color/participants_layout"
+            android:layout_marginEnd="16dp"
             android:text="@string/general_cancel"/>
 
         <Button
+            style="?attr/materialButtonStyle"
             android:id="@+id/contact_attachment_chat_option_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:gravity="center_vertical|center_horizontal"
-            android:stateListAnimator="@null"
             android:minWidth="0dp"
-            android:layout_marginRight="16dp"
-            android:background="@color/participants_layout"
+            android:layout_marginEnd="16dp"
             android:text="@string/menu_add_contact"/>
     </LinearLayout>
 
     <View
         android:id="@+id/contact_attachment_chat_separator_3"
         android:layout_width="fill_parent"
-        android:layout_height="1dip"
+        android:layout_height="1dp"
         android:layout_above="@id/options_contact_attachment_chat_layout"
-        android:background="@color/tour_bar_grey" />
+        android:background="@color/grey_012_white_012" />
 
 
     <androidx.recyclerview.widget.RecyclerView

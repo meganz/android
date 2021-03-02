@@ -91,7 +91,7 @@ public class IncomingCallNotification {
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)
-                .setColor(ContextCompat.getColor(context, R.color.mega))
+                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL);
 

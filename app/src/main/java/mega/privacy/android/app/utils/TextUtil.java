@@ -1,10 +1,14 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
 import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -39,13 +43,16 @@ public class TextUtil {
     /**
      * Add the appropriate format in the chat messages.
      *
+     * @param context Current Context object, to get a resource(for example, color) should not use application context, need to pass it from the caller.
      * @param textToShow   The message text
      * @param isOwnMessage If it is a sent or received message
      * @return The formatted text
      */
-    public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
-        String colorStart = "'#060000'";
-        String colorEnd = isOwnMessage ? "'#868686'" : "'#00BFA5'";
+    public static Spanned replaceFormatChatMessages(Context context, String textToShow, boolean isOwnMessage) {
+        String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
+        String colorEnd = isOwnMessage ?
+                ColorUtils.getColorHexString(context, R.color.grey_500_grey_400) :
+                ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary);
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 
@@ -87,5 +94,15 @@ public class TextUtil {
         } else {
             return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
         }
+    }
+
+    /**
+     * If the string received is not null, neither empty, adds a STRING_SEPARATOR at the end.
+     *
+     * @param text Initial text without separator.
+     * @return Text with separator.
+     */
+    public static String addStringSeparator(String text) {
+        return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
     }
 }

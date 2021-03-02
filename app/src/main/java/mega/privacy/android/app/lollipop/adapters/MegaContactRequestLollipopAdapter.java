@@ -112,18 +112,15 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		}
 
 		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			createDefaultAvatar(holder);
 		} else {
 			logDebug("Multiselect ON");
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
 				logDebug("NOT selected");
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				createDefaultAvatar(holder);
 			}
 		}

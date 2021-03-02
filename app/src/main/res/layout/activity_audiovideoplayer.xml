@@ -34,16 +34,15 @@
 
 			</RelativeLayout>
 
-			<androidx.appcompat.widget.Toolbar
+			<com.google.android.material.appbar.MaterialToolbar
 				android:id="@+id/call_toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="@color/transparent_black"
 				android:minHeight="?attr/actionBarSize"
-				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-				app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-				android:fitsSystemWindows="true"/>
+				android:background="@color/grey_alpha_050"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.MenuDark"
+                app:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+				android:fitsSystemWindows="true" />
 
 			<ProgressBar
 				android:id="@+id/full_video_viewer_progress_bar"
@@ -56,8 +55,6 @@
 				android:layout_marginTop="30dp" />
 
 		</RelativeLayout>
-
-
 
 		<FrameLayout
 			android:id="@+id/fragment_container"

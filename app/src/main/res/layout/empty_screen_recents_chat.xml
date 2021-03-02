@@ -38,7 +38,7 @@
                 android:gravity="center"
                 android:layout_marginTop="12dp"
                 android:maxWidth="300dp"
-                android:textColor="@color/secondary_text"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                 android:textSize="14sp" />
 
             <TextView
@@ -46,12 +46,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/adapters_background"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
                 android:textSize="14sp" />
 
             <Button
                 android:id="@+id/invite_button"
-                style="@style/AccentBorderBackgroundBorderlessButton"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"

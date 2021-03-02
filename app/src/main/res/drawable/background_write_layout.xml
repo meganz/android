@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/background_input_text_chat_layout" />
+    <solid android:color="@color/grey_alpha_003" />
 
     <corners android:radius="18dp" />
 </shape>

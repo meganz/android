@@ -2,67 +2,60 @@
     android:id="@+id/relative_container_open_link"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/open_link_mega_logo"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:src="@drawable/logo_loading_ic" />
 
     <TextView
         android:id="@+id/open_link_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:textSize="16sp"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/open_link_mega_logo"
-        android:text="@string/processing_link" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/processing_link"
+        android:textAppearance="?attr/textAppearanceSubtitle1" />
 
     <TextView
         android:id="@+id/open_link_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/open_link_mega_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="50dp"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp"
-        android:textSize="16sp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/open_link_mega_logo"/>
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Error" />
 
     <ProgressBar
         android:id="@+id/open_link_bar"
         style="?android:attr/progressBarStyleLargeInverse"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@id/open_link_text"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
 
     <RelativeLayout
         android:id="@+id/container_accept_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/open_link_error">
+        android:layout_below="@+id/open_link_error"
+        android:layout_alignParentEnd="true">
 
         <TextView
             android:id="@+id/open_link_accept_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:fontFamily="sans-serif-medium"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="40dp"
-            android:textColor="@color/accentColor"
+            android:layout_margin="30dp"
             android:text="@string/general_ok"
-            android:textSize="14sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
 
     </RelativeLayout>
 

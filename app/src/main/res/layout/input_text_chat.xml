@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="bottom"
     android:layout_gravity="bottom"
-    android:background="@android:color/white">
+    android:background="@color/white">
 
     <RelativeLayout
         android:id="@+id/more_options_rl"
@@ -19,7 +19,8 @@
             android:layout_height="24dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_add" />
+            android:src="@drawable/ic_add"
+            app:tint="@color/grey_054_white_054" />
     </RelativeLayout>
 
     <LinearLayout
@@ -57,7 +58,7 @@
                             android:id="@+id/edit_icon"
                             android:layout_width="2dp"
                             android:layout_height="31dp"
-                            android:background="@color/accentColor"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                             android:layout_marginEnd="12dp"/>
                         <RelativeLayout
                             android:layout_width="wrap_content"
@@ -70,12 +71,12 @@
                                 android:text="@string/edit_message"
                                 android:fontFamily="sans-serif-medium"
                                 android:textSize="12sp"
-                                android:textColor="@color/accentColor"/>
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"/>
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/edit_msg_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/secondary_text"
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                                 android:fontFamily="sans-serif"
                                 android:layout_below="@id/edit_msg_title"
                                 android:textSize="13sp"/>
@@ -92,12 +93,10 @@
                         android:fontFamily="sans-serif"
                         android:gravity="start"
                         android:layout_gravity="start|top"
-                        android:background="@android:color/transparent"
                         android:inputType="textMultiLine|textCapSentences"
                         android:maxLines="5"
                         android:minHeight="38dp"
-                        android:textColor="@color/primary_text"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                         app:emojiSize="18sp"/>
                 </LinearLayout>
 
@@ -116,7 +115,8 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="12dp"
                         android:background="@null"
-                        android:src="@drawable/ic_remove_chat_toolbar"/>
+                        android:src="@drawable/ic_remove_chat_toolbar"
+                        app:tint="@color/grey_054_white_054"/>
 
                     <ImageButton
                         android:id="@+id/emoji_icon"
@@ -124,7 +124,8 @@
                         android:layout_height="24dp"
                         android:layout_alignParentBottom="true"
                         android:background="@null"
-                        android:src="@drawable/ic_emoji_light" />
+                        android:src="@drawable/ic_emoji_light"
+                        app:tint="@color/grey_054_white_054"/>
                 </RelativeLayout>
             </LinearLayout>
 
@@ -143,8 +144,8 @@
                     android:id="@+id/expand_input_text_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@null"
                     android:src="@drawable/ic_expand_text_input"
+                    app:tint="@color/grey_054_white_054"
                     android:visibility="visible" />
             </RelativeLayout>
 
@@ -162,8 +163,8 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:src="@drawable/ic_send_black"
-                    android:visibility="visible"
-                    app:tint="@color/accentColor" />
+                    app:tint="@color/grey_054_white_054"
+                    android:visibility="visible" />
             </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>

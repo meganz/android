@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Top level DayNight theme to be used in AndroidManifest.xml-->
+    <style name="Theme.Mega" parent="Base.Theme.Mega" />
+
+    <!--Base custom theme which will be shared between both light and dark theme variants-->
+    <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!--Material color attributes (light theme) -->
+        <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
+        <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
+        <!--selection controls.-->
+
+        <!-- e.g. the color of the action bar -->
+        <item name="colorPrimary">@color/white</item>
+        <!-- e.g. the background color of the FAB -->
+        <item name="colorSecondary">@color/teal_300</item>
+        <!-- e.g. The action bar color of the "select folder" screen -->
+        <item name="colorPrimaryVariant">@color/white</item>
+        <!-- e.g. A variant color of the FAB -->
+        <!--        <item name="colorSecondaryVariant"></item>-->
+
+        <!--colorBackground appears behind scrollable content and is used for the default window
+            background(default: @color/white). -->
+        <!--        <item name="android:colorBackground">@color/white</item>-->
+        <!-- colorSurface is mapped to the surface of components
+        such as cards, sheets and menus. -->
+        <!-- e.g. the color of the bottom sheet, overflow menu(with some auto-alpha?) -->
+        <item name="colorSurface">@color/white</item>
+        <!-- colorError is used to indicate an error state for
+        components such as text fields. -->
+        <!-- e.g. the color of the invalid email address hint -->
+        <item name="colorError">@color/red_900</item>
+
+        <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+        <!--on which they appear.-->
+        <!-- e.g. the color of the title text on the action bar -->
+        <item name="colorOnPrimary">@color/grey_alpha_087</item>
+        <!-- e.g. the color of the "+" icon on the FAB -->
+        <item name="colorOnSecondary">@color/white_alpha_087</item>
+        <!--        <item name="colorOnSurface"></item>-->
+        <!--        <item name="colorOnError"></item>-->
+        <!--        <item name="colorOnBackground"></item>-->
+
+        <!-- The color applied to icons/controls in their normal state -->
+        <!-- e.g. The overflow menu item (3 dotes) automatically use this color
+             so is the BadgeDrawerArrowDrawable's arrow color.
+             Other action bar menu icons tint (activity_manager menu xml), etc. -->
+        <item name="colorControlNormal">@color/grey_alpha_087</item>
+        <!-- You can also set colorControlActivated
+        colorControlHighlight & colorSwitchThumbNormal. -->
+
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">?attr/colorPrimary</item>
+        <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
+        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <!-- we need this to tint the overflow icon (3 dots) -->
+        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
+
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
+        <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+
+        <item name="borderlessButtonStyle">@style/Widget.Mega.Button.TextButton</item>
+        <item name="materialButtonStyle">@style/Widget.Mega.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Mega.Button.OutlinedButton</item>
+
+        <!-- Headline text color. Title on action bar, menu item text automatically use it -->
+        <item name="android:textColorPrimary">@color/grey_alpha_087</item>
+        <!-- Body text color -->
+        <item name="android:textColorSecondary">@color/grey_alpha_054</item>
+
+        <!-- Used by the hint text color of TextInputLayout -->
+        <item name="textColorHint">@color/grey_alpha_038</item>
+
+        <!-- Besides the global style, the TextInputLayout should apply android:theme to make its
+          child view TextInputEditText to have the correct underline color -->
+        <item name="textInputStyle">@style/Widget.Mega.TextInputLayout</item>
+
+        <!-- Progress indicator -->
+        <item name="indicatorColor">?attr/colorSecondary</item>
+        <item name="trackColor">@color/grey_alpha_012</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Widget.Mega.Toolbar</item>
+
+        <!-- Alert Dialog -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
+
+        <!-- Theme for ListPreference in settings, colorControlNormal controls radio button's tint color -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog.ListPreference</item>
+
+        <!-- Switch -->
+        <item name="switchStyle">@style/Widget.Mega.Switch</item>
+
+        <item name="checkedTextViewStyle">@style/Widget.Mega.CheckedTextView</item>
+
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
+        <!-- In material design, typically for the title of the action bar -->
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
+        <!-- textAppearanceSubtitle1, Invision design is default value -->
+        <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
+        <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
+        <!-- In material design, for the CheckedTextView -->
+        <!--        <item name="textAppearanceBody1">@style/TextAppearance.Mega.Body1</item>-->
+        <!-- In material design, Alert Dialog, Snack bar, Chip text. Default value is
+         TextAppearance.MaterialComponents.Body2 which conform to Invision design-->
+        <!--        <item name="textAppearanceBody2">@style/TextAppearance.Mega.Body2</item>-->
+        <item name="textAppearanceButton">@style/TextAppearance.Mega.Button</item>
+        <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
+        <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
+    </style>
+
+    <style name="Theme.Dark.FullScreen.Draggable" parent="Theme.Mega">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+</resources>

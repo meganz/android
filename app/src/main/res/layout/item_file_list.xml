@@ -1,10 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/file_list_item_layout"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:background="@drawable/statelist_item_layout"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
@@ -14,6 +13,7 @@
         android:layout_centerVertical="true"
         android:background="@null"
         android:src="@drawable/ic_cloud_saved_offline"
+        app:tint="@color/red_500_red_300"
         tools:ignore="ContentDescription" />
 
     <RelativeLayout
@@ -50,6 +50,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:src="@drawable/ic_dots_vertical_grey"
+            app:tint="?android:attr/textColorSecondary"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>
@@ -62,10 +63,10 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_toStartOf="@id/file_list_three_dots_layout"
-        android:alpha="0.35"
         android:background="@null"
         android:src="@drawable/ic_permissions_full_access"
         android:visibility="gone"
+        app:tint="?android:attr/textColorSecondary"
         tools:ignore="ContentDescription" />
 
     <RelativeLayout
@@ -83,9 +84,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
-            tools:text="Test title" />
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
 
         <ImageView
             android:id="@+id/img_label"
@@ -122,9 +121,9 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
             android:layout_toEndOf="@+id/img_favourite"
-            android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
+            app:tint="?android:attr/textColorSecondary"
             tools:ignore="ContentDescription" />
 
         <ImageView
@@ -139,8 +138,9 @@
             android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_public_link"
             android:src="@drawable/ic_input_warning"
+            app:tint="?attr/colorError"
             tools:ignore="ContentDescription"
-            tools:visibility="visible" />
+            tools:visibility="visible"/>
 
     </RelativeLayout>
 
@@ -158,21 +158,19 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
-            android:alpha="0.76"
             android:background="@null"
             android:src="@drawable/ic_versions_small"
             android:visibility="gone"
+            app:tint="@color/black_white"
             tools:ignore="ContentDescription" />
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/file_list_filesize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/file_list_second_row"
-            android:maxLines="1"
-            android:textSize="14sp"
-            rounded:emojiSize="14sp"
             android:layout_toEndOf="@id/file_list_versions_icon"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
             tools:text="4.6 MB" />
     </RelativeLayout>
 

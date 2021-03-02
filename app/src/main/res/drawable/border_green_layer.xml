@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/user_layer_group_call"/>
+    <solid android:color="@color/teal_300_alpha_050"/>
 
     <stroke android:width="0dp"/>
 
