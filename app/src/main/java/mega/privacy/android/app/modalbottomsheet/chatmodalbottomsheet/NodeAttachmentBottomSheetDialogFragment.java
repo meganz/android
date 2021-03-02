@@ -3,18 +3,19 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -27,10 +28,12 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -103,13 +106,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);
         nodeName = contentView.findViewById(R.id.node_attachment_name_text);
         nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
-        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_attachment_relative_layout_icon);
 
         optionView = contentView.findViewById(R.id.option_view_layout);
         TextView optionViewText = contentView.findViewById(R.id.option_view_text);
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
+        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.option_save_offline_switch);
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
@@ -120,7 +123,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             optionSaveOffline.setVisibility(View.GONE);
             optionImport.setVisibility(View.GONE);
         }
-        nodeIconLayout.setVisibility(View.GONE);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             nodeName.setMaxWidth(scaleWidthPx(275, outMetrics));
@@ -176,38 +178,16 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             showSingleNodeSelected();
         }
 
+        offlineSwitch.setChecked(availableOffline(context, node));
+        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }
 
     private void showSingleNodeSelected() {
-        if (node.hasThumbnail()) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.setMargins(20, 0, 12, 0);
-            nodeThumb.setLayoutParams(params1);
-
-            Bitmap thumb = getThumbnailFromCache(node);
-            if (thumb != null) {
-                nodeThumb.setImageBitmap(thumb);
-            } else {
-                thumb = getThumbnailFromFolder(node, context);
-                if (thumb != null) {
-                    nodeThumb.setImageBitmap(thumb);
-                } else {
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                }
-            }
-        } else {
-            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-        }
-
+        setNodeThumbnail(context, node, nodeThumb);
         nodeName.setText(node.getName());
-
-        long nodeSize = node.getSize();
-        nodeInfo.setText(getSizeString(nodeSize));
-
+        nodeInfo.setText(getSizeString(node.getSize()));
         optionView.setVisibility(View.GONE);
     }
 
@@ -250,13 +230,20 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 chatC.importNode(messageId, chatId);
                 break;
 
+            case R.id.option_save_offline_switch:
             case R.id.option_save_offline_layout:
-                if (message != null) {
+                if (message == null) {
+                    logWarning("Message is NULL");
+                    return;
+                }
+
+                if (availableOffline(context, node)) {
+                    MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
+                    removeOffline(mOffDelete, dbH, context);
+                } else {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
-                } else {
-                    logWarning("Message is NULL");
                 }
                 break;
         }

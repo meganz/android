@@ -2,10 +2,8 @@ package mega.privacy.android.app.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -34,29 +32,38 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+
+import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -96,12 +103,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -119,6 +126,7 @@ import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -164,30 +172,29 @@ public class Util {
 		if(activity == null){
 			return;
 		}
-		
-		try{ 
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+
+		try{
+			MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
-						dialog.dismiss();
-						if (finish) {
-							activity.finish();
-						}
-					});
+				dialog.dismiss();
+				if (finish) {
+					activity.finish();
+				}
+			});
 			dialogBuilder.setOnCancelListener(dialog -> {
 				if (finish) {
 					activity.finish();
 				}
 			});
-		
-		
+
 			AlertDialog dialog = dialogBuilder.create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.setCancelable(false);
-			dialog.show(); 
+			dialog.show();
 			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
-			Util.showToast(activity, message); 
+			Util.showToast(activity, message);
 		}
 	}
 	
@@ -291,10 +298,7 @@ public class Util {
 			count =  list.length;
 		}
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
-
-		return numChilden;
+		return getQuantityString(R.plurals.general_num_items, count, count);
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
@@ -376,8 +380,8 @@ public class Util {
 	 * @param message To display, could be null
 	 * @param view Custom view to display in the dialog
 	 */
-	public static AlertDialog.Builder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+	public static MaterialAlertDialogBuilder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
 		ViewGroup customView = getCustomAlertView(activity, title, message);
 		if (view != null) {
 			customView.addView(view);
@@ -435,18 +439,19 @@ public class Util {
 	/**
 	 * Convert dp to px.
 	 *
-	 * Note: the name of this function is wrong since the beginning, we should rename it in
-	 * the future.
-	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
-	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
+	public static int dp2px(float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
-	
+
+	public static int dp2px(float dp) {
+		return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				Resources.getSystem().getDisplayMetrics()));
+	}
+
 	/*
 	 * AES encryption
 	 */
@@ -470,32 +475,38 @@ public class Util {
 		return decrypted;
 	}
 	
-	/*
-	 * Check is device on WiFi
+	/**
+	 * Checks if device is on WiFi.
 	 */
 	public static boolean isOnWifi(Context context) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = null;
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+		return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
 	}
 
-	/*
-	 * Check is device on Mobile Data
+	/**
+	 * Checks if device is on Mobile Data.
 	 */
 	public static boolean isOnMobileData(Context context) {
+		return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
+	}
+
+	/**
+	 * Checks if device is on specific network.
+	 *
+	 * @param networkType The type of network,
+	 * @see ConnectivityManager to check the available network types available.
+	 * @return True if device is on specified network, false otherwise.
+	 */
+	private static boolean isOnNetwork(Context context, int networkType) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		NetworkInfo networkInfo = null;
+
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+			networkInfo = connectivityManager.getNetworkInfo(networkType);
 		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+
+		return networkInfo != null && networkInfo.isConnected();
 	}
 
 	static public boolean isOnline(Context context) {
@@ -584,13 +595,13 @@ public class Util {
 
 	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
 	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change title text color
+	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change title text color
 	        }
 
 	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
 	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change divider color
+	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change divider color
 	        }
 	    } catch (Exception ex) {
 	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -1350,40 +1361,6 @@ public class Util {
 		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
-	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		logDebug("changeStatusBarColor");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  1) {
-				window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-			}
-			else if (option == 2) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 500);
-			}
-			else if (option == 3) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
-					}
-				}, 500);
-			}
-			else {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
-					}
-				}, 500);
-			}
-		}
-	}
     public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
@@ -1395,11 +1372,47 @@ public class Util {
         return circle;
     }
 
-    public static void changeStatusBarColor(Context context, Window window, @ColorRes int colorId) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(context, colorId));
-    }
+	/**
+	 * Draw activity content under status bar.
+	 * @param activity the activity
+	 * @param drawUnderStatusBar whether draw under status bar
+	 */
+	public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
+
+		if (drawUnderStatusBar) {
+			int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
+			if (Util.isDarkMode(activity)) {
+				visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+			} else {
+				// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+				visibility |= 0x00002000 | 0x00000010;
+			}
+
+			window.getDecorView().setSystemUiVisibility(visibility);
+			window.setStatusBarColor(Color.TRANSPARENT);
+		} else {
+			ColorUtils.setStatusBarTextColor(activity);
+		}
+	}
+
+	/**
+	 * Set status bar color.
+	 * @param activity the activity
+	 * @param color color of the status bar
+	 */
+	public static void setStatusBarColor(Activity activity, @ColorRes int color) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
+
+		window.setStatusBarColor(ContextCompat.getColor(activity, color));
+	}
 
 	public static int getStatusBarHeight() {
 		Context context = MegaApplication.getInstance().getBaseContext();
@@ -1407,7 +1420,7 @@ public class Util {
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: px2dp(24, context.getResources().getDisplayMetrics());
+				: dp2px(24, context.getResources().getDisplayMetrics());
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1486,8 +1499,8 @@ public class Util {
 			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof ContactInfoActivityLollipop) {
 			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof GetLinkActivityLollipop) {
-			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof GetLinkActivity) {
+			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatFullScreenImageViewer) {
 			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof AudioVideoPlayerLollipop) {
@@ -1707,15 +1720,6 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
-
 	public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
 			if(option == TAKE_PHOTO_CODE) {
@@ -1803,7 +1807,7 @@ public class Util {
 	 * @param outMetrics	DisplayMetrics of the current device.
 	 */
 	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
-		float elevation = px2dp(4, outMetrics);
+		float elevation = dp2px(4, outMetrics);
 
 		if (withElevation) {
 			aB.setElevation(elevation);
@@ -1812,8 +1816,139 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Gets a reference to a given drawable and prepares it for use with tinting through.
+	 *
+	 * @param resId the resource id for the given drawable
+	 * @return a wrapped drawable ready fo use
+	 * with {@link DrawableCompat}'s tinting methods
+	 * @throws Resources.NotFoundException
+	 */
+	public static Drawable getWrappedDrawable(Context context, @DrawableRes int resId)
+			throws Resources.NotFoundException {
+		return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
+				resId, null));
+	}
+
 	public static LocalDate fromEpoch(long seconds) {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
+
+	/**
+	 * Judge if current mode is Dark mode
+	 * @param context
+	 * @return true if it is dark mode, false for light mode
+	 */
+	public static boolean isDarkMode(Context context) {
+		int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
+	}
+
+    /**
+     * Store the selected download location if user unticket "Always ask for download location",
+     * then this location should be set as download location.
+     *
+     * @param downloadLocation The download location selected by the user.
+     */
+    public static void storeDownloadLocationIfNeeded(String downloadLocation) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        // Should set as default download location.
+        if (!askMe) {
+            dbH.setStorageDownloadLocation(downloadLocation);
+        }
+    }
+
+    /**
+	 * Create a RecyclerView.ItemAnimator that doesn't support change animation.
+	 *
+	 * @return the RecyclerView.ItemAnimator
+	 */
+    public static RecyclerView.ItemAnimator noChangeRecyclerViewItemAnimator() {
+		DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+		itemAnimator.setSupportsChangeAnimations(false);
+		return itemAnimator;
+	}
+
+    /**
+     * Apply elevation effect by controlling AppBarLayout's elevation only, regardless of whether on dark mode.
+     *
+     * @param activity Current activity.
+     * @param abL AppBarLayout in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeActionBarElevation(Activity activity, AppBarLayout abL, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+		abL.setElevation(withElevation
+				? activity.getResources().getDimension(R.dimen.toolbar_elevation)
+				: 0);
+    }
+
+    /**
+     * For some pages that have a layout below AppBarLayout, also need to apply elevation effect on the additional layout.
+     * It's done by changing ToolBar's background color on dark mode.
+     * On light mode, no need to do anything here, the elevation effect is applied on the AppBarLayout.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevationForDarkMode(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        if (Util.isDarkMode(activity)) {
+            float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        }
+        // On light mode, do nothing.
+    }
+
+    /**
+     * For some pages don't have AppBarLayout, apply elevation effect by controlling AppBarLayout's elevation.
+     * On dark mode, it's done by changing ToolBar's background.
+     * On light mode, it's done by setting elevation on ToolBar.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevation(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(activity)) {
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        } else {
+            tB.setElevation(withElevation ? elevation : 0);
+        }
+    }
+
+    /**
+     * Apply elevation effect for ToolBar on dark mode by setting its background.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param elevation Elevation height.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
+        tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
+    }
 }

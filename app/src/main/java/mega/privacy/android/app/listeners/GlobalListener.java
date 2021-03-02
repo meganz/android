@@ -1,7 +1,8 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 
@@ -43,13 +44,34 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
+                MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
+            }
+
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
                 api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
             }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
+                logDebug("Get CU attribute when change on other client.");
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
+                api.shouldShowRichLinkWarning(new GetAttrUserListener(megaApplication));
+                api.isRichPreviewsEnabled(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME) && isMyChange) {
+                api.getRubbishBinAutopurgePeriod(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
+                api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
             }
         }
@@ -58,6 +80,14 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
+    }
+
+    private void notifyNotificationCountChange(MegaApiJava api) {
+        ArrayList<MegaContactRequest> incomingContactRequests = api.getIncomingContactRequests();
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Integer.class).post(api.getNumUnreadUserAlerts()
+                + (incomingContactRequests == null ? 0 : incomingContactRequests.size()));
     }
 
     @Override
@@ -97,6 +127,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         if (requests == null) return;
 
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);
@@ -161,6 +193,12 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             case MegaEvent.EVENT_BUSINESS_STATUS:
                 megaApplication.updateBusinessStatus();
+
+                break;
+
+            case MegaEvent.EVENT_MISC_FLAGS_READY:
+                megaApplication.setCookieBannerEnabled(api.isCookieBannerEnabled());
+                megaApplication.checkEnabledCookies();
 
                 break;
         }

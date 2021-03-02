@@ -13,7 +13,7 @@
       android:layout_marginStart="16dp"
       android:fontFamily="roboto"
       android:gravity="center_vertical"
-      android:textColor="@color/name_my_account"
+      android:textColor="?android:attr/textColorPrimary"
       android:textSize="12sp"
       tools:text="July 2020"
       />

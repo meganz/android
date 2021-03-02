@@ -27,8 +27,11 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
+import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -40,7 +43,6 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
@@ -597,7 +599,7 @@ public class NodeController {
         }
     }
 
-    private void askForPermissions () {
+    public void askForPermissions() {
         if(context instanceof ManagerActivityLollipop){
             ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
@@ -958,8 +960,8 @@ public class NodeController {
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
-        else if(context instanceof GetLinkActivityLollipop){
-            megaApi.exportNode(document, ((GetLinkActivityLollipop) context));
+        else if(context instanceof GetLinkActivity){
+            megaApi.exportNode(document, new ExportListener(context));
         }
         else  if(context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
@@ -980,8 +982,8 @@ public class NodeController {
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
         }
-        else if (context instanceof GetLinkActivityLollipop){
-            megaApi.exportNode(document, timestamp, ((GetLinkActivityLollipop) context));
+        else if (context instanceof GetLinkActivity){
+            megaApi.exportNode(document, timestamp, new ExportListener(context));
         }
         else if (context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
@@ -1341,12 +1343,12 @@ public class NodeController {
 
     public void cleanRubbishBin(){
         logDebug("cleanRubbishBin");
-        megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+        megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
     }
 
     public void clearAllVersions(){
         logDebug("clearAllVersions");
-        megaApi.removeVersions((ManagerActivityLollipop) context);
+        megaApi.removeVersions(new RemoveVersionsListener(context));
     }
 
     public void deleteOffline(MegaOffline selectedNode){
@@ -1372,10 +1374,6 @@ public class NodeController {
         if (parentNode != null) {
             logDebug("Parent to check: " + parentNode.getName());
             checkParentDeletion(parentNode);
-        }
-
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).updateOfflineView(null);
         }
     }
 

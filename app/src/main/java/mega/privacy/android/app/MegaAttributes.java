@@ -26,11 +26,13 @@ public class MegaAttributes {
 	private int lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_INVALID;
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN;
 	private String myChatFilesFolderHandle = "";
+	private String transferQueueStatus;
 
 	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger,
 						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
 						  String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging,
-						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState, String myChatFilesFolderHandle) {
+						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState, String myChatFilesFolderHandle,
+						  String transferQueueStatus) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -51,12 +53,14 @@ public class MegaAttributes {
 		this.lastPublicHandleType = lastPublicHandleType;
 		this.storageState = storageState;
 		this.myChatFilesFolderHandle = myChatFilesFolderHandle;
+		this.transferQueueStatus = transferQueueStatus;
 	}
 
 	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger,
 						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
 						  String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging,
-						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState, String myChatFilesFolderHandle) {
+						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState, String myChatFilesFolderHandle,
+						  String transferQueueStatus) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -77,6 +81,7 @@ public class MegaAttributes {
 		this.lastPublicHandleType = lastPublicHandleType;
 		this.storageState = storageState;
 		this.myChatFilesFolderHandle = myChatFilesFolderHandle;
+		this.transferQueueStatus = transferQueueStatus;
 	}
 	
 	public String getOnline(){
@@ -237,6 +242,14 @@ public class MegaAttributes {
 
 	public void setMyChatFilesFolderHandle(long myChatFilesFolderHandle) {
 		this.myChatFilesFolderHandle = Long.toString(myChatFilesFolderHandle);
+	}
+
+	public String getTransferQueueStatus() {
+		return transferQueueStatus;
+	}
+
+	public void setTransferQueueStatus(String transferQueueStatus) {
+		this.transferQueueStatus = transferQueueStatus;
 	}
 
 	/**

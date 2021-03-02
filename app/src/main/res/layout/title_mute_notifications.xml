@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="24dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="30dp">
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="start"
+        android:textAlignment="gravity"
+        android:text="@string/title_dialog_mute_chat_notifications"
+        android:textAppearance="@style/TextAppearance.Mega.Headline6.Medium"/>
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:textAlignment="gravity"
+        android:text="@string/subtitle_dialog_mute_chat_notifications"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"/>
+
+</LinearLayout>

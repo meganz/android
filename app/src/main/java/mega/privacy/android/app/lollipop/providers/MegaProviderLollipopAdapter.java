@@ -27,7 +27,6 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -63,7 +62,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	Object fragment;
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
-	LinearLayout emptyTextViewFragment;
 
 	boolean multipleSelect;
 	private SparseBooleanArray selectedItems;
@@ -84,13 +82,12 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
     	public long document;
     }
 	
-	public MegaProviderLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, int type){
+	public MegaProviderLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, ImageView emptyImageView, int type){
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
 		this.fragment = fragment;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
@@ -168,7 +165,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.textViewFileName.setText(node.getName());
 		
 		setViewAlpha(holder.imageView, 1);
-		holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 
 		if (node.isFolder()){
 
@@ -179,7 +175,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			holder.imageView.setLayoutParams(params);
 
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			holder.textViewFileSize.setText(getInfoFolder(node, context));
+			holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
 			if(node.isInShare()){
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -210,7 +206,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 				}
 
 				if (!multipleSelect) {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
 				else {
@@ -221,11 +216,9 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
-						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
 						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}
 				}
@@ -233,10 +226,9 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			}
 			else{
 				holder.permissionsIcon.setVisibility(View.GONE);
-				holder.textViewFileSize.setText(getInfoFolder(node, context));
+				holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
 				if (!multipleSelect) {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
 				else {
@@ -247,11 +239,9 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
-						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
 						holder.imageView.setImageResource(R.drawable.ic_folder_list);
 					}
 				}
@@ -279,9 +269,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 				params.setMargins(0, 0, 0, 0);
 				holder.imageView.setLayoutParams(params);
-
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 
 				if (node.hasThumbnail()){
 
@@ -354,12 +341,9 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					paramsMultiselect.setMargins(0, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
 
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-
 					if (node.hasThumbnail()){
 
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();

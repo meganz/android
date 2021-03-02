@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
@@ -19,10 +20,12 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
@@ -39,12 +42,19 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
 			super.activateActionMode();
-			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
-					new ActionBarCallBack());
+
+			if (getActivity() != null) {
+				actionMode = ((AppCompatActivity) getActivity())
+						.startSupportActionMode(new ActionBarCallBack(INCOMING_TAB));
+			}
 		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
+
+		public ActionBarCallBack(int currentTab) {
+			super(currentTab);
+		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -58,10 +68,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			} else {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
@@ -77,6 +83,17 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				}
 			}
 
+			if (managerActivity.getDeepBrowserTreeIncoming() > 0 && selected.size() > 0
+					&& allHaveFullAccess(selected)) {
+				control.move().setVisible(true);
+
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			}
+
 			control.copy().setVisible(true);
 			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -86,7 +103,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			control.selectAll().setVisible(notAllNodesSelected());
 			control.trash().setVisible(managerActivity.getDeepBrowserTreeIncoming() > 0
-					&& MegaNodeUtil.allHaveFullAccess(selected));
+					&& allHaveFullAccess(selected));
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
@@ -133,6 +150,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			logWarning("ParentHandle -1");
 			findNodes();
 		} else {
+			managerActivity.hideTabs(true, INCOMING_TAB);
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 
@@ -184,6 +202,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				updateActionModeTitle();
 			}
 		} else if (nodes.get(position).isFolder()) {
+			managerActivity.hideTabs(true, INCOMING_TAB);
 			managerActivity.increaseDeepBrowserTreeIncoming();
 			logDebug("Is folder deep: " + managerActivity.deepBrowserTreeIncoming);
 
@@ -259,7 +278,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				//In the beginning of the navigation
 
 				logDebug("deepBrowserTree==0");
-				managerActivity.setParentHandleIncoming(-1);
+				managerActivity.setParentHandleIncoming(INVALID_HANDLE);
+				managerActivity.hideTabs(false, INCOMING_TAB);
 				managerActivity.setToolbarTitle();
 				findNodes();
 				visibilityFastScroller();
@@ -345,6 +365,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleIncoming()
 				|| managerActivity.getParentHandleIncoming() == -1) {
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 			} else {

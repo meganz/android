@@ -17,14 +17,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
-import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaError.API_OK;
 import static nz.mega.sdk.MegaShare.ACCESS_FULL;
@@ -39,12 +40,18 @@ public class LinksFragment extends MegaNodeBaseFragment {
     public void activateActionMode() {
         if (!adapter.isMultipleSelect()) {
             super.activateActionMode();
-            actionMode =
-                ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+
+            if (getActivity() != null) {
+                actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack(LINKS_TAB));
+            }
         }
     }
 
     private class ActionBarCallBack extends BaseActionBarCallBack {
+
+        public ActionBarCallBack(int currentTab) {
+            super(currentTab);
+        }
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -67,10 +74,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             if (areAllFileNodes(selected)) {
-                menu.findItem(R.id.cab_menu_send_to_chat)
-                    .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-                        R.color.white));
-
                 control.sendToChat().setVisible(true)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
@@ -121,6 +124,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             findNodes();
             adapter.setParentHandle(INVALID_HANDLE);
         } else {
+            managerActivity.hideTabs(true, LINKS_TAB);
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
             logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
 
@@ -154,6 +158,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
                 || managerActivity.getParentHandleOutgoing() == -1) {
+            ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links);
             textToShow = context.getString(R.string.context_empty_links);
         }
@@ -173,6 +178,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         if (managerActivity.getDeepBrowserTreeLinks() == 0) {
             managerActivity.setParentHandleLinks(INVALID_HANDLE);
+            managerActivity.hideTabs(false, LINKS_TAB);
             findNodes();
         } else if (managerActivity.getDeepBrowserTreeLinks() > 0) {
             MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
@@ -214,6 +220,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             }
         } else if (nodes.get(position).isFolder()) {
             lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+            managerActivity.hideTabs(true, LINKS_TAB);
             managerActivity.increaseDeepBrowserTreeLinks();
             managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
             managerActivity.supportInvalidateOptionsMenu();

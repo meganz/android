@@ -4,15 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Html
-import android.text.Spanned
 import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
@@ -20,10 +18,13 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRAD
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logInfo
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
+import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
@@ -38,6 +39,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private var proPlanNeeded: Int? = 0
 
     private var deadlineTs: Long = -1
+
+    override fun shouldSetStatusBarTextColor() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +58,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         megaApi.getUserData(GetUserDataListener(this))
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
-        window.statusBarColor = resources.getColor(R.color.status_bar_red_alert)
+
+        setDrawUnderStatusBar(this, true)
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout)
 
@@ -133,20 +137,20 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                     email, files.toString(), size, getProPlanNeeded())
         }else if (warningsTs.size() == 1) {
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, 1,
-                    email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
+                    email, formatDate(warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         } else {
             var dates = String()
             val lastWarningIndex: Int = warningsTs.size() - 1
             for (i in 0 until lastWarningIndex) {
                 if (dates.isEmpty()) {
-                    dates += formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates += formatDate( warningsTs.get(i), DATE_LONG_FORMAT, false)
                 } else if (i != lastWarningIndex) {
-                    dates = dates + ", " + formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates = dates + ", " + formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false)
                 }
             }
 
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, warningsTs.size(),
-                    email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
+                    email, dates, formatDate(warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
         updateDeletionWarningText()
@@ -157,7 +161,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
      * Uses a @see CountDownTimer to update the remaining time.
      */
     private fun updateDeletionWarningText() {
-        var text: String?
+        var text: String
         val time = TimeUnit.SECONDS.toMillis(deadlineTs) - System.currentTimeMillis()
 
         when {
@@ -188,19 +192,13 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]", "<font color='" + resources.getColor(R.color.mega) + "'>")
+            text = text.replace("[M]", "<font color='" + ColorUtils.getThemeColorHexString(applicationContext, R.attr.colorError) + "'>")
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)
         }
 
-        val result: Spanned
-        result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            Html.fromHtml(text)
-        }
-        deletionWarningText?.text = result
+        deletionWarningText?.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     /**

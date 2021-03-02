@@ -21,9 +21,11 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static android.text.format.DateFormat.getBestDateTimePattern;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class TimeUtils implements Comparator<Calendar> {
 
@@ -35,6 +37,14 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
+    private static final int TIME_OF_CHANGE = 8;
+    private static final int INITIAL_PERIOD_TIME = 0;
+
+    public static final long SECOND = 1000;
+    public static final long MINUTE = 60 * SECOND;
+    public static final long HOUR = 60 * MINUTE;
+    public static final long DAY = 24 * HOUR;
+    public static final long WEEK = 7 * DAY;
 
     int type;
 
@@ -140,34 +150,34 @@ public class TimeUtils implements Comparator<Calendar> {
 
     /**
      Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp){
-        return formatDate(context, timestamp, DATE_LONG_FORMAT, true);
+    public static String formatDate(long timestamp){
+        return formatDate(timestamp, DATE_LONG_FORMAT, true);
     }
 
     /**
      * Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp, int format){
-        return formatDate(context, timestamp, format, true);
+    public static String formatDate(long timestamp, int format){
+        return formatDate(timestamp, format, true);
     }
 
     /**
      * Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @param humanized Use humanized date format (i.e. today, yesterday or week day).
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp, int format, boolean humanized) {
+    public static String formatDate(long timestamp, int format, boolean humanized) {
 
         Locale locale = Locale.getDefault();
         DateFormat df;
@@ -201,9 +211,9 @@ public class TimeUtils implements Comparator<Calendar> {
             TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             if (tc.compare(cal, calToday) == 0) {
-                return context.getString(R.string.label_today);
+                return getString(R.string.label_today);
             } else if (tc.compare(cal, calYesterday) == 0) {
-                return context.getString(R.string.label_yesterday);
+                return getString(R.string.label_yesterday);
             } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
                 return new SimpleDateFormat("EEEE", locale).format(date);
@@ -214,6 +224,17 @@ public class TimeUtils implements Comparator<Calendar> {
         df.setTimeZone(tz);
         Date date = cal.getTime();
         return df.format(date);
+    }
+
+    public static boolean isTodayOrYesterday(long timestamp) {
+        Calendar date = calculateDateFromTimestamp(timestamp);
+        Calendar today = Calendar.getInstance();
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DATE, -1);
+
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+
+        return tc.compare(date, today) == 0 || tc.compare(date, yesterday) == 0;
     }
 
     public static String formatShortDateTime(long timestamp){
@@ -392,7 +413,87 @@ public class TimeUtils implements Comparator<Calendar> {
         return null;
     }
 
-    /*
+    /**
+     * Method for obtaining the appropriate String depending on the current time.
+     *
+     * @param option  Selected mute type.
+     * @return The right string.
+     */
+    public static String getCorrectStringDependingOnCalendar(String option) {
+        Calendar calendar = getCalendarSpecificTime(option);
+        TimeZone tz = calendar.getTimeZone();
+
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        java.text.DateFormat df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+        df.setTimeZone(tz);
+
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        String time = df.format(calendar.getTime());
+
+        return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
+                getQuantityString(R.plurals.success_muting_chat_until_specific_time, hour, time) :
+                getQuantityString(R.plurals.success_muting_chat_until_specific_date_and_time, hour, getString(R.string.label_tomorrow).toLowerCase(), time);
+    }
+
+    /**
+     * Method for obtaining the appropriate String depending on the option selected.
+     *
+     * @param timestamp The time in minutes that notifications of a chat or all chats are muted.
+     * @return The right string
+     */
+    public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp * 1000);
+
+        Calendar calToday = Calendar.getInstance();
+        calToday.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar calTomorrow = Calendar.getInstance();
+        calTomorrow.add(Calendar.DATE, +1);
+
+        java.text.DateFormat df;
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+
+        return getQuantityString(R.plurals.chat_notifications_muted_until_specific_time, cal.get(Calendar.HOUR_OF_DAY), df.format(cal.getTime()));
+    }
+
+    /**
+     * Method for obtaining a calendar depending on the type of silencing chosen.
+     * @param option Selected mute type.
+     * @return The Calendar.
+     */
+    public static Calendar getCalendarSpecificTime(String option) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+
+        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)){
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return calendar;
+    }
+
+    /**
+     * Method to know if the silencing should be until this morning.
+     *
+     * @return True if it is. False it is not.
+     */
+    public static boolean isUntilThisMorning() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int minute = cal.get(Calendar.MINUTE);
+        return hour < TIME_OF_CHANGE || (hour == TIME_OF_CHANGE && minute == INITIAL_PERIOD_TIME);
+    }
+
+    /**
      * Converts seconds time into a humanized format string.
      * - If time is greater than a DAY, the formatted string will be "X day(s)".
      * - If time is lower than a DAY and greater than a HOUR, the formatted string will be "Xh Ym".

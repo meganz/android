@@ -29,7 +29,7 @@ if [ ! -d "${ANDROID_HOME}" ]; then
     echo "* ANDROID_HOME not set. Please download Android SDK and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk to point to your Android SDK installation path and try again."
     exit 1
 fi
-if [ ! -d "${ANDROID_HOME}" ]; then
+if [ ! -d "${JAVA_HOME}" ]; then
     echo "* JAVA_HOME not set. Please download JDK and export JAVA_HOME variable or create a link at ${HOME}/android-jdk to point to your JDK installation path and try again."
     exit 1
 fi
@@ -71,6 +71,13 @@ ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
 ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
 ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
+
+CRASHLYTICS=crashlytics
+CRASHLYTICS_DOWNLOAD_URL=https://raw.githubusercontent.com/firebase/firebase-android-sdk/master/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
+CRASHLYTICS_DOWNLOAD_URL_C=https://raw.githubusercontent.com/firebase/firebase-android-sdk/8f02834e94f8b24a7cf0f777562cad73c6b9a40f/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
+CRASHLYTICS_SOURCE_FILE=crashlytics.h
+CRASHLYTICS_SOURCE_FILE_C=crashlyticsC.h
+CRASHLYTICS_DEST_PATH=mega/sdk/third_party
 
 SODIUM=sodium
 SODIUM_VERSION=1.0.18
@@ -133,11 +140,11 @@ function downloadCheckAndUnpack()
         local CURRENTSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
         if [ "${SHA1}" != "${CURRENTSHA1}" ]; then
             echo "* Invalid hash. Redownloading..."
-            wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+            wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
         fi
     else
         echo "* Downloading '${FILENAME}' ..."
-        wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
     fi
 
     local NEWSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
@@ -218,6 +225,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL}
     rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
     rm -rf ${CURL}/ares
+    rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
+    rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
@@ -239,6 +248,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL_SOURCE_FILE}
     rm -rf ${CURL}/${ARES_SOURCE_FILE}
     rm -rf ${CURL}/${CURL_SOURCE_FILE}.ready
+    rm -rf ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
@@ -381,6 +391,19 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
 echo "* cURL with c-ares is ready"
+
+echo "* Setting up crashlytics"
+if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
+
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch; then
+        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch
+    fi
+
+    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
+fi
+echo "* crashlytics is ready"
 
 echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then

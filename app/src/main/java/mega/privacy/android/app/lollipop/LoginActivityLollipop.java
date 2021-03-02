@@ -1,40 +1,33 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.view.Window;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -42,6 +35,8 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -55,7 +50,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-
 
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
@@ -106,7 +100,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             int actionType;
 
             if (intent != null){
-                actionType = intent.getIntExtra("actionType", -1);
+                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
                 if(actionType == UPDATE_GET_PRICING){
                     logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -235,11 +229,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
@@ -254,7 +243,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     }
                     case CHOOSE_ACCOUNT_FRAGMENT: {
                         if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick(null);
+                            chooseAccountFragment.onFreeClick();
                         }
                         break;
                     }
@@ -288,7 +277,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -302,7 +291,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -316,21 +305,25 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                setDrawUnderStatusBar(this, false);
                 break;
 
             }
             case TOUR_FRAGMENT: {
                 logDebug("Show TOUR_FRAGMENT");
 
-                String recoveryKeyUrl = null;
-                if (intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_RESET_PASS)) {
-                    recoveryKeyUrl = intentReceived.getDataString();
+                if (ACTION_RESET_PASS.equals(intentReceived.getAction())) {
+                    tourFragment = TourFragmentLollipop.newInstance(intentReceived.getDataString(), null);
+                } else if (ACTION_PARK_ACCOUNT.equals(intentReceived.getAction())) {
+                    tourFragment = TourFragmentLollipop.newInstance(null, intentReceived.getDataString());
+                } else {
+                    tourFragment = TourFragmentLollipop.newInstance(null, null);
                 }
-                tourFragment = TourFragmentLollipop.newInstance(recoveryKeyUrl);
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, tourFragment).commit();
+                ft.replace(R.id.fragment_container_login, tourFragment).commitNowAllowingStateLoss();
+
+                setDrawUnderStatusBar(this, true);
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
@@ -343,11 +336,12 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commit();
+                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commitNowAllowingStateLoss();
+
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
         }
@@ -355,6 +349,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if( ((MegaApplication) getApplication()).isEsid()){
             showAlertLoggedOut();
         }
+    }
+
+    @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
     }
 
     public Intent getIntentReceived() {
@@ -454,8 +453,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
         builder.setPositiveButton(R.string.cancel_all_action, dialogClickListener);
@@ -492,7 +490,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
                 if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick(null);
+                    chooseAccountFragment.onFreeClick();
                 }
                 break;
             }
@@ -516,7 +514,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     logDebug("ACTION_CANCEL_CAM_SYNC");
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
-                    AlertDialog.Builder builder = getCustomAlertBuilder(this, title, text, null);
+                    MaterialAlertDialogBuilder builder = getCustomAlertBuilder(this, title, text, null);
                     builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
 
@@ -692,7 +690,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
 
         if (visibleFragment == LOGIN_FRAGMENT) {
-            changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color_secondary);
+            setDrawUnderStatusBar(this, false);
         }
     }
 
@@ -730,7 +728,5 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if (aB != null){
             aB.hide();
         }
-
-        changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
     }
 }

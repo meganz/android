@@ -40,7 +40,6 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.lollipop.adapters.MediaRecentsAdapter;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter.ViewHolderFileStorage;
@@ -279,20 +278,6 @@ public class ThumbnailUtilsLollipop {
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
 					}
 				}
-				else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
-					RecentsAdapter.ViewHolderBucket viewHolderBucket = (RecentsAdapter.ViewHolderBucket) holder;
-					if (viewHolderBucket.getDocument() == handle) {
-						viewHolderBucket.setImageThumbnail(bitmap);
-						viewHolderBucket.getImageThumbnail().startAnimation(fadeInAnimation);
-					}
-				}
-				else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
-					MediaRecentsAdapter.ViewHolderMediaBucket viewHolderMediaBucket = (MediaRecentsAdapter.ViewHolderMediaBucket) holder;
-					if (viewHolderMediaBucket.getDocument() == handle) {
-						viewHolderMediaBucket.setImage(bitmap);
-						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
-					}
-				}
 				else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
 					MultipleBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (MultipleBucketAdapter.ViewHolderMultipleBucket) holder;
 					if (viewHolderMultipleBucket.getDocument() == handle) {
@@ -364,7 +349,7 @@ public class ThumbnailUtilsLollipop {
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
-										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
 										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
 										adapter.notifyItemChanged(holder.getAdapterPosition());
@@ -376,7 +361,7 @@ public class ThumbnailUtilsLollipop {
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
-										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
 										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
 										adapter.notifyItemChanged(holder.getAdapterPosition());
@@ -1051,7 +1036,6 @@ public class ThumbnailUtilsLollipop {
 
 				onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
 			} else if (holder instanceof RecentsAdapter.ViewHolderBucket
-					|| holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket
 					|| holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
 				onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
 			}
@@ -1111,12 +1095,6 @@ public class ThumbnailUtilsLollipop {
 		else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 			((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
 		}
-		else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
-			((RecentsAdapter.ViewHolderBucket) holder).setImageThumbnail(bitmap);
-		}
-		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
-			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
-		}
 		else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
 			((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
 		}
@@ -1138,13 +1116,13 @@ public class ThumbnailUtilsLollipop {
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
-			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
 		}
 		else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
-			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
 		}
 
 		thumbnailCache.put(document.getHandle(), bitmap);

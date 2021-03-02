@@ -17,7 +17,7 @@
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:textStyle="bold"
-        android:textColor="@color/mail_my_account"
+        android:textColor="?android:attr/textColorSecondary"
         android:text="@string/subtitle_confirmation_invite_friends" />
 
     <TextView
@@ -28,7 +28,7 @@
         android:layout_marginBottom="50dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
-        android:textColor="@color/grey_achievements_invite_friends"
+        android:textColor="?android:attr/textColorSecondary"
         android:text="@string/invite_sent_text"
         android:textSize="14sp"
         android:gravity="center_horizontal"/>
@@ -41,7 +41,6 @@
         android:layout_marginLeft="26dp"
         android:layout_marginRight="26dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/background_accent_button"
-        android:textColor="@color/white"/>
+        style="?attr/materialButtonStyle"/>
 
 </LinearLayout>

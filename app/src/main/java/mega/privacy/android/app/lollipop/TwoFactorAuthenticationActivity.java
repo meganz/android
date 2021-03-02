@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -28,10 +27,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -168,13 +165,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-        }
-
         twoFactorAuthenticationActivity = this;
 
         tB = (Toolbar) findViewById(R.id.toolbar);
@@ -227,7 +217,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
         SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
-        Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_b_question_mark);
+        Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_question_mark);
         questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
         ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
         text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
@@ -910,11 +900,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
@@ -1184,24 +1169,24 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     void quitError(){
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-        secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+        firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
     }
 
     void showError(){
         firstTime = false;
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
-        firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
     }
 
     @Override

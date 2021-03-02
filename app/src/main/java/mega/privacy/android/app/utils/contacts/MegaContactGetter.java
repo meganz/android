@@ -49,9 +49,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     //different instance should share
     private static long lastSyncTimestamp;
 
-    public static final int DAY = 24 * 60 * 60 * 1000;
-    public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
-
     public static final String LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp";
     public static final String LAST_SYNC_TIMESTAMP_KEY = "last_sync_mega_contacts_timestamp";
 

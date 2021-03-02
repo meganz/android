@@ -4,20 +4,25 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.PorterDuff;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -34,7 +39,6 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
@@ -72,7 +76,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.inviteMore = v.findViewById(R.id.invite_more);
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidth(dp2px(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
         holder.addIcon = v.findViewById(R.id.add_icon_chip);
         holder.clickableArea.setOnClickListener(this);
@@ -118,7 +122,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
         builder.setMessage(message);
         String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
@@ -140,7 +144,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         final MegaContactGetter.MegaContact megaContact = getItem(position);
         // Bind 'Invite more'.
         if (isInviteMore(megaContact)) {
-            holder.avatar.setImageDrawable(context.getDrawable(R.drawable.invite_more));
+            holder.avatar.setImageResource(R.drawable.invite_more);
+            holder.avatar.setColorFilter(ContextCompat.getColor(context, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
             holder.inviteMore.setVisibility(View.VISIBLE);
             holder.textViewName.setVisibility(View.GONE);
             holder.addIcon.setVisibility(View.GONE);
@@ -153,6 +158,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             holder.textViewName.setText(localName);
 
             setImageAvatar(megaContact.getHandle(), email, localName, holder.avatar);
+            holder.avatar.setColorFilter(null);
             Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(megaContact.getHandle()), email);
             if (bitmap == null) {
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
@@ -186,7 +192,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        TextView textViewName, inviteMore;
+        TextView textViewName;
+        TextView inviteMore;
 
         ImageView addIcon;
 

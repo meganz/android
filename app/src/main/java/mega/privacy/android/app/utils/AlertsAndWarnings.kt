@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -35,7 +36,7 @@ class AlertsAndWarnings {
 
             // If app is doing login, the ODQ will be displayed at login finish
             if (app.currentActivity is LoginActivityLollipop && !loginFinished) {
-                return;
+                return
             }
 
             if (app.currentActivity is OverDiskQuotaPaywallActivity) {
@@ -68,12 +69,13 @@ class AlertsAndWarnings {
                 return
             }
 
-            val resumeTransfersDialogBuilder = AlertDialog.Builder(context, R.style.ResumeTransfersWarning)
+            val resumeTransfersDialogBuilder =
+                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
                         .setMessage(R.string.warning_message_resume_transfers)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, which ->
+                    .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, _ ->
                         MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
                         if (context is ChatActivityLollipop) {
@@ -82,10 +84,10 @@ class AlertsAndWarnings {
 
                         dialog.dismiss()
                     }
-                    .setNegativeButton(R.string.general_cancel) { dialog, which ->
+                    .setNegativeButton(R.string.general_cancel) { dialog, _ ->
                         dialog.dismiss()
-                    }.setOnDismissListener { dialog ->
-                        if (context is BaseActivity) {
+                    }.setOnDismissListener {
+                    if (context is BaseActivity) {
                             context.setIsResumeTransfersWarningShown(false)
                         }
                     }

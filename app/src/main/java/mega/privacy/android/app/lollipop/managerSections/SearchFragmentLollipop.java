@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -64,6 +66,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -128,6 +131,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
+			hideKeyboard(getActivity());
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
@@ -175,6 +179,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		return null;
 	}
 
+	/**
+	 * Disables select mode by clearing selections and resetting selected items.
+	 */
+	private void closeSelectMode() {
+		clearSelections();
+		hideMultipleSelect();
+		resetSelectedItems();
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -190,13 +203,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList, false);
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_rename:{
-
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -207,6 +222,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					closeSelectMode();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -217,6 +233,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -225,8 +242,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 //						NodeController nC = new NodeController(context);
 //						nC.exportLink(documents.get(0));
 						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-						clearSelections();
-						hideMultipleSelect();
+						closeSelectMode();
 					}
 					break;
 				}
@@ -238,8 +254,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 
 					break;
 				}
@@ -251,8 +266,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
@@ -264,8 +278,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -282,8 +295,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}				
 			}
@@ -295,8 +307,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
+			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).setTextSubmitted();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -307,8 +319,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+
+			((ManagerActivityLollipop) getActivity()).requestSearchViewFocus();
 		}
 
 		@Override
@@ -326,8 +339,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			boolean showRemoveLink = false;
 			boolean showTrash = false;
 			boolean itemsSelected = false;
-
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -492,10 +503,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public void checkScroll () {
 		if (recyclerView != null) {
 			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -516,8 +527,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
             }
         }
 
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -590,7 +599,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -690,7 +699,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void onAttach(Context context) {
+	public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
 		super.onAttach(context);
 		this.context = context;
@@ -722,7 +731,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			logDebug("nodes.size(): "+nodes.size());
 			((ManagerActivityLollipop) context).setTextSubmitted();
 
-			// If nothing is input, then click a folder in search view, redirect to CD.
+			// If search text is empty and try to open a folder in search fragment.
 			if (!((ManagerActivityLollipop) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
 				((ManagerActivityLollipop) context).closeSearchView();
 				((ManagerActivityLollipop) context).openSearchFolder(nodes.get(position));
@@ -1151,6 +1160,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		}
 
 		logDebug("levels == -1");
+		resetSelectedItems();
 		((ManagerActivityLollipop) context).showFabButton();
 		return 0;
 	}
@@ -1229,10 +1239,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				} catch (Exception e) {
 				}
 				Spanned result = null;
@@ -1250,10 +1265,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				} catch (Exception e) {
 				}
 				Spanned result = null;
@@ -1302,5 +1322,18 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	/**
+	 * Checks if select mode is enabled.
+	 * If so, clear the focus on SearchView.
+	 */
+	public void checkSelectMode() {
+		if (getActivity() == null || !(getActivity() instanceof ManagerActivityLollipop)
+				|| adapter == null || !adapter.isMultipleSelect()) {
+			return;
+		}
+
+		((ManagerActivityLollipop) getActivity()).clearSearchViewFocus();
 	}
 }

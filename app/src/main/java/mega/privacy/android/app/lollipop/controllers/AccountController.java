@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -16,9 +17,10 @@ import android.os.Build;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,7 +31,6 @@ import java.io.IOException;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
@@ -37,23 +38,31 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.sync.BackupToolsKt;
+import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
+import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AccountController {
 
@@ -434,6 +443,8 @@ public class AccountController {
 
         dbH.clearChatSettings();
 
+        dbH.clearBackups();
+
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();
         new MegaContactGetter(context).clearLastSyncTimeStamp();
@@ -441,12 +452,23 @@ public class AccountController {
         // clean time stamps preference settings after logout
         clearCUBackUp();
 
+        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+
+        //clear push token
+        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
+
         new LastShowSMSDialogTimeChecker(context).reset();
+
+        PsaManager.INSTANCE.stopChecking();
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
         app.getMyAccountInfo().clear();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
+
+        // Clear get banner success flag
+        LiveEventBus.get(EVENT_LOGOUT_CLEARED).post(null);
     }
 
     public static void removeFolder(Context context, File folder) {
@@ -460,6 +482,8 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
+
+        BackupToolsKt.removeBackupsBeforeLogout();
 
         if (megaApi == null){
             megaApi = MegaApplication.getInstance().getMegaApi();
@@ -546,5 +570,56 @@ public class AccountController {
 
     static public void setCount(int countUa) {
         count = countUa;
+    }
+
+    /**
+     * Updates own firstName/lastName and fullName data.
+     *
+     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
+     * @param newName   New firstName/lastName text.
+     * @param e         MegaError of the request.
+     */
+    public static void updateMyData(boolean firstName, String newName, MegaError e) {
+        MegaApplication app = MegaApplication.getInstance();
+        MyAccountInfo accountInfo = app.getMyAccountInfo();
+        DatabaseHandler dbH = app.getDbH();
+        long handle = app.getMegaApi().getMyUser() != null
+                ? app.getMegaApi().getMyUser().getHandle() : INVALID_HANDLE;
+
+        if (e.getErrorCode() == MegaError.API_OK) {
+            logDebug("request.getText(): " + newName);
+
+            if (accountInfo != null) {
+                if (firstName) {
+                    accountInfo.setFirstNameText(newName);
+                } else {
+                    accountInfo.setLastNameText(newName);
+                }
+            }
+
+            if (firstName) {
+                dbH.saveMyFirstName(newName);
+
+                if (handle != INVALID_HANDLE) {
+                    notifyFirstNameUpdate(app, handle);
+                }
+            } else {
+                dbH.saveMyLastName(newName);
+
+                if (handle != INVALID_HANDLE) {
+                    notifyLastNameUpdate(app, handle);
+                }
+            }
+        } else {
+            logError("ERROR - request.getText(): " + newName);
+
+            if (accountInfo != null) {
+                if (firstName) {
+                    accountInfo.setFirstNameText("");
+                } else {
+                    accountInfo.setLastNameText("");
+                }
+            }
+        }
     }
 }

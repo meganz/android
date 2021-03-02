@@ -28,7 +28,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +38,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -48,10 +48,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -69,6 +71,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -130,9 +133,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public static boolean running, ignoreAttr;
     private Handler handler;
-    
+
     private ExecutorService threadPool = Executors.newFixedThreadPool(8);
-    
+
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
 
@@ -143,11 +146,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private DatabaseHandler dbH;
 
     private MegaPreferences prefs;
-    private String localPath = "";
+    private String localPath = INVALID_NON_NULL_VALUE;
     private boolean removeGPS = true;
     private long cameraUploadHandle = INVALID_HANDLE;
     private boolean secondaryEnabled;
-    private String localPathSecondary = "";
+    private String localPathSecondary = INVALID_NON_NULL_VALUE;
     private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode;
 
@@ -230,7 +233,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     };
 
-    private GetAttrUserListener getAttrUserListener;
+    private GetCuAttributeListener getAttrUserListener;
     private SetAttrUserListener setAttrUserListener;
     private CreateFolderListener createFolderListener;
 
@@ -239,7 +242,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
-        getAttrUserListener = new GetAttrUserListener(this);
+        getAttrUserListener = new GetCuAttributeListener(this);
         setAttrUserListener = new SetAttrUserListener(this);
         createFolderListener = new CreateFolderListener(this, INIT_CU);
     }
@@ -249,6 +252,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Service destroys.");
         super.onDestroy();
         isServiceRunning = false;
+        JobUtil.hasStartedCU = false;
         uploadingInProgress = false;
         if (receiver != null) {
             unregisterReceiver(receiver);
@@ -265,6 +269,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         getAttrUserListener = null;
         setAttrUserListener = null;
         createFolderListener = null;
+
+        // CU process is running, but interrupted.
+        if (CuSyncManager.INSTANCE.isActive()) {
+            //Update backups' state.
+            CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
+            CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
+
+            // Send failed heartbeat.
+            CuSyncManager.INSTANCE.reportUploadInterrupted();
+        }
+        CuSyncManager.INSTANCE.stopActiveHeartbeat();
     }
 
     @Nullable
@@ -644,12 +659,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
 
+        // Reset backup state as active.
+        CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
+        CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
+
         if (finalList.size() == 0) {
             if (isCompressedVideoPending()) {
                 logDebug("Pending upload list is empty, now check view compression status.");
                 startVideoCompression();
             } else {
                 logDebug("Nothing to upload.");
+
+                // Make sure to send inactive heartbeat.
+                CuSyncManager.INSTANCE.doInactiveHeartbeat(() -> {
+                    logDebug("Nothing to upload, send inactive heartbeat.");
+                    return Unit.INSTANCE;
+                });
                 finish();
                 purgeDirectory(new File(tempRoot));
             }
@@ -660,6 +685,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void startParallelUpload(List<SyncRecord> finalList, boolean isCompressedVideo) {
+        CuSyncManager.INSTANCE.startActiveHeartbeat(finalList);
+
         for (SyncRecord file : finalList) {
             if (!running) break;
 
@@ -734,7 +761,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        megaApi.startUpload(path, parent, CU_UPLOAD, file.getFileName(), lastModified / 1000, this);
+                        megaApi.startUpload(path, parent, APP_DATA_CU, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
                     logDebug("Local file is unavailable, delete record from database.");
@@ -851,6 +878,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalUploaded = 0;
         totalToUpload = 0;
 
+        CuSyncManager.INSTANCE.reportUploadFinish();
+        CuSyncManager.INSTANCE.stopActiveHeartbeat();
         finish();
     }
 
@@ -871,7 +900,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (media == null) continue;
 
             if (dbH.localPathExists(media.filePath, isSecondary, SyncRecord.TYPE_ANY)) {
-                logDebug("Skip media with timestamp: "  + media.timestamp);
+                logDebug("Skip media with timestamp: " + media.timestamp);
                 continue;
             }
 
@@ -991,8 +1020,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (!checkPrimaryLocalFolder()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable, LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
-            dbH.setCamSyncLocalPath(INVALID_PATH);
-            dbH.setSecondaryFolderPath(INVALID_PATH);
+            dbH.setCamSyncLocalPath(INVALID_NON_NULL_VALUE);
+            dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
             //refresh settings fragment UI
             sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
@@ -1101,9 +1130,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      */
     private boolean checkSecondaryLocalFolder() {
         // check secondary local folder if media upload is enabled
-        if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+        secondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+        if (secondaryEnabled) {
             if (dbH.getMediaFolderExternalSdCard()) {
                 Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                localPathSecondary = getFullPathFromTreeUri(uri, this);
+                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                    localPathSecondary += SEPARATOR;
+                }
+
                 DocumentFile file = DocumentFile.fromTreeUri(this, uri);
                 if (file == null) {
                     logError("Local media folder on sd card is unavailable.");
@@ -1112,17 +1147,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
                 return file.exists();
             } else {
-                String path = prefs.getLocalPathSecondaryFolder();
-                // First time enable media upload, haven't set local path.
-                if (INVALID_PATH.equals(path)) {
-                    return true;
+                localPathSecondary = prefs.getLocalPathSecondaryFolder();
+
+                if (localPathSecondary == null) return false;
+
+                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                    localPathSecondary += SEPARATOR;
                 }
 
-                return path != null && new File(path).exists();
+                return new File(localPathSecondary).exists();
             }
+        } else {
+            logDebug("Not enabled Secondary");
+            dbH.setSecondaryUploadEnabled(false);
+            // if not enable secondary
+            return true;
         }
-        // if not enable secondary
-        return true;
     }
 
     /**
@@ -1133,29 +1173,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * SETTING_USER_ATTRIBUTE, set CU attributes with valid hanle. CU process will launch after the setting completes.
      */
     private int checkTargetFolders() {
-        // To see if secondary sync is enabled.
-        if (prefs.getSecondaryMediaFolderEnabled() == null) {
-            logDebug("Secondary upload setting not defined, so not enabled");
-            dbH.setSecondaryUploadEnabled(false);
-            secondaryEnabled = false;
-        } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            secondaryEnabled = true;
-
-            if (dbH.getMediaFolderExternalSdCard()) {
-                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
-                localPathSecondary = getFullPathFromTreeUri(uri,this);
-            } else {
-                localPathSecondary = prefs.getLocalPathSecondaryFolder();
-            }
-
-            if (!localPathSecondary.endsWith(SEPARATOR)) {
-                localPathSecondary += SEPARATOR;
-            }
-        } else {
-            logDebug("Not enabled Secondary");
-            secondaryEnabled = false;
-        }
-
         long primaryToSet = INVALID_HANDLE;
         // If CU folder in local setting is deleted, then need to reset.
         boolean needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle);
@@ -1211,6 +1228,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (needToSetPrimary || needToSetSecondary) {
+            logDebug("Set CU attribute: " + primaryToSet + " " + secondaryToSet);
             megaApi.setCameraUploadsFolders(primaryToSet, secondaryToSet, setAttrUserListener);
             return SETTING_USER_ATTRIBUTE;
         }
@@ -1446,6 +1464,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 String fingerPrint = node.getFingerprint();
                 boolean isSecondary = node.getParentHandle() == secondaryUploadHandle;
                 dbH.deleteSyncRecordByFingerprint(fingerPrint, fingerPrint, isSecondary);
+                CuSyncManager.INSTANCE.onUploadSuccess(node, isSecondary);
             }
             updateUpload();
         }
@@ -1455,14 +1474,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * Callback when getting CU folder handle from CU attributes completes.
      *
      * @param handle      CU folder hanlde stored in CU atrributes.
-     * @param e           Used to get error code to see if the request is successful.
+     * @param errorCode   Used to get error code to see if the request is successful.
      * @param shouldStart If should start CU process.
      */
-    public void onGetPrimaryFolderAttribute(long handle, MegaError e, boolean shouldStart) {
-        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+    public void onGetPrimaryFolderAttribute(long handle, int errorCode, boolean shouldStart) {
+        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true;
             if (cameraUploadHandle != handle) cameraUploadHandle = handle;
             if (shouldStart) {
+                logDebug("On get primary, start work thread.");
                 startWorkerThread();
             }
         } else {
@@ -1474,13 +1494,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     /**
      * Callback when getting MU folder handle from CU attributes completes.
      *
-     * @param handle MU folder hanlde stored in CU atrributes.
-     * @param e      Used to get error code to see if the request is successful.
+     * @param handle    MU folder hanlde stored in CU atrributes.
+     * @param errorCode Used to get error code to see if the request is successful.
      */
-    public void onGetSecondaryFolderAttribute(long handle, MegaError e) {
-        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+    public void onGetSecondaryFolderAttribute(long handle, int errorCode) {
+        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             if (handle != secondaryUploadHandle) secondaryUploadHandle = handle;
             // Start to upload. Unlike onGetPrimaryFolderAttribute needs to wait for getting MU folder handle completes.
+            logDebug("On get secondary, start work thread.");
             startWorkerThread();
         } else {
             logWarning("Get secondary handle faild, finish process.");
@@ -1489,6 +1510,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     public void onSetFolderAttribute() {
+        logDebug("On set CU folder, start work thread.");
         startWorkerThread();
     }
 
@@ -1515,7 +1537,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     @Override
-    public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
+    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
         transferUpdated(transfer);
     }
 
@@ -1580,6 +1602,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 record = dbH.findSyncRecordByLocalPath(path, isSecondary);
             }
             if (record != null) {
+                CuSyncManager.INSTANCE.onUploadSuccess(node, record.isSecondary());
+
                 String originalFingerprint = record.getOriginFingerprint();
                 megaApi.setOriginalFingerprint(node, originalFingerprint, this);
                 megaApi.setNodeCoordinates(node, record.getLatitude(), record.getLongitude(), null);
@@ -1771,7 +1795,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
             showNotification(title, message, pendingIntent, true);
         }
-
     }
 
     private boolean shouldStartVideoCompression(long queueSize) {
@@ -1943,7 +1966,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder.setSubText(subText);
         } else {
-            mBuilder.setColor(ContextCompat.getColor(this, R.color.mega))
+            mBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setContentInfo(subText);
         }
         mNotification = mBuilder.build();
@@ -1976,7 +1999,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             builder.setContentText(contentText);
         } else {
             builder.setContentInfo(contentText)
-                    .setColor(ContextCompat.getColor(this, R.color.mega));
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
         }
         mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, builder.build());

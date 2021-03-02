@@ -1,21 +1,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
-    
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_return_call"
+        android:icon="@drawable/ic_call_menu"
+        android:orderInCategory="80"
+        android:title="@string/call_in_progress_layout"
+        android:visible="false"
+        app:actionLayout="@layout/layout_menu_return_call"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/cab_menu_share_folder"
+        android:icon="@drawable/ic_share"
         android:orderInCategory="110"
         android:title="@string/context_share_folder"
-        android:icon="@drawable/ic_share_white"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
-
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_send_file"
+        android:icon="@drawable/ic_send_to_contact"
         android:orderInCategory="100"
         android:title="@string/context_send_file"
-        android:icon="@drawable/ic_send_to_contact"
-        MEGA:showAsAction="always"
-        android:visible="false"/>
-
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 </menu>

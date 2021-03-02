@@ -11,9 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,8 +21,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -52,10 +48,13 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -191,7 +190,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			if (intent != null) {
 				position = intent.getIntExtra("position", -1);
 				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if (position != -1) {
 					if (adapterType == ZIP_ADAPTER) {
@@ -292,19 +291,12 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(getString(R.string.zip_browser_activity));
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
 		zipLayout = (RelativeLayout) findViewById(R.id.zip_layout);
 		recyclerView = (RecyclerView) findViewById(R.id.zip_list_view_browser);
 		recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		recyclerView.setClipToPadding(false);
-		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setHasFixedSize(true);
@@ -820,23 +812,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			}
 		}
 
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ this.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		return info;
+		return getFolderInfo(numFolders, numFiles);
 	}
 }

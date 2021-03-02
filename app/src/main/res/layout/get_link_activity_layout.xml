@@ -1,41 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/get_link_coordinator_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/white"
     android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_below="@id/toolbar"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_below="@id/toolbar">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_get_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_get_link"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                tools:context=".ManagerActivityLollipop" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+            android:minHeight="?attr/actionBarSize" />
 
         <FrameLayout
             android:id="@+id/fragment_container_get_link"
-            android:layout_below="@id/app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_get_link" />
 
     </RelativeLayout>
 

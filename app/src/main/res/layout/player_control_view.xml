@@ -55,7 +55,7 @@
             android:id="@+id/relative_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/transparent_black"
+            android:background="@color/grey_alpha_050"
             android:layout_below="@+id/exo_progress"
             android:paddingTop="8dp">
 
@@ -89,8 +89,8 @@
                 android:fontFamily="Roboto"
                 android:layout_below="@id/exo_duration"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="14dp"
+                android:layout_marginTop="@dimen/av_player_file_name_margin_top_portrait"
+                android:layout_marginBottom="@dimen/av_player_file_name_margin_bottom_portrait"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 
@@ -98,8 +98,8 @@
                 android:id="@+id/container_control_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="@dimen/av_player_control_buttons_margin_top_portrait"
+                android:layout_marginBottom="@dimen/av_player_control_buttons_margin_bottom_portrait"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/exo_name_file">
 
@@ -126,7 +126,7 @@
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:background="@drawable/ic_fab_default"
-                        android:src="@drawable/ic_w_resume_all_transfers"
+                        android:src="@drawable/ic_resume_all_transfers"
                         android:padding="10dp" />
 
                     <ImageButton

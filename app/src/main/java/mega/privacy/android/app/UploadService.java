@@ -24,7 +24,6 @@ import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -39,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
@@ -55,6 +56,7 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -80,6 +82,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
 	private int childUploadFailed = 0;
+	private int childrenAlreadyUploaded = 0;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -98,16 +101,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private NotificationCompat.Builder mBuilderCompat;
 	private NotificationManager mNotificationManager;
 
-	private int notificationIdForFileUpload = NOTIFICATION_UPLOAD;
-	private int notificationIdFinalForFileUpload = NOTIFICATION_UPLOAD_FINAL;
-	private String notificationChannelIdForFileUpload = NOTIFICATION_CHANNEL_UPLOAD_ID;
-	private String notificationChannelNameForFileUpload = NOTIFICATION_CHANNEL_UPLOAD_NAME;
-
-    private int notificationIdForFolderUpload = NOTIFICATION_UPLOAD_FOLDER;
-    private int notificationIdFinalForFolderUpload = NOTIFICATION_UPLOAD_FINAL_FOLDER;
-    private String notificationChannelIdForFolderUpload = NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER;
-    private String notificationChannelNameForFolderUpload = NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER;
-
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
     private HashMap<Integer, MegaTransfer> mapProgressFolderTransfers;
     private static int totalFileUploadsCompleted = 0;
@@ -116,14 +109,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private static int totalFolderUploadsCompleted = 0;
     private static int totalFolderUploads = 0;
     private static int totalFolderUploadsCompletedSuccessfully = 0;
+    private static int filesAlreadyUploaded = 0;
 
     private static int uploadCount = 0;
     private static int currentUpload = 0;
 
-	//0 - not overquota, not pre-overquota
-	//1 - overquota
-	//2 - pre-overquota
-    private int isOverquota = 0;
+	//NOT_OVERQUOTA_STATE           = 0 - not overquota, not pre-overquota
+	//OVERQUOTA_STORAGE_STATE       = 1 - overquota
+	//PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-overquota
+    private int isOverquota = NOT_OVERQUOTA_STATE;
 
     /** the receiver and manager for the broadcast to listen to the pause event */
     private BroadcastReceiver pauseBroadcastReceiver;
@@ -145,7 +139,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isForeground = false;
 		canceled = false;
-		isOverquota = 0;
+		isOverquota = NOT_OVERQUOTA_STATE;
 
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
@@ -162,6 +156,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		startForeground();
 
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = new BroadcastReceiver() {
@@ -180,6 +176,34 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
+    private void startForeground() {
+        if (megaApi.getNumPendingUploads() <= 0) {
+            return;
+        }
+
+        try {
+            startForeground(NOTIFICATION_UPLOAD,
+                    createInitialServiceNotification(NOTIFICATION_CHANNEL_UPLOAD_ID,
+                            NOTIFICATION_CHANNEL_UPLOAD_NAME,
+                            mNotificationManager,
+                            new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID),
+                            mBuilder));
+
+            isForeground = true;
+        } catch (Exception e) {
+            logWarning("Error starting foreground.", e);
+            isForeground = false;
+        }
+    }
+
+    private void stopForeground() {
+        isForeground = false;
+        stopForeground(true);
+        mNotificationManager.cancel(NOTIFICATION_UPLOAD);
+        mNotificationManager.cancel(NOTIFICATION_UPLOAD_FOLDER);
+        stopSelf();
+    }
+
 	@Override
 	public void onDestroy(){
 		logDebug("onDestroy");
@@ -196,6 +220,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
+        stopForeground();
 
 		super.onDestroy();
 	}
@@ -228,23 +253,69 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private synchronized void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 
-		String action = intent.getAction();
-		logDebug("Action is " + action);
-		if(action != null){
-            if (ACTION_OVERQUOTA_STORAGE.equals(action)) {
-                isOverquota = 1;
-            }else if(ACTION_STORAGE_STATE_CHANGED.equals(action)){
-                isOverquota = 0;
+        String action = intent.getAction();
+        logDebug("Action is " + action);
+        if (action != null) {
+            switch (action) {
+                case ACTION_OVERQUOTA_STORAGE:
+                    isOverquota = OVERQUOTA_STORAGE_STATE;
+                    break;
+
+                case ACTION_STORAGE_STATE_CHANGED:
+                    isOverquota = NOT_OVERQUOTA_STATE;
+                    break;
+
+                case ACTION_RESTART_SERVICE:
+                    MegaTransferData transferData = megaApi.getTransferData(null);
+                    if (transferData == null) {
+                        stopForeground();
+                        return;
+                    }
+
+                    int uploadsInProgress = transferData.getNumUploads();
+
+                    for (int i = 0; i < uploadsInProgress; i++) {
+                        MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+                        if (transfer == null || isCUOrChatTransfer(transfer)) {
+                            continue;
+                        }
+
+                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+
+                        if (transfer.isFolderTransfer()) {
+                            mapProgressFolderTransfers.put(transfer.getTag(), transfer);
+                        } else {
+                            mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                        }
+                    }
+
+                    totalFolderUploads = mapProgressFolderTransfers.size();
+                    totalFileUploads = mapProgressFileTransfers.size();
+                    uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+
+                    if (transfersCount == 0) {
+                        stopForeground();
+                    } else if (totalFileUploads == 0) {
+                        isForeground = false;
+                        stopForeground(true);
+                        mNotificationManager.cancel(NOTIFICATION_UPLOAD);
+                    }
+
+                    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+                    break;
             }
+
             if (totalFileUploads > 0) {
                 updateProgressNotification(false);
             }
+
             if (totalFolderUploads > 0) {
                 updateProgressNotification(true);
             }
+
             return;
-        }else {
-            isOverquota = 0;
+        } else {
+            isOverquota = NOT_OVERQUOTA_STATE;
         }
 
         currentUpload ++;
@@ -313,11 +384,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationIdForFileUpload);
-		mNotificationManager.cancel(notificationIdForFolderUpload);
-		stopSelf();
+		stopForeground();
 	}
 
 	@Override
@@ -331,7 +398,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void onQueueComplete() {
 		logDebug("onQueueComplete");
         releaseLocks();
-        if (isOverquota != 0) {
+        if (isOverquota != NOT_OVERQUOTA_STATE) {
             if (totalFileUploads > 0) {
                 showStorageOverQuotaNotification(false);
             }
@@ -359,11 +426,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         resetUploadNumbers();
 
 		logDebug("Stopping service!");
-        isForeground = false;
-        stopForeground(true);
-        mNotificationManager.cancel(notificationIdForFileUpload);
-        mNotificationManager.cancel(notificationIdForFolderUpload);
-        stopSelf();
+        stopForeground();
 		logDebug("After stopSelf");
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -388,6 +451,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -397,6 +461,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -422,67 +487,98 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 .putExtra(NUMBER_FILES, totalFileUploads + totalFolderUploads));
     }
 
-    /*
-     * Show complete success notification
+    /**
+     * Show complete success notification. File upload.
      */
     private void showFileUploadCompleteNotification() {
-		logDebug("showFileUploadCompleteNotification");
-        if (isOverquota == 0) {
-            String notificationTitle, size;
-            int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
-            notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,quantity,totalFileUploadsCompletedSuccessfully);
+        logDebug("showFileUploadCompleteNotification");
 
-            if (errorCount > 0) {
-                size = getResources().getQuantityString(R.plurals.upload_service_failed,errorCount,errorCount);
+        if (isOverquota == NOT_OVERQUOTA_STATE) {
+            String notificationTitle = "";
+
+            if (totalFileUploadsCompletedSuccessfully == 0 && filesAlreadyUploaded == 0 && errorCount == 0) {
+                notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                        1, 1);
             } else {
-                long transferredBytes = getTransferredByte(mapProgressFileTransfers);
+                if (totalFileUploadsCompletedSuccessfully > 0) {
+                    notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                            totalFileUploadsCompletedSuccessfully, totalFileUploadsCompletedSuccessfully);
+                }
 
-                String totalBytes = getSizeString(transferredBytes);
-                size = getString(R.string.general_total_size,totalBytes);
+                if (filesAlreadyUploaded > 0) {
+                    notificationTitle = addStringSeparator(notificationTitle);
+                    notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
+                            filesAlreadyUploaded, filesAlreadyUploaded);
+                }
+
+                if (errorCount > 0) {
+                    notificationTitle = addStringSeparator(notificationTitle);
+                    notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
+                            errorCount, errorCount);
+                }
             }
 
-            notifyNotification(notificationTitle,size,notificationIdFinalForFileUpload,notificationChannelIdForFileUpload,notificationChannelNameForFileUpload);
+            long transferredBytes = getTransferredByte(mapProgressFileTransfers);
+            String totalBytes = getSizeString(transferredBytes);
+            String size = StringResourcesUtils.getString(R.string.general_total_size, totalBytes);
+
+            notifyNotification(notificationTitle, size, NOTIFICATION_UPLOAD_FINAL, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
         }
     }
 
+    /**
+     * Show complete success notification. Folder upload.
+     */
     private void showFolderUploadCompleteNotification() {
-		logDebug("showFolderUploadCompleteNotification");
-        if (isOverquota == 0) {
-            String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
-            String notificationSubTitle;
+        logDebug("showFolderUploadCompleteNotification");
 
-            if (childUploadSucceeded > 0 && childUploadFailed > 0) {
-                String uploadedString = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
-                String errorString = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
-                notificationSubTitle = uploadedString + ", " + errorString;
-            } else if (childUploadSucceeded > 0) {
-                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
-            } else if(childUploadFailed > 0){
-                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
-            }else{
-                long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
+        if (isOverquota == NOT_OVERQUOTA_STATE) {
+            String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification, totalFolderUploadsCompletedSuccessfully, totalFolderUploadsCompletedSuccessfully);
+            String notificationSubTitle = "";
 
-                String totalBytes = getSizeString(transferredBytes);
-                notificationSubTitle = getString(R.string.general_total_size,totalBytes);
+            if (childUploadSucceeded > 0) {
+                notificationSubTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                        childUploadSucceeded, childUploadSucceeded);
             }
 
-            notifyNotification(notificationTitle,notificationSubTitle,notificationIdFinalForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
+            if (childrenAlreadyUploaded > 0) {
+                notificationSubTitle = addStringSeparator(notificationTitle);
+                notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
+                        childrenAlreadyUploaded, childrenAlreadyUploaded);
+            }
+
+            if (childUploadFailed > 0) {
+                notificationSubTitle = addStringSeparator(notificationTitle);
+                notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
+                        childUploadFailed, childUploadFailed);
+            }
+
+            if (isTextEmpty(notificationSubTitle)) {
+                long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
+                String totalBytes = getSizeString(transferredBytes);
+                notificationSubTitle = getString(R.string.general_total_size, totalBytes);
+            }
+
+            notifyNotification(notificationTitle, notificationSubTitle, NOTIFICATION_UPLOAD_FINAL_FOLDER,
+                    NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
         }
     }
 
     private void notifyProgressNotification(int progressPercent,String message,String info,String actionString,int notificationId,String notificationChannelId,String notificationChannelName){
         Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
         switch (isOverquota) {
-            case 0:
+            case OVERQUOTA_STORAGE_STATE:
+                intent.setAction(ACTION_OVERQUOTA_STORAGE);
+                break;
+
+            case PRE_OVERQUOTA_STORAGE_STATE:
+                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+                break;
+
+            case NOT_OVERQUOTA_STATE:
             default:
                 intent.setAction(ACTION_SHOW_TRANSFERS);
                 intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-                break;
-            case 1:
-                intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                break;
-            case 2:
-                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
                 break;
         }
 
@@ -498,7 +594,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setSubText(info)
@@ -510,7 +606,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setSubText(info)
@@ -528,7 +624,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     .setOnlyAlertOnce(true);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+                mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
             }
             notification = mBuilder.build();
         }
@@ -577,20 +673,20 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
         String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
 		logDebug(logMessage + progressPercent + " " + message);
-        String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
+        String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
-        if(isFolderTransfer){
-            notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
-        }else{
-            notifyProgressNotification(progressPercent,message,info,actionString,notificationIdForFileUpload,notificationChannelIdForFileUpload,notificationChannelNameForFileUpload);
+        if (isFolderTransfer) {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
+        } else {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
         }
     }
 
     private String getMessageForProgressNotification(long inProgress,boolean isFolderUpload) {
         logDebug("inProgress: " + inProgress + ", isFolderUpload:" + isFolderUpload);
         String message;
-        if (isOverquota != 0) {
+        if (isOverquota != NOT_OVERQUOTA_STATE) {
             message = getString(R.string.overquota_alert_title);
         } else if (inProgress == 0) {
             message = getString(R.string.download_preparing_files);
@@ -651,7 +747,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-		    if (isCUTransfer(transfer)) return;
+		    if (isCUOrChatTransfer(transfer)) return;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			String appData = transfer.getAppData();
@@ -685,7 +781,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private void doOnTransferFinish(MegaTransfer transfer, MegaError error) {
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
-        if (isCUTransfer(transfer)) return;
+        if (isCUOrChatTransfer(transfer)) return;
 
 		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -704,10 +800,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             if (isTransferBelongsToFolderTransfer(transfer)) {
                 if (!transfer.isFolderTransfer()) {
-                    if (error.getErrorCode() == MegaError.API_OK) {
-                        childUploadSucceeded++;
-                    } else {
+                    if (error.getErrorCode() != MegaError.API_OK) {
                         childUploadFailed++;
+                    } else if (transfer.getTransferredBytes() == 0) {
+                        childrenAlreadyUploaded++;
+                    } else {
+                        childUploadSucceeded++;
                     }
                 }
                 return;
@@ -737,12 +835,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
-					logDebug("Upload OK: " + transfer.getFileName());
-					if(transfer.isFolderTransfer()){
+                    if (transfer.isFolderTransfer()) {
                         totalFolderUploadsCompletedSuccessfully++;
-                    }else{
+                    } else if (transfer.getTransferredBytes() == 0) {
+                        filesAlreadyUploaded++;
+                    } else {
                         totalFileUploadsCompletedSuccessfully++;
                     }
+
 					if (isVideoFile(transfer.getPath())) {
 						logDebug("Is video!!!");
 
@@ -886,10 +986,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					logError("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
 					if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-						isOverquota = 1;
+						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = 2;
+						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
 					}
 
 					if (!transfer.isFolderTransfer()) {
@@ -941,7 +1041,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void doOnTransferUpdate(MegaTransfer transfer) {
 		logDebug("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
-            if (isCUTransfer(transfer)) return;
+            if (isCUOrChatTransfer(transfer)) return;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -986,7 +1086,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-            if (isCUTransfer(transfer)) return;
+            if (isCUOrChatTransfer(transfer)) return;
 
             if(isTransferBelongsToFolderTransfer(transfer)){
                 return;
@@ -996,10 +1096,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				case MegaError.API_EOVERQUOTA:
 				case MegaError.API_EGOINGOVERQUOTA:
 					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-						isOverquota = 1;
+						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = 2;
+						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
 					}
 
 					if (e.getValue() != 0) {
@@ -1028,11 +1128,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logDebug("showStorageOverQuotaNotification");
 		String notificationChannelId,notificationChannelName;
 		if(isFolderTransfer){
-            notificationChannelId = notificationChannelIdForFolderUpload;
-            notificationChannelName = notificationChannelNameForFolderUpload;
+            notificationChannelId = NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER;
+            notificationChannelName = NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER;
         }else{
-            notificationChannelId = notificationChannelIdForFileUpload;
-            notificationChannelName = notificationChannelNameForFileUpload;
+            notificationChannelId = NOTIFICATION_CHANNEL_UPLOAD_ID;
+            notificationChannelName = NOTIFICATION_CHANNEL_UPLOAD_NAME;
         }
 
 		String contentText = getString(R.string.download_show_info);
@@ -1040,12 +1140,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		if(isOverquota==1){
-			intent.setAction(ACTION_OVERQUOTA_STORAGE);
-		}
-		else{
-			intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-		}
+        if (isOverquota == OVERQUOTA_STORAGE_STATE) {
+            intent.setAction(ACTION_OVERQUOTA_STORAGE);
+        } else {
+            intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+        }
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -1112,8 +1211,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         totalFolderUploadsCompleted = 0;
         totalFolderUploads = 0;
         totalFolderUploadsCompletedSuccessfully = 0;
+        filesAlreadyUploaded = 0;
         childUploadFailed = 0;
         childUploadSucceeded = 0;
+        childrenAlreadyUploaded = 0;
         uploadCount = 0;
         currentUpload = 0;
     }
@@ -1144,13 +1245,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     /**
-     * Checks if a transfer is a CU transfer.
+     * Checks if a transfer is a CU or Chat transfer.
      *
-     * @param transfer  MegaTransfer to check
-     * @return True if the transfer is a CU transfer, false otherwise.
+     * @param transfer MegaTransfer to check
+     * @return True if the transfer is a CU or Chat transfer, false otherwise.
      */
-    private boolean isCUTransfer(MegaTransfer transfer) {
+    private boolean isCUOrChatTransfer(MegaTransfer transfer) {
         String appData = transfer.getAppData();
-        return !isTextEmpty(appData) && appData.contains(CU_UPLOAD);
+        return !isTextEmpty(appData)
+                && (appData.contains(APP_DATA_CU)
+                || appData.contains(APP_DATA_CHAT));
     }
 }

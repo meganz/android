@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -68,7 +69,6 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
@@ -79,6 +79,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -185,10 +186,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void checkScroll () {
 		if (scrollView != null) {
 			if (scrollView.canScrollVertically(-1)) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -271,13 +272,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         }
 
 		mkButton = v.findViewById(R.id.MK_button);
-		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		mkButton.setOnClickListener(this);
 
 		setMkButtonText();
 
 		changePassButton = v.findViewById(R.id.change_pass_button);
-		changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -403,7 +402,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				visibleContacts.add(contacts.get(i));
 			}
 		}
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		connections.setText(getQuantityString(R.plurals.general_selection_num_contacts,
+						visibleContacts.size(), visibleContacts.size()));
 	}
 
 	public void setMkButtonText(){
@@ -502,18 +502,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				switch (status) {
 					case BUSINESS_STATUS_EXPIRED:
 						status = R.string.payment_overdue_label;
-						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
-						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.mail_my_account));
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.red_800));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grey_054_white_054));
 						break;
 					case BUSINESS_STATUS_ACTIVE:
 						status = R.string.active_label;
-						businessAccountStatusText.setTextColor(getResources().getColor(R.color.name_my_account));
-						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.name_my_account));
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grey_087_white_087));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 						break;
 					case BUSINESS_STATUS_GRACE_PERIOD:
 						status = R.string.payment_required_label;
-						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
-						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.orange_400_orange_300));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.orange_400_orange_300));
 						break;
 				}
 				businessAccountStatusText.setText(status);
@@ -521,7 +521,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (myAccountInfo.getSubscriptionRenewTime() > 0) {
 					businessAccountRenewsText.setVisibility(View.VISIBLE);
 					businessAccountRenewsDateText.setVisibility(View.VISIBLE);
-					businessAccountRenewsDateText.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+					businessAccountRenewsDateText.setText(formatDate(myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
 				} else {
 					businessAccountRenewsText.setVisibility(View.GONE);
 					businessAccountRenewsDateText.setVisibility(View.GONE);
@@ -588,12 +588,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			expiryRenewLayout.setVisibility(View.VISIBLE);
 			expiryRenewSeparator.setVisibility(View.VISIBLE);
 			expiryRenewText.setText(getString(R.string.renews_on));
-			expiryRenewDate.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+			expiryRenewDate.setText(formatDate(myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
 		} else if (myAccountInfo.getProExpirationTime() > 0) {
 			expiryRenewLayout.setVisibility(View.VISIBLE);
 			expiryRenewSeparator.setVisibility(View.VISIBLE);
 			expiryRenewText.setText(getString(R.string.expires_on));
-			expiryRenewDate.setText(formatDate(context, myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
+			expiryRenewDate.setText(formatDate(myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
 		} else {
 			expiryRenewLayout.setVisibility(View.GONE);
 			expiryRenewSeparator.setVisibility(View.GONE);
@@ -784,39 +784,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return 0;
 	}
 
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-
-		return info;
-	}
-
 	public void updateNameView(String fullName){
 		logDebug("updateNameView");
 
@@ -938,14 +905,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		int w = bitMatrix.getWidth();
 		int h = bitMatrix.getHeight();
 		int[] pixels = new int[w * h];
-		int color = ContextCompat.getColor(context, R.color.grey_achievements_invite_friends_sub);
+		int color = ContextCompat.getColor(context, R.color.grey_400);
 		float resize = 12.2f;
 
 		Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(bitmap);
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
-		paint.setColor(WHITE);
+		int paintColor = ContextCompat.getColor(context, R.color.white_dark_grey);
+		paint.setColor(paintColor);
 		c.drawRect(0, 0, WIDTH, WIDTH, paint);
 		paint.setColor(color);
 
@@ -959,7 +927,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 //				log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
 			}
 		}
-		paint.setColor(WHITE);
+		paint.setColor(paintColor);
 		c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
 		c.drawRect(28.5f*resize, 3*resize, 37*resize, 11.5f*resize, paint);
 		c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
@@ -971,7 +939,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			c.drawRoundRect(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize, 30, 30, paint);
 			c.drawRoundRect(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize, 30, 30, paint);
 
-			paint.setColor(WHITE);
+			paint.setColor(paintColor);
 			c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
 			c.drawRoundRect(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize, 25, 25, paint);
 			c.drawRoundRect(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize, 25, 25, paint);
@@ -981,7 +949,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			c.drawRoundRect(new RectF(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize), 30, 30, paint);
 			c.drawRoundRect(new RectF(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize), 30, 30, paint);
 
-			paint.setColor(WHITE);
+			paint.setColor(paintColor);
 			c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
 			c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 25, 25, paint);
 			c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 25, 25, paint);

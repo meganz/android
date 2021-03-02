@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -131,6 +131,14 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	private Button inviteFriendsButton;
 
 	private AchievementsActivity mActivity;
+
+	private static final String AD_SLOT = "and2";
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		initAdsLoader(AD_SLOT, true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -309,6 +317,15 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		figureUnlockedRewardTransfer.setText("...");
 
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				mActivity.getOutMetrics());
+
+		if (Util.isDarkMode(context)) {
+			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+			v.findViewById(R.id.unlocked_rewards_layout).setBackgroundColor(backgroundColor);
+			v.findViewById(R.id.card_view_2).setBackgroundColor(backgroundColor);
+		}
+
 		return v;
 	}
 
@@ -486,7 +503,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftInstallAppText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftInstallAppText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){
@@ -545,7 +562,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if(diffDays<=15){
-                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
                 }
 
                 if(diffDays>0){
@@ -604,7 +621,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){
@@ -659,7 +676,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftRegistrationText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftRegistrationText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){

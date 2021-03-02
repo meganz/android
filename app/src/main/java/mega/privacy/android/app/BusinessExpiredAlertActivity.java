@@ -8,8 +8,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
+
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -40,9 +44,9 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
         LinearLayout.LayoutParams expiredLayoutParams = (LinearLayout.LayoutParams) expiredImageLayout.getLayoutParams();
 
         if (isScreenInPortrait(this)) {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
         } else {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
         }
 
         expiredImageLayout.setLayoutParams(expiredLayoutParams);
@@ -54,7 +58,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
         RelativeLayout.LayoutParams expiredImageParams = (RelativeLayout.LayoutParams) expiredImage.getLayoutParams();
 
         if (megaApi.isMasterBusinessAccount()) {
-            expiredImageLayout.setBackgroundColor(getResources().getColor(R.color.expired_business_admin));
+            expiredImageLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.gradient_business_admin_expired_bg));
             expiredImageParams.addRule(RelativeLayout.CENTER_IN_PARENT);
             if (isScreenInPortrait(this)) {
                 expiredImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_expired_admin_portrait));
@@ -63,9 +67,8 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             expiredText.setText(R.string.expired_admin_business_text);
             expiredSubtext.setVisibility(View.GONE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.expired_business_admin_statusbar));
         } else {
-            expiredImageLayout.setBackgroundColor(getResources().getColor(R.color.expired_business_user));
+            expiredImageLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.gradient_business_user_expired_bg));
             expiredImageParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             expiredImageParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             if (isScreenInPortrait(this)) {
@@ -75,14 +78,13 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'" + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
             }
-            expiredText.setText(getSpannedHtmlText(expiredString));
+            expiredText.setText(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY));
             expiredSubtext.setVisibility(View.VISIBLE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.expired_business_user_statusbar));
         }
 
         expiredImage.setLayoutParams(expiredImageParams);

@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,7 +30,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -40,6 +38,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -89,6 +88,7 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,6 +100,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -109,8 +110,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
+import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -118,11 +124,11 @@ import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -152,12 +158,12 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -165,7 +171,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
@@ -176,6 +182,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
+
+    private static final int DIALOG_VIEW_MARGIN_LEFT_DP = 20;
+    private static final int DIALOG_VIEW_MARGIN_RIGHT_DP = 17;
+    private static final int DIALOG_VIEW_MARGIN_TOP_DP = 10;
+    private static final int DIALOG_VIEW_MARGIN_TOP_LARGE_DP = 20;
+    private static final int FILE_NAME_MAX_WIDTH_DP = 300;
+    private static final int RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT_DP = 3;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_LEFT_DP = 25;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_TOP_DP = 20;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_RIGHT_DP = 10;
 
     private boolean fromChatSavedInstance = false;
     private int[] screenPosition;
@@ -195,8 +211,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DatabaseHandler dbH = null;
     private MegaPreferences prefs = null;
 
-    private AlertDialog alertDialogTransferOverquota;
-
     private Handler handler;
     private Runnable runnableActionStatusBar = new Runnable() {
         @Override
@@ -207,6 +221,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private boolean isFolderLink = false;
     private PlayerView playerView;
     private SimpleExoPlayer player;
+    private Player.EventListener playerListener;
     private Uri uri;
     private TextView exoPlayerName;
     private ProgressBar progressBar;
@@ -277,7 +292,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private OfflineNodeSaver offlineNodeSaver;
+    private AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
@@ -387,27 +403,31 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Window window = getWindow();
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_audiovideoplayer);
 
         audioVideoPlayerLollipop = this;
 
+        registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
         registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
         registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
-
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        registerReceiver(chatCallUpdateReceiver, filter);
 
         downloadLocationDefaultPath = getDownloadLocation();
 
         draggableView.setViewAnimator(new ExitViewAnimator<>());
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Intent intent = getIntent();
         if (intent == null){
@@ -503,7 +523,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             msgId = intent.getLongExtra("msgId", -1);
             chatId = intent.getLongExtra("chatId", -1);
         }
-        else if (adapterType == RECENTS_ADAPTER) {
+        else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
             nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
             if (nodeHandles == null || nodeHandles.length <= 0) isPlayList = false;
         }
@@ -520,11 +540,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
             logWarning("Tb is Null");
@@ -534,19 +549,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        logDebug("aB.setHomeAsUpIndicator");
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
-        else{
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
+        exoPlayerName.setMaxWidth(scaleWidthPx(FILE_NAME_MAX_WIDTH_DP, outMetrics));
 
         if (fileName == null) {
             fileName = getFileName(uri);
@@ -574,17 +582,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
         controlsButtonsLayout = (RelativeLayout) findViewById(R.id.container_control_buttons);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
-            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
-            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
-            exoPlayerName.setLayoutParams(params1);
-            controlsButtonsLayout.setLayoutParams(params2);
-            audioContainer.setLayoutParams(params3);
-        }
+        setControllerLayoutParam();
 
         previousButton = (ImageButton) findViewById(R.id.exo_prev);
         previousButton.setOnTouchListener(this);
@@ -832,6 +830,42 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        setControllerLayoutParam();
+    }
+
+    /**
+     * Update controller layout parameters according to screen orientation.
+     */
+    private void setControllerLayoutParam() {
+        RelativeLayout.LayoutParams paramsName = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
+        RelativeLayout.LayoutParams paramsControlButtons = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
+        RelativeLayout.LayoutParams paramsAudioContainer = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            paramsName.setMargins(0, 0, 0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_bottom_landscape));
+            paramsControlButtons.setMargins(0, 0, 0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_bottom_landscape));
+            paramsAudioContainer.addRule(RelativeLayout.ABOVE, containerControls.getId());
+        } else {
+            paramsName.setMargins(0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_top_portrait),
+                    0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_bottom_portrait));
+            paramsControlButtons.setMargins(0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_top_portrait),
+                    0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_bottom_portrait));
+            paramsAudioContainer.removeRule(RelativeLayout.ABOVE);
+        }
+        exoPlayerName.setLayoutParams(paramsName);
+        controlsButtonsLayout.setLayoutParams(paramsControlButtons);
+        audioContainer.setLayoutParams(paramsAudioContainer);
+    }
+
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -840,7 +874,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             MegaNode parentNode;
 
             if (adapterType == OFFLINE_ADAPTER){
-                offList = getIntent().getParcelableArrayListExtra(ARRAY_OFFLINE);
+                offList = getIntent().getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE);
                 logDebug ("offList.size() = " + offList.size());
 
                 for(int i=0; i<offList.size();i++){
@@ -877,8 +911,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 mediaHandles = new ArrayList<>();
                 ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
                 getMediaHandles(getSearchedNodes(handles));
-            }
-            else if(adapterType == FILE_LINK_ADAPTER){
+            } else if (adapterType == SEARCH_BY_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER || adapterType  == VIDEO_SEARCH_ADAPTER) {
+                long[] handles = getIntent().getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH);
+                getMediaHandles(getSearchedNodes(handles));
+            } else if (adapterType == AUDIO_BROWSE_ADAPTER) {
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_AUDIO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
+            } else if (adapterType == VIDEO_BROWSE_ADAPTER) {
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_VIDEO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
+            } else if (adapterType == FILE_LINK_ADAPTER) {
                 if (currentDocument != null) {
                     logDebug("File link node NOT null");
                     size = 1;
@@ -921,7 +961,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
-            else if (adapterType == RECENTS_ADAPTER) {
+            else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
                 ArrayList<MegaNode> nodes = new ArrayList<>();
                 MegaNode node;
 
@@ -1096,7 +1136,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
             //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-            player.addListener(new Player.EventListener() {
+            playerListener = new Player.EventListener() {
                 @Override
                 public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
                     logDebug("playerListener: onTimelineChanged");
@@ -1221,7 +1261,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     updateContainers();
                     enableNextButton();
                 }
-            });
+            };
+
+            player.addListener(playerListener);
+
             numErrors = 0;
             if (playWhenReady) {
                 startPlayback();
@@ -1363,13 +1406,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void showErrorDialog() {
         logWarning("Error open video file");
-        new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
-            .setCancelable(false)
-            .setMessage(isOnline(this) ? R.string.unsupported_file_type
-                : R.string.error_fail_to_open_file_no_network)
-            .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
-                (dialog, which) -> finish())
-            .show();
+
+        // Google Play Console reports crash here, which should be caused by showing a dialog
+        // after activity is destroyed, but since we already stop player in onDestroy,
+        // so it may be caused by bug in other parts. So we should add protection here.
+        if (!isFinishing()) {
+            try {
+                new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                        .setCancelable(false)
+                        .setMessage(isOnline(this) ? R.string.unsupported_file_type
+                                : R.string.error_fail_to_open_file_no_network)
+                        .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
+                                (dialog, which) -> finish())
+                        .show();
+            } catch (Exception e) {
+                logError("Exception trying to show A/V player error dialog", e);
+            }
+        }
 
         numErrors = 0;
     }
@@ -1406,7 +1459,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             for (int i=0; i<offList.size(); i++){
                 logDebug("Name: "+fileName+" mOfflist name: "+offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
-                    getImageView(i, -1);
+                    getImageView(i, Long.parseLong(offList.get(i).getHandle()));
                     break;
                 }
             }
@@ -1450,7 +1503,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+        intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
@@ -1462,7 +1515,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             for (int i=0; i<offList.size(); i++){
                 logDebug("Name: " + fileName + " mOfflist name: " + offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, Long.parseLong(offList.get(i).getHandle()));
                     break;
                 }
             }
@@ -1507,7 +1560,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         getImageView(i, handle);
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", SCROLL_TO_POSITION);
+        intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
@@ -1561,10 +1614,24 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (callback != null) {
                 callback.setVisibility(visibility);
             }
+        } else if (adapterType == AUDIO_BROWSE_ADAPTER ||adapterType == AUDIO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(AudioFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
+        } else if (adapterType == VIDEO_BROWSE_ADAPTER ||adapterType == VIDEO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
-            if (OfflineFragmentLollipop.imageDrag != null){
-                OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
             }
         }
         else if (adapterType == ZIP_ADAPTER) {
@@ -1577,6 +1644,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
             RecentsFragment.imageDrag.setVisibility(visibility);
+        } else if (adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
     }
 
@@ -1627,10 +1699,24 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (callback != null) {
                 callback.getLocationOnScreen(location);
             }
+        } else if (adapterType == AUDIO_BROWSE_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(AudioFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        } else if (adapterType == VIDEO_BROWSE_ADAPTER || adapterType == VIDEO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER){
-            if (OfflineFragmentLollipop.imageDrag != null){
-                OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
             }
         }
         else if (adapterType == ZIP_ADAPTER){
@@ -1643,6 +1729,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null){
             RecentsFragment.imageDrag.getLocationOnScreen(location);
+        } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
     }
 
@@ -1784,7 +1875,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                 aB.hide();
                             }
                         }).start();
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
             else {
                 aB.hide();
@@ -1805,7 +1895,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             aB.show();
             if(tB != null) {
                 tB.animate().translationY(0).setDuration(400L).start();
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
             playerView.showController();
             if (creatingPlaylist){
@@ -1834,7 +1923,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             aB = getSupportActionBar();
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
             aB.show();
@@ -1852,7 +1940,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
@@ -1930,7 +2017,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
         downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
         chatMenuItem = menu.findItem(R.id.full_video_viewer_chat);
-        chatMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
+        chatMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.full_video_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.full_video_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.full_video_viewer_rename);
@@ -1942,7 +2029,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
         importMenuItem = menu.findItem(R.id.chat_full_video_viewer_import);
         saveForOfflineMenuItem = menu.findItem(R.id.chat_full_video_viewer_save_for_offline);
-        saveForOfflineMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
+        saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_full_video_viewer_remove);
 
         if (nC == null) {
@@ -1976,7 +2063,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
-                downloadMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
@@ -2140,7 +2227,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
-            else if (adapterType == RECENTS_ADAPTER) {
+            else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
@@ -2374,7 +2461,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     break;
                 }
 
-                showGetLinkActivity();
+                showGetLinkActivity(this, handle);
                 break;
             }
             case R.id.full_video_viewer_remove_link: {
@@ -2481,14 +2568,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
              }
          };
 
-         androidx.appcompat.app.AlertDialog.Builder builder;
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-             builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-         }
-         else{
-             builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-         }
-
+         MaterialAlertDialogBuilder builder =
+                 new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
          builder.setMessage(R.string.confirmation_delete_one_attachment);
 
          builder.setPositiveButton(R.string.context_remove, dialogClickListener)
@@ -2512,21 +2593,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          final long sizeC = size;
          final ChatController chatC = new ChatController(this);
 
-         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-         LinearLayout confirmationLayout = new LinearLayout(this);
-         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-         params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+         Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+         MaterialAlertDialogBuilder builder = pair.first;
+         CheckBox dontShowAgain = pair.second;
 
-         final CheckBox dontShowAgain =new CheckBox(this);
-         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-         dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-         confirmationLayout.addView(dontShowAgain, params);
-
-         builder.setView(confirmationLayout);
-
-         builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+         builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
          builder.setPositiveButton(getString(R.string.general_save_to_device),
                  new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2548,6 +2619,34 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          downloadConfirmationDialog.show();
     }
 
+    /**
+     * Create an MaterialAlertDialogBuilder with a "Do not show again" CheckBox.
+     *
+     * @return the first is MaterialAlertDialogBuilder, the second is CheckBox
+     */
+    private Pair<MaterialAlertDialogBuilder, CheckBox> confirmationDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(
+                scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(DIALOG_VIEW_MARGIN_TOP_DP, outMetrics),
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics),
+                0);
+
+        CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+        return Pair.create(builder, dontShowAgain);
+    }
+
     void releasePlaylist(){
         onPlaylist = false;
         if (player != null){
@@ -2562,18 +2661,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commitNowAllowingStateLoss();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-
-        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_black));
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
         aB.setTitle(" ");
 
         supportInvalidateOptionsMenu();
@@ -2661,13 +2749,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         };
 
         if (moveToRubbish){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_move_to_rubbish);
             builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
         }
         else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_delete_from_mega);
             builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -2724,12 +2812,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
-        //	    layout.setLayoutParams(params);
+        params.setMargins(
+                scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(DIALOG_VIEW_MARGIN_TOP_LARGE_DP, outMetrics),
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics),
+                0);
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
@@ -2768,7 +2859,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         layout.addView(input, params);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), 0, mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        params1.setMargins(scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics), 0,
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics), 0);
 
         final RelativeLayout error_layout = new RelativeLayout(AudioVideoPlayerLollipop.this);
         layout.addView(error_layout, params1);
@@ -2781,7 +2873,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
 
-        error_icon.setColorFilter(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
+        error_icon.setColorFilter(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.red_600));
 
         final TextView textError = new TextView(AudioVideoPlayerLollipop.this);
         error_layout.addView(textError);
@@ -2790,15 +2882,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+        params_text_error.setMargins(scaleWidthPx(RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT_DP, outMetrics),
+                0, 0, 0);
         textError.setLayoutParams(params_text_error);
 
-        textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
+        textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.red_600));
 
         error_layout.setVisibility(View.GONE);
 
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2815,7 +2908,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (error_layout.getVisibility() == View.VISIBLE) {
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -2828,7 +2921,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2836,7 +2929,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     } else {
                         boolean result = matches(regex, value);
                         if (result) {
-                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
                             error_layout.setVisibility(View.VISIBLE);
                             input.requestFocus();
@@ -2852,8 +2945,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 return false;
             }
         });
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ node.getName());
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2873,7 +2966,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2881,7 +2974,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 String value = input.getText().toString().trim();
 
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2889,7 +2982,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else{
                     boolean result=matches(regex, value);
                     if(result){
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2940,8 +3033,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void showRemoveLink(){
-        androidx.appcompat.app.AlertDialog removeLinkDialog;
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        AlertDialog removeLinkDialog;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -2950,7 +3043,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
         TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
-        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(25, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(10, outMetrics), 0);
+        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(
+                scaleWidthPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_TOP_DP, outMetrics),
+                scaleWidthPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_RIGHT_DP, outMetrics), 0);
 
         url.setVisibility(View.GONE);
         key.setVisibility(View.GONE);
@@ -2964,8 +3060,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         display.getMetrics(outMetrics);
         float density = getResources().getDisplayMetrics().density;
 
-        float scaleW = mega.privacy.android.app.utils.Util.getScaleW(outMetrics, density);
-        float scaleH = mega.privacy.android.app.utils.Util.getScaleH(outMetrics, density);
+        float scaleW = getScaleW(outMetrics, density);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
         }else{
@@ -2994,13 +3089,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         removeLinkDialog = builder.create();
         removeLinkDialog.show();
-    }
-
-    public void showGetLinkActivity(){
-        logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
-        startActivity(linkIntent);
     }
 
     public void showPropertiesActivity(){
@@ -3045,8 +3133,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void downloadFile() {
-
-        if (adapterType == FILE_LINK_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER) {
+            if (offlineNodeSaver == null) {
+                offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+            }
+            offlineNodeSaver.save(Collections.singletonList(mediaOffList.get(currentWindowIndex)), false, (intent, code) -> {
+                startActivityForResult(intent, code);
+                return Unit.INSTANCE;
+            });
+        } else if (adapterType == FILE_LINK_ADAPTER) {
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -3136,6 +3231,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             return;
         }
 
+        if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+            return;
+        }
+
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
             long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
@@ -3185,6 +3284,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            storeDownloadLocationIfNeeded(parentPath);
+
             if (adapterType == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);
@@ -3406,6 +3507,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (player != null){
+            player.removeListener(playerListener);
             player.release();
         }
 
@@ -3658,7 +3760,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);
-        ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+        ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_060));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         container.addView(ivShadow, params);
         container.addView(draggableView);
@@ -3668,7 +3770,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onDragActivated(boolean activated) {
         if (activated) {
-            ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+            ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_060));
             updateCurrentImage();
             if (aB != null && aB.isShowing()) {
                 if(tB != null) {
@@ -3720,15 +3822,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
-//		handleToDownload = handle;
-        String externalPath = mega.privacy.android.app.utils.Util.getExternalCardPath();
+        String externalPath = getExternalCardPath();
 
         if(externalPath!=null){
             logDebug("ExternalPath for advancedDevices: " + externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -3771,23 +3871,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
 
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+        MaterialAlertDialogBuilder builder = pair.first;
+        CheckBox dontShowAgain = pair.second;
 
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-        builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
         builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -3835,21 +3924,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+        MaterialAlertDialogBuilder builder = pair.first;
+        CheckBox dontShowAgain = pair.second;
 
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
         builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
@@ -4098,7 +4176,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         playerLayout.setVisibility(View.GONE);
         fragmentContainer.setVisibility(View.VISIBLE);
         draggableView.setDraggable(false);
-        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+        tB.setTitleTextColor(WHITE);
         aB.setTitle(getString(R.string.section_playlist));
         supportInvalidateOptionsMenu();
 

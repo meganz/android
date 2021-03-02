@@ -3,17 +3,17 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import java.io.File;
 
 import mega.privacy.android.app.MegaOffline;
@@ -21,12 +21,13 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_MARGIN_DP;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -57,23 +58,29 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         mainLinearLayout = contentView.findViewById(R.id.offline_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
 
-        ImageView nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
+        contentView.findViewById(R.id.option_download_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.option_properties_layout).setOnClickListener(this);
+        TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
+
+        SimpleDraweeView nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.offline_name_text);
         TextView nodeInfo = contentView.findViewById(R.id.offline_info_text);
-        LinearLayout optionDeleteOffline = contentView.findViewById(R.id.option_delete_offline_layout);
         LinearLayout optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
         LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
 
-        optionDeleteOffline.setOnClickListener(this);
+        contentView.findViewById(R.id.option_delete_offline_layout).setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionShare.setOnClickListener(this);
 
-        LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open);
+        View separatorOpen = contentView.findViewById(R.id.separator_open);
 
         nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         if (nodeOffline != null) {
+            optionInfoText.setText(nodeOffline.isFolder() ? R.string.general_folder_info
+                    : R.string.general_file_info);
+
             if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()
                     || MimeTypeList.typeForName(nodeOffline.getName()).isImage() || MimeTypeList.typeForName(nodeOffline.getName()).isPdf()) {
                 optionOpenWith.setVisibility(View.VISIBLE);
@@ -89,33 +96,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             file = getOfflineFile(context, nodeOffline);
             if (!isFileAvailable(file)) return;
 
-            int folders = 0;
-            int files = 0;
             if (file.isDirectory()) {
-                File[] fList = file.listFiles();
-                if (fList != null) {
-                    for (File f : fList) {
-                        if (f.isDirectory()) {
-                            folders++;
-                        } else {
-                            files++;
-                        }
-                    }
-
-                    String info = "";
-                    if (folders > 0) {
-                        info = folders + " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-                        if (files > 0) {
-                            info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-                        }
-                    } else {
-                        info = files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-                    }
-
-                    nodeInfo.setText(info);
-                } else {
-                    nodeInfo.setText(" ");
-                }
+                nodeInfo.setText(getFileFolderInfo(file));
             } else {
                 long nodeSize = file.length();
                 nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(file.lastModified() / 1000)));
@@ -123,16 +105,16 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
 
             if (file.isFile()) {
                 if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()) {
-                    Bitmap thumb = null;
                     if (file.exists()) {
-                        thumb = getThumbnailFromCache(Long.parseLong(nodeOffline.getHandle()));
-                        if (thumb != null) {
-                            nodeThumb.setImageBitmap(thumb);
-                        } else {
-                            nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
-                        }
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                        params.height = params.width = dp2px(THUMB_SIZE_DP);
+                        int margin = dp2px(THUMB_MARGIN_DP);
+                        params.setMargins(margin, margin, margin, margin);
+                        nodeThumb.setLayoutParams(params);
+
+                        nodeThumb.setImageURI(Uri.fromFile(file));
                     } else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
+                        nodeThumb.setActualImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                     }
                 } else {
                     nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
@@ -140,8 +122,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             } else {
                 nodeThumb.setImageResource(R.drawable.ic_folder_list);
             }
-
-            optionDeleteOffline.setVisibility(View.VISIBLE);
 
             if (nodeOffline.isFolder() && !isOnline(context)) {
                 optionShare.setVisibility(View.GONE);
@@ -159,16 +139,24 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
+                    ((ManagerActivityLollipop) context)
+                            .showConfirmationRemoveFromOffline(nodeOffline,
+                                    this::setStateBottomSheetBehaviorHidden);
                 }
-                break;
-
+                return;
             case R.id.option_open_with_layout:
                 openWith();
                 break;
-
             case R.id.option_share_layout:
                 shareOfflineNode(context, nodeOffline);
+                break;
+            case R.id.option_download_layout:
+                ((ManagerActivityLollipop) context).saveOfflineNodeToDevice(nodeOffline);
+                break;
+            case R.id.option_properties_layout:
+                ((ManagerActivityLollipop) requireActivity()).showOfflineFileInfo(nodeOffline);
+                break;
+            default:
                 break;
         }
 

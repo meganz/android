@@ -1,22 +1,21 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -66,8 +65,10 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.openContactInfoActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -129,7 +130,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	Handler handler;
 	DisplayMetrics outMetrics;
 
-	private AlertDialog.Builder dialogBuilder;
+	private MaterialAlertDialogBuilder dialogBuilder;
 
 	private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -236,7 +237,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
 			checkScroll();
 			return true;
 		}
@@ -247,7 +247,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 3);
 			checkScroll();
 		}
 
@@ -333,14 +332,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 
-		dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+		dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
 
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
-		
 		listContacts = new ArrayList<MegaShare>();
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -389,10 +386,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			listView.setClipToPadding(false);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -506,7 +503,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		unSelectMenuItem.setVisible(false);
 
 		addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-		addSharingContact.setIcon(mutateIconSecondary(this, R.drawable.ic_share_white, R.color.black));
 		addSharingContact.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	    
 	    return super.onCreateOptionsMenu(menu);
@@ -583,13 +579,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		else{
 			MegaUser contact = megaApi.getContact(listContacts.get(position).getUser());
-
 			if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-				i.putExtra(NAME, listContacts.get(position).getUser());
-				startActivity(i);
+				openContactInfoActivity(this, listContacts.get(position).getUser());
 			}
-
 		}
 	}
 
@@ -640,10 +632,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			logDebug("Contacts selected: " + contacts.size());
 		}
 
-		Resources res = getResources();
-		String format = "%d %s";
-	
-		actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
+		actionMode.setTitle(getQuantityString(R.plurals.general_selection_num_contacts,
+						contacts.size(), contacts.size()));
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -733,7 +723,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				showOverDiskQuotaPaywallWarning();
 				return;
 			}
-			showSnackbar(getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
+			showSnackbar(getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

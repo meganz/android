@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="actionModeViewModel"
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
+
+        <variable
+            name="itemOperationViewModel"
+            type="mega.privacy.android.app.fragments.homepage.ItemOperationViewModel" />
+
+        <variable
+            name="item"
+            type="mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem" />
+    </data>
+
+    <!-- Caution: don't set to wrap_content, or the grid item size will be messy and
+     loading images by Glide would cause performance issue of UI stuck -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/photo_grid_margin"
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item))}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:placeholderImage="@drawable/ic_image_thumbnail"
+            app:selected="@{item.selected}"
+            app:thumbnail="@{item.thumbnail}"
+            tools:src="@drawable/ic_image_thumbnail" />
+
+        <ImageView
+            android:id="@+id/icon_selected"
+            android:layout_width="@dimen/icon_selected_size"
+            android:layout_height="@dimen/icon_selected_size"
+            android:layout_marginStart="@dimen/icon_selected_margin"
+            android:layout_marginTop="@dimen/icon_selected_margin"
+            android:src="@drawable/ic_select_folder"
+            app:layout_constraintStart_toStartOf="@id/thumbnail"
+            app:layout_constraintTop_toTopOf="@id/thumbnail"
+            app:visibleGone="@{item.selected}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

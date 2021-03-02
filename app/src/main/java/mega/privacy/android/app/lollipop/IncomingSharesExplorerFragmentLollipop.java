@@ -5,12 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
@@ -30,6 +24,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -47,21 +47,24 @@ import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.getPreferences;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
@@ -90,8 +93,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private LinearLayout emptyTextView;
 	private TextView emptyTextViewFirst;
 
-	private TextView contentText;
-	private View separator;
 	private Button optionButton;
 	private Button cancelButton;
 	private LinearLayout optionsBar;
@@ -110,6 +111,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private SearchNodesTask searchNodesTask;
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
+	private boolean hasWritePermissions = true;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -162,20 +164,20 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 			return true;
 		}
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 				((FileExplorerActivityLollipop) context).clearQuerySearch();
 				getNodes();
 				setNodes(nodes);
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -259,8 +261,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		contentLayout = v.findViewById(R.id.content_layout);
 		searchProgressBar = v.findViewById(R.id.progressbar);
 		
-		separator = v.findViewById(R.id.separator);
-		
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 
 		optionButton = v.findViewById(R.id.action_text);
@@ -277,7 +277,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		if (((FileExplorerActivityLollipop) context).isList()) {
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 		}
@@ -295,13 +294,14 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 		});
 
-		contentText = v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
-
 		emptyImageView = v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
 		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleIncoming();
+
+		if (parentHandle != INVALID_HANDLE) {
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
+		}
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
@@ -331,8 +331,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         recyclerView.setAdapter(adapter);
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
-
-		findDisabledNodes();
 
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
@@ -370,7 +368,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		} else if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -391,11 +388,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void setOptionsBarVisibility() {
 		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
 				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			separator.setVisibility(View.VISIBLE);
 			optionsBar.setVisibility(View.VISIBLE);
 		}
 	}
@@ -426,6 +421,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 			String textToShow;
 
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 			if (parentHandle == -1) {
 				if (isScreenInPortrait(context)) {
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
@@ -445,10 +442,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 
 			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			} catch (Exception e) {
 				logWarning("Error formatting string", e);
 			}
@@ -503,30 +505,17 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		nodes.addAll(fileNodes);
 	}
 
-	private void findDisabledNodes (){
-		logDebug("findDisabledNodes");
-		if (((FileExplorerActivityLollipop) context).isMultiselect()) {
-			return;
-		}
-		ArrayList<Long> disabledNodes = new ArrayList<Long>();
+	private void checkWritePermissions() {
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-		for (int i=0;i<nodes.size();i++){
-			MegaNode folder = nodes.get(i);
-			int accessLevel = megaApi.getAccess(folder);
-
-			if(selectFile){
-				if(accessLevel!=MegaShare.ACCESS_FULL) {
-					disabledNodes.add(folder.getHandle());
-				}
-			}
-			else{
-				if(accessLevel==MegaShare.ACCESS_READ) {
-					disabledNodes.add(folder.getHandle());
-				}
-			}
+		if (parentNode == null) {
+			hasWritePermissions = false;
+		} else {
+			int accessLevel = megaApi.getAccess(parentNode);
+			hasWritePermissions = accessLevel >= MegaShare.ACCESS_READWRITE;
 		}
 
-		this.setDisableNodes(disabledNodes);
+		activateButton(hasWritePermissions);
 	}
 
 	@Override
@@ -609,6 +598,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		if (n.isFolder()){
 		    searchNodes = null;
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 		    ((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
@@ -630,6 +620,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			lastPositionStack.push(lastFirstVisiblePosition);
 
 			setParentHandle(n.getHandle());
+			((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			setNodes(megaApi.getChildren(nodes.get(position), order));
 			recyclerView.scrollToPosition(0);
 
@@ -674,10 +666,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		if(((FileExplorerActivityLollipop)context).getDeepBrowserTree()==0){
-			setParentHandle(-1);
-//			uploadButton.setText(getString(R.string.choose_folder_explorer));
+			setParentHandle(INVALID_HANDLE);
+			((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 			findNodes();
-			findDisabledNodes();
 
 			setNodes(nodes);
 
@@ -755,20 +746,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 			activateButton(false);
 			((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 0;
 		}
-	}
-	
-	/*
-	 * Disable nodes from the list
-	 */
-	private void setDisableNodes(ArrayList<Long> disabledNodes) {
-		adapter.setDisableNodes(disabledNodes);
 	}
 
 	public long getParentHandle() {
@@ -791,6 +774,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			adapter.setNodes(nodes);
 			showEmptyScreen();
 		}
+
+		checkWritePermissions();
 	}
 	
 	private RecyclerView getRecyclerView(){
@@ -798,11 +783,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	}
 
 	private void activateButton(boolean show) {
-		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
-		} else {
-			optionButton.setEnabled(show);
-			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
+        if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+            fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
+        } else {
+            boolean shouldShowButton = hasWritePermissions && show;
+            optionButton.setEnabled(shouldShowButton);
+            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.teal_300_teal_200 : R.color.teal_300_038_teal_200_038));
 		}
 	}
 
@@ -1006,5 +992,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	public boolean isFolderEmpty() {
+		return adapter == null || adapter.getItemCount() <= 0;
 	}
 }

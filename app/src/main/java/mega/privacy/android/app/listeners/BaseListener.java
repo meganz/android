@@ -2,6 +2,8 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiJava;
@@ -20,22 +22,24 @@ public class BaseListener implements MegaRequestListenerInterface {
     }
 
     @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+    public void onRequestStart(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+    public void onRequestUpdate(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
     }
 
     @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request,
+                                @NonNull MegaError e) {
 
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestTemporaryError(@NonNull MegaApiJava api, @NonNull MegaRequest request,
+                                        @NonNull MegaError e) {
 
     }
 }

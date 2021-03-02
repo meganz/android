@@ -81,6 +81,7 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
 /**
@@ -713,11 +714,16 @@ public class PDFView extends RelativeLayout {
     }
 
     void showErrorDialog(final Throwable t) {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(getContext());
+        if (pdfViewer == null || t == null) {
+            logError("Cannot show error dialog, pdfViewer or t is null");
+            return;
+        }
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(false);
-        if (t.getLocalizedMessage().equals("Password required or incorrect password.") || t.getMessage().equals("Password required or incorrect password.")) {
+
+        if ("Password required or incorrect password.".equals(t.getLocalizedMessage())
+                || ("Password required or incorrect password.").equals(t.getMessage())) {
             if (pdfViewer.getMaxIntents() > 0) {
                 View layout = pdfViewer.getLayoutInflater().inflate(R.layout.dialog_pdf_password, null);
                 final TextInputLayout passwordLayout = layout.findViewById(R.id.password_layout);
@@ -730,14 +736,15 @@ public class PDFView extends RelativeLayout {
                     passwordText.setText(text);
                     passwordText.setSelection(text.length());
                     passwordLayout.setError(pdfViewer.getString(R.string.error_enter_password));
-                    passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                    passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                     passwordError.setVisibility(View.VISIBLE);
-                    passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                 } else {
                     passwordError.setVisibility(GONE);
                 }
 
-                passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+                passwordLayout.setEndIconVisible(false);
+                passwordText.setOnFocusChangeListener((v, hasFocus) -> passwordLayout.setEndIconVisible(hasFocus));
 
                 passwordText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -1206,8 +1213,8 @@ public class PDFView extends RelativeLayout {
     }
 
     /** Use stream as the pdf source. Stream will be written to bytearray, because native code does not support Java Streams */
-    public Configurator fromStream(InputStream stream) {
-        return new Configurator(new InputStreamSource(stream));
+    public Configurator fromStream(InputStream stream, String tmpFileName) {
+        return new Configurator(new InputStreamSource(stream, tmpFileName));
     }
 
     /** Use custom source as pdf source */

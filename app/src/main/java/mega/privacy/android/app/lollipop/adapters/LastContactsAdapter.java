@@ -21,6 +21,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -92,20 +93,14 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         MegaChatApiAndroid megaChatApi = ((MegaApplication)context.getApplication()).getMegaChatApi();
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getHandle());
         if (chat == null) {
-            toContactInfo(contact);
+            ContactUtil.openContactInfoActivity(context, contact.getEmail());
         } else {
             Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID",chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID,chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentOpenChat);
         }
-    }
-    
-    private void toContactInfo(MegaUser contact) {
-        Intent i = new Intent(context,ContactInfoActivityLollipop.class);
-        i.putExtra(NAME, contact.getEmail());
-        context.startActivity(i);
     }
     
     @Override

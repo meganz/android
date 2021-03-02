@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/manage_chat__layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/manage_chat_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        tools:context=".ManagerActivityLollipop" />
+
+    <ScrollView
+        android:id="@+id/manage_chat_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/history_retention_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="19dp"
+                android:paddingBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:baselineAligned="false">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:text ="@string/title_properties_history_retention"
+                            android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/history_retention_switch_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="end|center_vertical">
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/history_retention_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="end|center_vertical"
+                            android:stateListAnimator="@null"
+                            android:clickable="false" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/retention_time_text_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical">
+                    <TextView
+                        android:id="@+id/retention_time_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subtitle_properties_history_retention"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
+                    <TextView
+                        android:id="@+id/retention_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/retention_time_subtitle"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012" />
+
+            <LinearLayout
+                android:id="@+id/picker_layout"
+                android:layout_width="match_parent"
+                android:layout_height="187dp"
+                android:paddingTop="18dp"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="126dp"
+                    android:gravity="center_horizontal">
+
+                    <NumberPicker
+                        android:id="@+id/number_picker"
+                        android:theme="@style/Widget.Mega.NumberPicker"
+                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_marginEnd="34dp"
+                        android:selectionDividerHeight="1dp"
+                        android:descendantFocusability="blocksDescendants"
+                        android:showDividers="none"/>
+
+                    <NumberPicker
+                        android:id="@+id/text_picker"
+                        android:theme="@style/Widget.Mega.NumberPicker"
+                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_toEndOf="@id/number_picker"
+                        android:selectionDividerHeight="1dp"
+                        android:descendantFocusability="blocksDescendants"
+                        android:showDividers="none"/>
+                    </RelativeLayout>
+
+                <Button
+                    android:id="@+id/picker_button"
+                    android:stateListAnimator="@null"
+                    android:text="@string/general_ok"
+                    android:layout_gravity="end"
+                    android:gravity="center"
+                    style="?attr/borderlessButtonStyle"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012" />
+
+            <LinearLayout
+                android:id="@+id/clear_chat_history_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="19dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/title_properties_clear_chat_history"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginBottom="17dp"
+                    android:text="@string/subtitle_properties_chat_clear"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

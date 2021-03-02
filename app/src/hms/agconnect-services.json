@@ -1,0 +1,12 @@
+{
+	"client":{
+		"cp_id":"890064000023000226",
+		"product_id":"9105385871709201844",
+		"client_id":"336506096061514880",
+		"client_secret":"1D8B6BACC69B2CD7D27FB9AE682A5856E8CE0240AB2A1637673E6DBF2192EBF1",
+		"app_id":"102009895",
+		"package_name":"mega.privacy.android.app.huawei",
+		"api_key":"CV615BpZFQAtZTZJY66AUU/7YiKDxTGnCsWWc80v9oLtnyzUlXriGzSpWqOK3wRcA0Pj07c3mwpA2peCqCFfZcmjhOtk"
+	},
+	"configuration_version":"1.0"
+}

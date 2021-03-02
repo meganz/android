@@ -2,34 +2,42 @@ package mega.privacy.android.app.utils.billing;
 
 import android.content.Context;
 
+import java.util.List;
+
+import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.TextUtil;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 
 public class PaymentUtils {
 
     /** SKU for our subscription PRO_I monthly */
-    public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+    public static final String SKU_PRO_I_MONTH = BillingManagerImpl.SKU_PRO_I_MONTH;
 
     /** SKU for our subscription PRO_I yearly */
-    public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
+    public static final String SKU_PRO_I_YEAR = BillingManagerImpl.SKU_PRO_I_YEAR;
 
     /** SKU for our subscription PRO_II monthly */
-    public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+    public static final String SKU_PRO_II_MONTH = BillingManagerImpl.SKU_PRO_II_MONTH;
 
     /** SKU for our subscription PRO_II yearly */
-    public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
+    public static final String SKU_PRO_II_YEAR = BillingManagerImpl.SKU_PRO_II_YEAR;
 
     /** SKU for our subscription PRO_III monthly */
-    public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+    public static final String SKU_PRO_III_MONTH = BillingManagerImpl.SKU_PRO_III_MONTH;
 
     /** SKU for our subscription PRO_III yearly */
-    public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
+    public static final String SKU_PRO_III_YEAR = BillingManagerImpl.SKU_PRO_III_YEAR;
 
     /** SKU for our subscription PRO_LITE monthly */
-    public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
+    public static final String SKU_PRO_LITE_MONTH = BillingManagerImpl.SKU_PRO_LITE_MONTH;
 
     /** SKU for our subscription PRO_LITE yearly */
-    public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+    public static final String SKU_PRO_LITE_YEAR = BillingManagerImpl.SKU_PRO_LITE_YEAR;
 
     /**
      * Get the level of a certain sku.
@@ -37,8 +45,8 @@ public class PaymentUtils {
      * @param sku The id of the sku item.
      * @return The level of the sku.
      */
-    static int getProductLevel(String sku) {
-        if (TextUtil.isTextEmpty(sku)) {
+    public static int getProductLevel(String sku) {
+        if (isTextEmpty(sku)) {
             return -1;
         }
         switch (sku) {
@@ -108,5 +116,48 @@ public class PaymentUtils {
             default:
                 return "";
         }
+    }
+
+    /**
+     * Gets the Google Play SKU associated to a product.
+     * @param product Product to get the SKU.
+     * @return SKU of the product
+     */
+    public static String getSku(Product product) {
+        if (product == null) {
+            return "";
+        }
+
+        switch (product.getLevel()) {
+            case PRO_LITE:
+                return product.getMonths() == 1 ? SKU_PRO_LITE_MONTH : SKU_PRO_LITE_YEAR;
+            case PRO_I:
+                return product.getMonths() == 1 ? SKU_PRO_I_MONTH : SKU_PRO_I_YEAR;
+            case PRO_II:
+                return product.getMonths() == 1 ? SKU_PRO_II_MONTH : SKU_PRO_II_YEAR;
+            case PRO_III:
+                return product.getMonths() == 1 ? SKU_PRO_III_MONTH : SKU_PRO_III_YEAR;
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * Gets the details of a SKU from current platform(Google play/Huawei app gallery).
+     * @param list List of available products in current platform.
+     * @param key Key of the product to get the details.
+     * @return Details of the product corresponding to the provided key.
+     */
+    public static MegaSku getSkuDetails(List<MegaSku> list, String key) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        for (MegaSku details : list) {
+            if (details.getSku().equals(key)) {
+                return details;
+            }
+        }
+        return null;
     }
 }

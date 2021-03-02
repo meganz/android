@@ -3,10 +3,7 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,20 +12,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -115,7 +110,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         if (node.isFolder()) {
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
             optionInfoText.setText(R.string.general_folder_info);
-            nodeInfo.setText(getInfoFolder(node, context, megaApi));
+            nodeInfo.setText(getMegaNodeFolderInfo(node));
 
             if (firstLevel || parentHandle == INVALID_HANDLE) {
                 optionLeave.setVisibility(View.VISIBLE);
@@ -144,29 +139,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize));
             nodeIconLayout.setVisibility(View.GONE);
-
-            if (node.hasThumbnail()) {
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.setMargins(20, 0, 12, 0);
-                nodeThumb.setLayoutParams(params1);
-
-                Bitmap thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-                    nodeThumb.setImageBitmap(thumb);
-                } else {
-                    thumb = getThumbnailFromFolder(node, context);
-                    if (thumb != null) {
-                        nodeThumb.setImageBitmap(thumb);
-                    } else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                    }
-                }
-            } else {
-                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-            }
-
+            setNodeThumbnail(context, node, nodeThumb);
             optionLeave.setVisibility(View.GONE);
         }
 

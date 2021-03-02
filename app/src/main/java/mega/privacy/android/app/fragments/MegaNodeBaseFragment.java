@@ -5,12 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -23,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +50,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -50,11 +58,15 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -67,6 +79,8 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
+
+    private static final String AD_SLOT = "and4";
 
     protected ManagerActivityLollipop managerActivity;
 
@@ -108,9 +122,20 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         downloadLocationDefaultPath = getDownloadLocation();
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initAdsLoader(AD_SLOT, true);
+    }
+
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
+        private int currentTab;
+
+        public BaseActionBarCallBack (int currentTab) {
+            this.currentTab = currentTab;
+        }
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -118,8 +143,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             inflater.inflate(R.menu.cloud_storage_action, menu);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.hideFabButton();
+                managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
             checkScroll();
             return true;
@@ -236,8 +261,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             adapter.setMultipleSelect(false);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.showFabButton();
+                managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
             checkScroll();
         }
@@ -248,7 +273,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         if (context instanceof ManagerActivityLollipop) {
@@ -473,9 +498,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-                managerActivity.changeActionBarElevation(true);
+                managerActivity.changeAppBarElevation(true);
             } else {
-                managerActivity.changeActionBarElevation(false);
+                managerActivity.changeAppBarElevation(false);
             }
         }
     }
@@ -715,6 +740,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_list_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_list_empty_text);
@@ -734,6 +760,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_grid_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_grid_empty_text);
@@ -747,15 +774,25 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private void setRecyclerView() {
-        recyclerView.setPadding(0, 0, 0, px2dp(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
+                int tab = ERROR_TAB;
+                if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
+                    tab = INCOMING_TAB;
+                } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
+                    tab = OUTGOING_TAB;
+                } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
+                    tab = LINKS_TAB;
+                }
+
+                if (managerActivity.getTabItemShares() == tab) {
+                    checkScroll();
+                }
             }
         });
         fastScroller.setRecyclerView(recyclerView);
@@ -777,15 +814,19 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         try {
-            text = text.replace("[A]", "<font color=\'#000000\'>");
-            text = text.replace("[/A]", "</font>");
-            text = text.replace("[B]", "<font color=\'#7a7a7a\'>");
-            text = text.replace("[/B]", "</font>");
+            text = text.replace("[A]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
+            text = text.replace("[/A]","</font>");
+            text = text.replace("[B]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + "\'>");
+            text = text.replace("[/B]","</font>");
         } catch (Exception e) {
             logWarning("Exception formatting text", e);
         }
 
-        emptyTextViewFirst.setText(getSpannedHtmlText(text));
+        emptyTextViewFirst.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
         checkEmptyView();
     }
 
@@ -809,5 +850,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected void hideActionMode() {
         clearSelections();
         hideMultipleSelect();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Set the Ad view container to the Ads Loader,
+        // in order to let it know in where to show the Ads
+        mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
+                managerActivity.getOutMetrics());
     }
 }

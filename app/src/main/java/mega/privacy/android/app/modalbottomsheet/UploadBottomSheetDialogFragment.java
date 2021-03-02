@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import nz.mega.documentscanner.openCV.ImageScanner;
 
 public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -28,22 +29,21 @@ public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragme
 
         LinearLayout optionFromDevice = contentView.findViewById(R.id.upload_from_device_layout);
         LinearLayout optionFromSystem = contentView.findViewById(R.id.upload_from_system_layout);
+        LinearLayout optionScanDocument = contentView.findViewById(R.id.scan_document_layout);
         LinearLayout optionTakePicture = contentView.findViewById(R.id.take_picture_layout);
         LinearLayout optionCreateFolder = contentView.findViewById(R.id.new_folder_layout);
 
         LinearLayout createFolderSeparator = contentView.findViewById(R.id.create_folder_separator);
         if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).isOnRecents()) {
-                optionCreateFolder.setVisibility(View.GONE);
-                createFolderSeparator.setVisibility(View.GONE);
-            } else {
-                optionCreateFolder.setVisibility(View.VISIBLE);
-                createFolderSeparator.setVisibility(View.VISIBLE);
-            }
+            optionCreateFolder.setVisibility(View.VISIBLE);
+            createFolderSeparator.setVisibility(View.VISIBLE);
         }
+
+        optionScanDocument.setVisibility(ImageScanner.INSTANCE.isCpuCompatible() ? View.VISIBLE : View.GONE);
 
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
+        optionScanDocument.setOnClickListener(this);
         optionTakePicture.setOnClickListener(this);
         optionCreateFolder.setOnClickListener(this);
 
@@ -60,6 +60,10 @@ public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragme
 
             case R.id.upload_from_system_layout:
                 listener.uploadFromSystem();
+                break;
+
+            case R.id.scan_document_layout:
+                listener.scanDocument();
                 break;
 
             case R.id.take_picture_layout:

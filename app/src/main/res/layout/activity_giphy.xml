@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/giphy_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:elevation="8dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/powered_by_giphy_view"
+        android:layout_below="@+id/giphy_toolbar">
+
+        <RelativeLayout
+            android:id="@+id/giphy_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/giphy_end_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp"
+                android:textAllCaps="true"
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/giphy_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="60dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/empty_giphy_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/empty_giphy_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_no_gifs" />
+
+            <TextView
+                android:id="@+id/empty_giphy_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/empty_giphy_image"
+                android:layout_centerHorizontal="true"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/powered_by_giphy_view"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/powered_by_giphy_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_powered_by_giphy" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

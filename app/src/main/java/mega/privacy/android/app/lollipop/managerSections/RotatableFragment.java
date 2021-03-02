@@ -144,4 +144,8 @@ public abstract class RotatableFragment extends BaseFragment {
     public void setWaitingForSearchedNodes(boolean waitingForSearchedNodes) {
         this.waitingForSearchedNodes = waitingForSearchedNodes;
     }
+
+    void resetSelectedItems() {
+        selectedItems = null;
+    }
 }

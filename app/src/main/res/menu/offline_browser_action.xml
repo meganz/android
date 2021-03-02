@@ -2,30 +2,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <item
+      android:id="@+id/cab_menu_download"
+      android:icon="@drawable/ic_download_white"
+      android:orderInCategory="70"
+      android:title="@string/general_save_to_device"
+      app:iconTint="?attr/colorSecondary"
+      app:showAsAction="always" />
+
+  <item
       android:id="@+id/cab_menu_share_out"
       android:icon="@drawable/ic_social_share_white"
       android:orderInCategory="80"
-      android:tint="@color/white"
+      app:iconTint="?attr/colorSecondary"
       android:title="@string/general_share"
       app:showAsAction="always" />
 
-  <item
-      android:id="@+id/cab_menu_delete"
-      android:icon="@drawable/ic_close_white"
-      android:orderInCategory="90"
-      android:title="@string/context_delete_offline"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_menu_delete"
+        android:icon="@drawable/ic_close_white"
+        android:orderInCategory="90"
+        android:title="@string/context_delete_offline"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/cab_menu_select_all"
-      android:orderInCategory="100"
-      android:title="@string/action_select_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_clear_selection"
-      android:orderInCategory="110"
-      android:title="@string/action_unselect_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_clear_selection"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
 
 </menu>

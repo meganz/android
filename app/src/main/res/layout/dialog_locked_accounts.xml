@@ -19,9 +19,7 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/locked_accounts_label"
             android:textSize="20sp"
-            android:textColor="@color/name_my_account"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="bold"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"/>
 
         <ImageView
             android:layout_width="80dp"
@@ -35,26 +33,21 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/locked_accounts_text_1"
-            android:textSize="16sp"
-            android:textColor="@color/file_properties_text_available"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/locked_accounts_text_2"
-            android:textSize="16sp"
-            android:textColor="@color/file_properties_text_available"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"/>
 
         <Button
             android:id="@+id/ok_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:text="@string/general_ok"
-            android:textColor="@color/accentColor"
-            style="?android:attr/borderlessButtonStyle" />
+            style="?attr/borderlessButtonStyle" />
 
     </LinearLayout>
 

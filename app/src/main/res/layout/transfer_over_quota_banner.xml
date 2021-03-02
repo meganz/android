@@ -12,7 +12,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="22dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/text_login"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="14sp" />
 
     <RelativeLayout
@@ -25,7 +25,7 @@
 
         <Button
             android:id="@+id/banner_upgrade_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -34,7 +34,7 @@
 
         <Button
             android:id="@+id/banner_dismiss_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -46,7 +46,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/separator_grey"
+        android:background="@color/grey_012_white_012"
         android:layout_below="@+id/banner_container_buttons"/>
 
 </RelativeLayout>

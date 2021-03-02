@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -36,7 +37,6 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -51,6 +51,8 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -63,6 +65,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -109,6 +112,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView publicLinkImage;
         public ImageView takenDownImage;
         public TextView textViewFileName;
+        public ImageView imageFavourite;
+        public ImageView imageLabel;
         public EmojiTextView textViewFileSize;
         public long document;
         public RelativeLayout itemLayout;
@@ -134,7 +139,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView imageViewThumb;
         public ImageView imageViewIcon;
         public RelativeLayout thumbLayout;
-        public View separator;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
         public RelativeLayout videoInfoLayout, bottomContainer;
@@ -464,7 +468,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         this.listFragment = recyclerView;
-        this.type = type;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication)((Activity)context).getApplication())
@@ -534,6 +537,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
 
+            holderList.imageLabel = v.findViewById(R.id.img_label);
+            holderList.imageFavourite = v.findViewById(R.id.img_favourite);
+
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderList.textViewFileName.setMaxWidth(scaleWidthPx(275, outMetrics));
             } else {
@@ -542,9 +548,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileSize = v.findViewById(R.id.file_list_filesize);
             if (isScreenInPortrait(context)) {
-                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+                holderList.textViewFileSize.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
             } else {
-                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+                holderList.textViewFileSize.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
             }
 
             holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
@@ -583,11 +589,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.textViewFileName = v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewFileSize = v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = v.findViewById(R.id.file_grid_three_dots);
-            holderGrid.savedOffline = v.findViewById(R.id.file_grid_saved_offline);
-            holderGrid.separator = v.findViewById(R.id.file_grid_separator);
-            holderGrid.publicLinkImage = v.findViewById(R.id.file_grid_public_link);
             holderGrid.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
             holderGrid.takenDownImageForFile = v.findViewById(R.id.file_grid_taken_down_for_file);
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
@@ -599,25 +601,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.bottomContainer.setOnClickListener(this);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewFileSize.setMaxWidth(scaleWidthPx(70, outMetrics));
-            } else {
-                holderGrid.textViewFileSize.setMaxWidth(scaleWidthPx(130, outMetrics));
-            }
-            if (holderGrid.textViewFileSize != null) {
-                holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
-            } else {
-                logWarning("textViewMessageInfo is NULL");
-            }
-
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(70, outMetrics));
             } else {
                 holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(140, outMetrics));
             }
 
-
-            holderGrid.savedOffline.setVisibility(View.INVISIBLE);
-            holderGrid.publicLinkImage.setVisibility(View.GONE);
             holderGrid.takenDownImage.setVisibility(View.GONE);
             holderGrid.takenDownImageForFile.setVisibility(View.GONE);
 
@@ -665,27 +653,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         logDebug("Node : " + position + " " + node.getHandle());
 
         holder.textViewFileName.setText(node.getName());
-        holder.textViewFileSize.setText("");
         holder.videoInfoLayout.setVisibility(View.GONE);
 
-        if (node.isExported()) {
-            //Node has public link
-            holder.publicLinkImage.setVisibility(View.VISIBLE);
-            if (node.isExpired()) {
-                logWarning("Node exported but expired!!");
-            }
-        } else {
-            holder.publicLinkImage.setVisibility(View.INVISIBLE);
-        }
-
         if (node.isTakenDown()) {
-            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
             holder.takenDownImageForFile.setVisibility(View.GONE);
         }
@@ -694,50 +671,23 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.itemLayout.setVisibility(View.VISIBLE);
             holder.folderLayout.setVisibility(View.VISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
-            holder.textViewFileSize.setVisibility(View.VISIBLE);
 
             setFolderGridSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
-            if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
-            } else {
-                holder.textViewFileSize.setText(getInfoFolder(node,context));
-            }
             holder.imageViewIcon.setVisibility(View.VISIBLE);
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
-            if (type == INCOMING_SHARES_ADAPTER) {
-                //Show the owner of the shared folder
-                ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                for (int j = 0;j < sharesIncoming.size();j++) {
-                    MegaShare mS = sharesIncoming.get(j);
-                    if (mS.getNodeHandle() == node.getHandle()) {
-                        MegaUser user = megaApi.getContact(mS.getUser());
-                        if (user != null) {
-                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
-                        } else {
-                            holder.textViewFileSize.setText(mS.getUser());
-                        }
-                    }
-                }
-            } else if (type == OUTGOING_SHARES_ADAPTER) {
-                //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
-                holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            }
         } else if (node.isFile()) {
-            //TODO file
             holder.itemLayout.setVisibility(View.VISIBLE);
             holder.folderLayout.setVisibility(View.GONE);
             holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.textViewFileName.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setVisibility(View.GONE);
 
             holder.textViewFileNameForFile.setText(node.getName());
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
 
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
@@ -805,14 +755,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.fileGridSelected.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         }
-
-        //Check if is an offline file to show the red arrow
-        if (availableOffline(context, node)) {
-            holder.savedOffline.setVisibility(View.VISIBLE);
-        }
-        else {
-            holder.savedOffline.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void setImageThumbnail (ViewHolderBrowserGrid holder, Bitmap temp) {
@@ -843,11 +785,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
             paramsMultiselect.setMargins(0,0,0,0);
             holder.imageView.setLayoutParams(paramsMultiselect);
-            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
             holder.imageView.setImageResource(R.drawable.ic_select_folder);
         }
         else {
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemLayout.setBackground(null);
             holder.imageView.setImageResource(folderDrawableResId);
         }
     }
@@ -865,6 +806,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
+        holder.imageFavourite.setVisibility(type != RUBBISH_BIN_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
+
+        if (type != RUBBISH_BIN_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+            Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+            holder.imageLabel.setImageDrawable(drawable);
+            holder.imageLabel.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageLabel.setVisibility(View.GONE);
+        }
+
         holder.publicLinkImage.setVisibility(View.INVISIBLE);
         holder.permissionsIcon.setVisibility(View.GONE);
 
@@ -879,17 +830,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
         if (node.isFolder()) {
 
             logDebug("Node is folder");
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemLayout.setBackground(null);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
             params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
             params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -897,14 +848,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(getInfoFolder(node,context));
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             } else if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
                 boolean firstLevel;
                 if(type == CONTACT_FILE_ADAPTER){
@@ -931,10 +882,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
-                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
-                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
                     holder.takenDownImage.setVisibility(View.GONE);
                 }
 
@@ -986,7 +937,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (!isMultipleSelect()) {
                 logDebug("Not multiselect");
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                holder.itemLayout.setBackground(null);
                 holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1007,7 +958,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else {
                 logDebug("Multiselection ON");
                 if (this.isItemChecked(position)) {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                     RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                     paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
                     paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -1015,7 +965,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     holder.imageView.setLayoutParams(paramsMultiselect);
                     holder.imageView.setImageResource(R.drawable.ic_select_folder);
                 } else {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
+                    holder.itemLayout.setBackground(null);
                     logDebug("Check the thumb");
 
                     if (node.hasThumbnail()) {
@@ -1332,7 +1282,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else {
-                subtitle = context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size());
+                subtitle = getQuantityString(R.plurals.general_num_shared_with, sl.size(), sl.size());
             }
         }
 

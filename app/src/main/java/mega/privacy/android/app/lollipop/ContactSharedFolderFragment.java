@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -77,9 +76,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             //set up list view
             listView = (RecyclerView)v.findViewById(R.id.contact_shared_folder_list_view);
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
-            listView.addItemDecoration(new SimpleDividerItemDecoration(context,outMetrics));
+            listView.addItemDecoration(new SimpleDividerItemDecoration(context));
             listView.setLayoutManager(mLayoutManager);
-            listView.setItemAnimator(new DefaultItemAnimator());
+            listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
             
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -319,7 +318,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 1);
             return true;
         }
         
@@ -328,7 +326,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             logDebug("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
         }
         
         @Override

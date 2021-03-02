@@ -140,9 +140,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
         if(isScreenInPortrait(context)){
-            holder.titleText.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
+            holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_PORT, outMetrics));
         }else{
-            holder.titleText.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_LAND, outMetrics));
+            holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_LAND, outMetrics));
         }
 
         v.setTag(holder);
@@ -154,8 +154,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
-
-        holder.itemLayout.setBackgroundColor(Color.WHITE);
 
         if (item.isHeader()) {
             holder.itemContainer.setVisibility(View.GONE);
@@ -176,8 +174,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if (chat != null && chat.isGroup()) {
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-                holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
+                holder.avatarImage.setImageResource(R.drawable.ic_select_folder);
             }
             else{
                 createGroupChatAvatar(holder);
@@ -211,8 +208,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-                holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
+                holder.avatarImage.setImageResource(R.drawable.ic_select_folder);
             }
             else{
                 setUserAvatar(holder, userHandleEncoded);
@@ -226,10 +222,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         holder.itemLayout.setOnClickListener(this);
         holder.itemLayout.setOnLongClickListener(this);
-
-        holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
-        holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-        holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
@@ -361,7 +353,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     private boolean isSearchItemChecked(int position) {
-        return searchSelectedItems.get(position);
+        return searchSelectedItems != null && searchSelectedItems.get(position);
     }
 
     public void toggleSelection(int pos) {

@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -38,12 +39,19 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
 			super.activateActionMode();
-			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
-					new ActionBarCallBack());
+
+			if (getActivity() != null) {
+				actionMode = ((AppCompatActivity) getActivity())
+						.startSupportActionMode(new ActionBarCallBack(OUTGOING_TAB));
+			}
 		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
+
+		public ActionBarCallBack(int currentTab) {
+			super(currentTab);
+		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -75,9 +83,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					control.removeShare().setVisible(true);
 				}
 			} else {
-				menu.findItem(R.id.cab_menu_remove_share)
-						.setIcon(mutateIconSecondary(context, R.drawable.ic_remove_share,
-								R.color.white));
 				control.removeShare().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
@@ -87,10 +92,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
@@ -160,6 +161,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			findNodes();
 			adapter.setParentHandle(INVALID_HANDLE);
 		} else {
+			managerActivity.hideTabs(true, OUTGOING_TAB);
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			logDebug("Parent Handle: " + managerActivity.getParentHandleOutgoing());
 
@@ -234,6 +236,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				updateActionModeTitle();
 			}
 		} else if (nodes.get(position).isFolder()) {
+			managerActivity.hideTabs(true, OUTGOING_TAB);
 			managerActivity.increaseDeepBrowserTreeOutgoing();
 			logDebug("deepBrowserTree after clicking folder" + managerActivity.deepBrowserTreeOutgoing);
 
@@ -301,7 +304,8 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (managerActivity.deepBrowserTreeOutgoing == 0) {
 			logDebug("deepBrowserTree==0");
 			//In the beginning of the navigation
-			managerActivity.setParentHandleOutgoing(-1);
+			managerActivity.setParentHandleOutgoing(INVALID_HANDLE);
+			managerActivity.hideTabs(false, OUTGOING_TAB);
 
 			managerActivity.setToolbarTitle();
 			findNodes();

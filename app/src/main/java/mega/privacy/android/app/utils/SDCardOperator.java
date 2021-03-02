@@ -104,36 +104,12 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
-    private boolean isNewSDCardPath(String path) {
+    public boolean isNewSDCardPath(String path) {
         return !path.startsWith(sdCardRoot);
     }
 
     public static boolean isSDCardPath(String path) {
         return path.matches(SD_PATH_REGEX);
-    }
-
-    public boolean canWriteWithFile(String target) {
-        boolean canWrite = new File(target).canWrite();
-        if (!canWrite) {
-            return false;
-        }
-        // test if really can write on this path.
-        File test = new File(target, TEST);
-        try {
-            canWrite = test.createNewFile();
-        } catch (IOException e) {
-            return false;
-        }
-        if (!canWrite) {
-            return false;
-        } else {
-            return test.delete();
-        }
-    }
-
-    public String move(String targetPath, File source) throws IOException {
-        moveFile(targetPath, source);
-        return targetPath + File.separator + source.getName();
     }
 
     public void buildFileStructure(Map<Long, String> dlList, String parent, MegaApiJava api, MegaNode node) {
@@ -175,31 +151,62 @@ public class SDCardOperator {
         return parent.createDirectory(name);
     }
 
-    void moveFile(String targetPath, File file) throws IOException {
+    /**
+     * Checks if the file already exists in targetPath.
+     *
+     * @param file       File to check.
+     * @param targetPath Path where the file is checked for.
+     */
+    public boolean fileExistsInTargetPath(File file, String targetPath) {
+        DocumentFile parent = getDocumentFileByPath(targetPath);
+        if (parent == null) {
+            return false;
+        }
+
+        DocumentFile destFile = parent.findFile(file.getName());
+
+        return destFile != null && destFile.length() == file.length();
+    }
+
+    /**
+     * Moves a file from its location to targetPath.
+     *
+     * @param targetPath Path where the file has to be moved.
+     * @param file       File to move.
+     *
+     * @throws IOException If some error happens opening output stream.
+     */
+    public void moveFile(String targetPath, File file) throws IOException {
         String name = file.getName();
         DocumentFile parent = getDocumentFileByPath(targetPath);
         DocumentFile df = parent.findFile(name);
-        //alreay exists
+
+        //Already exists
         if (df != null && df.length() == file.length()) {
             logDebug(name + " already exists.");
             return;
         }
-        //update
+
+        //Update
         if (df != null && df.length() != file.length()) {
             logDebug("delete former file.");
             df.delete();
         }
+
         Uri uri = parent.createFile(null, name).getUri();
         OutputStream os = null;
         InputStream is = null;
+
         try {
             os = context.getContentResolver().openOutputStream(uri, "rwt");
             if (os == null) {
-                throw new IOException("open output stream exception!");
+                throw new IOException("Open output stream exception!");
             }
+
             is = new FileInputStream(file);
             byte[] buffer = new byte[BUFFER_SIZE];
             int length;
+
             while ((length = is.read(buffer)) != -1) {
                 os.write(buffer, 0, length);
                 os.flush();
@@ -208,6 +215,7 @@ public class SDCardOperator {
             if (is != null) {
                 is.close();
             }
+
             if (os != null) {
                 os.close();
             }
@@ -215,6 +223,14 @@ public class SDCardOperator {
     }
 
     private List<String> getSubFolders(String root, String parent) {
+        if (parent == null) {
+            throw new IllegalArgumentException("parent is null");
+        }
+
+        if (root == null) {
+            throw new IllegalArgumentException("root is null");
+        }
+
         if (parent.length() < root.length()) {
             throw new IllegalArgumentException("no subfolders!");
         }
@@ -262,6 +278,7 @@ public class SDCardOperator {
                 return null;
             }
         }
+
         if (sdCardOperator != null && isSDCardPath) {
             //user has installed another sd card.
             if (sdCardOperator.isNewSDCardPath(downloadPath)) {
@@ -270,16 +287,15 @@ public class SDCardOperator {
                 return null;
             }
 
-            if (!sdCardOperator.canWriteWithFile(downloadPath)) {
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                    return null;
-                }
+            try {
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
+                return null;
             }
         }
+
         return sdCardOperator;
     }
 
@@ -303,5 +319,44 @@ public class SDCardOperator {
         }
 
         return sdCardOperator;
+    }
+
+    /**
+     * Moves an SD card file download to the targetPath.
+     *
+     * @param downloadedFile Downloaded file to move.
+     * @param targetPath     Path where the file has to be moved.
+     * @param uri            Uri to init SD card operator.
+     * @param tag            Identifier of the SD transfer on DB.
+     */
+    public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
+       if(!downloadedFile.exists()) {
+           logError("Download file doesn't exist!");
+           return;
+       }
+
+       if(TextUtil.isTextEmpty(targetPath)) {
+           logError("Target path is empty!");
+           return;
+       }
+
+        MegaApplication app = MegaApplication.getInstance();
+        try {
+            initDocumentFileRoot(uri != null ? uri : app.getDbH().getSDCardUri());
+
+            moveFile(targetPath, downloadedFile);
+
+            //New path, after moving to target location.
+            File newFile = new File(targetPath + File.separator + downloadedFile.getName());
+            if (!newFile.exists() || newFile.length() != downloadedFile.length()) {
+                logError("Error moving file to the sd card path");
+            } else {
+                app.getDbH().removeSDTransfer(tag);
+            }
+        } catch (Exception e) {
+            logError("Error moving file to the sd card path", e);
+        } finally {
+            downloadedFile.delete();
+        }
     }
 }

@@ -17,6 +17,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -36,6 +37,9 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private long chatId = INVALID_HANDLE;
     private long participantHandle = INVALID_HANDLE;
     private ChatController chatC;
+
+    private EmojiTextView titleNameContactChatPanel;
+    private RoundedImageView contactImageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +72,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         mainLinearLayout = contentView.findViewById(R.id.participant_item_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
 
-        EmojiTextView titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
+        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
         ImageView stateIcon = contentView.findViewById(R.id.group_participants_state_circle);
 
         stateIcon.setVisibility(View.VISIBLE);
@@ -79,7 +83,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         ImageView permissionsIcon = contentView.findViewById(R.id.group_participant_list_permissions);
 
         TextView titleMailContactChatPanel = contentView.findViewById(R.id.group_participants_chat_mail_text);
-        RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
+        contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
 
         LinearLayout optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         LinearLayout optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
@@ -99,17 +103,17 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionLeaveChat.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
         optionStartCall.setVisibility(View.GONE);
-        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
-        LinearLayout separatorChat = contentView.findViewById(R.id.separator_chat);
-        LinearLayout separatorOptions = contentView.findViewById(R.id.separator_options);
-        LinearLayout separatorLeave = contentView.findViewById(R.id.separator_leave);
+        View separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorChat = contentView.findViewById(R.id.separator_chat);
+        View separatorOptions = contentView.findViewById(R.id.separator_options);
+        View separatorLeave = contentView.findViewById(R.id.separator_leave);
 
         if (isScreenInPortrait(context)) {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
         } else {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
         setContactStatus(getUserStatus(participantHandle), stateIcon);
@@ -153,7 +157,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             String fullName = chatC.getParticipantFullName(participantHandle);
             titleNameContactChatPanel.setText(fullName);
             String email = chatC.getParticipantEmail(participantHandle);
-            titleMailContactChatPanel.setText(email);
 
             int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
 
@@ -173,10 +176,14 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionStartCall.setVisibility(View.VISIBLE);
                 optionStartCall.setOnClickListener(participatingInACall() ? null : this);
                 optionInvite.setVisibility(View.GONE);
+
+                titleMailContactChatPanel.setText(email);
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
                 optionInvite.setVisibility(View.VISIBLE);
+
+                titleMailContactChatPanel.setVisibility(View.GONE);
             }
 
             optionEditProfileChat.setVisibility(View.GONE);
@@ -218,9 +225,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.contact_info_group_participants_chat_layout:
-                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, chatC.getParticipantEmail(participantHandle));
-                context.startActivity(i);
+                ContactUtil.openContactInfoActivity(context, chatC.getParticipantEmail(participantHandle));
                 dismissAllowingStateLoss();
                 break;
 
@@ -264,5 +269,23 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         outState.putLong(CHAT_ID, chatId);
         outState.putLong(CONTACT_HANDLE, participantHandle);
+    }
+
+    public void updateContactData() {
+        if (participantHandle == megaApi.getMyUser().getHandle()) {
+            String myFullName = chatC.getMyFullName();
+            if (isTextEmpty(myFullName)) {
+                myFullName = megaChatApi.getMyEmail();
+            }
+
+            titleNameContactChatPanel.setText(myFullName);
+            setImageAvatar(megaApi.getMyUser().getHandle(), megaChatApi.getMyEmail(), myFullName, contactImageView);
+        } else {
+            String fullName = chatC.getParticipantFullName(participantHandle);
+            titleNameContactChatPanel.setText(fullName);
+            String email = chatC.getParticipantEmail(participantHandle);
+
+            setImageAvatar(participantHandle, isTextEmpty(email) ? MegaApiAndroid.userHandleToBase64(participantHandle) : email, fullName, contactImageView);
+        }
     }
 }

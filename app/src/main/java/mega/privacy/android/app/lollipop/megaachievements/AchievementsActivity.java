@@ -20,19 +20,28 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
 public class AchievementsActivity extends PinActivityLollipop {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -51,16 +60,16 @@ public class AchievementsActivity extends PinActivityLollipop {
 
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
+        if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
-        if(megaApi==null||megaApi.getRootNode()==null){
+        if (megaApi == null || megaApi.getRootNode() == null) {
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -89,16 +98,9 @@ public class AchievementsActivity extends PinActivityLollipop {
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         logDebug("aB.setHomeAsUpIndicator_1");
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        aB.setHomeAsUpIndicator(Util.isDarkMode(this) ? R.drawable.ic_arrow_back_white : R.drawable.ic_arrow_back_black);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -200,7 +202,7 @@ public class AchievementsActivity extends PinActivityLollipop {
     public void showInviteConfirmationDialog(String contentText){
         logDebug("showInviteConfirmationDialog");
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
         TextView content = dialogLayout.findViewById(R.id.invite_content);
@@ -226,12 +228,11 @@ public class AchievementsActivity extends PinActivityLollipop {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && data != null) {
-            String email = data.getStringExtra(InviteContactActivity.KEY_SENT_EMAIL);
             int sentNumber = data.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1);
             if (sentNumber > 1) {
                 showInviteConfirmationDialog(getString(R.string.invite_sent_text_multi));
             } else {
-                showInviteConfirmationDialog(getString(R.string.invite_sent_text, email));
+                showInviteConfirmationDialog(getString(R.string.invite_sent_text));
             }
         }
     }

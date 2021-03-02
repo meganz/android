@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,10 +11,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -32,6 +35,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -121,7 +125,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         recyclerView = (RecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         sendIcon = (FloatingActionButton) v.findViewById(R.id.send_file_icon_chat);
         sendIcon.setVisibility(View.GONE);
         sendIcon.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +151,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             });
 
             if (adapter == null) {
-                adapter = new MegaChatFileStorageAdapter(context, this, aB, mPhotoUris, dimImages);
+                adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages);
                 adapter.setHasStableIds(true);
 
             }else{
@@ -199,6 +203,16 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        ColorUtils.setStatusBarTextColor(dialog.getContext(), dialog.getWindow());
+
+        return dialog;
     }
 
     public void updateIconSend(boolean isVisible) {

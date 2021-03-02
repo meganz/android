@@ -2,9 +2,9 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 
 import android.media.AudioAttributes;
@@ -25,44 +26,66 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.interfaces.ChatManagementCallback;
+import mega.privacy.android.app.listeners.SetRetentionTimeListener;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatUtil {
     private static final int MIN_WIDTH = 44;
@@ -71,6 +94,12 @@ public class ChatUtil {
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
+
+    private static final int RETENTION_TIME_DIALOG_OPTION_DISABLED = 0;
+    private static final int RETENTION_TIME_DIALOG_OPTION_DAY = 1;
+    private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
+    private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
+    private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -118,84 +147,55 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
+
         if (context instanceof GroupChatInfoActivityLollipop) {
             inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
         } else if (context instanceof ChatActivityLollipop) {
             inflater = ((ChatActivityLollipop) context).getLayoutInflater();
         }
+
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
         EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
         nameGroup.setText(getTitleChat(chat));
-        TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
+        TextView chatLinkText = v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
-        final boolean isModerator = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? true : false;
+        Button copyButton = v.findViewById(R.id.copy_button);
+        copyButton.setOnClickListener(v12 -> {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
+            clipboard.setPrimaryClip(clip);
+            if (context instanceof ChatActivityLollipop) {
+                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.copy_button: {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                        clipboard.setPrimaryClip(clip);
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
-
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.share_button: {
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        sharingIntent.setType("text/plain");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, chatLink);
-                        context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.delete_button: {
-                        if (isModerator) {
-                            showConfirmationRemoveChatLink(context);
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.dismiss_button: {
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                }
             }
-        };
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
 
-        Button copyButton = (Button) v.findViewById(R.id.copy_button);
-        copyButton.setOnClickListener(clickListener);
-        Button shareButton = (Button) v.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(clickListener);
-        Button deleteButton = (Button) v.findViewById(R.id.delete_button);
-        if (isModerator) {
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            deleteButton.setVisibility(View.GONE);
-        }
-        deleteButton.setOnClickListener(clickListener);
-        Button dismissButton = (Button) v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(clickListener);
+        Button shareButton = v.findViewById(R.id.share_button);
+        shareButton.setOnClickListener(v13 -> {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
+            context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
+
+        Button dismissButton = v.findViewById(R.id.dismiss_button);
+        dismissButton.setOnClickListener(v15 -> dismissShareChatLinkDialog(context, shareLinkDialog));
 
         shareLinkDialog.setCancelable(false);
         shareLinkDialog.setCanceledOnTouchOutside(false);
+
         try {
             shareLinkDialog.show();
         } catch (Exception e) {
+            logWarning("Exception showing share link dialog.", e);
         }
     }
 
@@ -210,31 +210,15 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        logDebug("showConfirmationRemoveChatLink");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).removeChatLink();
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).removeChatLink();
-                        }
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        builder.setTitle(R.string.action_delete_link);
-        builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.action_delete_link)
+                .setMessage(R.string.context_remove_chat_link_warning_text)
+                .setPositiveButton(R.string.delete_button, (dialog, which) -> {
+                    if (context instanceof GroupChatInfoActivityLollipop) {
+                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel, null).show();
     }
 
     public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
@@ -409,7 +393,7 @@ public class ChatUtil {
             return 0;
         }
 
-        int initSize = px2dp(MIN_WIDTH, outMetrics);
+        int initSize = dp2px(MIN_WIDTH, outMetrics);
         for (String reaction : listReactions) {
             int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
             if (numUsers > 0) {
@@ -419,7 +403,7 @@ public class ChatUtil {
                 paint.setTextSize(TEXT_SIZE);
                 int newWidth = (int) paint.measureText(text);
                 int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
-                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);
+                int possibleNewSize = dp2px(MIN_WIDTH, outMetrics) + dp2px(sizeText, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }
@@ -460,8 +444,15 @@ public class ChatUtil {
         if (!(context instanceof ChatActivityLollipop))
             return;
 
-        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
-        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        if (isMyOwnReaction(chatId, messageId, reaction)) {
+            if (!isFromKeyboard) {
+                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+            }
+        } else {
+            megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        }
     }
 
     public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
@@ -491,6 +482,27 @@ public class ChatUtil {
     }
 
     /**
+     * Method for know if I have a concrete reaction to a particular message
+     *
+     * @param chatId   The chat ID.
+     * @param msgId    The message ID.
+     * @param reaction The reaction.
+     * @return True, if I have reacted. False otherwise.
+     */
+    public static boolean isMyOwnReaction(long chatId, long msgId, String reaction) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, msgId, reaction);
+
+        for (int i = 0; i < handleList.size(); i++) {
+            if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Sets the contact status icon
      *
      * @param userStatus         contact's status
@@ -501,23 +513,24 @@ public class ChatUtil {
             return;
         }
 
+        Context context = contactStateIcon.getContext();
         contactStateIcon.setVisibility(View.VISIBLE);
 
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_online_dark_standard : R.drawable.ic_online_light);
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_away_dark_standard : R.drawable.ic_away_light);
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_busy_dark_standard : R.drawable.ic_busy_light);
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_offline_dark_standard : R.drawable.ic_offline_light);
                 break;
 
             case MegaChatApi.STATUS_INVALID:
@@ -679,8 +692,11 @@ public class ChatUtil {
             return chat.getTitle();
         }
 
-        MegaApplication app = MegaApplication.getInstance();
-        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
+        String date = formatDate(chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT);
+
+        return isTodayOrYesterday(chat.getCreationTs())
+                ? getString(R.string.inactive_chat_title_2, date.toLowerCase(Locale.getDefault()))
+                : getString(R.string.inactive_chat_title, date);
     }
 
     /**
@@ -698,6 +714,222 @@ public class ChatUtil {
     }
 
     /**
+     * Method to know if the chat notifications are activated or deactivated.
+     *
+     * @return The type of mute.
+     */
+    public static String getGeneralNotification() {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+        if (pushNotificationSettings != null) {
+            if (!pushNotificationSettings.isGlobalChatsDndEnabled() || pushNotificationSettings.getGlobalChatsDnd() == -1) {
+                ChatSettings chatSettings = app.getDbH().getChatSettings();
+                if (chatSettings == null) {
+                    chatSettings = new ChatSettings();
+                    app.getDbH().setChatSettings(chatSettings);
+                }
+
+                return NOTIFICATIONS_ENABLED;
+            }
+
+            if (pushNotificationSettings.getGlobalChatsDnd() == 0) {
+                return NOTIFICATIONS_DISABLED;
+            }
+
+            return NOTIFICATIONS_DISABLED_X_TIME;
+        }
+
+        return NOTIFICATIONS_ENABLED;
+    }
+
+    /**
+     * Method to display a dialog to mute a specific chat.
+     * @param context Context of Activity.
+     * @param chatId Chat ID.
+     */
+    public static void createMuteNotificationsAlertDialogOfAChat(Activity context, long chatId) {
+        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        MegaChatListItem chat = MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId);
+        if (chat != null) {
+            chats.add(chat);
+            createMuteNotificationsChatAlertDialog(context, chats);
+        }
+    }
+
+    /**
+     * Method to display a dialog to mute general chat notifications or several specific chats.
+     *
+     * @param context Context of Activity.
+     * @param chats  Chats. If the chats is null, it's for the general chats notifications.
+     */
+    public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
+
+        final AlertDialog muteDialog;
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
+        if (chats == null) {
+            View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
+            dialogBuilder.setCustomTitle(view);
+        } else {
+            dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
+        }
+
+        boolean isUntilThisMorning = isUntilThisMorning();
+        String optionUntil = chats != null ?
+                context.getString(R.string.mute_chatroom_notification_option_forever) :
+                (isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) :
+                        context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning));
+
+        String optionSelected = chats != null ?
+                NOTIFICATIONS_DISABLED :
+                (isUntilThisMorning ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING :
+                        NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
+
+        AtomicReference<Integer> itemClicked = new AtomicReference<>();
+
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(0, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(1, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(2, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(3, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(4, optionUntil);
+
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
+            itemClicked.set(item);
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+        });
+
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+                (dialog, which) -> {
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chats);
+                    dialog.dismiss();
+                });
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+
+        muteDialog = dialogBuilder.create();
+        muteDialog.show();
+        muteDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+    }
+
+    /**
+     * Method for getting the string depending on the selected mute option.
+     *
+     * @param option The selected mute option.
+     * @return The appropriate string.
+     */
+    public static String getMutedPeriodString(String option) {
+        Context context = MegaApplication.getInstance().getBaseContext();
+        switch (option) {
+            case NOTIFICATIONS_30_MINUTES:
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
+            case NOTIFICATIONS_1_HOUR:
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
+            case NOTIFICATIONS_6_HOURS:
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
+            case NOTIFICATIONS_24_HOURS:
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
+        }
+
+        return null;
+    }
+
+    /**
+     * Method for getting the selected mute option depending on the selected item.
+     *
+     * @param itemClicked   The selected item.
+     * @param optionSelected The right choice when you select the fifth option.
+     * @return The right mute option.
+     */
+    private static String getTypeMute(int itemClicked, String optionSelected) {
+        switch (itemClicked) {
+            case 0:
+                return NOTIFICATIONS_30_MINUTES;
+            case 1:
+                return NOTIFICATIONS_1_HOUR;
+            case 2:
+                return NOTIFICATIONS_6_HOURS;
+            case 3:
+                return NOTIFICATIONS_24_HOURS;
+            case 4:
+                return optionSelected;
+            default:
+                return NOTIFICATIONS_ENABLED;
+        }
+    }
+
+    /**
+     * Method to mute a specific chat or general notifications chat for a specific period of time.
+     * @param context Context of Activity.
+     * @param muteOption The selected mute option.
+     */
+    public static void muteChat(Context context, String muteOption) {
+        new ChatController(context).muteChat(muteOption);
+    }
+
+    /**
+     * Method to know if the general chat notifications are activated or muted.
+     *
+     * @return True, if notifications are activated. False in the opposite case
+     */
+    public static boolean isEnableGeneralChatNotifications(){
+        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+        return megaPushNotificationSettings == null || !megaPushNotificationSettings.isGlobalChatsDndEnabled();
+
+    }
+
+    /**
+     * Method to know if the notifications of a specific chat are activated or muted.
+     *
+     * @param chatId Chat id.
+     * @return True, if notifications are activated. False in the opposite case
+     */
+    public static boolean isEnableChatNotifications(long chatId) {
+        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+        return megaPushNotificationSettings == null || !megaPushNotificationSettings.isChatDndEnabled(chatId);
+    }
+
+    /**
+     * Method to checking when chat notifications are enabled and update the UI elements.
+     *
+     * @param chatHandle            Chat ID.
+     * @param notificationsSwitch   The SwitchCompat.
+     * @param notificationsSubTitle The TextView with the info.
+     */
+    public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
+        if (MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting() != null) {
+            updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
+        }
+    }
+
+    /**
+     * Method to update the switch element related to the notifications of a specific chat.
+     *
+     * @param chatId                The chat ID.
+     * @param notificationsSwitch   The SwitchCompat.
+     * @param notificationsSubTitle The TextView with the info.
+     */
+    public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
+        MegaPushNotificationSettings push = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+        if (push == null)
+            return;
+
+        if (push.isChatDndEnabled(chatId)) {
+            notificationsSwitch.setChecked(false);
+            long timestampMute = push.getChatDnd(chatId);
+            notificationsSubTitle.setVisibility(View.VISIBLE);
+            notificationsSubTitle.setText(timestampMute == 0 ?
+                    MegaApplication.getInstance().getString(R.string.mute_chatroom_notification_option_off) :
+                    getCorrectStringDependingOnOptionSelected(timestampMute));
+        } else {
+            notificationsSwitch.setChecked(true);
+            notificationsSubTitle.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Gets the user's online status.
      *
      * @param userHandle    handle of the user
@@ -707,5 +939,411 @@ public class ChatUtil {
         return isContact(userHandle)
                 ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
                 : MegaChatApi.STATUS_INVALID;
+    }
+
+    /**
+     * Method for obtaining the contact status bitmap.
+     *
+     * @param userStatus The contact status.
+     * @return The final bitmap.
+     */
+    public static Bitmap getStatusBitmap(int userStatus) {
+        Resources resources = MegaApplication.getInstance().getBaseContext().getResources();
+        boolean isDarkMode = Util.isDarkMode(MegaApplication.getInstance());
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_online_dark_standard
+                                : R.drawable.ic_online_light);
+            case MegaChatApi.STATUS_AWAY:
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_away_dark_standard
+                                : R.drawable.ic_away_light);
+            case MegaChatApi.STATUS_BUSY:
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_busy_dark_standard
+                                : R.drawable.ic_busy_light);
+            case MegaChatApi.STATUS_OFFLINE:
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_offline_dark_standard
+                                : R.drawable.ic_offline_light);
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+     *
+     * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * @return String to show for invalid meta message.
+     */
+    public static String getInvalidMetaMessage(MegaChatMessage message) {
+        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+
+        if (message == null) {
+            return invalidMetaMessage;
+        }
+
+        String contentMessage = message.getContent();
+        if (!isTextEmpty(contentMessage)) {
+            return contentMessage;
+        }
+
+        MegaChatContainsMeta meta = message.getContainsMeta();
+
+        String metaTextMessage = meta != null ? meta.getTextMessage() : null;
+        if (!isTextEmpty(metaTextMessage)) {
+            return metaTextMessage;
+        }
+
+        return invalidMetaMessage;
+    }
+
+    /**
+     * Dialog to confirm if you want to delete the history of a chat.
+     *
+     * @param chat The MegaChatRoom.
+     */
+    public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        String message = context.getString(R.string.confirmation_clear_chat_history);
+
+        builder.setTitle(R.string.title_properties_chat_clear)
+                .setMessage(message)
+                .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
+                .setNegativeButton(R.string.general_cancel, null)
+                .show();
+    }
+
+    /**
+     * Method to display a dialog to configure the history retention.
+     *
+     * @param context    Context of Activity.
+     * @param idChat     The chat ID.
+     * @param isDisabled True, if the Retention Time is disabled. False, otherwise.
+     */
+    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled) {
+        if (idChat == MEGACHAT_INVALID_HANDLE)
+            return;
+
+        final AlertDialog historyRetentionDialog;
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
+
+        View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
+        TextView title = view.findViewById(R.id.title);
+        title.setText(context.getString(R.string.title_properties_history_retention));
+        TextView subtitle = view.findViewById(R.id.subtitle);
+        subtitle.setText(context.getString(R.string.subtitle_properties_manage_chat));
+        dialogBuilder.setCustomTitle(view);
+
+        AtomicReference<Integer> itemClicked = new AtomicReference<>();
+
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DISABLED, context.getString(R.string.history_retention_option_disabled));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DAY, context.getString(R.string.history_retention_option_one_day));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_WEEK, context.getString(R.string.history_retention_option_one_week));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_MONTH, context.getString(R.string.history_retention_option_one_month));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_CUSTOM, context.getString(R.string.history_retention_option_custom));
+
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+        int optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
+
+        itemClicked.set(optionSelected);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, optionSelected, (dialog, item) -> {
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
+                    context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                            R.string.general_next :
+                            R.string.general_ok));
+
+            itemClicked.set(item);
+
+            updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE),
+                    checkIfPositiveButtonShouldBeShown(idChat, item));
+        });
+
+        dialogBuilder.setPositiveButton(context.getString(itemClicked.get() ==
+                        RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                        R.string.general_next : R.string.general_ok),
+                (dialog, which) -> {
+                    if (itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM) {
+                        if (context instanceof ManageChatHistoryActivity) {
+                            ((ManageChatHistoryActivity) context).showPickers(isDisabled ?
+                                    DISABLED_RETENTION_TIME :
+                                    getUpdatedRetentionTimeFromAChat(idChat));
+                        }
+                    } else {
+                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat,
+                                getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
+                    }
+                });
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), null);
+
+        historyRetentionDialog = dialogBuilder.create();
+        historyRetentionDialog.show();
+
+        updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE),
+                checkIfPositiveButtonShouldBeShown(idChat, itemClicked.get()));
+    }
+
+    /**
+     * Method for checking whether the positive button should be enabled or not.
+     *
+     * @param idChat        The chat ID.
+     * @param itemClicked   The option selected.
+     * @return              True, if it must be enabled. False, if not.
+     */
+    private static boolean checkIfPositiveButtonShouldBeShown(long idChat, int itemClicked) {
+        return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED ||
+                itemClicked != RETENTION_TIME_DIALOG_OPTION_DISABLED;
+    }
+
+    /**
+     * Gets retention time for a particular chat.
+     *
+     * @param idChat The chat ID.
+     * @return The retention time in seconds.
+     */
+    public static long getUpdatedRetentionTimeFromAChat(long idChat) {
+        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
+        if (chat != null) {
+            return chat.getRetentionTime();
+        }
+
+        return DISABLED_RETENTION_TIME;
+    }
+
+    /**
+     * Gets the appropriate dialogue option from the chat ID.
+     *
+     * @param idChat The chat ID.
+     * @return The option.
+     */
+    private static int getOptionSelectedFromRetentionTime(long idChat) {
+        long seconds = getUpdatedRetentionTimeFromAChat(idChat);
+
+        if (seconds == DISABLED_RETENTION_TIME) {
+            return RETENTION_TIME_DIALOG_OPTION_DISABLED;
+        }
+
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_30;
+        long years = seconds % SECONDS_IN_YEAR;
+
+        if (years == 0) {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
+
+        if (months == 0) {
+            if (seconds / SECONDS_IN_MONTH_30 == 1) {
+                return RETENTION_TIME_DIALOG_OPTION_MONTH;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
+        }
+
+        if (weeks == 0) {
+            if (seconds / SECONDS_IN_WEEK == 1) {
+                return RETENTION_TIME_DIALOG_OPTION_WEEK;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
+        }
+
+        if (days == 0 && seconds / SECONDS_IN_DAY == 1) {
+            return RETENTION_TIME_DIALOG_OPTION_DAY;
+        } else {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
+    }
+
+    /**
+     * Update Retention Time Dialog Positive Button.
+     *
+     * @param buttonPositive The button
+     * @param isEnabled      True, if it must be enabled. False, if not.
+     */
+    private static void updatePositiveButton(final Button buttonPositive, boolean isEnabled) {
+        buttonPositive.setEnabled(isEnabled);
+        buttonPositive.setAlpha(isEnabled ? 1f : 0.30f);
+    }
+
+    /**
+     * Method for getting the seconds from an selected option.
+     *
+     * @param itemClicked The selected item.
+     * @return The seconds.
+     */
+    private static long getSecondsFromOption(int itemClicked) {
+        switch (itemClicked) {
+            case 1:
+                return SECONDS_IN_DAY;
+            case 2:
+                return SECONDS_IN_WEEK;
+            case 3:
+                return SECONDS_IN_MONTH_30;
+            default:
+                return DISABLED_RETENTION_TIME;
+        }
+    }
+
+    /**
+     * Method for getting the appropriate String from the seconds of rentention time.
+     *
+     * @param seconds The retention time in seconds
+     * @return The right text
+     */
+    public static String transformSecondsInString(long seconds) {
+        if (seconds == DISABLED_RETENTION_TIME)
+            return " ";
+
+        long hours = seconds % SECONDS_IN_HOUR;
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_30;
+        long years = seconds % SECONDS_IN_YEAR;
+
+        if (years == 0) {
+            return MegaApplication.getInstance().getBaseContext().getResources().getString(R.string.subtitle_properties_manage_chat_label_year);
+        }
+
+        if (months == 0) {
+            int month = (int) (seconds / SECONDS_IN_MONTH_30);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
+        }
+
+        if (weeks == 0) {
+            int week = (int) (seconds / SECONDS_IN_WEEK);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_weeks, week, week);
+        }
+
+        if (days == 0) {
+            int day = (int) (seconds / SECONDS_IN_DAY);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.label_time_in_days_full, day, day);
+        }
+
+        if (hours == 0) {
+            int hour = (int) (seconds / SECONDS_IN_HOUR);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
+        }
+
+        return " ";
+    }
+
+    /**
+     * Method for updating the Time retention layout.
+     *
+     * @param time The retention time in seconds.
+     */
+    public static void updateRetentionTimeLayout(final TextView retentionTimeText, long time) {
+        String timeFormatted = transformSecondsInString(time);
+        if (isTextEmpty(timeFormatted)) {
+            retentionTimeText.setVisibility(View.GONE);
+        } else {
+            String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
+            retentionTimeText.setText(subtitleText);
+            retentionTimeText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChat(chatId))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
+    }
+
+    public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChats(chats))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
+    }
+
+    /**
+     * Method to compare if the current message is the same message that needs to be updated.     *
+     *
+     * @param messageToUpdate The message to be updated.
+     * @param currentMessage  The current message.
+     * @return True, if it is the same. False, if not.
+     */
+    public static boolean isItSameMsg(MegaChatMessage messageToUpdate, MegaChatMessage currentMessage) {
+        if (messageToUpdate.getMsgId() != MEGACHAT_INVALID_HANDLE) {
+            return messageToUpdate.getMsgId() == currentMessage.getMsgId();
+        } else {
+            return messageToUpdate.getTempId() == currentMessage.getTempId();
+        }
+    }
+
+    /**
+     * Method to know whether to show mute or unmute options.
+     *
+     * @param context  The Activity context.
+     * @param chatRoom The chat room.
+     * @return True, if it should be shown. False, if not.
+     */
+    public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
+        return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
+                ((chatRoom.isGroup() && chatRoom.isActive()) ||
+                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
+    }
+
+    /**
+     * Creates a pending message representing an attachment message.
+     *
+     * @param idChat       Identifier of the chat where the message has to be sent.
+     * @param filePath     Path of the file which will be attached to the chat.
+     * @param fileName     Name of the file which will be attached to the chat.
+     * @param fromExplorer True if the file comes from File Explorer, false otherwise.
+     * @return The pending message after add it to the DB.
+     */
+    public static PendingMessageSingle createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
+        long idPendingMessage;
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+
+        PendingMessageSingle pendingMsg = new PendingMessageSingle();
+        pendingMsg.setChatId(idChat);
+        pendingMsg.setUploadTimestamp(System.currentTimeMillis() / 1000);
+        pendingMsg.setFilePath(filePath);
+        pendingMsg.setName(fileName);
+        pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
+
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments()) {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
+            pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
+        } else if (fromExplorer) {
+            idPendingMessage = dbH.addPendingMessageFromExplorer(pendingMsg);
+        } else {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg);
+        }
+
+        pendingMsg.setId(idPendingMessage);
+
+        return pendingMsg;
+    }
+
+    /**
+     * Gets the identifier of a pending message from the appData of its transfer.
+     *
+     * @param appData AppData of the transfer in question.
+     * @return The identifier of the pending message.
+     */
+    public static long getPendingMessageIdFromAppData(String appData) {
+        String[] parts = appData.split(APP_DATA_INDICATOR);
+        String idFound = parts[parts.length - 1];
+
+        return Long.parseLong(idFound);
     }
 }

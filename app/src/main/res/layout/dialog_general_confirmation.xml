@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp">
 
@@ -9,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:textColor="@color/name_my_account"
+        android:textColor="?android:attr/textColorPrimary"
         android:fontFamily="sans-serif-light"
         android:textStyle="bold"/>
 
@@ -24,16 +25,15 @@
             android:id="@+id/confirmation_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:theme="@style/ColorControlStyle"/>
+            android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
         <TextView
             android:id="@+id/do_not_show_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp"
-            android:textSize="14sp"
-            android:textColor="@color/file_properties_text_available"
+            android:layout_marginStart="12dp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary"
             android:text="@string/general_do_not_show"/>
 
     </LinearLayout>
@@ -48,13 +48,13 @@
         <Button
             android:id="@+id/positive_button"
             android:layout_alignParentRight="true"
-            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/negative_button"
             android:layout_toLeftOf="@+id/positive_button"
             android:layout_marginRight="30dp"
-            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+            style="?attr/borderlessButtonStyle" />
     </RelativeLayout>
 
 </LinearLayout>

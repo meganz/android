@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <mega.privacy.android.app.components.TwoLineCheckPreference
+        android:key="settings_use_https_only"
+        android:title="@string/setting_title_use_https_only"
+        android:summary="@string/setting_subtitle_use_https_only"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+</androidx.preference.PreferenceScreen>

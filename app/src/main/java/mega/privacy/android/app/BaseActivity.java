@@ -12,12 +12,17 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Lifecycle;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -35,10 +40,16 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -108,6 +119,10 @@ public class BaseActivity extends AppCompatActivity {
     private boolean isResumeTransfersWarningShown;
     private AlertDialog resumeTransfersWarning;
 
+    private FrameLayout psaWebBrowserContainer;
+    private PsaWebBrowser psaWebBrowser;
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -164,6 +179,91 @@ public class BaseActivity extends AppCompatActivity {
                 showResumeTransfersWarning(this);
             }
         }
+
+        PsaManager.INSTANCE.getPsa().observe(this, psa -> {
+            if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+                    && psa != null && !TextUtils.isEmpty(psa.getUrl())) {
+                launchPsaWebBrowser(psa);
+            }
+        });
+
+        if (shouldSetStatusBarTextColor()) {
+            ColorUtils.setStatusBarTextColor(this);
+        }
+    }
+
+    protected boolean shouldSetStatusBarTextColor() {
+        return true;
+    }
+
+    /**
+     * Launch web browser to display the new url PSA.
+     *
+     * @param psa the psa to display
+     */
+    private void launchPsaWebBrowser(Psa psa) {
+        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            return;
+        }
+
+        if (psaWebBrowserContainer == null) {
+            psaWebBrowserContainer = new FrameLayout(this);
+            psaWebBrowserContainer.setId(R.id.psa_web_browser_container);
+
+            ViewGroup contentView = findViewById(android.R.id.content);
+
+            contentView.addView(psaWebBrowserContainer,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        Bundle args = new Bundle();
+        args.putString(PsaWebBrowser.ARGS_URL_KEY, psa.getUrl());
+        psaWebBrowser = new PsaWebBrowser();
+        psaWebBrowser.setArguments(args);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.psa_web_browser_container, psaWebBrowser)
+                .addToBackStack(PsaWebBrowser.class.getSimpleName())
+                .commit();
+    }
+
+    /**
+     * Notify the PSA web browser is closed.
+     *
+     * @param visible whether it's visible when closed
+     */
+    public void onPsaWebViewDestroyed(boolean visible) {
+        if (psaWebBrowserContainer != null) {
+            ViewGroup contentView = findViewById(android.R.id.content);
+            contentView.removeView(psaWebBrowserContainer);
+        }
+
+        psaWebBrowserContainer = null;
+        psaWebBrowser = null;
+
+        // The PsaWebBrowser is launched, but isn't displayed yet, and a back press is consumed
+        // by it, so we need fire another back press event, so user will get expected result
+        // from the consumed back press.
+        if (!visible) {
+            uiHandler.post(this::onBackPressed);
+        }
+    }
+
+    /**
+     * Close the displaying PSA if there is one.
+     *
+     * @return whether there is one PSA closed
+     */
+    public boolean closeDisplayingPsa() {
+        if (psaWebBrowser != null) {
+            super.onBackPressed();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -177,6 +277,17 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        // If the PsaWebBrowser is launched but not visible, and current activity is paused,
+        // we should close PsaWebBrowser, otherwise new PsaWebBrowser won't be launched
+        // because of the check in launchPsaWebBrowser.
+        if (psaWebBrowser != null && !psaWebBrowser.visible()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(psaWebBrowser)
+                    .commitAllowingStateLoss();
+            psaWebBrowser = null;
+        }
+
         checkMegaObjects();
         isPaused = true;
         super.onPause();
@@ -192,6 +303,8 @@ public class BaseActivity extends AppCompatActivity {
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
+
+        PsaManager.INSTANCE.displayPendingPsa();
     }
 
     /**
@@ -531,7 +644,25 @@ public class BaseActivity extends AppCompatActivity {
      * @param s Text to shown in the snackbar
      */
     public void showSnackbar (int type, View view, String s) {
-        showSnackbar(type, view, s, -1);
+        showSnackbar(type, view, s, MEGACHAT_INVALID_HANDLE);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type   There are three possible values to this param:
+     *               - SNACKBAR_TYPE: creates a simple snackbar
+     *               - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *               - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *               - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *               - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view   Layout where the snackbar is going to show.
+     * @param s      Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     */
+    public void showSnackbar(int type, View view, String s, long idChat) {
+        showSnackbar(type, view, s, idChat, null);
     }
 
     /**
@@ -541,12 +672,15 @@ public class BaseActivity extends AppCompatActivity {
      *            - SNACKBAR_TYPE: creates a simple snackbar
      *            - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
      *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *            - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *            - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     * @param userEmail Email of the user to be invited.
      */
-    public void showSnackbar (int type, View view, String s, long idChat) {
+    public void showSnackbar (int type, View view, String s, long idChat, String userEmail) {
         logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -561,6 +695,9 @@ public class BaseActivity extends AppCompatActivity {
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
                     break;
+                case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -571,18 +708,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-
-        if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
-            final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
-        else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0, px2dp(8, outMetrics), px2dp(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
+        snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
 
         switch (type) {
             case SNACKBAR_TYPE: {
@@ -601,6 +727,20 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.show();
                 break;
             }
+            case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), type));
+                snackbar.show();
+                break;
+
+            case PERMISSIONS_TYPE:
+                snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
+
+            case INVITE_CONTACT_TYPE:
+                snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
+                snackbar.show();
+                break;
         }
     }
 
@@ -617,7 +757,7 @@ public class BaseActivity extends AppCompatActivity {
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
+        params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
@@ -644,12 +784,12 @@ public class BaseActivity extends AppCompatActivity {
      * The message is different depending if the account belongs to an admin or an user.
      *
      */
-    private void showExpiredBusinessAlert(){
+    protected void showExpiredBusinessAlert(){
         if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(R.string.expired_business_title);
 
         if (megaApi.isMasterBusinessAccount()) {
@@ -657,12 +797,14 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.black_white)
+                        + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
             }
-            builder.setMessage(TextUtils.concat(getSpannedHtmlText(expiredString), "\n\n" + getString(R.string.expired_user_business_text_2)));
+            builder.setMessage(TextUtils.concat(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY), "\n\n" + getString(R.string.expired_user_business_text_2)));
         }
 
         builder.setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {
@@ -805,10 +947,12 @@ public class BaseActivity extends AppCompatActivity {
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        new MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.enable_log_text_dialog)
+                .setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener)
+                .show()
+                .setCanceledOnTouchOutside(false);
     }
 
     /**
@@ -817,7 +961,7 @@ public class BaseActivity extends AppCompatActivity {
     public void showGeneralTransferOverQuotaWarning() {
         if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
         builder.setView(dialogView)
                 .setOnDismissListener(dialog -> {
@@ -929,5 +1073,43 @@ public class BaseActivity extends AppCompatActivity {
 
     public AlertDialog getResumeTransfersWarning() {
         return resumeTransfersWarning;
+    }
+
+    /**
+     * Checks if should refresh session due to megaApi.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToSDK() {
+        if (megaApi == null || megaApi.getRootNode() == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if should refresh session due to karere.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToKarere() {
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logWarning("Refresh session - karere");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void refreshSession() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

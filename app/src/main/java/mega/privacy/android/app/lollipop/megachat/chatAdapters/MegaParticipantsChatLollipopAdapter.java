@@ -22,24 +22,22 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -143,7 +141,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private TextView infoNumParticipantsText;
         private ImageView editImageView;
         private LinearLayout notificationsLayout;
+        private RelativeLayout notificationsSwitchLayout;
         private SwitchCompat notificationsSwitch;
+        private TextView notificationsTitle;
+        private TextView notificationsSubTitle;
         private View dividerNotifications;
         private LinearLayout chatLinkLayout;
         private View chatLinkSeparator;
@@ -152,7 +153,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private TextView privateText;
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
-        private RelativeLayout clearChatLayout;
+        private RelativeLayout manageChatLayout;
+        private TextView retentionTimeText;
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
         private View dividerLeaveLayout;
@@ -180,9 +182,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.avatarImageView = v.findViewById(R.id.chat_group_properties_thumbnail);
                 holderHeader.infoTitleChatText = v.findViewById(R.id.chat_group_contact_properties_info_title);
                 if (isScreenInPortrait(groupChatInfoActivity)) {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
                 } else {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
                 }
 
                 holderHeader.editImageView = v.findViewById(R.id.chat_group_contact_properties_edit_icon);
@@ -190,8 +192,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 //Notifications Layout
                 holderHeader.notificationsLayout = v.findViewById(R.id.chat_group_contact_properties_notifications_layout);
+                holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
+                holderHeader.notificationsTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_title);
+                holderHeader.notificationsSubTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_muted_text);
+                holderHeader.notificationsSubTitle.setVisibility(View.GONE);
+                holderHeader.notificationsSwitchLayout = v.findViewById(R.id.chat_group_contact_properties_layout);
+                holderHeader.notificationsSwitchLayout.setOnClickListener(this);
                 holderHeader.notificationsSwitch = v.findViewById(R.id.chat_group_contact_properties_switch);
-                holderHeader.notificationsSwitch.setOnClickListener(this);
+                holderHeader.notificationsSwitch.setClickable(false);
                 holderHeader.dividerNotifications = v.findViewById(R.id.divider_notifications_layout);
 
                 holderHeader.infoNumParticipantsText = v.findViewById(R.id.chat_group_contact_properties_info_participants);
@@ -211,8 +219,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.sharedFilesLayout.setOnClickListener(this);
 
                 //Clear chat Layout
-                holderHeader.clearChatLayout = v.findViewById(R.id.chat_group_contact_properties_clear_layout);
-                holderHeader.clearChatLayout.setOnClickListener(this);
+                holderHeader.manageChatLayout =  v.findViewById(R.id.manage_chat_history_group_info_layout);
+                holderHeader.manageChatLayout.setOnClickListener(this);
+                holderHeader.retentionTimeText =  v.findViewById(R.id.manage_chat_history_group_info_subtitle);
+                holderHeader.retentionTimeText.setVisibility(View.GONE);
                 holderHeader.dividerClearLayout = v.findViewById(R.id.divider_clear_layout);
 
                 //Archive chat Layout
@@ -235,6 +245,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.participantsLayout =  v.findViewById(R.id.chat_group_contact_properties_participants_title);
                 holderHeader.observersSeparator = v.findViewById(R.id.divider_observers_layout);
 
+                v.setTag(holderHeader);
                 return holderHeader;
 
             case ITEM_VIEW_TYPE_NORMAL:
@@ -294,17 +305,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
 
-                String title = getChat().getTitle();
+                String title = getTitleChat(getChat());
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
-                holderHeader.infoTitleChatText.setText(getChat().getTitle());
+                holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_unarchive);
                 } else {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_archive);
                 }
 
                 long participantsCount = getChat().getPeerCount();
@@ -317,7 +328,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderHeader.chatLinkSeparator.setVisibility(View.GONE);
                     holderHeader.privateLayout.setVisibility(View.GONE);
                     holderHeader.privateSeparator.setVisibility(View.GONE);
-                    holderHeader.clearChatLayout.setVisibility(View.GONE);
+                    holderHeader.manageChatLayout.setVisibility(View.GONE);
                     holderHeader.dividerClearLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatSeparator.setVisibility(View.GONE);
@@ -330,31 +341,40 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     if (getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
-                        holderHeader.clearChatLayout.setVisibility(View.VISIBLE);
+                        holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
+                        holderHeader.privateLayout.setVisibility(View.VISIBLE);
+                        holderHeader.privateSeparator.setVisibility(View.VISIBLE);
 
-                        if (getChat().isPublic()) {
-                            holderHeader.privateLayout.setVisibility(View.VISIBLE);
-                            holderHeader.privateSeparator.setVisibility(View.VISIBLE);
+                        if (!getChat().isPublic()) {
+                            holderHeader.privateTitle.setText(R.string.private_chat);
+                            holderHeader.privateTitle.setAllCaps(false);
+                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_087_white_087));
+                            holderHeader.privateText.setText(R.string.make_chat_private_option_text);
+                            holderHeader.privateLayout.setOnClickListener(null);
+                        } else {
+                            holderHeader.privateTitle.setText(R.string.make_chat_private_option);
+                            holderHeader.privateTitle.setAllCaps(true);
 
                             if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.accentColor));
+                                holderHeader.privateTitle.setTextColor(ColorUtils.getThemeColor(groupChatInfoActivity, R.attr.colorSecondary));
                                 holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                                 holderHeader.privateLayout.setOnClickListener(this);
                             } else {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.emoji_icons));
+                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                                 holderHeader.privateText.setText(R.string.make_chat_private_not_available_text);
                                 holderHeader.privateLayout.setOnClickListener(null);
                             }
-                        } else {
-                            logDebug("Private getChat()");
-                            holderHeader.privateLayout.setVisibility(View.GONE);
-                            holderHeader.privateSeparator.setVisibility(View.GONE);
                         }
+
+                        if (!groupChatInfoActivity.isChatOpen()) {
+                            MegaApplication.getChatManagement().openChatRoom(getChat().getChatId());
+                        }
+                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()));
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
                         holderHeader.dividerClearLayout.setVisibility(View.GONE);
-                        holderHeader.clearChatLayout.setVisibility(View.GONE);
+                        holderHeader.manageChatLayout.setVisibility(View.GONE);
                         holderHeader.privateLayout.setVisibility(View.GONE);
                         holderHeader.privateSeparator.setVisibility(View.GONE);
 
@@ -375,18 +395,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     }
 
                     if (getChat().isActive()) {
-                        holderHeader.notificationsSwitch.setChecked(!groupChatInfoActivity.isChatMuted());
                         holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerNotifications.setVisibility(View.VISIBLE);
                     } else {
                         holderHeader.notificationsLayout.setVisibility(View.GONE);
                         holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
+
+                    checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
-                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
-                        groupChatInfoActivity.getString(R.string.inactive_chat) :
-                        groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
+                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants()
+                        ? groupChatInfoActivity.getString(R.string.inactive_chat)
+                        : groupChatInfoActivity.getResources().getQuantityString(R.plurals.subtitle_of_group_chat,
+                        (int) participantsCount, (int) participantsCount));
 
                 if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
@@ -428,14 +450,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
-                holderParticipantsList.threeDotsLayout.setOnClickListener(this);
-                holderParticipantsList.itemLayout.setOnClickListener(this);
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
-                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                     holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                     holderParticipantsList.itemLayout.setOnClickListener(null);
+                } else {
+                    holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                    holderParticipantsList.itemLayout.setOnClickListener(this);
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
                 }
 
                 int permission = participant.getPrivilege();
@@ -589,26 +612,28 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 groupChatInfoActivity.showConfirmationLeaveChat();
                 break;
 
-            case R.id.chat_group_contact_properties_clear_layout:
-                groupChatInfoActivity.showConfirmationClearChat();
+            case R.id.manage_chat_history_group_info_layout:
+                Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
+                intentManageChat.putExtra(CHAT_ID, chatId);
+                intentManageChat.putExtra(IS_FROM_CONTACTS, false);
+                groupChatInfoActivity.startActivity(intentManageChat);
                 break;
 
             case R.id.chat_group_contact_properties_archive_layout:
                 new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
                 break;
 
-            case R.id.chat_group_contact_properties_switch: {
-                groupChatInfoActivity.setChatMuted();
-
-                ChatController chatC = new ChatController(groupChatInfoActivity);
-                if (groupChatInfoActivity.isChatMuted()) {
-                    chatC.muteChat(chatId);
-                } else {
-                    chatC.unmuteChat(chatId);
+            case R.id.chat_group_contact_properties_layout:
+                ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+                if (holderHeader != null) {
+                    if (holderHeader.notificationsSwitch.isChecked()) {
+                        createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
+                    } else {
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
+                    }
                 }
                 break;
 
-            }
             case R.id.chat_group_contact_properties_chat_link_layout: {
                 megaChatApi.queryChatLink(chatId, groupChatInfoActivity);
                 break;
@@ -623,6 +648,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 groupChatInfoActivity.startActivity(nodeHistoryIntent);
                 break;
             }
+        }
+    }
+
+    public void checkNotifications(long chatId) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
         }
     }
 
@@ -656,6 +688,18 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         int positionInAdapter = getParticipantPositionInAdapter(positionInArray);
         if (listFragment.findViewHolderForAdapterPosition(positionInAdapter) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
             notifyItemChanged(positionInAdapter);
+        }
+    }
+
+    /**
+     * Method for updating the text indicating the retention time.
+     *
+     * @param seconds The retention time.
+     */
+    public void updateRetentionTimeUI(long seconds) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds);
         }
     }
 
@@ -703,12 +747,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             String nameFileEmail = holderParticipantsList.contactMail;
 
             if (isTextEmpty(nameFileEmail)) {
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                 holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                 holderParticipantsList.itemLayout.setOnClickListener(null);
                 avatarBitmap = getAvatarBitmap(nameFileHandle);
             } else {
                 avatarBitmap = getUserAvatar(nameFileHandle, nameFileEmail);
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
             }
         }
 

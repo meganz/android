@@ -9,9 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -24,12 +22,13 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,6 +36,7 @@ import java.util.TimerTask;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -50,7 +50,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
 
-    private Toolbar toolbar;
+    private MaterialToolbar toolbar;
     private ActionBar actionBar;
     private TextView backButton, pinError, resendTextView;
     private Button confirmButton;
@@ -75,10 +75,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getResources().getString(R.string.verify_account_enter_code_title).toUpperCase());
-
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(getResources().getColor(R.color.dark_primary_color));
 
         //labels
         Intent intent = getIntent();
@@ -107,7 +103,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(false);
-                ds.setColor(getResources().getColor(R.color.accentColor));
+                ds.setColor(ColorUtils.getThemeColor(SMSVerificationReceiveTxtActivity.this, R.attr.colorSecondary));
                 ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             }
         };
@@ -572,24 +568,24 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         logDebug("hideError");
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
+        firstPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        secondPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
+        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.grey_087_white_087));
     }
 
     private void showError(String errorMessage) {
         logDebug("showError");
         firstTime = false;
         isErrorShown = true;
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
         pinError.setVisibility(View.VISIBLE);
         if (errorMessage != null) {
             logWarning("Error message is: " + errorMessage);
