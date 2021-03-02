@@ -6090,7 +6090,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)) {
             int statusMsg = msg.getStatus();
-            logDebug("Status change: " + statusMsg + "Temporal id: " + msg.getTempId() + " Final id: " + msg.getMsgId());
+            logDebug("Status change: " + statusMsg + ", Temporal ID: " + msg.getTempId() + ", Final ID: " + msg.getMsgId());
 
             if (msg.getUserHandle() == megaChatApi.getMyUserHandle()
                     && ((msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT)
@@ -6125,8 +6125,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("STATUS_SERVER_REJECTED: " + msg.getStatus());
                 deleteMessage(msg, true);
             } else {
-                logDebug("Status: " + msg.getStatus() + "Timestamp: " + msg.getTimestamp()
-                        + "resultModify: " + modifyMessageReceived(androidMsg, false));
+                logDebug("Status: " + msg.getStatus() + ", Timestamp: " + msg.getTimestamp()
+                        + ", resultModify: " + modifyMessageReceived(androidMsg, false));
                 return;
             }
         }
