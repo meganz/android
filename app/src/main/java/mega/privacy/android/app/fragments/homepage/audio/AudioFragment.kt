@@ -226,7 +226,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
             setLocalIntentParams(activity, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)
         } else {
-            setStreamingIntentParams(activity, node, megaApi, intent)
+            setStreamingIntentParams(activity, node, megaApi, intent,
+                requireActivity() as ManagerActivityLollipop)
         }
 
         if (paramsSetSuccessfully && isOpusFile(node)) {

@@ -404,7 +404,8 @@ class VideoFragment : Fragment(), HomepageSearchable {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)
         } else {
-            FileUtil.setStreamingIntentParams(context, node, megaApi, intent)
+            FileUtil.setStreamingIntentParams(context, node, megaApi, intent,
+                requireActivity() as ManagerActivityLollipop)
         }
 
         if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {

@@ -196,7 +196,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 
@@ -237,7 +237,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			checkScroll();
 			managerActivity.showFabButton();
 		} else {
-			openFile(nodes.get(position), INCOMING_SHARES_ADAPTER, position, screenPosition, imageView);
+			openFile(nodes.get(position), INCOMING_SHARES_ADAPTER, position);
 		}
 	}
 

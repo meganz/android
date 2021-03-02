@@ -2,14 +2,10 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -48,7 +44,6 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,9 +83,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
-import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -107,8 +102,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 	private static final String TAG_DECRYPT = "decrypt";
 
-	public static ImageView imageDrag;
-	
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
@@ -318,73 +311,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapterList != null && mLayoutManager != null){
-			mLayoutManager.scrollToPosition(position);
-		}
-	}
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapterList != null && mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null){
-				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-			}
-		}
-
-		return null;
-	}
-
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			int position;
-			int adapterType;
-			int actionType;
-			ImageView imageDrag = null;
-
-			if (intent != null) {
-				position = intent.getIntExtra("position", -1);
-				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-				if (position != -1) {
-					if (adapterType == FOLDER_LINK_ADAPTER) {
-						if (actionType == UPDATE_IMAGE_DRAG) {
-							imageDrag = getImageDrag(position);
-							if (folderLinkActivity.imageDrag != null) {
-								folderLinkActivity.imageDrag.setVisibility(View.VISIBLE);
-							}
-							if (imageDrag != null) {
-								folderLinkActivity.imageDrag = imageDrag;
-								folderLinkActivity.imageDrag.setVisibility(View.GONE);
-							}
-						} else if (actionType == SCROLL_TO_POSITION) {
-							updateScrollPosition(position);
-						}
-					}
-				}
-
-				if (imageDrag != null){
-					int[] positionDrag = new int[2];
-					int[] screenPosition = new int[4];
-					imageDrag.getLocationOnScreen(positionDrag);
-
-					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
-					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
-					screenPosition[2] = imageDrag.getWidth();
-					screenPosition[3] = imageDrag.getHeight();
-
-					Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
-					intent1.putExtra("screenPosition", screenPosition);
-					sendBroadcast(intent1);
-				}
-			}
-		}
-	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate()");
@@ -415,7 +341,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
-		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		registerTransfersReceiver();
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
@@ -659,6 +584,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		}
 
 		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+
+		observeDragSupportEvents(this, listView);
     }
 
 	@Override
@@ -687,7 +614,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 //			megaApiFolder.logout();
 		}
 
-		unregisterReceiver(receiver);
 		handler.removeCallbacksAndMessages(null);
 
 		nodeSaver.destroy();
@@ -1298,7 +1224,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 
 		if (adapterList.isMultipleSelect()){
 			logDebug("Multiselect ON");
@@ -1358,10 +1284,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					intent.putExtra("isFolderLink", true);
-					intent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(intent, listView, position, adapterList);
 					startActivity(intent);
 					overridePendingTransition(0,0);
-					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -1388,7 +1313,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					mediaIntent.putExtra("isFolderLink", true);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					mediaIntent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(mediaIntent, listView, position, adapterList);
 					mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1396,68 +1321,21 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
 					}
-					imageDrag = imageView;
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
-					if (localPath != null){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							mediaIntent.setDataAndType(
-									FileProvider.getUriForFile(FolderLinkActivityLollipop.this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile),
-									MimeTypeList.typeForName(file.getName()).getType());
-						} else {
-							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
 
-						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					boolean paramsSetSuccessfully;
+					if (isLocalFile(file, megaApiFolder, localPath)) {
+						paramsSetSuccessfully = setLocalIntentParams(this, file, mediaIntent,
+								localPath, false, this);
+					} else {
+						paramsSetSuccessfully = setStreamingIntentParams(this, file, megaApiFolder,
+								mediaIntent, this);
 					}
-					else {
-						String url;
-						if (dbH.getCredentials() != null) {
-							if (megaApi.httpServerIsRunning() == 0) {
-								megaApi.httpServerStart();
-							}
-
-							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-							activityManager.getMemoryInfo(mi);
-
-							if (mi.totalMem > BUFFER_COMP) {
-								logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-								megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-							}
-							else {
-								logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-								megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-							}
-
-							url = megaApi.httpServerGetLocalLink(file);
-						}
-						else {
-							if (megaApiFolder.httpServerIsRunning() == 0) {
-								megaApiFolder.httpServerStart();
-							}
-
-							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-							activityManager.getMemoryInfo(mi);
-
-							if (mi.totalMem > BUFFER_COMP) {
-								logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-								megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-							}
-							else {
-								logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-								megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-							}
-
-							url = megaApiFolder.httpServerGetLocalLink(file);
-						}
-						if (url != null) {
-							logDebug("FolderLink URL: " + url);
-							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-						}
+					if (!paramsSetSuccessfully) {
+						return;
 					}
+
 					if (opusFile){
 						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
 					}
@@ -1487,70 +1365,23 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					pdfIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
-					if (localPath != null){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							pdfIntent.setDataAndType(
-									FileProvider.getUriForFile(FolderLinkActivityLollipop.this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile),
-									MimeTypeList.typeForName(file.getName()).getType());
-						} else {
-							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
 
-						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					boolean paramsSetSuccessfully;
+					if (isLocalFile(file, megaApiFolder, localPath)) {
+						paramsSetSuccessfully = setLocalIntentParams(this, file, pdfIntent,
+								localPath, false, this);
+					} else {
+						paramsSetSuccessfully = setStreamingIntentParams(this, file, megaApiFolder,
+								pdfIntent, this);
 					}
-					else {
-						String url;
-						if (dbH != null && dbH.getCredentials() != null) {
-							if (megaApi.httpServerIsRunning() == 0) {
-								megaApi.httpServerStart();
-							}
-
-							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-							activityManager.getMemoryInfo(mi);
-
-							if (mi.totalMem > BUFFER_COMP) {
-								logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-								megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-							}
-							else {
-								logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-								megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-							}
-
-							url = megaApi.httpServerGetLocalLink(file);
-						}
-						else {
-							if (megaApiFolder.httpServerIsRunning() == 0) {
-								megaApiFolder.httpServerStart();
-							}
-
-							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-							activityManager.getMemoryInfo(mi);
-
-							if (mi.totalMem > BUFFER_COMP) {
-								logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-								megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-							}
-							else {
-								logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-								megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-							}
-
-							url = megaApiFolder.httpServerGetLocalLink(file);
-						}
-						if (url != null) {
-							logDebug("FolderLink URL: " + url);
-							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-						}
+					if (!paramsSetSuccessfully) {
+						return;
 					}
+
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);
 					pdfIntent.putExtra("inside", true);
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
+					putThumbnailLocation(pdfIntent, listView, position, adapterList);
 					if (isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
 						startActivity(pdfIntent);
 					}

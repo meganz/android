@@ -181,7 +181,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         listView.invalidate();
     }
     
-    public void itemClick(int position,int[] screenPosition,ImageView imageView) {
+    public void itemClick(int position) {
         
         if (adapter.isMultipleSelect()) {
             logDebug("Multiselect ON");

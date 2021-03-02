@@ -356,7 +356,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
                         false, (ManagerActivityLollipop) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                        (ManagerActivityLollipop) requireActivity());
             }
 
             if (paramsSetSuccessfully) {
@@ -381,7 +382,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
                         false, (ManagerActivityLollipop) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                        (ManagerActivityLollipop) requireActivity());
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());

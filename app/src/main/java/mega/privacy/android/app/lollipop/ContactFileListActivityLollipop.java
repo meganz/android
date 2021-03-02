@@ -469,56 +469,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}, 50);
 	}
 
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			int position;
-			int adapterType;
-			int actionType;
-			ImageView imageDrag = null;
-
-			if (intent != null) {
-				position = intent.getIntExtra("position", -1);
-				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-				if (position != -1) {
-					if (adapterType == CONTACT_FILE_ADAPTER) {
-						if (cflF != null && cflF.isAdded()) {
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = cflF.getImageDrag(position);
-								if (cflF.imageDrag != null) {
-									cflF.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null) {
-									cflF.imageDrag = imageDrag;
-									cflF.imageDrag.setVisibility(View.GONE);
-								}
-							} else if (actionType == SCROLL_TO_POSITION) {
-								cflF.updateScrollPosition(position);
-							}
-						}
-					}
-				}
-
-				if (imageDrag != null) {
-					int[] positionDrag = new int[2];
-					int[] screenPosition = new int[4];
-					imageDrag.getLocationOnScreen(positionDrag);
-
-					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
-					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
-					screenPosition[2] = imageDrag.getWidth();
-					screenPosition[3] = imageDrag.getHeight();
-
-					Intent intent1 = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
-					intent1.putExtra("screenPosition", screenPosition);
-					sendBroadcast(intent1);
-				}
-			}
-		}
-	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -565,7 +515,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity = this;
 
-		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -705,7 +654,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			megaApi.removeRequestListener(this);
 		}
 
-		unregisterReceiver(receiver);
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
 

@@ -443,7 +443,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
                         requireActivity() as ManagerActivityLollipop)
                 } else {
-                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
+                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                        requireActivity() as ManagerActivityLollipop)
                 }
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)

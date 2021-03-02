@@ -29,8 +29,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaRecentActionBucket;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;

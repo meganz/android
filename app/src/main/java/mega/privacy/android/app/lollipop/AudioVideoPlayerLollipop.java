@@ -106,22 +106,11 @@ import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
-import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
-import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
-import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1532,88 +1521,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void showPreviousHiddenThumbnail(){
-        int visibility = View.VISIBLE;
-
-        if (adapterType == RUBBISH_BIN_ADAPTER){
-            if (RubbishBinFragmentLollipop.imageDrag != null){
-                RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == INBOX_ADAPTER){
-            if (InboxFragmentLollipop.imageDrag != null){
-                InboxFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == INCOMING_SHARES_ADAPTER){
-            if (IncomingSharesFragmentLollipop.imageDrag != null) {
-                IncomingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == OUTGOING_SHARES_ADAPTER){
-            if (OutgoingSharesFragmentLollipop.imageDrag != null){
-                OutgoingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == CONTACT_FILE_ADAPTER){
-            if (ContactFileListFragmentLollipop.imageDrag != null){
-                ContactFileListFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == FOLDER_LINK_ADAPTER){
-            if (FolderLinkActivityLollipop.imageDrag != null){
-                FolderLinkActivityLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == SEARCH_ADAPTER){
-            if (SearchFragmentLollipop.imageDrag != null){
-                SearchFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == FILE_BROWSER_ADAPTER){
-            if (FileBrowserFragmentLollipop.imageDrag != null){
-                FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
-            if (callback != null) {
-                callback.setVisibility(visibility);
-            }
-        } else if (adapterType == AUDIO_BROWSE_ADAPTER ||adapterType == AUDIO_SEARCH_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(AudioFragment.class);
-            if (callback != null) {
-                callback.setVisibility(visibility);
-            }
-        } else if (adapterType == VIDEO_BROWSE_ADAPTER ||adapterType == VIDEO_SEARCH_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
-            if (callback != null) {
-                callback.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == OFFLINE_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
-            if (callback != null) {
-                callback.setVisibility(visibility);
-            }
-        }
-        else if (adapterType == ZIP_ADAPTER) {
-            if (ZipBrowserActivityLollipop.imageDrag != null){
-                ZipBrowserActivityLollipop.imageDrag.setVisibility(visibility);
-            }
-        } else if (adapterType == LINKS_ADAPTER) {
-            if (LinksFragment.imageDrag != null){
-                LinksFragment.imageDrag.setVisibility(visibility);
-            }
-        } else if (adapterType == RECENTS_BUCKET_ADAPTER) {
-            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
-            if (callback != null) {
-                callback.setVisibility(visibility);
-            }
-        }
     }
 
     @Override
@@ -1623,86 +1530,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void getLocationOnScreen(int[] location){
-        if (adapterType == RUBBISH_BIN_ADAPTER){
-            if (RubbishBinFragmentLollipop.imageDrag != null) {
-                RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == INBOX_ADAPTER){
-            if (InboxFragmentLollipop.imageDrag != null){
-                InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == INCOMING_SHARES_ADAPTER){
-            if (IncomingSharesFragmentLollipop.imageDrag != null) {
-                IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == OUTGOING_SHARES_ADAPTER){
-            if (OutgoingSharesFragmentLollipop.imageDrag != null) {
-                OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == CONTACT_FILE_ADAPTER){
-            if (ContactFileListFragmentLollipop.imageDrag != null) {
-                ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == FOLDER_LINK_ADAPTER){
-            if (FolderLinkActivityLollipop.imageDrag != null) {
-                FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == SEARCH_ADAPTER){
-            if (SearchFragmentLollipop.imageDrag != null){
-                SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == FILE_BROWSER_ADAPTER){
-            if (FileBrowserFragmentLollipop.imageDrag != null){
-                FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        } else if (adapterType == AUDIO_BROWSE_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(AudioFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        } else if (adapterType == VIDEO_BROWSE_ADAPTER || adapterType == VIDEO_SEARCH_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == OFFLINE_ADAPTER){
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        }
-        else if (adapterType == ZIP_ADAPTER){
-            if (ZipBrowserActivityLollipop.imageDrag != null){
-                ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
-            }
-        } else if (adapterType == LINKS_ADAPTER){
-            if (LinksFragment.imageDrag != null){
-                LinksFragment.imageDrag.getLocationOnScreen(location);
-            }
-        } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
-            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        }
     }
 
     public void runEnterAnimation() {

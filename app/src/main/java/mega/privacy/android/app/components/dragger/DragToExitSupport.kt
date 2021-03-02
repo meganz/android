@@ -148,6 +148,12 @@ class DragToExitSupport(
                     widthScale = thumbnailLocation[LOCATION_INDEX_WIDTH].toFloat() / mainView.width
                     heightScale =
                         thumbnailLocation[LOCATION_INDEX_HEIGHT].toFloat() / mainView.height
+
+                    val newLoc = intArrayOf(*thumbnailLocation)
+                    newLoc[LOCATION_INDEX_LEFT] += newLoc[LOCATION_INDEX_WIDTH] / 2
+                    newLoc[LOCATION_INDEX_TOP] += newLoc[LOCATION_INDEX_HEIGHT] / 2
+
+                    draggableView?.screenPosition = newLoc
                 }
 
                 animationCallback(true)

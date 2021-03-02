@@ -7,9 +7,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
@@ -19,7 +23,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 
 public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
-        implements SectionTitleProvider {
+        implements SectionTitleProvider, DragThumbnailGetter {
 
     private final Listener mListener;
     private final List<CuNode> mNodes = new ArrayList<>();
@@ -30,6 +34,30 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         mListener = listener;
         mSpanCount = spanCount;
         mItemSizeConfig = itemSizeConfig;
+    }
+
+    @Override
+    public int getNodePosition(long handle) {
+        for (int i = 0, n = mNodes.size(); i < n; i++) {
+            MegaNode node = mNodes.get(i).getNode();
+            if (node != null && node.getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
+    }
+
+    @Nullable
+    @Override
+    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof CuImageViewHolder) {
+            return ((CuImageViewHolder) viewHolder).binding().thumbnail;
+        } else if (viewHolder instanceof CuVideoViewHolder) {
+            return ((CuVideoViewHolder) viewHolder).binding().thumbnail;
+        }
+
+        return null;
     }
 
     @Override public long getItemId(int position) {
@@ -92,45 +120,6 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             default:
                 return 1;
         }
-    }
-
-    public int[] getThumbnailLocationOnScreen(RecyclerView.ViewHolder holder) {
-        View thumbnail = null;
-        if (holder instanceof CuImageViewHolder) {
-            thumbnail = ((CuImageViewHolder) holder).binding().thumbnail;
-        } else if (holder instanceof CuVideoViewHolder) {
-            thumbnail = ((CuVideoViewHolder) holder).binding().thumbnail;
-        }
-
-        if (thumbnail == null) {
-            return null;
-        }
-
-        int[] topLeft = new int[2];
-        thumbnail.getLocationOnScreen(topLeft);
-
-        return new int[] {
-                topLeft[0], topLeft[1], thumbnail.getWidth(), thumbnail.getHeight()
-        };
-    }
-
-    public void setThumbnailVisibility(RecyclerView.ViewHolder holder, int visibility) {
-        if (holder instanceof CuImageViewHolder) {
-            ((CuImageViewHolder) holder).binding().thumbnail.setVisibility(visibility);
-        } else if (holder instanceof CuVideoViewHolder) {
-            ((CuVideoViewHolder) holder).binding().thumbnail.setVisibility(visibility);
-        }
-    }
-
-    public int getNodePosition(long handle) {
-        for (int i = 0, n = mNodes.size(); i < n; i++) {
-            MegaNode node = mNodes.get(i).getNode();
-            if (node != null && node.getHandle() == handle) {
-                return i;
-            }
-        }
-
-        return INVALID_POSITION;
     }
 
     public void showSelectionAnimation(int position, CuNode node, RecyclerView.ViewHolder holder) {

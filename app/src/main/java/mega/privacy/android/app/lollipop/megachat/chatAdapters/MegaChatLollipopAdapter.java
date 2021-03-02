@@ -7711,8 +7711,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (imageView != null) {
             imageView.getLocationOnScreen(screenPosition);
-            dimens[0] = screenPosition[0] + (imageView.getWidth() / 2);
-            dimens[1] = screenPosition[1] + (imageView.getHeight() / 2);
+            dimens[0] = screenPosition[0];
+            dimens[1] = screenPosition[1];
             dimens[2] = imageView.getWidth();
             dimens[3] = imageView.getHeight();
         }

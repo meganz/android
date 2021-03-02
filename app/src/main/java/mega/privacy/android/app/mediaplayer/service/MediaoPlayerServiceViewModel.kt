@@ -18,8 +18,8 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
+import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -220,7 +220,8 @@ class MediaoPlayerServiceViewModel(
                             LINKS_ADAPTER,
                             INCOMING_SHARES_ADAPTER,
                             OUTGOING_SHARES_ADAPTER,
-                            CONTACT_FILE_ADAPTER -> {
+                            CONTACT_FILE_ADAPTER,
+                            PHOTO_SYNC_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
                                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
@@ -306,7 +307,9 @@ class MediaoPlayerServiceViewModel(
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
                                 playlistTitle = context.getString(R.string.section_recents)
 
-                                buildPlaylistFromHandles(intent, firstPlayHandle)
+                                val handles =
+                                    intent.getLongArrayExtra(NODE_HANDLES) ?: return@Callable
+                                buildPlaylistFromHandles(handles.toList(), firstPlayHandle)
                             }
                             FOLDER_LINK_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
@@ -340,6 +343,12 @@ class MediaoPlayerServiceViewModel(
 
                                 val files = File(zipPath).parentFile?.listFiles() ?: return@Callable
                                 buildPlaylistFromFiles(files.asList(), firstPlayHandle)
+                            }
+                            SEARCH_BY_ADAPTER -> {
+                                val handles =
+                                    intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+                                        ?: return@Callable
+                                buildPlaylistFromHandles(handles.toList(), firstPlayHandle)
                             }
                         }
 
@@ -429,7 +438,8 @@ class MediaoPlayerServiceViewModel(
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
-            FOLDER_LINK_ADAPTER -> {
+            FOLDER_LINK_ADAPTER,
+            PHOTO_SYNC_ADAPTER -> {
                 val oldParentHandle = oldIntent.getLongExtra(
                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
@@ -451,6 +461,13 @@ class MediaoPlayerServiceViewModel(
                 val newZipPath =
                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
                 return oldZipPath == newZipPath
+            }
+            SEARCH_BY_ADAPTER -> {
+                val oldHandles = oldIntent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+                    ?: return false
+                val newHandles =
+                    intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return false
+                return oldHandles.contentEquals(newHandles)
             }
             else -> {
                 return false
@@ -490,11 +507,6 @@ class MediaoPlayerServiceViewModel(
                 getThumbnailFile(context, it)
             }
         )
-    }
-
-    private fun buildPlaylistFromHandles(intent: Intent, firstPlayHandle: Long) {
-        val handles = intent.getLongArrayExtra(NODE_HANDLES) ?: return
-        buildPlaylistFromHandles(handles.toList(), firstPlayHandle)
     }
 
     private fun buildPlaylistFromParent(parent: MegaNode, intent: Intent, firstPlayHandle: Long) {

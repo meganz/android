@@ -2,10 +2,8 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -24,9 +22,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -49,10 +49,11 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
-import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -62,9 +63,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class ZipBrowserActivityLollipop extends PinActivityLollipop{
-	public static ImageView imageDrag;
-	int[] screenPosition;
-
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP ="HANDLE_ZIP";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
@@ -182,80 +180,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 	}
 
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			int position;
-			int adapterType;
-			int actionType;
-			ImageView imageDrag = null;
-
-			if (intent != null) {
-				position = intent.getIntExtra("position", -1);
-				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-				if (position != -1) {
-					if (adapterType == ZIP_ADAPTER) {
-						if (actionType == UPDATE_IMAGE_DRAG) {
-							imageDrag = getImageDrag(position);
-							if (zipBrowserActivityLollipop.imageDrag != null) {
-								zipBrowserActivityLollipop.imageDrag.setVisibility(View.VISIBLE);
-							}
-							if (imageDrag != null) {
-								zipBrowserActivityLollipop.imageDrag = imageDrag;
-								zipBrowserActivityLollipop.imageDrag.setVisibility(View.GONE);
-							}
-						} else if (actionType == SCROLL_TO_POSITION) {
-							updateScrollPosition(position);
-						}
-					}
-				}
-
-				if (imageDrag != null){
-					int[] positionDrag = new int[2];
-					int[] screenPosition = new int[4];
-					imageDrag.getLocationOnScreen(positionDrag);
-
-					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
-					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
-					screenPosition[2] = imageDrag.getWidth();
-					screenPosition[3] = imageDrag.getHeight();
-
-					Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
-					intent1.putExtra("screenPosition", screenPosition);
-					sendBroadcast(intent1);
-				}
-			}
-		}
-	};
-
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapterList != null && mLayoutManager != null){
-			mLayoutManager.scrollToPosition(position);
-		}
-	}
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapterList != null && mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null){
-				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
-		unregisterReceiver(receiver);
-	}
-
 	@SuppressLint("NewApi") @Override
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
@@ -279,8 +203,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		currentPath = pathZip;
 		downloadLocationDefaultPath = getDownloadLocation();
 
-		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
-		
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);	
@@ -385,6 +307,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 
 		recyclerView.setAdapter(adapterList);
+
+		observeDragSupportEvents(this, recyclerView);
 	}
 
 	void orderZips () {
@@ -419,7 +343,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
         logDebug("Position: " + position);
 		
 		if (dbH == null){
-//			dbH = new DatabaseHandler(getApplicationContext());
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
@@ -439,6 +362,19 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
         logDebug("The absolutePath of the file to open is: " + absolutePath);
 
 		File currentFile = new File(absolutePath);
+		if (!currentFile.exists()) {
+			logError("zip entry position " + position + " file not exists");
+
+			new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+					.setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
+					.setPositiveButton(
+							StringResourcesUtils.getString(R.string.general_ok).toUpperCase(Locale.getDefault()),
+							(dialog, which) -> { })
+					.show();
+
+			return;
+		}
+
 		ZipEntry currentNode = zipNodes.get(position);
 
 		if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
@@ -450,7 +386,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("offlinePathDirectory", absolutePath);
 			intent.putExtra("orderGetChildren", orderGetChildren);
-			intent.putExtra("screenPosition", screenPosition);
+			putThumbnailLocation(intent, recyclerView, position, adapterList);
 			startActivity(intent);
 			overridePendingTransition(0,0);
 		}
@@ -483,7 +419,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			mediaIntent.putExtra("parentNodeHandle", -1L);
 			mediaIntent.putExtra("offlinePathDirectory", absolutePath);
 			mediaIntent.putExtra("orderGetChildren", orderGetChildren);
-			mediaIntent.putExtra("screenPosition", screenPosition);
+			putThumbnailLocation(mediaIntent, recyclerView, position, adapterList);
 			mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && absolutePath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -526,10 +462,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
 			pdfIntent.putExtra("inside", true);
-//			pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 			pdfIntent.putExtra("adapterType", ZIP_ADAPTER);
 			pdfIntent.putExtra("path", currentFile.getAbsolutePath());
-			pdfIntent.putExtra("screenPosition", screenPosition);
+			putThumbnailLocation(pdfIntent, recyclerView, position, adapterList);
 			pdfIntent.putExtra("offlinePathDirectory", absolutePath);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && absolutePath.contains(Environment.getExternalStorageDirectory().getPath())) {
 				pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -586,10 +521,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
     	super.onSaveInstanceState(outState);
 	}
 
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
         logDebug("Position: " + position);
-		this.screenPosition = screenPosition;
-		this.imageDrag = imageView;
 
 		ZipEntry currentNode = zipNodes.get(position);
 
