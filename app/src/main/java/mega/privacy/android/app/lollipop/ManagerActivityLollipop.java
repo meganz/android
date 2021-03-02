@@ -13336,64 +13336,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
-					}
-					dbH.saveMyFirstName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
-					}
-
-					dbH.saveMyLastName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+				updateMyData(true, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+				updateMyData(false, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
 
 				if(e.getErrorCode() == MegaError.API_OK){
 					logDebug("Attribute USER_ATTR_GEOLOCATION enabled");
@@ -14021,6 +13968,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 			if (maFLol != null) {
 				maFLol.initCreateQR(request, e);
+			}
+		}
+	}
+
+	/**
+	 * Updates own firstName/lastName and fullName data in UI and DB.
+	 *
+	 * @param firstName True if the update makes reference to the firstName, false it to the lastName.
+	 * @param newName   New firstName/lastName text.
+	 * @param e         MegaError of the request.
+	 */
+	private void updateMyData(boolean firstName, String newName, MegaError e) {
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
+		AccountController.updateMyData(firstName, newName, e);
+
+		if (accountInfo != null) {
+			accountInfo.setFullName();
+			updateUserNameNavigationView(accountInfo.getFullName());
+
+			if (getMyAccountFragment() != null) {
+				logDebug("Update the account fragment");
+				maFLol.updateNameView(accountInfo.getFullName());
 			}
 		}
 	}
