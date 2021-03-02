@@ -1859,8 +1859,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	 */
 	private void updateUI() {
 		if (chat == null || chat.getChatId() == MEGACHAT_INVALID_HANDLE) {
-			notificationsLayout.setVisibility(View.GONE);
-			dividerNotificationsLayout.setVisibility(View.GONE);
 			sharedFilesLayout.setVisibility(View.GONE);
 			dividerSharedFilesLayout.setVisibility(View.GONE);
 			manageChatLayout.setVisibility(View.GONE);
@@ -1882,6 +1880,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				manageChatLayout.setVisibility(View.GONE);
 				dividerClearChatLayout.setVisibility(View.GONE);
 			}
+
+			sharedFilesLayout.setVisibility(View.VISIBLE);
+			dividerSharedFilesLayout.setVisibility(View.VISIBLE);
 		}
 
 		checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
