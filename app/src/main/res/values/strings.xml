@@ -1768,7 +1768,7 @@
 
     <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Characters not allowed</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Invalid characters</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: \" * / : &lt; > \? \\ |</string>
 
     <plurals name="empty_names">
