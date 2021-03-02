@@ -22,7 +22,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@+id/edit_icon_layout"
-        android:layout_toEndOf="@+id/thumbnail_file">
+        android:layout_toEndOf="@+id/thumbnail_file"
+        app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/text_file"
@@ -31,7 +32,8 @@
             android:fontFamily="sans-serif"
             android:inputType="textNoSuggestions"
             android:singleLine="true"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:theme="@style/TransparentEditText" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,8 +51,8 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="22dp"
             android:layout_marginEnd="4dp"
-            android:alpha="0.5"
             android:src="@drawable/ic_rename"
+            app:tint="?android:attr/textColorSecondary"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>
@@ -60,7 +62,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="72dp"
         android:background="@color/grey_012_white_012" />
 
 </RelativeLayout>

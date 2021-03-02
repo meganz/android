@@ -2,9 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_container_import"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".lollipop.FileExplorerActivityLollipop">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,8 +18,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:gravity="start|center_vertical"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey" />
 
         <RelativeLayout
             android:id="@+id/files_layout"
@@ -43,6 +40,7 @@
             android:id="@+id/show_more_layout"
             android:layout_width="match_parent"
             android:layout_height="36dp"
+            android:layout_marginTop="8dp"
             android:layout_below="@id/files_layout"
             android:layout_marginStart="16dp">
 
@@ -56,8 +54,7 @@
                 android:layout_toStartOf="@id/show_more_image"
                 android:gravity="start|center_vertical"
                 android:text="@string/general_show_more"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor" />
 
             <ImageView
                 android:id="@+id/show_more_image"
@@ -87,19 +84,18 @@
             android:layout_marginEnd="16dp"
             android:gravity="start|center_vertical"
             android:text="@string/choose_destionation"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey" />
 
         <Button
             android:id="@+id/cloud_drive_button"
-            style="?attr/borderlessButtonStyle"
+            style="@style/Widget.Mega.Button.Transparent"
             android:layout_below="@+id/choose_destination"
             android:layout_marginTop="8dp"
             android:text="@string/section_cloud_drive" />
 
         <Button
             android:id="@+id/chat_button"
-            style="?attr/borderlessButtonStyle"
+            style="@style/Widget.Mega.Button.Transparent"
             android:layout_below="@+id/cloud_drive_button"
             android:layout_marginTop="12dp"
             android:text="@string/section_chat" />
