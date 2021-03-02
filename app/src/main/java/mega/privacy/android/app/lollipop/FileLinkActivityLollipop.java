@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -870,22 +871,23 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (intent == null) {
 			return;
 		}
-		
+
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			logDebug("URL: " + url + ", SIZE: " + size);
+
+			storeDownloadLocationIfNeeded(parentPath);
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
-        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();

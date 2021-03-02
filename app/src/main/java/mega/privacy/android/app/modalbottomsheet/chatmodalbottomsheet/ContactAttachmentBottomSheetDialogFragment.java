@@ -20,6 +20,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -265,7 +266,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        Intent i;
         long numUsers = message.getMessage().getUsersCount();
 
         switch (v.getId()) {
@@ -276,30 +276,27 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 }
 
                 long contactHandle = MEGACHAT_INVALID_HANDLE;
-                i = new Intent(context, ContactInfoActivityLollipop.class);
+                String contactEmail = null;
                 if (context instanceof ChatActivityLollipop) {
-                    i.putExtra(NAME, message.getMessage().getUserEmail(0));
+                    contactEmail = message.getMessage().getUserEmail(0);
                     contactHandle = message.getMessage().getUserHandle(0);
                 } else if (position != -1) {
-                    i.putExtra(NAME, message.getMessage().getUserEmail(position));
+                    contactEmail = message.getMessage().getUserEmail(position);
                     contactHandle = message.getMessage().getUserHandle(position);
                 } else {
                     logWarning("Error - position -1");
                 }
 
-                MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                if (chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0)) {
-                    i.putExtra(ACTION_CHAT_OPEN, true);
+                if (contactHandle != MEGACHAT_INVALID_HANDLE) {
+                    MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                    boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
+                    ContactUtil.openContactInfoActivity(context, contactEmail, isChatRoomOpen);
                 }
-                context.startActivity(i);
                 break;
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                i = new Intent(context, ContactAttachmentActivityLollipop.class);
-                i.putExtra("chatId", chatId);
-                i.putExtra(MESSAGE_ID, messageId);
-                context.startActivity(i);
+                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
                 break;
 
             case R.id.option_invite_layout:

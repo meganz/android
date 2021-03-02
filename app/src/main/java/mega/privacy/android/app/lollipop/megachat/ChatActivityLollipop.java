@@ -140,6 +140,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -1625,7 +1626,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         setPreviewersView();
-        titleToolbar.setText(chatRoom.getTitle());
+        titleToolbar.setText(getTitleChat(chatRoom));
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
         muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
@@ -4905,14 +4906,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                 if(nodeList.size()==1){
                                     MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
                                     if (MimeTypeList.typeForName(node.getName()).isImage()){
-
                                         if(node.hasPreview()){
                                             logDebug("Show full screen viewer");
                                             showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
                                         }
                                         else{
-                                            logDebug("Image without preview - show node attachment panel for one node");
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                            logDebug("Image without preview - open with");
+                                            openWith(this, node);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -5021,16 +5021,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                             logDebug("opusFile ");
                                             mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
                                         }
-                                        if(internalIntent){
+
+                                        if(internalIntent || isIntentAvailable(this, mediaIntent)){
                                             startActivity(mediaIntent);
-                                        }else{
-                                            logDebug("externalIntent");
-                                            if (isIntentAvailable(this, mediaIntent)){
-                                                startActivity(mediaIntent);
-                                            }else{
-                                                logDebug("noAvailableIntent");
-                                                showGeneralChatMessageBottomSheet(m, positionInMessages);
-                                            }
+                                        } else {
+                                            openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
                                         if (adapter != null) {
@@ -5118,40 +5113,44 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                         }
                                         pdfIntent.putExtra("HANDLE", node.getHandle());
 
-                                        if (isIntentAvailable(this, pdfIntent)){
+                                        if (isIntentAvailable(this, pdfIntent)) {
                                             startActivity(pdfIntent);
-                                        }
-                                        else{
+                                        } else {
                                             logWarning("noAvailableIntent");
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                            openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
-                                    }
-                                    else{
+                                    } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                        openWith(this, node);
                                     }
-                                }
-                                else{
-                                    logDebug("show node attachment panel");
-                                    showGeneralChatMessageBottomSheet(m, positionInMessages);
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                                logDebug("TYPE_CONTACT_ATTACHMENT");
                                 logDebug("show contact attachment panel");
-                                if (isOnline(this)) {
-                                    if (!chatC.isInAnonymousMode() && m != null) {
-                                        if (m.getMessage().getUsersCount() == 1) {
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
-                                        }else{
-                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
+                                if (!isOnline(this)) {
+                                    //No shown - is not possible to know is it already contact or not - megaApi not working
+                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                                } else if (!chatC.isInAnonymousMode()) {
+                                    if (m.getMessage().getUsersCount() < 1)
+                                        return;
+
+                                    if(m.getMessage().getUsersCount() > 1){
+                                        ContactUtil.openContactAttachmentActivity(this, idChat, m.getMessage().getMsgId());
+                                        return;
+                                    }
+
+                                    if (m.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle()) {
+                                        String email = m.getMessage().getUserEmail(0);
+                                        MegaUser contact = megaApi.getContact(email);
+
+                                        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                                            ContactUtil.openContactInfoActivity(this, email);
+                                        } else {
+                                            String text = getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, m.getMessage().getUserEmail(0));
                                         }
                                     }
-                                }
-                                else{
-                                    //No shown - is not possible to know is it already contact or not - megaApi not working
-                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                                 }
                             }
                             else if (m.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META) {
@@ -5195,9 +5194,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                 logDebug("TYPE_NORMAL");
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
 
-                                if(richLinkMessage == null){
-                                    showGeneralChatMessageBottomSheet(m, positionInMessages);
-                                }else{
+                                if(richLinkMessage != null){
                                     String url = richLinkMessage.getUrl();
                                     if (richLinkMessage.isChat()) {
                                         loadChatLink(url);
@@ -7443,6 +7440,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
         showSnackbar(type, fragmentContainer, s, idChat);
     }
 
+    public void showSnackbar(int type, String s, long idChat, String emailUser){
+        showSnackbar(type, fragmentContainer, s, idChat, emailUser);
+    }
+
     public void removeProgressDialog(){
         if (statusDialog != null) {
             try {
@@ -7663,7 +7664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                         if (initChat()) {
                             //Chat successfully initialized, now can rejoin
                             setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-                            titleToolbar.setText(chatRoom.getTitle());
+                            titleToolbar.setText(getTitleChat(chatRoom));
                             groupalSubtitleToolbar.setText(null);
                             setGroupalSubtitleToolbarVisibility(false);
 

@@ -3284,6 +3284,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            storeDownloadLocationIfNeeded(parentPath);
+
             if (adapterType == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);

@@ -7604,7 +7604,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
     private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
-            upgradeAccountMenuItem.setVisible(false);
+			doNotDisturbMenuItem.setVisible(false);
+			upgradeAccountMenuItem.setVisible(false);
             cancelAllTransfersMenuItem.setVisible(false);
             clearCompletedTransfers.setVisible(false);
             pauseTransfersMenuIcon.setVisible(false);
@@ -13187,64 +13188,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
-					}
-					dbH.saveMyFirstName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
-					}
-
-					dbH.saveMyLastName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+				updateMyData(true, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+				updateMyData(false, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
 
 				if(e.getErrorCode() == MegaError.API_OK){
 					logDebug("Attribute USER_ATTR_GEOLOCATION enabled");
@@ -13872,6 +13820,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 			if (maFLol != null) {
 				maFLol.initCreateQR(request, e);
+			}
+		}
+	}
+
+	/**
+	 * Updates own firstName/lastName and fullName data in UI and DB.
+	 *
+	 * @param firstName True if the update makes reference to the firstName, false it to the lastName.
+	 * @param newName   New firstName/lastName text.
+	 * @param e         MegaError of the request.
+	 */
+	private void updateMyData(boolean firstName, String newName, MegaError e) {
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
+		AccountController.updateMyData(firstName, newName, e);
+
+		if (accountInfo != null) {
+			accountInfo.setFullName();
+			updateUserNameNavigationView(accountInfo.getFullName());
+
+			if (getMyAccountFragment() != null) {
+				logDebug("Update the account fragment");
+				maFLol.updateNameView(accountInfo.getFullName());
 			}
 		}
 	}
@@ -14846,54 +14816,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				updateFabPositionAndShow(true);
 				break;
 
-			case SEARCH:
-				if (shouldShowFabWhenSearch()) {
-					updateFabPositionAndShow(false);
-				} else {
-					hideFabButton();
-				}
-				break;
-
 			default:
 				hideFabButton();
-		}
-	}
-
-	private boolean shouldShowFabWhenSearch() {
-		if (searchDrawerItem == null) {
-			return false;
-		}
-
-		switch (searchDrawerItem) {
-			case RUBBISH_BIN:
-			case INBOX:
-				return false;
-			case CLOUD_DRIVE:
-				return true;
-			case SHARED_ITEMS:
-				if (isFirstNavigationLevel()) return false;
-
-				if (searchSharedTab == INCOMING_TAB) {
-					if (parentHandleIncoming == INVALID_HANDLE) return false;
-
-					MegaNode node;
-					if (parentHandleSearch == INVALID_HANDLE) {
-						node = megaApi.getNodeByHandle(parentHandleIncoming);
-					} else {
-						node = megaApi.getNodeByHandle(parentHandleSearch);
-					}
-					if (node == null) return false;
-
-					int accessLevel = megaApi.getAccess(node);
-					if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
-						return true;
-					}
-				} else if ((searchSharedTab == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
-						|| (searchSharedTab == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
-					return true;
-				}
-			default:
-				return false;
 		}
 	}
 

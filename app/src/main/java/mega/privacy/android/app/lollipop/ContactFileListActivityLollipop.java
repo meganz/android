@@ -65,6 +65,7 @@ import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -999,6 +1000,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			logDebug("URL: " + url + "___SIZE: " + size);
+
+			Util.storeDownloadLocationIfNeeded(parentPath);
 
 			if (nC == null) {
 				nC = new NodeController(this);

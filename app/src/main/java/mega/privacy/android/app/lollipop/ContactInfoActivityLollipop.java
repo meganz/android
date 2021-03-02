@@ -1526,6 +1526,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
             logDebug("hashes size: "+hashes.length);
 
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
             boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);

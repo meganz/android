@@ -980,7 +980,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("ChatRoom ID: " + chat.getChatId());
 				logDebug("Chat timestamp: " + chat.getLastTimestamp());
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
-				String dateFS = formatDate(context,chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT);
+				String dateFS = formatDate(chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT);
 				logDebug("Date timestamp: " + date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;

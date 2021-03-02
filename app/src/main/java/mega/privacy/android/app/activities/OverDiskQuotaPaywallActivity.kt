@@ -137,20 +137,20 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                     email, files.toString(), size, getProPlanNeeded())
         }else if (warningsTs.size() == 1) {
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, 1,
-                    email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
+                    email, formatDate(warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         } else {
             var dates = String()
             val lastWarningIndex: Int = warningsTs.size() - 1
             for (i in 0 until lastWarningIndex) {
                 if (dates.isEmpty()) {
-                    dates += formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates += formatDate( warningsTs.get(i), DATE_LONG_FORMAT, false)
                 } else if (i != lastWarningIndex) {
-                    dates = dates + ", " + formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates = dates + ", " + formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false)
                 }
             }
 
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, warningsTs.size(),
-                    email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
+                    email, dates, formatDate(warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
         updateDeletionWarningText()

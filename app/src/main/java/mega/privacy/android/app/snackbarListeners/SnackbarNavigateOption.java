@@ -12,6 +12,7 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
@@ -22,6 +23,7 @@ public class SnackbarNavigateOption implements View.OnClickListener {
 
     Context context;
     long idChat;
+    private String userEmail;
     private int type;
     boolean isSentAsMessageSnackbar = false;
 
@@ -32,6 +34,12 @@ public class SnackbarNavigateOption implements View.OnClickListener {
     public SnackbarNavigateOption(Context context, int type) {
         this.context = context;
         this.type = type;
+    }
+
+    public SnackbarNavigateOption(Context context, int type, String userEmail) {
+        this.context = context;
+        this.type = type;
+        this.userEmail = userEmail;
     }
 
     public SnackbarNavigateOption(Context context, long idChat) {
@@ -53,6 +61,11 @@ public class SnackbarNavigateOption implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();
             }
 
+            return;
+        }
+
+        if(context instanceof ChatActivityLollipop && type == INVITE_CONTACT_TYPE){
+            new ContactController(context).inviteContact(userEmail);
             return;
         }
 

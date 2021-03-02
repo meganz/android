@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
@@ -19,6 +21,10 @@ import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -291,5 +297,43 @@ public class ContactUtil {
      */
     public static String getContactEmailDB(MegaContactDB contactDB) {
         return contactDB != null ? contactDB.getMail() : null;
+    }
+
+    /**
+     * Method to open ContactInfoActivityLollipop.class.
+     *
+     * @param context Activity context.
+     * @param name    The name of the contact.
+     */
+    public static void openContactInfoActivity(Context context, String name) {
+        openContactInfoActivity(context, name, false);
+    }
+
+    /**
+     * Method to open ContactInfoActivityLollipop.class.
+     *
+     * @param context        Activity context.
+     * @param name           The name of the contact.
+     * @param isChatRoomOpen True, if the chatRoom is already open. False, otherwise.
+     */
+    public static void openContactInfoActivity(Context context, String name, boolean isChatRoomOpen) {
+        Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+        i.putExtra(NAME, name);
+        i.putExtra(ACTION_CHAT_OPEN, isChatRoomOpen);
+        context.startActivity(i);
+    }
+
+    /**
+     * Method to open ContactAttachmentActivityLollipop.class.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of a chat.
+     * @param msgId   The ID of a message.
+     */
+    public static void openContactAttachmentActivity(Context context, long chatId, long msgId) {
+        Intent i = new Intent(context, ContactAttachmentActivityLollipop.class);
+        i.putExtra(CHAT_ID, chatId);
+        i.putExtra(MESSAGE_ID, msgId);
+        context.startActivity(i);
     }
 }

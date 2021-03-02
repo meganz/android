@@ -16,6 +16,7 @@ public class SettingsConstants {
     public static final String KEY_2FA = "settings_2fa_activated";
     public static final String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
     public static final String KEY_SECURITY_ADVANCED = "settings_security_advanced";
+    public static final String KEY_HELP_CENTRE = "settings_help_centre";
     public static final String KEY_HELP_SEND_FEEDBACK = "settings_help_send_feedback";
     public static final String CATEGORY_ABOUT = "settings_about";
     public static final String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";

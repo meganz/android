@@ -40,6 +40,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -439,9 +440,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
                 }
-                Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                intent.putExtra(NAME, myEmail);
-                startActivity(intent);
+                ContactUtil.openContactInfoActivity(context, myEmail);
                 ((QRCodeActivity) context).finish();
                 break;
             }

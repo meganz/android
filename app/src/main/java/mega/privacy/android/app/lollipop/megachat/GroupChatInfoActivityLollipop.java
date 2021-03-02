@@ -60,6 +60,7 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsC
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -145,7 +146,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
-                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
+
+                if (userHandle != INVALID_HANDLE) {
+                    updateAdapter(userHandle);
+
+                    if (!intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)
+                            && bottomSheetDialogFragment instanceof ParticipantBottomSheetDialogFragment
+                            && isBottomSheetDialogShown(bottomSheetDialogFragment)
+                            && selectedHandleParticipant == userHandle) {
+                        ((ParticipantBottomSheetDialogFragment) bottomSheetDialogFragment).updateContactData();
+                    }
+                }
             }
         }
     };
@@ -332,6 +344,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private void updateAdapter(long contactHandle) {
         chat = megaChatApi.getChatRoom(chatHandle);
+
+        if (contactHandle == megaChatApi.getMyUserHandle()) {
+            int pos = participants.size() - 1;
+            participants.get(pos).setFullName(StringResourcesUtils.getString(R.string.chat_me_text_bracket, megaChatApi.getMyFullname()));
+            adapter.updateParticipant(pos, participants);
+            return;
+        }
+
         for (MegaChatParticipant participant : participants) {
             if (participant.getHandle() == contactHandle) {
                 int pos = participants.indexOf(participant);

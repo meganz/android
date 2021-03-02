@@ -65,6 +65,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.openContactInfoActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -578,13 +579,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		else{
 			MegaUser contact = megaApi.getContact(listContacts.get(position).getUser());
-
 			if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-				i.putExtra(NAME, listContacts.get(position).getUser());
-				startActivity(i);
+				openContactInfoActivity(this, listContacts.get(position).getUser());
 			}
-
 		}
 	}
 

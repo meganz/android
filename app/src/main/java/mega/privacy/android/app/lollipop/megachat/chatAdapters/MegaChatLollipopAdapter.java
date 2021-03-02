@@ -1451,7 +1451,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (message.isUploading()) {
             if (message.getInfoToShow() != -1) {
                 setInfoToShow(position, ((ViewHolderMessageChat) holder), true, message.getInfoToShow(),
-                        formatDate(context, message.getPendingMessage().getUploadTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getPendingMessage().getUploadTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message.getPendingMessage().getUploadTimestamp()));
             }
 
@@ -1899,7 +1899,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -2043,7 +2043,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
@@ -2195,7 +2195,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             logDebug("Me alter participant");
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -2298,7 +2298,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
@@ -2471,7 +2471,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -2579,7 +2579,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
@@ -2723,7 +2723,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("MY message handle!!: " + message.getMsgId());
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                            formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                             formatTime(message));
                 }
 
@@ -2846,7 +2846,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                            formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                             formatTime(message));
                 }
 
@@ -2959,7 +2959,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                            formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                             formatTime(message));
                 }
 
@@ -3041,7 +3041,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                            formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                             formatTime(message));
                 }
 
@@ -3139,7 +3139,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, isMyMessage, messages.get(position - 1).getInfoToShow(),
-                    formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                     formatTime(message));
         }
 
@@ -3312,7 +3312,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT));
+                        holder.dateText.setText(formatDate(message.getTimestamp(), DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
                         holder.timeOwnText.setText(formatTime(message));
                         break;
@@ -3540,7 +3540,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -3727,7 +3727,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -4002,7 +4002,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -4206,7 +4206,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             logDebug("MY message handle!!: " + message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -4505,7 +4505,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -4892,7 +4892,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, isOwnMessage, messages.get(position - 1).getInfoToShow(),
-                    formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                     formatTime(message));
         }
 
@@ -5359,7 +5359,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             logDebug("MY message handle!!: " + message.getMsgId());
             if (messages.get(positionInAdapter - 1).getInfoToShow() != -1) {
                 setInfoToShow(positionInAdapter, holder, true, messages.get(positionInAdapter -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -5539,7 +5539,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(positionInAdapter - 1).getInfoToShow() != -1) {
                 setInfoToShow(positionInAdapter, holder, false, messages.get(positionInAdapter -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -5715,7 +5715,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -5820,7 +5820,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -5941,7 +5941,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             logDebug("MY message handle!!: " + message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6001,7 +6001,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6077,7 +6077,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                    formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                     formatTime(message));
         }
 
@@ -6166,7 +6166,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (messages.get(position - 1).getInfoToShow() != INVALID_INFO) {
             setInfoToShow(position, holder, isMyMessage(message), messages.get(position - 1).getInfoToShow(),
-                    formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                     formatTime(message));
         }
 
@@ -6252,7 +6252,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6288,7 +6288,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6332,7 +6332,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6398,7 +6398,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6485,7 +6485,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 
@@ -6554,7 +6554,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
-                        formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
                         formatTime(message));
             }
 

@@ -29,10 +29,10 @@ import java.util.ListIterator;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -40,7 +40,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -264,9 +263,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
-                    Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra(NAME, notif.getEmail());
-                    startActivity(intent);
+                    ContactUtil.openContactInfoActivity(context, notif.getEmail());
                 }
                 else{ ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
                     if(contacts!=null){
@@ -288,9 +285,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
-                    Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra(NAME, notif.getEmail());
-                    startActivity(intent);
+                    ContactUtil.openContactInfoActivity(context, notif.getEmail());
                 }
                 break;
             }

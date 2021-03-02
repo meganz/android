@@ -541,7 +541,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
-		if (mode.equals(Mode.PICK_FILE) || sdCardOperator.canWriteWithFile(sdCardRoot)) {
+
+		if (mode.equals(Mode.PICK_FILE)) {
 			sdRoot = sdCardRoot;
 		} else if (isBasedOnFileStorage()) {
 			try {
@@ -1203,7 +1204,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             logError("Initialize SDCardOperator failed", e);
         }
 
-        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath())) {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.createFolder(path.getAbsolutePath(), value);

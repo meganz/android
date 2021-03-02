@@ -64,6 +64,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -793,20 +794,23 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (intent == null) {
 			return;
 		}
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			storeDownloadLocationIfNeeded(parentPath);
 			chatC.prepareForDownload(intent, parentPath);
 		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-			if(!isOnline(this)||megaApi==null) {
-				try{
+			if (!isOnline(this) || megaApi == null) {
+				try {
 					statusDialog.dismiss();
-				} catch(Exception ex) {}
+				} catch (Exception ex) {
+				}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -816,7 +820,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 			MegaNode target = null;
 			target = megaApi.getNodeByHandle(toHandle);
-			if(target == null){
+			if (target == null) {
 				target = megaApi.getRootNode();
 			}
 			logDebug("TARGET HANDLE: " + target.getHandle());
@@ -828,8 +832,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					logError("TARGET: null");
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
-			}
-			else{
+			} else {
 				logError("DOCUMENT: null");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
 			}

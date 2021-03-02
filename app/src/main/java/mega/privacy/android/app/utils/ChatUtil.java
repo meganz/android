@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -691,8 +692,11 @@ public class ChatUtil {
             return chat.getTitle();
         }
 
-        MegaApplication app = MegaApplication.getInstance();
-        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
+        String date = formatDate(chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT);
+
+        return isTodayOrYesterday(chat.getCreationTs())
+                ? getString(R.string.inactive_chat_title_2, date.toLowerCase(Locale.getDefault()))
+                : getString(R.string.inactive_chat_title, date);
     }
 
     /**
