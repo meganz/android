@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -24,7 +23,6 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -38,7 +36,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -47,6 +44,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,6 +64,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -239,9 +239,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
-			MenuItem newFolderItem = menu.findItem(R.id.cab_menu_create_folder);
-			newFolderItem.setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_b_new_folder, R.color.white));
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+			tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
 			return true;
 		}
 
@@ -249,7 +247,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
+			tB.setElevation(0);
 		}
 
 		@Override
@@ -309,7 +307,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-
         newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
@@ -337,7 +334,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						REQUEST_WRITE_STORAGE);
 			}
 		}
-		changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
@@ -352,7 +348,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
@@ -404,8 +399,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
-		boolean actionButtonAccentStyle = true;
-
 		if (fromSaveRecoveryKey) {
 			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
 		} else if (fromSettings) {
@@ -413,18 +406,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		} else if (mode == Mode.PICK_FOLDER) {
 			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.PICK_FILE){
-			actionButtonAccentStyle = false;
 			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.BROWSE_FILES) {
 			buttonsContainer.setVisibility(View.GONE);
-		}
-
-		if (actionButtonAccentStyle) {
-			button.setTextColor(ContextCompat.getColor(this, R.color.white));
-			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_accent_button));
-		} else {
-			button.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
 		}
 
 		rootLevelLayout = findViewById(R.id.root_level_layout);
@@ -436,13 +420,17 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		emptyImageView = findViewById(R.id.file_storage_empty_image);
 		emptyTextView = findViewById(R.id.file_storage_empty_text);
-		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
 
-		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
+		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		} catch (Exception e) {
 			logWarning("Exception formatting text, ", e);
@@ -453,7 +441,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		
 		if (adapter == null){
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);
@@ -545,7 +533,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
-		if (mode.equals(Mode.PICK_FILE) || sdCardOperator.canWriteWithFile(sdCardRoot)) {
+
+		if (mode.equals(Mode.PICK_FILE)) {
 			sdRoot = sdCardRoot;
 		} else if (isBasedOnFileStorage()) {
 			try {
@@ -652,7 +641,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
 	}
 
 	@Override
@@ -862,7 +851,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			prefs = dbH.getPreferences();
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
 		builder.setView(v);
 
@@ -1021,19 +1010,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 	}
-	
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		view.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) FileStorageActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
-	}
 
 	@Override
 	public void finishRenameActionWithSuccess() {
@@ -1056,7 +1032,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             logError("Initialize SDCardOperator failed", e);
         }
 
-        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath())) {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.createFolder(path.getAbsolutePath(), value);

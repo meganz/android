@@ -9,13 +9,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColorStateList
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
@@ -47,7 +47,7 @@ class MegaNodeDialogUtil {
             actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
             val renameDialogBuilder =
-                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             renameDialogBuilder
                 .setTitle(getString(R.string.rename_dialog_title, node.name))
@@ -78,7 +78,7 @@ class MegaNodeDialogUtil {
             actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
             val newFolderDialogBuilder =
-                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             newFolderDialogBuilder
                 .setTitle(R.string.menu_new_folder)
@@ -107,7 +107,7 @@ class MegaNodeDialogUtil {
         @JvmStatic
         fun showNewFileDialog(activity: Activity, parent: MegaNode, data: String): AlertDialog {
             val newFileDialogBuilder =
-                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             newFileDialogBuilder
                 .setTitle(R.string.context_new_file_name)
@@ -142,7 +142,7 @@ class MegaNodeDialogUtil {
             defaultURLName: String?
         ): AlertDialog {
             val newURLFileDialogBuilder =
-                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             newURLFileDialogBuilder
                 .setTitle(R.string.dialog_title_new_link)
@@ -215,7 +215,7 @@ class MegaNodeDialogUtil {
                     }
                 }
 
-                doAfterTextChanged { quitDialogError(activity, typeText, errorText) }
+                doAfterTextChanged { quitDialogError(typeText, errorText) }
 
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -235,7 +235,7 @@ class MegaNodeDialogUtil {
                 }
             }
 
-            quitDialogError(activity, typeText, errorText)
+            quitDialogError(typeText, errorText)
 
             dialog.show()
 
@@ -291,7 +291,6 @@ class MegaNodeDialogUtil {
             when {
                 typedString.isEmpty() -> {
                     showDialogError(
-                        activity,
                         typeText,
                         errorText,
                         getString(R.string.invalid_string)
@@ -299,7 +298,6 @@ class MegaNodeDialogUtil {
                 }
                 Pattern.compile(NODE_NAME_REGEX).matcher(typedString).find() -> {
                     showDialogError(
-                        activity,
                         typeText,
                         errorText,
                         getString(R.string.invalid_characters_defined)
@@ -341,23 +339,17 @@ class MegaNodeDialogUtil {
         /**
          * Shows an error in a dialog and updates the input text field UI in consequence.
          *
-         * @param activity  Current activity.
          * @param typeText  The input text field.
          * @param errorText The text field to show the error.
          * @param error     Text to show as error.
          */
         @SuppressLint("UseCompatLoadingForColorStateLists")
-        private fun showDialogError(
-            activity: Activity,
-            typeText: EditText?,
-            errorText: TextView?,
-            error: String
-        ) {
-            typeText?.apply {
-                backgroundTintList = getColorStateList(activity, R.color.background_error_input_text)
-                setTextColor(ContextCompat.getColor(activity, R.color.dark_primary_color))
-                requestFocus()
+        private fun showDialogError(typeText: EditText?, errorText: TextView?, error: String) {
+            if (typeText != null) {
+                setErrorAwareInputAppearance(typeText, true)
             }
+
+            typeText?.requestFocus()
 
             errorText?.apply {
                 visibility = VISIBLE
@@ -368,20 +360,16 @@ class MegaNodeDialogUtil {
         /**
          * Hides an error from a dialog and updates the input text field UI in consequence.
          *
-         * @param activity  Current activity.
          * @param typeText  The input text field.
          * @param errorText The text field to hide the error.
          */
         @SuppressLint("UseCompatLoadingForColorStateLists")
-        private fun quitDialogError(
-            activity: Activity, typeText: EditText?, errorText: TextView?
-        ) {
-            typeText?.apply {
-                backgroundTintList = getColorStateList(activity, R.color.background_right_input_text)
-                setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
-                requestFocus()
+        private fun quitDialogError(typeText: EditText?, errorText: TextView?) {
+            if (typeText != null) {
+                setErrorAwareInputAppearance(typeText, false)
             }
 
+            typeText?.requestFocus()
             errorText?.visibility = GONE
         }
     }

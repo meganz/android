@@ -206,7 +206,7 @@ public class CallService extends Service{
                     .setAutoCancel(false)
                     .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall)
                     .setOngoing(false)
-                    .setColor(ContextCompat.getColor(this, R.color.mega));
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
             String title;
             String email;
@@ -257,7 +257,7 @@ public class CallService extends Service{
                     .setOngoing(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+                mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             }
 
             String title;

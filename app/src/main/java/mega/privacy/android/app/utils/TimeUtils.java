@@ -150,34 +150,34 @@ public class TimeUtils implements Comparator<Calendar> {
 
     /**
      Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp){
-        return formatDate(context, timestamp, DATE_LONG_FORMAT, true);
+    public static String formatDate(long timestamp){
+        return formatDate(timestamp, DATE_LONG_FORMAT, true);
     }
 
     /**
      * Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp, int format){
-        return formatDate(context, timestamp, format, true);
+    public static String formatDate(long timestamp, int format){
+        return formatDate(timestamp, format, true);
     }
 
     /**
      * Gets a date formatted string from a timestamp.
-     * @param context   Current context.
+     *
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @param humanized Use humanized date format (i.e. today, yesterday or week day).
      * @return The date formatted string.
      */
-    public static String formatDate(Context context, long timestamp, int format, boolean humanized) {
+    public static String formatDate(long timestamp, int format, boolean humanized) {
 
         Locale locale = Locale.getDefault();
         DateFormat df;
@@ -211,9 +211,9 @@ public class TimeUtils implements Comparator<Calendar> {
             TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             if (tc.compare(cal, calToday) == 0) {
-                return context.getString(R.string.label_today);
+                return getString(R.string.label_today);
             } else if (tc.compare(cal, calYesterday) == 0) {
-                return context.getString(R.string.label_yesterday);
+                return getString(R.string.label_yesterday);
             } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
                 return new SimpleDateFormat("EEEE", locale).format(date);
@@ -224,6 +224,17 @@ public class TimeUtils implements Comparator<Calendar> {
         df.setTimeZone(tz);
         Date date = cal.getTime();
         return df.format(date);
+    }
+
+    public static boolean isTodayOrYesterday(long timestamp) {
+        Calendar date = calculateDateFromTimestamp(timestamp);
+        Calendar today = Calendar.getInstance();
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DATE, -1);
+
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+
+        return tc.compare(date, today) == 0 || tc.compare(date, yesterday) == 0;
     }
 
     public static String formatShortDateTime(long timestamp){

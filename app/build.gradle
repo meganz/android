@@ -143,7 +143,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
@@ -166,7 +166,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
-    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
@@ -181,7 +181,7 @@ dependencies {
     implementation 'androidx.emoji:emoji:1.1.0'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.emoji:emoji-bundled:1.1.0'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
     implementation 'com.github.tony19:named-regexp:0.2.5'

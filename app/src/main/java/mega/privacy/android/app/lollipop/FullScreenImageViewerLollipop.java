@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,6 +16,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -33,6 +35,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
@@ -79,7 +82,9 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -175,7 +180,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
-	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+	private AlertDialog downloadConfirmationDialog;
 
 	MegaOffline currentNode;
 
@@ -210,7 +215,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
-	private androidx.appcompat.app.AlertDialog renameDialog;
+	private AlertDialog renameDialog;
 
 	int orderGetChildren = ORDER_DEFAULT_ASC;
 
@@ -299,7 +304,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
-		chatIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -675,8 +679,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}
-				androidx.appcompat.app.AlertDialog removeLinkDialog;
-				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				AlertDialog removeLinkDialog;
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -850,8 +854,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	}
 
 	@Override
+	protected boolean shouldSetStatusBarTextColor() {
+		return false;
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
+
+		Window window = getWindow();
+		window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
@@ -951,12 +965,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
-
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
@@ -1778,13 +1789,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		};
 
 		if (moveToRubbish){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1971,6 +1982,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
             if(adapterType == FILE_LINK_ADAPTER){
 				if (nC == null) {
 					nC = new NodeController(this);
@@ -2154,7 +2168,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2162,13 +2176,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
 		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
 		builder.setPositiveButton(getString(R.string.general_save_to_device),
@@ -2203,7 +2215,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2211,7 +2223,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -2277,7 +2289,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(400L).start();
 				bottomLayout.animate().translationY(0).setDuration(400L).start();
-				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 			}
 		}
 	}
@@ -2435,7 +2446,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		}
 		draggableView.setDraggableListener(this);
 		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 		container.addView(ivShadow, params);
 		container.addView(draggableView);

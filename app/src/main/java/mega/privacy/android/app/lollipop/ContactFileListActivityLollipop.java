@@ -10,15 +10,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -33,7 +32,6 @@ import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +55,9 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -103,7 +103,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	ContactFileListFragmentLollipop cflF;
 
 	NodeController nC;
-	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+	private AlertDialog downloadConfirmationDialog;
 
 	CoordinatorLayout coordinatorLayout;
 	Handler handler;
@@ -184,6 +184,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
 		menu.findItem(R.id.cab_menu_sort).setVisible(false);
+		menu.findItem(R.id.cab_menu_search).setVisible(false);
 		menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
@@ -393,7 +394,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		} else {
 			this.setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1));
 		}
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 
 		if (megaApi == null) {
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
@@ -672,6 +672,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			logDebug("URL: " + url + "___SIZE: " + size);
 
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
 			if (nC == null) {
 				nC = new NodeController(this);
 			}
@@ -779,7 +781,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
 			if (parent.isFolder()) {
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
@@ -789,10 +791,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				});
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
 		} else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			if (intent == null) {
@@ -972,7 +970,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		if (handleList != null) {
 
 			if (handleList.size() > 0) {
-				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 				if (handleList.size() > 1) {
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
 				} else {
@@ -1227,7 +1225,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -1272,7 +1270,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 

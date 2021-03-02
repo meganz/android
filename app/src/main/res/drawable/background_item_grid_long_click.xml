@@ -1,9 +1,0 @@
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:bottom="-2dp" android:left="1dp" android:right="1dp" android:top="0dp">
-         <shape android:shape="rectangle">
-         	<solid android:color="#80ffffff"/>
-         	<stroke android:width="2dp" android:color="@color/grid_item_border"></stroke>
-         	<corners android:bottomRightRadius="0dp" android:bottomLeftRadius="0dp"    android:topLeftRadius="5dp" android:topRightRadius="5dp"/>
-         </shape>
-    </item>
-</layer-list>

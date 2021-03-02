@@ -9,6 +9,7 @@ import android.os.Handler;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -28,6 +29,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -112,7 +115,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-//		dbH = new DatabaseHandler(this);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		prefs = dbH.getPreferences();
 		att = dbH.getAttributes();
@@ -179,7 +181,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		redLayout.setVisibility(View.GONE);
 
 		textLogout = (TextView) findViewById(R.id.alert_text);
-		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20));
 		//Margins
 		RelativeLayout.LayoutParams textLogoutParams = (RelativeLayout.LayoutParams)textLogout.getLayoutParams();
 		textLogoutParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
@@ -234,6 +235,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				//Log out!!
 				logWarning("INTENTS==10 - LOGOUT");
 				redLayout.setVisibility(View.VISIBLE);
+
 				textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 				hideKeyboard(this);
@@ -249,7 +251,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						logWarning("Logout!!!");
 						attemps=0;
 						att.setAttemps(attemps);
-//						dbH.setAttributes(att);
 						dbH.setAttrAttemps(attemps);
 						AccountController accountController = new AccountController(getApplicationContext());
 						accountController.logout(pinLockActivity, megaApi);
@@ -261,11 +262,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			//Show alert
 			logDebug("Attemps less than 5: " + attemps);
 			warningLayout.setVisibility(View.VISIBLE);
+			unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		}
 		else{
 			//Hide alert
 			logDebug("Number of attemps: " + attemps);
 			warningLayout.setVisibility(View.INVISIBLE);
+            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		}
 
 		if (prefs != null){
@@ -954,11 +957,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 							message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 		            	showSnackbar(message);
 
@@ -1053,11 +1058,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 			        	showSnackbar(message);
 
@@ -1153,11 +1160,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 
 			        	showSnackbar(message);
@@ -1241,11 +1250,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 			        	showSnackbar(message);
 
@@ -1299,7 +1310,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		ViewGroup.MarginLayoutParams pinANMLP = (ViewGroup.MarginLayoutParams) pinANCheck.getLayoutParams();
 		pinANMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		builder.setView(dialoglayout);
 		builder.setTitle(getString(R.string.pin_lock_type));
 

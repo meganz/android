@@ -1,9 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".FileExplorerListFragment" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
 	<FrameLayout
 		android:id="@+id/ad_view_container"
@@ -14,17 +12,6 @@
 		android:id="@+id/content_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
-
-		<TextView
-			android:id="@+id/content_text"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingLeft="8dp"
-			android:paddingTop="3dp"
-			android:paddingBottom="3dp"
-			android:textColor="@color/white"
-			android:background="@color/content_text_folder"
-			android:textSize="14sp"/>
 
 		<RelativeLayout
 			android:layout_width="match_parent"
@@ -49,47 +36,40 @@
 					android:orientation="horizontal"
 					android:layout_below="@id/file_list_empty_image"
 					android:layout_centerHorizontal="true">
-
 					<TextView
 						android:id="@+id/file_list_empty_text_first"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:fontFamily="sans-serif"
-						android:textAllCaps="true"
-						android:textColor="@color/text_secondary"
-						android:textSize="14sp" />
+						android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
 				</LinearLayout>
 			</RelativeLayout>
 		</RelativeLayout>
 
 		<LinearLayout
 			android:id="@+id/options_explorer_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="52dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentEnd="true"
 			android:layout_alignParentBottom="true"
-			android:background="@color/white"
+			android:layout_marginBottom="16dp"
 			android:gravity="end|center_vertical"
-			android:orientation="horizontal">
+			android:orientation="horizontal"
+			android:padding="5dp">
 
 			<Button
 				android:id="@+id/cancel_text"
-				style="@style/TransparentBackgroundButtonWithoutBorder"
-				android:layout_gravity="center_vertical"
-				android:layout_marginStart="16dp"
-				android:layout_marginEnd="12dp" />
+				android:layout_marginEnd="16dp"
+				style="?attr/borderlessButtonStyle"/>
 
 			<Button
 				android:id="@+id/action_text"
-				style="@style/AccentButton"
-				android:layout_gravity="center_vertical"
-				android:layout_marginEnd="16dp" />
-
+				style="?attr/borderlessButtonStyle"
+				android:layout_marginEnd="19dp"/>
 		</LinearLayout>
 
 		<RelativeLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_below="@id/content_text"
 			android:layout_above="@id/options_explorer_layout">
 
 			<androidx.recyclerview.widget.RecyclerView

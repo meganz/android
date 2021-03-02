@@ -27,7 +27,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:gravity="center"
-            android:textColor="@color/primary_text"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             app:emojiSize="20sp" />
 
@@ -36,12 +36,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/group_name_text"
+            android:textColor="?android:attr/textColorPrimary"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/primary_text"
             android:textSize="16sp" />
 
         <View
@@ -50,7 +50,7 @@
             android:layout_below="@+id/chat_link_text"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:background="@color/accentColor" />
+            android:background="?attr/colorSecondary" />
 
         <TextView
             android:id="@+id/description"
@@ -61,36 +61,32 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="24dp"
             android:text="@string/copy_link_explanation"
-            android:textColor="@color/secondary_text"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
         <Button
             android:id="@+id/copy_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_below="@+id/description"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="20dp"
-            android:text="@string/context_copy"
-            android:textSize="14sp" />
+            android:text="@string/context_copy" />
 
         <Button
             android:id="@+id/share_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_below="@+id/copy_button"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
-            android:text="@string/general_share"
-            android:textSize="14sp" />
+            android:text="@string/general_share" />
 
         <Button
             android:id="@+id/dismiss_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_below="@+id/share_button"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="14dp"
-            android:text="@string/general_dismiss"
-            android:textSize="14sp" />
+            android:text="@string/general_dismiss" />
 
     </RelativeLayout>
 

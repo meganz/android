@@ -67,7 +67,7 @@ ext {
     gsonVersion = '2.8.5'
     ktxVersion = '1.3.2'
     lifecycleVersion = '2.2.0'
-    materialVersion = '1.2.1'
+    materialVersion = '1.3.0'
     recyclerViewVersion = '1.1.0'
     roomVersion = '2.2.5'
     viewPagerVersion = '1.0.0'

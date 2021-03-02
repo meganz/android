@@ -50,6 +50,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
@@ -72,7 +73,6 @@ import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -96,6 +96,7 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -156,9 +157,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     MegaApiAndroid megaApi;
     MegaApiAndroid megaApiFolder;
     MegaChatApiAndroid megaChatApi;
-    MegaPreferences prefs = null;
 
-    private AlertDialog alertDialogTransferOverquota;
     public ProgressBar progressBar;
 
     public static boolean loading = true;
@@ -220,7 +219,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
     NodeController nC;
     private OfflineNodeSaver offlineNodeSaver;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private RelativeLayout bottomLayout;
@@ -268,10 +267,21 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     }
 
     @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
+    }
+
+    @Override
     public void onCreate (Bundle savedInstanceState){
         logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        Window window = getWindow();
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         pdfViewerActivityLollipop = this;
 
@@ -500,11 +510,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
         actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
@@ -618,7 +623,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                                 aB.hide();
                             }
                         }).start();
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 bottomLayout.animate().translationY(220).setDuration(0).start();
                 uploadContainer.animate().translationY(220).setDuration(0).start();
                 pageNumber.animate().translationY(0).setDuration(0).start();
@@ -807,17 +811,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-            }
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
 
             bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
             fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
@@ -1200,7 +1193,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         toolbarVisible = true;
         aB.show();
         if(tB != null) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
@@ -1217,7 +1209,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         logDebug("Duration: " + duration);
         toolbarVisible = false;
         if(tB != null) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(-220).setDuration(duration).withEndAction(new Runnable() {
                 @Override
                 public void run() {
@@ -1229,7 +1220,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             aB.hide();
         }
     }
@@ -1272,7 +1262,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
         downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
         chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
-        chatMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
@@ -1283,7 +1272,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
         importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
         saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
-        saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
         if (!inside){
@@ -1758,13 +1746,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setMessage(R.string.confirmation_delete_one_attachment);
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1851,13 +1833,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         };
 
         if (moveToRubbish){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_move_to_rubbish);
             builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
         }
         else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_delete_from_mega);
             builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1939,8 +1921,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     }
 
     public void showRemoveLink(){
-        androidx.appcompat.app.AlertDialog removeLinkDialog;
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        AlertDialog removeLinkDialog;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -2120,6 +2102,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            Util.storeDownloadLocationIfNeeded(parentPath);
+
             if (type == FILE_LINK_ADAPTER){
                 if (nC == null) {
                     nC = new NodeController(this);
@@ -2353,15 +2337,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
             if (e.getErrorCode() == MegaError.API_OK){
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-                }
-
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();
                 String myUserHandle = "";
@@ -2667,7 +2642,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2675,7 +2650,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2711,7 +2686,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2719,7 +2694,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2760,7 +2735,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2768,7 +2743,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
         confirmationLayout.addView(dontShowAgain, params);
 

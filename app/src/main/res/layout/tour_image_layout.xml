@@ -19,8 +19,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginTop="20dp"
-        android:textSize="22sp"
-        android:textColor="@color/primary_text"
+        android:textAppearance="?attr/textAppearanceHeadline5"
         android:gravity="center"/>
 
     <TextView
@@ -32,8 +31,8 @@
         android:layout_marginTop="8dp"
         android:layout_alignTop="@+id/invisible_view"
         android:lineSpacingExtra="5sp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"
         android:textSize="15sp"
-        android:textColor="@color/secondary_text"
         android:gravity="center"/>
 
 </LinearLayout>

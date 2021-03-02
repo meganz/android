@@ -19,9 +19,8 @@
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:fontFamily="sans-serif"
             android:gravity="start|center_vertical"
-            android:textColor="@color/secondary_text"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
             android:textSize="14sp" />
 
         <RelativeLayout
@@ -55,10 +54,9 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@id/show_more_image"
-                android:fontFamily="sans-serif"
                 android:gravity="start|center_vertical"
                 android:text="@string/general_show_more"
-                android:textColor="@color/accentColor"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor"
                 android:textSize="14sp" />
 
             <ImageView
@@ -75,7 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
         </RelativeLayout>
 
@@ -87,22 +85,21 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:fontFamily="sans-serif"
             android:gravity="start|center_vertical"
             android:text="@string/choose_destionation"
-            android:textColor="@color/secondary_text"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
             android:textSize="14sp" />
 
         <Button
             android:id="@+id/cloud_drive_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_below="@+id/choose_destination"
             android:layout_marginTop="8dp"
             android:text="@string/section_cloud_drive" />
 
         <Button
             android:id="@+id/chat_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_below="@+id/cloud_drive_button"
             android:layout_marginTop="12dp"
             android:text="@string/section_chat" />

@@ -191,7 +191,6 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
     public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
-    public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
@@ -498,6 +497,7 @@ public class Constants {
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
+    public static final int INVITE_CONTACT_TYPE = 5;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -741,6 +741,8 @@ public class Constants {
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 
+    public static final int MAX_BADGE_NUM = 9;
+
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
@@ -751,7 +753,14 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+    public static final String EVENT_PSA_VISIBILITY = "psa_visibility";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
+
+    public static final String STRING_SEPARATOR = " · ";
+
+    public static final int NOT_OVERQUOTA_STATE = 0;
+    public static final int OVERQUOTA_STORAGE_STATE = 1;
+    public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 }

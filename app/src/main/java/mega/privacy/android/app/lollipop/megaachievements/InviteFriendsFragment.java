@@ -17,6 +17,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.*;
@@ -45,6 +47,12 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
         inviteContactsBtn = v.findViewById(R.id.invite_contacts_button);
         inviteContactsBtn.setOnClickListener(this);
 		titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
+
+		if (Util.isDarkMode(context)) {
+			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+			v.findViewById(R.id.invite_contacts_layout).setBackgroundColor(backgroundColor);
+			v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
+		}
 
 		return v;
 	}
