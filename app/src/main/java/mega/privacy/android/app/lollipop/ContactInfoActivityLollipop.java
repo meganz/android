@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,6 +18,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -57,7 +58,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
@@ -84,6 +84,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -137,21 +138,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 	private ChatController chatC;
 	private ContactController cC;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
-    private androidx.appcompat.app.AlertDialog renameDialog;
+    private AlertDialog downloadConfirmationDialog;
+    private AlertDialog renameDialog;
 
 	private final static int MAX_WIDTH_APPBAR_LAND = 400;
 	private final static int MAX_WIDTH_APPBAR_PORT = 200;
 
 	RelativeLayout imageLayout;
-	android.app.AlertDialog permissionsDialog;
+	AlertDialog permissionsDialog;
 	ProgressDialog statusDialog;
 	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
 
-	View imageGradient;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
 
@@ -196,7 +196,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private EmojiTextView firstLineTextToolbar;
 	private int firstLineTextMaxWidthExpanded;
 	private int firstLineTextMaxWidthCollapsed;
-	private int contactStateIcon = R.drawable.ic_offline;
+	private int contactStateIcon = R.drawable.ic_offline_light;
 	private int contactStateIconPaddingLeft;
 
 	private MarqueeTextView secondLineTextToolbar;
@@ -295,6 +295,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 
 	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
@@ -488,8 +489,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineTextMaxWidthCollapsed = width;
 			firstLineTextToolbar.setMaxWidthEmojis(firstLineTextMaxWidthExpanded);
 			contactStateIconPaddingLeft = dp2px(8, outMetrics);
-
-			imageGradient = findViewById(R.id.gradient_view);
 
 			setTitle(null);
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -818,23 +817,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				contactStateIcon = R.drawable.ic_online;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_online_dark_standard
+						: R.drawable.ic_online_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.online_status));
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				contactStateIcon = R.drawable.ic_away;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_away_dark_standard
+						: R.drawable.ic_away_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				contactStateIcon = R.drawable.ic_busy;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_busy_dark_standard
+						: R.drawable.ic_busy_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				contactStateIcon = R.drawable.ic_offline;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_offline_dark_standard
+						: R.drawable.ic_offline_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 			}
@@ -859,7 +862,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		drawableArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
 		drawableArrow = drawableArrow.mutate();
 
-		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share);
 		drawableShare = drawableShare.mutate();
 		drawableSend = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
 		drawableSend = drawableSend.mutate();
@@ -870,6 +873,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
+
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
 		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
 		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
@@ -889,18 +893,24 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sendFileMenuItem.setVisible(false);
 		}
 
+		int statusBarColor = ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation));
+		if(isDarkMode(this)) {
+			collapsingToolbar.setContentScrimColor(statusBarColor);
+		}
+        collapsingToolbar.setStatusBarScrimColor(statusBarColor);
+
 		appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
 			@Override
 			public void onStateChanged(AppBarLayout appBarLayout, State state) {
 				stateToolbar = state;
 				if (stateToolbar == State.EXPANDED) {
-					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+					firstLineTextToolbar.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.white_alpha_087));
+					secondLineTextToolbar.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.white_alpha_087));
 					setColorFilterWhite();
 					visibilityStateIcon();
 				} else if (stateToolbar == State.COLLAPSED) {
-					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+					firstLineTextToolbar.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.grey_087_white_087));
+					secondLineTextToolbar.setTextColor(ColorUtils.getThemeColor(ContactInfoActivityLollipop.this, android.R.attr.textColorSecondary));
 					setColorFilterBlack();
 					visibilityStateIcon();
 				}
@@ -911,36 +921,37 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	void setColorFilterWhite () {
-
-		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+        int color = ContextCompat.getColor(this,R.color.white_alpha_087);
+		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
 
-		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		toolbar.setOverflowIcon(drawableDots);
 
 		if (shareMenuItem != null) {
-			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			shareMenuItem.setIcon(drawableShare);
 		}
 		if (sendFileMenuItem != null) {
-			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			sendFileMenuItem.setIcon(drawableSend);
 		}
 	}
 
 	void setColorFilterBlack () {
-		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        int color = ContextCompat.getColor(this,R.color.grey_087_white_087);
+		drawableArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
 
-		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+		drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 		toolbar.setOverflowIcon(drawableDots);
 
 		if (shareMenuItem != null) {
-			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			shareMenuItem.setIcon(drawableShare);
 		}
 		if (sendFileMenuItem != null) {
-			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			drawableSend.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			sendFileMenuItem.setIcon(drawableSend);
 		}
 	}
@@ -1115,7 +1126,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                 if (imBitmap != null) {
                     contactPropertiesImage.setImageBitmap(imBitmap);
-                    imageGradient.setVisibility(View.VISIBLE);
 
                     if (imBitmap != null && !imBitmap.isRecycled()) {
                         int colorBackground = getDominantColor1(imBitmap);
@@ -1138,7 +1148,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     megaApi.getUserAvatar(user,buildAvatarFile(this, user.getEmail()).getAbsolutePath(), this);
                 } else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
-					imageGradient.setVisibility(View.VISIBLE);
 
 					if (imBitmap != null && !imBitmap.isRecycled()) {
 						int colorBackground = getDominantColor1(imBitmap);
@@ -1351,14 +1360,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.requestFocus();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 		input.setEmojiSize(dp2px(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		showKeyboardDelayed(input);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
 		if (alias == null) {
@@ -1370,8 +1379,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			input.setSelection(input.length());
 			builder.setTitle(getString(R.string.edit_nickname));
 		}
-		int colorDisableButton = ContextCompat.getColor(this, R.color.accentColorTransparent);
-		int colorEnableButton = ContextCompat.getColor(this, R.color.accentColor);
+		int colorDisableButton = ContextCompat.getColor(this, R.color.teal_300_038_teal_200_038);
+		int colorEnableButton = ContextCompat.getColor(this, R.color.teal_300_teal_200);
 
 		input.addTextChangedListener(new TextWatcher() {
 			private void handleText() {
@@ -1459,7 +1468,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
 			if (parent.isFolder()){
-				android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -1471,10 +1480,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				});
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
         }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
@@ -1603,13 +1608,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	@Override
@@ -1634,7 +1638,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							avatar.delete();
 						} else {
 							contactPropertiesImage.setImageBitmap(imBitmap);
-							imageGradient.setVisibility(View.VISIBLE);
 
 							if (imBitmap != null && !imBitmap.isRecycled()) {
 								Palette palette = Palette.from(imBitmap).generate();
@@ -1990,7 +1993,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if(handleList!=null){
             
             if (handleList.size() > 0){
-                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
                 if (handleList.size() > 1){
                     builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
@@ -2058,11 +2061,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        
+
         input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
         input.setText(text);
+        input.requestFocus();
+
         input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(final View v, boolean hasFocus) {
@@ -2110,7 +2115,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
         
-        error_icon.setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.login_warning));
+        error_icon.setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300));
         
         final TextView textError = new TextView(ContactInfoActivityLollipop.this);
         error_layout.addView(textError);
@@ -2122,12 +2127,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
         textError.setLayoutParams(params_text_error);
         
-        textError.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.login_warning));
+        textError.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300));
         
         error_layout.setVisibility(View.GONE);
         
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2144,7 +2149,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
                 }
             }
         });
@@ -2158,7 +2163,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					logDebug("actionId is IME_ACTION_DONE");
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2172,9 +2177,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 return false;
             }
         });
-        
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ document.getName());
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2194,14 +2199,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 String value = input.getText().toString().trim();
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2265,7 +2270,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2273,7 +2278,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         
         confirmationLayout.addView(dontShowAgain, params);
         
@@ -2309,7 +2314,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2317,7 +2322,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         
         confirmationLayout.addView(dontShowAgain, params);
         

@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/primary_text"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             android:fontFamily="roboto"
             android:text="@string/no_authentication_apps_title"/>
@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/secondary_text"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp"
             android:fontFamily="roboto"
             android:text="@string/intent_not_available_2fa"
@@ -29,7 +29,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/secondary_text"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp"
             android:fontFamily="roboto"
             android:text="@string/open_play_store_2fa"
@@ -50,9 +50,6 @@
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:text="@string/general_cancel"
-                android:textSize="14sp"
-                android:fontFamily="roboto"
-                android:textColor="@color/accentColor"
                 android:layout_marginRight="8dp"/>
 
             <Button
@@ -60,10 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
-                android:text="@string/context_open_link"
-                android:textSize="14sp"
-                android:fontFamily="roboto"
-                android:textColor="@color/accentColor"/>
+                android:text="@string/context_open_link" />
 
         </LinearLayout>
 

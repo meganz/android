@@ -15,7 +15,7 @@
             android:layout_height="1dp"
             android:layout_above="@id/emojis_tab"
             android:layout_gravity="bottom"
-            android:background="@color/black_12_alpha" />
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:id="@+id/emojis_tab"

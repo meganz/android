@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
@@ -19,10 +18,13 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRAD
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logInfo
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
+import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
@@ -37,6 +39,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private var proPlanNeeded: Int? = 0
 
     private var deadlineTs: Long = -1
+
+    override fun shouldSetStatusBarTextColor() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +58,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         megaApi.getUserData(GetUserDataListener(this))
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
-        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.status_bar_red_alert)
+
+        setDrawUnderStatusBar(this, true)
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout)
 
@@ -187,7 +192,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]", "<font color='" + ContextCompat.getColor(applicationContext, R.color.mega) + "'>")
+            text = text.replace("[M]", "<font color='" + ColorUtils.getThemeColorHexString(applicationContext, R.attr.colorError) + "'>")
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)

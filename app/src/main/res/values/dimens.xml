@@ -22,7 +22,6 @@
     <dimen name="status_bar_height">24dp</dimen>
     <dimen name="left_margin_back_arrow">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="recycler_view_separator">72dp</dimen>
 
 
     <dimen name="width_image_pending_message_one_digit">20dp</dimen>
@@ -75,14 +74,14 @@
 
     <dimen name="homepage_node_grid_round_corner_radius">5dp</dimen>
 
-    <dimen name="empty_data_font_size">18sp</dimen>
+    <dimen name="empty_data_font_size">14sp</dimen>
 
     <dimen name="cu_fragment_ic_selected_size_large">23dp</dimen>
     <dimen name="cu_fragment_ic_selected_margin_large">8dp</dimen>
     <dimen name="cu_fragment_ic_selected_size_small">16dp</dimen>
     <dimen name="cu_fragment_ic_selected_margin_small">4dp</dimen>
-    <dimen name="cu_fragment_selected_padding">2dp</dimen>
-    <dimen name="cu_fragment_selected_round_corner_radius">4dp</dimen>
+    <dimen name="cu_fragment_selected_padding">1dp</dimen>
+    <dimen name="cu_fragment_selected_round_corner_radius">5dp</dimen>
     <dimen name="cu_fragment_image_margin_small">1dp</dimen>
     <dimen name="cu_fragment_image_margin_large">2dp</dimen>
 
@@ -92,4 +91,20 @@
     <dimen name="av_player_control_buttons_margin_top_portrait">14dp</dimen>
     <dimen name="av_player_control_buttons_margin_bottom_portrait">20dp</dimen>
     <dimen name="av_player_control_buttons_margin_bottom_landscape">5dp</dimen>
+
+    <!-- Dark mode refactor start -->
+
+    <dimen name="btn_padding_vertical">10dp</dimen>
+    <dimen name="btn_padding_horizontal">16dp</dimen>
+
+    <dimen name="linear_progress_size">4dp</dimen>
+
+    <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="drawer_item_height">48dp</dimen>
+
+    <dimen name="bottom_sheet_drawable_padding">32dp</dimen>
+    <dimen name="divider_width">72dp</dimen>
+
+    <!-- My account page button padding -->
+    <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
 </resources>

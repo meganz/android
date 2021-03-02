@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginHorizontal="10dp">
@@ -32,32 +33,31 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="Roboto"
-        android:text="TextView"
-        android:textColor="@color/homepage_fab_label_text_color"
-        android:textSize="15sp"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textColor="@color/grey_alpha_087"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="title" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="3dp"
-        android:fontFamily="Roboto"
         android:maxLines="3"
         android:singleLine="false"
-        android:text="TextView"
-        android:textColor="@color/file_properties_text_available"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
+        android:textColor="@color/grey_alpha_087"
         app:autoSizeMaxTextSize="13sp"
         app:autoSizeMinTextSize="10sp"
         app:autoSizeStepGranularity="1sp"
         app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
         app:layout_constraintStart_toStartOf="@+id/textView_title"
-        app:layout_constraintTop_toBottomOf="@id/textView_title" />
+        app:layout_constraintTop_toBottomOf="@id/textView_title"
+        tools:text="desc" />
 
     <ImageView
         android:id="@+id/imageView_dismiss"

@@ -40,6 +40,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
@@ -85,8 +86,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         screenOrientation = getResources().getConfiguration().orientation;
 
@@ -139,7 +138,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         currentLocationLandscape = findViewById(R.id.address_name_label_landscape);
 
         geocoder = new Geocoder(this, Locale.getDefault());
-        Bitmap icon = drawableBitmap(mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
+        Bitmap icon = drawableBitmap(mutateIconSecondary(this, R.drawable.ic_send_location, R.color.red_800));
 
         mapHandler = new MapHandlerImpl(this, icon);
 

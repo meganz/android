@@ -1,9 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,10 +14,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
@@ -118,8 +118,7 @@ public class DecryptAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         mContext = getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext,
-                R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(mContext);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
@@ -147,7 +146,7 @@ public class DecryptAlertDialog extends DialogFragment {
 
         if (TextUtil.isTextEmpty(mKey)) {
             mEdit.setHint(getString(R.string.password_text));
-            mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.text_secondary));
+            mEdit.setTextColor(ColorUtils.getThemeColor(mContext, android.R.attr.textColorPrimary));
         } else {
             showErrorMessage();
         }
@@ -190,7 +189,7 @@ public class DecryptAlertDialog extends DialogFragment {
                 dismiss();
             }
         });
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) -> {
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) -> {
             if (mListener != null) {
                 mListener.onDialogNegativeClick();
             }
@@ -205,10 +204,7 @@ public class DecryptAlertDialog extends DialogFragment {
 
         mEdit.setText(mKey);
         mEdit.setSelectAllOnFocus(true);
-        mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.dark_primary_color));
-        mEdit.getBackground().mutate().clearColorFilter();
-        mEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-                mContext, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+        ColorUtils.setErrorAwareInputAppearance(mEdit, true);
 
         mErrorView.setVisibility(View.VISIBLE);
     }
@@ -217,10 +213,7 @@ public class DecryptAlertDialog extends DialogFragment {
         if (mEdit == null || mErrorView == null) return;
 
         mErrorView.setVisibility(View.GONE);
-        mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.primary_text));
-        mEdit.getBackground().mutate().clearColorFilter();
-        mEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-                mContext, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        ColorUtils.setErrorAwareInputAppearance(mEdit, false);
     }
 
     private boolean validateInput() {

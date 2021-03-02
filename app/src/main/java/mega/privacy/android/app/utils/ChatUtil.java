@@ -147,7 +147,7 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
 
         if (context instanceof GroupChatInfoActivityLollipop) {
@@ -513,23 +513,24 @@ public class ChatUtil {
             return;
         }
 
+        Context context = contactStateIcon.getContext();
         contactStateIcon.setVisibility(View.VISIBLE);
 
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_online_dark_standard : R.drawable.ic_online_light);
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_away_dark_standard : R.drawable.ic_away_light);
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_busy_dark_standard : R.drawable.ic_busy_light);
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_offline_dark_standard : R.drawable.ic_offline_light);
                 break;
 
             case MegaChatApi.STATUS_INVALID:
@@ -764,7 +765,7 @@ public class ChatUtil {
     public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
         final AlertDialog muteDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
         if (chats == null) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);
@@ -947,19 +948,25 @@ public class ChatUtil {
      * @return The final bitmap.
      */
     public static Bitmap getStatusBitmap(int userStatus) {
+        Resources resources = MegaApplication.getInstance().getBaseContext().getResources();
+        boolean isDarkMode = Util.isDarkMode(MegaApplication.getInstance());
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_online_dark_standard
+                                : R.drawable.ic_online_light);
             case MegaChatApi.STATUS_AWAY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_away_dark_standard
+                                : R.drawable.ic_away_light);
             case MegaChatApi.STATUS_BUSY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_busy_dark_standard
+                                : R.drawable.ic_busy_light);
             case MegaChatApi.STATUS_OFFLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_offline_dark_standard
+                                : R.drawable.ic_offline_light);
             case MegaChatApi.STATUS_INVALID:
             default:
                 return null;
@@ -1000,7 +1007,7 @@ public class ChatUtil {
      * @param chat The MegaChatRoom.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.ResumeTransfersWarning);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         String message = context.getString(R.string.confirmation_clear_chat_history);
 
         builder.setTitle(R.string.title_properties_chat_clear)
@@ -1022,7 +1029,7 @@ public class ChatUtil {
             return;
 
         final AlertDialog historyRetentionDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
 
         View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
         TextView title = view.findViewById(R.id.title);
@@ -1246,7 +1253,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
@@ -1256,7 +1263,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)

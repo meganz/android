@@ -9,7 +9,7 @@
 		<item>1001</item>
 		<item>1002</item>
 	</string-array>
-	
+
 	<string-array name="settings_camera_upload_file_upload_values">
 		<item>1001</item>
 		<item>1002</item>
@@ -31,5 +31,17 @@
 	<string-array name="settings_video_upload_quality_values">
 		<item>0</item>
 		<item>1</item>
+	</string-array>
+	
+	<string-array name="theme_list_array">
+		<item>@string/theme_light</item>
+		<item>@string/theme_dark</item>
+		<item>@string/theme_battery_saver</item>
+	</string-array>
+
+	<string-array name="theme_entry_array">
+		<item>light</item>
+		<item>dark</item>
+		<item>default</item>
 	</string-array>
 </resources>
