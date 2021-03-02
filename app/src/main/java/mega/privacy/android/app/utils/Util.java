@@ -98,7 +98,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity;
 import mega.privacy.android.app.activities.GetLinkActivity;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -1495,8 +1494,6 @@ public class Util {
 			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatFullScreenImageViewer) {
 			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
-		} else if (context instanceof AudioVideoPlayerLollipop) {
-			((AudioVideoPlayerLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof PdfViewerActivityLollipop) {
 			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatActivityLollipop) {

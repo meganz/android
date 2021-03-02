@@ -24,7 +24,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -982,11 +981,6 @@ public class ChatController {
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             REQUEST_WRITE_STORAGE);
                 }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
             }
         }
 
@@ -1044,7 +1038,7 @@ public class ChatController {
             logDebug("serializeString: " + serializeString);
             service.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
-            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+            if (context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
             }
             context.startService(service);
