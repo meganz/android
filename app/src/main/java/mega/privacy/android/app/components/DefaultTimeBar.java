@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ColorUtils;
 
 /**
  * A time bar that shows a current position, buffered position, duration and ad markers.
@@ -281,8 +282,9 @@ public class DefaultTimeBar extends View implements TimeBar {
             DEFAULT_AD_MARKER_COLOR);
         int playedAdMarkerColor = a.getInt(com.google.android.exoplayer2.ui.R.styleable.DefaultTimeBar_played_ad_marker_color,
             getDefaultPlayedAdMarkerColor(adMarkerColor));
-        playedPaint.setColor(ContextCompat.getColor(context, R.color.accentColor));
-        scrubberPaint.setColor(ContextCompat.getColor(context, R.color.accentColor));
+        // Components in AV player fix to dark mode.
+        playedPaint.setColor(ContextCompat.getColor(context, R.color.teal_200));
+        scrubberPaint.setColor(ContextCompat.getColor(context, R.color.teal_200));
         bufferedPaint.setColor(bufferedColor);
         unplayedPaint.setColor(unplayedColor);
         adMarkerPaint.setColor(adMarkerColor);

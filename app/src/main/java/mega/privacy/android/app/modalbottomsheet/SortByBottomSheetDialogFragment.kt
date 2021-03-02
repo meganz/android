@@ -2,20 +2,17 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.os.Build
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
+import mega.privacy.android.app.utils.ColorUtils
+import nz.mega.sdk.MegaApiJava.*
+import java.util.*
 
 class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n", "RestrictedApi")
@@ -25,10 +22,10 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val binding = BottomSheetSortByBinding.inflate(LayoutInflater.from(context), null, false)
 
         val sortByName = getString(R.string.sortby_name)
-        val sortByAsc = getString(R.string.sortby_name_ascending)
-        val sortByDesc = getString(R.string.sortby_name_descending)
-        binding.sortByNameAsc.text = "$sortByName     $sortByAsc"
-        binding.sortByNameDesc.text = "$sortByName     $sortByDesc"
+        val sortByAsc = getString(R.string.sortby_name_ascending).toLowerCase(Locale.ROOT)
+        val sortByDesc = getString(R.string.sortby_name_descending).toLowerCase(Locale.ROOT)
+        binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
+        binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
         val managerActivity = requireActivity() as ManagerActivityLollipop
         when (managerActivity.orderCloud) {
@@ -66,8 +63,15 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
     }
 
-    private fun setSelectedColor(text: TextView) =
-        text.setTextColor(ContextCompat.getColor(context, R.color.accentColor))
+    private fun setSelectedColor(text: TextView) {
+        val colorSecondary = ColorUtils.getThemeColor(context, R.attr.colorSecondary)
+        text.setTextColor(colorSecondary)
+
+        var icon = text.compoundDrawablesRelative[0] ?: return
+        icon = icon.mutate()
+        icon.colorFilter = PorterDuffColorFilter(colorSecondary, PorterDuff.Mode.SRC_IN)
+        text.setCompoundDrawablesRelative(icon, null, null, null)
+    }
 
     private fun setCloudOrder(managerActivity: ManagerActivityLollipop, order: Int) {
         managerActivity.refreshCloudOrder(order)

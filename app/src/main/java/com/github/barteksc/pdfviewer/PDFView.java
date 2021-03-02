@@ -736,14 +736,15 @@ public class PDFView extends RelativeLayout {
                     passwordText.setText(text);
                     passwordText.setSelection(text.length());
                     passwordLayout.setError(pdfViewer.getString(R.string.error_enter_password));
-                    passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                    passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                     passwordError.setVisibility(View.VISIBLE);
-                    passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                 } else {
                     passwordError.setVisibility(GONE);
                 }
 
-                passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+                passwordLayout.setEndIconVisible(false);
+                passwordText.setOnFocusChangeListener((v, hasFocus) -> passwordLayout.setEndIconVisible(hasFocus));
 
                 passwordText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {

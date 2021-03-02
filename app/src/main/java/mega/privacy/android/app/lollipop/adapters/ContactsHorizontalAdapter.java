@@ -7,15 +7,21 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.PorterDuff;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
@@ -116,7 +122,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
         builder.setMessage(message);
         String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
@@ -138,7 +144,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         final MegaContactGetter.MegaContact megaContact = getItem(position);
         // Bind 'Invite more'.
         if (isInviteMore(megaContact)) {
-            holder.avatar.setImageDrawable(context.getDrawable(R.drawable.invite_more));
+            holder.avatar.setImageResource(R.drawable.invite_more);
+            holder.avatar.setColorFilter(ContextCompat.getColor(context, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
             holder.inviteMore.setVisibility(View.VISIBLE);
             holder.textViewName.setVisibility(View.GONE);
             holder.addIcon.setVisibility(View.GONE);
@@ -151,6 +158,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             holder.textViewName.setText(localName);
 
             setImageAvatar(megaContact.getHandle(), email, localName, holder.avatar);
+            holder.avatar.setColorFilter(null);
             Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(megaContact.getHandle()), email);
             if (bitmap == null) {
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
@@ -184,7 +192,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        TextView textViewName, inviteMore;
+        TextView textViewName;
+        TextView inviteMore;
 
         ImageView addIcon;
 

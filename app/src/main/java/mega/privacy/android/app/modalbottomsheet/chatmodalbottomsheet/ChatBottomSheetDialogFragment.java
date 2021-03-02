@@ -113,6 +113,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         titleNameContactChatPanel.setText(getTitleChat(chat));
 
+        if (!shouldMuteOrUnmuteOptionsBeShown(context, megaChatApi.getChatRoom(chat.getChatId()))) {
+            optionMuteChat.setVisibility(View.GONE);
+        }
+
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
             iconStateChatPanel.setVisibility(View.GONE);
@@ -128,7 +132,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 separatorInfo.setVisibility(View.GONE);
             }
 
-            optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.VISIBLE);
             optionLeaveText.setText("Remove preview");
             optionClearHistory.setVisibility(View.GONE);
@@ -209,14 +212,18 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             }
             if (chat.isArchived()) {
                 archiveChatText.setText(getString(R.string.unarchive_chat_option));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unarchive));
                 optionInfoChat.setVisibility(View.GONE);
                 optionMuteChat.setVisibility(View.GONE);
                 optionLeaveChat.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             } else {
                 archiveChatText.setText(getString(R.string.archive_chat_option));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_archive));
+            }
+
+            if (optionInfoChat.getVisibility() == View.GONE) {
+                separatorInfo.setVisibility(View.GONE);
             }
         }
 

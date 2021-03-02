@@ -3,12 +3,10 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +37,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactRequestLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
@@ -46,6 +45,7 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.RECEIVED
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 
 public class ReceivedRequestsFragmentLollipop extends Fragment {
 
@@ -122,7 +122,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			inflater.inflate(R.menu.received_request_action, menu);
 			((ManagerActivityLollipop) context).hideTabs(true, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -133,7 +132,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			adapterList.setMultipleSelect(false);
 			((ManagerActivityLollipop) context).hideTabs(false, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -271,10 +269,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	public void checkScroll () {
 		if (listView != null) {
 			if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -311,7 +309,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -349,10 +347,15 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 				String textToShow = String.format(getString(R.string.received_requests_empty)).toUpperCase();
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -419,10 +422,15 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			}
 			String textToShow = String.format(getString(R.string.received_requests_empty).toUpperCase());
 			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			}
 			catch (Exception e){}
 			Spanned result = null;

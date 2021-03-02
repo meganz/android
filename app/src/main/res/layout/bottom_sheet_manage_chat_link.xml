@@ -4,7 +4,6 @@
     android:id="@+id/manage_chat_link_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <!-- Title -->
@@ -23,8 +22,7 @@
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:text="@string/get_chat_link_option"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
     </RelativeLayout>
 
@@ -49,9 +47,9 @@
                 android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/button_copy_link"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"
-                app:drawableStartCompat="@drawable/ic_copy_grey" />
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_copy_white"
+                app:drawableTint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/share_manage_chat_link_option"
@@ -60,10 +58,9 @@
                 android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/context_get_link"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 app:drawableStartCompat="@drawable/ic_social_share_white"
-                app:drawableTint="@color/black_bottom_sheets_icon_tint" />
+                app:drawableTint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/delete_manage_chat_link_option"
@@ -72,10 +69,9 @@
                 android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/context_delete_link"
-                android:textColor="@color/dark_primary_color"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"
                 app:drawableStartCompat="@drawable/ic_delete_msg"
-                app:drawableTint="@color/dark_primary_color" />
+                app:drawableTint="@color/red_600_red_300" />
 
         </LinearLayout>
 

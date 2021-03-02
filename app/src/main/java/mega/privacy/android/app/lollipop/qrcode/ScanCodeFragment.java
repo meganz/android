@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.Result;
 
 import java.io.ByteArrayOutputStream;
@@ -39,6 +40,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -295,7 +297,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
      * @param printEmail Flag to indicate if the dialog message includes contact email or not.
      */
     public void showAlertDialog (int title, int text, final boolean success, final boolean printEmail) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_invite, null);
         builder.setView(v);
@@ -336,7 +338,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     }
 
     public void invite (Result rawResult){
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         String contactLink = rawResult.getText();
         String[] s = contactLink.split("C!");
@@ -438,9 +440,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
                 }
-                Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                intent.putExtra(NAME, myEmail);
-                startActivity(intent);
+                ContactUtil.openContactInfoActivity(context, myEmail);
                 ((QRCodeActivity) context).finish();
                 break;
             }
@@ -536,11 +536,11 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             }
             else{
                 logDebug("Default color to the avatar");
-                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
         }
         else {
-            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
         }
 
         int radius;
@@ -617,7 +617,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             setAvatar();
         }
         else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
             LayoutInflater inflater = getActivity().getLayoutInflater();
 
             View v = inflater.inflate(R.layout.dialog_accept_contact, null);

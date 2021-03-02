@@ -6,14 +6,14 @@
         android:id="@+id/dialog_link_text_remove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
+        android:textColor="?android:attr/textColorSecondary"
         android:visibility="gone"/>
     
     <TextView
         android:id="@+id/dialog_link_link_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"/>
+        android:textColor="?android:attr/textColorSecondary"/>
     
     <TextView
         android:id="@+id/dialog_link_symbol"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:text="!" 
         android:layout_below="@id/dialog_link_link_url"
-        android:textColor="@color/text_secondary"/>
+        android:textColor="?android:attr/textColorSecondary"/>
     
     <TextView
         android:id="@+id/dialog_link_link_key"
@@ -29,6 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/dialog_link_symbol"
         android:layout_below="@id/dialog_link_link_url"
-        android:textColor="@color/text_secondary"/>
+        android:textColor="?android:attr/textColorSecondary"/>
     
 </RelativeLayout>

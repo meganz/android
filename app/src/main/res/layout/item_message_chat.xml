@@ -1,9 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/message_chat_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:focusable="true"
     android:descendantFocusability="afterDescendants">
 
@@ -18,9 +18,8 @@
             android:id="@+id/message_chat_date_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/accentColor"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
     </RelativeLayout>
 
@@ -36,15 +35,14 @@
             android:id="@+id/title_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:gravity="left|bottom">
+            android:gravity="start|bottom">
             <TextView
                 android:id="@+id/message_chat_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/file_list_second_row"
                 android:layout_centerVertical="true"
-                android:gravity="center_vertical"/>
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary" />
         </RelativeLayout>
 
         <!--management messages-->
@@ -52,7 +50,7 @@
             android:id="@+id/own_management_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:layout_marginBottom="6dp"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
@@ -60,7 +58,7 @@
             <RelativeLayout
                 android:id="@+id/own_text_layout"
                 android:layout_width="match_parent"
-                android:gravity="left"
+                android:gravity="start"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -68,18 +66,17 @@
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
                     android:visibility="gone"/>
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/own_management_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    rounded:emojiSize="12sp"
-                    android:gravity="left|center_vertical"
+                    android:gravity="start|center_vertical"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/secondary_text"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle2"
+                    app:emojiSize="12sp" />
 
             </RelativeLayout>
         </RelativeLayout>
@@ -89,8 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_below="@+id/title_own_message_layout"
-            android:background = "@null">
+            android:layout_below="@+id/title_own_message_layout">
 
             <!--multiseleccion-->
             <RelativeLayout
@@ -98,10 +94,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="16dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
                 android:layout_marginBottom="10dp"
-                android:background="@android:color/transparent"
                 android:visibility="gone">
 
                 <ImageView
@@ -115,27 +110,26 @@
             <RelativeLayout
                 android:id="@+id/own_message"
                 android:layout_width="match_parent"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent">
+                android:gravity="end"
+                android:layout_height="wrap_content">
 
                 <!-- text message-->
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:layout_alignParentRight="true"
-                    android:textSize="14sp"
+                    android:layout_alignParentEnd="true"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/dark_rounded_chat_own_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:layout_marginLeft="72dp"
-                    android:layout_marginRight="16dp"
-                    android:gravity="left"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                    android:textColorLink="@color/white"
+                    android:gravity="start"
                     app:emojiSize="18sp"/>
 
                 <!--triangle icon own text-->
@@ -144,19 +138,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/content_own_message_text"
+                    android:layout_toStartOf="@+id/content_own_message_text"
                     android:background="@null"
-                    android:src="@drawable/ic_input_warning"/>
+                    android:src="@drawable/ic_input_warning"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <!--Rich links-->
                 <RelativeLayout
                     android:id="@+id/url_own_message_layout"
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:background="@drawable/background_rich_link">
+                    android:background="@drawable/background_own_message_stroke">
                     <RelativeLayout
                         android:id="@+id/url_own_message_text_rl"
                         android:layout_width="match_parent"
@@ -167,15 +161,13 @@
                             android:id="@+id/url_own_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:layout_marginLeft="12dp"
+                            android:gravity="start"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_marginRight="12dp"
                             android:layout_marginEnd="12dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:textColorLink="@color/white"
                             app:emojiSize="14sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
@@ -184,31 +176,29 @@
                         android:id="@+id/url_own_message_enable_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_text_rl"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_text_rl">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_own_message_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_rich_link"
-                            android:background="@android:color/transparent"
                             android:layout_gravity="center_vertical"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
-                            android:layout_marginLeft="12dp" />
+                            android:layout_marginStart="12dp"
+                            tools:src="@drawable/ic_rich_link" />
 
                         <RelativeLayout
                             android:id="@+id/url_chat_own_message_image"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:layout_centerVertical="true">
 
                             <mega.privacy.android.app.components.RoundedImageView
@@ -216,10 +206,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                rounded:border_color="@color/white"
-                                rounded:border_width="2dp"
-                                rounded:corner_radius="20dp"/>
+                                android:layout_centerInParent="true" />
 
                             <TextView
                                 android:id="@+id/content_url_chat_own_message_contact_initial_letter"
@@ -234,41 +221,34 @@
                             android:id="@+id/url_own_message_enable_layout_inside"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:layout_marginEnd="12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@android:color/transparent">
+                            android:layout_gravity="center_vertical">
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_own_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:textColor="@color/primary_text"
-                                android:textSize="16sp"
-                                rounded:emojiSize="16sp"
-                                android:background="@android:color/transparent"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+                                app:emojiSize="16sp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp" />
 
                             <TextView
                                 android:id="@+id/url_own_message_description"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:maxLines="2"
                                 android:ellipsize="end"
-                                android:background="@android:color/transparent"
                                 android:layout_below="@+id/url_own_message_title"
-                                android:textColor="@color/primary_text"
-                                android:textSize="14sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle2"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="left"/>
+                                android:layout_gravity="start" />
 
                         </RelativeLayout>
 
@@ -278,31 +258,27 @@
                         android:id="@+id/url_own_message_icon_link_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <ImageView
                             android:id="@+id/url_own_message_icon"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginEnd="5dp"
                             android:layout_gravity="center_vertical|center_horizontal"
-                            android:background="@null"/>
+                            android:background="@null" />
 
                         <TextView
                             android:id="@+id/url_own_message_link"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:textColor="@color/secondary_text"
-                            android:textSize="14sp"/>
+                            android:gravity="start"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
                     </LinearLayout>
 
@@ -310,57 +286,44 @@
                         android:id="@+id/url_own_message_buttons_warning_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:orientation="vertical"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <Button
                             android:id="@+id/url_always_allow_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/accentColor"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
                             android:text="@string/button_always_rich_links"
-                            android:minWidth="0dp"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
-
+                            android:minWidth="0dp" />
 
                         <Button
                             android:id="@+id/url_not_now_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
                             android:minWidth="0dp"
-                            android:text="@string/button_not_now_rich_links"
-                            android:elevation="0dp"
-                            android:background="@android:color/transparent"
-                            android:textColor="@color/accentColor"/>
+                            android:text="@string/button_not_now_rich_links" />
 
                         <Button
                             android:id="@+id/url_never_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textColor="@color/tour_bar_red"
+                            style="@style/Widget.Mega.Button.TextButton.Red"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
                             android:minWidth="0dp"
-                            android:text="@string/button_never_rich_links"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
+                            android:text="@string/button_never_rich_links" />
 
                     </LinearLayout>
 
@@ -368,42 +331,33 @@
                         android:id="@+id/url_own_message_buttons_disable_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="right"
+                        android:gravity="end"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <Button
                             android:id="@+id/url_no_disable_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/accentColor"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
-                            android:text="@string/general_no"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
+                            android:text="@string/general_no" />
 
 
                         <Button
                             android:id="@+id/url_yes_disable_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
-                            android:layout_marginLeft="24dp"
+                            android:layout_marginStart="24dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
-                            android:text="@string/general_yes"
-                            android:elevation="0dp"
-                            android:background="@android:color/transparent"
-                            android:textColor="@color/accentColor"/>
+                            android:text="@string/general_yes" />
 
                     </LinearLayout>
 
@@ -415,44 +369,44 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:paddingRight="4dp"
-                    android:layout_toLeftOf="@+id/url_own_message_layout"
-                    android:background="@android:color/transparent">
+                    android:paddingEnd="4dp"
+                    android:layout_toStartOf="@+id/url_own_message_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
-                        android:src="@drawable/ic_input_warning"/>
+                        android:src="@drawable/ic_input_warning"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
 
                 <!--forward rich links-->
                 <ImageView
                     android:id="@+id/forward_own_rich_links"
+                    android:layout_toStartOf="@+id/url_own_message_layout"
                     style="@style/MessageForwardIconStyleEnd"
-                    android:layout_toStartOf="@+id/url_own_message_layout" />
+                    app:tint="@color/grey_200_grey_500" />
+
                 <!--End Rich links-->
 
                 <!-- Send a voice clip-->
                 <RelativeLayout
                     android:id="@+id/content_own_message_voice_clip_rl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:id="@+id/content_own_message_voice_clip_layout"
                         android:layout_width="230dp"
                         android:layout_height="56dp"
                         android:background="@drawable/dark_rounded_chat_own_message"
-                        android:layout_marginRight="16dp"
-                        android:layout_alignParentRight="true">
+                        android:layout_marginEnd="16dp"
+                        android:layout_alignParentEnd="true">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:background="@null"
                             android:orientation="horizontal">
 
                             <ImageView
@@ -460,21 +414,22 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
-                                android:src="@drawable/ic_play_grey"
+                                android:layout_marginStart="16dp"
+                                android:src="@drawable/ic_play_voice_clip"
                                 android:background="@null"
-                                android:visibility="gone"/>
+                                android:visibility="gone"
+                                app:tint="@color/white" />
 
                             <ImageView
                                 android:id="@+id/content_own_message_voice_clip_not_available"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
                                 android:src="@drawable/ic_clear_white"
-                                android:tint="@color/grey_achievements_invite_friends"
                                 android:background="@null"
-                                android:visibility="gone"/>
+                                android:visibility="gone"
+                                app:tint="@color/white" />
 
                             <!-- Progress bar-->
                             <RelativeLayout
@@ -482,13 +437,12 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
-                                android:visibility="gone"
-                                android:background="@android:color/transparent">
+                                android:layout_marginStart="16dp"
+                                android:visibility="gone">
                                 <ProgressBar
                                     android:indeterminate="true"
                                     android:indeterminateTintMode="src_atop"
-                                    android:indeterminateTint="@color/small_letter_upgrade_account"
+                                    android:indeterminateTint="@color/white"
                                     android:layout_centerInParent="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -498,8 +452,7 @@
                                 android:id="@+id/content_own_message_voice_clip_seekBar"
                                 android:layout_width="145dp"
                                 android:layout_height="wrap_content"
-                                android:theme="@style/MySeekBar"
-                                android:thumbTint="@color/white"
+                                android:theme="@style/Widget.Mega.SeekBar.White"
                                 android:max="200"
                                 android:focusable="false"
                                 android:progress="0"
@@ -513,12 +466,10 @@
                                 android:id="@+id/content_own_message_voice_clip_duration"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="00:00"
                                 android:textAlignment="center"
-                                android:background="@null"
-                                android:textColor="@android:color/white"
+                                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                                 android:layout_gravity="center_vertical"
-                                android:textSize="13sp"/>
+                                tools:text="00:00" />
                         </LinearLayout>
                     </RelativeLayout>
 
@@ -528,17 +479,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@id/content_own_message_voice_clip_layout"
-                        android:gravity="right"
-                        android:paddingRight="4dp"
-                        android:background="@android:color/transparent">
+                        android:layout_toStartOf="@id/content_own_message_voice_clip_layout"
+                        android:gravity="end"
+                        android:paddingEnd="4dp">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
-                            android:src="@drawable/ic_input_warning"/>
+                            android:src="@drawable/ic_input_warning"
+                            app:tint="?android:attr/textColorSecondary" />
                     </RelativeLayout>
 
                 </RelativeLayout>
@@ -548,17 +499,15 @@
                 <RelativeLayout
                     android:id="@+id/own_main_item_location"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:id="@+id/own_main_item_location_rl"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:background="@drawable/own_background_location_message">
+                        android:background="@drawable/background_own_message_stroke">
 
                         <!--Preview of location-->
                         <mega.privacy.android.app.components.RoundedImageView
@@ -566,31 +515,29 @@
                             android:layout_width="256dp"
                             android:layout_height="140dp"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
-                            android:layout_marginRight="1dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="1dp"
                             android:scaleType="centerCrop"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            android:layout_gravity="center_horizontal|center_vertical" />
 
                         <RelativeLayout
                             android:id="@+id/own_separator_imageview_location"
                             android:layout_width="256dp"
                             android:layout_height="12dp"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginLeft="1dp"
-                            android:layout_marginRight="1dp"
-                            android:background="@color/white"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="1dp"
+                            android:background="?attr/colorSurface"
                             android:layout_below="@id/own_rounded_imageview_location"/>
 
                         <RelativeLayout
                             android:id="@+id/own_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
-                            android:background="@android:color/transparent"
                             android:layout_below="@id/own_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginStart="12dp"
                             android:layout_marginBottom="1dp">
 
                             <RelativeLayout
@@ -602,17 +549,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/title_geolocation_message"
-                                    android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="@color/primary_text"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                                 <TextView
                                     android:id="@+id/own_info_pinned_location"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/own_title_pinned_location"
-                                    android:textSize="14dp"
-                                    android:textColor="@color/primary_text"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
 
                             </RelativeLayout>
 
@@ -624,8 +569,8 @@
                             android:layout_width="256dp"
                             android:layout_height="128dp"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
-                            android:layout_marginRight="1dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="1dp"
                             android:background="@drawable/shape_location_chat_transparent">
 
                             <!-- Progress bar location message-->
@@ -634,13 +579,12 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentBottom="true"
-                                android:layout_alignParentRight="true"
-                                android:background="@android:color/transparent">
+                                android:layout_alignParentEnd="true">
 
                                 <ProgressBar
                                     android:id="@+id/uploadingProgressBarLocation_im"
                                     android:indeterminate="true"
-                                    android:paddingRight="5dp"
+                                    android:paddingEnd="5dp"
                                     android:paddingBottom="5dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -654,23 +598,25 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/own_main_item_location_rl"
-                        android:background="@android:color/transparent">
+                        android:paddingEnd="4dp"
+                        android:layout_toStartOf="@+id/own_main_item_location_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
-                            android:src="@drawable/ic_input_warning"/>
+                            android:src="@drawable/ic_input_warning"
+                            app:tint="?android:attr/textColorSecondary" />
                     </RelativeLayout>
 
                     <!--forward icon location message-->
                     <ImageView
                         android:id="@+id/forward_own_location"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/own_main_item_location_rl" />
+                        android:layout_toStartOf="@+id/own_main_item_location_rl"
+                        app:tint="@color/grey_200_grey_500" />
+
 
                 </RelativeLayout>
                 <!-- End location-->
@@ -679,25 +625,24 @@
                 <RelativeLayout
                     android:id="@+id/preview_frame_portrait"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_portrait_rl">
 
                         <!--Image with preview or Giphy-->
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp"
-                            rounded:roundingBorderColor="@color/secondary_text"
-                            rounded:roundingBorderWidth="1px" />
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:roundWithOverlayColor="?attr/colorSurface"
+                            app:roundedCornerRadius="10dp"
+                            app:roundingBorderColor="@color/teal_500_teal_400_090"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
@@ -710,7 +655,8 @@
                         <ProgressBar
                             android:id="@+id/content_own_message_thumb_portrait_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -729,20 +675,19 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignLeft="@+id/content_own_message_thumb_portrait"/>
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_own_message_thumb_portrait"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginRight="10dp"
-                            android:text="00:00"/>
+                            android:layout_marginEnd="10dp"
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -753,7 +698,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                         <!--Transparent coat-->
                         <RelativeLayout
@@ -775,14 +720,13 @@
                             android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_own_message_thumb_portrait"
                             android:layout_alignTop="@+id/content_own_message_thumb_portrait"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:background="@android:color/transparent">
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait">
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarPort_im"
                                 android:indeterminate="true"
                                 android:layout_alignParentBottom="true"
-                                android:layout_alignParentRight="true"
-                                android:paddingRight="5dp"
+                                android:layout_alignParentEnd="true"
+                                android:paddingEnd="5dp"
                                 android:paddingBottom="5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
@@ -796,50 +740,47 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/preview_frame_portrait_rl"
-                        android:background="@android:color/transparent">
+                        android:paddingEnd="4dp"
+                        android:layout_toStartOf="@+id/preview_frame_portrait_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
-                            android:src="@drawable/ic_input_warning"/>
+                            android:src="@drawable/ic_input_warning"
+                            app:tint="?android:attr/textColorSecondary" />
                     </RelativeLayout>
 
                     <!--forward icon with preview portrait-->
                     <ImageView
                         android:id="@+id/forward_own_preview_portrait"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/preview_frame_portrait_rl" />
-
+                        android:layout_toStartOf="@+id/preview_frame_portrait_rl"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
 
                 <!-- own elements landscape -->
                 <RelativeLayout
                     android:id="@+id/preview_frame_landscape"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_landscape_rl">
 
                         <!--Image with preview or Giphy-->
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp"
-                            rounded:roundingBorderColor="@color/secondary_text"
-                            rounded:roundingBorderWidth="1px" />
+                            app:roundWithOverlayColor="?attr/colorSurface"
+                            app:roundedCornerRadius="10dp"
+                            app:roundingBorderColor="@color/teal_500_teal_400_090"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
@@ -852,7 +793,8 @@
                         <ProgressBar
                             android:id="@+id/content_own_message_thumb_landscape_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -871,20 +813,19 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:layout_alignLeft="@+id/content_own_message_thumb_landscape"/>
                         <TextView
                             android:id="@+id/video_time_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_own_message_thumb_landscape"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginRight="10dp"
-                            android:text="00:00"/>
+                            android:layout_marginEnd="10dp"
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
 
@@ -896,7 +837,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                         <!--Transparent coat-->
                         <RelativeLayout
@@ -917,15 +858,14 @@
                             android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_own_message_thumb_landscape"
                             android:layout_alignTop="@+id/content_own_message_thumb_landscape"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                            android:background="@android:color/transparent">
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape">
 
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarLand_im"
                                 android:indeterminate="true"
                                 android:layout_alignParentBottom="true"
-                                android:layout_alignParentRight="true"
-                                android:paddingRight="5dp"
+                                android:layout_alignParentEnd="true"
+                                android:paddingEnd="5dp"
                                 android:paddingBottom="5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
@@ -938,23 +878,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/preview_frame_landscape_rl"
-                        android:background="@android:color/transparent">
+                        android:paddingEnd="4dp"
+                        android:layout_toStartOf="@+id/preview_frame_landscape_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
-                            android:src="@drawable/ic_input_warning"/>
+                            android:src="@drawable/ic_input_warning"
+                            app:tint="?android:attr/textColorSecondary" />
                     </RelativeLayout>
 
                     <!--forward icon with preview landscape-->
                     <ImageView
                         android:id="@+id/forward_own_preview_landscape"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/preview_frame_landscape_rl" />
+                        android:layout_toStartOf="@+id/preview_frame_landscape_rl"
+                        app:tint="@color/grey_200_grey_500" />
 
                 </RelativeLayout>
 
@@ -964,44 +905,42 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/dark_rounded_chat_own_message"
-                    android:layout_marginRight="16dp"
-                    android:gravity="right"
-                    android:layout_alignParentRight="true"
-                    android:paddingRight="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="end"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="12dp"
                     android:paddingLeft="7dp">
                     <ImageView
                         android:id="@+id/content_own_message_file_thumb"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="4dp"
-                        android:layout_marginRight="7dp"
+                        android:layout_marginEnd="7dp"
                         android:layout_centerVertical="true"/>
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/content_own_message_file_thumb">
+                        android:layout_toEndOf="@+id/content_own_message_file_thumb">
                         <TextView
                             android:id="@+id/content_own_message_file_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
                             android:ellipsize="middle"
-                            android:gravity="left"/>
+                            android:gravity="start"/>
                         <TextView
                             android:id="@+id/content_own_message_file_size"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant"
                             android:layout_below="@+id/content_own_message_file_name"
-                            android:textSize="12sp"
                             android:inputType="textMultiLine|textNoSuggestions"
-                            android:gravity="left"/>
+                            android:gravity="start"/>
                     </RelativeLayout>
                 </RelativeLayout>
 
@@ -1011,23 +950,24 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@+id/content_own_message_file_layout"
-                    android:gravity="right"
-                    android:paddingRight="4dp"
-                    android:background="@android:color/transparent">
+                    android:gravity="end"
+                    android:paddingEnd="4dp">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
-                        android:src="@drawable/ic_input_warning"/>
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
 
                 <!--forward file-->
                 <ImageView
                     android:id="@+id/forward_own_file"
                     style="@style/MessageForwardIconStyleEnd"
-                    android:layout_toStartOf="@+id/content_own_message_file_layout" />
+                    android:layout_toStartOf="@+id/content_own_message_file_layout"
+                    app:tint="@color/grey_200_grey_500" />
+
                 <!--End RelativeLayout file-->
 
                 <!-- send a contact-->
@@ -1036,21 +976,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/dark_rounded_chat_own_message"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="16dp"
                     android:minHeight="56dp"
-                    android:gravity="right"
-                    android:layout_alignParentRight="true"
-                    android:paddingRight="12dp"
+                    android:gravity="end"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="12dp"
                     android:paddingLeft="12dp">
 
                     <RelativeLayout
                         android:id="@+id/content_own_message_contact_layout_avatar"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginRight="12dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_centerVertical="true">
 
                         <mega.privacy.android.app.components.RoundedImageView
@@ -1059,14 +999,14 @@
                             android:layout_height="match_parent"
                             android:scaleType="fitCenter"
                             android:layout_centerInParent="true"
-                            rounded:border_color="@color/white"
-                            rounded:border_width="2dp"
-                            rounded:corner_radius="20dp"/>
+                            app:border_color="@color/white"
+                            app:border_width="2dp"
+                            app:corner_radius="20dp"/>
                     </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/content_own_message_contact_layout_avatar"
+                        android:layout_toEndOf="@+id/content_own_message_contact_layout_avatar"
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
@@ -1074,25 +1014,23 @@
                             android:id="@+id/content_own_message_contact_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            rounded:emojiSize="12sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body1.Variant"
+                            app:emojiSize="14sp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:gravity="left"/>
+                            android:gravity="start"/>
 
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:layout_below="@+id/content_own_message_contact_name"
-                            android:textSize="12sp"
-                            rounded:emojiSize="10sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            app:emojiSize="12sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:gravity="left"
+                            android:gravity="start"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>
 
@@ -1104,24 +1042,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/content_own_message_contact_layout"
-                    android:gravity="right"
-                    android:paddingRight="4dp"
-                    android:background="@android:color/transparent">
+                    android:layout_toStartOf="@+id/content_own_message_contact_layout"
+                    android:gravity="end"
+                    android:paddingEnd="4dp">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
-                        android:src="@drawable/ic_input_warning"/>
+                        android:src="@drawable/ic_input_warning"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
 
                 <!--forward contact-->
                 <ImageView
                     android:id="@+id/forward_own_contact"
                     style="@style/MessageForwardIconStyleEnd"
-                    android:layout_toStartOf="@+id/content_own_message_contact_layout" />
+                    android:layout_toStartOf="@+id/content_own_message_contact_layout"
+                    app:tint="@color/grey_200_grey_500" />
 
             </RelativeLayout>
             <!--End RelativeLayout own content message-->
@@ -1131,14 +1070,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/own_message"
-                android:textColor="@color/text_login"
-                android:layout_alignParentRight="true"
+                android:textColor="@color/black_white"
+                android:layout_alignParentEnd="true"
                 android:text="@string/manual_retry_alert"
                 android:textSize="11sp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:inputType="textMultiLine|textNoSuggestions"
-                android:gravity="right"/>
+                android:gravity="end"/>
 
         </RelativeLayout>
 
@@ -1154,7 +1092,6 @@
             android:layout_marginTop="-4dp"
             android:layout_alignEnd="@id/content_own_message_layout"
             android:gravity="end"
-            android:background="@null"
             android:visibility="gone">
 
             <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
@@ -1178,40 +1115,36 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
+            android:layout_height="wrap_content">
 
             <!--Name and Hours-->
             <RelativeLayout
                 android:id="@+id/title_contact_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:gravity="left|bottom">
+                android:gravity="start|bottom">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/contact_message_chat_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    rounded:emojiSize="10sp"
-                    android:text="name of the contact"
-                    android:textColor="@color/primary_text"
-                    android:layout_marginRight="4dp"
+                    android:layout_marginEnd="4dp"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption"
+                    app:emojiSize="10sp"
+                    tools:text="name of the contact" />
 
                 <TextView
                     android:id="@+id/contact_message_chat_time_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/file_list_second_row"
                     android:layout_toEndOf="@+id/contact_message_chat_name_text"
-                    android:layout_toRightOf="@+id/contact_message_chat_name_text"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary" />
 
             </RelativeLayout>
 
@@ -1220,7 +1153,7 @@
                 android:id="@+id/contact_management_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout"
                 android:visibility="gone">
@@ -1228,7 +1161,7 @@
                 <RelativeLayout
                     android:id="@+id/contact_text_layout"
                     android:layout_width="match_parent"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:layout_height="wrap_content">
 
                     <ImageView
@@ -1236,19 +1169,18 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="16dp"
-                        android:src="@drawable/ic_call_started"
-                        android:visibility="gone"/>
+                        android:layout_marginStart="16dp"
+                        android:visibility="gone"
+                        tools:src="@drawable/ic_call_started" />
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/contact_management_message_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        rounded:emojiSize="12sp"
-                        android:gravity="left|center_vertical"
+                        android:gravity="start|center_vertical"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/secondary_text" />
+                        android:textAppearance="?attr/textAppearanceSubtitle2"
+                        app:emojiSize="12sp" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -1257,7 +1189,6 @@
                 android:id="@+id/content_contact_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout">
 
@@ -1267,21 +1198,18 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="@android:color/transparent">
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="10dp">
 
                     <mega.privacy.android.app.components.RoundedImageView
                         android:id="@+id/contact_thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
-                        android:background="@android:color/transparent"
                         android:scaleType="fitCenter"
-                        rounded:border_color="@color/border_file_properties"
-                        rounded:border_width="0dp"
-                        rounded:corner_radius="40dp" />
+                        app:border_width="0dp"
+                        app:corner_radius="40dp" />
                 </RelativeLayout>
 
                 <!--multiseleccion-->
@@ -1290,10 +1218,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
                     android:layout_marginBottom="10dp"
-                    android:background="@android:color/transparent"
                     android:visibility="gone">
 
                     <ImageView
@@ -1309,25 +1236,25 @@
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
+                    android:textColorLink="@color/grey_087_white"
                     app:emojiSize="18sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:layout_marginLeft="48dp"
-                    android:layout_marginRight="40dp"/>
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginEnd="40dp" />
 
                 <!-- contact's Rich links-->
                 <RelativeLayout
                     android:id="@+id/url_contact_message_layout"
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:background="@drawable/contact_background_rich_link">
+                    android:layout_alignParentStart="true"
+                    android:background="@drawable/background_contact_message_stroke">
 
                     <RelativeLayout
                         android:id="@+id/url_contact_message_text_rl"
@@ -1339,16 +1266,13 @@
                             android:id="@+id/url_contact_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:background="@android:color/transparent"
-                            android:layout_marginLeft="12dp"
+                            android:gravity="start"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_marginRight="12dp"
                             android:layout_marginEnd="12dp"
-                            android:textColor="@color/black"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
+                            android:textColorLink="@color/grey_087_white"
                             app:emojiSize="18sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>/>
 
@@ -1358,31 +1282,29 @@
                         android:id="@+id/url_contact_message_enable_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_contact_message_text_rl"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_contact_message_text_rl">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_contact_message_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_install_mega"
-                            android:background="@android:color/transparent"
                             android:layout_marginBottom="12dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginTop="12dp"
-                            android:layout_marginLeft="12dp" />
+                            android:layout_marginStart="12dp"
+                            tools:src="@drawable/ic_install_mega" />
 
                         <RelativeLayout
                             android:id="@+id/url_chat_contact_message_image"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:layout_centerVertical="true">
 
                             <mega.privacy.android.app.components.RoundedImageView
@@ -1390,10 +1312,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                rounded:border_color="@color/white"
-                                rounded:border_width="2dp"
-                                rounded:corner_radius="20dp"/>
+                                android:layout_centerInParent="true" />
 
                             <TextView
                                 android:id="@+id/content_url_chat_contact_message_contact_initial_letter"
@@ -1412,38 +1331,33 @@
                             android:layout_marginEnd="12dp"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical"
-                            android:layout_gravity="center_vertical"
-                            android:background="@android:color/transparent">
+                            android:layout_gravity="center_vertical">
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_contact_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:text="@string/title_enable_rich_links"
-                                android:textColor="@color/primary_text"
-                                android:textSize="16sp"
-                                rounded:emojiSize="16sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+                                app:emojiSize="16sp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:background="@android:color/transparent"
                                 android:layout_marginTop="12dp"
-                                android:layout_gravity="center_vertical"/>
+                                android:layout_gravity="center_vertical" />
 
                             <TextView
                                 android:id="@+id/url_contact_message_description"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:maxLines="2"
                                 android:ellipsize="end"
                                 android:layout_below="@+id/url_contact_message_title"
-                                android:background="@android:color/transparent"
-                                android:textColor="@color/secondary_text"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle2"
                                 android:text="@string/text_enable_rich_links"
-                                android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="left"/>
+                                android:layout_gravity="start" />
 
                         </RelativeLayout>
 
@@ -1453,21 +1367,18 @@
                         android:id="@+id/url_contact_message_icon_link_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_contact_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_contact_message_enable_layout">
 
                         <ImageView
                             android:id="@+id/url_contact_message_icon"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginEnd="5dp"
                             android:layout_gravity="center_vertical|center_horizontal"
                             android:background="@null"/>
 
@@ -1475,9 +1386,8 @@
                             android:id="@+id/url_contact_message_link"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:textColor="@color/secondary_text"
-                            android:textSize="14sp"/>
+                            android:gravity="start"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
                     </LinearLayout>
 
                 </RelativeLayout>
@@ -1486,7 +1396,8 @@
                 <ImageView
                     android:id="@+id/forward_contact_rich_links"
                     style="@style/MessageForwardIconStyleStart"
-                    android:layout_toEndOf="@+id/url_contact_message_layout" />
+                    android:layout_toEndOf="@+id/url_contact_message_layout"
+                    app:tint="@color/grey_200_grey_500" />
 
                 <!--Received a voice clip-->
                 <RelativeLayout
@@ -1494,23 +1405,23 @@
                     android:layout_width="230dp"
                     android:layout_height="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
-                    android:gravity="left"
-                    android:layout_alignParentLeft="true">
+                    android:gravity="start"
+                    android:layout_alignParentStart="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:background="@null"
                         android:orientation="horizontal">
                         <ImageView
                             android:id="@+id/content_contact_message_voice_clip_play_pause"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:background="@null"
-                            android:visibility="gone"/>
+                            android:visibility="gone"
+                            app:tint="@color/grey_087_white" />
 
 
                         <ImageView
@@ -1518,11 +1429,11 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:src="@drawable/ic_clear_white"
-                            android:tint="@color/grey_achievements_invite_friends"
                             android:background="@null"
-                            android:visibility="gone"/>
+                            android:visibility="gone"
+                            app:tint="@color/grey_087_white" />
 
                         <!-- Progress bar-->
                         <RelativeLayout
@@ -1530,13 +1441,12 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
-                            android:visibility="gone"
-                            android:background="@android:color/transparent">
+                            android:layout_marginStart="16dp"
+                            android:visibility="gone">
                             <ProgressBar
                                 android:indeterminate="true"
                                 android:indeterminateTintMode="src_atop"
-                                android:indeterminateTint="@color/small_letter_upgrade_account"
+                                android:indeterminateTint="@color/grey_087_white"
                                 android:layout_centerInParent="true"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
@@ -1545,8 +1455,7 @@
                             android:id="@+id/content_contact_message_voice_clip_seekBar"
                             android:layout_width="145dp"
                             android:layout_height="wrap_content"
-                            android:theme="@style/ContactSeekBar"
-                            android:thumbTint="@color/accentColor"
+                            android:theme="@style/Widget.Mega.SeekBar.Secondary"
                             android:max="200"
                             android:progress="0"
                             android:background="@null"
@@ -1558,12 +1467,10 @@
                             android:id="@+id/content_contact_message_voice_clip_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00"
                             android:textAlignment="center"
-                            android:background="@null"
-                            android:textColor="@android:color/black"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
                             android:layout_gravity="center_vertical"
-                            android:textSize="13sp"/>
+                            tools:text="00:00" />
                     </LinearLayout>
                 </RelativeLayout>
                 <!-- End voice clip-->
@@ -1572,15 +1479,14 @@
                 <RelativeLayout
                     android:id="@+id/contact_main_item_location_rl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:id="@+id/contact_main_item_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:background="@drawable/contact_background_location_message">
+                        android:layout_alignParentStart="true"
+                        android:background="@drawable/background_contact_message_stroke">
 
                         <!--Preview of location-->
                         <mega.privacy.android.app.components.RoundedImageView
@@ -1589,31 +1495,29 @@
                             android:layout_height="140dp"
                             android:adjustViewBounds="true"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
-                            android:layout_marginRight="1dp"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="1dp"
                             android:scaleType="centerCrop"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            android:layout_gravity="center_horizontal|center_vertical" />
 
                         <RelativeLayout
                             android:id="@+id/contact_separator_imageview_location"
                             android:layout_width="256dp"
                             android:layout_height="12dp"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginLeft="1dp"
-                            android:layout_marginRight="1dp"
-                            android:background="@color/white"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginEnd="1dp"
+                            android:background="?attr/colorSurface"
                             android:layout_below="@id/contact_rounded_imageview_location"/>
 
                         <RelativeLayout
                             android:id="@+id/contact_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
-                            android:background="@android:color/transparent"
                             android:layout_below="@id/contact_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginStart="12dp"
                             android:layout_marginBottom="1dp">
 
                             <RelativeLayout
@@ -1625,17 +1529,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Pinned Location"
-                                    android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="@color/primary_text"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                                 <TextView
                                     android:id="@+id/contact_info_pinned_location"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/contact_title_pinned_location"
-                                    android:textSize="14dp"
-                                    android:textColor="@color/primary_text"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
 
                             </RelativeLayout>
 
@@ -1646,7 +1548,8 @@
                     <ImageView
                         android:id="@+id/forward_contact_location"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/contact_main_item_location" />
+                        android:layout_toEndOf="@+id/contact_main_item_location"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!-- End location-->
 
@@ -1655,9 +1558,8 @@
                     android:id="@+id/content_contact_message_attach_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:gravity="left"
-                    android:background="@android:color/transparent">
+                    android:layout_alignParentStart="true"
+                    android:gravity="start">
 
                     <!-- contacts elements portrait -->
                     <RelativeLayout
@@ -1669,10 +1571,10 @@
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp"
-                            rounded:roundingBorderColor="@color/secondary_text"
-                            rounded:roundingBorderWidth="1px" />
+                            app:roundWithOverlayColor="?attr/colorSurface"
+                            app:roundedCornerRadius="10dp"
+                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
@@ -1685,7 +1587,8 @@
                         <ProgressBar
                             android:id="@+id/content_contact_message_thumb_portrait_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1704,20 +1607,19 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                             android:layout_alignLeft="@+id/content_contact_message_thumb_portrait"/>
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_contact_message_thumb_portrait"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginRight="10dp"
-                            android:text="00:00"/>
+                            android:layout_marginEnd="10dp"
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -1728,7 +1630,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                     </RelativeLayout>
 
@@ -1736,7 +1638,8 @@
                     <ImageView
                         android:id="@+id/forward_contact_preview_portrait"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_portrait" />
+                        android:layout_toEndOf="@+id/content_contact_message_portrait"
+                        app:tint="@color/grey_200_grey_500" />
 
                     <!-- contact elements landscape -->
                     <RelativeLayout
@@ -1748,10 +1651,10 @@
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp"
-                            rounded:roundingBorderColor="@color/secondary_text"
-                            rounded:roundingBorderWidth="1px" />
+                            app:roundWithOverlayColor="?attr/colorSurface"
+                            app:roundedCornerRadius="10dp"
+                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
@@ -1764,7 +1667,8 @@
                         <ProgressBar
                             android:id="@+id/content_contact_message_thumb_landscape_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1783,21 +1687,19 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                             android:layout_alignLeft="@+id/content_contact_message_thumb_landscape"/>
                         <TextView
                             android:id="@+id/video_time_contact_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_contact_message_thumb_landscape"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginRight="10dp"
-                            android:text="00:00"/>
-
+                            android:layout_marginEnd="10dp"
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -1808,7 +1710,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                     </RelativeLayout>
 
@@ -1816,7 +1718,9 @@
                     <ImageView
                         android:id="@+id/forward_contact_preview_landscape"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_landscape" />
+                        android:layout_toEndOf="@+id/content_contact_message_landscape"
+                        app:tint="@color/grey_200_grey_500" />
+
 
                     <!--End contact elements landscape-->
 
@@ -1826,49 +1730,47 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_text_view_chat_contact_message"
-                        android:layout_alignParentLeft="true"
-                        android:paddingRight="12dp"
+                        android:layout_alignParentStart="true"
+                        android:paddingEnd="12dp"
                         android:paddingLeft="7dp"
-                        android:gravity="left">
+                        android:gravity="start">
 
                         <ImageView
                             android:id="@+id/content_contact_message_file_thumb"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="4dp"
-                            android:layout_marginRight="7dp"
+                            android:layout_marginEnd="7dp"
                             android:layout_centerVertical="true"/>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_toRightOf="@+id/content_contact_message_file_thumb">
+                            android:layout_toEndOf="@+id/content_contact_message_file_thumb">
 
                             <TextView
                                 android:id="@+id/content_contact_message_file_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/primary_text"
-                                android:textSize="14sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
                                 android:layout_marginTop="11dp"
                                 android:layout_marginBottom="2dp"
                                 android:singleLine="true"
                                 android:ellipsize="middle"
-                                android:gravity="left"/>
+                                android:gravity="start"/>
 
                             <TextView
                                 android:id="@+id/content_contact_message_file_size"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/secondary_text"
                                 android:layout_below="@+id/content_contact_message_file_name"
-                                android:textSize="12sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2"
                                 android:layout_marginBottom="11dp"
                                 android:inputType="textMultiLine|textNoSuggestions"
-                                android:gravity="left"/>
+                                android:gravity="start"/>
 
                         </RelativeLayout>
 
@@ -1878,7 +1780,8 @@
                     <ImageView
                         android:id="@+id/forward_contact_file"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_file" />
+                        android:layout_toEndOf="@+id/content_contact_message_file"
+                        app:tint="@color/grey_200_grey_500" />
 
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
@@ -1890,19 +1793,19 @@
                     android:layout_height="wrap_content"
                     android:minHeight="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
-                    android:gravity="left"
-                    android:layout_alignParentLeft="true"
-                    android:paddingRight="12dp"
+                    android:gravity="start"
+                    android:layout_alignParentStart="true"
+                    android:paddingEnd="12dp"
                     android:paddingLeft="12dp">
 
                     <RelativeLayout
                         android:id="@+id/content_contact_message_contact_layout_avatar"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginRight="12dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_centerVertical="true">
 
                         <mega.privacy.android.app.components.RoundedImageView
@@ -1911,23 +1814,15 @@
                             android:layout_height="match_parent"
                             android:scaleType="fitCenter"
                             android:layout_centerInParent="true"
-                            rounded:border_color="@color/white"
-                            rounded:border_width="2dp"
-                            rounded:corner_radius="20dp"/>
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/content_contact_message_contact_initial_letter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            rounded:emojiSize="25sp"
-                            android:gravity="center_horizontal|center_vertical"/>
+                            app:border_color="@color/white"
+                            app:border_width="2dp"
+                            app:corner_radius="20dp"/>
                     </RelativeLayout>
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/content_contact_message_contact_layout_avatar"
+                        android:layout_toEndOf="@+id/content_contact_message_contact_layout_avatar"
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
@@ -1935,24 +1830,22 @@
                             android:id="@+id/content_contact_message_contact_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/primary_text"
-                            android:textSize="14sp"
-                            rounded:emojiSize="12sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body1.Variant2"
+                            app:emojiSize="14sp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:gravity="left"/>
+                            android:gravity="start"/>
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/secondary_text"
                             android:layout_below="@+id/content_contact_message_contact_name"
-                            android:textSize="12sp"
-                            rounded:emojiSize="10sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
+                            app:emojiSize="12sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:gravity="left"
+                            android:gravity="start"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>
 
@@ -1962,7 +1855,8 @@
                 <ImageView
                     android:id="@+id/forward_contact_contact"
                     style="@style/MessageForwardIconStyleStart"
-                    android:layout_toEndOf="@+id/content_contact_message_contact_layout" />
+                    android:layout_toEndOf="@+id/content_contact_message_contact_layout"
+                    app:tint="@color/grey_200_grey_500" />
 
                 <!--End RelativeLayout contact-->
 
@@ -2013,8 +1907,7 @@
             android:layout_height="match_parent"
             android:textAllCaps="true"
             android:gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/color_text_new_messages"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5" />
 
     </LinearLayout>
 

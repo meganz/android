@@ -21,6 +21,11 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.listeners.SessionTransferURLListener;
+import mega.privacy.android.app.utils.ColorUtils;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaPricing;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -186,7 +191,9 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
-            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color='#000000'>");
+            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
@@ -195,7 +202,9 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
         String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
-            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color='#000000'>");
+            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);

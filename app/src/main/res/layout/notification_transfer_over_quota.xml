@@ -19,21 +19,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/label_transfer_over_quota"
-            android:textColor="@color/primary_text"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/content_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/secondary_text"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="22dp"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,13 +43,13 @@
 
             <Button
                 android:id="@+id/dismiss_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/upgrade_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp" />

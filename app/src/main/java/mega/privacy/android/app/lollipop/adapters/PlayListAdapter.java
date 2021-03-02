@@ -190,7 +190,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileSize.setText(getSizeString(mediaFile.length()));
 
             if (isCurrentChecked(position, querySearch, offNode.getName().equals(offNodeChecked.getName()))){
-                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
                 if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
@@ -201,7 +200,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 holder.textViewFileSize.setVisibility(View.VISIBLE);
                 holder.textViewState.setVisibility(View.GONE);
             }
@@ -212,7 +210,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileSize.setText(getSizeString(zipFile.length()));
 
             if (isCurrentChecked(position, querySearch, zipFile.getName().equals(zipChecked.getName()))) {
-                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
                 if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
@@ -223,7 +220,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             }
             else {
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 holder.textViewFileSize.setVisibility(View.VISIBLE);
                 holder.textViewState.setVisibility(View.GONE);
             }
@@ -234,7 +230,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.textViewFileSize.setText(getSizeString(node.getSize()));
 
             if (isCurrentChecked(position, querySearch, node.getName().equals(nodeChecked.getName()))){
-                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
                 holder.textViewFileSize.setVisibility(View.GONE);
                 holder.textViewState.setVisibility(View.VISIBLE);
                 if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
@@ -245,7 +240,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 holder.textViewFileSize.setVisibility(View.VISIBLE);
                 holder.textViewState.setVisibility(View.GONE);
             }

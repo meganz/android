@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -239,12 +240,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
 
-            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT &&
-                    (MimeTypeList.typeForName(node.getName()).isVideoReproducible() ||
-                            MimeTypeList.typeForName(node.getName()).isVideo() ||
-                            MimeTypeList.typeForName(node.getName()).isAudio()
-                            || MimeTypeList.typeForName(node.getName()).isImage() ||
-                            MimeTypeList.typeForName(node.getName()).isPdf()) ? View.VISIBLE : View.GONE);
+            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
             optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
             optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
@@ -366,7 +362,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                openWith(node);
+                openWith(context, node);
                 break;
 
             case R.id.forward_layout:
@@ -399,10 +395,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                i = new Intent(context, ContactAttachmentActivityLollipop.class);
-                i.putExtra("chatId", chatId);
-                i.putExtra(MESSAGE_ID, messageId);
-                context.startActivity(i);
+                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
                 break;
 
             case R.id.option_info_layout:
@@ -411,9 +404,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, message.getMessage().getUserEmail(0));
-                context.startActivity(i);
+                boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() &&
+                        message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0);
+                ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0), isChatRoomOpen);
                 break;
 
             case R.id.option_invite_layout:

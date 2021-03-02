@@ -2,6 +2,8 @@ package mega.privacy.android.app;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
 
@@ -39,6 +41,10 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     private Object mFrameSyncObject = new Object();     // guards mFrameAvailable
     private boolean mFrameAvailable;
     private TextureRender mTextureRender;
+
+    private HandlerThread mHandlerThread;
+    private Handler mHandler;
+
     /**
      * Creates an OutputSurface backed by a pbuffer with the specifed dimensions.  The new
      * EGL context and surface will be made current.  Creates a Surface that can be passed
@@ -66,6 +72,11 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     private void setup() {
         mTextureRender = new TextureRender();
         mTextureRender.surfaceCreated();
+
+        mHandlerThread = new HandlerThread("callback-thread");
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
         // Even if we don't access the SurfaceTexture after the constructor returns, we
         // still need to keep a reference to it.  The Surface doesn't retain a reference
         // at the Java level, so if we don't either then the object can get GCed, which
@@ -83,7 +94,7 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
         //
         // Java language note: passing "this" out of a constructor is generally unwise,
         // but we should be able to get away with it here.
-        mSurfaceTexture.setOnFrameAvailableListener(this);
+        mSurfaceTexture.setOnFrameAvailableListener(this, mHandler);
         mSurface = new Surface(mSurfaceTexture);
     }
     /**

@@ -74,6 +74,7 @@ import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
 import nz.mega.sdk.MegaAccountSession;
@@ -124,9 +125,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/4.0.0_352";
-
-    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
 	private static ChatManagement chatManagement;
 
@@ -219,7 +218,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private CallListener callListener = new CallListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
-	@Override
+    @Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
@@ -718,6 +717,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		super.onCreate();
 
+		ThemeHelper.INSTANCE.initTheme(this);
+
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -921,7 +922,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					MegaApplication.USER_AGENT, path);
+					BuildConfig.USER_AGENT, path);
 
 			megaApiFolder.retrySSLerrors(true);
 
@@ -1159,7 +1160,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setAutoCancel(true)
 						.setSound(defaultSoundUri)
 						.setContentIntent(pendingIntent)
-						.setColor(ContextCompat.getColor(this, R.color.mega));
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 				Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
 				notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
@@ -1178,7 +1179,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setContentIntent(pendingIntent);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 				}
 
 				Drawable d;

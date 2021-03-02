@@ -73,6 +73,7 @@ public class FileUtil {
     public static final String JPG_EXTENSION = ".jpg";
     public static final String TXT_EXTENSION = ".txt";
     public static final String _3GP_EXTENSION = ".3gp";
+    public static final String MP4_EXTENSION = ".mp4";
     public static final String ANY_TYPE_FILE = "*/*";
 
     private static final String VOLUME_EXTERNAL = "external";
