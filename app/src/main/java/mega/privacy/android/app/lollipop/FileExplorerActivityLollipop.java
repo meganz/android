@@ -3328,9 +3328,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public long getParentHandleIncoming() {
-		if (iSharesExplorer != null) {
-			parentHandleIncoming = iSharesExplorer.getParentHandle();
-		}
 		return parentHandleIncoming;
 	}
 
