@@ -9,7 +9,6 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication

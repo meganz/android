@@ -8,7 +8,6 @@
         android:id="@+id/parent_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:orientation="vertical">
 
         <TextView
@@ -18,8 +17,7 @@
         <TextView
             android:id="@+id/four_digits_option"
             style="@style/OnlyTextBottomSheetOptionStyle"
-            android:text="@string/four_pin_lock"
-            tools:textColor="@color/accentColor" />
+            android:text="@string/four_pin_lock" />
 
         <View style="@style/SeparatorBottomSheetStyle" />
 

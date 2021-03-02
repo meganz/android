@@ -438,7 +438,7 @@
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginEnd">16dp</item>
         <item name="android:layout_marginBottom">12dp</item>m>
-        <item name="android:textColor">@color/grey_alpha_054</item>
+        <item name="android:textColor">@color/grey_054_white_054</item>
         <item name="android:textSize">16sp</item>
     </style>
 
@@ -448,6 +448,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/grey_087_white_087</item>
         <item name="android:textSize">16sp</item>
     </style>
 
