@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -47,7 +48,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             transfer = managerActivity.getSelectedTransfer();
             transferId = transfer.getId();
         } else {
-            transferId = savedInstanceState.getInt(TRANSFER_ID, -1);
+            transferId = savedInstanceState.getLong(TRANSFER_ID, INVALID_ID);
             transfer = dbH.getcompletedTransfer(transferId);
         }
     }
