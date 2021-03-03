@@ -144,6 +144,10 @@ class AudioPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
+                if (service.viewModel.playlistSearchQuery != null) {
+                    return@observe
+                }
+
                 togglePlaylistEnabled(it.first)
             }
 

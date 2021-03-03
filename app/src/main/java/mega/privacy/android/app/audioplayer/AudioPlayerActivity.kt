@@ -78,6 +78,10 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@AudioPlayerActivity) {
+                    if (service.service.viewModel.playlistSearchQuery != null) {
+                        return@observe
+                    }
+
                     if (it.first.isEmpty()) {
                         stopPlayer()
                     } else {
