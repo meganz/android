@@ -38,7 +38,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
     }
 
     private fun showUnsavedDialog() {
-        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(this)
             .setMessage(StringResourcesUtils.getString(R.string.dialog_cookie_alert_unsaved))
             .setPositiveButton(StringResourcesUtils.getString(R.string.save_action)) { _: DialogInterface, _: Int ->
                 saveCookieSettings()

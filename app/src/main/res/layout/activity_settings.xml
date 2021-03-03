@@ -22,21 +22,20 @@
         android:id="@+id/view_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="?colorSurface"
         android:elevation="4dp"
         android:visibility="gone"
         tools:visibility="visible">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save"
-            style="@style/Widget.Mega.Button.Save"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="32dp"
-            android:text="@string/save_action"
-            android:theme="@style/Theme.MaterialComponents.Bridge" />
+            android:text="@string/save_action" />
     </FrameLayout>
 </LinearLayout>

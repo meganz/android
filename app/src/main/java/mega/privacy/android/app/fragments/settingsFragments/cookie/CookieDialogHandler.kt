@@ -79,7 +79,7 @@ class CookieDialogHandler @Inject constructor(
     private fun createDialog(context: Context) {
         if (dialog?.isShowing == true || !context.isValid()) return
 
-        dialog = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+        dialog = MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(StringResourcesUtils.getString(R.string.preference_cookies_accept)) { _, _ ->

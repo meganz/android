@@ -17,7 +17,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
-        android:theme="@style/Theme.MaterialComponents.Bridge"
         tools:text="Cookie Policy" />
 
     <com.google.android.material.button.MaterialButton
@@ -25,7 +24,6 @@
         style="@style/Widget.Mega.Button.Preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.MaterialComponents.Bridge"
         tools:text="Privacy Policy" />
 
 </com.google.android.flexbox.FlexboxLayout>

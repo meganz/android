@@ -399,9 +399,4 @@
         <item name="android:textColor">?attr/colorSecondary</item>
         <item name="android:textAppearance">?textAppearanceCaption</item>
     </style>
-
-    <style name="Widget.Mega.Button.Save" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/accentColor</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
 </resources>

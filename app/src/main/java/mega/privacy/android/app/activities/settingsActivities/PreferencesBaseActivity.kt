@@ -10,7 +10,6 @@ import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import java.util.*
 
 open class PreferencesBaseActivity : PinActivityLollipop() {
@@ -29,8 +28,6 @@ open class PreferencesBaseActivity : PinActivityLollipop() {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
-
-        Util.changeStatusBarColor(this, window, R.color.dark_primary_color)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
