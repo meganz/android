@@ -79,7 +79,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private AppCompatEditText newPassword2;
 	private ImageView newPassword2Error;
 	private Button changePasswordButton;
-    private RelativeLayout fragmentContainer;
+    private LinearLayout generalContainer;
 	private TextView title;
 	private String linkToReset;
 	private String mk;
@@ -127,7 +127,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_change_password);
 		
-        fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_change_pass);
+        generalContainer = findViewById(R.id.change_password_container);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
 		display = getWindowManager().getDefaultDisplay();
@@ -217,8 +217,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		});
 
-		changePasswordButton = (Button) findViewById(R.id.action_change_password);
+		changePasswordButton = findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
+
+		findViewById(R.id.action_cancel).setOnClickListener(v -> finish());
 
         TextView top = findViewById(R.id.top);
 
@@ -1274,7 +1276,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(fragmentContainer, s);
+		showSnackbar(generalContainer, s);
 	}
 
 	void hideAB(){

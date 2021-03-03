@@ -190,7 +190,7 @@
     </style>
 
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
@@ -214,6 +214,19 @@
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
 
+    <!--  Same in dark mode and light mode  -->
+    <style name="Widget.Mega.Button.Transparent" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">10dp</item>
+        <item name="android:textColor">?android:attr/colorAccent</item>
+        <item name="android:paddingStart">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+    </style>
+
+
     <!-- For date picker dialog -->
     <style name="Widget.Mega.DatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Calendar">
         <item name="android:datePickerStyle">@style/Widget.Mega.DatePicker</item>
@@ -221,7 +234,9 @@
     </style>
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
-        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
+        <item name="android:headerMonthTextAppearance">
+            @style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary
+        </item>
     </style>
 
     <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary">
@@ -383,10 +398,11 @@
     </style>
 
     <!-- For dropdown menu in AudioVideoPlayerLollipop, fix to dark mode -->
-    <style name="ThemeOverlay.MaterialComponents.MenuDark" >
+    <style name="ThemeOverlay.MaterialComponents.MenuDark">
         <item name="colorSurface">@color/grey_900</item>
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
-        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark</item>
+        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark
+        </item>
     </style>
 
     <style name="Widget.MaterialComponents.CompoundButton.CheckBox.Dark">
