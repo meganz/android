@@ -398,14 +398,14 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private ImageButton gifButton;
 
     private EmojiKeyboard emojiKeyboard;
-    private FrameLayout rLKeyboardTwemojiButton;
+    private RelativeLayout rLKeyboardTwemojiButton;
 
-    private FrameLayout rLMediaButton;
-    private FrameLayout rLPickFileStorageButton;
-    private FrameLayout rLPickAttachButton;
-    private FrameLayout rlGifButton;
+    private RelativeLayout rLMediaButton;
+    private RelativeLayout rLPickFileStorageButton;
+    private RelativeLayout rLPickAttachButton;
+    private RelativeLayout rlGifButton;
 
-    private LinearLayout returnCallOnHoldButton;
+    private RelativeLayout returnCallOnHoldButton;
     private ImageView returnCallOnHoldButtonIcon;
     private TextView returnCallOnHoldButtonText;
 
@@ -1540,7 +1540,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
         keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
+        sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
 
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
@@ -2750,7 +2750,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
     }
 
-    private void disableButton(final  FrameLayout layout, final  ImageButton button){
+    private void disableButton(final RelativeLayout layout, final  ImageButton button){
         logDebug("disableButton");
         layout.setOnClickListener(null);
         button.setOnClickListener(null);
@@ -2770,7 +2770,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         enableButton(rlGifButton, gifButton);
     }
 
-    private void enableButton(FrameLayout layout, ImageButton button){
+    private void enableButton(RelativeLayout layout, ImageButton button){
         logDebug("enableButton");
         layout.setOnClickListener(this);
         button.setOnClickListener(this);
@@ -2785,8 +2785,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
             return;
 
         sendIcon.setEnabled(true);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, editingMessage ?
-                R.drawable.ic_select_thumbnail : R.drawable.ic_send_black));
+        if(editingMessage){
+            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_select_thumbnail));
+        }else{
+            sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.teal_500));
+        }
 
         textChat.setHint(" ");
         setSizeInputText(false);
@@ -2811,17 +2814,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             if(isDeactivated){
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc));
-                recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
-                        PorterDuff.Mode.SRC_IN);
+                recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_voice_clip_outline, R.color.grey_054_white_054));
                 return;
             }
 
             recordButton.activateOnTouchListener(false);
             recordButton.activateOnClickListener(true);
-            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-            recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
-                    PorterDuff.Mode.SRC_IN);
+            recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
         }
     }
 
@@ -2845,9 +2844,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
                 recordButton.activateOnTouchListener(true);
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc));
-                recordButton.setColorFilter(ContextCompat.getColor(this, R.color.white_black),
-                        PorterDuff.Mode.SRC_IN);
+                recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_voice_clip_outline, R.color.white));
             }
 
         }else if(currentRecordButtonState == RECORD_BUTTON_DEACTIVATED){
