@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_file_list_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -14,29 +15,21 @@
         android:layout_marginTop="8dp"
         android:layout_gravity="center_vertical" >
 
-        <RelativeLayout
-            android:id="@+id/contact_file_list_relative_layout_thumb"
+        <ImageView
+            android:id="@+id/contact_file_list_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp">
-
-            <ImageView
-                android:id="@+id/contact_file_list_thumbnail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:scaleType="fitCenter" />
-
-        </RelativeLayout>
+            android:layout_margin="12dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:id="@+id/contact_file_list_relative_layout_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/contact_file_list_relative_layout_thumb"
-            android:layout_marginLeft="12dp">
+            android:layout_toEndOf="@id/contact_file_list_thumbnail">
 
             <TextView
                 android:id="@+id/contact_file_list_name_text"
@@ -46,20 +39,17 @@
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
             <TextView
                 android:id="@+id/contact_file_list_info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/contact_file_list_name_text"
-                android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
-                android:ellipsize="middle"/>
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
+                android:ellipsize="middle" />
 
         </RelativeLayout>
 
@@ -77,8 +67,8 @@
                 android:id="@+id/contact_file_list_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.35"
-                android:background="@null"/>
+                app:tint="@color/grey_038_white_038"
+                android:background="@null" />
 
         </RelativeLayout>
 
@@ -88,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -113,7 +103,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
+                    app:tint="?android:attr/textColorSecondary"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
@@ -127,8 +117,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    tools:text="Folder info" />
             </LinearLayout>
 
             <LinearLayout
@@ -137,7 +127,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012" />
 
             <!-- Options -->
             <LinearLayout
@@ -152,11 +142,11 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
+                    app:tint="?android:attr/textColorSecondary"
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:src="@drawable/ic_save_to_device"
                     android:visibility="visible" />
 
                 <TextView
@@ -167,8 +157,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -177,7 +166,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -191,7 +180,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
+                    app:tint="?android:attr/textColorSecondary"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
@@ -206,8 +195,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_rename"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -222,7 +210,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
+                    app:tint="?android:attr/textColorSecondary"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
@@ -237,8 +225,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_move_to"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -253,7 +240,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
+                    app:tint="?android:attr/textColorSecondary"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
@@ -268,8 +255,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_copy"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -278,7 +264,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_leave_layout"
@@ -295,7 +281,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/leave_share_ic"
                     android:visibility="visible" />
 
@@ -307,8 +293,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/alert_leave_share"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -326,7 +311,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_rubbish_bin"
                     android:visibility="visible" />
 
@@ -338,8 +323,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.recent;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -48,6 +49,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -141,12 +143,23 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
+        } else {
+            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
+        }
+
         String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
+
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[A]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
+            textToShow = textToShow.replace("[/A]","</font>");
+            textToShow = textToShow.replace("[B]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + "\'>");
+            textToShow = textToShow.replace("[/B]","</font>");
         } catch (Exception e) {
         }
         Spanned result = null;

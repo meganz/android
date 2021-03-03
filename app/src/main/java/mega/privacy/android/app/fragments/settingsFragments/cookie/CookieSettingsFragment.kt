@@ -128,7 +128,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         if (!isThirdPartyDialogShowing) {
             isThirdPartyDialogShowing = true
 
-            MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+            MaterialAlertDialogBuilder(requireContext())
                 .setView(R.layout.dialog_cookie_thirdparty)
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes), null)
                 .setOnDismissListener { isThirdPartyDialogShowing = false }

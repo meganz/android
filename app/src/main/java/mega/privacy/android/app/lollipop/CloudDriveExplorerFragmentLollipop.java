@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,6 +51,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -92,10 +92,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private LinearLayout emptyTextView;
 	private TextView emptyTextViewFirst;
 
-	private TextView contentText;
 	private Button optionButton;
 	private Button cancelButton;
-	private View separator;
 	private FloatingActionButton fabSelect;
 
 	private ArrayList<Long> nodeHandleMoveCopy;
@@ -167,7 +165,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
 			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -181,7 +178,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -286,8 +282,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		contentLayout = v.findViewById(R.id.content_layout);
 		searchProgressBar = v.findViewById(R.id.progressbar);
 
-		separator = v.findViewById(R.id.separator);
-
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
@@ -318,9 +312,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				checkScroll();
 			}
 		});
-
-		contentText = v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
@@ -377,7 +368,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
-				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
 				activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)));
 				//No break; needed: the text should be set with SELECT mode
@@ -453,10 +443,15 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 
 			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			} catch (Exception e) {
 				logWarning("Exception formatting string", e);
 			}
@@ -831,12 +826,10 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			if (selectFile) {
 				fabSelect.setVisibility(visibility);
 			} else {
-				separator.setVisibility(visibility);
 				optionsBar.setVisibility(visibility);
 			}
 		} else {
 			optionButton.setEnabled(show);
-			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
 		}
 	}
 

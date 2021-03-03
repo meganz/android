@@ -57,12 +57,13 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         strongShape = ContextCompat.getDrawable(context, R.drawable.passwd_strong)!!
         emptyShape = ContextCompat.getDrawable(context, R.drawable.shape_password)!!
 
-        veryWeakColor = ContextCompat.getColor(context, R.color.login_warning)
-        weakColor = ContextCompat.getColor(context, R.color.pass_weak)
-        mediumColor = ContextCompat.getColor(context, R.color.green_unlocked_rewards)
-        goodColor = ContextCompat.getColor(context, R.color.pass_good)
-        strongColor = ContextCompat.getColor(context, R.color.blue_unlocked_rewards)
+        veryWeakColor = ContextCompat.getColor(context, R.color.red_600_red_300)
+        weakColor = ContextCompat.getColor(context, R.color.yellow_600_yellow_300)
+        mediumColor = ContextCompat.getColor(context, R.color.green_500_green_400)
+        goodColor = ContextCompat.getColor(context, R.color.lime_green_500_200)
+        strongColor = ContextCompat.getColor(context, R.color.dark_blue_500_200)
 
+        binding.passwordLayout.isEndIconVisible = false
         with(binding.passwordText) {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -92,13 +93,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
             })
 
             setOnFocusChangeListener { _, hasFocus ->
-                setPasswordToggle(
-                    binding.passwordLayout,
-                    hasFocus
-                )
+                binding.passwordLayout.isEndIconVisible = hasFocus
             }
         }
 
+        binding.confirmPasswordLayout.isEndIconVisible = false
         with(binding.confirmPasswordText) {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -116,10 +115,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
             })
 
             setOnFocusChangeListener { _, hasFocus ->
-                setPasswordToggle(
-                    binding.confirmPasswordLayout,
-                    hasFocus
-                )
+                binding.confirmPasswordLayout.isEndIconVisible = hasFocus
             }
 
             setOnEditorActionListener { _, actionId, _ ->
@@ -162,8 +158,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 binding.passwordType.setTextColor(veryWeakColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_weak)
                 isPasswordValid = false
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceVeryWeak)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceVeryWeak)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
             }
             MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
                 binding.shapePasswordFirst.background = weakShape
@@ -175,8 +171,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 binding.passwordType.setTextColor(weakColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_weak)
                 isPasswordValid = true
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceWeak)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceWeak)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Weak)
             }
             MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
                 binding.shapePasswordFirst.background = mediumShape
@@ -188,8 +184,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 binding.passwordType.setTextColor(mediumColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_medium)
                 isPasswordValid = true
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
             }
             MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
                 binding.shapePasswordFirst.background = goodShape
@@ -201,8 +197,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 binding.passwordType.setTextColor(goodColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_good)
                 isPasswordValid = true
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceGood)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceGood)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Good)
             }
             else -> {
                 binding.shapePasswordFirst.background = strongShape
@@ -214,8 +210,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 binding.passwordType.setTextColor(strongColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_strong)
                 isPasswordValid = true
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceStrong)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceStrong)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Strong)
             }
         }
 
@@ -283,16 +279,16 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
             R.id.password_text -> {
                 binding.passwordLayout.isErrorEnabled = false
                 binding.passwordLayout.error = error
-                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError)
-                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError)
+                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)
                 binding.passwordErrorIcon.visibility = VISIBLE
                 binding.passwordLayout.isErrorEnabled = true
             }
             R.id.confirm_password_text -> {
                 binding.confirmPasswordLayout.isErrorEnabled = false
                 binding.confirmPasswordLayout.error = error
-                binding.confirmPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceError)
-                binding.confirmPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError)
+                binding.confirmPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                binding.confirmPasswordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)
                 binding.confirmPasswordText.requestFocus()
                 binding.confirmPasswordErrorIcon.visibility = VISIBLE
                 binding.confirmPasswordLayout.isErrorEnabled = true

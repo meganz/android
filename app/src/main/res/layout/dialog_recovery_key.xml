@@ -20,7 +20,7 @@
             android:imeActionLabel="@string/general_add"
             android:imeOptions="actionDone"
             android:inputType="textVisiblePassword"
-            android:textColor="@color/text_secondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp"
             />
     </com.google.android.material.textfield.TextInputLayout>

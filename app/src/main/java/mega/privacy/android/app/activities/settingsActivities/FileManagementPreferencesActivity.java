@@ -18,13 +18,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -201,7 +204,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * Show Clear Rubbish Bin dialog.
      */
     public void showClearRubbishBinDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.context_clear_rubbish));
         builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 
@@ -219,7 +222,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * Show confirmation clear all versions dialog.
      */
     public void showConfirmationClearAllVersions() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.settings_file_management_delete_versions));
         builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
 
@@ -237,7 +240,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * Show Rubbish bin not disabled dialog.
      */
     public void showRBNotDisabledDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
         builder.setView(v);
@@ -343,7 +346,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         layout.addView(input, params);
 
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setHint(getString(R.string.hint_days));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setOnEditorActionListener((v, actionId, event) -> {
@@ -374,7 +377,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         params_text_error.setMargins(scaleWidthPx(25, outMetrics), 0, scaleWidthPx(25, outMetrics), 0);
         text.setLayoutParams(params_text_error);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
         builder.setPositiveButton(getString(R.string.general_ok),
                 (dialog, whichButton) -> {
