@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ================== Headline ====================== -->
+
+    <!-- On boarding screen, text title in the carousel, Regular, 22sp, 0px, textColorPrimary, AllCaps=false-->
+    <style name="TextAppearance.Mega.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <!-- In material design, typically for the title of the action bar (but Mega app uses Subtitle1 as action bar title)
+         The account name uses the default style of Headline6-->
+    <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!--  For turn on DND dialog title  -->
+    <style name="TextAppearance.Mega.Headline6.Medium" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Headline6.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- ================== Subtitle 1 ====================== -->
+
+    <!-- In material design, typically for AlertDialog title, Popup menu, AutoCompleteTextView,
+     TextInputEditText, Action bar subtitle -->
+    <!-- Regular, normal, 16sp, 0.15px, textColorPrimary, Invision design is system default value  -->
+    <style name="TextAppearance.Mega.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+    </style>
+
+    <!-- 0px -->
+    <style name="TextAppearance.Mega.Subtitle1.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Variant2">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Variant3">
+        <item name="android:textColor">@color/grey_012_white_012</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Variant4">
+        <item name="android:textColor">@color/grey_087_grey_070</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Red">
+        <item name="android:textColor">@color/red_600_red_300</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Red.18">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Red.20">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Error">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Action mode title text -->
+    <style name="TextAppearance.Mega.Subtitle1.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.AccentColor.Variant1">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
+    <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- -0.4px -->
+    <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant2">
+        <item name="android:letterSpacing">-0.00875</item>
+    </style>
+
+    <!-- 0.5px -->
+    <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant3">
+        <item name="android:letterSpacing">0.03125</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0.15px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Mainly for login/create account screen titles -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Medium, normal, 18sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant2">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Medium, normal, 20sp, 0px, white - black 87% -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant3">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white_grey_087</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, grey_900 - grey_700 -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant4">
+        <item name="android:textColor">@color/grey_900_grey_700</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, white - black -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant5">
+        <item name="android:textColor">@color/white_black</item>
+    </style>
+
+    <!-- Bold, 18sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Bold">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--===============  Subtitle 2 =====================-->
+
+    <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
+    <!-- Medium, 14sp, 0px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!--- 0.5px, Medium, AllCap -->
+    <style name="TextAppearance.Mega.Subtitle2.Variant">
+        <item name="android:letterSpacing">0.035714286</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- ================== Body1 ====================== -->
+
+    <!-- In material design, for the CheckedTextView -->
+    <!-- Regular, 16sp, 0.5px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
+    </style>
+
+    <!-- Chat own send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant2">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
+    <!-- Labels in contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant3">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- ================== Body2 ====================== -->
+
+    <!-- In material design, Alert Dialog, Snack bar, Chip text. Default value is
+       TextAppearance.MaterialComponents.Body2 which conform to Invision design-->
+    <!-- TextAppearance.Mega.Body2 is using the system default TextAppearance.MaterialComponents.Body2 -->
+    <style name="TextAppearance.Mega.Body2" parent="TextAppearance.MaterialComponents.Body2">
+    </style>
+
+    <!-- Regular, 14sp, 0.25px, textColorSecondary-->
+    <style name="TextAppearance.Mega.Body2.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Regular, 14sp, 0px, textColorSecondary-->
+    <style name="TextAppearance.Mega.Body2.Secondary.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Regular, 14sp, -0.35px, textColorSecondary-->
+    <style name="TextAppearance.Mega.Body2.Secondary.Variant2">
+        <item name="android:letterSpacing">-0.025</item>
+    </style>
+
+    <!-- Regular, 13sp, 0px, Authenticity your credentials, 13sp -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant3" >
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <!-- Regular, 14sp, 0px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Body2.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Regular, 14sp, 0px, textColorSecondary, AllCaps=true -->
+    <style name="TextAppearance.Mega.Body2.Secondary.Variant.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Medium -->
+    <style name="TextAppearance.Mega.Body2.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Accent -->
+    <style name="TextAppearance.Mega.Body2.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <!-- Medium, Accent -->
+    <style name="TextAppearance.Mega.Body2.Medium.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Variant2">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Chat own message text -->
+    <style name="TextAppearance.Mega.Body2.Variant3">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact message text -->
+    <style name="TextAppearance.Mega.Body2.Variant4">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
+    <!-- Chat new message -->
+    <style name="TextAppearance.Mega.Body2.Variant5">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <!-- Chat own reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant6">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
+    <!-- Chat contact reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant7">
+        <item name="android:textColor">@color/teal_300_white</item>
+    </style>
+
+    <!-- Add contact email input -->
+    <style name="TextAppearance.Mega.Body2.Variant8">
+        <item name="android:textColor">@color/black_white</item>
+    </style>
+
+    <!-- Add contact empty hint -->
+    <style name="TextAppearance.Mega.Body2.Variant9">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
+    <!-- empty hint text non-highlight color -->
+    <style name="TextAppearance.Mega.Body2.Variant10">
+        <item name="android:textColor">@color/grey_300_grey_600</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.PrimaryColor">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- ================== Button ====================== -->
+
+    <!-- Medium, 14sp, 0px, textColorPrimary, AllCaps=true -->
+    <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Button.Red">
+        <item name="android:textColor">@color/red_600_red_300</item>
+    </style>
+
+    <!-- ================== Caption ====================== -->
+
+    <!-- In material design, TextInputLayout hint,error,helper text; BNV item text, etc. -->
+    <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
+    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px -->
+    <style name="TextAppearance.Mega.Caption.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px -->
+    <style name="TextAppearance.Mega.Caption.OnSecondary">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat own file info -->
+    <style name="TextAppearance.Mega.Caption.Variant">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat contact file info -->
+    <style name="TextAppearance.Mega.Caption.Variant2">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
+    <!-- Regular, 12sp, 0.25px -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant">
+        <item name="android:letterSpacing">0.020833333</item>
+    </style>
+
+    <!-- Regular, 11sp, 0px, Achievements small caption -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant2">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <!-- Medium, Accent -->
+    <style name="TextAppearance.Mega.Caption.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Secondary.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.035833333</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Italic">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <!-- ======== Password strength hint text ============ -->
+    <style name="TextAppearance.InputHint" parent="TextAppearance.Design.Error">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Error">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.VeryWeak">
+        <item name="android:textColor">@color/red_600_red_300</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Weak">
+        <item name="android:textColor">@color/yellow_600_yellow_300</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Medium">
+        <item name="android:textColor">@color/green_500_green_400</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Good">
+        <item name="android:textColor">@color/lime_green_500_200</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Strong">
+        <item name="android:textColor">@color/dark_blue_500_200</item>
+    </style>
+
+    <!-- Tab Layout -->
+    <style name="TextAppearance.Mega.Tab" parent="TextAppearance.Design.Tab">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:letterSpacing">0.017857143</item>
+    </style>
+</resources>

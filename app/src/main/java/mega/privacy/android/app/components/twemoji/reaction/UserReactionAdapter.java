@@ -20,6 +20,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
@@ -133,9 +134,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                         MegaUser contact = megaApi.getContact(email);
                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                             ((ChatActivityLollipop) context).hideBottomSheet();
-                            Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                            i.putExtra(NAME, email);
-                            context.startActivity(i);
+                            ContactUtil.openContactInfoActivity(context, email);
                         }
                     } else {
                         ((ChatActivityLollipop) context).hideBottomSheet();

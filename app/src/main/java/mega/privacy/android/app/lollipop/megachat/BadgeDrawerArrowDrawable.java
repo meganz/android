@@ -20,6 +20,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     // Fraction of the drawable's intrinsic size we want the badge to be.
     private static final float SIZE_FACTOR = .5f;
     private static final float HALF_SIZE_FACTOR = SIZE_FACTOR / 4;
+    private static final float TEXT_SIZE_FACTOR = .4f;
 
     private Paint backgroundPaint;
     private Paint bigBackgroundPaint;
@@ -27,26 +28,16 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private String text;
     private boolean badgeEnabled = true;
 
-    public BadgeDrawerArrowDrawable(Context context, @ColorRes int textColor) {
+    public BadgeDrawerArrowDrawable(Context context, @ColorRes int backgroundColor
+            , @ColorRes int bigBackgroundColor, @ColorRes int textColor) {
         super(context);
 
         backgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
-        } else {
-            backgroundPaint.setColor(Color.WHITE);
-        }
+            backgroundPaint.setColor(ContextCompat.getColor(context, backgroundColor));
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            bigBackgroundPaint.setColor(Color.WHITE);
-        } else {
-            bigBackgroundPaint.setColor(
-                ContextCompat.getColor(context, R.color.dark_primary_color));
-        }
+        bigBackgroundPaint.setColor(ContextCompat.getColor(context, bigBackgroundColor));
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
@@ -54,7 +45,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTextSize(SIZE_FACTOR * getIntrinsicHeight());
+        textPaint.setTextSize(TEXT_SIZE_FACTOR * getIntrinsicHeight());
     }
 
     @Override

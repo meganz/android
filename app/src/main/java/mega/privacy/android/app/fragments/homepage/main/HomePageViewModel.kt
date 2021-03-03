@@ -20,13 +20,14 @@ class HomePageViewModel @ViewModelInject constructor(
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
-    private val _chatStatusDrawableId = MutableLiveData<Int>()
+    private val _chatStatus = MutableLiveData<Int>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
-    private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> = repository.getBannerListLiveData()
+    private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
+        repository.getBannerListLiveData()
 
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
-    val chatStatusDrawableId: LiveData<Int> = _chatStatusDrawableId
+    val chatStatus: LiveData<Int> = _chatStatus
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
@@ -43,15 +44,18 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private val chatOnlineStatusObserver = androidx.lifecycle.Observer<Int> {
-        _chatStatusDrawableId.value = repository.getChatStatusDrawableId(it)
+        _chatStatus.value = it
     }
 
     init {
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java).observeForever(avatarChangeObserver)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .observeForever(avatarChangeObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SCROLLING_CHANGE).observeForever(scrollingObserver as Observer<Any>)
-        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).observeForever(notificationCountObserver)
-        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).observeForever(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
+            .observeForever(notificationCountObserver)
+        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
+            .observeForever(chatOnlineStatusObserver)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -62,11 +66,14 @@ class HomePageViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java).removeObserver(avatarChangeObserver)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .removeObserver(avatarChangeObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SCROLLING_CHANGE).removeObserver(scrollingObserver as Observer<Any>)
-        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).removeObserver(notificationCountObserver)
-        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).removeObserver(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
+            .removeObserver(notificationCountObserver)
+        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
+            .removeObserver(chatOnlineStatusObserver)
     }
 
     private fun showDefaultAvatar() = viewModelScope.launch {
@@ -83,7 +90,8 @@ class HomePageViewModel @ViewModelInject constructor(
             repository.loadAvatar()?.also {
                 when {
                     it.first -> _avatar.value = it.second
-                    retry -> repository.createAvatar(object : BaseListener(MegaApplication.getInstance()) {
+                    retry -> repository.createAvatar(object :
+                        BaseListener(MegaApplication.getInstance()) {
                         override fun onRequestFinish(
                             api: MegaApiJava,
                             request: MegaRequest,

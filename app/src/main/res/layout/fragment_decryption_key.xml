@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -28,10 +27,8 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="24dp"
-            android:fontFamily="sans-serif-medium"
             android:text="@string/option_decryption_key"
-            android:textColor="@color/primary_text"
-            android:textSize="18sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant2"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/decryption_key_image" />
@@ -41,14 +38,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:fontFamily="sans-serif"
             android:gravity="center"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:paddingBottom="50dp"
             android:text="@string/decryption_key_explanation"
-            android:textColor="@color/primary_text"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/decryption_key_title" />

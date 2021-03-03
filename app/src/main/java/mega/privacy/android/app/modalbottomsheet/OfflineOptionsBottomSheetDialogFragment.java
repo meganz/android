@@ -9,11 +9,11 @@ import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.io.File;
 
 import mega.privacy.android.app.MegaOffline;
@@ -21,6 +21,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_MARGIN_DP;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -104,6 +106,12 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             if (file.isFile()) {
                 if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()) {
                     if (file.exists()) {
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                        params.height = params.width = dp2px(THUMB_SIZE_DP);
+                        int margin = dp2px(THUMB_MARGIN_DP);
+                        params.setMargins(margin, margin, margin, margin);
+                        nodeThumb.setLayoutParams(params);
+
                         nodeThumb.setImageURI(Uri.fromFile(file));
                     } else {
                         nodeThumb.setActualImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());

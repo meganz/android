@@ -2,8 +2,7 @@ package mega.privacy.android.app.fragments.getLinkFragments
 
 import android.app.DatePickerDialog
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.Drawable
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
@@ -14,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
@@ -22,6 +22,7 @@ import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
@@ -57,10 +58,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
     private var passwordVisible = false
 
-    private lateinit var accentDrawable: Drawable
-    private lateinit var transparentDrawable: Drawable
-    private var accentColor = 0
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,12 +68,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        accentDrawable = ContextCompat.getDrawable(context, R.drawable.background_accent_button)!!
-        transparentDrawable =
-            ContextCompat.getDrawable(context, R.drawable.background_button_border_accent)!!
-
-        accentColor = ContextCompat.getColor(context, R.color.accentColor)
-
         isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
 
         node = getLinkInterface.getNode()
@@ -348,7 +339,9 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(context, this, year, month, day)
+        val datePickerDialog = MaterialStyledDatePickerDialog(context,
+            R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Picker_Date_Calendar,
+            this, year, month, day)
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
         datePickerDialog.show()
     }
@@ -379,12 +372,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
             }
 
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
-
-            binding.copyLinkButton.background = accentDrawable
-            binding.copyLinkButton.setTextColor(Color.WHITE)
-        } else {
-            binding.copyLinkButton.background = transparentDrawable
-            binding.copyLinkButton.setTextColor(accentColor)
         }
 
         binding.passwordProtectionSetText.visibility = visibility
@@ -418,19 +405,13 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     private fun toggleClick() {
         if (passwordVisible) {
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
-            binding.passwordProtectionSetToggle.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_b_shared_read
-                )
+            binding.passwordProtectionSetToggle.setColorFilter(
+                ContextCompat.getColor(context, R.color.grey_012_white_038), PorterDuff.Mode.SRC_IN
             )
         } else {
             binding.passwordProtectionSetText.transformationMethod = null
-            binding.passwordProtectionSetToggle.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_b_see
-                )
+            binding.passwordProtectionSetToggle.setColorFilter(
+                ColorUtils.getThemeColor(context, R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
             )
         }
 

@@ -7,7 +7,6 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -31,6 +30,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -38,7 +38,6 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -306,17 +305,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
 
-                String title = getChat().getTitle();
+                String title = getTitleChat(getChat());
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
-                holderHeader.infoTitleChatText.setText(getChat().getTitle());
+                holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_unarchive);
                 } else {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_archive);
                 }
 
                 long participantsCount = getChat().getPeerCount();
@@ -350,26 +349,27 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         if (!getChat().isPublic()) {
                             holderHeader.privateTitle.setText(R.string.private_chat);
                             holderHeader.privateTitle.setAllCaps(false);
-                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.primary_text));
+                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_087_white_087));
                             holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                             holderHeader.privateLayout.setOnClickListener(null);
                         } else {
                             holderHeader.privateTitle.setText(R.string.make_chat_private_option);
                             holderHeader.privateTitle.setAllCaps(true);
-                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
 
                             if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.accentColor));
+                                holderHeader.privateTitle.setTextColor(ColorUtils.getThemeColor(groupChatInfoActivity, R.attr.colorSecondary));
                                 holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                                 holderHeader.privateLayout.setOnClickListener(this);
                             } else {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.emoji_icons));
+                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                                 holderHeader.privateText.setText(R.string.make_chat_private_not_available_text);
                                 holderHeader.privateLayout.setOnClickListener(null);
                             }
                         }
 
+                        if (!groupChatInfoActivity.isChatOpen()) {
+                            MegaApplication.getChatManagement().openChatRoom(getChat().getChatId());
+                        }
                         updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()));
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
@@ -450,14 +450,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
-                holderParticipantsList.threeDotsLayout.setOnClickListener(this);
-                holderParticipantsList.itemLayout.setOnClickListener(this);
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
-                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                     holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                     holderParticipantsList.itemLayout.setOnClickListener(null);
+                } else {
+                    holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                    holderParticipantsList.itemLayout.setOnClickListener(this);
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
                 }
 
                 int permission = participant.getPrivilege();
@@ -746,12 +747,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             String nameFileEmail = holderParticipantsList.contactMail;
 
             if (isTextEmpty(nameFileEmail)) {
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                 holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                 holderParticipantsList.itemLayout.setOnClickListener(null);
                 avatarBitmap = getAvatarBitmap(nameFileHandle);
             } else {
                 avatarBitmap = getUserAvatar(nameFileHandle, nameFileEmail);
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
             }
         }
 

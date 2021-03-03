@@ -15,8 +15,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/dialog_cookie_alert_title"
-            android:textAppearance="?textAppearanceHeadline6"
-            android:textColor="@color/primary_text" />
+            android:textAppearance="?textAppearanceHeadline6" />
 
         <TextView
             android:id="@+id/message"
@@ -25,9 +24,8 @@
             android:layout_marginTop="16dp"
             android:linksClickable="true"
             android:text="@string/dialog_cookie_alert_message"
-            android:textAppearance="?textAppearanceSubtitle1"
-            android:textColor="@color/transparent_black2"
-            android:textColorLink="@color/accentColor" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
+            android:textColorLink="?attr/colorSecondary" />
 
     </LinearLayout>
 </ScrollView>

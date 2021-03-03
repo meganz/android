@@ -7,8 +7,8 @@
 
     <RelativeLayout
         android:id="@+id/chip_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginTop="14dp"
         android:layout_marginLeft="22dp"
         android:layout_marginRight="22dp"
@@ -17,20 +17,16 @@
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/rounded_avatar"
             android:layout_width="40dp"
-            android:layout_height="40dp"/>
+            android:layout_height="40dp" />
 
         <ImageView
             android:id="@+id/delete_icon_chip"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignRight="@+id/rounded_avatar"
-            android:layout_alignBottom="@+id/rounded_avatar"
-            android:paddingLeft="24dp"
-            android:paddingTop="24dp"
-            android:layout_marginRight="-3dp"
-            android:layout_marginBottom="-3dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:contentDescription="@null"
-            android:src="@drawable/ic_b_remove_avatar" />
+            android:src="@drawable/ic_cancel_avatar" />
     </RelativeLayout>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -38,14 +34,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:textSize="12sp"
         app:emojiSize="10sp"
         android:singleLine="true"
         android:maxLines="1"
         android:maxWidth="60dp"
         android:gravity="center"
-        android:textColor="@color/secondary_text"
-        android:fontFamily="roboto"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
         android:layout_below="@+id/chip_layout"/>
 
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -25,6 +26,7 @@ import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.SortUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
@@ -139,21 +141,21 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                     case SHARED_ITEMS: {
                         if (managerA.getSearchSharedTab() == INCOMING_TAB) {
                             if (managerA.getParentHandleIncoming() == INVALID_HANDLE) {
-                                nodes = filterInShares(query);
+                                getInShares();
                                 return;
                             }
 
                             parent = megaApi.getNodeByHandle(managerA.getParentHandleIncoming());
                         } else if (managerA.getSearchSharedTab() == OUTGOING_TAB) {
                             if (managerA.getParentHandleOutgoing() == INVALID_HANDLE) {
-                                nodes = filterOutShares(query);
+                                getOutShares();
                                 return;
                             }
 
                             parent = megaApi.getNodeByHandle(managerA.getParentHandleOutgoing());
                         } else if (managerA.getSearchSharedTab() == LINKS_TAB) {
                             if (managerA.getParentHandleLinks() == INVALID_HANDLE) {
-                                nodes = filterLinks(query);
+                                getLinks();
                                 return;
                             }
 
@@ -184,7 +186,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 parent = megaApi.getNodeByHandle(fileExplorerA.getParentHandleCloud());
             } else if (isISharesExplorerF()) {
                 if (fileExplorerA.getParentHandleIncoming() == INVALID_HANDLE) {
-                    nodes = filterInShares(query);
+                    getInShares();
                     return;
                 }
 
@@ -195,7 +197,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         }
 
         if (parent != null) {
-            if (query.isEmpty() || parentHandleSearch != INVALID_HANDLE) {
+            if (isTextEmpty(query) || parentHandleSearch != INVALID_HANDLE) {
                 nodes = megaApi.getChildren(parent);
             } else {
                 megaCancelToken = MegaCancelToken.createInstance();
@@ -204,66 +206,62 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    private ArrayList<MegaNode> filterInShares(String query) {
-        ArrayList<MegaNode> inShares = megaApi.getInShares();
-        ArrayList<MegaNode> filteredInShares = new ArrayList<>();
+    /**
+     * Gets search result nodes of Incoming section, root navigation level.
+     */
+    private void getInShares() {
+        if (isTextEmpty(query)) {
+            nodes = megaApi.getInShares();
 
-        for (MegaNode inShare : inShares) {
-            if (shouldNodeBeFilter(inShare, query)) {
-                filteredInShares.add(inShare);
+            if (orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+                sortByMailDescending(nodes);
             }
+        } else {
+            megaCancelToken = MegaCancelToken.createInstance();
+            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderCloud);
         }
-
-        if(orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-            sortByMailDescending(filteredInShares);
-        }
-
-        return filteredInShares;
     }
 
-    private ArrayList<MegaNode> filterOutShares(String query) {
-        ArrayList<MegaShare> outShares = megaApi.getOutShares();
-        ArrayList<MegaNode> filteredOutShares = new ArrayList<>();
+    /**
+     * Gets search result nodes of Outgoing section, root navigation level.
+     */
+    private void getOutShares() {
+        if (isTextEmpty(query)) {
+            nodes.clear();
 
-        long lastHandle = INVALID_HANDLE;
+            ArrayList<MegaShare> outShares = megaApi.getOutShares();
+            List<Long> addedHandles = new ArrayList<>();
 
-        for (MegaShare outShare : outShares) {
-            MegaNode node = megaApi.getNodeByHandle(outShare.getNodeHandle());
-            if (node != null && lastHandle != node.getHandle()) {
-                lastHandle = node.getHandle();
-                if (shouldNodeBeFilter(node, query)) {
-                    filteredOutShares.add(node);
+            for (MegaShare outShare : outShares) {
+                MegaNode node = megaApi.getNodeByHandle(outShare.getNodeHandle());
+
+                if (node != null && !addedHandles.contains(node.getHandle())) {
+                    addedHandles.add(node.getHandle());
+                    nodes.add(node);
                 }
             }
-        }
 
-        if(orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-            sortByNameDescending(filteredOutShares);
-        }
-        else{
-            sortByNameAscending(filteredOutShares);
-        }
-
-        return filteredOutShares;
-    }
-
-    private ArrayList<MegaNode> filterLinks(String query) {
-        ArrayList<MegaNode> links = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
-        ArrayList<MegaNode> filteredLinks = new ArrayList<>();
-
-        for (MegaNode node : links) {
-            if (node == null) continue;
-
-            if (shouldNodeBeFilter(node, query)) {
-                filteredLinks.add(node);
+            if (orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+                sortByNameDescending(nodes);
+            } else {
+                sortByNameAscending(nodes);
             }
+        } else {
+            megaCancelToken = MegaCancelToken.createInstance();
+            nodes = megaApi.searchOnOutShares(query, megaCancelToken, orderOthers);
         }
-
-        return filteredLinks;
     }
 
-    private boolean shouldNodeBeFilter(MegaNode node, String query) {
-        return node != null && node.getName().toLowerCase().contains(query.toLowerCase());
+    /**
+     * Gets search result nodes of Links section, root navigation level.
+     */
+    private void getLinks() {
+        if (isTextEmpty(query)) {
+            nodes = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
+        } else {
+            megaCancelToken = MegaCancelToken.createInstance();
+            nodes = megaApi.searchOnPublicLinks(query, megaCancelToken, orderCloud);
+        }
     }
 
     private boolean isSearchF() {

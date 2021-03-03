@@ -11,7 +11,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_share_folder"
-        android:icon="@drawable/ic_share_white"
+        android:icon="@drawable/ic_share"
         android:orderInCategory="100"
         app:tint="@color/white"
         android:title="@string/context_share_folder"
@@ -43,7 +43,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_remove_link"
-        android:icon="@drawable/ic_remove_link_w"
+        android:icon="@drawable/ic_remove_link"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
         android:visible="false"
