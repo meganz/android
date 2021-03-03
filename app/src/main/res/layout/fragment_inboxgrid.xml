@@ -16,7 +16,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:textColor="@color/secondary_text"
+				android:textColor="?android:attr/textColorSecondary"
 				android:layout_marginLeft="72dp"
 				android:textSize="14sp" />
     </RelativeLayout>
@@ -52,15 +52,11 @@
 			android:orientation="horizontal"
 			android:layout_below="@id/inbox_grid_empty_image"
 			android:layout_centerHorizontal="true">
-
 			<TextView
 				android:id="@+id/inbox_grid_empty_text_first"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:fontFamily="sans-serif"
-				android:textAllCaps="true"
-				android:textColor="@color/text_secondary"
-				android:textSize="14sp" />
+				android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
 		</LinearLayout>
 	</RelativeLayout>
 

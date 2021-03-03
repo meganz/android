@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,6 +67,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -282,7 +284,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			inflater.inflate(R.menu.cloud_storage_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -294,7 +295,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -352,10 +352,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 
 			if (showSendToChat) {
-				menu.findItem(R.id.cab_menu_send_to_chat)
-						.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-								R.color.white));
-
 				control.sendToChat().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
@@ -428,7 +424,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				|| MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()
 				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
 
-		((ManagerActivityLollipop) context).changeActionBarElevation(visible);
+		((ManagerActivityLollipop) context).changeAppBarElevation(visible);
 	}
 
 	@Override
@@ -484,7 +480,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -1043,37 +1039,40 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == n.getHandle()) {
                 
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+                    emptyImageView.setImageResource(R.drawable.empty_cloud_drive_landscape);
                 } else {
-                    emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+                    emptyImageView.setImageResource(R.drawable.empty_cloud_drive_portrait);
                 }
-                String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
+                String textToShow = context.getString(R.string.context_empty_cloud_drive).toUpperCase();
                 try {
-                    textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]","<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
-                    textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]","<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+				Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
                 emptyTextViewFirst.setText(result);
                 
             } else {
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+                    emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
                 } else {
-                    emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+                    emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
                 }
-                String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                String textToShow = context.getString(R.string.file_browser_empty_folder_new);
                 try {
-                    textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]","<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
-                    textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]","<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
                 }
@@ -1334,15 +1333,19 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).getParentHandleBrowser() || ((ManagerActivityLollipop)context).getParentHandleBrowser() == -1) {
 
 					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+						emptyImageView.setImageResource(R.drawable.empty_cloud_drive_landscape);
 					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						emptyImageView.setImageResource(R.drawable.empty_cloud_drive_portrait);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
+					String textToShow = context.getString(R.string.context_empty_cloud_drive).toUpperCase();
 					try {
-						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]","<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
-						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]","<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
 					}
@@ -1356,15 +1359,19 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 				} else {
 					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 					} else {
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					String textToShow = context.getString(R.string.file_browser_empty_folder_new);
 					try {
-						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]","<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
-						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]","<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
 					}

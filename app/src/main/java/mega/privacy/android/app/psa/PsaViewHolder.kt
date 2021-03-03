@@ -1,6 +1,7 @@
 package mega.privacy.android.app.psa
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.text.TextUtils
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
+import mega.privacy.android.app.utils.Util
 
 /**
  * The view holder for normal PSA view, implementing the display logic of PSA.
@@ -27,6 +30,15 @@ class PsaViewHolder(
     fun bind(psa: Psa) {
         bound = true
         binding.root.visibility = View.VISIBLE
+
+        binding.root.setBackgroundColor(
+            if (Util.isDarkMode(binding.root.context)) {
+                getColorForElevation(binding.root.context, 8f)
+            } else {
+                Color.WHITE
+            }
+        )
+
         if (!TextUtils.isEmpty(psa.imageUrl)) {
             binding.image.visibility = View.VISIBLE
             binding.image.setImageURI(Uri.parse(psa.imageUrl))

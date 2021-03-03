@@ -20,6 +20,7 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -67,10 +68,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			} else {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
@@ -368,6 +365,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleIncoming()
 				|| managerActivity.getParentHandleIncoming() == -1) {
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 			} else {

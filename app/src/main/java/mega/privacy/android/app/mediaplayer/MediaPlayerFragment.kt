@@ -152,13 +152,17 @@ class MediaPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
+                if (service.viewModel.playlistSearchQuery != null) {
+                    return@observe
+                }
+
                 audioPlayerVH?.togglePlaylistEnabled(it.first)
                 videoPlayerVH?.togglePlaylistEnabled(it.first)
             }
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
                 if (!it) {
-                    MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+                    MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                         .setCancelable(false)
                         .setMessage(
                             if (isOnline(requireContext())) R.string.error_fail_to_open_file_general

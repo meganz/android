@@ -23,7 +23,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@{highlight ? @color/adapters_background : @color/navigation_drawer_background }"
+        android:background="@{highlight ? @color/grey_020_grey_800 : @color/white_dark_grey }"
         android:onClick="@{() -> itemOperation.onItemClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -65,6 +65,6 @@
             android:layout_height="1dp"
             android:layout_gravity="bottom"
             android:layout_marginStart="72dp"
-            android:background="@color/disable_fab_chat_call" />
+            android:background="@color/grey_012_white_012" />
     </FrameLayout>
 </layout>

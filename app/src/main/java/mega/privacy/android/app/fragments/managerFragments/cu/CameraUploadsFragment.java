@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -16,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 
 import androidx.annotation.NonNull;
@@ -28,6 +26,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.Locale;
@@ -45,6 +45,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -77,7 +78,6 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
-import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -138,9 +138,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         if (mViewModel.isSelecting() || mBinding.cuList.canScrollVertically(-1)) {
-            mManagerActivity.changeActionBarElevation(true);
+            mManagerActivity.changeAppBarElevation(true);
         } else {
-            mManagerActivity.changeActionBarElevation(false);
+            mManagerActivity.changeAppBarElevation(false);
         }
     }
 
@@ -241,7 +241,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                                     getResources().getString(R.string.cam_sync_wifi),
                                     getResources().getString(R.string.cam_sync_data)
                             });
-            new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
+            new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setTitle(getString(R.string.section_photo_sync))
                     .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
                         resetCUTimestampsAndCache();
@@ -297,8 +297,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        mBinding.turnOnCuLayout.setVisibility(View.VISIBLE);
-        mBinding.turnOnCuText.setText(
+        mBinding.turnOnCuButton.setVisibility(View.VISIBLE);
+        mBinding.turnOnCuButton.setText(
                 getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                         Locale.getDefault()));
     }
@@ -336,20 +336,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
             @Nullable ViewGroup container) {
-        mManagerActivity.showHideBottomNavigationView(true);
         mViewModel.setInitialPreferences();
 
         mFirstLoginBinding =
                 FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
 
         new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
-                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                    if (mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
-                        mManagerActivity.changeActionBarElevation(true);
-                    } else {
-                        mManagerActivity.changeActionBarElevation(false);
-                    }
-                });
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
+                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)));
 
         mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
@@ -360,7 +354,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
-            mManagerActivity.showHideBottomNavigationView(false);
         });
         mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
@@ -442,16 +435,16 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         if (mCamera == TYPE_CAMERA) {
-            mBinding.turnOnCuText.setText(
+            mBinding.turnOnCuButton.setText(
                     getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                             Locale.getDefault()));
         } else {
-            mBinding.turnOnCuText.setText(
+            mBinding.turnOnCuButton.setText(
                     getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
                             Locale.getDefault()));
         }
 
-        mBinding.turnOnCuLayout.setOnClickListener(v -> {
+        mBinding.turnOnCuButton.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
 
@@ -491,10 +484,15 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 } else {
                     String textToShow = getString(R.string.context_empty_camera_uploads);
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace(
+                                "[A]", "<font color=\'"
+                                        + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+                                        + "\'>"
+                        ).replace("[/A]", "</font>").replace(
+                                "[B]", "<font color=\'"
+                                        + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+                                        + "\'>"
+                        ).replace("[/B]", "</font>");
                     } catch (Exception ignored) {
                     }
                     Spanned result;
@@ -544,19 +542,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
-            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
-            if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
-                params.bottomMargin = dp2px(48, outMetrics);
-                mBinding.cuList.setLayoutParams(params);
-
-                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = dp2px(48, outMetrics);
-                mBinding.scroller.setLayoutParams(params);
-            }
-        });
+        mViewModel.camSyncEnabled()
+                .observe(getViewLifecycleOwner(), enabled -> mBinding.turnOnCuButton.setVisibility(
+                        enabled ? View.GONE : View.VISIBLE));
 
         observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList);
     }

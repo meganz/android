@@ -15,7 +15,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.AvatarUtil
@@ -59,20 +58,6 @@ class HomepageRepository @Inject constructor(
 
     fun getBannerListLiveData(): MutableLiveData<MutableList<MegaBanner>?> {
         return bannerList
-    }
-
-    /**
-     * Get the resource id of the "dot" drawable showing on the avatar
-     *
-     * @param status the chat status
-     * @return int the drawable Id
-     */
-    fun getChatStatusDrawableId(status: Int) = when (status) {
-        MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
-        MegaChatApi.STATUS_AWAY -> R.drawable.ic_away
-        MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy
-        MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline
-        else -> 0
     }
 
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {

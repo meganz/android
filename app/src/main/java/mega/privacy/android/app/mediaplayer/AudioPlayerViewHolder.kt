@@ -135,7 +135,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
         bgPlayHint.setTextColor(
             ContextCompat.getColor(
-                binding.root.context, if (enabled) R.color.teal_200 else R.color.text_tab_alpha
+                binding.root.context, if (enabled) R.color.teal_200 else R.color.white_alpha_060
             )
         )
         bgPlayHint.setText(

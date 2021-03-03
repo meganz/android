@@ -2,9 +2,12 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -77,23 +80,6 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop)context).showUploadPanel();
                 }
-                break;
-            }
-            case R.id.main_fab_chat: {
-                logDebug("Main FAB chat click!");
-                ((ManagerActivityLollipop)context).animateFABCollection();
-                break;
-            }
-            case R.id.first_fab_chat: {
-                logDebug("Create new chat");
-                break;
-            }
-            case R.id.second_fab_chat: {
-                logDebug("Second FAB chat click");
-                break;
-            }
-            case R.id.third_fab_chat: {
-                logDebug("Third FAB chat click");
                 break;
             }
         }

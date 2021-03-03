@@ -29,8 +29,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -54,6 +57,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     private DisplayMetrics outMetrics;
 
     private ArrayList<RecentsItem> recentsItems;
+
+    private int mHeaderColor = -1;
 
     public RecentsAdapter(Context context, Object fragment, ArrayList<RecentsItem> items) {
         logDebug("new RecentsAdapter");
@@ -164,6 +169,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             logDebug("onBindViewHolder: TYPE_HEADER");
             holder.itemBucketLayout.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
+            holder.headerLayout.setBackgroundColor(getHeaderColor());
             holder.headerText.setText(item.getDate());
         } else if (item.getViewType() == RecentsItem.TYPE_BUCKET) {
             logDebug("onBindViewHolder: TYPE_BUCKET");
@@ -258,16 +264,19 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             }
 
             if (bucket.isUpdate()) {
-                holder.actionIcon.setImageResource(R.drawable.ic_versions_small);
+                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
+                        R.drawable.ic_versions_small, R.color.grey_054_white_054));
             } else {
-                holder.actionIcon.setImageResource(R.drawable.ic_recents_up);
+                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
+                        R.drawable.ic_recents_up, R.color.grey_054_white));
             }
         }
     }
 
     private Spanned formatUserAction(String userAction) {
         try {
-            userAction = userAction.replace("[A]", "<font color=\'#7a7a7a\'>");
+            userAction = userAction.replace("[A]", "<font color=\'" +
+                    ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "\'>");
             userAction = userAction.replace("[/A]", "</font>");
         } catch (Exception e) {
             logError("Exception formatting string", e);
@@ -401,5 +410,21 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 || position < 0 || position >= recentsItems.size()) return "";
 
         return recentsItems.get(position).getDate();
+    }
+
+    /**
+     * The Homepage bottom sheet has a calculated background for elevation, while the
+     * Recent fragment UI is transparent. This function is for calculating
+     * the same background color as bottomSheet for the sticky "header"
+     * @return the header's background color value
+     */
+    private int getHeaderColor() {
+        if (mHeaderColor == -1) {
+            int elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION,
+                    context.getResources().getDisplayMetrics());
+            mHeaderColor = ColorUtils.getColorForElevation(context, elevationPx);
+        }
+
+        return mHeaderColor;
     }
 }

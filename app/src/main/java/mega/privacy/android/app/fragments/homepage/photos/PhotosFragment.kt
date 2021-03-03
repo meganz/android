@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -36,6 +34,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -95,13 +94,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
-        binding.emptyHint.emptyHintImage.setImageResource(
-            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                R.drawable.ic_zero_data_recents_portrait
-            } else {
-                R.drawable.ic_zero_data_recents_landscape
-            }
-        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
@@ -151,23 +143,15 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
-    private fun preventListItemBlink() {
-        val animator = listView.itemAnimator
-
-        if (animator is SimpleItemAnimator) {
-            animator.supportsChangeAnimations = false
-        }
-    }
-
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        (activity as ManagerActivityLollipop).changeActionBarElevation(v!!.canScrollVertically(-1))
+        (activity as ManagerActivityLollipop).changeAppBarElevation(v!!.canScrollVertically(-1))
     }
 
     private fun setupListView() {
         listView = binding.photoList
-        preventListItemBlink()
+        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
         elevateToolbarWhenScrolling()
 
         itemDecoration = SimpleDividerItemDecoration(context)

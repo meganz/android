@@ -19,6 +19,8 @@ import java.util.Date;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.*;
@@ -58,6 +60,12 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			return v;
 		}
 		achievementType = arguments.getInt("achievementType");
+
+		if (Util.isDarkMode(context)) {
+			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+			v.findViewById(R.id.title_layout).setBackgroundColor(backgroundColor);
+			v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
+		}
 
 		return v;
 	}
@@ -149,7 +157,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			}
 			else{
 				if(diffDays<=15){
-					title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					title.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_300));
 					title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 				}
 				else{
@@ -183,7 +191,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			}
 			else{
 				if(diffDays<=15){
-					title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					title.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_300));
 					title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 				}
 				else{
@@ -218,7 +226,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			}
 			else{
 				if(diffDays<=15){
-					title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					title.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_300));
 					title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 				}
 				else{
@@ -245,7 +253,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 //            long registrationTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
 
 			if(diffDays<=15){
-				title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+				title.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_300));
 				title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 			}
 			else{

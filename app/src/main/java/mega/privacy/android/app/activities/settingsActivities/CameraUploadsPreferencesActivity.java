@@ -10,6 +10,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment;
 import mega.privacy.android.app.utils.Util;
@@ -194,7 +196,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(R.string.section_photo_sync)
                 .setMessage(R.string.camera_uploads_business_alert)
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {

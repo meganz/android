@@ -49,7 +49,6 @@ import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import nz.mega.sdk.MegaApiAndroid
@@ -99,6 +98,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
+                    if (service.service.viewModel.playlistSearchQuery != null) {
+                        return@observe
+                    }
+
                     if (it.first.isEmpty()) {
                         stopPlayer()
                     } else {
@@ -140,7 +143,6 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(if (isAudioPlayer) binding.root else dragToExit.wrapContentView(binding.root))
-        changeStatusBarColor(this, window, R.color.black)
 
         if (!isAudioPlayer) {
             MediaPlayerService.pauseAudioPlayer(this)
@@ -215,7 +217,6 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         actionBar.title = ""
 
         binding.toolbar.setNavigationOnClickListener {
@@ -236,9 +237,13 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -246,6 +251,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
                     }
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
             }
             refreshMenuOptionsVisibility(dest.id)
@@ -554,7 +561,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             return
         }
 
-        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)

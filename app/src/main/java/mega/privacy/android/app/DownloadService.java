@@ -673,7 +673,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
 
-				mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+				mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 			}
@@ -686,7 +686,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						.setOngoing(false);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+					mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 				}
 
 				mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -962,7 +962,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
 
-								mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+								mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 							}
@@ -975,7 +975,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										.setOngoing(false);
 
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-									mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+									mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 								}
 
 								mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1041,7 +1041,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 													.setContentTitle(notificationTitle).setContentText(size)
 													.setOngoing(false);
 
-											mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+											mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 											mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 										}
@@ -1054,7 +1054,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 													.setOngoing(false);
 
 											if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-												mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+												mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 											}
 
 											mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1095,7 +1095,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 											.setContentTitle(notificationTitle).setContentText(size)
 											.setOngoing(false);
 
-									mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+									mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 									mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 								}
@@ -1108,7 +1108,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 											.setOngoing(false);
 
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-										mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+										mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 									}
 
 									mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1173,7 +1173,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
 
-							mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+							mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 						}
@@ -1186,7 +1186,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									.setOngoing(false);
 
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+								mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 							}
 
 							mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1211,7 +1211,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
 
-						mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+						mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 					}
@@ -1224,7 +1224,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								.setOngoing(false);
 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+							mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 						}
 
 						mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1251,7 +1251,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
 
-					mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+					mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompatO.build());
 				}
@@ -1264,7 +1264,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							.setOngoing(false);
 
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+						mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 					}
 
 					mNotificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, mBuilderCompat.build());
@@ -1366,7 +1366,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
+						.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -1378,7 +1378,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
+						.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -1397,7 +1397,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						.setOnlyAlertOnce(true);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
 				}
 
 				notification = mBuilder.getNotification();

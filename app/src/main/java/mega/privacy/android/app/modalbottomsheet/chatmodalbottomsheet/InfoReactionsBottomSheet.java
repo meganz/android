@@ -8,12 +8,19 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +45,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
+public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
     private static final int HEIGHT_HEADER = 96;
     private static final int HEIGHT_USERS = 56;
@@ -88,6 +95,22 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         }
     }
 
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        dialog.setOnShowListener(d -> {
+            FrameLayout bottomSheet = ((BottomSheetDialog) d).findViewById(R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                BottomSheetBehavior.from(bottomSheet)
+                        .setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+
+        return dialog;
+    }
+
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
@@ -102,7 +125,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
         infoReactionsPager.addOnPageChangeListener(this);
         separator = new RelativeLayout(context);
-        separator.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+        separator.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
 
         final MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
         list = getReactionsList(listReactions, false);
@@ -126,7 +149,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         BottomSheetUtils.setupViewPager(infoReactionsPager);
         ViewGroup.LayoutParams params = generalLayout.getLayoutParams();
         int height = getHeight();
-        if(height == 0)
+        if (height == 0)
             return;
 
         if (params != null) {
@@ -142,7 +165,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         BottomSheetUtils.setBottomSheetBehavior(getTotalHeight(), height, halfHeightDisplay, infoReactionsPager);
     }
 
-    private long getMaxUsers(){
+    private long getMaxUsers() {
         if (list == null || list.isEmpty()) {
             return 0;
         }
@@ -163,7 +186,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         return numMaxUsers;
     }
 
-    private int getTotalHeight(){
+    private int getTotalHeight() {
         int numOptions = (int) getMaxUsers();
         int heightChild = dp2px(HEIGHT_USERS, outMetrics);
         int peekHeight = dp2px(HEIGHT_HEADER, outMetrics);
@@ -245,11 +268,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         if (numUsers > 0 && emoji != null) {
             reactionImage.setEmoji(emoji, true);
-            reactionText.setText(numUsers + "");
+            reactionText.setText(String.valueOf(numUsers));
             reactionText.setTextColor(ContextCompat.getColor(context,
                     isMyOwnReaction(chatId, messageId, reaction)
-                            ? R.color.accentColor
-                            : R.color.secondary_text));
+                            ? R.color.teal_300_teal_200 : R.color.grey_054_white_054));
             parent.addView(button);
             return button;
         }
@@ -258,11 +280,12 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
 
     @Override
     public void onPageSelected(final int i) {
-        if(reactionTabLastSelectedIndex == i)
+        if (reactionTabLastSelectedIndex == i)
             return;
 
         if (reactionTabLastSelectedIndex >= 0 && reactionTabLastSelectedIndex < reactionTabs.size()) {
@@ -290,7 +313,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) { }
+    public void onPageScrollStateChanged(int state) {
+    }
 
     /**
      * Method for controlling changes received in reactions.

@@ -26,7 +26,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
@@ -43,8 +42,6 @@ import com.google.android.exoplayer2.util.Util;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import mega.privacy.android.app.R;
 
 /**
  * A time bar that shows a current position, buffered position, duration and ad markers.
@@ -281,8 +278,8 @@ public class DefaultTimeBar extends View implements TimeBar {
             DEFAULT_AD_MARKER_COLOR);
         int playedAdMarkerColor = a.getInt(com.google.android.exoplayer2.ui.R.styleable.DefaultTimeBar_played_ad_marker_color,
             getDefaultPlayedAdMarkerColor(adMarkerColor));
-        playedPaint.setColor(ContextCompat.getColor(context, R.color.accentColor));
-        scrubberPaint.setColor(ContextCompat.getColor(context, R.color.accentColor));
+        playedPaint.setColor(playedColor);
+        scrubberPaint.setColor(scrubberColor);
         bufferedPaint.setColor(bufferedColor);
         unplayedPaint.setColor(unplayedColor);
         adMarkerPaint.setColor(adMarkerColor);

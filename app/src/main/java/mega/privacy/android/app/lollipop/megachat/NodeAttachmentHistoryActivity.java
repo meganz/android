@@ -13,15 +13,11 @@ import android.os.Environment;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 
 import android.os.Looper;
 import android.text.Html;
@@ -33,14 +29,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.Nullable;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,6 +87,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -107,7 +104,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
-	Toolbar tB;
+	MaterialToolbar tB;
 	NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
     DatabaseHandler dbH = null;
@@ -197,13 +194,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
-
 		setContentView(R.layout.activity_node_history);
 
 		if (savedInstanceState != null){
@@ -213,18 +203,15 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
+		tB = findViewById(R.id.toolbar_node_history);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
 		aB.setTitle(getString(R.string.title_chat_shared_files_info).toUpperCase());
 
 		container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
-
-//		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
 		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
@@ -238,9 +225,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		String textToShow = String.format(getString(R.string.context_empty_shared_files));
 		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'" + getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'" + getColorHexString(this, R.color.grey_300_grey_600) + "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		}
 		catch (Exception e){}
@@ -264,7 +251,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		}
 		else{
 			linearLayoutList.setVisibility(View.GONE);
@@ -273,7 +260,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			listView = (NewGridRecyclerView)findViewById(R.id.file_grid_view_browser);
 		}
 
-		listView.setPadding(0,scaleHeightPx(8, outMetrics),0,scaleHeightPx(16, outMetrics));
 		listView.setClipToPadding(false);
 		listView.setHasFixedSize(true);
 
@@ -910,9 +896,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			inflater.inflate(R.menu.messages_node_history_action, menu);
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
-			menu.findItem(R.id.chat_cab_menu_offline).setIcon(mutateIconSecondary(nodeAttachmentHistoryActivity, R.drawable.ic_b_save_offline, R.color.white));
-			changeViewElevation(aB, true, outMetrics);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+            checkScroll();
 			return true;
 		}
 
@@ -922,7 +906,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			checkScroll();
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -1064,13 +1047,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		if(messages.size()==1){
 			builder.setMessage(R.string.confirmation_delete_one_message);
@@ -1097,6 +1074,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		logDebug("Result Code: " + resultCode);
 
 		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
@@ -1138,16 +1116,16 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
 				if (contactHandles != null && contactHandles.length > 0) {
 					ArrayList<MegaUser> users = new ArrayList<>();
-					ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+					ArrayList<MegaChatRoom> chats = new ArrayList<>();
 
-					for (int i=0; i<contactHandles.length; i++) {
+					for (int i = 0; i < contactHandles.length; i++) {
 						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
 						if (user != null) {
 							users.add(user);
 						}
 					}
 
-					for (int i=0; i<chatHandles.length; i++) {
+					for (int i = 0; i < chatHandles.length; i++) {
 						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
 						if (chatRoom != null) {
 							chats.add(chatRoom);
@@ -1161,16 +1139,14 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						megaChatApi.createChat(false, peers, listener);
 					}
-				}
-				else {
+				} else {
 					int countChat = chatHandles.length;
 					logDebug("Selected: " + countChat + " chats to send");
 
 					MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
 					forwardChatProcessor.forward(chatRoom);
 				}
-			}
-			else {
+			} else {
 				logError("Error on sending to chat");
 			}
 		}

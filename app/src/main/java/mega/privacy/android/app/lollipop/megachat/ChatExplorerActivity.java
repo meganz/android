@@ -26,6 +26,8 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -121,8 +123,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
         fab.setOnClickListener(this);
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         //Set toolbar
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
@@ -202,7 +202,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         menu.findItem(R.id.cab_menu_sort).setVisible(false);
         menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
-        searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
@@ -212,8 +211,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         searchView = (SearchView) searchMenuItem.getActionView();
 
         SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));

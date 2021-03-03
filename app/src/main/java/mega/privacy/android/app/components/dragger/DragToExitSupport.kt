@@ -67,7 +67,7 @@ class DragToExitSupport(
         draggable.addView(contentView)
 
         val shadow = ImageView(context)
-        shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.black_p50));
+        shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_alpha_060));
 
         container.addView(
             shadow, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
