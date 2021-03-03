@@ -594,7 +594,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setSubText(info)
@@ -606,7 +606,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setSubText(info)
@@ -624,7 +624,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     .setOnlyAlertOnce(true);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+                mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
             }
             notification = mBuilder.build();
         }

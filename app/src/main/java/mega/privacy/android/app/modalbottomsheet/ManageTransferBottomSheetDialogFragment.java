@@ -17,9 +17,11 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -46,7 +48,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             transfer = managerActivity.getSelectedTransfer();
             transferId = transfer.getId();
         } else {
-            transferId = savedInstanceState.getInt(TRANSFER_ID, -1);
+            transferId = savedInstanceState.getLong(TRANSFER_ID, INVALID_ID);
             transfer = dbH.getcompletedTransfer(transferId);
         }
     }
@@ -85,19 +87,19 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             type.setImageResource(R.drawable.ic_upload_transfers);
         }
 
-        location.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        location.setTextColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
         RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
         params.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
         switch (transfer.getState()) {
             case STATE_COMPLETED:
                 location.setText(transfer.getPath());
-                stateIcon.setImageResource(R.drawable.ic_complete_transfer);
+                stateIcon.setImageResource(R.drawable.ic_transfers_completed);
                 retryOption.setVisibility(View.GONE);
                 break;
 
             case STATE_FAILED:
-                location.setTextColor(ContextCompat.getColor(context, R.color.expired_red));
+                location.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
                 location.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);

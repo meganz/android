@@ -5,15 +5,14 @@
     android:id="@+id/offline_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/offline_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/offline_thumbnail"
@@ -22,7 +21,6 @@
             android:layout_centerVertical="true"
             android:layout_margin="12dp"
             app:actualImageScaleType="centerCrop"
-            app:roundWithOverlayColor="@color/white"
             app:roundedCornerRadius="4dp" />
 
         <RelativeLayout
@@ -36,23 +34,21 @@
                 android:id="@+id/offline_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"/>
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
             <TextView
                 android:id="@+id/offline_info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text"
-                android:gravity="center_vertical"
                 android:layout_below="@+id/offline_name_text"
-                android:textSize="14sp"
+                android:gravity="center_vertical"
                 android:singleLine="true"
-                android:ellipsize="middle"/>
+                android:ellipsize="middle"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
         </RelativeLayout>
 
@@ -63,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -83,36 +79,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_properties_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_properties_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -127,11 +122,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_open_with"
-                    android:visibility="visible" />
+                    android:src="@drawable/ic_open_with"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_with_text"
@@ -141,8 +136,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/external_play"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
@@ -150,38 +144,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_share_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_share_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_social_share_white"
                     android:visibility="visible"
-                    app:tint="@color/black" />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/general_share"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
@@ -189,44 +181,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_download_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_download_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_b_save_to_device"
-                    android:visibility="visible" />
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_save_to_device"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_download_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/general_save_to_device"
                     android:layout_marginStart="18dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/general_save_to_device"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_delete_offline_layout"
@@ -245,7 +236,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible"
-                    app:tint="@color/dark_primary_color" />
+                    app:tint="@color/red_600_red_300" />
 
                 <TextView
                     android:id="@+id/option_delete_offline_text"
@@ -255,8 +246,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_delete_offline"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
         </LinearLayout>

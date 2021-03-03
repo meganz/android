@@ -2,11 +2,9 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -81,12 +79,6 @@ public class PlaylistFragment extends Fragment{
     ImageButton previousButton;
     ImageButton nextButton;
 
-    public static PlaylistFragment newInstance() {
-        logDebug("newInstance");
-        PlaylistFragment fragment = new PlaylistFragment();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -124,17 +116,6 @@ public class PlaylistFragment extends Fragment{
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = ((AudioVideoPlayerLollipop)context).getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            ((AudioVideoPlayerLollipop)context).requestWindowFeature(Window.FEATURE_NO_TITLE);
-            ((AudioVideoPlayerLollipop)context).getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
         if (player == null){
@@ -372,6 +353,10 @@ public class PlaylistFragment extends Fragment{
     public void onDestroy() {
         logDebug("onDestroy");
         super.onDestroy();
+
+        // Turn to full screen, dismiss status bar.
+        Window window = ((AudioVideoPlayerLollipop) context).getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override

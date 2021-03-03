@@ -143,7 +143,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      * Show third party cookie information dialog.
      */
     private fun showThirdPartyInfoDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(requireContext())
             .setView(R.layout.dialog_cookie_thirdparty)
             .setPositiveButton(android.R.string.yes, null)
             .create()

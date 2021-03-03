@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -18,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -28,6 +25,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -53,7 +52,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
-    AppBarLayout abL;
     Toolbar tB;
     ActionBar aB;
     FrameLayout fragmentContainer;
@@ -129,10 +127,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
         fab.setVisibility(View.GONE);
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         //Set toolbar
-        abL = (AppBarLayout) findViewById(R.id.app_bar_layout_chat_explorer);
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
@@ -145,13 +140,13 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             logWarning("aB is null");
         }
 
-//        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-        badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.white);
+        badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.red_600_red_300,
+                R.color.white_dark_grey, R.color.white_dark_grey);
 
         updateNavigationToolbarIcon();
 
-        if(archivedChatsFragment ==null){
-            archivedChatsFragment = new RecentChatsFragmentLollipop().newInstance();
+        if (archivedChatsFragment ==null) {
+            archivedChatsFragment = RecentChatsFragmentLollipop.newInstance();
         }
 
         if (savedInstanceState != null) {
@@ -166,17 +161,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, archivedChatsFragment, "archivedChatsFragment");
         ft.commitNow();
-    }
-
-    public void changeActionBarElevation(boolean whitElevation){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (whitElevation) {
-                abL.setElevation(dp2px(4, outMetrics));
-            }
-            else {
-                abL.setElevation(0);
-            }
-        }
     }
 
     @Override
@@ -238,13 +222,10 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         inflater.inflate(R.menu.activity_archived_chats, menu);
 
         searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 
         searchView = (SearchView) searchMenuItem.getActionView();
 
         SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -315,45 +296,21 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         showSnackbar(fragmentContainer, s);
     }
 
-    public void changeStatusBarColor(int option) {
-        logDebug("Option: " + option);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            if (option == 1){
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.accentColorDark));
+    public void updateNavigationToolbarIcon() {
+        int numberUnread = megaChatApi.getUnreadChats();
+
+        if (numberUnread==0) {
+            aB.setHomeAsUpIndicator(Util.isDarkMode(this) ? R.drawable.ic_arrow_back_white : R.drawable.ic_arrow_back_black);
+        } else {
+            badgeDrawable.setProgress(1.0f);
+
+            if (numberUnread > Constants.MAX_BADGE_NUM) {
+                badgeDrawable.setText(Constants.MAX_BADGE_NUM + "+");
+            } else {
+                badgeDrawable.setText(numberUnread+"");
             }
-            else {
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-            }
-        }
-    }
 
-    public void updateNavigationToolbarIcon(){
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int numberUnread = megaChatApi.getUnreadChats();
-
-            if(numberUnread==0){
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
-            }
-            else{
-
-                badgeDrawable.setProgress(1.0f);
-
-                if(numberUnread>9){
-                    badgeDrawable.setText("9+");
-                }
-                else{
-                    badgeDrawable.setText(numberUnread+"");
-                }
-
-                aB.setHomeAsUpIndicator(badgeDrawable);
-            }
-        }
-        else{
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
+            aB.setHomeAsUpIndicator(badgeDrawable);
         }
     }
 
