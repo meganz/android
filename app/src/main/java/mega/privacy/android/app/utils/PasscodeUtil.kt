@@ -168,10 +168,10 @@ class PasscodeUtil @Inject constructor(
     private fun enableOrDisableDialogButton(enable: Boolean, button: Button) {
         button.isEnabled = enable
         button.setTextColor(
-            ColorUtils.getThemeColor(
+            if (enable) ColorUtils.getThemeColor(
                 context,
-                if (enable) R.attr.colorSecondary else R.color.teal_300_alpha_038
-            )
+                R.attr.colorSecondary
+            ) else ContextCompat.getColor(context, R.color.teal_300_alpha_038)
         )
     }
 
