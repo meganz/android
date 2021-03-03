@@ -25,13 +25,10 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -88,19 +85,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         this.context = context;
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-        // In portrait mode, `setStatusBarTextColor` could fix the navigation buttons color issue.
-        if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-            ColorUtils.setStatusBarTextColor(dialog.getContext(), dialog.getWindow());
-        }
-
-        return dialog;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -120,13 +104,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             int maxSize = displayMetrics.heightPixels;
             window.setLayout(maxSize, MATCH_PARENT);
-
-            // But `setLayout` causes navigation buttons almost invisible in light mode,
-            // in this case we set navigation bar background with light grey to make
-            // navigation buttons visible.
-            if (!Util.isDarkMode(requireContext())) {
-                window.setNavigationBarColor(ContextCompat.getColor(context, R.color.white_alpha_070));
-            }
         }
     }
 
