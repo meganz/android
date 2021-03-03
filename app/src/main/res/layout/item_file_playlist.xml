@@ -1,16 +1,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:id="@+id/file_list_item_layout_playlist"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
-    android:background="@drawable/statelist_item_layout"
-    android:id="@+id/file_list_item_layout_playlist" >
+    android:background="@drawable/statelist_item_layout" >
 
     <RelativeLayout
         android:id="@+id/container_thumbnail"
         android:layout_width="48dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:padding="0dp">
 
         <ImageView
@@ -18,7 +18,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter" />
 
     </RelativeLayout>
 
@@ -26,36 +26,36 @@
         android:id="@+id/file_list_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/container_thumbnail"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="15dp"
-        android:layout_marginLeft="12dp"
-        android:textColor="@color/file_list_first_row"
-        android:singleLine="true"
+        android:layout_toEndOf="@id/container_thumbnail"
         android:ellipsize="middle"
-        android:textSize="16sp"/>
+        android:singleLine="true"
+        android:textColor="@color/white_alpha_087"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
     <TextView
         android:id="@+id/file_list_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/container_thumbnail"
         android:layout_below="@+id/file_list_filename"
-        android:textColor="@color/file_list_second_row"
-        android:layout_marginLeft="13dp"
-        android:textSize="14sp"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@id/container_thumbnail"
         android:ellipsize="end"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:textColor="@color/white_alpha_054"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
     <TextView
         android:id="@+id/file_list_filestate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/container_thumbnail"
         android:layout_below="@+id/file_list_filename"
-        android:textColor="@color/accentColor"
-        android:layout_marginLeft="13dp"
-        android:textSize="14sp"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@id/container_thumbnail"
         android:ellipsize="end"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:textColor="@color/teal_200"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
 </RelativeLayout>

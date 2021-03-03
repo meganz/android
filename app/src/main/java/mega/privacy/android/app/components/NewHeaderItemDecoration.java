@@ -35,8 +35,6 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
 
     private Paint mTextPaint;
 
-    private Paint mBackgroundPaint;
-
     private float mTextHeight;
 
     private float mTextBaselineOffset;
@@ -60,14 +58,10 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,TEXT_SIZE,mContext.getResources().getDisplayMetrics()));
-        mTextPaint.setColor(mContext.getResources().getColor(R.color.primary_text));
+        mTextPaint.setColor(mContext.getResources().getColor(R.color.grey_087_white_087));
         Paint.FontMetrics fm = mTextPaint.getFontMetrics();
         mTextHeight = fm.bottom - fm.top;
         mTextBaselineOffset = fm.bottom;
-        
-        mBackgroundPaint = new Paint();
-        mBackgroundPaint.setAntiAlias(true);
-        mBackgroundPaint.setColor(mContext.getResources().getColor(R.color.white));
     }
     
     @Override
@@ -119,7 +113,6 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
             if (keys.containsKey(params.getViewLayoutPosition())) {
                 top = child.getTop() - params.topMargin - mTitleHeight;
                 bottom = top + mTitleHeight;
-                c.drawRect(left,top,right,bottom,mBackgroundPaint);
                 float x = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,17,mContext.getResources().getDisplayMetrics());
                 float y = bottom - (mTitleHeight - mTextHeight) / 2 - mTextBaselineOffset;
                 c.drawText(keys.get(params.getViewLayoutPosition()),x,y,mTextPaint);

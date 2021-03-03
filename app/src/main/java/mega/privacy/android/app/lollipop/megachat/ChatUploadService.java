@@ -817,7 +817,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setOngoing(true).setContentTitle(message)
 					.setContentText(actionString)
 					.setOnlyAlertOnce(true)
-					.setColor(ContextCompat.getColor(this, R.color.mega));
+					.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 			notification = mBuilderCompat.build();
 		} else {
@@ -828,7 +828,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setOngoing(true).setContentTitle(message)
 					.setContentText(actionString)
 					.setOnlyAlertOnce(true)
-					.setColor(ContextCompat.getColor(this, R.color.mega));
+					.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 			notification = mBuilder.build();
 		}
@@ -1521,12 +1521,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 		else {
 			mBuilder
+					.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
 					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
+			mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
 
 			notification = mBuilder.build();
 		}

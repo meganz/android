@@ -39,7 +39,7 @@
                 android:layout_width="88dp"
                 android:layout_height="88dp"
                 android:scaleType="fitCenter"
-                rounded:border_color="@color/border_avatar_call"
+                rounded:border_color="@color/white_alpha_030"
                 rounded:border_width="3dp"
                 rounded:corner_radius="60dp" />
         </RelativeLayout>

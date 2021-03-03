@@ -50,6 +50,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -57,11 +58,15 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -140,7 +145,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 managerActivity.hideFabButton();
                 managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
             checkScroll();
             return true;
@@ -259,7 +263,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 managerActivity.showFabButton();
                 managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
             checkScroll();
         }
@@ -495,9 +498,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-                managerActivity.changeActionBarElevation(true);
+                managerActivity.changeAppBarElevation(true);
             } else {
-                managerActivity.changeActionBarElevation(false);
+                managerActivity.changeAppBarElevation(false);
             }
         }
     }
@@ -737,6 +740,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_list_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_list_empty_text);
@@ -756,6 +760,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_grid_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_grid_empty_text);
@@ -772,12 +777,22 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
+                int tab = ERROR_TAB;
+                if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
+                    tab = INCOMING_TAB;
+                } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
+                    tab = OUTGOING_TAB;
+                } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
+                    tab = LINKS_TAB;
+                }
+
+                if (managerActivity.getTabItemShares() == tab) {
+                    checkScroll();
+                }
             }
         });
         fastScroller.setRecyclerView(recyclerView);
@@ -799,10 +814,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         try {
-            text = text.replace("[A]", "<font color=\'#000000\'>");
-            text = text.replace("[/A]", "</font>");
-            text = text.replace("[B]", "<font color=\'#7a7a7a\'>");
-            text = text.replace("[/B]", "</font>");
+            text = text.replace("[A]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
+            text = text.replace("[/A]","</font>");
+            text = text.replace("[B]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                    + "\'>");
+            text = text.replace("[/B]","</font>");
         } catch (Exception e) {
             logWarning("Exception formatting text", e);
         }

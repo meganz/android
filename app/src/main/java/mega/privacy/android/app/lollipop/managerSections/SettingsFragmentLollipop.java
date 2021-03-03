@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
@@ -34,6 +35,7 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -49,6 +51,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
     public int numberOfClicksAppVersion = 0;
+    private ListPreference colorThemeListPreference;
     private PreferenceCategory securityCategory;
     private Preference recoveryKey;
     private Preference pinLockPreference;
@@ -80,6 +83,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
+
+        colorThemeListPreference = findPreference(KEY_APPEARNCE_COLOR_THEME);
+        colorThemeListPreference.setOnPreferenceChangeListener(this);
 
         cameraUploadsPreference = findPreference(KEY_FEATURES_CAMERA_UPLOAD);
         cameraUploadsPreference.setOnPreferenceClickListener(this);
@@ -209,7 +215,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      */
     public void checkScroll() {
         if (listView != null) {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(listView.canScrollVertically(-1));
+            ((ManagerActivityLollipop) context).changeAppBarElevation(listView.canScrollVertically(-1));
         }
     }
 
@@ -222,6 +228,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+        switch (preference.getKey()) {
+            case KEY_APPEARNCE_COLOR_THEME:
+                ThemeHelper.INSTANCE.applyTheme((String) newValue);
+                break;
+        }
         return true;
     }
 

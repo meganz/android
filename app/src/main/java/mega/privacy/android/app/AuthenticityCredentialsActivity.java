@@ -103,8 +103,6 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             contactCredentials = savedInstanceState.getString(CONTACT_CREDENTIALS);
         }
 
-        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
-
         setContentView(R.layout.activity_authenticity_credentials);
 
         Toolbar tB = findViewById(R.id.credentials_toolbar);

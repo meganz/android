@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
@@ -23,7 +22,10 @@ import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
 import mega.privacy.android.app.utils.autoCleared
 import kotlin.math.abs
@@ -61,6 +63,15 @@ class OfflineFileInfoFragment : Fragment() {
             if (it == null) {
                 requireActivity().finish()
             } else {
+                if (Util.isDarkMode(requireActivity())) {
+                    binding.collapseToolbar.setContentScrimColor(
+                        getColorForElevation(
+                            requireActivity(),
+                            resources.getDimension(R.dimen.toolbar_elevation)
+                        )
+                    )
+                }
+
                 if (it.node.isFolder || it.thumbnail == null) {
                     binding.toolbarNodeIcon.setImageResource(
                         if (it.node.isFolder) {
@@ -100,8 +111,9 @@ class OfflineFileInfoFragment : Fragment() {
                         binding.containsValue.isVisible = true
                     }
 
-                    requireActivity().window.statusBarColor =
-                        ContextCompat.getColor(requireContext(), R.color.status_bar_search)
+                    binding.collapseToolbar.setStatusBarScrimColor(
+                        getThemeColor(requireContext(), R.attr.colorPrimaryVariant)
+                    )
                     setColorFilterBlack()
                 } else {
                     binding.toolbarFilePreview.isVisible = true
@@ -110,22 +122,19 @@ class OfflineFileInfoFragment : Fragment() {
                     binding.collapseToolbar.setCollapsedTitleTextColor(
                         ContextCompat.getColor(
                             requireContext(),
-                            R.color.primary_text
+                            R.color.grey_087_white_087
                         )
                     )
 
                     binding.collapseToolbar.setExpandedTitleColor(
                         ContextCompat.getColor(
                             requireContext(),
-                            R.color.white
+                            R.color.white_alpha_087
                         )
                     )
 
                     binding.collapseToolbar.setStatusBarScrimColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.status_bar_search
-                        )
+                        getThemeColor(requireContext(), R.attr.colorPrimaryVariant)
                     )
 
                     binding.appBar.addOnOffsetChangedListener(OnOffsetChangedListener { appBarLayout, offset ->
@@ -166,7 +175,7 @@ class OfflineFileInfoFragment : Fragment() {
     }
 
     private fun removeFromOffline(node: MegaOffline, onConfirmed: () -> Unit) {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove) { _, _ ->
                 NodeController(requireContext()).deleteOffline(node)
@@ -177,12 +186,22 @@ class OfflineFileInfoFragment : Fragment() {
     }
 
     private fun setColorFilterBlack() {
-        upArrow.colorFilter = PorterDuffColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP)
+        upArrow.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.grey_087_white_087
+            ), PorterDuff.Mode.SRC_IN
+        )
         binding.toolbar.navigationIcon = upArrow
     }
 
     private fun setColorFilterWhite() {
-        upArrow.colorFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
+        upArrow.colorFilter = PorterDuffColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.white_alpha_087
+            ), PorterDuff.Mode.SRC_IN
+        )
         binding.toolbar.navigationIcon = upArrow
     }
 }

@@ -26,13 +26,11 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PATH
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PROMPT
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
@@ -43,11 +41,7 @@ import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.askMe
-import mega.privacy.android.app.utils.Util.getSizeString
-import mega.privacy.android.app.utils.Util.scaleHeightPx
-import mega.privacy.android.app.utils.Util.scaleWidthPx
-import mega.privacy.android.app.utils.Util.showNotEnoughSpaceSnackbar
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -99,6 +93,7 @@ abstract class NodeSaver(
                 logWarning("parentPath null")
                 return false
             }
+            storeDownloadLocationIfNeeded(parentPath)
 
             add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
                 .subscribeOn(Schedulers.io())
@@ -311,7 +306,7 @@ abstract class NodeSaver(
 
         val notShowAgain = CheckBox(context)
         notShowAgain.setText(R.string.checkbox_not_show_again)
-        notShowAgain.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+        notShowAgain.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary))
         confirmationLayout.addView(notShowAgain, params)
 
         AlertDialog.Builder(context)

@@ -18,8 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -244,12 +247,12 @@ public class CallUtil {
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
             activateChrono(false, callInProgressChrono, null);
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
+            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.orange_400));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
         } else {
 
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+            callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                 activateChrono(true, callInProgressChrono, call);
@@ -261,7 +264,8 @@ public class CallUtil {
         callInProgressLayout.setVisibility(View.VISIBLE);
 
         if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+            ((ManagerActivityLollipop) context).changeAppBarElevation(true,
+                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
         }
         if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
@@ -319,7 +323,8 @@ public class CallUtil {
         callInProgressLayout.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, null);
         if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+            ((ManagerActivityLollipop) context).changeAppBarElevation(false,
+                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
         }
         if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
@@ -408,7 +413,8 @@ public class CallUtil {
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
             callInProgressLayout.setVisibility(View.GONE);
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+                ((ManagerActivityLollipop) context).changeAppBarElevation(false,
+                        ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
             }
             if (context instanceof ContactInfoActivityLollipop) {
                 ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
@@ -501,7 +507,7 @@ public class CallUtil {
         }
 
         try {
-            android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+            MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
             dialogBuilder.setPositiveButton(
                     activity.getString(android.R.string.ok),
                     (dialog, which) -> {
@@ -516,7 +522,7 @@ public class CallUtil {
                 }
             });
 
-            android.app.AlertDialog dialog = dialogBuilder.create();
+            AlertDialog dialog = dialogBuilder.create();
             dialog.show();
             brandAlertDialog(dialog);
         } catch (Exception ex) {
@@ -643,7 +649,7 @@ public class CallUtil {
                     break;
             }
         };
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = activity.getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();

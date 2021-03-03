@@ -49,7 +49,7 @@
                         android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
                         android:layout_alignEnd="@id/navigation_drawer_user_account_picture_profile"
                         android:background="@null"
-                        android:src="@drawable/ic_offline"
+                        android:src="@drawable/ic_offline_light"
                         tools:ignore="ContentDescription" />
 
                 </RelativeLayout>
@@ -70,9 +70,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-light"
                         android:singleLine="true"
-                        android:textColor="@color/primary_text"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
+                        android:textAppearance="@style/TextAppearance.Mega.Headline6"
                         app:emojiSize="14sp" />
 
                     <TextView
@@ -80,10 +78,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
-                        android:fontFamily="roboto"
                         android:singleLine="true"
-                        android:textColor="@color/primary_text"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+                        tools:text="email@domain.com" />
 
                     <TextView
                         android:id="@+id/business_label"
@@ -91,7 +88,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="7dp"
                         android:text="@string/business_label"
-                        android:textColor="@color/business_color"
+                        android:textColor="@color/dark_blue_500_200"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -116,9 +113,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/manager_used_space_bar"
                         android:layout_marginTop="12dp"
-                        android:fontFamily="sans-serif-light"
+                        android:textAppearance="?attr/textAppearanceSubtitle2"
                         android:textSize="13sp"
-                        android:textStyle="bold" />
+                        tools:text="25 GB of 50 GB used" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -133,19 +130,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_account"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -159,20 +153,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_contacts"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -186,20 +176,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_inbox"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -213,19 +199,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/title_properties_chat_contact_notifications"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -239,19 +222,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_transfers"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -264,20 +244,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_saved_for_offline_new"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -290,12 +266,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_rubbish_bin"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 
                 <View
@@ -303,7 +276,7 @@
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
@@ -317,13 +290,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/action_settings"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
                     android:id="@+id/settings_separator"
@@ -331,27 +300,23 @@
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginTop="16dp"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
 
             </RelativeLayout>
 
             <Button
                 android:id="@+id/upgrade_navigation_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="?attr/materialButtonStyle"
                 android:layout_gravity="start"
                 android:layout_marginTop="14dp"
                 android:layout_marginBottom="24dp"
-                android:elevation="6dp"
-                android:fontFamily="sans-serif-light"
+                android:backgroundTint="@color/drawer_upgrade_button_background_selector"
                 android:paddingLeft="16dp"
                 android:paddingTop="10dp"
                 android:paddingRight="16dp"
                 android:paddingBottom="10dp"
                 android:text="@string/my_account_upgrade_pro"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/white_dark_grey" />
 
         </LinearLayout>
 
@@ -377,16 +342,11 @@
 
             <Button
                 android:id="@+id/navigation_drawer_add_phone_number_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_toEndOf="@+id/navigation_drawer_add_phone_number_icon"
-                android:background="@drawable/background_transparent_button_border_accent"
-                android:paddingStart="20dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="20dp"
-                android:paddingBottom="8dp"
                 android:text="@string/add_phone_number_label"
-                android:textColor="@color/accentColor" />
+                android:textColor="@color/teal_300_dark_grey"
+                app:strokeColor="@color/teal_300_dark_grey" />
 
             <TextView
                 android:id="@+id/navigation_drawer_add_phone_number_label"
@@ -395,6 +355,7 @@
                 android:layout_below="@+id/navigation_drawer_add_phone_number_button"
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@+id/navigation_drawer_add_phone_number_icon"
+                android:textColor="@color/grey_alpha_054"
                 android:textSize="11sp" />
 
         </RelativeLayout>

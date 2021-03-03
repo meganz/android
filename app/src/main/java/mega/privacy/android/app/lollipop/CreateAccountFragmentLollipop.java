@@ -37,6 +37,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -135,10 +136,12 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userEmailError = v.findViewById(R.id.create_account_email_text_error_icon);
         userEmailError.setVisibility(View.GONE);
         userPasswordLayout = v.findViewById(R.id.create_account_password_text_layout);
+        userPasswordLayout.setEndIconVisible(false);
         userPassword = v.findViewById(R.id.create_account_password_text);
         userPasswordError = v.findViewById(R.id.create_account_password_text_error_icon);
         userPasswordError.setVisibility(View.GONE);
         userPasswordConfirmLayout = v.findViewById(R.id.create_account_password_text_confirm_layout);
+        userPasswordConfirmLayout.setEndIconVisible(false);
         userPasswordConfirm = v.findViewById(R.id.create_account_password_text_confirm);
         userPasswordConfirmError = v.findViewById(R.id.create_account_password_text_confirm_error_icon);
         userPasswordConfirmError.setVisibility(View.GONE);
@@ -206,29 +209,26 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 logDebug("Text changed: " + s.toString() + "_ " + start + "__" + before + "__" + count);
-                if (s != null){
-                    if (s.length() > 0) {
-                        String temp = s.toString();
-                        containerPasswdElements.setVisibility(View.VISIBLE);
+                if (s.length() > 0) {
+                    containerPasswdElements.setVisibility(View.VISIBLE);
 
-                        checkPasswordStrenght(temp.trim());
-                    }
-                    else{
-                        passwdValid = false;
-                        containerPasswdElements.setVisibility(View.GONE);
-                    }
+                    checkPasswordStrength(s.toString().trim());
+                } else {
+                    passwdValid = false;
+                    containerPasswdElements.setVisibility(View.GONE);
+
+                    userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+                    ColorUtils.resetEditTextUnderlineColor(userPassword);
                 }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable.toString().isEmpty()) {
-                    quitError(userPassword);
-                }
+                quitError(userPassword);
             }
         });
 
-        userPassword.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(userPasswordLayout, hasFocus));
+        userPassword.setOnFocusChangeListener((v1, hasFocus) -> userPasswordLayout.setEndIconVisible(hasFocus));
 
         userPasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
@@ -247,7 +247,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> setPasswordToggle(userPasswordConfirmLayout, hasFocus));
+        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> userPasswordConfirmLayout.setEndIconVisible(hasFocus));
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
 
@@ -328,8 +328,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         return v;
     }
 
-    public void checkPasswordStrenght(String s) {
-        userPasswordLayout.setErrorEnabled(false);
+    public void checkPasswordStrength(String s) {
 
         if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_very_weak));
@@ -339,14 +338,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_very_weak));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
             passwdValid = false;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceVeryWeak);
-            userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceVeryWeak);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.red_600_red_300);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
@@ -356,14 +355,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_weak));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.pass_weak));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.yellow_600_yellow_300));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceWeak);
-            userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceWeak);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.yellow_600_yellow_300);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
@@ -373,14 +372,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_medium));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.green_unlocked_rewards));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.green_500_green_400));
 
             passwdAdvice.setText(getString(R.string.passwd_medium));
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium);
-            userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.green_500_green_400);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
@@ -390,14 +389,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_good));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.pass_good));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.lime_green_500_200));
 
             passwdAdvice.setText(getString(R.string.passwd_good));
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceGood);
-            userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceGood);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.lime_green_500_200);
         }
         else {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
@@ -407,19 +406,17 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
 
             passwdType.setText(getString(R.string.pass_strong));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.blue_unlocked_rewards));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.dark_blue_500_200));
 
             passwdAdvice.setText(getString(R.string.passwd_strong));
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceStrong);
-            userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceStrong);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.dark_blue_500_200);
         }
 
         userPasswordError.setVisibility(View.GONE);
-        userPasswordLayout.setError(" ");
-        userPasswordLayout.setErrorEnabled(true);
     }
 
     @Override
@@ -712,32 +709,32 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         switch (editText.getId()){
             case R.id.create_account_email_text:{
                 userEmailLayout.setError(error);
-                userEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userEmailLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userEmailError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_password_text_confirm:{
                 userPasswordConfirmLayout.setError(error);
-                userPasswordConfirmLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordConfirmLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordConfirmError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_name_text:{
                 userNameLayout.setError(error);
-                userNameLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userNameError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_last_name_text:{
                 userLastNameLayout.setError(error);
-                userLastNameLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userLastNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userLastNameError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_password_text:{
                 userPasswordLayout.setError(error);
-                userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
-                userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
+                userPasswordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordError.setVisibility(View.VISIBLE);
                 break;
             }

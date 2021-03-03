@@ -1,22 +1,21 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -131,7 +130,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	Handler handler;
 	DisplayMetrics outMetrics;
 
-	private AlertDialog.Builder dialogBuilder;
+	private MaterialAlertDialogBuilder dialogBuilder;
 
 	private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -238,7 +237,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
 			checkScroll();
 			return true;
 		}
@@ -249,7 +247,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 3);
 			checkScroll();
 		}
 
@@ -335,14 +332,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 
-		dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+		dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
 
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
-		
 		listContacts = new ArrayList<MegaShare>();
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -394,7 +389,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -508,7 +503,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		unSelectMenuItem.setVisible(false);
 
 		addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-		addSharingContact.setIcon(mutateIconSecondary(this, R.drawable.ic_share_white, R.color.black));
 		addSharingContact.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	    
 	    return super.onCreateOptionsMenu(menu);
