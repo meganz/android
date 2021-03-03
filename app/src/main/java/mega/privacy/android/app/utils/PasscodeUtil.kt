@@ -271,7 +271,10 @@ class PasscodeUtil @Inject constructor(
         dbH.isPasscodeLockEnabled = enable
         dbH.passcodeLockType = type
         dbH.passcodeLockCode = passcode
-        dbH.passcodeRequiredTime = requiredTime
+
+        if (enable && dbH.passcodeRequiredTime == REQUIRE_PASSCODE_INVALID) {
+            dbH.passcodeRequiredTime = requiredTime
+        }
     }
 
     /**
