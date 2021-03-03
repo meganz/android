@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/qr_code_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -21,7 +22,7 @@
             android:layout_marginLeft="18dp"
             android:layout_marginTop="8dp"
             android:text="@string/save_action"
-            android:textColor="@color/transparent_black"
+            android:textColor="@color/grey_alpha_050"
             android:textSize="16sp"/>
     </LinearLayout>
 
@@ -49,12 +50,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_pick_cloud_drive"
-                    android:visibility="visible" />
+                    android:src="@drawable/ic_pick_cloud_drive"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/qr_code_saveTo_cloud_text"
@@ -64,8 +65,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/save_cloud_drive"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -80,12 +80,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_pick_file_system"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/qr_code_saveTo_fileSystem_text"
@@ -95,8 +95,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/save_file_system"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

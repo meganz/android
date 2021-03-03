@@ -4,7 +4,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/adapters_background">
+    android:background="@color/white_alpha_054">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"

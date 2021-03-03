@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -323,7 +324,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             checkScroll();
 			return true;
 		}
@@ -333,7 +333,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             checkScroll();
 		}
 
@@ -347,8 +346,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
@@ -477,10 +474,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void checkScroll () {
 		if (recyclerView != null) {
 			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -526,7 +523,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -1104,10 +1101,15 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 				String textToShow = String.format(context.getString(R.string.context_empty_inbox));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -1128,10 +1130,15 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				}
 				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;

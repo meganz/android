@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -36,6 +34,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -104,13 +103,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
-        binding.emptyHint.emptyHintImage.setImageResource(
-            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                R.drawable.ic_zero_data_recents_portrait
-            } else {
-                R.drawable.ic_zero_data_recents_landscape
-            }
-        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
@@ -130,7 +122,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private fun setupListView() {
         listView = binding.videoList
-        preventListItemBlink()
+        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
         elevateToolbarWhenScrolling()
         itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
 
@@ -138,19 +130,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
         listView.setHasFixedSize(true)
     }
 
-    private fun preventListItemBlink() {
-        val animator = listView.itemAnimator
-
-        if (animator is SimpleItemAnimator) {
-            animator.supportsChangeAnimations = false
-        }
-    }
-
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
         callManager {
-            it.changeActionBarElevation(v!!.canScrollVertically(-1))
+            it.changeAppBarElevation(v!!.canScrollVertically(-1))
         }
     }
 

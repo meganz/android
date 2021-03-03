@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,10 +32,17 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
@@ -44,6 +50,8 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -56,7 +64,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -169,7 +176,7 @@ public class Util {
 		}
 
 		try{
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+			MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
 				dialog.dismiss();
 				if (finish) {
@@ -375,8 +382,8 @@ public class Util {
 	 * @param message To display, could be null
 	 * @param view Custom view to display in the dialog
 	 */
-	public static AlertDialog.Builder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+	public static MaterialAlertDialogBuilder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
 		ViewGroup customView = getCustomAlertView(activity, title, message);
 		if (view != null) {
 			customView.addView(view);
@@ -590,13 +597,13 @@ public class Util {
 
 	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
 	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change title text color
+	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change title text color
 	        }
 
 	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
 	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change divider color
+	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.red_600_red_300)); // change divider color
 	        }
 	    } catch (Exception ex) {
 	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -1356,40 +1363,6 @@ public class Util {
 		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
-	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		logDebug("changeStatusBarColor");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  1) {
-				window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-			}
-			else if (option == 2) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 500);
-			}
-			else if (option == 3) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
-					}
-				}, 500);
-			}
-			else {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
-					}
-				}, 500);
-			}
-		}
-	}
     public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
@@ -1401,11 +1374,47 @@ public class Util {
         return circle;
     }
 
-    public static void changeStatusBarColor(Context context, Window window, @ColorRes int colorId) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(context, colorId));
-    }
+	/**
+	 * Draw activity content under status bar.
+	 * @param activity the activity
+	 * @param drawUnderStatusBar whether draw under status bar
+	 */
+	public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
+
+		if (drawUnderStatusBar) {
+			int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
+			if (Util.isDarkMode(activity)) {
+				visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+			} else {
+				// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+				visibility |= 0x00002000 | 0x00000010;
+			}
+
+			window.getDecorView().setSystemUiVisibility(visibility);
+			window.setStatusBarColor(Color.TRANSPARENT);
+		} else {
+			ColorUtils.setStatusBarTextColor(activity);
+		}
+	}
+
+	/**
+	 * Set status bar color.
+	 * @param activity the activity
+	 * @param color color of the status bar
+	 */
+	public static void setStatusBarColor(Activity activity, @ColorRes int color) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
+
+		window.setStatusBarColor(ContextCompat.getColor(activity, color));
+	}
 
 	public static int getStatusBarHeight() {
 		Context context = MegaApplication.getInstance().getBaseContext();
@@ -1844,6 +1853,16 @@ public class Util {
 	}
 
 	/**
+	 * Judge if current mode is Dark mode
+	 * @param context
+	 * @return true if it is dark mode, false for light mode
+	 */
+	public static boolean isDarkMode(Context context) {
+		int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+	}
+
+	/**
 	 * Method for displaying a snack bar when is Offline.
 	 *
 	 * @return True, is is Offline. False it is Online.
@@ -1870,5 +1889,83 @@ public class Util {
         if (!askMe) {
             dbH.setStorageDownloadLocation(downloadLocation);
         }
+    }
+
+    /**
+	 * Create a RecyclerView.ItemAnimator that doesn't support change animation.
+	 *
+	 * @return the RecyclerView.ItemAnimator
+	 */
+    public static RecyclerView.ItemAnimator noChangeRecyclerViewItemAnimator() {
+		DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+		itemAnimator.setSupportsChangeAnimations(false);
+		return itemAnimator;
+	}
+
+    /**
+     * Apply elevation effect by controlling AppBarLayout's elevation only, regardless of whether on dark mode.
+     *
+     * @param activity Current activity.
+     * @param abL AppBarLayout in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeActionBarElevation(Activity activity, AppBarLayout abL, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+		abL.setElevation(withElevation
+				? activity.getResources().getDimension(R.dimen.toolbar_elevation)
+				: 0);
+    }
+
+    /**
+     * For some pages that have a layout below AppBarLayout, also need to apply elevation effect on the additional layout.
+     * It's done by changing ToolBar's background color on dark mode.
+     * On light mode, no need to do anything here, the elevation effect is applied on the AppBarLayout.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevationForDarkMode(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        if (Util.isDarkMode(activity)) {
+            float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        }
+        // On light mode, do nothing.
+    }
+
+    /**
+     * For some pages don't have AppBarLayout, apply elevation effect by controlling AppBarLayout's elevation.
+     * On dark mode, it's done by changing ToolBar's background.
+     * On light mode, it's done by setting elevation on ToolBar.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevation(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(activity)) {
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        } else {
+            tB.setElevation(withElevation ? elevation : 0);
+        }
+    }
+
+    /**
+     * Apply elevation effect for ToolBar on dark mode by setting its background.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param elevation Elevation height.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
+        tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
 }

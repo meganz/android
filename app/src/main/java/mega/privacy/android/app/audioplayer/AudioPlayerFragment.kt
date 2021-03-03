@@ -149,7 +149,7 @@ class AudioPlayerFragment : Fragment() {
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
                 if (!it) {
-                    MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+                    MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                         .setCancelable(false)
                         .setMessage(
                             if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
@@ -323,7 +323,7 @@ class AudioPlayerFragment : Fragment() {
         bgPlayHint.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
-                if (enabled) R.color.teal_200 else R.color.text_tab_alpha
+                if (enabled) R.color.teal_200 else R.color.white_alpha_060
             )
         )
         bgPlayHint.setText(

@@ -49,7 +49,7 @@
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_mega_round"
-        android:theme="@style/Theme.Megaactionbar"
+        android:theme="@style/Theme.Mega"
         android:usesCleartextTraffic="true">
 
         <meta-data
@@ -87,8 +87,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/app_name">
         </activity>
 
         <activity android:name="OpenLinkActivity" android:launchMode="singleTask" android:screenOrientation="portrait" >
@@ -133,7 +132,7 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Dark.FullScreen.Draggable">
         </activity>
 
         <activity
@@ -141,29 +140,26 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Dark.FullScreen.Draggable">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
             android:label="@string/contact_properties_activity"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileContactListActivityLollipop"
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
             android:launchMode="singleTask"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
 
             <intent-filter>
@@ -184,20 +180,17 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
@@ -206,7 +199,6 @@
 
         <activity android:name="mega.privacy.android.app.providers.FileProviderActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:screenOrientation="locked">
 
             <intent-filter>
@@ -244,40 +236,31 @@
             android:name="mega.privacy.android.app.lollipop.FileStorageActivityLollipop"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.PhoneContactsActivityLollipop"
-            android:label="@string/app_name">
+            >
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FolderLinkActivityLollipop"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.TestPasswordActivity"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileLinkActivityLollipop"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
@@ -286,53 +269,46 @@
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog">
+            android:theme="@style/Theme.MaterialComponents.DayNight.Dialog">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
-            android:label="@string/my_account_change_password"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/my_account_change_password">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
-            android:label="@string/context_get_link_menu"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/context_get_link_menu">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
-            android:label="@string/action_search_by_date"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/action_search_by_date">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="adjustResize|stateVisible"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:windowSoftInputMode="adjustResize|stateVisible">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
             android:label="@string/zip_browser_activity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.AddContactActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
         </activity>
 
 	    <activity
 		    android:name="mega.privacy.android.app.lollipop.InviteContactActivity"
 		    android:label="@string/app_name"
-		    android:theme="@style/Theme.Megaactionbar"
 		    android:windowSoftInputMode="adjustNothing">
 	    </activity>
 
@@ -340,43 +316,36 @@
             android:name="mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden|adjustResize"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:launchMode="singleTask">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens"
             android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity
@@ -418,8 +387,8 @@
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Swipe.BackFullScreen"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.Dark.FullScreen.Draggable">
         </activity>
 
         <activity
@@ -429,94 +398,80 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.BusinessExpiredAlertActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
-
             android:label="@string/app_name">
         </activity>
-	    <activity android:name=".SMSVerificationActivity"
-	              android:theme="@style/SMSVerificationStyle"/>
 
-	    <activity android:name=".SMSVerificationReceiveTxtActivity"
-	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"/>
+        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+
+        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
             android:label="@string/settings_advanced_features"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity"
             android:label="@string/title_properties_chat_notifications_contact"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity"
             android:label="@string/section_chat"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity"
             android:label="@string/download_location"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity"
             android:label="@string/settings_file_management_category"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
             android:label="@string/settings_pin_lock_switch"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity"
             android:label="@string/settings_about_cookie_settings"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop" />
 
         <activity
             android:name="mega.privacy.android.app.WeakAccountProtectionAlertActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 
@@ -524,14 +479,12 @@
             android:name="mega.privacy.android.app.activities.ManageChatHistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_properties_manage_chat"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 
@@ -540,14 +493,12 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/search_giphy_title"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Giphy"
             android:windowSoftInputMode="adjustNothing">
 
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.GiphyViewerActivity"
-            android:theme="@style/Theme.Giphy"
             android:launchMode="singleTop">
         </activity>
 
@@ -657,7 +608,6 @@
             android:name=".lollipop.megachat.MapsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_maps"
-            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
 
             <meta-data
@@ -669,7 +619,6 @@
         <activity
             android:name=".activities.OverDiskQuotaPaywallActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 

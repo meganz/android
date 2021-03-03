@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
-import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -107,7 +106,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        changeStatusBarColor(this, window, R.color.black)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -476,7 +474,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             return
         }
 
-        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)

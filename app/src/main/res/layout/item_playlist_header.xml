@@ -24,7 +24,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="72dp"
             android:text="@{name}"
-            android:textColor="@color/ic_mic_unread_message"
+            android:textColor="@color/teal_300"
             android:textSize="14sp"
             tools:text="Now Playing" />
     </FrameLayout>

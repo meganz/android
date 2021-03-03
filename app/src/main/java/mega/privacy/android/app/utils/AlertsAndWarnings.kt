@@ -103,7 +103,7 @@ class AlertsAndWarnings {
             }
 
             val resumeTransfersDialogBuilder =
-                AlertDialog.Builder(context, R.style.ResumeTransfersWarning)
+                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
                 .setMessage(R.string.warning_message_resume_transfers)
@@ -141,7 +141,7 @@ class AlertsAndWarnings {
          */
         @JvmStatic
         fun showConfirmRemoveLinkDialog(context: Context, onPositive: () -> Unit) {
-            val builder = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+            val builder = MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_link, null)
 
@@ -197,7 +197,7 @@ class AlertsAndWarnings {
 
             val input = EditTextCursorWatcher(context, isFolder)
             input.setSingleLine()
-            input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+            input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary))
             input.imeOptions = EditorInfo.IME_ACTION_DONE
 
             input.setImeActionLabel(
@@ -265,7 +265,7 @@ class AlertsAndWarnings {
             paramsIcon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
             errorIcon.layoutParams = paramsIcon
 
-            errorIcon.setColorFilter(ContextCompat.getColor(context, R.color.login_warning))
+            errorIcon.setColorFilter(ColorUtils.getThemeColor(context, R.attr.colorError))
 
             val textError = TextView(context)
             errorLayout.addView(textError)
@@ -279,13 +279,13 @@ class AlertsAndWarnings {
             )
             textError.layoutParams = paramsTextError
 
-            textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning))
+            textError.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError))
 
             errorLayout.visibility = View.GONE
 
             input.background.mutate().clearColorFilter()
             input.background.mutate().colorFilter = PorterDuffColorFilter(
-                ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP
+                ColorUtils.getThemeColor(context, R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
             )
             input.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -309,8 +309,8 @@ class AlertsAndWarnings {
                         errorLayout.visibility = View.GONE
                         input.background.mutate().clearColorFilter()
                         input.background.mutate().colorFilter = PorterDuffColorFilter(
-                            ContextCompat.getColor(context, R.color.accentColor),
-                            PorterDuff.Mode.SRC_ATOP
+                            ColorUtils.getThemeColor(context, R.attr.colorSecondary),
+                            PorterDuff.Mode.SRC_IN
                         )
                     }
                 }
@@ -321,8 +321,7 @@ class AlertsAndWarnings {
                 val value = text.trim { it <= ' ' }
                 if (value.isEmpty()) {
                     input.background.mutate().colorFilter = PorterDuffColorFilter(
-                        ContextCompat.getColor(context, R.color.login_warning),
-                        PorterDuff.Mode.SRC_ATOP
+                        ColorUtils.getThemeColor(context, R.attr.colorError), PorterDuff.Mode.SRC_IN
                     )
                     textError.setText(R.string.invalid_string)
                     errorLayout.visibility = View.VISIBLE
@@ -330,8 +329,8 @@ class AlertsAndWarnings {
                 } else {
                     if (Pattern.compile(RENAME_REGEX).matcher(value).find()) {
                         input.background.mutate().colorFilter = PorterDuffColorFilter(
-                            ContextCompat.getColor(context, R.color.login_warning),
-                            PorterDuff.Mode.SRC_ATOP
+                            ColorUtils.getThemeColor(context, R.attr.colorError),
+                            PorterDuff.Mode.SRC_IN
                         )
                         textError.setText(R.string.invalid_characters)
                         errorLayout.visibility = View.VISIBLE
@@ -351,7 +350,7 @@ class AlertsAndWarnings {
                 false
             })
 
-            renameDialog = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+            renameDialog = MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setTitle(context.getString(R.string.context_rename) + " " + nodeName)
                 .setPositiveButton(R.string.context_rename, null)
                 .setNegativeButton(android.R.string.cancel, null)

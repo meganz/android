@@ -11,24 +11,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/black"
-        android:text="@string/title_dialog_mute_chat_notifications"
-        android:textSize="20sp"
         android:gravity="start"
-        android:fontFamily="Roboto"
-        android:textFontWeight="500"
-        android:letterSpacing="0"
-        android:textAlignment="gravity"/>
+        android:textAlignment="gravity"
+        android:text="@string/title_dialog_mute_chat_notifications"
+        android:textAppearance="@style/TextAppearance.Mega.Headline6.Medium"/>
     <TextView
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondary_text"
-        android:text="@string/subtitle_dialog_mute_chat_notifications"
-        android:textSize="16sp"
-        android:fontFamily="Roboto"
-        android:letterSpacing="0"
         android:gravity="start"
-        android:textAlignment="gravity"/>
+        android:textAlignment="gravity"
+        android:text="@string/subtitle_dialog_mute_chat_notifications"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"/>
 
 </LinearLayout>

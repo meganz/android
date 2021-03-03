@@ -14,7 +14,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:played_color="@color/ic_mic_unread_message"
+        app:played_color="@color/teal_300"
         app:scrubber_enabled_size="0dp"
         app:unplayed_color="@color/transfer_progress" />
 
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="64dp"
         android:gravity="center"
-        android:textColor="@color/primary_text"
+        android:textColor="@color/grey_alpha_087"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@id/artist_name"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="64dp"
         android:gravity="center"
-        android:textColor="@color/transparent_black2"
+        android:textColor="@color/grey_alpha_060"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

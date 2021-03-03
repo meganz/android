@@ -20,14 +20,14 @@ class HomePageViewModel @ViewModelInject constructor(
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
-    private val _chatStatusDrawableId = MutableLiveData<Int>()
+    private val _chatStatus = MutableLiveData<Int>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
     private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
         repository.getBannerListLiveData()
 
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
-    val chatStatusDrawableId: LiveData<Int> = _chatStatusDrawableId
+    val chatStatus: LiveData<Int> = _chatStatus
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
@@ -44,7 +44,7 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private val chatOnlineStatusObserver = androidx.lifecycle.Observer<Int> {
-        _chatStatusDrawableId.value = repository.getChatStatusDrawableId(it)
+        _chatStatus.value = it
     }
 
     init {

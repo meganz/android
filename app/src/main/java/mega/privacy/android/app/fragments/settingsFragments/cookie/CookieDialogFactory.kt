@@ -39,7 +39,7 @@ class CookieDialogFactory @Inject constructor(
     }
 
     private fun createDialog(context: Context) {
-        val dialog = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+        val dialog = MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(R.string.preference_cookies_accept) { _, _ ->

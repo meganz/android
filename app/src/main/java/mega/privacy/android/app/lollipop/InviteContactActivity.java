@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -60,6 +59,7 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
@@ -158,7 +158,6 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbH = DatabaseHandler.getDbHandler(this);
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -166,7 +165,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
         Context context = getApplicationContext();
-        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
+        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.grey_500_grey_400);
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
@@ -477,10 +476,15 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         logDebug("showEmptyTextView");
         String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace(
+                    "[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>"
+            ).replace("[/A]", "</font>").replace(
+                    "[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>"
+            ).replace("[/B]", "</font>");
         } catch (Exception e) {
             logError(e.toString());
         }
@@ -1194,8 +1198,6 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
 
     private void enableFabButton(Boolean enableFabButton) {
         logDebug("enableFabButton: " + enableFabButton);
-        int lintColor = enableFabButton ? R.color.accentColor : R.color.disable_fab_invite_contact;
-        fabButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(lintColor)));
         fabButton.setEnabled(enableFabButton);
     }
 
