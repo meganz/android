@@ -7,6 +7,7 @@
         android:icon="@drawable/ic_download_white"
         android:orderInCategory="100"
         android:title="@string/general_save_to_device"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -14,6 +15,7 @@
         android:icon="@drawable/info_ic_white"
         android:orderInCategory="105"
         android:title="@string/general_file_info"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -22,6 +24,7 @@
         android:orderInCategory="110"
         android:title="@string/general_share"
         android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -29,7 +32,7 @@
         android:icon="@drawable/ic_send_to_contact"
         android:orderInCategory="110"
         android:title="@string/general_share"
-        app:iconTint="@color/white"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
@@ -38,6 +41,7 @@
         android:orderInCategory="85"
         android:title="@string/action_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom|collapseActionView" />
 
     <item

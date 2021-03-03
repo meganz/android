@@ -137,7 +137,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/audio_player_mini_controller_height"
                 android:layout_above="@id/psa_layout"
-                android:background="@color/white"
                 android:visibility="gone"
                 app:controller_layout_id="@layout/audio_player_control_in_mini_player"
                 app:player_layout_id="@layout/audio_player_view_controller_only"

@@ -203,6 +203,9 @@
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
+    <!-- AudioPlayer playlist position and duration  -->
+    <color name="grey_038_white">@color/grey_alpha_038</color>
+
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
@@ -217,6 +220,9 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- AudioPlayer artist name -->
+    <color name="grey_060_white_060">@color/grey_alpha_060</color>
 
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/white_alpha_087</color>
@@ -388,9 +394,6 @@
     <color name="mega">#d90007</color>
 
     <!-- TODO: replace with palette colors -->
-    <color name="switch_selector_layout">#555555</color>
-    <color name="transfer_progress">#CCCCCC</color>
-    <color name="adapters_background">#333333</color>
-    <color name="navigation_drawer_background">#222222</color>
-    <color name="disable_fab_chat_call">#444444</color>
+    <color name="buffered_color">#999999</color>
+    <color name="unplayed_color">#CCCCCC</color>
 </resources>

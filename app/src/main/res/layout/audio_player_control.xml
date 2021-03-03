@@ -9,6 +9,7 @@
         android:id="@+id/controller_bg"
         android:layout_width="0dp"
         android:layout_height="@dimen/audio_player_main_controller_height"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -17,19 +18,20 @@
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="26dp"
+        app:buffered_color="@color/buffered_color"
         app:layout_constraintBottom_toTopOf="@id/controller_bg"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/controller_bg" />
+        app:layout_constraintTop_toTopOf="@id/controller_bg"
+        app:played_color="@color/teal_300_teal_200"
+        app:unplayed_color="@color/unplayed_color" />
 
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white_alpha_038"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
         tools:text="00:30" />
@@ -39,9 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white_alpha_038"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
         tools:text="04:30" />
@@ -52,10 +52,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="@dimen/audio_player_track_name_margin_bottom_small"
-        android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
         app:layout_constraintBottom_toTopOf="@id/artist_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,10 +65,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="54dp"
         android:layout_marginBottom="10dp"
-        android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:textColor="@color/white_alpha_060"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Variant"
         app:layout_constraintBottom_toTopOf="@id/exo_play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,18 +113,18 @@
 
     <ImageButton
         android:id="@id/exo_play"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
     <ImageButton
         android:id="@id/exo_pause"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -169,9 +165,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="29dp"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/teal_300"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

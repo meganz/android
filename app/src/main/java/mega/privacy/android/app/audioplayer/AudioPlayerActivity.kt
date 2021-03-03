@@ -11,6 +11,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -145,7 +146,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         actionBar.title = ""
 
         binding.toolbar.setNavigationOnClickListener {
@@ -166,9 +166,13 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -176,6 +180,8 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
                     }
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
             }
             refreshMenuOptionsVisibility(dest.id)
