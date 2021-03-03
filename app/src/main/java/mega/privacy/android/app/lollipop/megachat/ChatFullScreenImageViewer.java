@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -29,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
@@ -168,17 +171,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		downloadIcon = menu.findItem(R.id.chat_full_image_viewer_download);
 		importIcon = menu.findItem(R.id.chat_full_image_viewer_import);
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
-        saveForOfflineIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
-
-//		Drawable drawable = importIcon.getIcon();
-//		if (drawable != null) {
-//			// If we don't mutate the drawable, then all drawable's with this id will have a color
-//			// filter applied to it.
-//			drawable.mutate();
-//			drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-//			drawable.setAlpha(255);
-//		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -285,11 +278,21 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		return super.onOptionsItemSelected(item);
 	}
 
-
+	@Override
+	protected boolean shouldSetStatusBarTextColor() {
+		return false;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
+
+		Window window = getWindow();
+		window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+
+		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		super.onCreate(savedInstanceState);
 
 		handler = new Handler();
@@ -398,8 +401,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		logDebug("aB.setHomeAsUpIndicator");
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
@@ -702,14 +703,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		};
 
-		androidx.appcompat.app.AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		}
-
+		MaterialAlertDialogBuilder builder =
+				new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		builder.setMessage(R.string.confirmation_delete_one_attachment);
 
 		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
@@ -740,6 +735,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (intent == null) {
 			return;
 		}
@@ -751,10 +747,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-			if(!isOnline(this)||megaApi==null) {
-				try{
+			if (!isOnline(this) || megaApi == null) {
+				try {
 					statusDialog.dismiss();
-				} catch(Exception ex) {}
+				} catch (Exception ex) {
+				}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -764,7 +761,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 			MegaNode target = null;
 			target = megaApi.getNodeByHandle(toHandle);
-			if(target == null){
+			if (target == null) {
 				target = megaApi.getRootNode();
 			}
 			logDebug("TARGET HANDLE: " + target.getHandle());
@@ -776,8 +773,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					logError("TARGET: null");
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
-			}
-			else{
+			} else {
 				logError("DOCUMENT: null");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
 			}
@@ -956,7 +952,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -968,7 +963,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
-				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}
@@ -1014,7 +1008,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		draggableView.setDraggableListener(this);
 		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 		container.addView(ivShadow, params);
 		container.addView(draggableView);

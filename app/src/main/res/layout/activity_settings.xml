@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical" >
+    android:fitsSystemWindows="true">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_settings"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle"
-        app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:theme="@style/Theme.Megaactionbar"
-        tools:context=".ManagerActivityLollipop" />
+        android:layout_height="?attr/actionBarSize"/>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
-        android:background="@color/white"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_settings">

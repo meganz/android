@@ -19,7 +19,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +30,9 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavOptions;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
@@ -39,6 +43,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -77,10 +82,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -226,6 +228,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.Constants;
@@ -240,8 +243,8 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -280,18 +283,22 @@ import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -299,13 +306,10 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -363,6 +367,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
+	/** The causes of elevating the app bar */
+	public static final int ELEVATION_SCROLL = 0x01;
+    public static final int ELEVATION_CALL_IN_PROGRESS = 0x02;
+    /** The cause bitmap of elevating the app bar */
+    private int mElevationCause;
+    /** True if any TabLayout is visible */
+    private boolean mShowAnyTabLayout;
+
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	@Inject
@@ -384,7 +396,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
-	TextView addPhoneNumberButton;
+	Button addPhoneNumberButton;
 	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
@@ -416,15 +428,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private BadgeDrawerArrowDrawable badgeDrawable;
 
-	//COLLECTION FAB BUTTONS
-	CoordinatorLayout fabButtonsLayout;
-	FloatingActionButton mainFabButtonChat;
-	FloatingActionButton firstFabButtonChat;
-	FloatingActionButton secondFabButtonChat;
-	FloatingActionButton thirdFabButtonChat;
-	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
-	boolean isFabOpen=false;
-
 	MegaPreferences prefs = null;
 	MegaAttributes attr = null;
 	static ManagerActivityLollipop managerActivity = null;
@@ -436,8 +439,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
     float scaleText;
 	FragmentContainerView fragmentContainer;
     ActionBar aB;
+    MaterialToolbar toolbar;
     AppBarLayout abL;
-	private AppBarLayout toolbarLayout;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -479,7 +482,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
-    float elevation = 0;
     private boolean isSMSDialogShowing;
     private String bonusStorageSMS = "GB";
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
@@ -829,7 +831,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewHolder psaViewHolder;
-
 
 	/**
 	 * Broadcast to update the completed transfers tab.
@@ -1614,15 +1615,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch(requestCode){
-			case REQUEST_READ_CONTACTS:{
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					if (checkPermission(Manifest.permission.READ_CONTACTS)){
-						Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-						this.startActivity(phoneContactIntent);
-					}
-				}
-				break;
-			}
 			case REQUEST_UPLOAD_CONTACT:{
 				uploadContactInfo(infoManager, parentNodeManager);
 				break;
@@ -1907,7 +1899,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
         if (onAskingSMSVerificationFragment && svF != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), svF);
         }
-		outState.putFloat("elevation", abL.getElevation());
+		outState.putInt("elevation", mElevationCause);
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
@@ -2022,7 +2014,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
             if (onAskingSMSVerificationFragment) {
                 svF = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
-			elevation = savedInstanceState.getFloat("elevation", 0);
+			mElevationCause = savedInstanceState.getInt("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
@@ -2277,9 +2269,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
-		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
 
-		setSupportActionBar(findViewById(R.id.toolbar));
+		toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 		aB = getSupportActionBar();
 
 		aB.setHomeButtonEnabled(true);
@@ -2348,38 +2340,38 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		});
         nV = (NavigationView) findViewById(R.id.navigation_view);
 
-		myAccountHeader = (RelativeLayout) findViewById(R.id.navigation_drawer_account_section);
+		myAccountHeader = findViewById(R.id.navigation_drawer_account_section);
 		myAccountHeader.setOnClickListener(this);
 		contactStatus = (ImageView) findViewById(R.id.contact_state);
-        myAccountSection = (RelativeLayout) findViewById(R.id.my_account_section);
+        myAccountSection = findViewById(R.id.my_account_section);
         myAccountSection.setOnClickListener(this);
-        inboxSection = (RelativeLayout) findViewById(R.id.inbox_section);
+        inboxSection = findViewById(R.id.inbox_section);
         inboxSection.setOnClickListener(this);
-        contactsSection = (RelativeLayout) findViewById(R.id.contacts_section);
+        contactsSection = findViewById(R.id.contacts_section);
         contactsSection.setOnClickListener(this);
-		notificationsSection = (RelativeLayout) findViewById(R.id.notifications_section);
+		notificationsSection = findViewById(R.id.notifications_section);
 		notificationsSection.setOnClickListener(this);
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
 		findViewById(R.id.offline_section).setOnClickListener(this);
 		transfersSection = findViewById(R.id.transfers_section);
 		transfersSection.setOnClickListener(this);
-        settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
+        settingsSection = findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
-        upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
 
-        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton = (Button)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
         megaApi.getAccountAchievements(this);
 
-//		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity,R.color.white);
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.red_600_red_300,
+				R.color.white_dark_grey, R.color.white_dark_grey);
+
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
 		// Navi button Chat
 		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
@@ -2392,69 +2384,16 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		callBadge.setVisibility(View.GONE);
 		setCallBadge();
 
-		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
+		usedSpaceLayout = findViewById(R.id.nv_used_space_layout);
 
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
 
-		//Collection of FAB for CHAT
-		fabButtonsLayout = (CoordinatorLayout) findViewById(R.id.fab_collection_layout);
-		mainFabButtonChat = (FloatingActionButton) findViewById(R.id.main_fab_chat);
-		mainFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		firstFabButtonChat = (FloatingActionButton) findViewById(R.id.first_fab_chat);
-		firstFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		secondFabButtonChat = (FloatingActionButton) findViewById(R.id.second_fab_chat);
-		secondFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		thirdFabButtonChat = (FloatingActionButton) findViewById(R.id.third_fab_chat);
-		thirdFabButtonChat.setOnClickListener(new FabButtonListener(this));
-
-		collectionFABLayoutOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.collection_fab_layout_out);
-		collectionFABLayoutOut.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				logDebug("onAnimationEnd");
-				fabButtonsLayout.setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-		});
-		openFabAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.open_fab);
-		closeFabAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.close_fab);
-		closeFabAnim.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				logDebug("onAnimationEnd");
-//				mainFabButtonChat.setVisibility(View.GONE);
-//				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
-				fabButtonsLayout.setVisibility(View.GONE);
-				fabButton.show();
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-		});
-
-		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
-		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
-
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		getProLayout.setBackgroundColor(Util.isDarkMode(this)
+				? ColorUtils.getColorForElevation(this, 8f) : Color.WHITE);
 		String getProTextString = getString(R.string.get_pro_account);
 		try {
 			getProTextString = getProTextString.replace("[A]", "\n");
@@ -2581,7 +2520,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
-		changeToolbarLayoutElevation();
+
+		if (mElevationCause > 0) {
+			// A work around: mElevationCause will be changed unexpectedly shortly
+			int elevationCause = mElevationCause;
+			// Apply the previous Appbar elevation(e.g. before rotation) after all views have been created
+			handler.postDelayed(()-> changeAppBarElevation(true, elevationCause), 100);
+		}
 
 		mNavHostView = findViewById(R.id.nav_host_fragment);
 		setupNavDestListener();
@@ -3453,22 +3398,21 @@ public class ManagerActivityLollipop extends SorterContentActivity
     		return;
 		}
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_business_grace_alert, null);
-        builder.setView(v);
 
-        Button dismissButton = v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(view -> {
-			setBusinessAlertShown(isBusinessGraceAlertShown = false);
-			try {
-				businessGraceAlert.dismiss();
-			} catch (Exception e) {
-				logWarning("Exception dismissing businessGraceAlert", e);
-			}
-		});
+		businessGraceAlert = builder.setView(v)
+				.setPositiveButton(R.string.general_dismiss, (dialog, which) -> {
+					setBusinessAlertShown(isBusinessGraceAlertShown = false);
+					try {
+						businessGraceAlert.dismiss();
+					} catch (Exception e) {
+						logWarning("Exception dismissing businessGraceAlert", e);
+					}
+				})
+				.create();
 
-        businessGraceAlert = builder.create();
         businessGraceAlert.setCanceledOnTouchOutside(false);
         try {
             businessGraceAlert.show();
@@ -3493,7 +3437,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.section_photo_sync)
                 .setMessage(R.string.camera_uploads_business_alert)
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
@@ -3616,9 +3560,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
             deleteCurrentFragment();
 
-
-            changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
-
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             supportInvalidateOptionsMenu();
             selectDrawerItemLollipop(drawerItem);
@@ -3641,8 +3582,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		onAskingPermissionsFragment = false;
 
 		pF = null;
-
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
@@ -3669,25 +3608,33 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				case MegaChatApi.STATUS_ONLINE: {
 					logDebug("Online");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_online_dark_drawer
+									: R.drawable.ic_online_light));
 					break;
 				}
 				case MegaChatApi.STATUS_AWAY: {
 					logDebug("Away");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_away_dark_drawer
+									: R.drawable.ic_away_light));
 					break;
 				}
 				case MegaChatApi.STATUS_BUSY: {
 					logDebug("Busy");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_busy_dark_drawer
+									: R.drawable.ic_busy_light));
 					break;
 				}
 				case MegaChatApi.STATUS_OFFLINE: {
 					logDebug("Offline");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_offline_dark_drawer
+									: R.drawable.ic_offline_light));
 					break;
 				}
 				case MegaChatApi.STATUS_INVALID: {
@@ -3782,11 +3729,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		tonF = null;
 
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
-
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
 		selectDrawerItemLollipop(drawerItem);
+
+		setStatusBarColor(this, android.R.color.transparent);
 	}
 
 	void deleteCurrentFragment () {
@@ -3811,16 +3758,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		setTabsVisibility();
 		abL.setVisibility(View.GONE);
 
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
-
 		drawerLayout.closeDrawer(Gravity.LEFT);
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		supportInvalidateOptionsMenu();
 		hideFabButton();
 		showHideBottomNavigationView(true);
+
+		setStatusBarColor(this, R.color.teal_500_teal_400);
 	}
 
 	void actionOpenFolder (long handleIntent) {
@@ -4016,7 +3960,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
                     String text = getString(R.string.cam_sync_cancel_sync);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                     builder.setMessage(text);
 
                     builder.setPositiveButton(getString(R.string.general_yes),
@@ -4312,39 +4256,39 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
 		inputFirstName.getBackground().mutate().clearColorFilter();
-		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputFirstName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
 
-		final RelativeLayout error_layout_firtName = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout_firtName, params1);
+		final RelativeLayout error_layout_firstName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_firstName, params1);
 
-		final ImageView error_icon_firtName = new ImageView(ManagerActivityLollipop.this);
-		error_icon_firtName.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout_firtName.addView(error_icon_firtName);
-		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
+		final ImageView error_icon_firstName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_firstName.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
+		error_layout_firstName.addView(error_icon_firstName);
+		RelativeLayout.LayoutParams params_icon_firstName = (RelativeLayout.LayoutParams) error_icon_firstName.getLayoutParams();
 
-		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon_firtName.setLayoutParams(params_icon_firtName);
+		params_icon_firstName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_firstName.setLayoutParams(params_icon_firstName);
 
-		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_firstName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
-		final TextView textError_firtName = new TextView(ManagerActivityLollipop.this);
-		error_layout_firtName.addView(textError_firtName);
-		RelativeLayout.LayoutParams params_text_error_firtName = (RelativeLayout.LayoutParams) textError_firtName.getLayoutParams();
-		params_text_error_firtName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error_firtName.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_firtName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError_firtName.setLayoutParams(params_text_error_firtName);
+		final TextView textError_firstName = new TextView(ManagerActivityLollipop.this);
+		error_layout_firstName.addView(textError_firstName);
+		RelativeLayout.LayoutParams params_text_error_firstName = (RelativeLayout.LayoutParams) textError_firstName.getLayoutParams();
+		params_text_error_firstName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_firstName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error_firstName.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error_firstName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_firstName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_firstName.setLayoutParams(params_text_error_firstName);
 
-		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_firstName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
-		error_layout_firtName.setVisibility(View.GONE);
+		error_layout_firstName.setVisibility(View.GONE);
 
 		final EmojiEditText inputLastName = new EmojiEditText(this);
 		inputLastName.getBackground().mutate().clearColorFilter();
-		inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputLastName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
 
 		final RelativeLayout error_layout_lastName = new RelativeLayout(ManagerActivityLollipop.this);
@@ -4359,7 +4303,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_icon_lastName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_lastName.setLayoutParams(params_icon_lastName);
 
-		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_lastName = new TextView(ManagerActivityLollipop.this);
 		error_layout_lastName.addView(textError_lastName);
@@ -4371,13 +4315,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_text_error_lastName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_lastName.setLayoutParams(params_text_error_lastName);
 
-		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_lastName.setVisibility(View.GONE);
 
 		final EditText inputMail = new EditText(this);
 		inputMail.getBackground().mutate().clearColorFilter();
-		inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputMail.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputMail, params);
 
 		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
@@ -4392,7 +4336,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_icon_email.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon_email);
 
-		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
 		error_layout_email.addView(textError_email);
@@ -4404,7 +4348,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,scaleWidthPx(20, outMetrics),0);
 		textError_email.setLayoutParams(params_text_error_email);
 
-		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_email.setVisibility(View.GONE);
 
@@ -4420,19 +4364,19 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						emailError = comparedToCurrentEmail(value, managerActivity);
 					}
 					if (emailError != null) {
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
 						logWarning("First name input is empty");
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(R.string.error_enter_username);
-						error_layout_firtName.setVisibility(View.VISIBLE);
+						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+						textError_firstName.setText(R.string.error_enter_username);
+						error_layout_firstName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
 						logWarning("Last name input is empty");
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                         textError_lastName.setText(R.string.error_enter_userlastname);
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
@@ -4451,7 +4395,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		inputFirstName.setSingleLine();
 		inputFirstName.setHint(R.string.first_name_text);
 		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
-		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputFirstName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.addTextChangedListener(new TextWatcher() {
@@ -4468,10 +4412,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			@Override
 			public void afterTextChanged(Editable editable) {
 				userNameChanged = true;
-				if(error_layout_firtName.getVisibility() == View.VISIBLE){
-					error_layout_firtName.setVisibility(View.GONE);
+				if(error_layout_firstName.getVisibility() == View.VISIBLE){
+					error_layout_firstName.setVisibility(View.GONE);
 					inputFirstName.getBackground().mutate().clearColorFilter();
-					inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputFirstName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -4482,7 +4427,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		inputLastName.setSingleLine();
 		inputLastName.setHint(R.string.lastname_text);
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
-		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputLastName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputLastName.addTextChangedListener(new TextWatcher() {
@@ -4502,7 +4447,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(error_layout_lastName.getVisibility() == View.VISIBLE){
 					error_layout_lastName.setVisibility(View.GONE);
 					inputLastName.getBackground().mutate().clearColorFilter();
-					inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputLastName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -4513,7 +4459,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		inputMail.setSingleLine();
 		inputMail.setHint(R.string.email_text);
 		inputMail.setText(megaApi.getMyUser().getEmail());
-		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputMail.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -4534,7 +4480,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					inputMail.getBackground().mutate().clearColorFilter();
-					inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputMail.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 
 				}
 			}
@@ -4542,7 +4489,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		inputMail.setOnEditorActionListener(editorActionListener);
 		inputMail.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
 		builder.setPositiveButton(getString(R.string.save_action), new DialogInterface.OnClickListener() {
@@ -4575,21 +4522,21 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
-					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 					inputMail.requestFocus();
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					logWarning("Input is empty");
-					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-                    textError_firtName.setText(R.string.error_enter_username);
-					error_layout_firtName.setVisibility(View.VISIBLE);
+					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+                    textError_firstName.setText(R.string.error_enter_username);
+					error_layout_firstName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					logWarning("Input is empty");
-					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                     textError_lastName.setText(R.string.error_enter_userlastname);
 					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
@@ -5130,14 +5077,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			if(isFirstNavigationLevel()){
 				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
-					aB.setHomeAsUpIndicator(mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
+					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 				}
 				else {
-					aB.setHomeAsUpIndicator(mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
+					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
 				}
 			}
 			else{
-				aB.setHomeAsUpIndicator(mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
+				aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 			}
 		}
 		else{
@@ -5230,7 +5177,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener);
@@ -5405,22 +5352,22 @@ public class ManagerActivityLollipop extends SorterContentActivity
     		return;
 		}
 
+    	// The TabLayout style sets the default icon tint
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(R.drawable.ic_incoming_shares);
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(this, R.drawable.ic_outgoing_shares, R.color.red_600_red_300));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(R.drawable.link_ic);
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(R.drawable.ic_incoming_shares);
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(R.drawable.ic_outgoing_shares);
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(this, R.drawable.link_ic, R.color.red_600_red_300));
 				break;
 			default:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
-
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(this, R.drawable.ic_incoming_shares, R.color.red_600_red_300));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(R.drawable.ic_outgoing_shares);
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(R.drawable.link_ic);
 		}
 	}
 
@@ -5725,6 +5672,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
+		mShowAnyTabLayout = false;
 
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
@@ -5752,11 +5700,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				viewPagerShares.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case CONTACTS: {
 				tabLayoutContacts.setVisibility(View.VISIBLE);
 				viewPagerContacts.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case ACCOUNT: {
@@ -5772,6 +5722,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					default:{
 						tabLayoutMyAccount.setVisibility(View.VISIBLE);
 						viewPagerMyAccount.setVisibility(View.VISIBLE);
+						mShowAnyTabLayout = true;
 						break;
 					}
 				}
@@ -5780,6 +5731,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			case TRANSFERS: {
 				tabLayoutTransfers.setVisibility(View.VISIBLE);
 				viewPagerTransfers.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case HOMEPAGE:
@@ -6486,7 +6438,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		logDebug ("newAccount: "+newAccount);
 		newAccount = false;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
 		builder.setView(v);
@@ -6633,13 +6585,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		inflater.inflate(R.menu.activity_manager, menu);
 
 		searchMenuItem = menu.findItem(R.id.action_search);
-		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
-
 		searchView = (SearchView) searchMenuItem.getActionView();
 
 		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -6799,9 +6747,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		retryTransfers = menu.findItem(R.id.action_menu_retry_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
-		playTransfersMenuIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
-		pauseTransfersMenuIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
 		searchByDate = menu.findItem(R.id.action_search_by_date);
@@ -7150,25 +7096,26 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				searchByDate.setVisible(true);
 			}
 
-			if (isSmallGridCameraUploads) {
-				gridSmallLargeMenuItem.setIcon(
-						mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-			} else {
-				gridSmallLargeMenuItem.setIcon(
-						mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-			}
+			setCuThumbnailTypeIcon();
 			gridSmallLargeMenuItem.setVisible(true);
+		}
+	}
+
+	private void setCuThumbnailTypeIcon() {
+		if (isSmallGridCameraUploads) {
+			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
+		} else {
+			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
 		}
 	}
 
 	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));
+			thumbViewMenuItem.setIcon(R.drawable.ic_thumbnail_view);
 		}
 		else{
-			thumbViewMenuItem.setTitle(getString(R.string.action_list));
-			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
+			thumbViewMenuItem.setIcon(R.drawable.ic_list_view);
 		}
 	}
 
@@ -7430,9 +7377,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						}
 						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 							logWarning("Not permissions to upload");
-							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 							builder.setMessage(getString(R.string.no_permissions_upload));
-//								builder.setTitle(R.string.op_not_allowed);
 							builder.setCancelable(false).setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
 								   public void onClick(DialogInterface dialog, int id) {
 										//do things
@@ -7442,7 +7388,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 							alertNotPermissionsUpload = builder.create();
 							alertNotPermissionsUpload.show();
-//								brandAlertDialog(alertNotPermissionsUpload);
 						}
 
 	        		}
@@ -7562,11 +7507,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					isSmallGridCameraUploads = !isSmallGridCameraUploads;
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-					}else{
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-					}
+					setCuThumbnailTypeIcon();
 
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	        	}
@@ -7574,11 +7515,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					isSmallGridCameraUploads = !isSmallGridCameraUploads;
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-					}else{
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-					}
+					setCuThumbnailTypeIcon();
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 	        	}
 	        	return true;
@@ -7631,7 +7568,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-				showSortOptions(managerActivity, outMetrics);
+				showNewSortByPanel();
 	        	return true;
 	        }
 			case R.id.action_search_by_date:{
@@ -7818,7 +7755,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		abL.setVisibility(View.VISIBLE);
 
 		eRKeyF = null;
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
@@ -7842,11 +7778,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		replaceFragment(eRKeyF, FragmentTag.EXPORT_RECOVERY_KEY.getTag());
 
 		abL.setVisibility(View.GONE);
-
-		Window window = this.getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
 
 		setTabsVisibility();
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -8400,7 +8331,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 //		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -8445,7 +8376,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon.setLayoutParams(params_icon);
 
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError = new TextView(ManagerActivityLollipop.this);
 		error_layout.addView(textError);
@@ -8457,12 +8388,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -8479,7 +8410,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -8492,7 +8423,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -8500,7 +8431,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}else{
 						boolean result=matches(regex, value);
 						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
@@ -8516,7 +8447,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -8542,7 +8473,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				String value = input.getText().toString().trim();
 
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -8550,7 +8481,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				else{
 					boolean result=matches(regex, value);
 					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -8642,7 +8573,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 					setMoveToRubbish(true);
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
 					} else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
@@ -8659,10 +8590,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 					setMoveToRubbish(false);
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
-					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
 					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
@@ -8691,13 +8621,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setHint(getString(R.string.edit_text_insert_pass));
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		if(cancelAccount){
 			logDebug("cancelAccount action");
 			input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -8840,7 +8770,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.delete_account));
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
@@ -8957,7 +8887,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	public void showVerifyPin2FA(final int type){
 		verifyPin2FADialogType = type;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_verify_2fa, null);
 		builder.setView(v);
@@ -9319,12 +9249,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
 	}
 
 	void verifyShowError(){
@@ -9332,12 +9262,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		isFirstTime2fa = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 	}
 
 	void permitVerify(int type){
@@ -9365,9 +9295,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
-				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-				openLinkText.getBackground().mutate().clearColorFilter();
-				openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+				ColorUtils.setErrorAwareInputAppearance(openLinkText, true);
 				openLinkError.setVisibility(View.VISIBLE);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 					if (openLinkText.getText().toString().isEmpty()) {
@@ -9376,13 +9304,15 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
+									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
+									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
@@ -9404,9 +9334,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
-					openLinkText.getBackground().mutate().clearColorFilter();
-					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					ColorUtils.setErrorAwareInputAppearance(openLinkText, false);
 					openLinkError.setVisibility(View.GONE);
 					openLinkOpenButton.setText(R.string.context_open_link);
 				}
@@ -9478,14 +9406,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	private void showOpenLinkDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this,
-				R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
 				.setNegativeButton(R.string.general_cancel, null);
 
 		openLinkText = v.findViewById(R.id.text);
+
 		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -9510,6 +9438,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				return false;
 			}
 		});
+
+		Util.showKeyboardDelayed(openLinkText);
 
 		openLinkError = v.findViewById(R.id.error);
 		openLinkErrorText = v.findViewById(R.id.error_text);
@@ -9602,7 +9532,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void showCancelMessage(){
 		logDebug("showCancelMessage");
 		AlertDialog cancelDialog;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -9649,7 +9579,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
 		int statusToShow = megaChatApi.getOnlineStatus();
 		switch(statusToShow){
@@ -9696,7 +9626,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		});
 		dialogBuilder.setTitle(getString(R.string.status_label));
 		presenceStatusDialog = dialogBuilder.create();
-//		presenceStatusDialog.se
 		presenceStatusDialog.show();
 	}
 
@@ -9721,7 +9650,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 
@@ -9765,151 +9694,92 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void showNewFolderDialog() {
 		logDebug("showNewFolderDialogKitLollipop");
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		ViewGroup errorLayout = v.findViewById(R.id.error);
+		TextView errorText = v.findViewById(R.id.error_text);
+		EditText input = v.findViewById(R.id.text);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
 			}
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				if (errorLayout.getVisibility() == View.VISIBLE) {
+					errorLayout.setVisibility(View.GONE);
+					ColorUtils.setErrorAwareInputAppearance(input, false);
 				}
 			}
 		});
 
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		Runnable validateInput = () -> {
+			String value = input.getText().toString().trim();
+			if (value.length() == 0) {
+				ColorUtils.setErrorAwareInputAppearance(input, true);
+				errorText.setText(getString(R.string.invalid_string));
+				errorLayout.setVisibility(View.VISIBLE);
+				input.requestFocus();
+			} else if (matches(regex, value)) {
+				ColorUtils.setErrorAwareInputAppearance(input, true);
+				errorText.setText(getString(R.string.invalid_characters));
+				errorLayout.setVisibility(View.VISIBLE);
+				input.requestFocus();
+			} else {
+				createFolder(value);
+				newFolderDialog.dismiss();
+			}
+		};
+
 		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						boolean result = matches(regex, value);
-						if (result) {
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						} else {
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
 		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
 		input.requestFocus();
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
+		input.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				validateInput.run();
+				return true;
+			}
+			return false;
+		});
+
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+		builder.setView(v)
+				.setTitle(getString(R.string.menu_new_folder))
+				.setPositiveButton(getString(R.string.general_create),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								String value = input.getText().toString().trim();
+								if (value.length() == 0) {
+									return;
+								}
+								createFolder(value);
+							}
+						})
+				.setNegativeButton(getString(android.R.string.cancel),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int i) {
+								input.getBackground().clearColorFilter();
+							}
+						});
+		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+		newFolderDialog.show();
+		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						validateInput.run();
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				 if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-
-				} else {
-					boolean result = matches(regex, value);
-					if (result) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
 	}
 
 	public long getParentHandleBrowser() {
@@ -10048,14 +9918,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
-		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						nC.cleanRubbishBin();
-					}
-				});*/
 		builder.setPositiveButton(getString(R.string.general_clear),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -10125,7 +9990,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon);
 
-		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
 		error_layout_email.addView(textError_email);
@@ -10138,13 +10003,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error);
 
-		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_email.setVisibility(View.GONE);
 
 //		input.setId(EDIT_TEXT_ID);
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -10161,13 +10026,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
 		input.setSingleLine();
 		input.setHint(getString(R.string.context_new_contact_name));
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -10179,7 +10044,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					String emailError = getEmailError(value, managerActivity);
 					if (emailError != null) {
 //                        input.setError(emailError);
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
@@ -10203,7 +10068,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.menu_add_contact));
 		builder.setPositiveButton(getString(R.string.general_add),
 				new DialogInterface.OnClickListener() {
@@ -10227,7 +10092,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				String emailError = getEmailError(value, managerActivity);
 				if (emailError != null) {
 //					input.setError(emailError);
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
@@ -10255,7 +10120,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
@@ -10281,7 +10146,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
@@ -10307,7 +10172,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
 		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10332,7 +10197,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		};
 
 		String message="";
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		if(r.size()==1){
 			message= getResources().getString(R.string.confirmation_delete_contact_request,r.get(0).getTargetEmail());
 		}else{
@@ -10350,7 +10215,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			return;
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
 				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
 				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
@@ -10358,7 +10223,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void showConfirmationRemoveAllSharingContacts (final ArrayList<MegaShare> shareList, final MegaNode n){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		int size = shareList.size();
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
 
@@ -10450,7 +10315,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, nodes.size());
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		MegaNode finalNode = node;
 		builder.setMessage(message)
 				.setPositiveButton(R.string.general_remove, (dialog, which) -> {
@@ -10515,7 +10380,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
 		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10544,7 +10409,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
 		String message= getResources().getString(R.string.text_reset_pass_logged_in);
 		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
@@ -10592,13 +10457,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void showNodeOptionsPanel(MegaNode node){
-		logDebug("showNodeOptionsPanel");
-
-		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		selectedNode = node;
-		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.MODE0);
 	}
 
 	public void showNodeOptionsPanel(MegaNode node, int mode) {
@@ -10743,10 +10602,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
+                String colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary);
+				switch (storageState) {
+                    case MegaApiJava.STORAGE_STATE_GREEN:
+                        break;
+                    case MegaApiJava.STORAGE_STATE_ORANGE:
+                        colorString = ColorUtils.getColorHexString(this, R.color.amber_600_amber_300);
+                        break;
+                    case MegaApiJava.STORAGE_STATE_RED:
+                    case MegaApiJava.STORAGE_STATE_PAYWALL:
+                        ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+                        colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
+                        break;
+                }
+
 				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ colorString
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getThemeColorHexString(this, android.R.attr.textColorPrimary)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
@@ -10769,24 +10646,21 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		updateSubscriptionLevel(app.getMyAccountInfo());
 
-		switch (storageState) {
-			case MegaApiJava.STORAGE_STATE_GREEN:
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_ok));
-				break;
-
-			case MegaApiJava.STORAGE_STATE_ORANGE:
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_warning));
-				break;
-
-			case MegaApiJava.STORAGE_STATE_RED:
-			case MegaApiJava.STORAGE_STATE_PAYWALL:
-				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_exceed));
-				break;
-		}
+        int resId = R.drawable.custom_progress_bar_horizontal_ok;
+        switch (storageState) {
+            case MegaApiJava.STORAGE_STATE_GREEN:
+                break;
+            case MegaApiJava.STORAGE_STATE_ORANGE:
+                resId = R.drawable.custom_progress_bar_horizontal_warning;
+                break;
+            case MegaApiJava.STORAGE_STATE_RED:
+            case MegaApiJava.STORAGE_STATE_PAYWALL:
+                ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+                resId = R.drawable.custom_progress_bar_horizontal_exceed;
+                break;
+        }
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), resId, null);
+        usedSpacePB.setProgressDrawable(drawable);
 	}
 
 	public void selectSortByContacts(int _orderContacts){
@@ -11187,7 +11061,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setTitle(R.string.confirmation_close_sessions_title);
 
@@ -11227,7 +11101,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11256,7 +11130,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11297,7 +11171,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11461,7 +11335,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
-			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+			MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 			dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11494,7 +11368,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				//One file to share
 				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
@@ -11509,7 +11383,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				//Several folders to share
 				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
 
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11980,7 +11854,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	void disableNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(false);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 		}
 
 		if (inboxSection != null){
@@ -11992,7 +11866,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(hasChildren){
 					inboxSection.setEnabled(false);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 				}
 				else{
 					inboxSection.setVisibility(View.GONE);
@@ -12002,45 +11876,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(false);
+
 			if (contactsSectionText == null) {
-				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
-			}
-			String contactsText = contactsSectionText.getText().toString();
-			if (!contactsText.equals(getString(R.string.section_contacts))){
-				int start = contactsText.indexOf('(');
-				start++;
-				int end = contactsText.indexOf(')');
-				if (start>0 && end>0) {
-					int pendingRequest = Integer.parseInt(contactsText.substring(start, end));
-					setFormattedContactTitleSection(pendingRequest, false);
-				}
+				contactsSectionText = contactsSection.findViewById(R.id.contacts_section_text);
 			}
 
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			contactsSectionText.setAlpha(0.38F);
+			setContactTitleSection();
 		}
 
 		if (notificationsSection != null) {
 			notificationsSection.setEnabled(false);
+
 			if (notificationsSectionText == null) {
-				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.contacts_section_text);
+				notificationsSectionText = notificationsSection.findViewById(R.id.contacts_section_text);
 			}
 
-			int unread = megaApi.getNumUnreadUserAlerts();
-
-			if(unread == 0){
-				notificationsSectionText.setText(getString(R.string.title_properties_chat_contact_notifications));
-			}
-			else{
-				setFormattedNotificationsTitleSection(unread, false);
-			}
-
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			notificationsSectionText.setAlpha(0.38F);
+			setNotificationsTitleSection();
 		}
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(false);
-			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_disable));
-			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accent_color_30_opacity));
 		}
 	}
 
@@ -12080,7 +11937,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(
+					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 		}
 
 		if (inboxSection != null){
@@ -12093,7 +11951,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(
+							ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12104,26 +11963,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(true);
+
 			if (contactsSectionText == null) {
-				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
+				contactsSectionText = contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+
+			contactsSectionText.setAlpha(1F);
 			setContactTitleSection();
 		}
 
 		if (notificationsSection != null) {
 			notificationsSection.setEnabled(true);
+
 			if (notificationsSectionText == null) {
-				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
+				notificationsSectionText = notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+
+			notificationsSectionText.setAlpha(1F);
 			setNotificationsTitleSection();
 		}
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(true);
-			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
-			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}
 	}
 
@@ -12299,7 +12160,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void showSMSVerificationDialog() {
 	    isSMSDialogShowing = true;
         smsDialogTimeChecker.update();
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
         dialogBuilder.setView(dialogView);
@@ -12314,11 +12175,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }
 
-        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(v -> alertDialogSMSVerification.dismiss());
-        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(v -> {
-            startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
-            alertDialogSMSVerification.dismiss();
-        });
+        dialogBuilder.setPositiveButton(R.string.general_add, (dialog, which) -> {
+			startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+			alertDialogSMSVerification.dismiss();
+		}).setNegativeButton(R.string.verify_account_not_now_button, (dialog, which) -> {
+			alertDialogSMSVerification.dismiss();
+		});
+
         if(alertDialogSMSVerification == null) {
             alertDialogSMSVerification = dialogBuilder.create();
             alertDialogSMSVerification.setCancelable(false);
@@ -12347,7 +12210,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			return;
 		}
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 
 		LayoutInflater inflater = this.getLayoutInflater();
 		View dialogView = inflater.inflate(R.layout.storage_status_dialog_layout, null);
@@ -13212,64 +13075,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
-					}
-					dbH.saveMyFirstName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
-					}
-
-					dbH.saveMyLastName(request.getText());
-				}
-				else{
-					logError("ERROR - request.getText(): " + request.getText());
-					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText("");
-					}
-				}
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-
-					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						logDebug("Update the account fragment");
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-					}
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+				updateMyData(true, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+				updateMyData(false, request.getText(), e);
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
 
 				if(e.getErrorCode() == MegaError.API_OK){
 					logDebug("Attribute USER_ATTR_GEOLOCATION enabled");
@@ -13901,6 +13711,28 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 	}
 
+	/**
+	 * Updates own firstName/lastName and fullName data in UI and DB.
+	 *
+	 * @param firstName True if the update makes reference to the firstName, false it to the lastName.
+	 * @param newName   New firstName/lastName text.
+	 * @param e         MegaError of the request.
+	 */
+	private void updateMyData(boolean firstName, String newName, MegaError e) {
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
+		AccountController.updateMyData(firstName, newName, e);
+
+		if (accountInfo != null) {
+			accountInfo.setFullName();
+			updateUserNameNavigationView(accountInfo.getFullName());
+
+			if (getMyAccountFragment() != null) {
+				logDebug("Update the account fragment");
+				maFLol.updateNameView(accountInfo.getFullName());
+			}
+		}
+	}
+
 	public void updateAccountStorageInfo(){
 		logDebug("updateAccountStorageInfo");
 		megaApi.getFolderInfo(megaApi.getRootNode(), this);
@@ -14362,7 +14194,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * Shows a warning to ensure if it is sure of remove all completed transfers.
 	 */
 	public void showConfirmationClearCompletedTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
 					dbH.emptyCompletedTransfers();
@@ -14386,7 +14218,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			return;
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
 				.setPositiveButton(R.string.button_continue, (dialog, which) -> {
 					CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
@@ -14406,7 +14238,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * Shows a warning to ensure if it is sure of cancel all transfers.
 	 */
 	public void showConfirmationCancelAllTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
@@ -14763,35 +14595,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		nVEmail.setText(megaApi.getMyEmail());
 	}
 
-	public void animateFABCollection(){
-		logDebug("animateFABCollection");
-
-		if(isFabOpen){
-			mainFabButtonChat.startAnimation(rotateLeftAnim);
-			firstFabButtonChat.startAnimation(closeFabAnim);
-			secondFabButtonChat.startAnimation(closeFabAnim);
-			thirdFabButtonChat.startAnimation(closeFabAnim);
-			firstFabButtonChat.setClickable(false);
-			secondFabButtonChat.setClickable(false);
-			thirdFabButtonChat.setClickable(false);
-			isFabOpen = false;
-			logDebug("Close COLLECTION FAB");
-
-		} else {
-			mainFabButtonChat.startAnimation(rotateRightAnim);
-			firstFabButtonChat.startAnimation(openFabAnim);
-			secondFabButtonChat.startAnimation(openFabAnim);
-			thirdFabButtonChat.startAnimation(openFabAnim);
-			firstFabButtonChat.setClickable(true);
-			secondFabButtonChat.setClickable(true);
-			thirdFabButtonChat.setClickable(true);
-			isFabOpen = true;
-			hideFabButton();
-			fabButtonsLayout.setVisibility(View.VISIBLE);
-			logDebug("Open COLLECTION FAB");
-		}
-	}
-
 	public void hideFabButton(){
 		fabButton.hide();
 	}
@@ -15141,47 +14944,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		catch (Exception ex) {}
 	}
 
-	public void changeStatusBarColor(int option) {
-		logDebug("changeStatusBarColor");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			final Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  COLOR_STATUS_BAR_ACCENT) {
-				window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.accentColorDark));
-				changeActionBarElevation(true);
-			}
-			else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 300);
-			}
-			else if (option == COLOR_STATUS_BAR_ZERO) {
-				window.setStatusBarColor(0);
-			}
-            else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
-                window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
-            }
-			else if (option == COLOR_STATUS_BAR_SEARCH_DELAY){
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
-					}
-				}, 300);
-			}
-		}
-		if (option == COLOR_STATUS_BAR_ACCENT){
-			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		}
-		else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
-			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-		}
-	}
-
 	public void setDrawerLockMode (boolean locked) {
         if (locked){
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -15192,31 +14954,53 @@ public class ManagerActivityLollipop extends SorterContentActivity
     }
 
 	/**
-	 * This method is used to change the elevation of the toolbar when a call is in progress.
+	 * This method is used to change the elevation of the AppBarLayout when
+	 * scrolling the RecyclerView
+	 * @param withElevation true if need elevation, false otherwise
 	 */
-	public void changeToolbarLayoutElevation() {
-		toolbarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
-				dp2px(16, outMetrics) : 0);
+	public void changeAppBarElevation(boolean withElevation) {
+		changeAppBarElevation(withElevation, ELEVATION_SCROLL);
 	}
 
-	public void changeActionBarElevation(boolean withElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (withElevation) {
-				abL.setElevation(dp2px(4, outMetrics));
-				if (elevation > 0) {
-					elevation = 0;
-					abL.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							abL.setElevation(dp2px(4, outMetrics));
-						}
-					}, 100);
-				}
-			}
-			else {
-				abL.setElevation(0);
-			}
+	/**
+	 * This method is used to change the elevation of the AppBarLayout for some reason
+	 *
+	 * @param withElevation true if need elevation, false otherwise
+	 * @param cause for what cause adding/removing elevation. Only if mElevationCause(cause bitmap)
+	 *              is zero will the elevation being eliminated
+	 */
+	public void changeAppBarElevation(boolean withElevation, int cause) {
+		if (withElevation) {
+			mElevationCause |= cause;
+		} else if ((mElevationCause & cause) > 0) {
+			mElevationCause ^= cause;
 		}
+
+		// In landscape mode, if no call in progress layout ("Tap to return call"), then don't show elevation
+		if (mElevationCause == ELEVATION_CALL_IN_PROGRESS && callInProgressLayout.getVisibility() != View.VISIBLE) return;
+
+		// If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
+		// overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
+		// in this way, both Toolbar and TabLayout would have expected elevation overlay.
+		// If TabLayout is invisible, directly set toolbar's color for the elevation effect. Set AppBarLayout
+		// elevation in this case, a crack would appear between toolbar and ChatRecentFragment's Appbarlayout, for example.
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+		boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
+
+		if (mElevationCause > 0) {
+			if (onlySetToolbar) {
+				toolbar.setBackgroundColor(toolbarElevationColor);
+			} else {
+				toolbar.setBackgroundColor(android.R.color.transparent);
+				abL.setElevation(elevation);
+			}
+		} else {
+			toolbar.setBackgroundColor(android.R.color.transparent);
+			abL.setElevation(0);
+		}
+
+		ColorUtils.changeStatusBarColorForElevation(this, mElevationCause > 0);
 	}
 
 	public long getParentHandleInbox() {
@@ -15243,7 +15027,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
 		try {
 			if (enable) {
-				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'" + ColorUtils.getColorHexString(this, R.color.red_600_red_300) + "\'>");
 			}
 			else {
 				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
@@ -15278,7 +15062,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		String textToShow = String.format(getString(R.string.section_notification_with_unread), unread);
 		try {
 			if (enable) {
-				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(this, R.color.red_600_red_300)
+						+ "\'>");
 			}
 			else {
 				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
@@ -15329,7 +15115,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void showEvaluatedAppDialog(){
-
 		LayoutInflater inflater = getLayoutInflater();
 		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
 
@@ -15347,7 +15132,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
 		sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setView(dialoglayout);
 
 		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
@@ -15704,7 +15489,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
-
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
@@ -15874,7 +15658,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
      * Shows a "transfer over quota" warning.
      */
 	public void showTransfersTransferOverQuotaWarning() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		int messageResource = R.string.warning_transfer_over_quota;
 
 		transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)

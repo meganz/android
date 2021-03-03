@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -32,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -44,22 +41,23 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.Nullable;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -79,6 +77,8 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -127,7 +127,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	MegaNode selectedNode;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	TextView contentText;
     RelativeLayout fragmentContainer;
 	RelativeLayout fileLinkFragmentContainer;
 	Button downloadButton;
@@ -256,9 +255,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
+            MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+
+            ColorUtils.changeStatusBarColorForElevation(FolderLinkActivityLollipop.this, true);
+            // No App bar in this activity, control tool bar instead.
+            tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+
 			return true;
 		}
 
@@ -268,7 +271,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
+
+			// No App bar in this activity, control tool bar instead.
+			boolean withElevation = listView.canScrollVertically(-1);
+            ColorUtils.changeStatusBarColorForElevation(FolderLinkActivityLollipop.this, withElevation);
+            if(!withElevation) {
+                tB.setElevation(0);
+            }
 		}
 
 		@Override
@@ -462,13 +471,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		
 		folderLinkActivity = this;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
-
 		prefs = dbH.getPreferences();
 
 		lastPositionStack = new Stack<>();
@@ -479,7 +481,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		tB = (Toolbar) findViewById(R.id.toolbar_folder_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
@@ -493,25 +494,24 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 		}else{
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 		}
 
-		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
+		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		}
 		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
+		Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
 		emptyTextView.setText(result);
 		emptyImageView.setVisibility(View.GONE);
 		emptyTextView.setVisibility(View.GONE);
@@ -520,7 +520,16 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);
@@ -542,9 +551,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				importButton.setVisibility(View.GONE);
 			}
 		}
-
-		contentText = (TextView) findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		fileLinkIconView = (ImageView) findViewById(R.id.folder_link_file_link_icon);
 		fileLinkIconView.getLayoutParams().width = scaleWidthPx(200, outMetrics);
@@ -581,14 +587,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
-		fileLinkDownloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(scaleWidthPx(6, outMetrics), 0, scaleWidthPx(8, outMetrics), 0);
 		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
 
 		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
-		fileLinkImportButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		fileLinkImportButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();
@@ -668,6 +672,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		nodeSaver.saveState(outState);
 	}
 
+    public void checkScroll() {
+        if (listView == null) return;
+
+        boolean canScroll = listView.canScrollVertically(-1);
+        Util.changeToolBarElevation(this, tB, canScroll || adapterList.isMultipleSelect());
+    }
+	
 	public void askForDecryptionKeyDialog(){
 		logDebug("askForDecryptionKeyDialog");
 
@@ -735,8 +746,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
-
+		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if(!isOnline(this)) {
 				try{
 					statusDialog.dismiss();
@@ -844,7 +854,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					else{
 						try{
 							logWarning("API_EARGS - show alert dialog");
-							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 							builder.setMessage(getString(R.string.link_broken));
 							builder.setTitle(getString(R.string.general_error_word));
 							builder.setCancelable(false);
@@ -880,7 +890,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				else{
 					try{
 						logWarning("No link - show alert dialog");
-						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 
@@ -960,7 +970,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					if(request.getFlag()){
 						logWarning("Login into a folder with invalid decryption key");
 						try{
-							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 							builder.setMessage(getString(R.string.general_error_invalid_decryption_key));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1099,8 +1109,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					}
 				}
 				else{
-					try{ 
-						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					try{
+						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			            builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 						
@@ -1132,7 +1142,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			else{
 				logWarning("Error: " + e.getErrorCode() + " " + e.getErrorString());
 				try{
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 					if(e.getErrorCode() == MegaError.API_EBLOCKED){
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));

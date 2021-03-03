@@ -79,8 +79,7 @@ class ActionModeCallback constructor(
             val inflater = it.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
         }
-        mainActivity.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
-        mainActivity.changeActionBarElevation(true)
+        mainActivity.changeAppBarElevation(true)
 
         return true
     }
@@ -116,11 +115,6 @@ class ActionModeCallback constructor(
         control.move().isVisible = true
         control.copy().isVisible = true
 
-        menu?.findItem(R.id.cab_menu_send_to_chat)?.icon = Util.mutateIconSecondary(
-            mainActivity, R.drawable.ic_send_to_contact,
-            R.color.white
-        )
-
         CloudStorageOptionControlUtil.applyControl(menu, control)
 
         return true
@@ -129,8 +123,7 @@ class ActionModeCallback constructor(
     override fun onDestroyActionMode(mode: ActionMode?) {
         viewModel.clearSelection()
 
-        mainActivity.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
-        mainActivity.changeActionBarElevation(false)
+        mainActivity.changeAppBarElevation(false)
 
         viewModel.actionModeDestroy()
     }

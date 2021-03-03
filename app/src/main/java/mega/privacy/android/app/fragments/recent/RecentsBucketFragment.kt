@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util.getMediaIntent
+import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -132,11 +133,13 @@ class RecentsBucketFragment : BaseFragment() {
             val folder = megaApi.getNodeByHandle(bucket.parentHandle) ?: return
             binding.folderNameText.text = folder.name
 
-            if (bucket.isUpdate) {
-                binding.actionImage.setImageResource(R.drawable.ic_versions_small)
-            } else {
-                binding.actionImage.setImageResource(R.drawable.ic_recents_up)
-            }
+            binding.actionImage.setImageDrawable(
+                mutateIconSecondary(
+                    context,
+                    if (bucket.isUpdate) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
+                    R.color.grey_054_white_054
+                )
+            )
 
             binding.dateText.text =
                 TimeUtils.formatBucketDate(activity, bucket.timestamp)
@@ -152,7 +155,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun checkScroll() {
         val canScroll = listView.canScrollVertically(-1)
-        (activity as ManagerActivityLollipop).changeActionBarElevation(canScroll)
+        (activity as ManagerActivityLollipop).changeAppBarElevation(canScroll)
     }
 
     private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {

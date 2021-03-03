@@ -12,7 +12,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.app.ActivityCompat;
@@ -49,6 +50,7 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -189,6 +191,14 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 launchPsaWebBrowser(psa);
             }
         });
+
+        if (shouldSetStatusBarTextColor()) {
+            ColorUtils.setStatusBarTextColor(this);
+        }
+    }
+
+    protected boolean shouldSetStatusBarTextColor() {
+        return true;
     }
 
     /**
@@ -703,18 +713,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-
-        if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
-            final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
-        else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
+        snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
 
         switch (type) {
             case SNACKBAR_TYPE: {
@@ -790,12 +789,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * The message is different depending if the account belongs to an admin or an user.
      *
      */
-    private void showExpiredBusinessAlert(){
+    protected void showExpiredBusinessAlert(){
         if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(R.string.expired_business_title);
 
         if (megaApi.isMasterBusinessAccount()) {
@@ -803,7 +802,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         } else {
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.black_white)
+                        + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
@@ -951,10 +952,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        new MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.enable_log_text_dialog)
+                .setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener)
+                .show()
+                .setCanceledOnTouchOutside(false);
     }
 
     /**
@@ -963,7 +966,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     public void showGeneralTransferOverQuotaWarning() {
         if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
         builder.setView(dialogView)
                 .setOnDismissListener(dialog -> {

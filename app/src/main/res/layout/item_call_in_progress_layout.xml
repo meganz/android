@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/call_in_progress_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:background="?attr/colorSecondary"
+    android:gravity="center_vertical|center_horizontal"
     android:minHeight="48dp"
-    android:visibility="gone"
     android:paddingStart="16dp"
+    android:paddingTop="10dp"
     android:paddingEnd="16dp"
     android:paddingBottom="10dp"
-    android:paddingTop="10dp"
-    android:layout_gravity="center_horizontal|center_vertical"
-    android:gravity="center_vertical|center_horizontal"
-    android:background="@color/accentColor">
+    android:visibility="gone">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -23,21 +22,19 @@
             android:id="@+id/call_in_progress_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:textAlignment="gravity"
-            android:singleLine="true"
             android:ellipsize="middle"
-            android:textSize="14sp"
-            android:text="@string/call_in_progress_layout"/>
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/call_in_progress_layout"
+            android:textAlignment="gravity"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
 
         <Chronometer
             android:id="@+id/call_in_progress_chrono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:textColor="@color/white"
             android:layout_marginStart="5dp"
-            android:textSize="13sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2"
+            android:visibility="gone" />
     </LinearLayout>
 </RelativeLayout>

@@ -18,7 +18,7 @@
             android:layout_marginTop="22dp"
             android:layout_marginRight="25dp"
             android:layout_marginBottom="14dp"
-            android:textColor="@color/dialog_title"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -30,26 +30,22 @@
             android:layout_marginRight="25dp"
             android:layout_marginBottom="16dp"
             android:lineSpacingMultiplier="1.2"
-            android:textColor="@color/dialog_text"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
         <Button
             android:id="@+id/dialog_first_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_second_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_third_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
     </LinearLayout>
 

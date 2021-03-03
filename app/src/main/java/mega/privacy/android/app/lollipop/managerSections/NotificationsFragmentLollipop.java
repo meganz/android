@@ -22,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.material.bottomappbar.BottomAppBar;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
@@ -31,9 +29,9 @@ import java.util.ListIterator;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -42,7 +40,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -95,10 +92,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     public void checkScroll() {
         if (listView != null) {
             if (listView.canScrollVertically(-1)) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                ((ManagerActivityLollipop) context).changeAppBarElevation(true);
             }
             else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                ((ManagerActivityLollipop) context).changeAppBarElevation(false);
             }
         }
     }
@@ -183,9 +180,13 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShow = String.format(getString(R.string.context_empty_notifications));
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}

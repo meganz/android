@@ -17,7 +17,7 @@
             android:layout_marginEnd="24dp"
             android:fontFamily="sans-serif-light"
             android:text="@string/title_depleted_transfer_overquota"
-            android:textColor="@color/primary_text"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -36,8 +36,7 @@
             android:layout_margin="24dp"
             android:layout_marginTop="21dp"
             android:layout_marginEnd="24dp"
-            android:textColor="@color/dialog_text"
-            android:textSize="16sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -49,13 +48,13 @@
 
             <Button
                 android:id="@+id/transfer_overquota_button_dissmiss"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_marginEnd="8dp"
                 android:text="@string/general_dismiss" />
 
             <Button
                 android:id="@+id/transfer_overquota_button_payment"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

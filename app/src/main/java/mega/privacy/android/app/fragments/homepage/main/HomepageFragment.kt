@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -32,6 +31,7 @@ import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_homepage.*
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
+import kotlinx.android.synthetic.main.homepage_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -42,12 +42,15 @@ import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaBanner
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
@@ -89,7 +92,7 @@ class HomepageFragment : Fragment() {
 
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it) {
-            post { setBottomSheetHeight() }
+            post { setBottomSheetMaxHeight() }
         }
     }
 
@@ -149,6 +152,8 @@ class HomepageFragment : Fragment() {
                 }
             }
         })
+
+        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
         return rootView
     }
@@ -253,7 +258,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
-        setBottomSheetHeight(true)
+        setBottomSheetMaxHeight()
     }
 
     /**
@@ -281,8 +286,26 @@ class HomepageFragment : Fragment() {
         viewModel.avatar.observe(viewLifecycleOwner) {
             searchInputView.setAvatar(it)
         }
-        viewModel.chatStatusDrawableId.observe(viewLifecycleOwner) {
-            searchInputView.setChatStatus(it != 0, it)
+        viewModel.chatStatus.observe(viewLifecycleOwner) {
+            val iconRes = if (Util.isDarkMode(requireContext())) {
+                when (it) {
+                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_dark_drawer
+                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_dark_drawer
+                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_dark_drawer
+                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_dark_drawer
+                    else -> 0
+                }
+            } else {
+                when (it) {
+                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_light
+                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_light
+                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_light
+                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_light
+                    else -> 0
+                }
+            }
+
+            searchInputView.setChatStatus(iconRes != 0, iconRes)
         }
 
         searchInputView.setAvatarClickListener {
@@ -310,13 +333,13 @@ class HomepageFragment : Fragment() {
      * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
      */
     private fun setupBottomSheetUI() {
-        viewPager = rootView.findViewById(R.id.view_pager)
+        viewPager = rootView.view_pager
         val adapter = BottomSheetPagerAdapter(this)
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter
         // Attach the view pager to the tab layout
-        tabLayout = rootView.findViewById(R.id.tabs)
+        tabLayout = rootView.tab_layout
         val mediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }
@@ -342,6 +365,24 @@ class HomepageFragment : Fragment() {
                 changeTabElevation(it.second)
             }
         }
+
+        setupBottomSheetBackground()
+    }
+
+    /**
+     * Set bottom sheet background for the elevation effect according to Invision
+     */
+    private fun setupBottomSheetBackground() {
+        val elevationPx = Util.dp2px(BOTTOM_SHEET_ELEVATION, resources.displayMetrics).toFloat()
+        val cornerSizePx = Util.dp2px(BOTTOM_SHEET_CORNER_SIZE, resources.displayMetrics).toFloat()
+
+        viewDataBinding.root.homepage_bottom_sheet.background =
+            ColorUtils.getShapeDrawableForElevation(
+                requireContext(),
+                elevationPx,
+                cornerSizePx
+            )
+        viewPager.setBackgroundColor(ColorUtils.getColorForElevation(requireContext(), elevationPx))
     }
 
     /**
@@ -363,7 +404,7 @@ class HomepageFragment : Fragment() {
             )
             .setIndicatorGravity(IndicatorGravity.CENTER)
             .setIndicatorSliderColor(
-                ContextCompat.getColor(requireContext(), R.color.grey_info_menu),
+                ContextCompat.getColor(requireContext(), R.color.grey_300_grey_600),
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
@@ -371,12 +412,7 @@ class HomepageFragment : Fragment() {
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {
-            if (it == null || it.isEmpty()) {
-                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
-            } else {
-                bannerViewPager.refreshData(it)
-                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-            }
+            bannerViewPager.refreshData(it)
         }
     }
 
@@ -425,11 +461,11 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver?.addOnPreDrawListener(object :
-            ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
                 if (category == null) {
-                    return true
+                    return
                 }
 
                 if (bannerViewPager.data.isNotEmpty()) {
@@ -438,11 +474,7 @@ class HomepageFragment : Fragment() {
                     bottomSheetBehavior.peekHeight = rootView.height - category.bottom
                 }
 
-                if (bottomSheetBehavior.peekHeight > 0) {
-                    rootView.viewTreeObserver?.removeOnPreDrawListener(this)
-                }
-
-                return true
+                setBottomSheetMaxHeight()
             }
         })
     }
@@ -462,13 +494,7 @@ class HomepageFragment : Fragment() {
             val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                setBottomSheetHeight()
-
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
-                } else {
-                    tabLayout.setBackgroundResource(R.drawable.bg_cardview_white_top)
-                }
+                setBottomSheetMaxHeight()
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -492,12 +518,12 @@ class HomepageFragment : Fragment() {
         })
     }
 
-    private fun setBottomSheetHeight(forceMaxHeight: Boolean = false) {
+    private fun setBottomSheetMaxHeight() {
         val bottomSheet = viewDataBinding.homepageBottomSheet.root
         val maxHeight = rootView.measuredHeight - searchInputView.bottom
+        val layoutParams = bottomSheet.layoutParams
 
-        if (bottomSheet.measuredHeight > maxHeight || forceMaxHeight) {
-            val layoutParams = bottomSheet.layoutParams
+        if (layoutParams.height != maxHeight) {
             layoutParams.height = maxHeight
             bottomSheet.layoutParams = layoutParams
         }
@@ -730,10 +756,7 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else ContextCompat.getColor(
-                requireContext(),
-                R.color.accentColor
-            )
+            if (isExpand) Color.WHITE else getThemeColor(requireContext(), R.attr.colorSecondary)
         )
 
         AnimatorSet().apply {
@@ -753,6 +776,8 @@ class HomepageFragment : Fragment() {
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
         private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
+        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
     }
 }

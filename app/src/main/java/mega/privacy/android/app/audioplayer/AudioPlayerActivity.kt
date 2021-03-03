@@ -11,6 +11,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -38,7 +39,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
-import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -82,6 +82,10 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@AudioPlayerActivity) {
+                    if (service.service.viewModel.playlistSearchQuery != null) {
+                        return@observe
+                    }
+
                     if (it.first.isEmpty()) {
                         stopPlayer()
                     } else {
@@ -116,7 +120,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        changeStatusBarColor(this, window, R.color.black)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -159,7 +162,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         actionBar.title = ""
 
         binding.toolbar.setNavigationOnClickListener {
@@ -180,9 +182,13 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -190,6 +196,8 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
                     }
+
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
                 }
             }
             refreshMenuOptionsVisibility(dest.id)
@@ -473,7 +481,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             return
         }
 
-        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)

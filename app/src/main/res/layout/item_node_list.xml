@@ -51,6 +51,7 @@
             android:background="@null"
             android:src="@drawable/ic_cloud_saved_offline"
             android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.INVISIBLE}"
+            app:tint="@color/red_500_red_300"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -78,8 +79,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@+id/thumbnail"
@@ -118,10 +118,10 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginStart="3dp"
-            android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
             android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"
+            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintStart_toEndOf="@id/img_favourite"
             app:layout_constraintTop_toTopOf="@id/name"
             app:layout_constraintBottom_toBottomOf="@id/name"/>
@@ -136,6 +136,7 @@
             app:layout_constraintTop_toTopOf="@id/public_link"
             app:layout_constraintBottom_toBottomOf="@id/public_link"
             app:visibleGone="@{item.node.takenDown}"
+            app:tint="?attr/colorError"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -150,12 +151,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:alpha="0.76"
-                android:background="@null"
                 android:src="@drawable/ic_versions_small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black_white"
                 app:visibleGone="@{megaApi.hasVersions(item.node)}" />
 
             <TextView
@@ -165,8 +165,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
-                android:textColor="@color/file_list_second_row"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                 app:layout_constraintStart_toEndOf="@id/versions_icon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="8.27 MB . June 2020 10:39:12" />
@@ -181,6 +180,7 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_dots_vertical_grey"
+            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -2,41 +2,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-	<LinearLayout
-	    android:id="@+id/choose_pin_type_dialog_layout"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical">	    
-	    	    
-	    <CheckedTextView
-		    android:id="@+id/choose_pin_4_check"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-		    android:ellipsize="marquee"
-		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"
-			android:theme="@style/ColorControlStyle"/>
-	    
-	    <CheckedTextView
-		    android:id="@+id/choose_pin_6_check"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-		    android:ellipsize="marquee"
-		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"
-			android:theme="@style/ColorControlStyle"/>
-	    
-	    <CheckedTextView
-		    android:id="@+id/choose_pin_alphaN_check"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-		    android:ellipsize="marquee"
-		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"
-			android:theme="@style/ColorControlStyle"/>
-	    
-	</LinearLayout>
+    <LinearLayout
+        android:id="@+id/choose_pin_type_dialog_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckedTextView
+            android:id="@+id/choose_pin_4_check"
+            style="?attr/checkedTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical" />
+
+        <CheckedTextView
+            android:id="@+id/choose_pin_6_check"
+            style="?attr/checkedTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical" />
+
+        <CheckedTextView
+            android:id="@+id/choose_pin_alphaN_check"
+            style="?attr/checkedTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical" />
+
+    </LinearLayout>
 </ScrollView>

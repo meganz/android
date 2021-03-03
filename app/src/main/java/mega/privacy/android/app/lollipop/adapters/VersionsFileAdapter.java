@@ -344,7 +344,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 		if (!multipleSelect) {
 			logDebug("Not multiselect");
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
+			holder.itemLayout.setBackground(null);
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 			holder.imageView.setLayoutParams(paramsLarge);
 
@@ -440,13 +440,11 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		else {
 			logDebug("Multiselection ON");
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-
 				holder.imageView.setLayoutParams(paramsLarge);
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+				holder.itemLayout.setBackground(null);
 
 				logDebug("Check the thumb");
 				holder.imageView.setLayoutParams(paramsLarge);

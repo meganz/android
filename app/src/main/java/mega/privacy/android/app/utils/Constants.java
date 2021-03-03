@@ -191,7 +191,6 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
     public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
-    public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
@@ -756,6 +755,8 @@ public class Constants {
 
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
+
+    public static final int MAX_BADGE_NUM = 9;
 
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";

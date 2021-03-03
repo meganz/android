@@ -17,19 +17,20 @@
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="26dp"
+        app:buffered_color="@color/buffered_color"
         app:layout_constraintBottom_toTopOf="@id/progress_center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/progress_center" />
+        app:layout_constraintTop_toTopOf="@id/progress_center"
+        app:played_color="@color/teal_300_teal_200"
+        app:unplayed_color="@color/unplayed_color" />
 
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white_38_opacity"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
         tools:text="00:30" />
@@ -39,9 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white_38_opacity"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
         tools:text="04:30" />
@@ -87,18 +86,18 @@
 
     <ImageButton
         android:id="@id/exo_play"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
     <ImageButton
         android:id="@id/exo_pause"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />

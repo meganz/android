@@ -18,8 +18,6 @@
             android:layout_height="fill_parent"
             android:scaleType="fitCenter"
             android:layout_centerInParent="true"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
 
     </RelativeLayout>
@@ -42,7 +40,7 @@
         android:layout_toRightOf="@id/referral_bonus_relative_layout_avatar"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row"
+        android:textColor="@color/black"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="end"
@@ -63,7 +61,7 @@
             android:textSize="14sp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/blue_unlocked_rewards" />
+            android:textColor="@color/dark_blue_500_200" />
 
         <TextView
             android:id="@+id/referral_bonus_transfer"
@@ -74,7 +72,7 @@
             android:maxLines="1"
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/referral_bonus_storage"
-            android:textColor="@color/green_unlocked_rewards" />
+            android:textColor="@color/green_500_green_400" />
 
     </RelativeLayout>
 

@@ -26,6 +26,10 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQu
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
+import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
+import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.autoPlayNode
@@ -346,6 +350,7 @@ class NodeSaver(
                 logWarning("parentPath null")
                 return false
             }
+            storeDownloadLocationIfNeeded(parentPath)
 
             add(Completable
                 .fromCallable {
