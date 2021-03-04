@@ -1,38 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layer-list
-	xmlns:android="http://schemas.android.com/apk/res/android">
-	<item
-		android:id="@android:id/background">
-		<shape>
-			<gradient
-				android:startColor="#26000000"
-				android:centerColor="#26000000"
-				android:centerY="0.50"
-				android:endColor="#26000000"
-				android:angle="270" />
-		</shape>
-	</item>
-	<item
-		android:id="@android:id/secondaryProgress">
-		<clip>
-			<shape>
-				<gradient
-					android:startColor="#770e75af"
-					android:endColor="#771997e1"
-					android:angle="90" />
-			</shape>
-		</clip>
-	</item>
-	<item
-		android:id="@android:id/progress">
-		<clip>
-			<shape>
-				<gradient
-					android:startColor="@color/accentColor"
-					android:endColor="@color/accentColor"
-					android:angle="90" />
-			</shape>
-		</clip>
-	</item>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:centerColor="@color/grey_012_white_023"
+                android:centerY="0.50"
+                android:endColor="@color/grey_012_white_023"
+                android:startColor="@color/grey_012_white_023" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <gradient
+                    android:angle="90"
+                    android:endColor="@color/teal_300_teal_200"
+                    android:startColor="@color/teal_300_teal_200" />
+            </shape>
+        </clip>
+    </item>
 </layer-list>
-

@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,12 +25,11 @@ import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersA
 import mega.privacy.android.app.interfaces.MoveTransferInterface;
 import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
-import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -62,13 +60,17 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		View v = initView(inflater, container);
 
-		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.ic_zero_portrait_transfers : R.drawable.ic_zero_landscape_saved_for_offline);
+		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
 		String textToShow = context.getString(R.string.transfers_empty_new);
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		} catch (Exception e) {
 			logWarning("Exception formatting string", e);
@@ -81,7 +83,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
 			private boolean addElevation = true;
@@ -343,7 +345,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	@Override
 	public void checkScroll() {
-		managerActivity.changeActionBarElevation((listView != null && listView.canScrollVertically(-1))
+		managerActivity.changeAppBarElevation((listView != null && listView.canScrollVertically(-1))
 				|| (adapter != null && adapter.isMultipleSelect()));
 	}
 
@@ -401,13 +403,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	@Override
 	public void onCreateActionMode() {
-		managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 		checkScroll();
 	}
 
 	@Override
 	public void onDestroyActionMode() {
-		managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 		clearSelections();
 
 		if (adapter != null) {

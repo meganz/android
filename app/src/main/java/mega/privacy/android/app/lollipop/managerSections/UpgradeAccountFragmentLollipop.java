@@ -32,6 +32,7 @@ import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import nz.mega.sdk.MegaApiAndroid;
@@ -127,9 +128,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 		new ListenScrollChangesHelper().addViewToListen(scrollView, (v1, scrollX, scrollY, oldScrollX, oldScrollY) -> {
 			if (scrollView.canScrollVertically(-1)) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			} else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		});
 
@@ -183,7 +184,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		labelCustomPlan = v.findViewById(R.id.lbl_custom_plan);
 		labelCustomPlan.setVisibility(View.GONE);
 		labelCustomPlan.setOnClickListener(this);
-		String strColor = getHexValue(getResources().getColor(R.color.accentColor));
+		String strColor = getHexValue(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 		String textToShowB = getString(R.string.label_custom_plan);
 		textToShowB = textToShowB.replace("[A]", "<font color='" + strColor + "'>");
 		textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -277,9 +278,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
 						try {
-							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='#7a7a7a'>");
+							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
 							businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
-							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='#7a7a7a'>");
+							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
 							businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
 						} catch (Exception e) {
 							logError("Exception formatting string", e);
@@ -324,7 +325,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		format.setCurrency(Currency.getInstance(currency));
 		String stringPrice = format.format(price);
 
-		String color = String.valueOf(ContextCompat.getColor(context,R.color.black));
+		String color = ColorUtils.getColorHexString(context,R.color.grey_900_grey_100);
 		if (monthlyBasePrice) {
 			if (product.getMonths() != 1) {
 				return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY);
@@ -334,13 +335,13 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case PRO_I:
 				case PRO_II:
 				case PRO_III:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.red_600_red_300));
 					break;
 				case PRO_LITE:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.lite_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.orange_400_orange_300));
 					break;
 				case BUSINESS:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.business_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.dark_blue_500_200));
 					break;
 			}
 
@@ -410,22 +411,26 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			TextView paymentTitle = selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_title);
 
 			switch (account){
-				case PRO_LITE:
+				case PRO_LITE:{
 					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.lite_account));
 					paymentTitle.setText(getString(R.string.prolite_account));
 					break;
-				case PRO_I:
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
+				}
+				case PRO_I:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 					paymentTitle.setText(getString(R.string.pro1_account));
 					break;
-				case PRO_II:
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
+				}
+				case PRO_II:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 					paymentTitle.setText(getString(R.string.pro2_account));
 					break;
-				case PRO_III:
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
-					paymentTitle.setText(getString(R.string.pro3_account));
-					break;
+				}
+				case PRO_III: {
+                    paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+                    paymentTitle.setText(getString(R.string.pro3_account));
+                    break;
+                }
 				default:
 					break;
 			}
@@ -440,7 +445,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
             String textGoogleWallet = getString(BillingManagerImpl.PAY_METHOD_RES_ID);
             try{
-                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color='#000000'>");
+                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+						+ "\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -459,7 +466,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			TextView creditCardText = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
-				textCreditCardText = textCreditCardText.replace("[A]", "<font color='#000000'>");
+				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+						+ "\'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -477,7 +486,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
-				textFortumoText = textFortumoText.replace("[A]", "<font color='#000000'>");
+				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+						+ "\'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -495,7 +506,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
-				textCentiliText = textCentiliText.replace("[A]", "<font color='#000000'>");
+				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+						+ "\'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -518,7 +531,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
             buttonContinue.setOnClickListener(this);
 
             buttonContinue.setEnabled(false);
-			buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.invite_button_deactivated)));
+			buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.grey_700_026_grey_300_026)));
 
 			googlePlayLayout.setVisibility(View.GONE);
 			creditCardLayout.setVisibility(View.GONE);
@@ -581,7 +594,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String textToShow = "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType);
 
 		try {
-			textToShow = textToShow.replace("[A]", "<font color='#000000'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (Exception e) {
 			logError("Exception formatting string", e);
@@ -1031,7 +1046,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		//Set account details
 		if (myAccountInfo.getAccountType() < FREE || myAccountInfo.getAccountType() > PRO_LITE) {
 			textMyAccount.setText(getString(R.string.recovering_info));
-			textMyAccount.setTextColor(ContextCompat.getColor(context,R.color.secondary_text));
+			textMyAccount.setTextColor(ContextCompat.getColor(context,R.color.grey_054_white_054));
 		} else {
 			String textToShow;
 			String color;
@@ -1039,19 +1054,19 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case FREE:
 				default:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.free_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.free_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.green_500_green_400));
 					break;
 				case PRO_I:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro1_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_II:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro2_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_III:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro3_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_LITE:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account));
@@ -1108,7 +1123,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1121,7 +1136,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1134,7 +1149,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1147,7 +1162,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 
@@ -1182,7 +1197,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1195,7 +1210,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1208,7 +1223,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1221,7 +1236,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 
@@ -1256,7 +1271,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1269,7 +1284,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1282,7 +1297,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1295,7 +1310,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
@@ -1328,7 +1343,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
 						billedYearly.setVisibility(View.GONE);
@@ -1342,7 +1357,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
 						billedYearly.setVisibility(View.GONE);
@@ -1356,7 +1371,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						billedYearly.setChecked(true);
@@ -1370,7 +1385,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
+						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 

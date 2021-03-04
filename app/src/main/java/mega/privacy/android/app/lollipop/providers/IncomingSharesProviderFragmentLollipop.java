@@ -9,7 +9,6 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,6 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
@@ -63,9 +62,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 
 	ImageView emptyImageView;
-	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView contentText;
 
 	int deepBrowserTree = -1;
 
@@ -91,7 +88,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((FileProviderActivity) context).hideTabs(true, INCOMING_TAB);
-			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -184,7 +180,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((FileProviderActivity) context).hideTabs(false, INCOMING_TAB);
-			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
@@ -231,13 +226,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
-		
-		contentText = (TextView) v.findViewById(R.id.provider_content_text);
-		contentText.setVisibility(View.GONE);
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
 
 		if (context instanceof FileProviderActivity){
@@ -248,7 +239,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		}
 		
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, INCOMING_SHARES_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, INCOMING_SHARES_PROVIDER_ADAPTER);
 		}
 		listView.setAdapter(adapter);
 
@@ -440,7 +431,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			if (parentNode != null){
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextViewFirst.setVisibility(View.GONE);
 
 				changeActionBarTitle(parentNode.getName());
 				
@@ -470,7 +461,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		else{
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextViewFirst.setVisibility(View.GONE);
 			deepBrowserTree=0;
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
@@ -504,7 +495,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+				emptyTextViewFirst.setVisibility(View.VISIBLE);
 
 				if (parentHandle==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -514,10 +505,15 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -537,10 +533,15 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -555,7 +556,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextViewFirst.setVisibility(View.GONE);
 			}
 		}
 	}

@@ -1,45 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/fragment_container_file_browser_grid"
-    android:background="@color/white"
-    tools:context=".FileBrowserGridFragment" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <include layout="@layout/item_call_in_progress_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_alignParentTop="true" />
-
-        <RelativeLayout
-            android:id="@+id/content_grid_text_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="36dp"
-            android:background="@color/white"
-            android:visibility="gone">
-
-            <ProgressBar
-                android:id="@+id/file_grid_download_progress_bar"
-                style="@style/UsedSpaceProgressBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/file_grid_transfer_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/file_grid_download_progress_bar"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/ic_chevron_right_grey"
-                android:visibility="gone" />
-        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -51,50 +18,30 @@
                 android:id="@+id/file_grid_empty_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true" />
 
             <LinearLayout
                 android:id="@+id/file_grid_empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_below="@id/file_grid_empty_image"
-                android:layout_centerHorizontal="true">
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/file_grid_empty_text_first"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:textAllCaps="true"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
             </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/linear_layout_recycler"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:id="@+id/content_text_nested_layout"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/content_grid_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondary_text"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="72dp"
-                    android:textSize="14sp" />
-            </RelativeLayout>
-
-            <include layout="@layout/transfer_over_quota_banner"/>
+            <include layout="@layout/transfer_over_quota_banner" />
 
             <FrameLayout
                 android:id="@+id/ad_view_container"
@@ -109,26 +56,19 @@
                     android:id="@+id/file_grid_view_browser"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
                     android:choiceMode="multipleChoice"
-                    android:columnWidth ="172dp"
-                    android:paddingRight="4dp"
-                    android:paddingLeft="4dp"/>
+                    android:columnWidth="172dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp" />
 
                 <mega.privacy.android.app.components.scrollBar.FastScroller
                     android:id="@+id/fastscroll"
-                    android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"/>
+                    android:layout_alignParentEnd="true"
+                    android:gravity="end"
+                    android:orientation="vertical" />
             </RelativeLayout>
-
         </LinearLayout>
-
     </RelativeLayout>
-
-    <include layout="@layout/general_progress_bar"/>
-
 </RelativeLayout>

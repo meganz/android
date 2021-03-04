@@ -49,8 +49,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/guideline"
                     app:layout_constraintStart_toStartOf="parent"
@@ -94,10 +93,9 @@
                 android:id="@+id/info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                 android:ellipsize="middle"
-                android:singleLine="true"
-                android:textColor="@color/secondary_text"
-                android:textSize="14sp"/>
+                android:singleLine="true" />
 
         </LinearLayout>
 

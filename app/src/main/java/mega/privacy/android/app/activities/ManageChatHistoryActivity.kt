@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.NumberPicker.OnValueChangeListener
 import android.widget.NumberPicker.OnScrollListener
-import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -106,11 +105,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        window.statusBarColor = ContextCompat.getColor(
-            applicationContext,
-            R.color.dark_primary_color
-        )
 
         setSupportActionBar(binding.manageChatToolbar)
         val actionBar = supportActionBar

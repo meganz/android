@@ -212,14 +212,14 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             }
             if (chat.isArchived()) {
                 archiveChatText.setText(getString(R.string.unarchive_chat_option));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unarchive));
                 optionInfoChat.setVisibility(View.GONE);
                 optionMuteChat.setVisibility(View.GONE);
                 optionLeaveChat.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             } else {
                 archiveChatText.setText(getString(R.string.archive_chat_option));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_archive));
             }
 
             if (optionInfoChat.getVisibility() == View.GONE) {
