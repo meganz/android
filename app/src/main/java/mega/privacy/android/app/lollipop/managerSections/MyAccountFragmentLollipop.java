@@ -211,7 +211,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		View v = inflater.inflate(R.layout.fragment_my_account, container, false);
 
-		scrollView = v.findViewById(R.id.my_account_complete_relative_layout);
+		scrollView = v.findViewById(R.id.scroll_view);
 		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {

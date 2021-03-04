@@ -4959,18 +4959,15 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 			case ACCOUNT:{
 				aB.setSubtitle(null);
-				if(accountFragment==MY_ACCOUNT_FRAGMENT){
-					aB.setTitle(getString(R.string.section_account).toUpperCase());
-					setFirstNavigationLevel(true);
-				}
-				else if(accountFragment==UPGRADE_ACCOUNT_FRAGMENT){
+
+				if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
 					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
 					setFirstNavigationLevel(false);
-				}
-				else{
-					aB.setTitle(getString(R.string.section_account).toUpperCase());
+				} else {
+					aB.setTitle(null);
 					setFirstNavigationLevel(true);
 				}
+
 				break;
 			}
 			case TRANSFERS:{
