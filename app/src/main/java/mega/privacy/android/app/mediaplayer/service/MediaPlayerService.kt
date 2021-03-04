@@ -147,8 +147,12 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             override fun onPlaybackStateChanged(state: Int) {
                 when {
-                    state == Player.STATE_ENDED && !viewModel.paused -> viewModel.paused = true
-                    state == Player.STATE_READY && viewModel.paused -> viewModel.paused = false
+                    state == Player.STATE_ENDED && !viewModel.paused -> {
+                        viewModel.paused = true
+                    }
+                    state == Player.STATE_READY && viewModel.paused && exoPlayer.playWhenReady -> {
+                        viewModel.paused = false
+                    }
                 }
             }
 
