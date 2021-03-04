@@ -73,7 +73,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
 
         (requireActivity() as MediaPlayerActivity).showToolbar(false)
 
-        adapter = PlaylistAdapter(this)
+        adapter = PlaylistAdapter(this, (requireActivity() as MediaPlayerActivity).isAudioPlayer())
 
         binding.playlist.setHasFixedSize(true)
         listLayoutManager = LinearLayoutManager(requireContext())

@@ -6,14 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -27,7 +30,8 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
+import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
+import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -38,20 +42,16 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
-import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
-import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
-import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.Util.changeToolBarElevation
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.getFragmentFromNavHost
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -65,7 +65,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    private lateinit var binding: ActivityMediaPlayerBinding
+    private lateinit var rootLayout: ViewGroup
+    private lateinit var toolbar: Toolbar
     private val viewModel: MediaPlayerViewModel by viewModels()
 
     private lateinit var actionBar: ActionBar
@@ -142,10 +143,22 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         val isAudioPlayer = isAudioPlayer(intent)
 
-        binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
-        setContentView(if (isAudioPlayer) binding.root else dragToExit.wrapContentView(binding.root))
+        if (isAudioPlayer) {
+            val binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+            setContentView(binding.root)
 
-        if (!isAudioPlayer) {
+            rootLayout = binding.rootLayout
+            toolbar = binding.toolbar
+        } else {
+            val binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
+            setContentView(dragToExit.wrapContentView(binding.root))
+
+            rootLayout = binding.rootLayout
+            toolbar = binding.toolbar
+
+            toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_020))
+            toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white_alpha_087))
+
             MediaPlayerService.pauseAudioPlayer(this)
 
             dragToExit.observeThumbnailLocation(this)
@@ -197,7 +210,6 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            window.statusBarColor = ContextCompat.getColor(this, android.R.color.black)
         }
     }
 
@@ -214,13 +226,13 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
+        setSupportActionBar(toolbar)
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.title = ""
 
-        binding.toolbar.setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
     }
@@ -234,25 +246,28 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
-            binding.toolbar.elevation = 0F
+            if (isAudioPlayer()) {
+                toolbar.elevation = 0F
+
+                val color = ContextCompat.getColor(
+                    this,
+                    if (dest.id == R.id.main_player) R.color.grey_020_grey_800 else R.color.white_dark_grey
+                )
+
+                window.statusBarColor = color
+                toolbar.setBackgroundColor(color)
+            } else {
+                window.statusBarColor = Color.BLACK
+                toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_020))
+            }
 
             when (dest.id) {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
-
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
-                    binding.toolbar.setBackgroundColor(
-                        ContextCompat.getColor(this, R.color.grey_020_grey_800)
-                    )
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
-
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
-                    binding.toolbar.setBackgroundColor(
-                        ContextCompat.getColor(this, R.color.white_dark_grey)
-                    )
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -260,13 +275,9 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
                     }
-
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
-                    binding.toolbar.setBackgroundColor(
-                        ContextCompat.getColor(this, R.color.white_dark_grey)
-                    )
                 }
             }
+
             refreshMenuOptionsVisibility(dest.id)
         }
     }
@@ -445,7 +456,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.properties -> {
-                if (!isVideoPlayer()) {
+                if (isAudioPlayer()) {
                     val uri =
                         service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return true
                     navController.navigate(
@@ -608,7 +619,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     }
 
     fun setToolbarTitle(title: String) {
-        binding.toolbar.title = title
+        toolbar.title = title
     }
 
     fun closeSearch() {
@@ -617,33 +628,57 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     fun hideToolbar(animate: Boolean = true) {
         if (animate) {
-            binding.toolbar.animate()
-                .translationY(-binding.toolbar.measuredHeight.toFloat())
+            toolbar.animate()
+                .translationY(-toolbar.measuredHeight.toFloat())
                 .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
-            binding.toolbar.animate().cancel()
-            binding.toolbar.translationY = -binding.toolbar.measuredHeight.toFloat()
+            toolbar.animate().cancel()
+            toolbar.translationY = -toolbar.measuredHeight.toFloat()
         }
 
-        if (isVideoPlayer()) {
+        if (!isAudioPlayer()) {
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
     }
 
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
-            binding.toolbar.animate()
+            toolbar.animate()
                 .translationY(0F)
                 .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
-            binding.toolbar.animate().cancel()
-            binding.toolbar.translationY = 0F
+            toolbar.animate().cancel()
+            toolbar.translationY = 0F
         }
 
-        if (isVideoPlayer()) {
+        if (!isAudioPlayer()) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+    }
+
+    fun showToolbarElevation(withElevation: Boolean) {
+        // This is the actual color when using Util.changeToolBarElevation, but video player
+        // use different toolbar theme (to force dark theme), which breaks
+        // Util.changeToolBarElevation, so we just use the actual color here.
+        val darkElevationColor = Color.parseColor("#282828")
+
+        if (!isAudioPlayer() || Util.isDarkMode(this)) {
+            toolbar.setBackgroundColor(
+                when {
+                    withElevation -> darkElevationColor
+                    isAudioPlayer() -> Color.TRANSPARENT
+                    else -> ContextCompat.getColor(this, R.color.dark_grey)
+                }
+            )
+
+            post {
+                window.statusBarColor = if (withElevation) darkElevationColor else Color.BLACK
+            }
+        } else {
+            toolbar.elevation =
+                if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0F
         }
     }
 
@@ -656,12 +691,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             ?.onDragActivated(dragToExit, activated)
     }
 
-    fun showToolbarElevation(withElevation: Boolean) {
-        changeToolBarElevation(this, binding.toolbar, withElevation)
-    }
-
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        showSnackbar(type, binding.rootLayout, content, chatId)
+        showSnackbar(type, rootLayout, content, chatId)
     }
 
     override fun launchActivity(intent: Intent) {
@@ -673,7 +704,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         startActivityForResult(intent, requestCode)
     }
 
-    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
+    fun isAudioPlayer() = isAudioPlayer(intent)
 
     companion object {
         fun isAudioPlayer(intent: Intent?): Boolean {

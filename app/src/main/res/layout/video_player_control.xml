@@ -26,21 +26,22 @@
 
     <ImageButton
         android:id="@id/exo_play"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
     <ImageButton
         android:id="@id/exo_pause"
-        style="@style/AudioPlayerButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:background="@null"
         android:src="@drawable/player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
+        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
+        tools:visibility="invisible" />
 
     <ImageButton
         android:id="@id/exo_next"
@@ -50,6 +51,15 @@
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/grey_alpha_020"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/exo_progress" />
 
     <mega.privacy.android.app.components.DefaultTimeBar
         android:id="@id/exo_progress"
@@ -102,7 +112,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:enabled="false"
-        android:src="@drawable/player_playlist"
+        android:src="@drawable/player_playlist_video"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
