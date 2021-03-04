@@ -626,7 +626,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         searchMenuItem?.collapseActionView()
     }
 
-    fun hideToolbar(animate: Boolean = true) {
+    fun hideToolbar(animate: Boolean = true, hideStatusBar: Boolean = true) {
         if (animate) {
             toolbar.animate()
                 .translationY(-toolbar.measuredHeight.toFloat())
@@ -637,8 +637,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             toolbar.translationY = -toolbar.measuredHeight.toFloat()
         }
 
-        if (!isAudioPlayer()) {
+        if (!isAudioPlayer() && hideStatusBar) {
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
     }
 

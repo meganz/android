@@ -272,10 +272,10 @@ class MediaPlayerFragment : Fragment() {
         }
     }
 
-    private fun hideToolbar(animate: Boolean = true) {
+    private fun hideToolbar(animate: Boolean = true, hideStatusBar: Boolean = true) {
         toolbarVisible = false
 
-        (requireActivity() as MediaPlayerActivity).hideToolbar(animate)
+        (requireActivity() as MediaPlayerActivity).hideToolbar(animate, hideStatusBar)
     }
 
     private fun showToolbar() {
@@ -289,10 +289,7 @@ class MediaPlayerFragment : Fragment() {
 
         dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
             if (it) {
-                hideToolbar(false)
-                videoPlayerVH?.hideController()
-
-                binding.root.setBackgroundColor(Color.TRANSPARENT)
+                updateViewForAnimation()
             } else {
                 showToolbar()
                 videoPlayerVH?.showController()
@@ -306,10 +303,8 @@ class MediaPlayerFragment : Fragment() {
 
     fun onDragActivated(dragToExit: DragToExitSupport, activated: Boolean) {
         if (activated) {
-            hideToolbar(false)
-            videoPlayerVH?.hideController()
-
-            videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
+            delayHideToolbarCanceled = true
+            updateViewForAnimation()
 
             val videoSurfaceView = videoPlayerVH?.binding?.playerView?.videoSurfaceView ?: return
             dragToExit.setCurrentView(videoSurfaceView)
@@ -318,6 +313,13 @@ class MediaPlayerFragment : Fragment() {
                 videoPlayerVH?.binding?.root?.setBackgroundColor(Color.BLACK)
             }
         }
+    }
+
+    private fun updateViewForAnimation() {
+        hideToolbar(animate = false, hideStatusBar = false)
+        videoPlayerVH?.hideController()
+
+        videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
