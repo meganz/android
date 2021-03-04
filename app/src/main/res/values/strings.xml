@@ -601,7 +601,7 @@
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
     -->
     <string name="my_account_last_session" context="when did the last session happen">Last session</string>
-    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections</string>
+    <string name="my_account_connections" context="Number of social connections, showing the number of contacts the user has. e.g. 37 connections">%1$d connections</string>
 
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changing password</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Current password</string>
@@ -3044,4 +3044,7 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Dark</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+
+    <string name="add_phone_label" context="Title of Add phone number option in My account section">Add your phone number</string>
+    <string name="backup_recovery_key_subtitle" context="Text of the option Backup Recovery Key in My account section">Do you remember your password?\nMEGA can\'t reset your password if you forget it.</string>
 </resources>

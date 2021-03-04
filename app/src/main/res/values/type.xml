@@ -69,6 +69,10 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.White">
+        <item name="android:textColor">@color/white_black</item>
+    </style>
+
     <!-- Action mode title text -->
     <style name="TextAppearance.Mega.Subtitle1.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
@@ -136,6 +140,11 @@
         <item name="android:textColor">@color/white_black</item>
     </style>
 
+    <!-- Medium, normal, 20sp, white - black -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
         <item name="android:textSize">18sp</item>
@@ -174,6 +183,14 @@
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.GreyWhite87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.GreyWhite87.16">
+        <item name="android:textSize">16sp</item>
     </style>
 
     <!--- 0.5px, Medium, AllCap -->
@@ -348,6 +365,14 @@
     <!-- Regular, 12sp, 0px, chat contact file info -->
     <style name="TextAppearance.Mega.Caption.Variant2">
         <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Variant3">
+        <item name="android:textColor">@color/grey_054_white_060</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Variant3.14">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->

@@ -222,4 +222,9 @@
     <color name="grey_012_white_023">@color/white_alpha_023</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/white</color>
+
+    <!--   my account -->
+    <color name="grey_020_black">@color/black</color>
+    <color name="grey_050_dark_grey">@color/dark_grey</color>
+    <color name="grey_054_white_060">@color/white_alpha_060</color>
 </resources>

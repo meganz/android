@@ -209,7 +209,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 
-		View v = inflater.inflate(R.layout.fragment_my_account, container, false);
+		View v = inflater.inflate(R.layout.fragment_my_account_lollipop, container, false);
 
 		scrollView = v.findViewById(R.id.scroll_view);
 		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {

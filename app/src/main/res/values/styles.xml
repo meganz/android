@@ -214,6 +214,11 @@
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
 
+    <style name="Widget.Mega.Button.Variant4" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textColor">@color/white_black</item>
+    </style>
+
     <!--  Same in dark mode and light mode  -->
     <style name="Widget.Mega.Button.Transparent" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_width">wrap_content</item>
