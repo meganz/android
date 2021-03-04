@@ -760,9 +760,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else {
 						internalIntent = true;
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
-						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
-							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-						}
+						mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);

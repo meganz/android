@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -26,7 +27,8 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     }
 
     fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
-        playlist.isVisible = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
+        playlist.visibility =
+            if (playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE) View.VISIBLE else View.INVISIBLE
     }
 
     fun updateLoadingAnimation(@Player.State playbackState: Int) {
