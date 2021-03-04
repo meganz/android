@@ -217,6 +217,7 @@ import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
@@ -754,7 +755,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem returnCallMenuItem;
-
+	private MenuItem openMeetingMenuItem;
+	private MenuItem startMeetingMenuItem;
 	private Chronometer chronometerMenuItem;
 	private LinearLayout layoutCallMenuItem;
 
@@ -6708,6 +6710,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
+		openMeetingMenuItem = menu.findItem(R.id.action_menu_open_meeting);
+		startMeetingMenuItem = menu.findItem(R.id.action_menu_start_join_meeting);
 		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
 		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
@@ -6919,6 +6923,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					if (searchExpand) {
 						openSearchView();
 					} else {
+						openMeetingMenuItem.setVisible(true);
 						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
@@ -6926,6 +6931,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						}
 						importLinkMenuItem.setVisible(true);
 						importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
+						startMeetingMenuItem.setVisible(true);
 					}
 					break;
 
@@ -7595,7 +7601,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					tFLol.activateActionMode();
 				}
 				return true;
-
+			case R.id.action_menu_open_meeting:
+				return true;
+			case R.id.action_menu_start_join_meeting:
+				return true;
             default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -7633,6 +7642,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
             searchMenuItem.setVisible(false);
             killAllSessions.setVisible(false);
             exportMK.setVisible(false);
+            openMeetingMenuItem.setVisible(false);
+            startMeetingMenuItem.setVisible(false);
         }
     }
 
@@ -10548,6 +10559,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	public void showMeetingOptionsPanel(){
+		bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
 	public void showSentRequestOptionsPanel(MegaContactRequest request){
 		logDebug("showSentRequestOptionsPanel");
 		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -11674,7 +11690,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				logWarning("Intent NULL");
 				return;
 			}
-
+			boolean isMeeting = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEETING, false);
+			if(isMeeting){
+				showMeetingOptionsPanel();
+				return;
+			}
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
 			final boolean isGroup = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false);

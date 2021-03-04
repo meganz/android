@@ -171,6 +171,28 @@
 			</RelativeLayout>
 
 			<RelativeLayout
+				android:id="@+id/layout_meeting_link"
+				android:layout_width="match_parent"
+				android:layout_height="56dp">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/new_meeting_link_label"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:paddingLeft="16dp"
+					android:layout_centerVertical="true"/>
+
+				<View
+					android:id="@+id/separator_meeting_link"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/grey_012_white_012"
+					android:layout_alignParentBottom="true"/>
+
+			</RelativeLayout>
+
+			<RelativeLayout
 				android:id="@+id/contacts_adds_container"
 				android:layout_width="match_parent"
 				android:layout_height="90dp">

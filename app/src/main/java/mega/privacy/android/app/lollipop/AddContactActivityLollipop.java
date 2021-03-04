@@ -120,6 +120,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
     public static final String EXTRA_CONTACTS = "extra_contacts";
+    public static final String EXTRA_MEETING = "extra_meeting";
     public static final String EXTRA_NODE_HANDLE = "node_handle";
     public static final String EXTRA_CHAT_TITLE = "chatTitle";
     public static final String EXTRA_GROUP_CHAT = "groupChat";
@@ -234,6 +235,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private RelativeLayout inviteContactButton;
     private RelativeLayout newGroupChatButton;
     private RelativeLayout newChatLinkButton;
+    private RelativeLayout newMeetingButton;
     private boolean isConfirmAddShown = false;
     private String confirmAddMail;
     private boolean createNewGroup = false;
@@ -1667,6 +1669,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         newChatLinkButton = (RelativeLayout) findViewById(R.id.layout_chat_link);
         newChatLinkButton.setOnClickListener(this);
         newChatLinkButton.setVisibility(View.GONE);
+        newMeetingButton = (RelativeLayout) findViewById(R.id.layout_meeting_link);
+        newMeetingButton.setOnClickListener(this);
+        newMeetingButton.setVisibility(View.GONE);
         addContactsLayout = (LinearLayout) findViewById(R.id.add_contacts_container);
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
@@ -1702,6 +1707,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 newGroupChatButton.setVisibility(View.VISIBLE);
                 newChatLinkButton.setVisibility(View.VISIBLE);
+                newMeetingButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
@@ -1804,6 +1810,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     inviteContactButton.setVisibility(View.GONE);
                     newGroupChatButton.setVisibility(View.GONE);
                     newChatLinkButton.setVisibility(View.GONE);
+                    newMeetingButton.setVisibility(View.GONE);
                 }
 
                 if (savedaddedContacts == null && (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH)) {
@@ -1878,7 +1885,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             inviteContactButton.setVisibility(View.GONE);
             newGroupChatButton.setVisibility(View.GONE);
             newChatLinkButton.setVisibility(View.GONE);
-
+            newMeetingButton.setVisibility(View.GONE);
         }
 
         setGetChatLinkVisibility();
@@ -2969,6 +2976,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
     }
 
+    private void toStartMeeting(){
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_MEETING, true);
+        setResult(RESULT_OK, intent);
+        hideKeyboard(addContactActivityLollipop, 0);
+        finish();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -3002,6 +3017,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 newGroup();
                 break;
             }
+            case R.id.layout_meeting_link:
+                toStartMeeting();
+                break;
             case R.id.fab_button_next: {
                 if (contactType == CONTACT_TYPE_DEVICE){
                     inviteContacts(addedContactsPhone);
@@ -3031,6 +3049,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             inviteContactButton.setVisibility(View.GONE);
             newGroupChatButton.setVisibility(View.GONE);
             newChatLinkButton.setVisibility(View.GONE);
+            newMeetingButton.setVisibility(View.GONE);
         }
         else {
             setResultContacts(addedContactsMEGA, true);
@@ -3156,6 +3175,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         newGroupChatButton.setVisibility(View.VISIBLE);
         newChatLinkButton.setVisibility(View.VISIBLE);
+        newMeetingButton.setVisibility(View.VISIBLE);
         filteredContactMEGA.clear();
         filteredContactMEGA.addAll(visibleContactsMEGA);
 

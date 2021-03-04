@@ -278,4 +278,22 @@
         android:title="@string/action_logout"
         android:visible="false"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_menu_open_meeting"
+        android:icon="@drawable/ic_meeting"
+        android:orderInCategory="180"
+        android:title="@string/start_join_meeting"
+        android:visible="false"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/action_menu_start_join_meeting"
+        android:icon="@drawable/ic_meeting"
+        android:orderInCategory="185"
+        android:title="@string/start_join_meeting"
+        android:visible="false"
+        app:showAsAction="never"
+        />
 </menu>

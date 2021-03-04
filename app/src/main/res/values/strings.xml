@@ -3044,4 +3044,8 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Dark</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+    <string name="start_join_meeting" context="Menu option that allows the user to start/join meeting.">Start/Join meeting</string>
+    <string name="new_meeting_link_label" context="Label that indicates the creation of a meeting">New meeting</string>
+    <string name="new_meeting" context="Label that create a meeting">New meeting</string>
+    <string name="join_meeting" context="Label that join a meeting">Join meeting</string>
 </resources>
