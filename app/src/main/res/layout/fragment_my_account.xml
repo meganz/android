@@ -248,7 +248,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="36dp"
                     android:src="@drawable/ic_contacts_connections"
                     tools:ignore="ContentDescription" />
 
@@ -258,7 +257,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_toEndOf="@+id/contacts_icon"
+                    android:layout_marginStart="72dp"
                     android:text="@string/section_contacts"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -269,7 +268,7 @@
                     android:layout_below="@id/contacts_title"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_toEndOf="@+id/contacts_icon"
+                    android:layout_marginStart="72dp"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
                     tools:text="132 connections" />
 
@@ -289,7 +288,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="36dp"
+                    android:layout_marginEnd="32dp"
                     android:src="@drawable/ic_achievement"
                     tools:ignore="ContentDescription" />
 
@@ -299,7 +298,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_toEndOf="@+id/achievements_icon"
+                    android:layout_marginStart="72dp"
                     android:text="@string/achievements_title"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -310,7 +309,7 @@
                     android:layout_below="@id/achievements_title"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_toEndOf="@+id/achievements_icon"
+                    android:layout_marginStart="72dp"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
                     android:text="@string/achievements_subtitle" />
 
@@ -330,7 +329,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="36dp"
                     android:src="@drawable/ic_last_session"
                     tools:ignore="ContentDescription" />
 
@@ -340,7 +338,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_toEndOf="@+id/last_session_icon"
+                    android:layout_marginStart="72dp"
                     android:text="@string/my_account_last_session"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -351,7 +349,7 @@
                     android:layout_below="@id/last_session_title"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_toEndOf="@+id/last_session_icon"
+                    android:layout_marginStart="72dp"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
                     tools:text="Today 14:53" />
 

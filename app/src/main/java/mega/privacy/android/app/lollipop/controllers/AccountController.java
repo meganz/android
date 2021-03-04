@@ -34,6 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.fragments.managerFragments.MyAccountFragment;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -535,7 +536,8 @@ public class AccountController {
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
         logDebug("updateUserAttributes");
-        MyAccountFragmentLollipop myAccountFragmentLollipop = ((ManagerActivityLollipop)context).getMyAccountFragment();
+        MyAccountFragment myAccountFragmentLollipop = ((ManagerActivityLollipop) context).getMyAccountFragment();
+
         if(!oldFirstName.equals(newFirstName)){
             logDebug("Changes in first name");
             if(myAccountFragmentLollipop!=null){

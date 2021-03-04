@@ -154,12 +154,11 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
+import mega.privacy.android.app.fragments.managerFragments.MyAccountFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -169,7 +168,6 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
-import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.TransfersPageAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -350,8 +348,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public static final int CONTACTS_TAB = 0;
 	public static final int SENT_REQUESTS_TAB = 1;
 	public static final int RECEIVED_REQUESTS_TAB = 2;
-	public static final int GENERAL_TAB = 0;
-	public static final int STORAGE_TAB = 1;
 	public static final int PENDING_TAB = 0;
 	public static final int COMPLETED_TAB = 1;
 
@@ -486,7 +482,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private List<MegaSku> mSkuDetailsList;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -502,8 +498,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
 				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
 				case SETTINGS: return "sttF";
-				case MY_ACCOUNT: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 0;
-				case MY_STORAGE: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 1;
+				case MY_ACCOUNT: return "maF";
 				case SEARCH: return "sFLol";
 				case TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 0;
 				case COMPLETED_TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
@@ -581,11 +576,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private ContactsPageAdapter contactsPageAdapter;
 	private CustomViewPager viewPagerContacts;
 
-	//Tabs in My Account
-	private TabLayout tabLayoutMyAccount;
-	private MyAccountPageAdapter mTabsAdapterMyAccount;
-	private ViewPager viewPagerMyAccount;
-
 	//Tabs in Transfers
 	private TabLayout tabLayoutTransfers;
 	private TransfersPageAdapter mTabsAdapterTransfers;
@@ -662,7 +652,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	int indexShares = -1;
 	int indexContacts = -1;
-	int indexAccount = -1;
 	int indexTransfers = -1;
 
 	//LOLLIPOP FRAGMENTS
@@ -675,8 +664,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private ContactsFragmentLollipop cFLol;
 	private ReceivedRequestsFragmentLollipop rRFLol;
 	private SentRequestsFragmentLollipop sRFLol;
-	private MyAccountFragmentLollipop maFLol;
-	private MyStorageFragmentLollipop mStorageFLol;
+	private MyAccountFragment maF;
 	private TransfersFragmentLollipop tFLol;
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
@@ -943,16 +931,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						updateAccountDetailsVisibleInfo();
 
 						//Check if myAccount section is visible
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol!=null){
+						if(getMyAccountFragment() != null){
 							logDebug("Update the account fragment");
-							maFLol.setAccountDetails();
-						}
-
-						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-						if(mStorageFLol!=null){
-							logDebug("Update the account fragment");
-							mStorageFLol.setAccountDetails();
+							maF.setAccountDetails();
 						}
 
 						upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
@@ -2474,10 +2455,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 		});
 
-		//Tab section MyAccount
-		tabLayoutMyAccount =  (TabLayout) findViewById(R.id.sliding_tabs_my_account);
-		viewPagerMyAccount = (ViewPager) findViewById(R.id.my_account_tabs_pager);
-
 		//Tab section Transfers
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
 		viewPagerTransfers = findViewById(R.id.transfers_tabs_pager);
@@ -3493,8 +3470,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
         viewPagerContacts.setVisibility(View.GONE);
         tabLayoutShares.setVisibility(View.GONE);
         viewPagerShares.setVisibility(View.GONE);
-        tabLayoutMyAccount.setVisibility(View.GONE);
-        viewPagerMyAccount.setVisibility(View.GONE);
         tabLayoutTransfers.setVisibility(View.GONE);
         viewPagerTransfers.setVisibility(View.GONE);
         abL.setVisibility(View.GONE);
@@ -4678,8 +4653,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
         viewPagerContacts.setVisibility(View.GONE);
         tabLayoutShares.setVisibility(View.GONE);
         viewPagerShares.setVisibility(View.GONE);
-        tabLayoutMyAccount.setVisibility(View.GONE);
-        viewPagerMyAccount.setVisibility(View.GONE);
         tabLayoutTransfers.setVisibility(View.GONE);
         viewPagerTransfers.setVisibility(View.GONE);
 
@@ -5479,63 +5452,27 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void selectDrawerItemAccount(){
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
 
-		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
+		if (accountInfo != null && accountInfo.getNumVersions() == -1) {
 			megaApi.getFolderInfo(megaApi.getRootNode(), this);
 		}
 
-		switch(accountFragment){
-			case UPGRADE_ACCOUNT_FRAGMENT:{
-				showUpAF();
-				break;
+		if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
+			showUpAF();
+		} else {
+			app.refreshAccountInfo();
+			accountFragment = MY_ACCOUNT_FRAGMENT;
+
+			if (getMyAccountFragment() == null) {
+				maF = MyAccountFragment.newInstance();
 			}
-			default:{
-				app.refreshAccountInfo();
-				accountFragment=MY_ACCOUNT_FRAGMENT;
 
-				if (mTabsAdapterMyAccount == null){
-					mTabsAdapterMyAccount = new MyAccountPageAdapter(getSupportFragmentManager(), this);
-					viewPagerMyAccount.setAdapter(mTabsAdapterMyAccount);
-					tabLayoutMyAccount.setupWithViewPager(viewPagerMyAccount);
-				} else{
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-				}
-
-				if(viewPagerMyAccount != null) {
-					switch (indexAccount){
-						case STORAGE_TAB:{
-							viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-							break;
-						}
-						default:{
-							indexAccount = GENERAL_TAB;
-							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-							updateLogoutWarnings();
-						}
-					}
-				}
-
-				viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-					@Override
-					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-					}
-
-					@Override
-					public void onPageSelected(int position) {
-						supportInvalidateOptionsMenu();
-						checkScrollElevation();
-					}
-
-					@Override
-					public void onPageScrollStateChanged(int state) {
-					}
-				});
-				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-				showFabButton();
-				break;
-			}
+			replaceFragment(maF, FragmentTag.MY_ACCOUNT.getTag());
+			checkScrollElevation();
+			setToolbarTitle();
+			supportInvalidateOptionsMenu();
+			showFabButton();
 		}
 	}
 
@@ -5648,8 +5585,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutShares.setVisibility(View.GONE);
 		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
 		mShowAnyTabLayout = false;
@@ -5690,22 +5625,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				break;
 			}
 			case ACCOUNT: {
-				switch(accountFragment){
-					case CENTILI_FRAGMENT:
-					case FORTUMO_FRAGMENT:
-					case CC_FRAGMENT:
-					case UPGRADE_ACCOUNT_FRAGMENT:
-					case BACKUP_RECOVERY_KEY_FRAGMENT:{
-						fragmentContainer.setVisibility(View.VISIBLE);
-						break;
-					}
-					default:{
-						tabLayoutMyAccount.setVisibility(View.VISIBLE);
-						viewPagerMyAccount.setVisibility(View.VISIBLE);
-						mShowAnyTabLayout = true;
-						break;
-					}
-				}
+				fragmentContainer.setVisibility(View.VISIBLE);
 				break;
 			}
 			case TRANSFERS: {
@@ -6339,14 +6259,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
                 break;
             }
             case ACCOUNT: {
-				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-                if (getTabItemMyAccount() == GENERAL_TAB && maFLol != null) {
-                    maFLol.checkScroll();
-                }
-                else if (getTabItemMyAccount() == STORAGE_TAB && mStorageFLol != null) {
-                    mStorageFLol.checkScroll();
-                }
+            	if (getMyAccountFragment() != null) {
+            		maF.checkScroll();
+				}
                 break;
             }
             case SEARCH: {
@@ -6468,21 +6383,17 @@ public class ManagerActivityLollipop extends SorterContentActivity
         setTabsVisibility();
 	}
 
-	public void updateInfoNumberOfSubscriptions(){
-        if (cancelSubscription != null){
-            cancelSubscription.setVisible(false);
-        }
-        if (((MegaApplication) getApplication()).getMyAccountInfo()!= null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
-            if (cancelSubscription != null){
-                if (drawerItem == DrawerItem.ACCOUNT){
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-                    if (maFLol != null){
-                        cancelSubscription.setVisible(true);
-                    }
-                }
-            }
-        }
-    }
+	public void updateInfoNumberOfSubscriptions() {
+		if (cancelSubscription == null) {
+			return;
+		}
+
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
+
+		cancelSubscription.setVisible(accountInfo != null && accountInfo.getNumberOfSubscriptions() > 0
+				&& cancelSubscription != null && drawerItem == DrawerItem.ACCOUNT
+				&& getMyAccountFragment() != null);
+	}
 
 	public void showFortumo(){
 		fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
@@ -6877,10 +6788,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						upgradeAccountMenuItem.setVisible(true);
 						changePass.setVisible(true);
 						logoutMenuItem.setVisible(true);
-
-						if (getTabItemMyAccount() == GENERAL_TAB) {
-							exportMK.setVisible(true);
-						}
+						exportMK.setVisible(true);
 
 						if (app.getMyAccountInfo() != null && app.getMyAccountInfo().getNumberOfSubscriptions() > 0) {
 							cancelSubscription.setVisible(true);
@@ -7566,8 +7474,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	        }
 			case R.id.action_menu_forgot_pass:{
 				logDebug("Action menu forgot pass pressed");
-				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-				if(maFLol!=null){
+				if (getMyAccountFragment() != null) {
 					showConfirmationResetPasswordFromMyAccount();
 				}
 				return true;
@@ -7998,9 +7905,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			logDebug("The accountFragment is: " + accountFragment);
     		switch(accountFragment) {
 	    		case MY_ACCOUNT_FRAGMENT:
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager()
-							.findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-	    			if (maFLol == null || maFLol.onBackPressed() == 0){
+	    			if (getMyAccountFragment() == null || maF.onBackPressed() == 0){
 						if (comesFromNotifications) {
 							comesFromNotifications = false;
 							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
@@ -10390,9 +10295,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol!=null){
-							maFLol.resetPass();
+						if (getMyAccountFragment() != null) {
+							maF.resetPass();
 						}
 						break;
 					}
@@ -12539,21 +12443,15 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	}
 
-	public void updateCancelSubscriptions(){
-		logDebug("updateCancelSubscriptions");
-		if (cancelSubscription != null){
-			cancelSubscription.setVisible(false);
+	public void updateCancelSubscriptions() {
+		if (cancelSubscription == null) {
+			return;
 		}
-		if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
-			if (cancelSubscription != null){
-				if (drawerItem == DrawerItem.ACCOUNT){
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if (maFLol != null){
-						cancelSubscription.setVisible(true);
-					}
-				}
-			}
-		}
+
+		MyAccountInfo accountInfo = app.getMyAccountInfo();
+		cancelSubscription.setVisible(accountInfo != null && accountInfo.getNumberOfSubscriptions() > 0
+				&& cancelSubscription != null && drawerItem == DrawerItem.ACCOUNT
+				&& getMyAccountFragment() != null);
 	}
 
 	private void refreshOfflineNodes() {
@@ -12628,8 +12526,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						}
                         if (newFile != null) {
                             MegaUtilsAndroid.createAvatar(imgFile,newFile);
-                            maFLol = (MyAccountFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-                            if (maFLol != null) {
+
+                            if (getMyAccountFragment() != null) {
                                 megaApi.setAvatar(newFile.getAbsolutePath(),this);
                             }
                         } else {
@@ -13001,10 +12899,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The first name has changed");
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					MyAccountInfo accountInfo = app.getMyAccountInfo();
+					if (accountInfo != null && getMyAccountFragment() != null) {
+						maF.updateNameView(accountInfo.getFullName());
 					}
+
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
 				else{
@@ -13035,10 +12934,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The last name has changed");
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					MyAccountInfo accountInfo = app.getMyAccountInfo();
+					if (accountInfo != null && getMyAccountFragment() != null) {
+						maF.updateNameView(accountInfo.getFullName());
 					}
+
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
 				else{
@@ -13087,9 +12987,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 					setProfileAvatar();
 
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
-						maFLol.updateAvatar(false);
+					if (getMyAccountFragment() != null) {
+						maF.updateAvatar(false);
 					}
 
 					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
@@ -13128,12 +13027,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-					if(mStorageFLol!=null){
-						mStorageFLol.refreshVersionsInfo();
+					if (getMyAccountFragment() != null) {
+						maF.refreshVersionsInfo();
 					}
-				}
-				else{
+				} else {
 					logDebug("File versioning attribute changed correctly");
 				}
 			}
@@ -13163,10 +13060,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				if (e.getErrorCode() == MegaError.API_OK){
 					setProfileAvatar();
 					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
+					if(getMyAccountFragment()!=null){
 						logDebug("Update the account fragment");
-						maFLol.updateAvatar(false);
+						maF.updateAvatar(false);
 					}
 				}
 				else{
@@ -13179,10 +13075,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 
 					//refresh MyAccountFragment if visible
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null){
+					if (getMyAccountFragment() != null) {
 						logDebug("Update the account fragment");
-						maFLol.updateAvatar(false);
+						maF.updateAvatar(false);
 					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
@@ -13235,9 +13130,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-				if(mStorageFLol!=null){
-					mStorageFLol.refreshVersionsInfo();
+
+				if (getMyAccountFragment() != null) {
+					maF.refreshVersionsInfo();
 				}
 			}
 		}
@@ -13809,15 +13704,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 
 			//Refresh My Storage if it is shown
-			mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-			if(mStorageFLol!=null){
-				mStorageFLol.refreshVersionsInfo();
+			if (getMyAccountFragment() != null) {
+				maF.refreshVersionsInfo();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-			if (maFLol != null) {
-				maFLol.initCreateQR(request, e);
+			if (getMyAccountFragment() != null) {
+				maF.initCreateQR(request, e);
 			}
 		}
 	}
@@ -13839,7 +13732,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 			if (getMyAccountFragment() != null) {
 				logDebug("Update the account fragment");
-				maFLol.updateNameView(accountInfo.getFullName());
+				maF.updateNameView(accountInfo.getFullName());
 			}
 		}
 	}
@@ -13972,10 +13865,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 							updateContactsView(true, false, false);
 						}
 						//When last contact changes avatar, update view.
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol != null) {
-							maFLol.updateContactsCount();
-							maFLol.updateView();
+						if(getMyAccountFragment() != null) {
+							maF.updateContactsCount();
+							maF.updateView();
                         }
 					}
 				}
@@ -14082,9 +13974,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		dbH.saveMyEmail(email);
 
-		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-		if(maFLol!=null){
-			maFLol.updateMailView(email);
+		if(getMyAccountFragment()!=null){
+			maF.updateMailView(email);
 		}
 	}
 
@@ -14460,7 +14351,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private void updateLogoutWarnings() {
 		if (getMyAccountFragment() != null) {
-			maFLol.checkLogoutWarnings();
+			maF.checkLogoutWarnings();
 		}
 	}
 
@@ -14664,12 +14555,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (viewPagerContacts == null) return ERROR_TAB;
 
 		return viewPagerContacts.getCurrentItem();
-	}
-
-	private int getTabItemMyAccount () {
-		if (viewPagerMyAccount == null) return ERROR_TAB;
-
-		return viewPagerMyAccount.getCurrentItem();
 	}
 
 	private int getTabItemTransfers() {
@@ -14880,12 +14765,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		return cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 	}
 
-	public MyAccountFragmentLollipop getMyAccountFragment() {
-		return maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-	}
-
-	public MyStorageFragmentLollipop getMyStorageFragment() {
-		return mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+	public MyAccountFragment getMyAccountFragment() {
+		return maF = (MyAccountFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 	}
 
 	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
@@ -15538,8 +15419,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
     private void refreshAddPhoneNumberButton(){
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
-        if(maFLol != null){
-            maFLol.updateAddPhoneNumberLabel();
+
+        if(getMyAccountFragment() != null){
+            maF.updateAddPhoneNumberLabel();
         }
     }
 
