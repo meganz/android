@@ -39,6 +39,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
+import mega.privacy.android.app.utils.Util.changeToolBarElevation
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -178,17 +179,25 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
+            binding.toolbar.elevation = 0F
+
             when (dest.id) {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.grey_020_grey_800)
+                    )
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.white_dark_grey)
+                    )
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -198,6 +207,9 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     }
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.white_dark_grey)
+                    )
                 }
             }
             refreshMenuOptionsVisibility(dest.id)
@@ -540,6 +552,10 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             binding.toolbar.animate().cancel()
             binding.toolbar.translationY = 0F
         }
+    }
+
+    fun showToolbarElevation(withElevation: Boolean) {
+        changeToolBarElevation(this, binding.toolbar, withElevation)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

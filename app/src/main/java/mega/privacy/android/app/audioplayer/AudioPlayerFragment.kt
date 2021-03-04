@@ -327,7 +327,7 @@ class AudioPlayerFragment : Fragment() {
         bgPlayHint.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
-                if (enabled) R.color.teal_200 else R.color.white_alpha_060
+                if (enabled) R.color.teal_300_teal_200 else R.color.grey_060_white_060
             )
         )
         bgPlayHint.setText(

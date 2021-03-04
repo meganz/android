@@ -68,10 +68,6 @@
         <item name="android:elevation">0dp</item>
     </style>
 
-    <style name="Widget.Mega.TransparentToolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <!-- BottomSheet Dialog -->
     <style name="Theme.Mega.BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.Mega.BottomSheetModal</item>
