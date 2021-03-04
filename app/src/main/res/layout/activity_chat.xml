@@ -51,7 +51,8 @@
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
                             android:layout_toEndOf="@id/title_toolbar"
                             android:orientation="horizontal"
                             android:layout_marginStart="8dp"
@@ -60,15 +61,12 @@
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:layout_marginEnd="4dp"
                                 android:background="@null"
                                 android:visibility="gone" />
                             <ImageView
                                 android:id="@+id/private_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
                                 android:src="@drawable/ic_private_chat"
                                 app:tint="?attr/colorControlNormal"
                                 android:visibility="gone" />
@@ -76,7 +74,6 @@
                                 android:id="@+id/mute_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
                                 android:background="@null"
                                 android:src="@drawable/ic_mute_small"
                                 app:tint="?attr/colorControlNormal"

@@ -244,7 +244,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     private final static int TITLE_TOOLBAR_PORT = 140;
     private final static int TITLE_TOOLBAR_LAND = 250;
-    private final static int TITLE_TOOLBAR_IND_PORT = 100;
+    private final static int TITLE_TOOLBAR_IND_PORT = 110;
     private final static int HINT_LAND = 550;
     private final static int HINT_PORT = 250;
     private final static boolean IS_LOW = true;
@@ -1642,7 +1642,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         setPreviewersView();
         titleToolbar.setText(getTitleChat(chatRoom));
         setChatSubtitle();
-        privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
+        privateIconToolbar.setVisibility((!chatRoom.isGroup() ||chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
         muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
         isOpeningChat = true;
 
@@ -1817,6 +1817,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
         int width;
         if(isScreenInPortrait(this)){
+
+
+
             if(chatRoom.isGroup()) {
                 width = scaleWidthPx(TITLE_TOOLBAR_PORT, getOutMetrics());
             }else {
