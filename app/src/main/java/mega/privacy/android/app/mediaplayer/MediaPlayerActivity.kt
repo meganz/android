@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.Util.changeToolBarElevation
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import nz.mega.sdk.MegaApiAndroid
@@ -233,17 +234,25 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
+            binding.toolbar.elevation = 0F
+
             when (dest.id) {
                 R.id.main_player -> {
                     actionBar.title = ""
                     viewingTrackInfo = null
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.grey_020_grey_800)
+                    )
                 }
                 R.id.playlist -> {
                     viewingTrackInfo = null
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.white_dark_grey)
+                    )
                 }
                 R.id.track_info -> {
                     actionBar.setTitle(R.string.audio_track_info)
@@ -253,6 +262,9 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     }
 
                     window.statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
+                    binding.toolbar.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.white_dark_grey)
+                    )
                 }
             }
             refreshMenuOptionsVisibility(dest.id)
@@ -642,6 +654,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private fun onDragActivated(activated: Boolean) {
         getFragmentFromNavHost(R.id.nav_host_fragment, MediaPlayerFragment::class.java)
             ?.onDragActivated(dragToExit, activated)
+    }
+
+    fun showToolbarElevation(withElevation: Boolean) {
+        changeToolBarElevation(this, binding.toolbar, withElevation)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

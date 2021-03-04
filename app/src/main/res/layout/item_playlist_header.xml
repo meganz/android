@@ -24,8 +24,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="72dp"
             android:text="@{name}"
-            android:textColor="@color/teal_300"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor"
             tools:text="Now Playing" />
     </FrameLayout>
 </layout>

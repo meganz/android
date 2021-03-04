@@ -13,10 +13,11 @@ import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
@@ -78,6 +79,16 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         listLayoutManager = LinearLayoutManager(requireContext())
         binding.playlist.layoutManager = listLayoutManager
         binding.playlist.adapter = adapter
+
+        binding.playlist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                (requireActivity() as MediaPlayerActivity).showToolbarElevation(
+                    recyclerView.canScrollVertically(-1)
+                )
+            }
+        })
 
         tryObservePlaylist()
     }
