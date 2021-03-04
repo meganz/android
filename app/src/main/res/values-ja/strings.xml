@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">お使いの電話番号が正常に検証されました</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">内部ストレージ</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">外部ストレージ</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部ストレージ</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">外部ストレージ</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部ストレージ</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">概要</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">プライバシーポリシー</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">プライバシーポリシー</string>
     <string name="settings_about_terms_of_service" context="">利用規約</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">アプリ用</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">このプロセスに予想以上時間がかかっています。お待ちください。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">無料アカウント</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Liteアカウント</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro Liteアカウント</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO Iアカウント</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO IIアカウント</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO IIIアカウント</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">あなたの回復キーはこちらに行きます</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">パスワードはこちら</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">これはあなたのアカウントをキャンセルする最後のステップです。クラウドに保存されているデータはすべて完全に失われます。以下にパスワードを入力してください。</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">これはあなたのアカウントを削除する最後のステップです。クラウドに保存されているデータはすべて完全に失われます。以下にパスワードを入力してください。</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">メール確認</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">続けるためにメールをチェックしてください。</string>
@@ -1129,7 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">携帯電話からの連絡先を読み込み中&#8230;</string>
 
-    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d件のリクエストがすでに送信されています。</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d件の招待要求が正常に送信されました。</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d件の招待要求は正常に送信されましたが、%2$d件の要求は送信されませんでした。</string>
 
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">チャットのアップロード</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">チャット動画の品質</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">動画の品質</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">動画の品質</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">カメラアップロードは、あなたの端末上の写真や他のメディアにアクセスする必要があります。設定ページに行き、許可を与えてください。</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">より強力なパスワードを入力してください</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">新しいコンタクト</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">ストレージの使用状況</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d件の保留中のコンタクト要求</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d件の保留中のコンタクト要求</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">ごみ箱クリアスケジューラを無効にするか、より長い保存期間を設定するには、PROプランのご契約をしていただく必要がございます。</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">日</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">日</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">チャットリンクを取得</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">チャットリンクの管理</string>
 
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]さんがメッセージクリア時間を[/B][A]%2$s[/A][B]に変更しました。[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">チャット履歴をクリア</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]さんがメッセージのクリアを無効にしました。[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">この会話で共有されているすべてのメッセージとファイルを両方の当事者から削除します。このアクションは元に戻せません。</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">この会話で共有されているすべてのメッセージとファイルを削除します。このアクションは元に戻せません。</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">履歴消去</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">一定時間以上経過したメッセージを自動削除します。</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">無効</string>
@@ -3023,5 +3022,5 @@
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">クッキーポリシー</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">常にオン</string>
 
-    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">ドキュメントをスキャン</string>
 </resources>

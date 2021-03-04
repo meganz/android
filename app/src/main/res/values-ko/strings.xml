@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">전화번호가 성공적으로 인증되었습니다</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">개인정보 보호정책</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">무료 계정</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite 계정</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro Lite 계정</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 계정</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 계정</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 계정</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">당신의 복구 키를 여기에 입력하세요</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">여기에 암호 입력</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">계정을 취소하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">이메일 인증</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">진행하려면 이메일을 확인하세요.</string>
@@ -1129,7 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">전화에서 연락처를 불러오는 중&#8230;</string>
 
-    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d개의 요청이 이미 발송되었습니다.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d개의 초대 요청이 성공적으로 발송되었습니다.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
 
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">대화 업로드중</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 동영상 품질</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">동영상 품질</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">동영상 품질</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">더 강력한 암호를 입력하세요</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">새 연락처</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">저장소 이용량</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d개의 대기중인 연락처 요청</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d개의 대기중인 연락처 요청</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, PRO 요금제를 구독하여야 합니다.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">일</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">일</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">대화 링크 얻기</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]님이 메시지 삭제 시간을[/B][A] %2$s[/A][B]로 변경하였습니다.[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">대화 기록 삭제</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]님이 메시지 삭제를 해제하였습니다.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">이 대화 내의 양쪽 모두의 메시지와 공유된 파일을 삭제합니다. 이 행동은 되돌릴 수 없습니다.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">이 대화 내의 모든 메시지와 공유된 파일을 삭제합니다. 이 행동은 되돌릴 수 없습니다.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">기록 삭제</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">특정 시간보다 오래된 메시지는 자동으로 삭제합니다.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">해제됨</string>
@@ -3023,5 +3022,5 @@
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">쿠키 정책</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">항상 켬</string>
 
-    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">문서 스캔</string>
 </resources>

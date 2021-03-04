@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Tu número de teléfono ha sido verificado</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Almacenamiento interno</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Almacenamiento externo</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Almacenamiento interno</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Almacenamiento externo</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Almacenamiento interno</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Los datos locales serán eliminados y la sesión se cerrará en %1d segundos.</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Acerca de</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Política de privacidad</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Política de privacidad</string>
     <string name="settings_about_terms_of_service" context="">Términos de servicio</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Reglamento de protección de datos</string>
     <string name="settings_about_app_version" context="App means “Application”">Versión de la aplicación</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este proceso está tardando más de lo esperado. Por favor espera.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cuenta gratuita</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Cuenta Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Introduce aquí la Clave de recuperación</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">Escribe aquí la contraseña</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Este es el último paso para cancelar tu cuenta. Perderás de forma permanente todos los datos almacenados en la nube. Por favor, introduce tu contraseña a continuación.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Este es el último paso para eliminar tu cuenta. Perderás de forma permanente todos los datos almacenados en la nube. Por favor, introduce tu contraseña a continuación.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Confirma el correo electrónico</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Ve a la bandeja de entrada de tu correo electrónico para continuar.</string>
@@ -1129,7 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono&#8230;</string>
 
-    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d solicitudes ya enviadas.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invitaciones enviadas correctamente</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invitaciones enviadas correctamente y %2$d no enviadas.</string>
 
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Subiendo al chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad de video del chat</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad de video</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Calidad de vídeo</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Subidas de la cámara necesita acceder a tus fotos y otros archivos multimedia del dispositivo. Ve a los ajustes y permite el acceso.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Por favor ingresa una contraseña más segura</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Nuevo contacto</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Almacenamiento utilizado</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d solicitud de contacto pendiente</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d solicitudes de contacto pendientes</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Para desactivar la limpieza automática de la papelera o establecer un período de retención más largo, amplía tu cuenta.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">días</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">días</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obtén enlace de chat</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gestionar enlace de chat</string>
 
@@ -2733,7 +2732,7 @@
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor espera&#8230;</string>
 
     <string name="account_label" context="Head label to show the business account type">Tipo de cuenta</string>
-    <string name="business_label" context="Label in My Account section to show user account type">Empresas</string>
+    <string name="business_label" context="Label in My Account section to show user account type">Business</string>
     <string name="admin_label" context="Business user role">Administrador</string>
     <string name="user_label" context="Business user role">Usuario</string>
     <string name="status_label" context="General label to show the status of something or someone">Estado</string>
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] ha cambiado el tiempo de limpieza de mensajes a [/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Limpiar historial del chat</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] ha desactivado la limpieza de mensajes.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Elimina todos los mensajes y archivos compartidos por ambas partes en esta conversación. Esta acción es irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Elimina todos los mensajes y archivos compartidos en esta conversación. Esta acción es irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">Limpieza del historial</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Elimina automáticamente los mensajes anteriores a una determinada cantidad de tiempo.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Desactivado</string>
@@ -3023,5 +3022,5 @@
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Política de Cookies</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Activas por defecto</string>
 
-    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Escanear documento</string>
 </resources>

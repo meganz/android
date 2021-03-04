@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Numărul tău de telefon a fost verificat cu succes</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Stocare externă</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Stocare externă</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Despre</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Politica de confidențialitate</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Politica de confidențialitate</string>
     <string name="settings_about_terms_of_service" context="">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versiunea aplicației</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cont gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cont Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Cont Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Cont Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Cont Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Cont Pro III</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Cheia de recuperare se introduce aici</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">parola se introduce aici</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Acesta este ultimul pas pentru a-ți anula contul. Vei pierde definitiv toate datele stocate în cloud. Te rugăm să introduci parola mai jos.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Acesta este ultimul pas pentru a-ți anula contul. Vei pierde definitiv toate datele stocate în cloud. Te rugăm să introduci parola mai jos.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verificarea e-mailului</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Te rugăm să verifici e-mailul pentru a continua.</string>
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Te rugăm să introduci o parolă mai puternică</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Contact nou</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Utilizarea spațiului de stocare</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d cerere de contact în așteptare</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d cereri de contact în așteptare</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Pentru a dezactiva planificatorul de golire a coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, trebuie să te abonezi la un plan PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">zile</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">zile</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obține linkul chatului</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gestionează linkul chatului</string>
 
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Golește istoricul chatului</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">Curățarea istoricului</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Șterge automat mesajele mai vechi de o anumită perioadă de timp.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Dezactivat</string>

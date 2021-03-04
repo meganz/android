@@ -220,7 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件箱</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">保存为离线</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">离线</string>
-    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s（%2$s）</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">您的手机号已成功验证</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的所有本地数据将被删除，您将以％1d秒后注销</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">关于</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">隐私政策</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">隐私政策</string>
     <string name="settings_about_terms_of_service" context="">服务条款</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">数据保护条例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免费账户</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro精简版帐户</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro精简版帐户</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 帐户</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 帐户</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 帐户</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">在这里输入您的恢复密钥</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">请在此处写下密码</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">这是删除您账户的最后一步。您将永久失去储存在云端空间中的所有资料。请在下方输入您的密码。</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">这是删除帐户的最后一步。您将永久丢失保存在云盘中的所有数据。请在下方输入您的密码。</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">电子邮件验证</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">请确认您的电子信箱以继续</string>
@@ -1129,7 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">正在载入手机联系薄&#8230;</string>
 
-    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">已发送%d个请求。</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">已发送%d个联系人请求</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d个联系人邀请发送成功，%2$d个邀请发送失败</string>
 
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上传至聊天</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天视频质量</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">视频质量</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">视频画质</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相机上传需要访问您设备上的照片和其他媒体内容。请转至设置页面开启权限。</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">请输入一个更安全的密码</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">新联系人</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">空间使用量</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d 个待接受请求</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d 个待接受请求</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">如果您想要禁用垃圾桶定时清理或设置延长保留期限，您需要订阅PRO计划。</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">天</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">天</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">获得聊天链接</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">管理聊天链接</string>
 
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]将消息清除时间更改为[/B][A] %2$s[/A][B]。[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]已禁用消息清除。[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">删除双方对话中的所有消息和文件。此操作无法撤回。</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">删除此对话中的所有消息和文件。此操作无法撤回。</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">清除聊天记录</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">自动删除超过一定时间的聊天记录。</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">停用</string>
@@ -3023,5 +3022,5 @@
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie政策</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">始终开启</string>
 
-    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">扫描文件</string>
 </resources>

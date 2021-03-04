@@ -721,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Ваш номер телефона был успешно подтверждён</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</string>
@@ -789,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Локальные данные будут удалены, а вы выйдете из системы через %1d сек.</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">О программе</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Политика конфиденциальности</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Политика конфиденциальности</string>
     <string name="settings_about_terms_of_service" context="">Условия предоставления услуг</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Версия приложения</string>
@@ -904,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Бесплатный</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Аккаунт Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Аккаунт Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Аккаунт Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Аккаунт Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Аккаунт PRO III</string>
@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Ключ восстановления</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">пароль</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Остался один шаг перед удалением учётной записи. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Остался один шаг перед удалением учётной записи. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Проверка электронной почты</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Проверьте электронную почту для продолжения.</string>
@@ -1129,7 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Загрузка контактов из телефона&#8230;</string>
 
-    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">Запросы (%d) уже отправлены.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">Приглашения отправлены (%d).</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">Часть приглашений отправлена успешно (%1$d), но некоторые не были отправлены (%2$d).</string>
 
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Загрузка в чат</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество видео в чате</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество видео</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Качество видео</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2040,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Введите более сложный пароль</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Новый контакт</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Использование хранилища</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">Неподтверждённый запрос контактов: %1$d</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">Неподтверждённые запросы контактов: %1$d</item>
@@ -2273,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Чтобы отключить очистку корзины по расписанию или установить более длительный период хранения, нужно подписаться на план PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">д.</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">д.</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Ссылка на чат</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Управление ссылкой на чат</string>
 
@@ -2909,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] изменил время очистки сообщения на[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Очистить историю чата</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] отключил очистку сообщений.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Удалить все сообщения и файлы, которыми поделились в этом разговоре с обеих сторон. Это действие необратимо.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Удалить все сообщения и файлы, которыми поделились в этом разговоре. Это действие необратимо.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">Очистка истории</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Автоматически удалять сообщения старше определенного времени.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Отключено</string>
@@ -3023,5 +3022,5 @@
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Политика использования файлов cookie</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Всегда включены</string>
 
-    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Сканировать документ</string>
 </resources>

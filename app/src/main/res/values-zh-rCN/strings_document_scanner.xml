@@ -1,22 +1,23 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Crop</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Save scan</string>
-    <string name="scan_action_add" context="Action text to add a new page (Document scanner)">Add</string>
-    <string name="scan_action_save" context="Action text to save document (Document scanner)">Save</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Retake</string>
-    <string name="scan_file_name" context="Document scanner file name">File name</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">File type</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Quality</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Destination</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">High</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">Medium</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">Low</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Discard scan?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">The current scan will be lost</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Discard all scans?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">The current document will be lost</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Delete current scan?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Camera permissions are needed to scan documents</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Invalid input</string>
+    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">裁剪</string>
+    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">保存扫描</string>
+    <string name="scan_action_add" context="button">新增</string>
+    <string name="scan_action_save" context="Action of a button to save something">保存</string>
+    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">重新扫描</string>
+    <string name="scan_file_name" context="Document scanner file name">文件名</string>
+    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">文件类型</string>
+    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">画质</string>
+    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">位置</string>
+    <string name="scan_quality_high" context="Document scanner high quality option">高</string>
+    <string name="scan_quality_medium" context="Document scanner medium quality option">中</string>
+    <string name="scan_quality_low" context="Document scanner low quality option">低</string>
+    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">放弃扫描？</string>
+    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">当前扫描将会丢失</string>
+    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">放弃所有扫描？</string>
+    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">当前文件将会丢失</string>
+    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">放弃</string>
+    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">删除当前扫描？</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">“相机”需获取此权限才能扫描文件</string>
+    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">输入无效</string>
 </resources>

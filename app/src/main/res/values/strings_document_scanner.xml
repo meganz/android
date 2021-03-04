@@ -2,8 +2,8 @@
 <resources>
     <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Crop</string>
     <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Save scan</string>
-    <string name="scan_action_add" context="Action text to add a new page (Document scanner)">Add</string>
-    <string name="scan_action_save" context="Action text to save document (Document scanner)">Save</string>
+    <string name="scan_action_add" context="button">Add</string>
+    <string name="scan_action_save" context="Action of a button to save something">Save</string>
     <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Retake</string>
     <string name="scan_file_name" context="Document scanner file name">File name</string>
     <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">File type</string>
@@ -18,6 +18,6 @@
     <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">The current document will be lost</string>
     <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Discard</string>
     <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Delete current scan?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Camera permissions are needed to scan documents</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">The Camera permission is needed to scan documents</string>
     <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Invalid input</string>
 </resources>
