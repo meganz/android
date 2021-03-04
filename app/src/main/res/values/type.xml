@@ -49,6 +49,10 @@
         <item name="android:textColor">@color/grey_087_grey_070</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant5">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
@@ -141,6 +145,11 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
         <item name="android:textSize">18sp</item>
@@ -173,6 +182,10 @@
         <item name="android:textColor">@color/grey_060_white_060</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Variant2">
+        <item name="android:textColor">@color/grey_070_white_070</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
@@ -189,6 +202,11 @@
     <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Variant2">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
     <!-- ================== Body1 ====================== -->

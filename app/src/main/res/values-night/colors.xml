@@ -53,6 +53,8 @@
     <!-- AudioPlayer artist name -->
     <color name="grey_060_white_060">@color/white_alpha_060</color>
 
+    <color name="grey_070_white_070">@color/white_alpha_070</color>
+
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/grey_alpha_087</color>
 

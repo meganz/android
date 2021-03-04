@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
@@ -69,6 +70,16 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         listLayoutManager = LinearLayoutManager(requireContext())
         binding.playlist.layoutManager = listLayoutManager
         binding.playlist.adapter = adapter
+
+        binding.playlist.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                (requireActivity() as AudioPlayerActivity).showToolbarElevation(
+                    recyclerView.canScrollVertically(-1)
+                )
+            }
+        })
 
         tryObservePlaylist()
     }
