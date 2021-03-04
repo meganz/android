@@ -48,7 +48,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
     private val binder = MediaPlayerServiceBinder(this)
 
-    lateinit var viewModel: MediaoPlayerServiceViewModel
+    lateinit var viewModel: MediaPlayerServiceViewModel
 
     private lateinit var trackSelector: DefaultTrackSelector
     lateinit var exoPlayer: SimpleExoPlayer
@@ -88,7 +88,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = MediaoPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
+        viewModel = MediaPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)

@@ -35,7 +35,7 @@ import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
-import mega.privacy.android.app.mediaplayer.service.MediaoPlayerServiceViewModel;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -462,7 +462,7 @@ public class AccountController {
 
         new LastShowSMSDialogTimeChecker(context).reset();
         MediaPlayerService.stopAudioPlayer(context);
-        MediaoPlayerServiceViewModel.clearSettings(context);
+        MediaPlayerServiceViewModel.clearSettings(context);
 
         PsaManager.INSTANCE.stopChecking();
 

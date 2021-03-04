@@ -44,7 +44,7 @@ import kotlin.collections.HashMap
  * A class containing audio player service logic, because using ViewModel in Service
  * is not the standard scenario, so this class is actually not a subclass of ViewModel.
  */
-class MediaoPlayerServiceViewModel(
+class MediaPlayerServiceViewModel(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
@@ -190,9 +190,7 @@ class MediaoPlayerServiceViewModel(
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
-                setupStreamingServer(
-                    if (type == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi, context
-                )
+                setupStreamingServer(getApi(type), context)
             }
 
             compositeDisposable.add(
@@ -330,7 +328,7 @@ class MediaoPlayerServiceViewModel(
                                 playlistTitle = parent.name
 
                                 buildPlaylistFromNodes(
-                                    megaApiFolder, megaApiFolder.getChildren(parent, order),
+                                    getApi(type), megaApiFolder.getChildren(parent, order),
                                     firstPlayHandle
                                 )
                             }
@@ -566,9 +564,7 @@ class MediaoPlayerServiceViewModel(
     }
 
     private fun buildPlaylistFromNodes(
-        api: MegaApiAndroid,
-        nodes: List<MegaNode>,
-        firstPlayHandle: Long
+        api: MegaApiAndroid, nodes: List<MegaNode>, firstPlayHandle: Long
     ) {
         doBuildPlaylist(
             api, nodes, firstPlayHandle,
@@ -880,6 +876,9 @@ class MediaoPlayerServiceViewModel(
         megaApi.httpServerStop()
         megaApiFolder.httpServerStop()
     }
+
+    private fun getApi(type: Int) =
+        if (type == FOLDER_LINK_ADAPTER && dbHandler.credentials == null) megaApiFolder else megaApi
 
     override fun onShuffleChanged(newShuffle: ShuffleOrder) {
         shuffleOrder = newShuffle

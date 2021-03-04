@@ -1338,12 +1338,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
 
+					MegaApiAndroid api = dbH.getCredentials() != null ? megaApi : megaApiFolder;
+
 					boolean paramsSetSuccessfully;
 					if (isLocalFile(file, megaApiFolder, localPath)) {
 						paramsSetSuccessfully = setLocalIntentParams(this, file, mediaIntent,
 								localPath, false, this);
 					} else {
-						paramsSetSuccessfully = setStreamingIntentParams(this, file, megaApiFolder,
+						paramsSetSuccessfully = setStreamingIntentParams(this, file, api,
 								mediaIntent, this);
 					}
 					if (!paramsSetSuccessfully) {
@@ -1380,12 +1382,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
 
+					MegaApiAndroid api = dbH.getCredentials() != null ? megaApi : megaApiFolder;
+
 					boolean paramsSetSuccessfully;
 					if (isLocalFile(file, megaApiFolder, localPath)) {
 						paramsSetSuccessfully = setLocalIntentParams(this, file, pdfIntent,
 								localPath, false, this);
 					} else {
-						paramsSetSuccessfully = setStreamingIntentParams(this, file, megaApiFolder,
+						paramsSetSuccessfully = setStreamingIntentParams(this, file, api,
 								pdfIntent, this);
 					}
 					if (!paramsSetSuccessfully) {
