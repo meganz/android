@@ -558,12 +558,13 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		if (n.isFolder()){
 		    searchNodes = null;
-		    ((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 			((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
 					hideMultipleSelect();
 			}
+
+			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 
 			int lastFirstVisiblePosition = 0;
 			if (((FileExplorerActivityLollipop)context).isList()) {
