@@ -194,8 +194,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             if (typeMessage == MegaChatMessage.TYPE_NORMAL || isGeolocation(megaChatMessage) ||
                     (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
                             megaChatMessage.getContainsMeta() != null &&
-                            (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW ||
-                                    megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW))) {
+                            (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW))) {
                 optionCopy.setVisibility(View.VISIBLE);
             } else {
                 optionCopy.setVisibility(View.GONE);

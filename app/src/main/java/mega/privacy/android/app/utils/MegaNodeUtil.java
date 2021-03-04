@@ -291,48 +291,6 @@ public class MegaNodeUtil {
     }
 
     /**
-     * Method for sharing selected chat messages.
-     *
-     * @param context          The Activity context.
-     * @param messagesSelected ArrayList of the selected messages.
-     * @param chatId           The chat ID.
-     */
-    public static void shareChatMessages(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, long chatId) {
-        ArrayList<MegaNode> listNodes = new ArrayList<>();
-
-        if (messagesSelected.isEmpty()) {
-            return;
-        }
-        if (messagesSelected.size() == 1) {
-            MegaNodeList nodeList = messagesSelected.get(0).getMessage().getMegaNodeList();
-            if (nodeList == null || nodeList.size() == 0)
-                return;
-
-            MegaNode node = nodeList.get(0);
-            if (node == null)
-                return;
-
-            shareNode(context, node, messagesSelected.get(0).getMessage().getMsgId(), chatId);
-
-        } else {
-            for (AndroidMegaChatMessage androidMessage : messagesSelected) {
-                MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
-                if (nodeList == null || nodeList.size() == 0) continue;
-
-                MegaNode node = nodeList.get(0);
-                if (node == null) continue;
-
-                listNodes.add(node);
-            }
-
-            if (listNodes.isEmpty())
-                return;
-
-            shareNodes(context, messagesSelected, listNodes, chatId);
-        }
-    }
-
-    /**
      * Method that controls which nodes of messages should be shared directly and which need to be shared via a public link.
      *
      * @param context          The Activity context.

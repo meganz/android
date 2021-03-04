@@ -4843,7 +4843,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     public boolean isMultiselectOn() {
-        return adapter == null || adapter.isMultipleSelect();
+        return adapter != null && adapter.isMultipleSelect();
     }
 
     public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage) {

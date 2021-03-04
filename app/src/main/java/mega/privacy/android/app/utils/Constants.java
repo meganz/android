@@ -173,8 +173,8 @@ public class Constants {
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
 
-    public static final int IMPORT_ONLY_OPTION= 0;
-    public static final int FORWARD_ONLY_OPTION= 1;
+    public static final int IMPORT_ONLY_OPTION = 0;
+    public static final int FORWARD_ONLY_OPTION = 1;
     public static final int IMPORT_TO_SHARE_OPTION = 2;
 
     public static final int FREE = 0;

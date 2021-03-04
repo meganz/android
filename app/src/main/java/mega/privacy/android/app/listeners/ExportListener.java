@@ -21,6 +21,7 @@ import mega.privacy.android.app.activities.GetLinkActivity;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaError.*;
@@ -137,8 +138,7 @@ public class ExportListener extends BaseListener {
      * @param newNodeHandle node Handle of a node imported.
      */
     public void updateNodeHandle(long msgID, long newNodeHandle) {
-        boolean isFoundAndRemoved = getKeyByValueAndRemoveIt(msgIdNodeHandle, msgID);
-        if (isFoundAndRemoved) {
+        if (getKeyByValueAndRemoveIt(msgIdNodeHandle, msgID)) {
             msgIdNodeHandle.put(newNodeHandle, msgID);
         }
     }
@@ -151,8 +151,7 @@ public class ExportListener extends BaseListener {
         pendingExport--;
         if (pendingExport == 0) {
             logError(numberExport + " errors exporting nodes");
-            showSnackbar(context, context.getResources()
-                    .getQuantityString(R.plurals.context_link_export_error, numberExport));
+            showSnackbar(context, getQuantityString(R.plurals.context_link_export_error, numberExport));
         }
     }
 
@@ -198,9 +197,6 @@ public class ExportListener extends BaseListener {
             return;
         }
 
-        if (request == null)
-            return;
-
         if (request.getLink() != null) {
             logDebug("The link is not null");
 
@@ -213,8 +209,6 @@ public class ExportListener extends BaseListener {
 
             if (numberError > 0) {
                 logError(numberError + " errors exporting nodes");
-                showSnackbar(context, context.getResources()
-                        .getQuantityString(R.plurals.context_link_export_error, numberExport));
                 return;
             }
 
