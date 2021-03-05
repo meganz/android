@@ -7602,10 +7602,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 				return true;
 			case R.id.action_menu_open_meeting:
-				return true;
 			case R.id.action_menu_start_join_meeting:
+				showMeetingOptionsPanel();
 				return true;
-            default:{
+			default:{
 	            return super.onOptionsItemSelected(item);
             }
 		}
