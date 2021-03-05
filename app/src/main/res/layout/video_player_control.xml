@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
+    android:background="@color/grey_alpha_050">
 
     <ImageButton
         android:id="@id/exo_prev"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/player_prev"
+        android:src="@drawable/player_prev_video"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -29,7 +29,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/player_play"
+        android:src="@drawable/player_play_video"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
@@ -38,7 +38,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/player_pause"
+        android:src="@drawable/player_pause_video"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
         tools:visibility="invisible" />
@@ -47,19 +47,10 @@
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/player_next"
+        android:src="@drawable/player_next_video"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/grey_alpha_020"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/exo_progress" />
 
     <mega.privacy.android.app.components.DefaultTimeBar
         android:id="@id/exo_progress"

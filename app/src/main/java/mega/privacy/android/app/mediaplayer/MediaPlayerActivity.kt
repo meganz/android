@@ -156,7 +156,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             rootLayout = binding.rootLayout
             toolbar = binding.toolbar
 
-            toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_020))
+            toolbar.setBackgroundColor(Color.TRANSPARENT)
             toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white_alpha_087))
 
             MediaPlayerService.pauseAudioPlayer(this)
@@ -258,7 +258,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 toolbar.setBackgroundColor(color)
             } else {
                 window.statusBarColor = Color.BLACK
-                toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_020))
+                toolbar.setBackgroundColor(Color.TRANSPARENT)
             }
 
             when (dest.id) {
