@@ -2065,7 +2065,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">請務必將此種子備份於安全的地方，以防您的裝置遺失。</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <string name="general_verify" context="Text button">確認</string>
-    <string name="general_next" context="Text button">次一</string>
+    <string name="general_next" context="Text button">下一步</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成種子或QR碼時出錯，請再試一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">已啟用雙重驗證</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>

@@ -937,7 +937,7 @@
 
     <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Avez-vous une sauvegarde de votre clé de récupération ?</string>
 
-    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Très bien !</string>
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Parfait !</string>
     <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">Saisissez votre adresse courriel ici</string>
     <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de fournir votre clé de récupération et de réinitialiser votre mot de passe.</string>
 
@@ -1445,7 +1445,7 @@
     -->
 
     <plurals name="upload_service_notification">
-        <item context="Text of the notification shown when the upload service is running, Singular" quantity="one">Téléversement d\'%1$d de %2$d fichier</item>
+        <item context="Text of the notification shown when the upload service is running, Singular" quantity="one">Téléversement d\'un %1$d de %2$d fichier</item>
         <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Téléversement de %1$d de %2$d fichiers</item>
     </plurals>
 
@@ -1455,7 +1455,7 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Téléversement d\'%1$d dossier de %2$d</item>
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Téléversement d\'un %1$d dossier de %2$d</item>
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Téléversement de %1$d dossiers de %2$d</item>
 	</plurals>
 
@@ -1507,7 +1507,7 @@
     </plurals>
 
     <plurals name="download_service_notification">
-        <item context="Text of the notification shown when the download service is running, Singular" quantity="one">Téléchargement d\'%1$d de %2$d fichier</item>
+        <item context="Text of the notification shown when the download service is running, Singular" quantity="one">Téléchargement d\'un %1$d de %2$d fichier</item>
         <item context="Text of the notification shown when the download service is running, Plural" quantity="other">Téléchargement de %1$d de %2$d fichiers</item>
     </plurals>
 
@@ -1856,7 +1856,7 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">Traitement du lien&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. N\'utilisez pas de noms ou de mots du dictionnaire.</string>
+    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. N\'utilisez pas des noms ou des mots du dictionnaire.</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Votre mot de passe est assez bon pour poursuivre, mais il est recommandé de le renforcer.</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Ce mot de passe résistera à la plupart des attaques en force typiques. Veuillez vous assurer de vous en souvenir.</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Ce mot de passe résistera à la plupart des attaques en force sophistiquées. Veuillez vous assurer de vous en souvenir.</string>
