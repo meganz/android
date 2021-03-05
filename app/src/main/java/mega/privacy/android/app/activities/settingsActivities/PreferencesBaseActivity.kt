@@ -24,7 +24,6 @@ open class PreferencesBaseActivity : PinActivityLollipop() {
         setSupportActionBar(binding.toolbarSettings)
 
         supportActionBar?.apply {
-            setHomeAsUpIndicator(R.drawable.ic_arrow_back_black)
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
