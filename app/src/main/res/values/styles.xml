@@ -215,6 +215,7 @@
     </style>
 
     <style name="Widget.Mega.Button.Variant4" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="strokeColor">@android:color/transparent</item>
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="android:textColor">@color/white_black</item>
     </style>

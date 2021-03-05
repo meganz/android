@@ -1,19 +1,36 @@
 package mega.privacy.android.app.fragments.managerFragments
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
+import mega.privacy.android.app.lollipop.MyAccountInfo
+import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
+import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
+import nz.mega.sdk.MegaUser
+import java.io.File
 
 class MyAccountFragment : BaseFragment(), Scrollable {
 
     private lateinit var binding: FragmentMyAccountBinding
+    private var accountInfo: MyAccountInfo? = null
 
     companion object {
         @JvmStatic
@@ -31,6 +48,51 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        accountInfo = app.myAccountInfo
+        setAccountDetails()
+
+        binding.myAccountInfoLayout.setOnClickListener {
+            //Open edit my profile activity
+        }
+
+        updateAvatar(true)
+
+        if (!isTextEmpty(accountInfo?.fullName)) {
+            binding.nameText.text = accountInfo?.fullName
+        }
+
+        binding.emailText.text = megaApi.myEmail
+
+        val registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber()
+
+        binding.phoneText.apply {
+            if (!isTextEmpty(registeredPhoneNumber)) {
+                text = registeredPhoneNumber
+                binding.addPhoneNumberLayout.visibility = GONE
+            } else if (canVoluntaryVerifyPhoneNumber()) {
+                visibility = GONE
+                binding.addPhoneNumberLayout.visibility = VISIBLE
+            }
+        }
+
+        binding.addPhoneNumberLayout.setOnClickListener {
+            //Open add phone number activity
+        }
+
+        binding.backupRecoveryKeyLayout.setOnClickListener {
+            //Open backup recovery key activity
+        }
+
+        binding.achievementsLayout.setOnClickListener {
+            //Open achievements activity
+        }
+
+        updateContactsCount()
+    }
+
     override fun checkScroll() {
         (requireActivity() as ManagerActivityLollipop).changeAppBarElevation(
             binding.scrollView.canScrollVertically(
@@ -40,7 +102,36 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     }
 
     fun setAccountDetails() {
+        binding.lastSessionSubtitle.text = if (isTextEmpty(accountInfo?.lastSessionFormattedDate)) {
+            StringResourcesUtils.getString(R.string.recovering_info)
+        } else accountInfo?.lastSessionFormattedDate
 
+        if (accountInfo?.isBusinessStatusReceived == false) {
+            binding.accountTypeText.text = StringResourcesUtils.getString(R.string.recovering_info)
+            binding.upgradeButton.visibility = GONE
+            binding.achievementsLayout.visibility = GONE
+            return
+        }
+
+        if (megaApi.isBusinessAccount) {
+            return
+        }
+
+        binding.accountTypeText.visibility = VISIBLE
+        binding.upgradeButton.visibility = VISIBLE
+
+        binding.achievementsLayout.visibility = if (megaApi.isAchievementsEnabled) VISIBLE else GONE
+
+        binding.accountTypeText.text = StringResourcesUtils.getString(
+            when (accountInfo?.accountType) {
+                0 -> R.string.free_account
+                1 -> R.string.pro1_account
+                2 -> R.string.pro2_account
+                3 -> R.string.pro3_account
+                4 -> R.string.lite_account
+                else -> R.string.recovering_info
+            }
+        )
     }
 
     fun onBackPressed(): Int {
@@ -48,39 +139,88 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     }
 
     fun resetPass() {
-
+        AccountController(context).resetPass(megaApi.myEmail)
     }
 
     fun updateNameView(fullName: String) {
-
+        binding.nameText.text = fullName
     }
 
     fun updateAvatar(retry: Boolean) {
+        val avatar = buildAvatarFile(requireActivity(), megaApi.myEmail + JPG_EXTENSION)
 
+        if (avatar != null) {
+            setProfileAvatar(avatar, retry)
+        } else {
+            setDefaultAvatar()
+        }
+    }
+
+    fun setProfileAvatar(avatar: File, retry: Boolean) {
+        val avatarBitmap: Bitmap?
+
+        if (avatar.exists() && avatar.length() > 0) {
+            avatarBitmap = BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
+
+            if (avatarBitmap == null) {
+                avatar.delete()
+            } else {
+                binding.myAccountThumbnail.setImageBitmap(avatarBitmap)
+                return
+            }
+        }
+
+        if (retry) {
+            megaApi.getUserAvatar(
+                megaApi.myUser,
+                buildAvatarFile(context, megaApi.myEmail).absolutePath,
+                context as ManagerActivityLollipop
+            )
+        } else {
+            setDefaultAvatar()
+        }
+    }
+
+    private fun setDefaultAvatar() {
+        binding.myAccountThumbnail.setImageBitmap(
+            getDefaultAvatar(
+                getColorAvatar(megaApi.myUser),
+                accountInfo?.fullName,
+                Constants.AVATAR_SIZE,
+                true
+            )
+        )
     }
 
     fun refreshVersionsInfo() {
 
     }
 
-    fun initCreateQR(request: MegaRequest, e: MegaError) {
-
-    }
-
     fun updateContactsCount() {
+        val contacts = megaApi.contacts
+        val visibleContacts = ArrayList<MegaUser>()
 
-    }
+        for (contact in contacts.indices) {
+            if (contacts[contact].visibility == MegaUser.VISIBILITY_VISIBLE
+                || megaApi.getInShares(contacts[contact]).size > 0
+            ) {
+                visibleContacts.add(contacts[contact])
+            }
+        }
 
-    fun updateView() {
-
+        binding.contactsSubtitle.text = StringResourcesUtils.getQuantityString(
+            R.plurals.general_selection_num_contacts,
+            visibleContacts.size,
+            visibleContacts.size
+        )
     }
 
     fun updateMailView(email: String) {
+        binding.emailText.text = email
 
-    }
-
-    fun checkLogoutWarnings() {
-
+        if (!isFileAvailable(buildAvatarFile(context, email + JPG_EXTENSION))) {
+            setDefaultAvatar()
+        }
     }
 
     fun updateAddPhoneNumberLabel() {

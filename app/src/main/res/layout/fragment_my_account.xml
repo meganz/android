@@ -96,20 +96,19 @@
 
         </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/account_type_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="22dp"
             android:layout_marginEnd="22dp"
-            android:orientation="horizontal"
             tools:background="@drawable/background_free_account_type">
 
             <ImageView
                 android:id="@+id/account_type_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="9dp"
                 tools:ignore="ContentDescription"
@@ -119,7 +118,9 @@
                 android:id="@+id/account_type_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/account_type_icon"
+                android:layout_toStartOf="@+id/upgrade_button"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White"
@@ -128,10 +129,10 @@
             <Button
                 android:id="@+id/upgrade_button"
                 style="@style/Widget.Mega.Button.Variant4"
-                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
                 android:text="@string/my_account_upgrade_pro" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/account_options_layout"

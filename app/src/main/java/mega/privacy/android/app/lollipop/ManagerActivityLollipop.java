@@ -13708,11 +13708,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				maF.refreshVersionsInfo();
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-			if (getMyAccountFragment() != null) {
-				maF.initCreateQR(request, e);
-			}
-		}
 	}
 
 	/**
@@ -13867,7 +13862,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						//When last contact changes avatar, update view.
 						if(getMyAccountFragment() != null) {
 							maF.updateContactsCount();
-							maF.updateView();
                         }
 					}
 				}
@@ -14267,10 +14261,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
 
-		if (!existOngoingTransfers(megaApi)) {
-			updateLogoutWarnings();
-		}
-
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
@@ -14342,16 +14332,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					tFLol.transferFinish(transfer.getTag());
 				}
 			}
-		}
-
-		if (!existOngoingTransfers(megaApi)) {
-			updateLogoutWarnings();
-		}
-	}
-
-	private void updateLogoutWarnings() {
-		if (getMyAccountFragment() != null) {
-			maF.checkLogoutWarnings();
 		}
 	}
 
