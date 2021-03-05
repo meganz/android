@@ -10,6 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -56,6 +59,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -66,7 +71,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
-	public static ImageView imageDrag;
     private ActionMode actionMode;
 	CoordinatorLayout mainLayout;
 	RecyclerView listView;
@@ -90,26 +94,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
-	}
-
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null && mLayoutManager != null){
-			mLayoutManager.scrollToPosition(position);
-		}
-	}
-
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null && mLayoutManager != null) {
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-			}
-		}
-
-		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -400,10 +384,17 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			listView.setAdapter(adapter);
 		}
         if(currNodePosition != -1 && parentHandle == -1 ) {
-            itemClick(currNodePosition,null,null);
+            itemClick(currNodePosition);
         }
 		showFabButton(megaApi.getNodeByHandle(parentHandle));
 		return v;
+	}
+
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		observeDragSupportEvents(getViewLifecycleOwner(), listView);
 	}
 
     public void checkScroll() {
@@ -482,7 +473,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		}
 	}
 
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 
 		if (adapter.isMultipleSelect()){
 			logDebug("Multiselect ON");
@@ -569,10 +560,12 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					} else {
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
-					intent.putExtra("screenPosition", screenPosition);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, contactNodes.get(position).getHandle());
+					putThumbnailLocation(intent, listView, position, adapter);
+
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
-					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
@@ -604,10 +597,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
-					mediaIntent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(mediaIntent, listView, position, adapter);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					imageDrag = imageView;
 
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
 					if (localPath != null){
@@ -703,8 +695,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
+					putThumbnailLocation(pdfIntent, listView, position, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}

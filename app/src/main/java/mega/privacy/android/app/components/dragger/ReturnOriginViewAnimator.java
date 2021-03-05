@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.dragger;
 
-import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
@@ -58,7 +57,7 @@ public class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAn
 
     @Override
     public boolean animateExit(@NonNull final D draggableView, final Direction direction,
-        int duration, Activity activity, int[] screenPosition, View currentView,
+        int duration, Listener listener, int[] screenPosition, View currentView,
         int[] draggableViewLocationOnScreen) {
         logDebug("animateExit");
         return false;

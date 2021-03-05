@@ -34,8 +34,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceViewModel;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -461,8 +461,8 @@ public class AccountController {
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
         new LastShowSMSDialogTimeChecker(context).reset();
-        AudioPlayerService.stopAudioPlayer(context);
-        AudioPlayerServiceViewModel.clearSettings(context);
+        MediaPlayerService.stopAudioPlayer(context);
+        MediaPlayerServiceViewModel.clearSettings(context);
 
         PsaManager.INSTANCE.stopChecking();
 

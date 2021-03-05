@@ -73,6 +73,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -84,8 +86,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
-
-	public static ImageView imageDrag;
 
 	private Context context;
 	private RecyclerView recyclerView;
@@ -143,38 +143,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	@Override
 	public void reselectUnHandledSingleItem(int position) {
 		adapter.filClicked(position);
-	}
-
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				mLayoutManager.scrollToPosition(position);
-			}
-			else if (gridLayoutManager != null) {
-				gridLayoutManager.scrollToPosition(position);
-			}
-		}
-	}
-
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				View v = mLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-				}
-			}
-			else if (gridLayoutManager != null){
-				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -661,6 +629,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			newSearchNodesTask();
 			((ManagerActivityLollipop) context).showFabButton();
 		}
+
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
 	}
 
 	public void newSearchNodesTask() {
@@ -702,7 +672,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		intent.putExtra(ARRAY_SEARCH, serialized);
 	}
 	
-    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+    public void itemClick(int position) {
 		logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
@@ -762,11 +732,13 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					intent.putExtra("screenPosition", screenPosition);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+					putThumbnailLocation(intent, recyclerView, position, adapter);
+
 					manageNodes(intent);
 					startActivity(intent);
 					getActivity().overridePendingTransition(0,0);
-					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -788,9 +760,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else {
 						internalIntent = true;
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
-						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
-							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-						}
+						mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);
@@ -803,12 +773,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					mediaIntent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
 					manageNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					imageDrag = imageView;
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
 
 					if (localPath != null){
@@ -907,8 +876,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
+					putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						context.startActivity(pdfIntent);
 					}

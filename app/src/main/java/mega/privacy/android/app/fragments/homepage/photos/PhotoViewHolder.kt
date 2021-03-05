@@ -12,7 +12,7 @@ import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
-class PhotoViewHolder(private val binding: ViewDataBinding) :
+class PhotoViewHolder(val binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     @MegaApi

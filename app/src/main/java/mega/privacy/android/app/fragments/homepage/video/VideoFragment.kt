@@ -23,22 +23,23 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 import java.util.*
 import javax.inject.Inject
 
@@ -58,8 +59,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
-
-    private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
 
     @MegaApi
     @Inject
@@ -88,7 +87,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
-        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -99,24 +97,21 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+
+        observeDragSupportEvents(viewLifecycleOwner, listView)
     }
 
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_video).toUpperCase(Locale.ROOT)
+            StringResourcesUtils.getString(R.string.homepage_empty_hint_video)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         viewModel.skipNextAutoScroll = true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(VideoFragment::class.java)
     }
 
     private fun setupListView() {
@@ -145,7 +140,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
                     SNACKBAR_TYPE,
-                    getString(R.string.error_server_connection_problem),
+                    StringResourcesUtils.getString(R.string.error_server_connection_problem),
                     MEGACHAT_INVALID_HANDLE
                 )
             }
@@ -278,8 +273,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
                         if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
-                            itemView.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                                R.color.new_multiselect_color))
+                            itemView.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(), R.color.new_multiselect_color
+                                )
+                            )
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
@@ -364,7 +362,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val internalIntent = FileUtil.isInternalIntent(node)
         val intent = if (internalIntent) {
-            Intent(context, AudioVideoPlayerLollipop::class.java)
+            getMediaIntent(context, node.name)
         } else {
             Intent(Intent.ACTION_VIEW)
         }
@@ -381,17 +379,17 @@ class VideoFragment : Fragment(), HomepageSearchable {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_BROWSE_ADAPTER)
         }
 
-        listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(R.id.thumbnail)
-            ?.let {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
-            }
+        (listView.adapter as? DragThumbnailGetter)?.let {
+            putThumbnailLocation(intent, listView, index, it)
+        }
 
         val localPath = FileUtil.getLocalFile(context, file.name, file.size)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)
         } else {
-            FileUtil.setStreamingIntentParams(context, node, megaApi, intent)
+            FileUtil.setStreamingIntentParams(context, node, megaApi, intent,
+                requireActivity() as ManagerActivityLollipop)
         }
 
         if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
@@ -403,15 +401,13 @@ class VideoFragment : Fragment(), HomepageSearchable {
             Util.showSnackbar(
                 context,
                 SNACKBAR_TYPE,
-                getString(R.string.intent_not_available),
+                StringResourcesUtils.getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE
             )
         }
 
         if (paramsSetSuccessfully) {
             if (internalIntent) {
-                draggingNodeHandle = node.handle
-                setupDraggingThumbnailCallback()
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             } else {
@@ -422,7 +418,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             Util.showSnackbar(
                 context,
                 SNACKBAR_TYPE,
-                getString(R.string.intent_not_available),
+                StringResourcesUtils.getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE
             )
             callManager { it.saveNodesToDevice(listOf(node), true, false, false, false) }
@@ -463,67 +459,5 @@ class VideoFragment : Fragment(), HomepageSearchable {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
         viewModel.loadVideo()
-    }
-
-    /** All below methods are for supporting functions of AudioVideoPlayerLollipop */
-
-    companion object {
-
-        private class VideoDraggingThumbnailCallback(private val fragmentRef: WeakReference<VideoFragment>) :
-            DraggingThumbnailCallback {
-
-            override fun setVisibility(visibility: Int) {
-                val fragment = fragmentRef.get() ?: return
-                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
-                    ?.apply { this.visibility = visibility }
-            }
-
-            override fun getLocationOnScreen(location: IntArray) {
-                val fragment = fragmentRef.get() ?: return
-                val result = fragment.getDraggingThumbnailLocationOnScreen() ?: return
-                result.copyInto(location, 0, 0, 2)
-            }
-        }
-    }
-
-    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
-        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
-        return thumbnailView.getLocationAndDimen()
-    }
-
-    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
-        val position = viewModel.getNodePositionByHandle(handle)
-        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
-        return viewHolder.itemView.findViewById(R.id.thumbnail)
-    }
-
-    private fun setupDraggingThumbnailCallback() =
-        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
-            VideoFragment::class.java, VideoDraggingThumbnailCallback(WeakReference(this))
-        )
-
-    fun scrollToPhoto(handle: Long) {
-        val position = viewModel.getNodePositionByHandle(handle)
-        if (position == INVALID_POSITION) return
-
-        listView.scrollToPosition(position)
-        notifyThumbnailLocationOnScreen()
-    }
-
-    fun hideDraggingThumbnail(handle: Long) {
-        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
-        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
-        draggingNodeHandle = handle
-        notifyThumbnailLocationOnScreen()
-    }
-
-    private fun notifyThumbnailLocationOnScreen() {
-        val location = getDraggingThumbnailLocationOnScreen() ?: return
-        location[0] += location[2] / 2
-        location[1] += location[3] / 2
-
-        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        requireContext().sendBroadcast(intent)
     }
 }

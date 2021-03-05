@@ -146,7 +146,7 @@ public class MegaNodeUtil {
          * The listener to handle button click events
          */
         public interface nodeTakenDownDialogListener {
-            void onOpenClicked(int currentPosition, View view);
+            void onOpenClicked(int currentPosition);
 
             void onDisputeClicked();
 
@@ -194,7 +194,7 @@ public class MegaNodeUtil {
             dialog.setCanceledOnTouchOutside(false);
 
             openButton.setOnClickListener(button -> {
-                listener.onOpenClicked(currentPosition, view);
+                listener.onOpenClicked(currentPosition);
                 dialog.dismiss();
             });
 

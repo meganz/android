@@ -36,10 +36,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
@@ -66,9 +64,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,22 +78,12 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
+import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
-import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
-import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -135,17 +121,6 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface,
         SnackbarShower {
-
-    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
-            = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
-
-    int[] screenPosition;
-    int mLeftDelta;
-    int mTopDelta;
-    float mWidthScale;
-    float mHeightScale;
-    int screenWidth;
-    int screenHeight;
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -207,6 +182,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
+    // it's only used for enter animation
+    private final DragToExitSupport dragToExit = new DragToExitSupport(this, null, null);
+
     NodeController nC;
     private DisplayMetrics outMetrics;
 
@@ -245,14 +223,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
     };
-
-    public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
-        DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
-    }
-
-    public static void removeDraggingThumbnailCallback(Class<?> clazz) {
-        DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
-    }
 
     @Override
     protected boolean shouldSetStatusBarTextColor() {
@@ -348,8 +318,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
-        screenHeight = outMetrics.heightPixels;
-        screenWidth = outMetrics.widthPixels;
 
         setContentView(R.layout.activity_pdfviewer);
 
@@ -564,121 +532,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             setToolbarVisibilityHide(0L);
         }
 
-        if (savedInstanceState == null){
-            ViewTreeObserver observer = pdfView.getViewTreeObserver();
-            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-
-                    pdfView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    int[] location = new int[2];
-                    pdfView.getLocationOnScreen(location);
-                    int[] getlocation = new int[2];
-                    getLocationOnScreen(getlocation);
-                    screenPosition = getIntent().getIntArrayExtra("screenPosition");
-                    if (screenPosition != null){
-                        mLeftDelta = getlocation[0] - location[0];
-                        mTopDelta = getlocation[1] - location[1];
-
-                        mWidthScale = (float) screenPosition[2] / pdfView.getWidth();
-                        mHeightScale = (float) screenPosition[3] / pdfView.getHeight();
-                    }
-                    else {
-                        mLeftDelta = (screenWidth/2) - location[0];
-                        mTopDelta = (screenHeight/2) - location[1];
-
-                        mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
-                        mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
-                    }
-                    logDebug("mLeftDelta: " + mLeftDelta + " mTopDelta: " + mTopDelta +
-                            " mWidthScale: " + mWidthScale + " mHeightScale: " + mHeightScale);
-                    runEnterAnimation();
-
-                    return true;
-                }
-            });
-        }
-    }
-
-    public void runEnterAnimation() {
-        final long duration = 400;
-        if (aB != null && aB.isShowing()) {
-            if(tB != null) {
-                tB.animate().translationY(-220).setDuration(0)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                aB.hide();
-                            }
-                        }).start();
-                bottomLayout.animate().translationY(220).setDuration(0).start();
-                uploadContainer.animate().translationY(220).setDuration(0).start();
-                pageNumber.animate().translationY(0).setDuration(0).start();
-            } else {
-                aB.hide();
-            }
-        }
-        pageNumber.animate().translationY(0).start();
-
-        pdfView.setPivotX(0);
-        pdfView.setPivotY(0);
-        pdfView.setScaleX(mWidthScale);
-        pdfView.setScaleY(mHeightScale);
-        pdfView.setTranslationX(mLeftDelta);
-        pdfView.setTranslationY(mTopDelta);
-
-        pdfView.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                setToolbarVisibilityShow();
-            }
-        });
-    }
-
-    void getLocationOnScreen(int[] location){
-        if (type == RUBBISH_BIN_ADAPTER){
-            RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == INBOX_ADAPTER){
-            InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == INCOMING_SHARES_ADAPTER){
-            IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == OUTGOING_SHARES_ADAPTER){
-            OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == CONTACT_FILE_ADAPTER){
-            ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == FOLDER_LINK_ADAPTER){
-            FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == SEARCH_ADAPTER){
-            SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == FILE_BROWSER_ADAPTER){
-            FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
-        }
-        else if (type == OFFLINE_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        } else if (type == DOCUMENTS_BROWSE_ADAPTER || type == DOCUMENTS_SEARCH_ADAPTER) {
-            DraggingThumbnailCallback callback
-                    = DRAGGING_THUMBNAIL_CALLBACKS.get(DocumentsFragment.class);
-            if (callback != null) {
-                callback.getLocationOnScreen(location);
-            }
-        }
-        else if (type == ZIP_ADAPTER) {
-            ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
-        } else if (type == LINKS_ADAPTER) {
-            LinksFragment.imageDrag.getLocationOnScreen(location);
-        } else if (type == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
-            RecentsFragment.imageDrag.getLocationOnScreen(location);
+        if (savedInstanceState == null) {
+            runEnterAnimation(intent);
         }
     }
 
@@ -753,8 +608,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             Display display = getWindowManager().getDefaultDisplay();
             outMetrics = new DisplayMetrics ();
             display.getMetrics(outMetrics);
-            screenHeight = outMetrics.heightPixels;
-            screenWidth = outMetrics.widthPixels;
 
             setContentView(R.layout.activity_pdfviewer);
 
@@ -847,38 +700,31 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
 
-            ViewTreeObserver observer = pdfView.getViewTreeObserver();
-            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-
-                    pdfView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    int[] location = new int[2];
-                    pdfView.getLocationOnScreen(location);
-                    int[] getlocation = new int[2];
-                    getLocationOnScreen(getlocation);
-                    screenPosition = getIntent().getIntArrayExtra("screenPosition");
-                    if (screenPosition != null){
-                        mLeftDelta = getlocation[0] - location[0];
-                        mTopDelta = getlocation[1] - location[1];
-
-                        mWidthScale = (float) screenPosition[2] / pdfView.getWidth();
-                        mHeightScale = (float) screenPosition[3] / pdfView.getHeight();
-                    }
-                    else {
-                        mLeftDelta = (screenWidth/2) - location[0];
-                        mTopDelta = (screenHeight/2) - location[1];
-
-                        mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
-                        mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
-                    }
-                    logDebug("mLeftDelta: " + mLeftDelta + " mTopDelta: " + mTopDelta + " mWidthScale: " + mWidthScale + " mHeightScale: " + mHeightScale);
-                    runEnterAnimation();
-
-                    return true;
-                }
-            });
+            runEnterAnimation(intent);
         }
+    }
+
+    private void runEnterAnimation(Intent intent) {
+        dragToExit.runEnterAnimation(intent, pdfView, animationStart -> {
+            if (animationStart) {
+                if (aB != null && aB.isShowing()) {
+                    if(tB != null) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                        tB.animate().translationY(-220).setDuration(0).withEndAction(aB::hide).start();
+                        bottomLayout.animate().translationY(220).setDuration(0).start();
+                        uploadContainer.animate().translationY(220).setDuration(0).start();
+                        pageNumber.animate().translationY(0).setDuration(0).start();
+                    } else {
+                        aB.hide();
+                    }
+                }
+            } else {
+                setToolbarVisibilityShow();
+            }
+
+            return null;
+        });
     }
 
     @Override

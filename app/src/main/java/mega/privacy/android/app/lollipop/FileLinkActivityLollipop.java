@@ -743,6 +743,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 			intent.putExtra("isFileLink", true);
+
+			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, document.getHandle());
+
 			startActivity(intent);
 
 		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){

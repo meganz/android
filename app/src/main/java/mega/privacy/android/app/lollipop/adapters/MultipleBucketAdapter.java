@@ -12,13 +12,17 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -35,7 +39,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider {
+public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
 
     Context context;
     Object fragment;
@@ -106,6 +110,28 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     public boolean isMedia() {
         return isMedia;
+    }
+
+    @Override
+    public int getNodePosition(long handle) {
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i).getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
+    }
+
+    @Nullable
+    @Override
+    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolderMultipleBucket) {
+            return isMedia ? ((ViewHolderMultipleBucket) viewHolder).thumbnailMedia
+                    : ((ViewHolderMultipleBucket) viewHolder).thumbnailList;
+        }
+
+        return null;
     }
 
     @Override
@@ -255,8 +281,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             }
             case R.id.multiple_bucket_layout: {
                 if (fragment instanceof RecentsBucketFragment) {
-                    ((RecentsBucketFragment) fragment).openFile(node, true,
-                            v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list));
+                    ((RecentsBucketFragment) fragment).openFile(holder.getAdapterPosition(), node, true);
                 }
                 break;
             }

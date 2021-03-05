@@ -10,6 +10,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -67,6 +70,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -75,8 +80,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class InboxFragmentLollipop extends RotatableFragment{
-
-	public static ImageView imageDrag;
 
 	public static int GRID_WIDTH = 400;
 	
@@ -135,18 +138,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void reselectUnHandledSingleItem(int position) {
 	}
 
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				mLayoutManager.scrollToPosition(position);
-			}
-			else if (gridLayoutManager != null) {
-				gridLayoutManager.scrollToPosition(position);
-			}
-		}
-	}
-    
     public void addSectionTitle(List<MegaNode> nodes,int type) {
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
@@ -203,26 +194,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		headerItemDecoration.setKeys(sections);
 		recyclerView.addItemDecoration(headerItemDecoration);
     }
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null){
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
-				View v = mLayoutManager.findViewByPosition(position);
-				if (v != null){
-					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-				}
-			}
-			else if ( gridLayoutManager != null){
-				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
-			}
-		}
-
-		return null;
-	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -590,7 +561,14 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			return v;	
 		}
 	}
-	
+
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+	}
+
 	public void refresh(){
 		logDebug("refresh");
 		if(inboxNode != null && (((ManagerActivityLollipop) context).getParentHandleInbox()==-1||((ManagerActivityLollipop) context).getParentHandleInbox()==inboxNode.getHandle())){
@@ -613,7 +591,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
         context = activity;
     }
 
-	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
+	public void openFile(MegaNode node, int position) {
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
 			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 			//Put flag to notify FullScreenImageViewerLollipop.
@@ -627,10 +605,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			}
 
 			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
-			intent.putExtra("screenPosition", screenPosition);
+
+			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+			putThumbnailLocation(intent, recyclerView, position, adapter);
+
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
-			imageDrag = imageView;
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
 			MegaNode file = node;
 
@@ -657,12 +637,11 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
-			mediaIntent.putExtra("screenPosition", screenPosition);
+			putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
 			mediaIntent.putExtra("placeholder", placeholderCount);
 			mediaIntent.putExtra("HANDLE", file.getHandle());
 			mediaIntent.putExtra("FILENAME", file.getName());
 			mediaIntent.putExtra("adapterType", INBOX_ADAPTER);
-			imageDrag = imageView;
 
 			String localPath = getLocalFile(context, file.getName(), file.getSize());
 
@@ -754,8 +733,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 			}
 			pdfIntent.putExtra("HANDLE", file.getHandle());
-			pdfIntent.putExtra("screenPosition", screenPosition);
-			imageDrag = imageView;
+			putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
 			if (isIntentAvailable(context, pdfIntent)) {
 				startActivity(pdfIntent);
 			} else {
@@ -854,7 +832,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		}
 	}
 
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 		logDebug("itemClick");
 
 		if (adapter.isMultipleSelect()) {
@@ -897,7 +875,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				recyclerView.scrollToPosition(0);
 				checkScroll();
 			} else {
-				openFile(nodes.get(position), position, screenPosition, imageView);
+				openFile(nodes.get(position), position);
 			}
 		}
 	}

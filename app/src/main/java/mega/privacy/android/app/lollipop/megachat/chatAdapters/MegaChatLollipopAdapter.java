@@ -71,7 +71,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GiphyViewerActivity;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -7786,8 +7786,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (imageView != null) {
             imageView.getLocationOnScreen(screenPosition);
-            dimens[0] = screenPosition[0] + (imageView.getWidth() / 2);
-            dimens[1] = screenPosition[1] + (imageView.getHeight() / 2);
+            dimens[0] = screenPosition[0];
+            dimens[1] = screenPosition[1];
             dimens[2] = imageView.getWidth();
             dimens[3] = imageView.getHeight();
         }
@@ -8141,7 +8141,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play the voice clip
      */
     private void playVoiceClip(MessageVoiceClip m, String voiceClipPath){
-        AudioPlayerService.pauseAudioPlayer(context);
+        MediaPlayerService.pauseAudioPlayer(context);
 
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();

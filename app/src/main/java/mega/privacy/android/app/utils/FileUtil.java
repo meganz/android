@@ -44,7 +44,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -174,7 +173,9 @@ public class FileUtil {
         }
     }
 
-    public static boolean setStreamingIntentParams(Context context, MegaNode node, MegaApiJava megaApi, Intent intent) {
+    public static boolean setStreamingIntentParams(Context context, MegaNode node,
+                                                   MegaApiJava megaApi, Intent intent,
+                                                   SnackbarShower snackbarShower) {
         if (megaApi.httpServerIsRunning() == 0) {
             megaApi.httpServerStart();
         }
@@ -202,8 +203,8 @@ public class FileUtil {
             }
         }
 
-        ((ManagerActivityLollipop) context)
-                .showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+                MEGACHAT_INVALID_HANDLE);
 
         return false;
     }

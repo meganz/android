@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
@@ -17,9 +16,10 @@ import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
@@ -29,10 +29,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 import java.util.*
 
 @AndroidEntryPoint
@@ -49,8 +47,6 @@ class RecentsBucketFragment : BaseFragment() {
     private var adapter: MultipleBucketAdapter? = null
 
     private lateinit var bucket: BucketSaved
-
-    private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -83,7 +79,8 @@ class RecentsBucketFragment : BaseFragment() {
             setupToolbar()
             checkScroll()
         }
-        setupDraggingThumbnailCallback()
+
+        observeDragSupportEvents(viewLifecycleOwner, listView)
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
@@ -167,14 +164,10 @@ class RecentsBucketFragment : BaseFragment() {
     }?.map { it.handle }?.toLongArray()
 
     fun openFile(
+        index: Int,
         node: MegaNode,
         isMedia: Boolean,
-        thumbnail: ImageView
     ) {
-        setupDraggingThumbnailCallback()
-        val screenPosition = getThumbnailLocationOnScreen(thumbnail)
-        draggingNodeHandle = node.handle
-
         val mime = MimeTypeList.typeForName(node.name)
         val localPath =
             FileUtil.getLocalFile(activity, node.name, node.size)
@@ -182,16 +175,16 @@ class RecentsBucketFragment : BaseFragment() {
 
         when {
             mime.isImage -> {
-                openImage(screenPosition, node)
+                openImage(index, node)
             }
             FileUtil.isAudioOrVideo(node) -> {
-                openAudioVideo(screenPosition, node, isMedia, localPath)
+                openAudioVideo(index, node, isMedia, localPath)
             }
             mime.isURL -> {
                 openURL(node, localPath)
             }
             mime.isPdf -> {
-                openPdf(node, localPath)
+                openPdf(index, node, localPath)
             }
             else -> {
                 download(node.handle)
@@ -200,19 +193,22 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun openPdf(
+        index: Int,
         node: MegaNode,
         localPath: String?
     ) {
         val intent = Intent(context, PdfViewerActivityLollipop::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+        putThumbnailLocation(intent, listView, index, adapter!!)
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
                 FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
                     requireActivity() as ManagerActivityLollipop)
             } else {
-                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
+                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                    requireActivity() as ManagerActivityLollipop)
             }
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
@@ -233,7 +229,7 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun openAudioVideo(
-        screenPosition: IntArray,
+        index: Int,
         node: MegaNode,
         isMedia: Boolean,
         localPath: String?
@@ -245,7 +241,7 @@ class RecentsBucketFragment : BaseFragment() {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+        putThumbnailLocation(intent, listView, index, adapter!!)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
 
         if (isMedia) {
@@ -260,7 +256,8 @@ class RecentsBucketFragment : BaseFragment() {
                 FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
                     requireActivity() as ManagerActivityLollipop)
             } else {
-                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
+                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                    requireActivity() as ManagerActivityLollipop)
             }
 
         if (paramsSetSuccessfully) {
@@ -293,13 +290,16 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun openImage(
-        screenPosition: IntArray,
+        index: Int,
         node: MegaNode
     ) {
         val intent = Intent(activity, FullScreenImageViewerLollipop::class.java)
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        putThumbnailLocation(intent, listView, index, adapter!!)
+
         intent.putExtra(HANDLE, node.handle)
         intent.putExtra(NODE_HANDLES, getNodesHandles(true))
 
@@ -309,92 +309,5 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun download(handle: Long) {
         callManager { it.saveHandlesToDevice(listOf(handle), true, false, false, false) }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
-        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
-    }
-
-    /** All below methods are for supporting functions of FullScreenImageViewer */
-
-    private fun setupDraggingThumbnailCallback() {
-        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
-            RecentsBucketFragment::class.java,
-            RecentsBucketDraggingThumbnailCallback(WeakReference(this))
-        )
-
-        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
-            RecentsBucketFragment::class.java,
-            RecentsBucketDraggingThumbnailCallback(WeakReference(this))
-        )
-    }
-
-    fun scrollToPosition(handle: Long) {
-        val position = viewModel.getItemPositionByHandle(handle)
-        if (position == INVALID_POSITION) return
-
-        listView.scrollToPosition(position)
-        notifyThumbnailLocationOnScreen()
-    }
-
-    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
-        val position = viewModel.getItemPositionByHandle(handle)
-        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
-
-        // List and grid have different thumnail ImageView
-        return if (bucket.isMedia) {
-            viewHolder.itemView.findViewById(R.id.thumbnail_media)
-        } else {
-            viewHolder.itemView.findViewById(R.id.thumbnail_list)
-        }
-    }
-
-    private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
-        val topLeft = IntArray(2)
-
-        imageView.getLocationOnScreen(topLeft)
-        return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
-    }
-
-    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
-        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
-        return getThumbnailLocationOnScreen(thumbnailView)
-    }
-
-    fun hideDraggingThumbnail(handle: Long) {
-        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
-        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
-        draggingNodeHandle = handle
-        notifyThumbnailLocationOnScreen()
-    }
-
-    private fun notifyThumbnailLocationOnScreen() {
-        val location = getDraggingThumbnailLocationOnScreen() ?: return
-        location[0] += location[2] / 2
-        location[1] += location[3] / 2
-
-        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
-        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        context.sendBroadcast(intent)
-    }
-
-    companion object {
-        private class RecentsBucketDraggingThumbnailCallback(private val fragmentRef: WeakReference<RecentsBucketFragment>) :
-            DraggingThumbnailCallback {
-
-            override fun setVisibility(visibility: Int) {
-                val fragment = fragmentRef.get() ?: return
-                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
-                    ?.apply { this.visibility = visibility }
-            }
-
-            override fun getLocationOnScreen(location: IntArray) {
-                val fragment = fragmentRef.get() ?: return
-                val result = fragment.getDraggingThumbnailLocationOnScreen() ?: return
-                result.copyInto(location, 0, 0, 2)
-            }
-        }
     }
 }
