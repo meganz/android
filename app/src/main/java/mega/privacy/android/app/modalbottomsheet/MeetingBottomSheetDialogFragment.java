@@ -7,6 +7,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +51,6 @@ public class MeetingBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         cC = new ContactController(context);
     }
 
@@ -54,12 +58,13 @@ public class MeetingBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_meeting, null);
-        mainLinearLayout = contentView.findViewById(R.id.contact_item_bottom_sheet);
-        ImageView contactStateIcon = contentView.findViewById(R.id.contact_list_drawable_state);
-
-
+        mainLinearLayout = contentView.findViewById(R.id.meeting_bottom_sheet);
+        items_layout = contentView.findViewById(R.id.meeting_item);
+        ImageView startMeeting = contentView.findViewById(R.id.iv_start_meeting);
+        ImageView joinMeeting = contentView.findViewById(R.id.iv_join_meeting);
+        startMeeting.setOnClickListener(this);
+        joinMeeting.setOnClickListener(this);
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
     }
@@ -67,6 +72,17 @@ public class MeetingBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     @Override
     public void onClick(View v) {
 
+        switch (v.getId()) {
+            case R.id.iv_start_meeting:
+//                ContactUtil.openContactInfoActivity(context, contact.getMegaUser().getEmail());
+                break;
+
+            case R.id.iv_join_meeting:
+//                ((ManagerActivityLollipop) context).startOneToOneChat(contact.getMegaUser());
+                break;
+
+
+        }
         setStateBottomSheetBehaviorHidden();
     }
 
@@ -74,4 +90,5 @@ public class MeetingBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
+
 }

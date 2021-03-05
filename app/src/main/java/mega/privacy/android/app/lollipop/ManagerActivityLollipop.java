@@ -11692,7 +11692,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 			boolean isMeeting = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEETING, false);
 			if(isMeeting){
-				showMeetingOptionsPanel();
+				handler.post(()->showMeetingOptionsPanel());
 				return;
 			}
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
