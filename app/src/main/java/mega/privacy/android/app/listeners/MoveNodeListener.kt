@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest

@@ -43,7 +43,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -109,18 +109,20 @@ public class FileUtil {
     }
 
     public static boolean setLocalIntentParams(Context context, MegaOffline offline, Intent intent,
-            String localPath, boolean isText) {
+            String localPath, boolean isText, SnackbarShower snackbarShower) {
         return setLocalIntentParams(context, getOfflineFile(context, offline).getName(), intent,
-                localPath, isText);
+                localPath, isText, snackbarShower);
     }
 
     public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent,
-            String localPath, boolean isText) {
-        return setLocalIntentParams(context, node.getName(), intent, localPath, isText);
+            String localPath, boolean isText, SnackbarShower snackbarShower) {
+        return setLocalIntentParams(context, node.getName(), intent, localPath, isText,
+                snackbarShower);
     }
 
     public static boolean setLocalIntentParams(Context context, String nodeName, Intent intent,
-            String localPath, boolean isText) {
+                                               String localPath, boolean isText,
+                                               SnackbarShower snackbarShower) {
         File mediaFile = new File(localPath);
 
         Uri mediaFileUri;
@@ -141,8 +143,8 @@ public class FileUtil {
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
-                getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+                MEGACHAT_INVALID_HANDLE);
 
         return false;
     }
@@ -171,7 +173,9 @@ public class FileUtil {
         }
     }
 
-    public static boolean setStreamingIntentParams(Context context, MegaNode node, MegaApiJava megaApi, Intent intent) {
+    public static boolean setStreamingIntentParams(Context context, MegaNode node,
+                                                   MegaApiJava megaApi, Intent intent,
+                                                   SnackbarShower snackbarShower) {
         if (megaApi.httpServerIsRunning() == 0) {
             megaApi.httpServerStart();
         }
@@ -199,13 +203,14 @@ public class FileUtil {
             }
         }
 
-        ((ManagerActivityLollipop) context)
-                .showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+                MEGACHAT_INVALID_HANDLE);
 
         return false;
     }
 
-    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent, String localPath) {
+    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent,
+                                             String localPath, SnackbarShower snackbarShower) {
         File mediaFile = new File(localPath);
         InputStream instream = null;
         boolean paramsSetSuccessfully = false;
@@ -240,7 +245,7 @@ public class FileUtil {
             return true;
         }
         logError("Not expected format: Exception on processing url file");
-        return setLocalIntentParams(context, node, intent, localPath, true);
+        return setLocalIntentParams(context, node, intent, localPath, true, snackbarShower);
     }
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {

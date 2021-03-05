@@ -209,7 +209,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     @Override
-    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+    public void itemClick(int position) {
         if (adapter.isMultipleSelect()) {
             logDebug("multiselect ON");
             adapter.toggleSelection(position);
@@ -231,7 +231,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             checkScroll();
             managerActivity.showFabButton();
         } else {
-            openFile(nodes.get(position), LINKS_ADAPTER, position, screenPosition, imageView);
+            openFile(nodes.get(position), LINKS_ADAPTER, position);
         }
     }
 

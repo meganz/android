@@ -4,13 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -23,22 +20,15 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
-import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
-import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -47,18 +37,14 @@ import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
@@ -67,10 +53,8 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DownloadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -78,7 +62,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -962,13 +945,6 @@ public class ChatController {
         }
     }
 
-    public void pickFileToSend(){
-        logDebug("pickFileToSend");
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
-        ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
-    }
-
     public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chatRoom){
         logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
@@ -1002,11 +978,6 @@ public class ChatController {
                 }
                 else if (context instanceof PdfViewerActivityLollipop){
                     ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             REQUEST_WRITE_STORAGE);
                 }
@@ -1065,473 +1036,14 @@ public class ChatController {
             document = authorizeNodeIfPreview(document, chatRoom);
             String serializeString = document.serialize();
             logDebug("serializeString: " + serializeString);
-            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
+            service.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
-            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+            if (context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
             }
             context.startService(service);
         }
 
-    }
-
-    public void requestLocalFolder (long size, ArrayList<String> serializedNodes) {
-        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-        intent.setClass(context, FileStorageActivityLollipop.class);
-        intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES, serializedNodes);
-
-        if(context instanceof ChatActivityLollipop){
-            ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-        }
-        else if(context instanceof ChatFullScreenImageViewer){
-            ((ChatFullScreenImageViewer) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-        }
-        else if(context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-        }
-        else if(context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-        }
-        else if(context instanceof NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-        }
-    }
-
-    private void filePathDefault(String path, final ArrayList<MegaNode> nodeList){
-        logDebug("filePathDefault");
-        File defaultPathF = new File(path);
-        defaultPathF.mkdirs();
-        checkSizeBeforeDownload(path, nodeList);
-    }
-
-    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
-        logDebug("prepareForChatDownload");
-        ArrayList<MegaNode> nodeList =  new ArrayList<>();
-        MegaNodeList megaNodeList;
-        for (int i= 0; i<list.size(); i++){
-            megaNodeList = list.get(i);
-            for (int j=0; j<megaNodeList.size(); j++){
-                nodeList.add(megaNodeList.get(j));
-            }
-        }
-        prepareForDownloadVersions(nodeList);
-    }
-
-    public void prepareForChatDownload(MegaNodeList list){
-        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
-        prepareForDownloadVersions(nodeList);
-    }
-
-    public void prepareForChatDownload(MegaNode node){
-        logDebug("Node: " + node.getHandle());
-        ArrayList<MegaNode> nodeList = new ArrayList<>();
-        nodeList.add(node);
-        prepareForDownloadVersions(nodeList);
-    }
-
-    private ArrayList<String> serializeNodes(ArrayList<MegaNode> nodeList) {
-        ArrayList<String> serializedNodes = new ArrayList<>();
-        for (MegaNode node : nodeList) {
-            serializedNodes.add(node.serialize());
-        }
-        return serializedNodes;
-    }
-
-    private ArrayList<MegaNode> unSerializeNodes(ArrayList<String> serializedNodes) {
-        ArrayList<MegaNode> nodeList = new ArrayList<>();
-        if (serializedNodes != null) {
-            for (String nodeString : serializedNodes) {
-                nodeList.add(MegaNode.unserialize(nodeString));
-            }
-        }
-        return nodeList;
-    }
-
-    public void prepareForDownload(Intent intent, String parentPath) {
-        ArrayList<String> serializedNodes = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES);
-        ArrayList<MegaNode> megaNodes = unSerializeNodes(serializedNodes);
-        if (megaNodes.size() > 0) {
-            checkSizeBeforeDownload(parentPath, megaNodes);
-        }
-    }
-
-    private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
-        logDebug("Node list size: " + nodeList.size() + " files to download");
-        long size = 0;
-        for (int i = 0; i < nodeList.size(); i++) {
-            size += nodeList.get(i).getSize();
-        }
-        logDebug("Number of files: " + nodeList.size());
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        String downloadLocationDefaultPath = getDownloadLocation();
-
-        if(!nodeList.isEmpty() && isVoiceClip(nodeList.get(0).getName())){
-            File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
-            checkSizeBeforeDownload(vcFile.getParentFile().getPath(), nodeList);
-            return;
-        }
-
-        boolean askMe = askMe(context);
-        if (askMe){
-            requestLocalFolder(size, serializeNodes(nodeList));
-        }
-        else{
-            logDebug("NOT askMe");
-            filePathDefault(downloadLocationDefaultPath,nodeList);
-        }
-    }
-
-    public void checkSizeBeforeDownload(String parentPath, ArrayList<MegaNode> nodeList){
-        //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        logDebug("Node list size: " + nodeList.size());
-
-        final String parentPathC = parentPath;
-        long sizeTemp=0;
-        long[] hashes = new long[nodeList.size()];
-
-        for (int i=0;i<nodeList.size();i++) {
-            MegaNode node = nodeList.get(i);
-            hashes[i] = node.getHandle();
-            if(node!=null){
-                sizeTemp = sizeTemp+node.getSize();
-            }
-        }
-
-        final long sizeC = sizeTemp;
-        logDebug("The final size is: " + getSizeString(sizeTemp));
-
-        //Check if there is available space
-        double availableFreeSpace = Double.MAX_VALUE;
-        try {
-            StatFs stat = new StatFs(parentPath);
-            availableFreeSpace = stat.getAvailableBytes();
-        } catch (Exception ex) { }
-
-        logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-        if(availableFreeSpace < sizeC) {
-            showNotEnoughSpaceSnackbar(context);
-            logWarning("Not enough space");
-            return;
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        if(isVoiceClip(nodeList.get(0).getName())){
-            download(parentPath, nodeList);
-            return;
-        }
-
-
-        String ask=dbH.getAttributes().getAskSizeDownload();
-
-        if (ask==null) {
-            ask="true";
-        }
-
-        if (ask.equals("false")) {
-            logDebug("SIZE: Do not ask before downloading");
-            download(parentPathC, nodeList);
-        }
-        else{
-            logDebug("SIZE: Ask before downloading");
-            if (sizeC>104857600) {
-                logDebug("Show size confirmation: " + sizeC);
-                //Show alert
-                if (context instanceof ChatActivityLollipop) {
-                    ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if (context instanceof ChatFullScreenImageViewer) {
-                    ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if (context instanceof PdfViewerActivityLollipop) {
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if (context instanceof NodeAttachmentHistoryActivity) {
-                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-            }
-            else {
-                download(parentPathC, nodeList);
-            }
-        }
-    }
-
-    public void download(String parentPath, ArrayList<MegaNode> nodeList){
-        logDebug("download()");
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                if (context instanceof ManagerActivityLollipop) {
-                    ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }else if (context instanceof ChatFullScreenImageViewer){
-                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }else if (context instanceof ChatActivityLollipop){
-                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                return;
-            }
-        }
-
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        if (nodeList == null) {
-            return;
-        }
-
-        long size = 0;
-        for (int i = 0; i < nodeList.size(); i++) {
-            size += nodeList.get(i).getSize();
-        }
-
-        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
-        if(sdCardOperator == null) {
-            requestLocalFolder(size, serializeNodes(nodeList));
-            return;
-        }
-
-        if(nodeList.size() == 1) {
-            logDebug("hashes.length == 1");
-            MegaNode tempNode = nodeList.get(0);
-            if (context instanceof ChatActivityLollipop) {
-                tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
-            } else if (context instanceof NodeAttachmentHistoryActivity) {
-                tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
-            }
-            if ((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE) {
-                logDebug("ISFILE");
-                String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize());
-
-                //Check if the file is already downloaded
-                MegaApplication app = MegaApplication.getInstance();
-                if (localPath != null) {
-                    checkDownload(context, tempNode, localPath, parentPath, true, sdCardOperator);
-
-                    if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled()) || isVoiceClip(nodeList.get(0).getName())) {
-                        return;
-                    }
-
-                    if (MimeTypeList.typeForName(tempNode.getName()).isZip()) {
-                        logDebug("MimeTypeList ZIP");
-                        File zipFile = new File(localPath);
-
-                        Intent intentZip = new Intent();
-                        intentZip.setClass(context, ZipBrowserActivityLollipop.class);
-                        intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-                        intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-
-                        context.startActivity(intentZip);
-
-                    } else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                        logDebug("Video/Audio file");
-
-                        File mediaFile = new File(localPath);
-
-                        Intent mediaIntent;
-                        boolean internalIntent;
-                        boolean opusFile = false;
-                        if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported() || MimeTypeList.typeForName(tempNode.getName()).isAudioNotSupported()) {
-                            mediaIntent = new Intent(Intent.ACTION_VIEW);
-                            internalIntent = false;
-                            String[] s = tempNode.getName().split("\\.");
-                            if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
-                                opusFile = true;
-                            }
-                        } else {
-                            internalIntent = true;
-                            mediaIntent = getMediaIntent(context, tempNode.getName());
-                        }
-                        mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-                        mediaIntent.putExtra("HANDLE", tempNode.getHandle());
-                        mediaIntent.putExtra("adapterType", FROM_CHAT);
-                        mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, app.isActivityVisible());
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                        } else {
-                            mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                        }
-                        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        if (opusFile) {
-                            mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-                        }
-                        if (internalIntent) {
-                            context.startActivity(mediaIntent);
-                        } else {
-                            if (isIntentAvailable(context, mediaIntent)) {
-                                context.startActivity(mediaIntent);
-                            } else {
-                                showSnackbar(context, context.getString(R.string.intent_not_available));
-                                Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                } else {
-                                    intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                if (isIntentAvailable(context, intentShare)) {
-                                    logDebug("Call to startActivity(intentShare)");
-                                    context.startActivity(intentShare);
-                                }
-                            }
-                        }
-                    } else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()) {
-                        logDebug("Pdf file");
-
-                        File pdfFile = new File(localPath);
-                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                        pdfIntent.putExtra("inside", true);
-                        pdfIntent.putExtra("HANDLE", tempNode.getHandle());
-                        pdfIntent.putExtra("adapterType", FROM_CHAT);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                        } else {
-                            pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                        }
-                        pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        context.startActivity(pdfIntent);
-                    } else {
-                        logDebug("MimeTypeList other file");
-                        try {
-                            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            } else {
-                                viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            if (isIntentAvailable(context, viewIntent)) {
-                                logDebug("IF isIntentAvailable");
-                                context.startActivity(viewIntent);
-                            } else {
-                                logDebug("ELSE isIntentAvailable");
-                                Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                } else {
-                                    intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                if (isIntentAvailable(context, intentShare)) {
-                                    logDebug("Call to startActivity(intentShare)");
-                                    context.startActivity(intentShare);
-                                }
-                                showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                            }
-                        } catch (Exception e) {
-                            logWarning("Exception downloading file", e);
-                            showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                        }
-                    }
-                    return;
-                }
-            }
-        }
-
-        int numberOfNodesToDownload = 0;
-        int numberOfNodesAlreadyDownloaded = 0;
-        int numberOfNodesPending = 0;
-
-        for (int i=0; i<nodeList.size();i++) {
-            MegaNode nodeToDownload = nodeList.get(i);
-            if(nodeToDownload != null){
-                logDebug("Node NOT null is going to donwload");
-                Map<MegaNode, String> dlFiles = new HashMap<>();
-                Map<Long, String> targets = new HashMap<>();
-
-                if (sdCardOperator.isSDCardDownload()) {
-                    targets.put(nodeToDownload.getHandle(), parentPath);
-                    dlFiles.put(nodeToDownload, sdCardOperator.getDownloadRoot());
-                } else {
-                    dlFiles.put(nodeToDownload, parentPath);
-                }
-
-                for (MegaNode document : dlFiles.keySet()) {
-                    String path = dlFiles.get(document);
-                    String targetPath = targets.get(document.getHandle());
-
-                    if (isTextEmpty(path)) {
-                        continue;
-                    }
-
-                    numberOfNodesToDownload++;
-
-                    File destDir = new File(path);
-                    File destFile;
-                    destDir.mkdirs();
-                    if (destDir.isDirectory()) {
-                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
-                    } else {
-                        destFile = destDir;
-                    }
-
-                    if (isFileAvailable(destFile) && document.getSize() == destFile.length()) {
-                        numberOfNodesAlreadyDownloaded++;
-                    } else {
-                        numberOfNodesPending++;
-                        Intent service = new Intent(context, DownloadService.class);
-                        if (context instanceof ChatActivityLollipop) {
-                            nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
-                        } else if (context instanceof NodeAttachmentHistoryActivity) {
-                            nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((NodeAttachmentHistoryActivity) context).getChatRoom());
-                        }
-                        String serializeString = nodeToDownload.serialize();
-
-                        if (isVoiceClip(nodeList.get(0).getName())) {
-                            service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra(EXTRA_TRANSFER_TYPE, APP_DATA_VOICE_CLIP);
-                        } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
-                            service.putExtra("fromMV", true);
-                        }
-                        if (sdCardOperator.isSDCardDownload()) {
-                            service = NodeController.getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
-                        } else {
-                            service.putExtra(DownloadService.EXTRA_PATH, path);
-                        }
-                        logDebug("serializeString: " + serializeString);
-                        service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-                        service.putExtra(HIGH_PRIORITY_TRANSFER, true);
-                        context.startService(service);
-                    }
-                }
-            }
-        }
-
-        if (numberOfNodesToDownload == 1 && isVoiceClip(nodeList.get(0).getName())) {
-            return;
-        }
-
-        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, 0);
     }
 
     public void importNode(long idMessage, long idChat) {
@@ -1725,227 +1237,6 @@ public class ChatController {
         }
 
         return false;
-    }
-
-    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long idChat) {
-        long[] idChats = new long[1];
-        idChats[0] = idChat;
-        checkIfNodesAreMineAndAttachNodes(handles, idChats);
-    }
-
-    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long[] idChats) {
-        if (handles == null) {
-            return;
-        }
-
-        MegaNode currentNode;
-        ArrayList<MegaNode> nodes = new ArrayList<>();
-        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
-        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
-        NodeController nC = new NodeController(context);
-
-
-        for (int i=0; i<handles.length; i++) {
-            currentNode = megaApi.getNodeByHandle(handles[i]);
-            if (currentNode != null) {
-                nodes.add(currentNode);
-            }
-        }
-
-        nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
-
-        if (notOwnerNodes.size() == 0) {
-            //Copy the ownerNodes handles to use them in case they are not the original ones stored on handles list
-            for (int i=0; i< ownerNodes.size(); i++) {
-                handles[i] = ownerNodes.get(i).getHandle();
-            }
-
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
-                return;
-            } else if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).sendFilesToChats(null, idChats, handles);
-                return;
-            } else if (context instanceof ChatActivityLollipop) {
-                MultipleAttachChatListener listener = new MultipleAttachChatListener(context, idChats[0], handles.length);
-                for (long fileHandle : handles) {
-                    megaChatApi.attachNode(idChats[0], fileHandle, listener);
-                }
-                return;
-            }
-        }
-
-        if (context instanceof ContactInfoActivityLollipop || context instanceof ChatActivityLollipop) {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats[0]);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        } else if (context instanceof ManagerActivityLollipop) {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        }
-    }
-
-    public void checkIntentToShareSomething(Intent intent) {
-        long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-        long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
-        long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-        long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
-        String extraLink = intent.getStringExtra(EXTRA_LINK);
-        String extraKey = intent.getStringExtra(EXTRA_KEY);
-        String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
-
-        if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
-            if (contactHandles != null && contactHandles.length > 0) {
-                ArrayList<MegaChatRoom> chats = new ArrayList<>();
-                ArrayList<MegaUser> users = new ArrayList<>();
-
-                for (long contactHandle : contactHandles) {
-                    MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandle));
-                    if (user != null) {
-                        users.add(user);
-                    }
-                }
-
-                if (chatHandles != null) {
-                    for (long chatHandle : chatHandles) {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandle);
-                        if (chatRoom != null) {
-                            chats.add(chatRoom);
-                        }
-                    }
-                }
-
-                CreateChatListener listener = null;
-                boolean createChats = false;
-
-                if (nodeHandles != null) {
-                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES);
-                    createChats = true;
-                } else if (userHandles != null) {
-                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
-                    createChats = true;
-                } else if (!isTextEmpty(extraLink)) {
-                    listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
-                } else {
-                    logWarning("Error on sending to chat");
-                }
-
-                if (createChats) {
-                    for (MegaUser user : users) {
-                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                        megaChatApi.createChat(false, peers, listener);
-                    }
-                }
-            } else {
-                int countChat = chatHandles.length;
-                logDebug("Selected: " + countChat + " chats to send");
-
-                if (nodeHandles != null) {
-                    logDebug("Send " + nodeHandles.length + " nodes");
-                    checkIfNodesAreMineAndAttachNodes(nodeHandles, chatHandles);
-                } else if (userHandles != null) {
-                    logDebug("Send " + userHandles.length + " contacts");
-                    sendContactsToChats(chatHandles, userHandles);
-                } else if (!isTextEmpty(extraLink)) {
-                    sendLinkToChats(context, chatHandles, extraLink, extraKey, extraPassword);
-                } else {
-                    logWarning("Error on sending to chat");
-                }
-            }
-        }
-    }
-
-    /**
-     * Shares a link to chats. The link can be received along with its decryption key or with it.
-     * There are several possibilities to share a link:
-     * - Link along with decryption key:
-     *      * Without password protection. Here key and password params should be null.
-     *      * With password protection. Here key param should be null and password param:
-     *              + Can contain the password protection.
-     *              + Be null if only the protected link is shared.
-     * - Link without decryption key. Here password param should be always null and key param:
-     *      * Can contain the decryption key.
-     *      * Be null if only the link is shared.
-     *
-     * @param context      Current context.
-     * @param chatHandles List of chat identifiers to which the link has to be shared.
-     * @param link        Link to share.
-     * @param key         Decryption key of the link to share. It can be null.
-     * @param password    Password protection of the link to share. It can be null.
-     */
-    public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
-        MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null) {
-            logError("MegaChatApi is null");
-            return;
-        }
-
-        for (Long chatId : chatHandles) {
-            megaChatApi.sendMessage(chatId, link);
-
-            if (!isTextEmpty(key)) {
-                megaChatApi.sendMessage(chatId, key);
-            } else if (!isTextEmpty(password)) {
-                megaChatApi.sendMessage(chatId, password);
-            }
-        }
-
-        String message;
-
-        if (!isTextEmpty(key)) {
-            message = context.getString(R.string.link_and_key_sent);
-        } else if (!isTextEmpty(password)) {
-            message = context.getString(R.string.link_and_password_sent);
-        } else {
-            message = context.getString(R.string.link_sent);
-        }
-
-        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, message, chatHandles.length == 1
-                ? chatHandles[0]
-                : MEGACHAT_INVALID_HANDLE);
-    }
-
-    public void sendContactsToChats(long[] chatHandles, long[] userHandles) {
-        MegaHandleList handleList = MegaHandleList.createInstance();
-
-        for (long userHandle : userHandles) {
-            handleList.addMegaHandle(userHandle);
-        }
-
-        for (long chatHandle : chatHandles) {
-            megaChatApi.attachContacts(chatHandle, handleList);
-        }
-
-        if (chatHandles.length == 1) {
-            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
-        } else {
-            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, INVALID_HANDLE);
-        }
-    }
-
-    /**
-     * Method for send a file into one or more chats
-     *
-     * @param context Context of the Activity where the file has to be sent
-     * @param chats Chats where the file has to be sent
-     * @param fileHandle Handle of the file that has to be sent
-     */
-    public static void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        logDebug("sendFileToChatsFromContacts");
-
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MultipleAttachChatListener listener;
-
-        if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
-            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-        }
-        else{
-            listener = new MultipleAttachChatListener(context, -1, chats.size());
-            for(int i=0;i<chats.size();i++){
-                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-            }
-        }
     }
 
     /**

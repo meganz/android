@@ -16,9 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -32,6 +30,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -60,7 +59,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -91,11 +89,12 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
+import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -106,8 +105,10 @@ import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -116,8 +117,8 @@ import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -141,6 +142,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -204,7 +206,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatActivityLollipop extends PinActivityLollipop
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
-        StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback {
+        StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
+        SnackbarShower, AttachNodeToChatListener {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -289,13 +292,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private int marginBottomActivated;
     private boolean newVisibility;
     private boolean getMoreHistory;
-    private int minutesLastGreen = INVALID_VALUE;
     private boolean isLoadingHistory;
     private AlertDialog errorOpenChatDialog;
     private long numberToLoad;
     private ArrayList<Integer> recoveredSelectedPositions = null;
 
-    private AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
     private AlertDialog errorReactionsDialog;
     private boolean errorReactionsDialogIsShown;
@@ -343,6 +344,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     private BadgeDrawerArrowDrawable badgeDrawable;
     private Drawable upArrow;
+
+    private final MegaAttacher nodeAttacher = new MegaAttacher(this);
+    private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -1454,6 +1459,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                         if(errorReactionsDialogIsShown && typeErrorReaction != REACTION_ERROR_DEFAULT_VALUE){
                             createLimitReactionsAlertDialog(typeErrorReaction);
                         }
+
+                        nodeSaver.restoreState(savedInstanceState);
                     }
 
                     String text = null;
@@ -2586,7 +2593,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
      * Start recording
      */
     public void startRecording(){
-        AudioPlayerService.pauseAudioPlayer(this);
+        MediaPlayerService.pauseAudioPlayer(this);
 
         long timeStamp = System.currentTimeMillis() / 1000;
         outputFileName = "/note_voice" + getVoiceClipName(timeStamp);
@@ -3049,33 +3056,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) return;
-        switch (requestCode) {
-            case REQUEST_WRITE_STORAGE: {
-                logDebug("REQUEST_WRITE_STORAGE");
-                //After storage authorization, resume unfinished download
-                if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
-                    ArrayList<MegaNodeList> list = new ArrayList<>();
-                    if(preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-                        for (int i = 0; i < preservedMessagesSelected.size(); i++) {
-                            MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
-                            list.add(megaNodeList);
-                        }
 
-                        chatC.prepareForChatDownload(list);
-                        preservedMessagesSelected = null;
-                    }
-                }
-                break;
-            }
-            case REQUEST_WRITE_STORAGE_OFFLINE: {
-                logDebug("REQUEST_WRITE_STORAGE");
-                //After storage authorization, resume unfinished offline download
-                if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE_OFFLINE)) {
-                    chatC.saveForOfflineWithAndroidMessages(preservedMessagesSelected, chatRoom);
-                    preservedMessagesSelected = null;
-                }
-                break;
-            }
+        if (nodeSaver.handleRequestPermissionsResult(requestCode)) {
+            return;
+        }
+
+        switch (requestCode) {
             case REQUEST_CAMERA:
             case REQUEST_RECORD_AUDIO:{
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO");
@@ -3225,6 +3211,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("resultCode: " + resultCode);
+
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+            return;
+        }
+
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             if (intent == null) {
                 logWarning("Return.....");
@@ -3264,15 +3255,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
-            if (intent == null) {
-                logWarning("Return.....");
-                return;
-            }
-
-            long handles[] = intent.getLongArrayExtra(NODE_HANDLES);
-            logDebug("Number of files to send: " + handles.length);
-
-            chatC.checkIfNodesAreMineAndAttachNodes(handles, idChat);
+            nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
         }
         else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
             if (intent == null) {
@@ -3402,13 +3385,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Send location [longLatitude]: " + latitude + " [longLongitude]: " + longitude);
                 sendLocationMessage(longitude, latitude, encodedSnapshot);
             }
-        } else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            logDebug("Local folder selected");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            Util.storeDownloadLocationIfNeeded(parentPath);
-
-            chatC.prepareForDownload(intent, parentPath);
-        } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
+        } if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));
         } else{
             logError("Error onActivityResult");
@@ -3938,8 +3915,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
     public void attachFromCloud(){
         logDebug("attachFromCloud");
         if(megaApi!=null && megaApi.getRootNode()!=null){
-            ChatController chatC = new ChatController(this);
-            chatC.pickFileToSend();
+            Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+            intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
+            startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
         }
         else{
             logWarning("Online but not megaApi");
@@ -4282,16 +4260,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     logDebug("chat_cab_menu_download ");
                     finishMultiselectionMode();
 
-                    if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
-                        preservedMessagesSelected = messagesSelected;
-                        return false;
-                    }
                     ArrayList<MegaNodeList> list = new ArrayList<>();
                     for (int i = 0; i < messagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
-                    chatC.prepareForChatDownload(list);
+                    nodeSaver.saveNodeLists(list, false, false, false, true);
                     break;
 
                 case R.id.chat_cab_menu_import:
@@ -4301,10 +4275,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                 case R.id.chat_cab_menu_offline:
                     finishMultiselectionMode();
-                    if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE_OFFLINE)) {
-                        preservedMessagesSelected = messagesSelected;
-                        return false;
-                    }
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
                     break;
 
@@ -4661,6 +4631,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
             return adapter.isMultipleSelect();
         }
         return false;
+    }
+
+    public void downloadNodeList(MegaNodeList nodeList) {
+        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
@@ -6055,7 +6029,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
     public void sendToDownload(MegaNodeList nodelist){
         logDebug("sendToDownload");
-        chatC.prepareForChatDownload(nodelist);
+        nodeSaver.downloadVoiceClip(nodelist);
     }
 
     @Override
@@ -7438,10 +7412,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
-    public void showSnackbar(int type, String s, long idChat){
-        showSnackbar(type, fragmentContainer, s, idChat);
-    }
-
     public void showSnackbar(int type, String s, long idChat, String emailUser){
         showSnackbar(type, fragmentContainer, s, idChat, emailUser);
     }
@@ -7879,7 +7849,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
             megaApi.removeRequestListener(this);
         }
 
-        AudioPlayerService.resumeAudioPlayerIfNotInCall(this);
+        MediaPlayerService.resumeAudioPlayerIfNotInCall(this);
+
+        nodeSaver.destroy();
 
         super.onDestroy();
     }
@@ -8156,6 +8128,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         outState.putString("mOutputFilePath",mOutputFilePath);
         outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
 
+        nodeSaver.saveState(outState);
+
         if(adapter == null)
             return;
 
@@ -8183,52 +8157,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-    }
-
-    public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-        logDebug("askSizeConfirmationBeforeChatDownload");
-
-        final String parentPathC = parentPath;
-        final ArrayList<MegaNode> nodeListC = nodeList;
-        final long sizeC = size;
-        final ChatController chatC = new ChatController(this);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleHeightPx(10, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
-
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskSizeDownload("false");
-                        }
-                        chatC.download(parentPathC, nodeListC);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskSizeDownload("false");
-                }
-            }
-        });
-
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
     }
 
     /*
@@ -8604,7 +8532,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         if(!chatRoom.isGroup() && userhandle == chatRoom.getPeerHandle(0)){
             logDebug("Update last green");
-            minutesLastGreen = lastGreen;
 
             int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
 
@@ -9597,6 +9524,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
         errorReactionsDialog.show();
         errorReactionsDialogIsShown = true;
         typeErrorReaction = typeError;
+    }
+
+    @Override
+    public void showSnackbar(int type, String content, long chatId) {
+        showSnackbar(type, fragmentContainer, content, chatId);
+    }
+
+    @Override
+    public void onSendSuccess(@NotNull AndroidMegaChatMessage message) {
+        sendMessageToUI(message);
     }
 
     /**

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,11 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -82,8 +84,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static final String AD_SLOT = "and4";
 
     protected ManagerActivityLollipop managerActivity;
-
-    public static ImageView imageDrag;
 
     protected ActionMode actionMode;
 
@@ -112,7 +112,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected abstract int onBackPressed();
 
-    protected abstract void itemClick(int position, int[] screenPosition, ImageView imageView);
+    protected abstract void itemClick(int position);
 
     protected abstract void refresh();
 
@@ -167,7 +167,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
-                    nC.prepareForDownload(handleList, false);
+                    managerActivity.saveNodesToDevice(selected, false, false, false, false);
                     hideActionMode();
                     break;
 
@@ -226,11 +226,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_send_to_chat:
-                    if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                        showOverDiskQuotaPaywallWarning();
-                        break;
-                    }
-                    nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
+                    managerActivity.attachNodesToChats(adapter.getArrayListSelectedNodes());
                     hideActionMode();
                     break;
 
@@ -408,35 +404,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public ImageView getImageDrag(int position) {
-        logDebug("Position: " + position);
-        if (adapter != null) {
-            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-                View v = mLayoutManager.findViewByPosition(position);
-                if (v != null) {
-                    return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-                }
-            } else if (gridLayoutManager != null) {
-                View v = gridLayoutManager.findViewByPosition(position);
-                if (v != null) {
-                    return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-                }
-            }
-        }
-        return null;
-    }
-
-    public void updateScrollPosition(int position) {
-        logDebug("Position: " + position);
-        if (adapter != null) {
-            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-                mLayoutManager.scrollToPosition(position);
-            } else if (gridLayoutManager != null) {
-                gridLayoutManager.scrollToPosition(position);
-            }
-        }
-    }
-
     public void addSectionTitle(List<MegaNode> nodes, int type) {
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
@@ -516,7 +483,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public void openFile(MegaNode node, int fragmentAdapter, int position, int[] screenPosition, ImageView imageView) {
+    public void openFile(MegaNode node, int fragmentAdapter, int position) {
         MimeTypeList mimeType = MimeTypeList.typeForName(node.getName());
         String mimeTypeType = mimeType.getType();
         Intent intent = null;
@@ -531,7 +498,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("isFolderLink", false);
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
-            intent.putExtra("screenPosition", screenPosition);
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
@@ -550,7 +517,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
-            intent.putExtra("screenPosition", screenPosition);
             intent.putExtra("HANDLE", node.getHandle());
             intent.putExtra("FILENAME", node.getName());
 
@@ -653,7 +619,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
-            intent.putExtra("screenPosition", screenPosition);
 
             String localPath = getLocalFile(context, node.getName(), node.getSize());
             if (localPath != null) {
@@ -699,9 +664,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         if (intent != null) {
             if (internalIntent || isIntentAvailable(context, intent)) {
+                putThumbnailLocation(intent, recyclerView, position, adapter);
                 context.startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
-                imageDrag = imageView;
 
                 return;
             } else {
@@ -709,10 +674,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         }
 
-        ArrayList<Long> handleList = new ArrayList<>();
-        handleList.add(node.getHandle());
-        NodeController nC = new NodeController(context);
-        nC.prepareForDownload(handleList, true);
+        managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
 
     private int getIntentOrder(int fragmentAdapter) {
@@ -858,5 +820,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         // in order to let it know in where to show the Ads
         mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
                 managerActivity.getOutMetrics());
+
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
     }
 }

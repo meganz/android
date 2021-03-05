@@ -2,21 +2,13 @@ package mega.privacy.android.app.components.saver
 
 import android.Manifest.permission
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
-import android.os.Handler
-import android.os.Looper
+import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -24,28 +16,40 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.autoPlayNode
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.nodeListToArray
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import java.util.concurrent.Callable
 
 /**
- * A class that encapsulate all the procedure of saving a node into device,
+ * A class that encapsulate all the procedure of saving nodes into device,
  * including choose save to internal storage or external sdcard,
  * choose save path, check download size, check other apps that could open this file, etc,
  * the final step that really download the node into a file is handled in sub-classes,
@@ -54,29 +58,280 @@ import java.util.concurrent.Callable
  * The initiation API of save should also be added by sub-classes, because it's usually
  * related with the final download step.
  *
- * It simplifies code in activity/fragment where a node need to be saved.
+ * It simplifies code in app/fragment where nodes need to be saved.
  */
-abstract class NodeSaver(
-    protected val context: Context,
-    protected val dbHandler: DatabaseHandler,
+class NodeSaver(
+    private val activityLauncher: ActivityLauncher,
+    private val permissionRequester: PermissionRequester,
+    private val snackbarShower: SnackbarShower,
+    private val confirmDialogShower: (message: String, onConfirmed: (Boolean) -> Unit) -> Unit
 ) {
     private val compositeDisposable = CompositeDisposable()
-    private val uiHandler = Handler(Looper.getMainLooper())
-    protected var saving = Saving.NOTHING
-    private var activityStarter: (Intent, Int) -> Unit = { _, _ -> }
+
+    private val app = MegaApplication.getInstance()
+    private val megaApi = app.megaApi
+    private val megaApiFolder = app.megaApiFolder
+    private val dbHandler = DatabaseHandler.getDbHandler(app)
+
+    private var saving = Saving.NOTHING
 
     /**
-     * Handle activity result from FileStorageActivityLollipop launched by requestLocalFolder,
+     * Save an offline node into device.
+     *
+     * @param handle handle of the offline node to save
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    fun saveOfflineNode(
+        handle: Long,
+        fromMediaViewer: Boolean = false
+    ) {
+        val node = dbHandler.findByHandle(handle) ?: return
+        saveOfflineNodes(listOf(node), fromMediaViewer)
+    }
+
+    /**
+     * Save an offline node into device.
+     *
+     * @param node the offline node to save
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    fun saveOfflineNode(
+        node: MegaOffline,
+        fromMediaViewer: Boolean = false
+    ) {
+        saveOfflineNodes(listOf(node), fromMediaViewer)
+    }
+
+    /**
+     * Save offline nodes into device.
+     *
+     * @param nodes the offline nodes to save
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    fun saveOfflineNodes(
+        nodes: List<MegaOffline>,
+        fromMediaViewer: Boolean = false
+    ) {
+        save {
+            var totalSize = 0L
+            for (node in nodes) {
+                totalSize += getTotalSize(getOfflineFile(app, node))
+            }
+            OfflineSaving(totalSize, nodes, fromMediaViewer)
+        }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param handle the handle of node to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveHandle(
+        handle: Long,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        saveHandles(listOf(handle), highPriority, isFolderLink, fromMediaViewer, needSerialize)
+    }
+
+    /**
+     * Save a list of MegaNode into device.
+     *
+     * @param handles the handle list of nodes to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveHandles(
+        handles: List<Long>,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        save {
+            val nodes = ArrayList<MegaNode>()
+            var totalSize = 0L
+
+            val api = if (isFolderLink) megaApiFolder else megaApi
+
+            for (handle in handles) {
+                val node = api.getNodeByHandle(handle)
+                if (node != null) {
+                    nodes.add(node)
+                    totalSize += node.size
+                }
+            }
+
+            MegaNodeSaving(
+                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+            )
+        }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param node node to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveNode(
+        node: MegaNode,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
+    }
+
+    /**
+     * Save a list of MegaNodeList into device.
+     *
+     * @param nodeLists MegaNodeLists to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveNodeLists(
+        nodeLists: List<MegaNodeList>,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        save {
+            val nodes = ArrayList<MegaNode>()
+            for (nodeList in nodeLists) {
+                val array = nodeListToArray(nodeList)
+                if (array != null) {
+                    nodes.addAll(array)
+                }
+            }
+
+            MegaNodeSaving(
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
+                needSerialize
+            )
+        }
+    }
+
+    /**
+     * Save a list of MegaNode into device.
+     *
+     * @param nodes nodes to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveNodes(
+        nodes: List<MegaNode>,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        save {
+            MegaNodeSaving(
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
+                needSerialize
+            )
+        }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param node node to save
+     * @param parentPath parent path
+     */
+    fun saveNode(node: MegaNode, parentPath: String) {
+        add(
+            Completable
+                .fromCallable(Callable {
+                    this.saving = MegaNodeSaving(
+                        node.size,
+                        highPriority = false,
+                        isFolderLink = false,
+                        nodes = listOf(node),
+                        fromMediaViewer = false,
+                        needSerialize = false
+                    )
+
+                    if (lackPermission()) {
+                        return@Callable
+                    }
+
+                    checkSizeBeforeDownload(parentPath)
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver saveNode"))
+        )
+    }
+
+    /**
+     * Download voice clip.
+     *
+     * @param nodeList voice clip to download
+     */
+    fun downloadVoiceClip(nodeList: MegaNodeList) {
+        add(
+            Completable
+                .fromCallable(Callable {
+                    val nodes = nodeListToArray(nodeList)
+                    if (nodes == null || nodes.isEmpty()) {
+                        return@Callable
+                    }
+
+                    val parentPath =
+                        buildVoiceClipFile(app, nodes[0].name)?.parentFile?.path ?: return@Callable
+
+                    val totalSize = nodesTotalSize(nodes)
+
+                    if (notEnoughSpace(parentPath, totalSize)) {
+                        return@Callable
+                    }
+
+                    val voiceClipSaving = MegaNodeSaving(
+                        totalSize,
+                        highPriority = true,
+                        isFolderLink = false,
+                        nodes = nodes,
+                        fromMediaViewer = false,
+                        needSerialize = true,
+                        isVoiceClip = true
+                    )
+
+                    voiceClipSaving.doDownload(parentPath, false, null, snackbarShower)
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver downloadVoiceClip"))
+        )
+    }
+
+    /**
+     * Handle app result from FileStorageActivityLollipop launched by requestLocalFolder,
      * and take actions according to the state and result.
      *
-     * It should be called in onActivityResult (but this doesn't mean NodeSaver should be
-     * owned by a fragment or activity).
+     * It should be called in onActivityResult.
      *
      * @param requestCode the requestCode from onActivityResult
      * @param resultCode the resultCode from onActivityResult
      * @param intent the intent from onActivityResult
      * @return whether NodeSaver handles this result, if this method return false,
-     * fragment/activity should handle the result by other code.
+     * fragment/app should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (saving == Saving.NOTHING) {
@@ -97,7 +352,11 @@ abstract class NodeSaver(
             }
             storeDownloadLocationIfNeeded(parentPath)
 
-            add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+            add(Completable
+                .fromCallable {
+                    storeDownloadLocationIfNeeded(parentPath)
+                    checkSizeBeforeDownload(parentPath)
+                }
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
 
@@ -105,11 +364,15 @@ abstract class NodeSaver(
         } else if (requestCode == REQUEST_CODE_TREE) {
             if (intent == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
-                if (resultCode != Activity.RESULT_OK) {
-                    showSnackbar(context, context.getString(R.string.download_requires_permission))
+
+                val message = if (resultCode != Activity.RESULT_OK) {
+                    getString(R.string.download_requires_permission)
                 } else {
-                    showSnackbar(context, context.getString(R.string.no_external_SD_card_detected))
+                    getString(R.string.no_external_SD_card_detected)
                 }
+
+                snackbarShower.showSnackbar(message)
+
                 return false
             }
 
@@ -119,7 +382,7 @@ abstract class NodeSaver(
                 return false
             }
 
-            val pickedDir = DocumentFile.fromTreeUri(context, uri)
+            val pickedDir = DocumentFile.fromTreeUri(app, uri)
             if (pickedDir == null || !pickedDir.canWrite()) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
                 return false
@@ -127,7 +390,7 @@ abstract class NodeSaver(
 
             dbHandler.sdCardUri = uri.toString()
 
-            val parentPath = getFullPathFromTreeUri(uri, context)
+            val parentPath = getFullPathFromTreeUri(uri, app)
             if (parentPath == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
                 return false
@@ -144,74 +407,144 @@ abstract class NodeSaver(
     }
 
     /**
-     * Initiate the saving.
+     * Handle request permission result, and take actions according to the state and result.
      *
-     * @param activityStarter a high-order function to launch activity when needed
-     * @param savingProducer a high-order function to produce internal state needed for later use
+     * It should be called in onRequestPermissionsResult (but this doesn't mean NodeSaver should be
+     * owned by an app).
+     *
+     * @param requestCode the requestCode from onRequestPermissionsResult
+     * @return whether NodeSaver handles this result, if this method return false,
+     * app should handle the result by other code.
      */
-    protected fun save(activityStarter: (Intent, Int) -> Unit, savingProducer: () -> Saving?) {
-        if (lackPermission()) {
-            return
+    fun handleRequestPermissionsResult(requestCode: Int): Boolean {
+        if (requestCode != REQUEST_WRITE_STORAGE) {
+            return false;
         }
 
+        if (hasWriteExternalStoragePermission()) {
+            add(Completable
+                .fromCallable { doSave() }
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver save")))
+        }
+
+        return true
+    }
+
+    /**
+     * Save instance state, should be called from onSaveInstanceState of the owning
+     * activity/fragment.
+     *
+     * @param outState outState param of onSaveInstanceState
+     */
+    fun saveState(outState: Bundle) {
+        outState.putParcelable(STATE_KEY_SAVING, saving)
+    }
+
+    /**
+     * Restore instance state, should be called from onCreate of the owning
+     * activity/fragment.
+     *
+     * @param savedInstanceState savedInstanceState param of onCreate
+     */
+    fun restoreState(savedInstanceState: Bundle) {
+        val oldSaving = savedInstanceState.getParcelable<Saving>(STATE_KEY_SAVING) ?: return
+        saving = oldSaving
+    }
+
+    /**
+     * Clear all internal state and cancel all flying operation, should be called
+     * in onDestroy lifecycle callback.
+     */
+    fun destroy() {
+        compositeDisposable.dispose()
+    }
+
+    private fun save(savingProducer: () -> Saving?) {
         add(
             Completable
                 .fromCallable(Callable {
                     val saving = savingProducer() ?: return@Callable
                     this.saving = saving
-                    this.activityStarter = activityStarter
-                    val downloadLocationDefaultPath = getDownloadLocation()
 
-                    if (askMe(context)) {
-                        requestLocalFolder(null, activityStarter)
-                    } else {
-                        checkSizeBeforeDownload(downloadLocationDefaultPath)
+                    if (lackPermission()) {
+                        return@Callable
                     }
+
+                    doSave()
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver save"))
         )
     }
 
+    private fun doSave() {
+        val downloadLocationDefaultPath = getDownloadLocation()
+
+        if (Util.askMe(app)) {
+            requestLocalFolder(null, activityLauncher)
+        } else {
+            checkSizeBeforeDownload(downloadLocationDefaultPath)
+        }
+    }
+
     private fun requestLocalFolder(
-        prompt: String?, activityStarter: (Intent, Int) -> Unit
+        prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
-        intent.putExtra(EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select))
+        intent.putExtra(EXTRA_BUTTON_PREFIX, getString(R.string.general_select))
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
-        intent.setClass(context, FileStorageActivityLollipop::class.java)
+        intent.setClass(app, FileStorageActivityLollipop::class.java)
 
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)
         }
 
-        activityStarter(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
+        activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
     }
 
-    private fun checkSizeBeforeDownload(parentPath: String) {
+    private fun nodesTotalSize(nodes: List<MegaNode>): Long {
+        var totalSize = 0L
+
+        for (node in nodes) {
+            totalSize += node.size
+        }
+
+        return totalSize
+    }
+
+    private fun notEnoughSpace(parentPath: String, totalSize: Long): Boolean {
         var availableFreeSpace = Long.MAX_VALUE
         try {
             val stat = StatFs(parentPath)
             availableFreeSpace = stat.availableBlocksLong * stat.blockSizeLong
         } catch (ex: Exception) {
         }
-        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize}")
+        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: $totalSize")
 
-        if (availableFreeSpace < saving.totalSize) {
-            runOnUiThread { showNotEnoughSpaceSnackbar(context) }
+        if (availableFreeSpace < totalSize) {
+            post { snackbarShower.showNotEnoughSpaceSnackbar() }
             logWarning("Not enough space")
+            return true
+        }
+
+        return false
+    }
+
+    private fun checkSizeBeforeDownload(parentPath: String) {
+        if (notEnoughSpace(parentPath, saving.totalSize())) {
             return
         }
 
         if (TextUtils.equals(dbHandler.attributes.askSizeDownload, false.toString())
-            || saving.totalSize < CONFIRM_SIZE_MIN_BYTES
+            || saving.totalSize() < CONFIRM_SIZE_MIN_BYTES
         ) {
             checkInstalledAppBeforeDownload(parentPath)
             return
         }
 
         showConfirmationDialog(
-            context.getString(R.string.alert_larger_file, getSizeString(saving.totalSize))
+            getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
@@ -229,13 +562,13 @@ abstract class NodeSaver(
             return
         }
 
-        if (!saving.hasUnsupportedFile(context)) {
+        if (!saving.hasUnsupportedFile(app)) {
             download(parentPath)
             return
         }
 
         showConfirmationDialog(
-            context.getString(R.string.alert_no_app, saving.unsupportedFileName)
+            getString(R.string.alert_no_app, saving.unsupportedFileName)
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
@@ -264,102 +597,58 @@ abstract class NodeSaver(
             return
         }
 
-        val sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath)
+        val sdCardOperator = SDCardOperator.initSDCardOperator(app, parentPath)
         if (sdCardOperator == null) {
             requestLocalFolder(
-                context.getString(R.string.no_external_SD_card_detected),
-                activityStarter
+                getString(R.string.no_external_SD_card_detected),
+                activityLauncher
             )
             return
         }
 
-        doDownload(parentPath, SDCardOperator.isSDCardPath(parentPath), sdCardOperator)
-    }
+        val autoPlayInfo = saving.doDownload(
+            parentPath,
+            SDCardOperator.isSDCardPath(parentPath),
+            sdCardOperator,
+            snackbarShower
+        )
 
-    /**
-     * The final step to download a node into a file.
-     *
-     * @param parentPath the parent path where the file should be inside
-     * @param externalSDCard whether it's download into external sdcard
-     * @param sdCardOperator SDCardOperator used when download to external sdcard,
-     * will be null if download to internal storage
-     */
-    abstract fun doDownload(
-        parentPath: String,
-        externalSDCard: Boolean,
-        sdCardOperator: SDCardOperator?
-    )
+        if (!autoPlayInfo.couldAutoPlay || dbHandler.autoPlayEnabled != true.toString()) {
+            return
+        }
+
+        if (saving.fromMediaViewer()) {
+            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
+        } else {
+            autoPlayNode(app, autoPlayInfo, activityLauncher, snackbarShower)
+        }
+    }
 
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
-        runOnUiThread { doShowConfirmationDialog(message, onConfirmed) }
+        post { confirmDialogShower(message, onConfirmed) }
     }
 
-    private fun doShowConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
-        val confirmationLayout = LinearLayout(context)
-        confirmationLayout.orientation = LinearLayout.VERTICAL
-        val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        params.setMargins(
-            scaleWidthPx(20, context.resources.displayMetrics),
-            scaleHeightPx(10, context.resources.displayMetrics),
-            scaleWidthPx(17, context.resources.displayMetrics),
-            0
-        )
-
-        val notShowAgain = CheckBox(context)
-        notShowAgain.setText(R.string.checkbox_not_show_again)
-        notShowAgain.setTextColor(
-            ColorUtils.getThemeColor(
-                context,
-                android.R.attr.textColorSecondary
-            )
-        )
-        confirmationLayout.addView(notShowAgain, params)
-
-        MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setView(confirmationLayout)
-            .setMessage(message)
-            .setPositiveButton(
-                R.string.general_save_to_device
-            ) { _, _ ->
-                onConfirmed(notShowAgain.isChecked)
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
-            .create()
-            .show()
-    }
+    private fun hasWriteExternalStoragePermission(): Boolean =
+        ContextCompat.checkSelfPermission(app, permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED
 
     private fun lackPermission(): Boolean {
-        if (VERSION.SDK_INT >= VERSION_CODES.M && ContextCompat.checkSelfPermission(
-                context, permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            NodeController(context).askForPermissions()
+        if (!hasWriteExternalStoragePermission()) {
+            permissionRequester.askPermissions(
+                arrayOf(permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_STORAGE
+            )
             return true
         }
         return false
     }
 
-    protected fun add(disposable: Disposable) {
+    private fun add(disposable: Disposable) {
         compositeDisposable.add(disposable)
-    }
-
-    /**
-     * Clear all internal state and cancel all flying operation, should be called
-     * in onDestroy lifecycle callback.
-     */
-    fun destroy() {
-        compositeDisposable.dispose()
-    }
-
-    protected fun runOnUiThread(task: () -> Unit) {
-        uiHandler.post(task)
-    }
-
-    private fun runOnUiThreadDelayed(delayMs: Long, task: () -> Unit) {
-        uiHandler.postDelayed(task, delayMs)
     }
 
     companion object {
         const val CONFIRM_SIZE_MIN_BYTES = 100 * 1024 * 1024L
+
+        private const val STATE_KEY_SAVING = "saving"
     }
 }

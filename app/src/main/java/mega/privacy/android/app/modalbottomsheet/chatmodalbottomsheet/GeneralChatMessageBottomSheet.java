@@ -441,7 +441,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                chatC.prepareForChatDownload(nodeList);
+                ((ChatActivityLollipop) context).downloadNodeList(nodeList);
                 break;
 
             case R.id.option_import_layout:

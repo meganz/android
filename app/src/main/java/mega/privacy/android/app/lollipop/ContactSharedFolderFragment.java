@@ -180,7 +180,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         listView.invalidate();
     }
     
-    public void itemClick(int position,int[] screenPosition,ImageView imageView) {
+    public void itemClick(int position) {
         
         if (adapter.isMultipleSelect()) {
             logDebug("Multiselect ON");
@@ -259,12 +259,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             switch (item.getItemId()) {
                 case R.id.cab_menu_download: {
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
-                    }
-                    
-                    ((ContactInfoActivityLollipop)context).onFileClick(handleList);
+                    ((ContactInfoActivityLollipop)context).downloadFile(documents);
                     break;
                 }
                 case R.id.cab_menu_copy: {

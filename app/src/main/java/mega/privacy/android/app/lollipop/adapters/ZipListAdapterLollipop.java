@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -14,19 +16,23 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.zip.ZipEntry;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapterLollipop.ViewHolderBrowserList> implements View.OnClickListener {
+public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapterLollipop.ViewHolderBrowserList> implements View.OnClickListener, DragThumbnailGetter {
 
 	Context context;
 	int positionClicked;
@@ -73,6 +79,30 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 	public void setNodes (List<ZipEntry> _nodes){
 		this.zipNodeList=_nodes;
 		notifyDataSetChanged();
+	}
+
+	@Override
+	public int getNodePosition(long handle) {
+		for (int i = 0, n = zipNodeList.size(); i < n; i++) {
+			ZipEntry currentNode = zipNodeList.get(i);
+			int index = currentNode.getName().lastIndexOf('/');
+			String name = currentNode.getName().substring(index+1);
+			if (name.hashCode() == handle) {
+				return i;
+			}
+		}
+
+		return INVALID_POSITION;
+	}
+
+	@Nullable
+	@Override
+	public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+		if (viewHolder instanceof ViewHolderBrowserList) {
+			return ((ViewHolderBrowserList) viewHolder).imageView;
+		}
+
+		return null;
 	}
 
 	@Override public ViewHolderBrowserList onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -169,17 +199,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 			((ZipBrowserActivityLollipop) context).showSnackbar(context.getString(R.string.unknownn_file));
 		}
 		else {
-			int currentPosition = holder.getAdapterPosition();
-			int[] screenPosition = new int[2];
-			ImageView imageView;
-			imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
-			imageView.getLocationOnScreen(screenPosition);
-			int[] dimens = new int[4];
-			dimens[0] = screenPosition[0];
-			dimens[1] = screenPosition[1];
-			dimens[2] = imageView.getWidth();
-			dimens[3] = imageView.getHeight();
-			((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
+			((ZipBrowserActivityLollipop) context).itemClick(holder.getAdapterPosition());
 		}
 	}
 	
