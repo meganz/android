@@ -307,6 +307,8 @@
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
 
+    <color name="grey_200_grey_600">@color/grey_200</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_900</color>
 
@@ -394,8 +396,4 @@
 
     <!-- notification -->
     <color name="mega">#d90007</color>
-
-    <!-- TODO: replace with palette colors -->
-    <color name="buffered_color">#999999</color>
-    <color name="unplayed_color">#CCCCCC</color>
 </resources>
