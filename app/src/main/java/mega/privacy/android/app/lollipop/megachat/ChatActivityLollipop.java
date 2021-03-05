@@ -522,13 +522,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
     @Override
     public void handleStoredData() {
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-            forwardMessages(preservedMessagesSelected, FORWARD_ONLY_OPTION);
+            forwardMessages(preservedMessagesSelected);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
-            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, typeImport == IMPORT_TO_SHARE_OPTION
-                    ? MULTIPLE_IMPORT_CONTACT_MESSAGES
-                    : MULTIPLE_FORWARD_MESSAGES);
-
+            chatC.proceedWithForwardOrShare(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, typeImport);
             isForwardingFromNC = false;
             preservedMsgSelected = null;
             preservedMsgToImport = null;
@@ -802,6 +799,18 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
+    private final BroadcastReceiver errorCopyingNodesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_ERROR_COPYING_NODES.equals(intent.getAction())) {
+                return;
+            }
+
+            removeProgressDialog();
+            showSnackbar(SNACKBAR_TYPE, intent.getStringExtra(ERROR_MESSAGE_TEXT), MEGACHAT_INVALID_HANDLE);
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -922,6 +931,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         registerReceiver(chatUploadStartedReceiver,
                 new IntentFilter(BROADCAST_ACTION_CHAT_TRANSFER_START));
+
+        registerReceiver(errorCopyingNodesReceiver,
+                new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -3208,30 +3220,54 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, int typeImport){
+    /**
+     * Method to import a node that will later be shared.
+     *
+     * @param messagesSelected List of messages to be imported and shared.
+     * @param listener         The listener to retrieve all the links of the nodes to be exported.
+     */
+    public void importNodeToShare(ArrayList<AndroidMegaChatMessage> messagesSelected, ExportListener listener) {
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
+        this.typeImport = IMPORT_TO_SHARE_OPTION;
+        this.exportListener = listener;
+        controlStoredUnhandledData(messagesSelected);
+    }
+
+    private void controlStoredUnhandledData(ArrayList<AndroidMegaChatMessage> messagesSelected){
+        storedUnhandledData(messagesSelected);
+        checkIfIsNeededToAskForMyChatFilesFolder();
+    }
+
+    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
 
         //Prevent trigger multiple forwarding messages screens in multiple clicks
-        if (typeImport != IMPORT_TO_SHARE_OPTION && isForwardingMessage) {
+        if (isForwardingMessage) {
             logDebug("Forwarding message is on going");
             return;
         }
 
-        this.typeImport = typeImport;
+        this.typeImport = FORWARD_ONLY_OPTION;
         isForwardingMessage = true;
-        storedUnhandledData(messagesSelected);
-        checkIfIsNeededToAskForMyChatFilesFolder();
+        controlStoredUnhandledData(messagesSelected);
     }
 
     public void proceedWithAction() {
-        if (isForwardingMessage) {
+        if(typeImport == IMPORT_TO_SHARE_OPTION){
             stopReproductions();
             chatC.setExportListener(exportListener);
-            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat, typeImport);
-        } else {
+            chatC.prepareMessagesToShare(preservedMessagesSelected, idChat);
+        }else if(isForwardingMessage){
+            stopReproductions();
+            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
+        }else{
             startUploadService();
         }
     }
@@ -4271,7 +4307,14 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     break;
 
                 case R.id.chat_cab_menu_share:
-                    shareChatMessages(chatActivity, messagesSelected, idChat);
+                    logDebug("Share option");
+                    if (!messagesSelected.isEmpty()) {
+                        if (messagesSelected.size() == 1) {
+                            shareNodeFromChat(chatActivity, messagesSelected.get(0), idChat);
+                        } else {
+                            shareNodesFromChat(chatActivity, messagesSelected, idChat);
+                        }
+                    }
                     break;
 
                 case R.id.chat_cab_menu_invite:
@@ -4301,7 +4344,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                 case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
-                    forwardMessages(messagesSelected, FORWARD_ONLY_OPTION);
+                    forwardMessages(messagesSelected);
                     break;
 
                 case R.id.chat_cab_menu_copy:
@@ -7921,6 +7964,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
+        unregisterReceiver(errorCopyingNodesReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);

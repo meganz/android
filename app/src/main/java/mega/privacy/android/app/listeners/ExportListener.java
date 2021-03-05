@@ -177,7 +177,6 @@ public class ExportListener extends BaseListener {
     @Override
     public void onRequestFinish(@NotNull MegaApiJava api, MegaRequest request, @NotNull MegaError e) {
         if (request.getType() != TYPE_EXPORT) return;
-
         if (removeExport) {
             pendingRemove--;
 
@@ -236,15 +235,21 @@ public class ExportListener extends BaseListener {
                 && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
             ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
                     context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
+            return;
         }
+
+        // When request.getLink() == null and we are sharing a node from chat, it is necessary to import the node and then to create the link
 
         ChatController chatC = new ChatController(context);
         if (messages == null || messages.isEmpty()) {
             logDebug("One node to import to MEGA and then share");
-            chatC.setExportListener(null);
         } else {
+            if(msgIdNodeHandle == null || msgIdNodeHandle.isEmpty()){
+                return;
+            }
+
             messageId = msgIdNodeHandle.get(request.getNodeHandle());
-            logDebug("Several nodes to import to MEGA and then share");
+            logDebug("Several nodes to import to MEGA and then share the links");
             chatC.setExportListener(this);
         }
 
