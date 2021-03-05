@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
@@ -345,10 +346,14 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         if(option.equals("day")){
             tsDay = ts;
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutDay.setEnabled(true);
             textViewDay.setText(date);
-            textViewDay.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewDay.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateEnabled);
+            } else {
+                textViewDay.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+            }
             removeDay.setVisibility(View.VISIBLE);
 
             textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
@@ -356,26 +361,38 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             relativeLayoutFrom.setEnabled(false);
             textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewFrom.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(false);
             textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewTo.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodTo.setVisibility(View.GONE);
 
         }else if (option.equals("from")){
             tsFrom = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleFrom.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
             if((tsTo == 0) || (tsTo > ts)){
 
                 textViewFrom.setText(date);
-                textViewFrom.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    textViewFrom.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateEnabled);
+                } else {
+                    textViewFrom.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                }
                 removePeriodFrom.setVisibility(View.VISIBLE);
                 optionPeriodFrom = true;
 
@@ -389,34 +406,50 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewDay.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removeDay.setVisibility(View.GONE);
 
         }else if(option.equals("to")){
             tsTo = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleTo.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
             if((tsFrom ==0 ) || (tsFrom < ts)){
 
                 textViewTo.setText(date);
-                textViewTo.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    textViewTo.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateEnabled);
+                } else {
+                    textViewTo.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                }
                 removePeriodTo.setVisibility(View.VISIBLE);
                 optionPeriodTo = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewTo.setText(weekDay);
-                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    textViewTo.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+                } else {
+                    textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+                }
                 removePeriodTo.setVisibility(View.GONE);
             }
 
             textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewDay.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removeDay.setVisibility(View.GONE);
         }
 
@@ -441,36 +474,52 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             tsDay = 0;
 
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewDay.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removeDay.setVisibility(View.GONE);
 
             buttonLastMonth.setEnabled(true);
 
             buttonLastYear.setEnabled(true);
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleFrom.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewFrom.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleTo.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewTo.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodTo.setVisibility(View.GONE);
 
         }else if(element.equals("from")){
             optionPeriodFrom = false;
             tsFrom = 0;
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewFrom.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodFrom.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+                textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
@@ -482,12 +531,16 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             optionPeriodTo = false;
             tsTo = 0;
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                textViewTo.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_DateDisabled);
+            } else {
+                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            }
             removePeriodTo.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
 
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+                textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);

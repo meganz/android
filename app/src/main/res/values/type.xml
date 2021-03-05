@@ -147,6 +147,16 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.DateDisabled">
+        <item name="android:textColor">@color/grey_012_white_012</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.DateEnabled">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
     <!--===============  Subtitle 2 =====================-->
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
