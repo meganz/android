@@ -4519,13 +4519,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                             if (isOnline(chatActivity)) {
                                 String userEmail = selected.get(0).getMessage().getUserEmail(0);
+                                long userHandle = selected.get(0).getMessage().getUserHandle(0);
                                 MegaUser contact = megaApi.getContact(userEmail);
                                 if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                     menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                                    long userHandle = selected.get(0).getMessage().getUserHandle(0);
                                     menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0));
                                 } else {
-                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(true);
+                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(userHandle != myUserHandle);
                                     menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                                 }
                             } else {
@@ -4671,7 +4671,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                     allNodeNonContacts = false;
                                 } else {
                                     MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
-                                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                                    if ((contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) ||
+                                            selected.get(i).getMessage().getUserHandle(0) == myUserHandle) {
                                         allNodeNonContacts = false;
                                     }
                                 }
