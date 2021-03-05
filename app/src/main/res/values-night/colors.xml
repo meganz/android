@@ -145,6 +145,8 @@
 
     <color name="grey_700_grey_300">@color/grey_300</color>
 
+    <color name="grey_200_grey_600">@color/grey_600</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_050</color>
 
@@ -230,7 +232,4 @@
     <color name="grey_012_white_023">@color/white_alpha_023</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/white</color>
-
-    <!-- TODO: replace with palette colors -->
-    <color name="unplayed_color">#666666</color>
 </resources>
