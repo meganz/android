@@ -604,10 +604,15 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
              */
             startActivityForResult(intent, REQUEST_CODE_TREE);
         } catch (Exception e) {
-            logError("Start request SD card uri activity error.", e);
-            // Try to request SD card uri with SAF.
-            Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
-            startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+            logError("Start request SD card uri activity error. Current OS version: " + Build.VERSION.SDK_INT, e);
+            if (isBasedOnFileStorage()) {
+                // Try to request SD card uri with SAF.
+                Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
+                startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+            } else {
+                // Should never happen.
+                e.printStackTrace();
+            }
         }
     }
 
