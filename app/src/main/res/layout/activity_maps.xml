@@ -90,7 +90,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_location"
-            app:tint="#00BFA5" />
+            app:tint="?attr/colorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label"
@@ -133,7 +133,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="16dp"
             android:src="@drawable/ic_location"
-            app:tint="#00BFA5" />
+            app:tint="?attr/colorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label_landscape"

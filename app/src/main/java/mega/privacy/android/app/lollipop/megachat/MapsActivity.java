@@ -122,10 +122,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         myLocationFab = findViewById(R.id.my_location_fab);
 
         Drawable myLocationFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_small_location));
-        if (myLocationFabDrawable != null) {
-//            myLocationFabDrawable.setAlpha(ICONS_ALPHA);
-        }
-
         myLocationFab.setImageDrawable(myLocationFabDrawable);
         myLocationFab.setOnClickListener(this);
         myLocationFab.setVisibility(View.GONE);
@@ -334,7 +330,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
                         : R.drawable.ic_fullscreen_location));
 
         if (setFullScreenFabDrawable != null) {
-//            setFullScreenFabDrawable.setAlpha(ICONS_ALPHA);
             setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
         }
     }
