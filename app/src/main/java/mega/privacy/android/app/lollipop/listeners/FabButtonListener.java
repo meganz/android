@@ -62,7 +62,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                         case CHAT:{
                             logDebug("Create new chat");
                             if (!Util.isFastDoubleClick()) {
-                                ((ManagerActivityLollipop) context).chooseAddContactDialog(true);
+                                ((ManagerActivityLollipop) context).fabMainClickCallback();//chooseAddContactDialog(true);
                             }
                             break;
                         }
