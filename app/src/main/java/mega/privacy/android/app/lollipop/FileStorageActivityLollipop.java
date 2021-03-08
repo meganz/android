@@ -52,6 +52,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -65,6 +66,7 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -72,7 +74,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.RunOnUIThreadUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SDCardUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -588,15 +592,35 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 
-		//for below N or above P, open SAF
-		if (intent == null) {
-			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-		}
+        //for below N or above P, open SAF
+        if (intent == null) intent = openSAFIntent();
 
-		logDebug("Request SD card write permission with intent: " + intent);
-		startActivityForResult(intent, REQUEST_CODE_TREE);
-	}
+        logDebug("Request SD card write permission with intent: " + intent);
+
+        try {
+            /*
+                A small number of devices(the device's OS version should be >= N and < Q) cannot handle
+                Intent { act=android.os.storage.action.OPEN_EXTERNAL_DIRECTORY launchParam=MultiScreenLaunchParams { mDisplayId=0 mBaseDisplayId=0 mFlags=0 }}.
+             */
+            startActivityForResult(intent, REQUEST_CODE_TREE);
+        } catch (Exception e) {
+            logError("Start request SD card uri activity error.", e);
+            // Try to request SD card uri with SAF.
+            Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
+            startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+        }
+    }
+
+    /**
+     * Get an Intent which access SD card via SAF and grant the uri.
+     *
+     * @return The Intent launches SAF.
+     */
+    private Intent openSAFIntent() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        return intent;
+    }
 
 	/**
 	 * Shows or hides the root view with Internal storage and External storage.
@@ -1268,6 +1292,23 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				onCannotWriteOnSDCard();
 				return;
 			}
+
+            /*
+                If a device's OS version is >= N and < Q, the granted SD card uri MUST be root uri,
+                then user can select any location on SD card as donwload location.
+
+                But if the uri is not root(it may happen when user request uri from SAF,
+                because user can select any folder and just grant the uri for the selected folder),
+                need to force the user to select SD card root on SAF.
+             */
+            if (isBasedOnFileStorage() && SDCardUtils.isNotRootUri(treeUri)) {
+                Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
+                RunOnUIThreadUtils.INSTANCE.runDelay(1500, () -> {
+                    startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+                    return Unit.INSTANCE;
+                });
+                return;
+            }
 
             ContentResolver contentResolver = getContentResolver();
 			contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
