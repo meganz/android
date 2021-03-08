@@ -1,6 +1,10 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -82,6 +86,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -146,6 +151,8 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
+import mega.privacy.android.app.databinding.FabMaskLayoutBinding;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
@@ -398,6 +405,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	Button addPhoneNumberButton;
 	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
+	FloatingActionButton fabMaskButton;
 
 	AlertDialog evaluateAppDialog;
 
@@ -845,6 +853,19 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewHolder psaViewHolder;
 
+	// for Meeting
+	boolean isFabExpanded = false;
+	private static long FAB_ANIM_DURATION = 200L;
+	private static long FAB_MASK_OUT_DELAY = 200L;
+	private static float ALPHA_TRANSPARENT = 0f;
+	private static float ALPHA_OPAQUE = 1f;
+	private static float FAB_DEFAULT_ANGEL = 0f;
+	private static float FAB_ROTATE_ANGEL = 135f;
+	private static String KEY_IS_FAB_EXPANDED = "isFabExpanded";
+	private View fabMaskLayout;
+	private ViewGroup windowContent;
+	private final ArrayList<View> fabs = new ArrayList<>();
+	// end for Meeting
 	/**
 	 * Broadcast to update the completed transfers tab.
 	 */
@@ -1939,6 +1960,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
+		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
 	}
 
 	@Override
@@ -2041,6 +2063,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
+			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2385,6 +2408,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
+		setupFabs();
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
@@ -10039,6 +10063,163 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 		else{
 			addContactFromPhone();
+		}
+	}
+
+	public void fabMainClickCallback() {
+		if (isFabExpanded) {
+			collapseFab();
+		} else {
+			expandFab();
+		}
+	}
+
+	private void setupFabs() {
+		windowContent = this.getWindow().findViewById(Window.ID_ANDROID_CONTENT);
+		fabMaskLayout = FabMaskChatLayoutBinding.inflate(getLayoutInflater(), windowContent, false).getRoot();
+		fabMaskButton = fabMaskLayout.findViewById(R.id.fab_main);
+
+		fabs.add(fabMaskLayout.findViewById(R.id.fab_chat));
+		fabs.add(fabMaskLayout.findViewById(R.id.fab_meeting));
+		fabs.add(fabMaskLayout.findViewById(R.id.text_chat));
+		fabs.add(fabMaskLayout.findViewById(R.id.text_meeting));
+
+//		fabButton.setOnClickListener(i-> fabMainClickCallback());
+
+
+		fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
+
+		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
+
+		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l->{
+			fabMainClickCallback();
+			handler.postDelayed(()->chooseAddContactDialog(true),FAB_MASK_OUT_DELAY);
+		});
+
+		fabMaskLayout.findViewById(R.id.text_chat).setOnClickListener(l-> {
+			fabMainClickCallback();
+			handler.postDelayed(()->chooseAddContactDialog(true),FAB_MASK_OUT_DELAY);
+		});
+
+		fabMaskLayout.findViewById(R.id.fab_meeting).setOnClickListener(l-> {
+			fabMainClickCallback();
+			handler.postDelayed(()->showMeetingOptionsPanel(),FAB_MASK_OUT_DELAY);
+		});
+
+		fabMaskLayout.findViewById(R.id.text_meeting).setOnClickListener(l-> {
+			fabMainClickCallback();
+			handler.postDelayed(()->showMeetingOptionsPanel(),FAB_MASK_OUT_DELAY);
+		});
+
+		if (isFabExpanded) {
+			expandFab();
+		}
+	}
+
+	private void collapseFab() {
+        rotateFab(false);
+        showOut(fabs);
+        // After animation completed, then remove mask.
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				removeMask();
+				fabButton.setVisibility(View.VISIBLE);
+				isFabExpanded = false;
+			}
+		}, FAB_MASK_OUT_DELAY);
+    }
+
+    private void expandFab() {
+        fabButton.setVisibility(View.GONE);
+        addMask();
+        // Need to do so, otherwise, fabMaskMain.background is null.
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				rotateFab(true);
+				showIn(fabs);
+				isFabExpanded = true;
+			}
+		});
+    }
+	/**
+	 * Showing the full screen mask by adding the mask layout to the window content
+	 */
+	private void addMask() {
+		windowContent.addView(fabMaskLayout);
+	}
+
+	/**
+	 * Removing the full screen mask
+	 */
+	private void removeMask() {
+		windowContent.removeView(fabMaskLayout);
+	}
+
+	private void rotateFab(boolean isExpand) {
+		float rotate = FAB_DEFAULT_ANGEL;
+		int color = Color.WHITE;
+		int bkColor = ColorUtils.getThemeColor(this, R.attr.colorSecondary);
+		if (isExpand) {
+			rotate = FAB_ROTATE_ANGEL;
+			color = Color.BLACK;
+			bkColor = Color.WHITE;
+		}
+
+		ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(
+				fabMaskButton, "rotation",rotate);
+
+
+		// The tint of the icon in the middle of the FAB
+		ObjectAnimator tintAnim = ObjectAnimator.ofArgb(
+				fabMaskButton.getDrawable().mutate(), "tint", color);
+
+		// The background tint of the FAB
+		ObjectAnimator backgroundTintAnim = ObjectAnimator.ofArgb(
+				fabMaskButton.getBackground().mutate(), "tint", bkColor);
+
+		AnimatorSet animatorSet = new AnimatorSet();
+		animatorSet.setDuration(FAB_ANIM_DURATION);
+		animatorSet.playTogether(rotateAnim, backgroundTintAnim, tintAnim);
+		animatorSet.start();
+	}
+
+	/**
+	 * Hide the expanded FABs with animated transition
+	 */
+	private void showOut(ArrayList<View> fabs) {
+		for (int i = 0; i< fabs.size(); i++) {
+			View fab = fabs.get(i);
+			fab.animate()
+					.setDuration(FAB_ANIM_DURATION)
+					.translationY(fab.getHeight())
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							fab.setVisibility(View.GONE);
+							super.onAnimationEnd(animation);
+						}
+					}).alpha(ALPHA_TRANSPARENT)
+					.start();
+		}
+	}
+	/**
+	 * Present the expanded FABs with animated transition
+	 */
+	private void showIn(ArrayList<View> fabs) {
+		for (int i = 0; i<fabs.size(); i++) {
+			View fab = fabs.get(i);
+			fab.setVisibility(View.VISIBLE);
+			fab.setAlpha(ALPHA_TRANSPARENT);
+			fab.setTranslationY(fab.getHeight());
+
+			fab.animate()
+					.setDuration(FAB_ANIM_DURATION)
+					.translationY(0f)
+					.setListener(new AnimatorListenerAdapter(){})
+                	.alpha(ALPHA_OPAQUE)
+					.start();
 		}
 	}
 
