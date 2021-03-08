@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">La tua Chiave di Recupero va qui</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password qui</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Questo è l\'ultimo step prima di cancellare il tuo account. Perderai in modo permanente tutti i tuoi dati salvati nel cloud. Inserisci la tua password qui sotto.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Questo è l\'ultimo step prima di eliminare il tuo account. Perderai in modo permanente tutti i tuoi dati salvati nel cloud. Inserisci la tua password qui sotto.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verifica dell\'email</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Per favore, controlla la tua email per procedere.</string>
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Caricamento della chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualità dei video della chat</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualità dei video</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Qualità dei video</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">I Caricamenti da fotocamera hanno bisogno dell\'accesso alle tue foto e agli altri media sul tuo dispositivo. Per favore, vai nella pagina delle Impostazioni e garantisci questo permesso.</string>
     <string-array name="settings_chat_upload_quality_entries">

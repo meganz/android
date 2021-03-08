@@ -944,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Uw Herstelsleutel komt hier</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">Wachtwoord komt hier</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Dit is de laatste stap om uw account te annuleren. U verliest alle gegevens die zijn opgeslagen in de cloud permanent. Voer alstublieft uw wachtwoord hieronder in.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Dit is de laatste stap om uw account te verwijderen. U verlies al uw gegevens die opgeslagen zijn in de cloud. Voer uw wachtwoord hieronder in.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">E-mail verificatie</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Controleer uw email alstublieft om door te gaan.</string>
@@ -1915,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Uploaden gesprek</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Gesprek video kwaliteit</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Video kwaliteit</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Kwaliteit</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads heeft toegang nodig tot uw foto\'s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <string-array name="settings_chat_upload_quality_entries">
