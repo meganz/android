@@ -279,6 +279,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -14866,17 +14867,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		evaluateAppDialog.show();
 
-		rateAppCheck.setOnClickListener(new View.OnClickListener() {
+		rateAppCheck.setOnClickListener(v -> {
+			logDebug("Rate the app");
+			//Rate the app option:
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL) ) );
 
-			@Override
-			public void onClick(View v) {
-				logDebug("Rate the app");
-				//Rate the app option:
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=mega.privacy.android.app") ) );
-
-				if (evaluateAppDialog!= null){
-					evaluateAppDialog.dismiss();
-				}
+			if (evaluateAppDialog!= null){
+				evaluateAppDialog.dismiss();
 			}
 		});
 
