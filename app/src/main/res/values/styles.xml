@@ -5,6 +5,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button</item>
+        <item name="backgroundTint">@color/mega_btn_bg_color_selector</item>
+        <item name="android:textColor">@color/mega_btn_text_color_selector</item>
     </style>
 
     <style name="ThemeOverlay.Mega.Button" parent="">
@@ -35,7 +37,8 @@
     <style name="Widget.Mega.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="android:textColor">@color/mega_text_btn_text_color_selector</item>
+        <item name="strokeColor">@color/mega_text_btn_text_color_selector</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 

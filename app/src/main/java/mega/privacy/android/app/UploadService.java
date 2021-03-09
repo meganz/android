@@ -451,7 +451,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -461,7 +461,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
