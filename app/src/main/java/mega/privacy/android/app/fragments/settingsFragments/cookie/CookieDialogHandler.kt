@@ -42,8 +42,12 @@ class CookieDialogHandler @Inject constructor(
      * Show cookie dialog if needed.
      *
      * @param context   View context for the Dialog to be shown.
+     * @param recreate  Dismiss current dialog and create a new instance.
      */
-    fun showDialogIfNeeded(context: Context) {
+    @JvmOverloads
+    fun showDialogIfNeeded(context: Context, recreate: Boolean = false) {
+        if (recreate) dialog?.dismiss()
+
         checkDialogSettings { showDialog ->
             if (showDialog) {
                 createDialog(context)

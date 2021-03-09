@@ -251,9 +251,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		getLifecycle().addObserver(cookieDialogHandler);
 		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
 		initAdsLoader();
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	/**

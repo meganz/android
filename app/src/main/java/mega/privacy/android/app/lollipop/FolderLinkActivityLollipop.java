@@ -685,7 +685,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 
-		getLifecycle().addObserver(cookieDialogHandler);
 		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
     }
 
@@ -737,6 +736,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 		}
 
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	@Override
