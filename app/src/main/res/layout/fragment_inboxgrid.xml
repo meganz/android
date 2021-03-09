@@ -1,22 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    
-    <RelativeLayout
-        android:id="@+id/inbox_grid_content_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:background="@color/grey_020_white_012">
-
-			<TextView
-				android:id="@+id/inbox_content_grid_text"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_centerVertical="true"
-				android:textColor="?android:attr/textColorSecondary"
-				android:layout_marginStart="72dp"
-				android:textSize="14sp" />
-    </RelativeLayout>
 
     <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/inbox_grid_view"
@@ -24,8 +8,7 @@
         android:layout_height="match_parent"
 		android:layout_centerHorizontal="true"
 		android:layout_centerInParent="true"
-        android:choiceMode="multipleChoice" 
-		android:layout_below="@id/inbox_grid_content_text_layout"
+        android:choiceMode="multipleChoice"
 		android:columnWidth="172dp"
 		android:paddingRight="4dp"
 		android:paddingLeft="4dp"/>
