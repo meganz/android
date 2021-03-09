@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Conținut media primit</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvate pentru offline</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -229,8 +230,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacte</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacte [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Nicio [/B][A]cerere trimisă[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Nicio [/B][A]cerere primită[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Nicio [/B][A]cerere trimisă[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Nicio [/B][A]cerere primită[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferuri</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Contul meu</string>
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Numărul tău de telefon a fost verificat cu succes</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Stocare externă</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Stocare externă</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Despre</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Politica de confidențialitate</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Politica de confidențialitate</string>
     <string name="settings_about_terms_of_service" context="">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versiunea aplicației</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cont gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cont Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Cont Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Cont Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Cont Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Cont Pro III</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Cheia de recuperare se introduce aici</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">parola se introduce aici</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Acesta este ultimul pas pentru a-ți anula contul. Vei pierde definitiv toate datele stocate în cloud. Te rugăm să introduci parola mai jos.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Acesta este ultimul pas pentru a-ți anula contul. Vei pierde definitiv toate datele stocate în cloud. Te rugăm să introduci parola mai jos.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verificarea e-mailului</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Te rugăm să verifici e-mailul pentru a continua.</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Se încarcă contactele de pe telefon..</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d cereri de invitație trimise cu succes.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d cereri de invitație trimise cu succes, însă %2$d cereri nu au fost trimise.</string>
 
@@ -1419,7 +1421,7 @@
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Reiei transferul?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Reia</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Ștergi toatet transferurile?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Ștergi toate transferurile?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">În curs</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Finalizate</string>
@@ -1436,7 +1438,7 @@
 
     <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Transferuri puse pe pauză</string>
 
-    <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">Niciun transfer finalizate</string>
+    <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">Niciun transfer finalizat</string>
 
     <!--
     <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers finished</string>
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">de la</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Folder nou partajat</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Cerere de contact nouă</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Golește istoricul chatului</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Golește istoricul chatului</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Elimină contactul</string>
 
@@ -1826,21 +1828,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Setează perioada</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invită-ți prietenii să intre pe [/B][A]Chat[/A][B] și bucură-te de platforma noastră criptată cu intimitate și securitate.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invită-ți prietenii să intre pe [/B][A]Chat[/A][B] și bucură-te de platforma noastră criptată cu intimitate și securitate[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Niciun conținut media în [/B][A]Încărcări cameră[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Coș de gunoi[/A] [B]gol[/B][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Niciun conținut media în [/B][A]Încărcări cameră[/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Coș de gunoi[/A] [B]gol[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Niciun fișier în [/B][A]Conținut media primit[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Niciun fișier în [/B][A]unitatea cloud[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Niciun fișier [/B][A]offline[/A]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Niciun fișier în [/B][A]Conținut media primit[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Niciun fișier în [/B][A]unitatea cloud[/A]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Niciun fișier [/B][A]salvat pentru offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Niciun [/B][A]contact[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Nicio[/A] [B]conversație[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Se încarcă[/A] [B]conversațiile&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Niciun [/B][A]folder partajat primit[/A][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Niciun [/B][A]folder partajat trimis[/A][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Niciun [/B][A]folder partajat primit[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Niciun [/B][A]folder partajat trimis[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Niciun [/B][A]link public[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Cereri trimise</string>
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Te rugăm să introduci o parolă mai puternică</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Contact nou</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Utilizarea spațiului de stocare</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d cerere de contact în așteptare</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d cereri de contact în așteptare</item>
@@ -2048,9 +2049,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Cerere de contact nouă</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrie un mesaj către „%s”&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer[/A] activ[B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer[/A] finalizat[B].[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Folder[/A] [B]gol[/B][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer activ[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer finalizat[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Folder[/A] [B]gol[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrie un mesaj către „%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrie un mesaj către %s&#8230;</string>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Pentru a dezactiva planificatorul de golire a coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, trebuie să te abonezi la un plan PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">zile</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">zile</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obține linkul chatului</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gestionează linkul chatului</string>
 
@@ -2304,7 +2305,7 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Această previzualizare a chatului nu mai este disponibilă. Dacă părăsești previzualizarea, nu vei mai putea să o redeschizi.</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a activat rotația cheii criptate.[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a activat rotația cheii de criptare.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Această conversație nu mai este disponibilă</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Linkul chatului nevalid</string>
@@ -2466,7 +2467,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Eroare privind cheia SSL</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA nu se poate conecta securizat prin SSL. S-ar putea să fii pe o rețea Wi-Fi publică cu cerințe suplimentare.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nicio [/B][A]notificare[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nicio [/B][A]notificare[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Configurare MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA are nevoie de acces la fotografiile, conținutul media și fișierele tale, astfel încât să poți să le partajezi cu prietenii, să faci schimb de mesaje criptate și să efectuezi apeluri securizate.</string>
@@ -2509,7 +2510,7 @@
     <string name="label_yesterday" context="label yesterday">Ieri</string>
     <string name="label_tomorrow" context="label tomorrow">Mâine</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Niciun [/B][A]fișier partajat[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Niciun [/B][A]fișier partajat[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s s-a alăturat apelului.</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s a părăsit apelul.</string>
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Acreditările lui %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Documente</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Documente</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documente</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Chat nou</string>
@@ -2907,9 +2908,9 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Golește istoricul chatului</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">Curățarea istoricului</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Șterge automat mesajele mai vechi de o anumită perioadă de timp.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Dezactivat</string>
     <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
     <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Politica de confidențialitate</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Politica privind cookie-urile</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 </resources>

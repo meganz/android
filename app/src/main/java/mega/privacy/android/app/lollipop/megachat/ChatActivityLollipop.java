@@ -769,6 +769,17 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
     };
 
+    private final BroadcastReceiver joinedSuccessfullyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_JOINED_SUCCESSFULLY.equals(intent.getAction())) {
+                return;
+            }
+
+            joiningOrLeaving = false;
+        }
+    };
+
     private final BroadcastReceiver chatUploadStartedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -907,6 +918,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         IntentFilter closeChatFilter = new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT);
         closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
         registerReceiver(closeChatReceiver, closeChatFilter);
+
+        registerReceiver(joinedSuccessfullyReceiver,
+                new IntentFilter(BROADCAST_ACTION_JOINED_SUCCESSFULLY));
 
         registerReceiver(chatUploadStartedReceiver,
                 new IntentFilter(BROADCAST_ACTION_CHAT_TRANSFER_START));
@@ -6073,119 +6087,104 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-        logDebug("msgID "+ msg.getMsgId());
-        logDebug("onMessageUpdate ");
-        int resultModify = -1;
-        if(msg.isDeleted()){
-            if(adapter!=null){
+        logDebug("msgID " + msg.getMsgId());
+
+        if (msg.isDeleted()) {
+            if (adapter != null) {
                 adapter.stopPlaying(msg.getMsgId());
             }
+
             deleteMessage(msg, false);
             return;
         }
+
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
-        if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
-            logDebug("Change access of the message");
-            logDebug("One attachment revoked, modify message");
-            resultModify = modifyMessageReceived(androidMsg, false);
-            if (resultModify == -1) {
-                logDebug("Modify result is -1");
+        if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)) {
+            logDebug("Change access of the message. One attachment revoked, modify message");
+
+            if (modifyMessageReceived(androidMsg, false) == INVALID_VALUE) {
                 int firstIndexShown = messages.get(0).getMessage().getMsgIndex();
-                logDebug("The first index is: " + firstIndexShown + " the index of the updated message: " + msg.getMsgIndex());
-                if (firstIndexShown <= msg.getMsgIndex()) {
-                    logDebug("The message should be in the list");
-                    if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                logDebug("Modify result is -1. The first index is: " + firstIndexShown
+                        + " the index of the updated message: " + msg.getMsgIndex());
 
-                        logDebug("Node attachment message not in list -> append");
-                        AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                        reinsertNodeAttachmentNoRevoked(msgToAppend);
-                    }
-                } else {
-                    if (messages.size() < NUMBER_MESSAGES_BEFORE_LOAD) {
-                        logDebug("Show more message - add to the list");
-                        if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-
-                            logDebug("Node attachment message not in list -> append");
-                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                            reinsertNodeAttachmentNoRevoked(msgToAppend);
-                        }
-                    }
+                if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        && (firstIndexShown <= msg.getMsgIndex()
+                        || messages.size() < NUMBER_MESSAGES_BEFORE_LOAD)) {
+                    logDebug("Node attachment message not in list -> append");
+                    AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+                    reinsertNodeAttachmentNoRevoked(msgToAppend);
                 }
             }
+
+            return;
         }
-        else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
+
+        if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)) {
             logDebug("Change content of the message");
 
-            if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+            if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                 clearHistory(androidMsg);
-            }
-            else{
-
+            } else {
                 disableMultiselection();
-                if(msg.isDeleted()){
-                    logDebug("Message deleted!!");
-                }
+
                 checkMegaLink(msg);
-                if (msg.getContainsMeta() != null && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+
+                if (msg.getContainsMeta() != null && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                     logDebug("CONTAINS_META_GEOLOCATION");
                 }
-                resultModify = modifyMessageReceived(androidMsg, false);
-                logDebug("resultModify: " + resultModify);
+
+                logDebug("resultModify: " + modifyMessageReceived(androidMsg, false));
             }
+
+            return;
         }
-        else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)){
 
+        if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)) {
             int statusMsg = msg.getStatus();
-            logDebug("Status change: "+ statusMsg + "T emporal id: "+ msg.getTempId() + " Final id: "+ msg.getMsgId());
+            logDebug("Status change: " + statusMsg + ", Temporal ID: " + msg.getTempId() + ", Final ID: " + msg.getMsgId());
 
-            if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
-                if((msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(msg.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                    logDebug("Modify my message and node attachment");
+            if (msg.getUserHandle() == megaChatApi.getMyUserHandle()
+                    && ((msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT)
+                    || (msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP))) {
+                long idMsg = dbH.findPendingMessageByIdTempKarere(msg.getTempId());
+                logDebug("Modify my message and node attachment. The id of my pending message is: " + idMsg);
 
-                    long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
-                    logDebug("The id of my pending message is: " + idMsg);
-                    if(idMsg!=-1){
-                        resultModify = modifyAttachmentReceived(androidMsg, idMsg);
-                        if(resultModify==-1){
-                            logWarning("Node attachment message not in list -> resultModify -1");
-//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-//                            appendMessagePosition(msgToAppend);
-                        }
-                        else{
-                            dbH.removePendingMessageById(idMsg);
-                        }
-                        return;
+                if (idMsg != INVALID_VALUE) {
+                    if (modifyAttachmentReceived(androidMsg, idMsg) == INVALID_VALUE) {
+                        logWarning("Node attachment message not in list -> resultModify -1");
+                    } else {
+                        dbH.removePendingMessageById(idMsg);
                     }
+
+                    return;
                 }
             }
 
-            if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
+            if (msg.getStatus() == MegaChatMessage.STATUS_SEEN) {
                 logDebug("STATUS_SEEN");
-            }
-            else if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
+            } else if (msg.getStatus() == MegaChatMessage.STATUS_SERVER_RECEIVED) {
                 logDebug("STATUS_SERVER_RECEIVED");
 
-                if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
-                    if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
-                        checkMegaLink(msg);
-                    }
+                if (msg.getType() == MegaChatMessage.TYPE_NORMAL
+                        && msg.getUserHandle() == megaChatApi.getMyUserHandle()) {
+                    checkMegaLink(msg);
                 }
 
-                resultModify = modifyMessageReceived(androidMsg, true);
-                logDebug("resultModify: " + resultModify);
-            }
-            else if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                logDebug("resultModify: " + modifyMessageReceived(androidMsg, true));
+                return;
+            } else if (msg.getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) {
                 logDebug("STATUS_SERVER_REJECTED: " + msg.getStatus());
                 deleteMessage(msg, true);
+            } else {
+                logDebug("Status: " + msg.getStatus() + ", Timestamp: " + msg.getTimestamp()
+                        + ", resultModify: " + modifyMessageReceived(androidMsg, false));
+                return;
             }
-            else{
-                logDebug("Status: " + msg.getStatus());
-                logDebug("Timestamp: " + msg.getTimestamp());
+        }
 
-                resultModify = modifyMessageReceived(androidMsg, false);
-                logDebug("resultModify: " + resultModify);
-            }
+        if (msg.hasChanged(MegaChatMessage.CHANGE_TYPE_TIMESTAMP)) {
+            logDebug("Timestamp change. ResultModify: " + modifyMessageReceived(androidMsg, true));
         }
     }
 
@@ -7871,6 +7870,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
+        unregisterReceiver(joinedSuccessfullyReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
 
         if(megaApi != null) {

@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Ваш номер телефона был успешно подтверждён</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Локальные данные будут удалены, а вы выйдете из системы через %1d сек.</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">О программе</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Политика конфиденциальности</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Политика конфиденциальности</string>
     <string name="settings_about_terms_of_service" context="">Условия предоставления услуг</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Версия приложения</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Бесплатный</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Аккаунт Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Аккаунт Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Аккаунт Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Аккаунт Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Аккаунт PRO III</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Ключ восстановления</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">пароль</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Остался один шаг перед удалением учётной записи. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Остался один шаг перед удалением учётной записи. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Проверка электронной почты</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Проверьте электронную почту для продолжения.</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Загрузка контактов из телефона&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">Запросы (%d) уже отправлены.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">Приглашения отправлены (%d).</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">Часть приглашений отправлена успешно (%1$d), но некоторые не были отправлены (%2$d).</string>
 
@@ -1149,19 +1151,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Уведомления чата будут отключены на %s</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Уведомления чата будут отключены до %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Уведомления чата будут отключены до %1$s</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Уведомления чата будут отключены до %1$s %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Уведомления чата будут отключены до %1$s %2$s</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Уведомления чата отключены</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Уведомления чата включены</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Отключены до %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Отключены до %1$s</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Оповещения</string>
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">От</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Новая папка с общим доступом</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Новый контакт</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Очистить историю чата</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Очистить историю чата</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Удалить контакт</string>
 
@@ -1913,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Загрузка в чат</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество видео в чате</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество видео</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Качество видео</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Введите более сложный пароль</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Новый контакт</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Использование хранилища</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">Неподтверждённый запрос контактов: %1$d</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">Неподтверждённые запросы контактов: %1$d</item>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Чтобы отключить очистку корзины по расписанию или установить более длительный период хранения, нужно подписаться на план PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">д.</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">д.</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Ссылка на чат</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Управление ссылкой на чат</string>
 
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Учётные данные %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Документы</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Документы</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Документы</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Новый чат</string>
@@ -2904,20 +2905,20 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Вы достигли максимального количества реакций: %d.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Достигнуто максимальное количество реакций на это сообщение: %d.</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] изменил время очистки сообщения на[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Очистить историю чата</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] отключил очистку сообщений.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Удалить все сообщения и файлы, которыми поделились в этом разговоре. Это действие необратимо.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">Очистка истории</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Автоматически удалять сообщения старше определенного времени.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Отключено</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">Один день</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">Одна неделя</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">Один месяц</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Другой срок</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Управление историей чата</string>
     <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Автоматически удалять сообщения старше:</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Очистить всю историю сообщений для этого разговора?</string>
 
     <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 год</string>
 
@@ -2943,17 +2944,17 @@
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 час</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d ч.</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 неделя</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d нед.</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 месяц</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d мес.</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Выбрать передачи</string>
 
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Политика конфиденциальности</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Политика использования файлов cookie</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Всегда включены</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Сканировать документ</string>
 </resources>

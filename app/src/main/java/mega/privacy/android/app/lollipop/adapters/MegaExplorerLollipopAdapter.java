@@ -444,7 +444,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             if(selectFile){
                 holder.fileThumbnail.setAlpha(1.0f);
-                holder.fileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
                 holder.itemView.setOnClickListener(this);
                 holder.itemView.setOnLongClickListener(this);
 
@@ -458,7 +458,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 }
             } else{
                 holder.fileThumbnail.setAlpha(.4f);
-                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
+                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
                 holder.itemView.setOnClickListener(null);
                 holder.itemView.setOnLongClickListener(null);
             }
