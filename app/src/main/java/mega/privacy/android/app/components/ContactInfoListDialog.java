@@ -26,6 +26,7 @@ import java.util.Set;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class ContactInfoListDialog {
@@ -101,11 +102,11 @@ public class ContactInfoListDialog {
                 .setTitle(current.getName())
                 .setView(contentView)
                 .setCancelable(false)
-                .setPositiveButton(R.string.general_ok, (dialog, which) -> {
+                .setPositiveButton(getString(R.string.general_ok), (dialog, which) -> {
                     dialog.dismiss();
                     listener.onSelect(selected, unSelected);
                 })
-                .setNegativeButton(R.string.button_cancel, (dialog, which) -> {
+                .setNegativeButton(getString(R.string.button_cancel), (dialog, which) -> {
                     dialog.dismiss();
                     listener.cancel();
                 })
