@@ -1157,7 +1157,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 
 			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).getParentHandleInbox()||((ManagerActivityLollipop) context).getParentHandleInbox()==-1) {
 
