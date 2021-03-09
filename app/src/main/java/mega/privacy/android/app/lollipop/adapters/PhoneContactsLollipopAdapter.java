@@ -244,8 +244,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		holder.contactNameTextView.setText(contact.getName());
 		holder.phoneEmailTextView.setText(contact.getEmail());
 
-		holder.contactLayout.setBackgroundColor(Color.WHITE);
-
 		createDefaultAvatar(holder, false);
 
 		try {

@@ -35,7 +35,7 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-        int left = (int) context.getResources().getDimension(R.dimen.recycler_view_separator);
+        int left = (int) context.getResources().getDimension(R.dimen.divider_width);
         int right = parent.getWidth() - parent.getPaddingRight();
 
         int childCount = parent.getChildCount();

@@ -226,7 +226,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		holder.textViewTransfer.setText(getSizeString(referralBonus.getTransfer()));
 
 		if(referralBonus.getDaysLeft()<=15){
-			holderList.textViewDaysLeft.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+			holderList.textViewDaysLeft.setTextColor(ContextCompat.getColor(context,R.color.red_800));
 		}
 
 		if(referralBonus.getDaysLeft()>0){

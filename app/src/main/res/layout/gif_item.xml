@@ -4,5 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="2dp"
-    android:background="@color/giphy_loading_background"
+    android:background="@color/grey_050_grey_800"
     android:scaleType="centerInside" />

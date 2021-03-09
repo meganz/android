@@ -2,14 +2,15 @@ package mega.privacy.android.app.lollipop.megachat;
 
 public class PendingMessageSingle {
 
-    public static int STATE_PREPARING = 0;
-    public static int STATE_PREPARING_FROM_EXPLORER = 1;
-    public static int STATE_UPLOADING = 2;
-    public static int STATE_ATTACHING = 3;
-    public static int STATE_SENT = 20;
+    public static final int STATE_PREPARING = 0;
+    public static final int STATE_PREPARING_FROM_EXPLORER = 1;
+    public static final int STATE_UPLOADING = 2;
+    public static final int STATE_ATTACHING = 3;
+    public static final int STATE_COMPRESSING = 4;
+    public static final int STATE_SENT = 20;
     //Error negative figures
-    public static int STATE_ERROR_UPLOADING = -1;
-    public static int STATE_ERROR_ATTACHING = -2;
+    public static final int STATE_ERROR_UPLOADING = -1;
+    public static final int STATE_ERROR_ATTACHING = -2;
 
     long id;
     long chatId;

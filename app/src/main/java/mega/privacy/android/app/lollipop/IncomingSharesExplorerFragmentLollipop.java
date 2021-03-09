@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -64,7 +65,6 @@ import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INC
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -96,8 +96,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private LinearLayout emptyTextView;
 	private TextView emptyTextViewFirst;
 
-	private TextView contentText;
-	private View separator;
 	private Button optionButton;
 	private Button cancelButton;
 	private LinearLayout optionsBar;
@@ -170,7 +168,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
 			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -184,7 +181,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -268,8 +264,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		contentLayout = v.findViewById(R.id.content_layout);
 		searchProgressBar = v.findViewById(R.id.progressbar);
 		
-		separator = v.findViewById(R.id.separator);
-		
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 
 		optionButton = v.findViewById(R.id.action_text);
@@ -302,9 +296,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				checkScroll();
 			}
 		});
-
-		contentText = v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
@@ -368,7 +359,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		} else if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -389,11 +379,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void setOptionsBarVisibility() {
 		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
 				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			separator.setVisibility(View.VISIBLE);
 			optionsBar.setVisibility(View.VISIBLE);
 		}
 	}
@@ -424,6 +412,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 			String textToShow;
 
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 			if (parentHandle == -1) {
 				if (isScreenInPortrait(context)) {
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
@@ -434,19 +424,24 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				textToShow = String.format(context.getString(R.string.context_empty_incoming));
 			} else {
 				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				}
 
 				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 			}
 
 			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			} catch (Exception e) {
 				logWarning("Error formatting string", e);
 			}
@@ -727,7 +722,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 			activateButton(false);
 			((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
@@ -770,7 +764,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         } else {
             boolean shouldShowButton = hasWritePermissions && show;
             optionButton.setEnabled(shouldShowButton);
-            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.accentColor : R.color.invite_button_deactivated));
+            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.teal_300_teal_200 : R.color.teal_300_038_teal_200_038));
 		}
 	}
 

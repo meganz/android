@@ -3,28 +3,28 @@ package mega.privacy.android.app.activities.settingsActivities;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class PreferencesBaseActivity extends PinActivityLollipop {
 
     protected FrameLayout fragmentContainer;
-    protected Toolbar tB;
+    protected MaterialToolbar tB;
     protected ActionBar aB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
         setContentView(R.layout.activity_settings);
 
@@ -39,12 +39,10 @@ public class PreferencesBaseActivity extends PinActivityLollipop {
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if (aB != null) {
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         }
-
-        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
     }
 
     @Override

@@ -45,6 +45,16 @@ public interface MapHandler {
     void initMap();
 
     /**
+     * Disables location updates.
+     */
+    void disableCurrentLocationUpdates();
+
+    /**
+     * Enables location updates.
+     */
+    void enableCurrentLocationUpdates();
+
+    /**
      * Move to current location.
      *
      * @param animateCamera Use camera moving animation if true, otherwise if false.

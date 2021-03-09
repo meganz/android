@@ -23,6 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -75,10 +76,10 @@ public class MyStorageFragmentLollipop extends Fragment {
 	public void checkScroll () {
 		if (scrollView != null) {
 			if (scrollView.canScrollVertically(-1)) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -103,10 +104,10 @@ public class MyStorageFragmentLollipop extends Fragment {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 				if (scrollView.canScrollVertically(-1)){
-					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					((ManagerActivityLollipop) context).changeAppBarElevation(true);
 				}
 				else {
-					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					((ManagerActivityLollipop) context).changeAppBarElevation(false);
 				}
 			}
 		});
@@ -161,11 +162,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
 			totalUsedSpace.setText(getString(R.string.recovering_info));
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.primary_text));
+			totalUsedSpace.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 			totalUsedSpace.setTypeface(normalTypeface);
 		}
 		else{
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.accentColor));
+			totalUsedSpace.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
 			if (megaApi.isBusinessAccount()) {
 				totalUsedSpace.setText(myAccountInfo.getUsedFormatted());
@@ -175,7 +176,9 @@ public class MyStorageFragmentLollipop extends Fragment {
 				try {
 					usedSpaceString = usedSpaceString.replace("[A]", "<b><font face=\"sans-serif-light\">");
 					usedSpaceString = usedSpaceString.replace("[/A]", "</font></b>");
-					usedSpaceString = usedSpaceString.replace("[B]", "<font color=\'#000000\'>");
+					usedSpaceString = usedSpaceString.replace("[B]", "<font color=" +
+							ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
+							+ ">");
 					usedSpaceString = usedSpaceString.replace("[/B]", "</font>");
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
@@ -209,14 +212,14 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
-			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 			transferQuotaUsedText.setText(getString(R.string.recovering_info));
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.primary_text));
+			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else{
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.accentColor));
+			transferQuotaUsedText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
 			if (megaApi.isBusinessAccount()) {
 				transferQuotaUsedText.setText(myAccountInfo.getUsedTransferFormatted());
