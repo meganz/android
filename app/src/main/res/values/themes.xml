@@ -113,7 +113,9 @@
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
     </style>
 
-    <style name="Theme.Dark.FullScreen.Draggable" parent="Theme.Mega">
+    <style name="Theme.Dark.FullScreen.Draggable" parent="Base.Theme.Dark.FullScreen.Draggable" />
+
+    <style name="Base.Theme.Dark.FullScreen.Draggable" parent="Theme.Mega">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:statusBarColor">@color/black</item>
         <item name="android:windowBackground">@android:color/transparent</item>

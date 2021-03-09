@@ -643,9 +643,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		super.onConfigurationChanged(newConfig);
 
 		if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 		}else{
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 		}
 
 	}

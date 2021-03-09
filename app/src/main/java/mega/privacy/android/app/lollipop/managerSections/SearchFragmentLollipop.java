@@ -1178,9 +1178,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			emptyTextView.setVisibility(View.VISIBLE);
 			if (((ManagerActivityLollipop) context).getParentHandleSearch() == -1) {
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				emptyTextViewFirst.setText(R.string.no_results_found);
 			} else if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop) context).getParentHandleSearch()) {
