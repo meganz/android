@@ -1077,7 +1077,10 @@ object MegaNodeUtil {
                     getString(R.string.section_saved_for_offline_new)
                 }
                 else -> {
-                    parentName + " (" + getString(R.string.section_saved_for_offline_new) + ")"
+                    getString(
+                        R.string.location_label, parentName,
+                        getString(R.string.section_saved_for_offline_new)
+                    )
                 }
             }
 
@@ -1086,7 +1089,7 @@ object MegaNodeUtil {
             val node = megaApi.getNodeByHandle(handle) ?: return null
 
             val parent = megaApi.getParentNode(node)
-            val topAncestor = MegaNodeUtil.getRootParentNode(node)
+            val topAncestor = getRootParentNode(node)
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
                     || topAncestor.handle == megaApi.rubbishNode.handle
@@ -1095,7 +1098,10 @@ object MegaNodeUtil {
             val location = when {
                 fromIncomingShare -> {
                     if (parent != null) {
-                        parent.name + " (" + getString(R.string.tab_incoming_shares) + ")"
+                        getString(
+                            R.string.location_label, parent.name,
+                            getString(R.string.tab_incoming_shares)
+                        )
                     } else {
                         getString(R.string.tab_incoming_shares)
                     }
@@ -1107,12 +1113,17 @@ object MegaNodeUtil {
                     if (topAncestor.handle == parent.handle) {
                         getTranslatedNameForParentNode(megaApi, topAncestor)
                     } else {
-                        parent.name + " (" +
-                                getTranslatedNameForParentNode(megaApi, topAncestor) + ")"
+                        getString(
+                            R.string.location_label, parent.name,
+                            getTranslatedNameForParentNode(megaApi, topAncestor)
+                        )
                     }
                 }
                 else -> {
-                    parent.name + " (" + getString(R.string.tab_incoming_shares) + ")"
+                    getString(
+                        R.string.location_label, parent.name,
+                        getString(R.string.tab_incoming_shares)
+                    )
                 }
             }
 
