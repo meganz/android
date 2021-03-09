@@ -415,9 +415,8 @@
     </style>
 
     <style name="TransparentEditText">
-        <item name="colorControlNormal">@android:color/transparent</item>
-        <item name="colorControlActivated">?attr/colorSecondary</item>
-        <item name="colorControlHighlight">?attr/colorSecondary</item>
+        <item name="android:colorControlNormal">@android:color/transparent</item>
+        <item name="android:colorControlActivated">?attr/colorSecondary</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>
 

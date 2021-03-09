@@ -33,6 +33,7 @@
             android:inputType="textNoSuggestions"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+            android:textColorHighlight="@color/teal_100_teal_500"
             android:theme="@style/TransparentEditText" />
 
     </com.google.android.material.textfield.TextInputLayout>
