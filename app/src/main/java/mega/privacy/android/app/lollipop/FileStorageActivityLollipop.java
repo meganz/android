@@ -77,6 +77,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.RunOnUIThreadUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SDCardUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -607,7 +608,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             logError("Start request SD card uri activity error. Current OS version: " + Build.VERSION.SDK_INT, e);
             if (isBasedOnFileStorage()) {
                 // Try to request SD card uri with SAF.
-                Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
+				// The toast is showing on SAF.
+                Toast.makeText(this,StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root),Toast.LENGTH_LONG).show();
                 startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
             } else {
                 // Should never happen.
@@ -1307,8 +1309,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 need to force the user to select SD card root on SAF.
              */
             if (isBasedOnFileStorage() && SDCardUtils.isNotRootUri(treeUri)) {
-                Toast.makeText(this,R.string.ask_for_select_sdcard_root,Toast.LENGTH_LONG).show();
-                RunOnUIThreadUtils.INSTANCE.runDelay(1500, () -> {
+				showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root));
+				RunOnUIThreadUtils.INSTANCE.runDelay(1500, () -> {
                     startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
                     return Unit.INSTANCE;
                 });
