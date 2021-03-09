@@ -2038,7 +2038,6 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Bitte wählen Sie ein stärkeres Passwort</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Neuer Kontakt</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Belegter Speicherplatz</string>
 
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d unbeantwortete Kontaktanfrage</item>

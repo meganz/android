@@ -1,11 +1,14 @@
 package mega.privacy.android.app.components;
 
+import android.content.Intent;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public class ChatManagement {
@@ -60,7 +63,9 @@ public class ChatManagement {
     }
 
     public void removeJoiningChatId(long joiningChatId) {
-        joiningChatIds.remove(joiningChatId);
+        if (joiningChatIds.remove(joiningChatId)) {
+            MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_JOINED_SUCCESSFULLY));
+        }
     }
 
     public boolean isAlreadyJoining(long joinChatId) {
