@@ -585,8 +585,8 @@ public class Constants {
 
     //Thumbnail dimens
     public static final float THUMB_CORNER_RADIUS_DP = 4;
-    public static final int THUMB_SIZE_DP = 36;
-    public static final int THUMB_MARGIN_DP = 18;
+    public static final int THUMB_SIZE_DP = 40;
+    public static final int THUMB_MARGIN_DP = 16;
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
 
