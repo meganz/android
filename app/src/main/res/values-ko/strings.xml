@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -229,8 +230,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">연락처</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">연락처 [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[A]발신된 요청[/A] [B]없음[/B][B].[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[A]수신된 요청[/A] [B]없음[/B][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[A]발송된 요청[/A][B] 없음[/B]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[A]수신된 요청[/A][B] 없음[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">내 계정</string>
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">전화번호가 성공적으로 인증되었습니다</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">개인정보 보호정책</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">무료 계정</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite 계정</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro Lite 계정</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 계정</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 계정</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 계정</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">당신의 복구 키를 여기에 입력하세요</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">여기에 암호 입력</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">계정을 취소하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">이메일 인증</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">진행하려면 이메일을 확인하세요.</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">전화에서 연락처를 불러오는 중&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d개의 요청이 이미 발송되었습니다.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d개의 초대 요청이 성공적으로 발송되었습니다.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
 
@@ -1149,19 +1151,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">%s 동안 대화 알림을 끕니다</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">%1$s까지 대화 알림을 끕니다</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">%1$s까지 대화 알림을 끕니다</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">%2$s %1$s까지 대화 알림을 끕니다</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">%2$s %1$s까지 대화 알림을 끕니다</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">대화 알림이 꺼져있습니다</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">대화 알림 활성화됨</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">%1$s까지 알림 끔</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">%1$s까지 알림 끔</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">알림</string>
@@ -1597,7 +1599,7 @@
     <string name="attachment_upload_panel_photo">장치에서</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">계정 삭제</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">계정을 취소하면 계정 데이터, MEGA 연락처 또는 대화에 더 이상 접근할 수 없게 됩니다.\n이 행동은 되돌릴 수 없습니다.</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">계정을 삭제하면 계정 데이터, MEGA 연락처 또는 대화에 더 이상 접근할 수 없게 됩니다.\n이 행동은 되돌릴 수 없습니다.</string>
     <string name="delete_button" context="menu item">삭제</string>
 
     <string name="file_properties_info_info_file">정보</string>
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">폴더가 공유됨, 공유자:</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">새 공유 폴더</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">대화 기록 삭제</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">대화 기록 삭제</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">연락처 삭제</string>
 
@@ -1828,19 +1830,19 @@
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[A]대화[/A]에 [B]친구들을 초대하여[/B] [B]보안과 프라이버시를 갖춘 우리의 암호화된 플랫폼을 즐기세요[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]카메라 업로드에[/A] [B]미디어가 없습니다[/B][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]휴지통[/A] [B]비우기[/B][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]카메라 업로드에[/A] [B]미디어가 없음[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]휴지통[/A] [B]비우기[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]수신함[/A][B]에 파일이 없음[/B][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]오프라인[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]수신함[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]오프라인용으로 저장[/A][B]에 파일 없음[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[A]연락처[/A] [B]없음[/B]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[B]대화[/B] [A]없음[/A]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[B]대화[/B] [A]불러오는 중&#8230;[/A]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]공개 링크[/A][B] 없음[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">보낸 요청</string>
@@ -1913,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">대화 업로드중</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 동영상 품질</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">동영상 품질</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">동영상 품질</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">더 강력한 암호를 입력하세요</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">새 연락처</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">저장소 이용량</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d개의 대기중인 연락처 요청</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d개의 대기중인 연락처 요청</item>
@@ -2048,9 +2049,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]활성화된[/B] [A]전송[/A] [B]없음.[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]완료된[/B] [A]전송[/A] [B]없음.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]활성화된 [A]전송[/A] 없음[/B]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]완료된 [A]전송[/A] 없음[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">%s에게 메시지 쓰는 중&#8230;</string>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, PRO 요금제를 구독하여야 합니다.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">일</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">일</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">대화 링크 얻기</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
@@ -2412,8 +2413,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">동영상 압축중 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">잘못된 폴더 선택됨</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더. 1개의 파일</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더. %1$d개의 파일</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더 · 1개의 파일</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더 · %1$d개의 파일</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d개의 파일</item>
@@ -2426,8 +2427,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d개의 폴더. 1개의 파일</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d개의 폴더. %2$d개의 파일</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d개의 폴더 · 1개의 파일</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d개의 폴더 · %2$d개의 파일</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s님이[/A][B] %2$s와/과 %3$s을/를 추가하였습니다[/B]</string>
@@ -2466,7 +2467,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL 키 오류</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA가 SSL을 통하여 안전하게 연결할 수 없습니다. 추가적인 요구사항이 있는 공개 와이파이에 접속했을 수 있습니다.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A][B] 없음[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">MEGA 설정</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA가 당신이 친구와 사진, 미디어와 파일을 공유하고, 암호화된 메시지를 교환하며 안전한 통화를 할 수 있도록 접근 권한이 필요합니다.</string>
@@ -2509,7 +2510,7 @@
     <string name="label_yesterday" context="label yesterday">어제</string>
     <string name="label_tomorrow" context="label tomorrow">내일</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A][B] 없음[/B]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s님이 통화에 참여하셨습니다</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s님이 통화에서 떠났습니다</string>
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">문서</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">문서</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">문서</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">새 대화</string>
@@ -2904,20 +2905,20 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">당신은 최대 반응 한도 %d개에 도달하였습니다.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">이 메시지는 최대 반응 한도 %d개에 도달하였습니다.</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]님이 메시지 삭제 시간을[/B][A] %2$s[/A][B]로 변경하였습니다.[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">대화 기록 삭제</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]님이 메시지 삭제를 해제하였습니다.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">이 대화 내의 모든 메시지와 공유된 파일을 삭제합니다. 이 행동은 되돌릴 수 없습니다.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">기록 삭제</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">특정 시간보다 오래된 메시지는 자동으로 삭제합니다.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">해제됨</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">1일</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">1주</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">1개월</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">사용자 지정</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">대화 기록 관리</string>
     <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">다음보다 오래된 메시지를 자동 삭제:</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">이 대화의 모든 메시지 기록을 삭제할까요?</string>
 
     <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1년</string>
 
@@ -2943,17 +2944,17 @@
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1시간</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d시간</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1주</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d주</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1개월</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d개월</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">전송 선택</string>
 
@@ -3016,8 +3017,10 @@
     <string name="preference_cookies_advertising_title" context="Preference screen item title">광고 쿠키</string>
     <string name="preference_cookies_advertising_summary" context="Preference screen item summary">당신의 브라우징 기록을 우리 또는 우리의 승인된 광고 파트너들이 활용하여 당신이 우리 서비스와 다른 웹사이트에서 보는 광고를 개인화 하도록 합니다. 이 쿠키를 허용하지 않는다면 덜 관련있는 광고를 보게 됩니다.</string>
     <string name="preference_cookies_thirdparty_title" context="Preference screen item title">제3자 쿠키</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것이냐에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보\'를 클릭하세요.</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보\'를 클릭하세요.</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">쿠키 정책</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">항상 켬</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">문서 스캔</string>
 </resources>
