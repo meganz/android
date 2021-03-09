@@ -4310,7 +4310,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     logDebug("Share option");
                     if (!messagesSelected.isEmpty()) {
                         if (messagesSelected.size() == 1) {
-                            shareNodeFromChat(chatActivity, messagesSelected.get(0), idChat);
+                            shareMsgFromChat(chatActivity, messagesSelected.get(0), idChat);
                         } else {
                             shareNodesFromChat(chatActivity, messagesSelected, idChat);
                         }

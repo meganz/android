@@ -385,7 +385,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                shareNodeFromChat(context, message, chatId);
+                shareMsgFromChat(context, message, chatId);
                 break;
 
             case R.id.select_layout:

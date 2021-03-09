@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
@@ -14,11 +13,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
+import static mega.privacy.android.app.utils.ChatUtil.shareNodeFromChat;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_IMPORT_CONTACT_MESSAGES;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 public class CopyListener extends BaseListener {
 
@@ -68,7 +70,7 @@ public class CopyListener extends BaseListener {
         switch (actionListener) {
             case MULTIPLE_FORWARD_MESSAGES:
                 if (error > 0) {
-                    String message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
+                    String message = getQuantityString(R.plurals.error_forwarding_messages, error);
                     Intent intent = new Intent(BROADCAST_ACTION_ERROR_COPYING_NODES);
                     intent.putExtra(ERROR_MESSAGE_TEXT, message);
                     MegaApplication.getInstance().sendBroadcast(intent);
@@ -81,6 +83,8 @@ public class CopyListener extends BaseListener {
                 if (error > 0) {
                     if (exportListener != null) {
                         exportListener.errorImportingNodes();
+                    }else{
+                        showSnackbar(context, getQuantityString(R.plurals.context_link_export_error, error));
                     }
                 } else {
                     MegaNode node = api.getNodeByHandle(request.getNodeHandle());
@@ -95,7 +99,7 @@ public class CopyListener extends BaseListener {
                         api.exportNode(node, exportListener);
                     } else {
                         logDebug("Share Node");
-                        MegaNodeUtil.shareNode(context, node);
+                        shareNodeFromChat(context, node, chatId, messagesSelected.get(0).getMsgId());
                     }
                 }
                 break;

@@ -1390,12 +1390,23 @@ public class ChatUtil {
      * @param androidMsg The msg to be shared
      * @param chatId  The ID of a chat room.
      */
-    public static void shareNodeFromChat(Context context, AndroidMegaChatMessage androidMsg, long chatId) {
+    public static void shareMsgFromChat(Context context, AndroidMegaChatMessage androidMsg, long chatId) {
         MegaChatMessage msg = androidMsg.getMessage();
         MegaNode node = getNodeFromMessage(msg);
         if(node == null)
             return;
 
+        shareNodeFromChat(context, node, chatId, msg.getMsgId());
+    }
+
+    /**
+     * Method to share a node from the chat.
+     *
+     * @param context Context of Activity.
+     * @param node The node to be shared
+     * @param chatId  The ID of a chat room.
+     */
+    public static void shareNodeFromChat(Context context, MegaNode node, long chatId, long msgId){
         if(!MegaNodeUtil.shouldContinueWithoutError(context, "sharing node", node)){
             return;
         }
@@ -1408,14 +1419,12 @@ public class ChatUtil {
             logDebug("Node is exported, so share the public link");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
         } else {
-            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-            long msgId = msg.getMsgId();
             if (msgId == MEGACHAT_INVALID_HANDLE) {
                 return;
             }
 
             logDebug("Node is not exported, so export Node");
-            megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
+            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
         }
     }
 
@@ -1452,7 +1461,7 @@ public class ChatUtil {
         }
 
         ArrayList<MegaNode> arrayNodesNotExported = getNotExportedNodes(listNodes);
-        if (arrayNodesNotExported != null && !arrayNodesNotExported.isEmpty()) {
+        if (!arrayNodesNotExported.isEmpty()) {
             ExportListener exportListener = new ExportListener(context, arrayNodesNotExported.size(), links,
                     new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
 

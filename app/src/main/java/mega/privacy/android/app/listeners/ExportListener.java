@@ -21,7 +21,7 @@ import mega.privacy.android.app.activities.GetLinkActivity;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaError.*;
@@ -198,6 +198,7 @@ public class ExportListener extends BaseListener {
 
         if (request.getLink() != null) {
             logDebug("The link is not null");
+            // When request.getLink() != null means that we have got the link to the node we want to export.
 
             if (e.getErrorCode() != API_OK) {
                 numberError++;
@@ -234,12 +235,11 @@ public class ExportListener extends BaseListener {
         if (context instanceof GetLinkActivity
                 && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
             ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
-                    context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
+                    getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
             return;
         }
 
         // When request.getLink() == null and we are sharing a node from chat, it is necessary to import the node and then to create the link
-
         ChatController chatC = new ChatController(context);
         if (messages == null || messages.isEmpty()) {
             logDebug("One node to import to MEGA and then share");

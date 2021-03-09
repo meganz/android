@@ -75,6 +75,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -1709,9 +1711,9 @@ public class ChatController {
 
         if (errors > 0) {
             if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                showSnackbar(context, context.getString(R.string.number_no_imported_from_chat, errors));
+                showSnackbar(context, getString(R.string.number_no_imported_from_chat, errors));
             } else {
-                showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
+                showSnackbar(context, getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
             }
         }
     }
