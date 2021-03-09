@@ -433,9 +433,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				textToShow = String.format(context.getString(R.string.context_empty_incoming));
 			} else {
 				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				}
 
 				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));

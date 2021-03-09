@@ -95,19 +95,17 @@
                     android:id="@+id/file_explorer_grid_file_title_video_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="33dp"
-                    android:text="00:00"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:layout_marginStart="33dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
                     android:visibility="gone"/>
 
                 <ImageView
                     android:id="@+id/file_explorer_grid_file_video_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:background="@null"
                     android:src="@drawable/ic_play_arrow_white_24dp"/>
 
@@ -136,7 +134,7 @@
                 android:layout_marginRight="8dp"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="#DE000000"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp"/>
 
         </RelativeLayout>

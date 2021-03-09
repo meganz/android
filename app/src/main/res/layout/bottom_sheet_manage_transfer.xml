@@ -163,7 +163,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_retry"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorPrimary" />
 
                 <TextView
                     android:id="@+id/option_retry_text"
