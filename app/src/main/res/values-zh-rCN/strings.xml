@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件箱</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">保存为离线</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">离线</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s（%2$s）</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">您的手机号已成功验证</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的所有本地数据将被删除，您将以％1d秒后注销</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">关于</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">隐私政策</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">隐私政策</string>
     <string name="settings_about_terms_of_service" context="">服务条款</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">数据保护条例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免费账户</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro精简版帐户</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro精简版帐户</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 帐户</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 帐户</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 帐户</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">在这里输入您的恢复密钥</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">请在此处写下密码</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">这是删除您账户的最后一步。您将永久失去储存在云端空间中的所有资料。请在下方输入您的密码。</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">这是删除帐户的最后一步。您将永久丢失保存在云盘中的所有数据。请在下方输入您的密码。</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">电子邮件验证</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">请确认您的电子信箱以继续</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">正在载入手机联系薄&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">已发送%d个请求。</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">已发送%d个联系人请求</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d个联系人邀请发送成功，%2$d个邀请发送失败</string>
 
@@ -1149,19 +1151,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">聊天通知将静音%s</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">聊天通知将静音至%1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">聊天通知将静音至%1$s</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">聊天通知将静音至%1$s %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">聊天通知将静音至%1$s %2$s</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">聊天通知已静音</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">聊天通知已开启</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">静音至%1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">静音至%1$s</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">通知</string>
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">从</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">新的分享文件夹</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">新的联系人请求</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">清除聊天记录</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">删除联系人</string>
 
@@ -1913,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上传至聊天</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天视频质量</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">视频质量</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">视频画质</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相机上传需要访问您设备上的照片和其他媒体内容。请转至设置页面开启权限。</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">请输入一个更安全的密码</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">新联系人</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">空间使用量</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d 个待接受请求</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d 个待接受请求</item>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">如果您想要禁用垃圾桶定时清理或设置延长保留期限，您需要订阅PRO计划。</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">天</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">天</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">获得聊天链接</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">管理聊天链接</string>
 
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的凭证</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">文档</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">文档</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">文档</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">创建新的聊天对话</string>
@@ -2904,20 +2905,20 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已达到%d个态度的最大上限。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]将消息清除时间更改为[/B][A] %2$s[/A][B]。[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]已禁用消息清除。[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">删除此对话中的所有消息和文件。此操作无法撤回。</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">清除聊天记录</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">自动删除超过一定时间的聊天记录。</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">停用</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">一天</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">一周</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">一个月</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">自定义</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">管理聊天记录</string>
     <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">自动删除早于以下时间的信息：</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">是否要清除此对话内的所有聊天记录？</string>
 
     <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">一年</string>
 
@@ -2943,17 +2944,17 @@
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1小时</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d小时</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1周</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d周</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">一个月</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d个月</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">选择传输</string>
 
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">隐私政策</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie政策</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">始终开启</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">扫描文件</string>
 </resources>

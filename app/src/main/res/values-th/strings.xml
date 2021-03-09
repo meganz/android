@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">กล่องขาเข้า</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">บันทึกออฟไลน์</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">ออฟไลน์</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">ตรวจสอบหมายเลขโทรศัพท์ของคุณเรียบร้อยแล้ว</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">พื้นที่เก็บข้อมูลภายใน</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">พื้นที่เก็บข้อมูลภายนอก</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">พื้นที่เก็บข้อมูลภายใน</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">พื้นที่เก็บข้อมูลภายนอก</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">พื้นที่เก็บข้อมูลภายใน</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">ข้อมูลภายในเครื่องทั้งหมดของคุณจะถูกลบออก และคุณจะถูกออกจากระบบภายใน %1d วินาที</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">เกี่ยวกับ</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">นโยบายสิทธิส่วนบุคคล</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">นโยบายสิทธิส่วนบุคคล</string>
     <string name="settings_about_terms_of_service" context="">เงื่อนไขการให้บริการ</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">หลักคุ้มครองข้อมูลส่วนบุคคล</string>
     <string name="settings_about_app_version" context="App means “Application”">เวอร์ชันแอป</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">กระบวนการนี้ใช้เวลานานกว่าที่คาดไว้ กรุณารอสักครู่</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">บัญชีฟรี</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">บัญชี Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">บัญชี Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">บัญชี Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">บัญชี Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">บัญชี Pro III</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">คีย์การกู้คืนของคุณอยู่ที่นี่</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">รหัสผ่านไปที่นี่</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">นี่เป็นขั้นตอนสุดท้ายในการยกเลิกบัญชีของคุณ คุณจะสูญเสียข้อมูลทั้งหมดที่เก็บไว้ในคลาวด์อย่างถาวร กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">นี่เป็นขั้นตอนสุดท้ายในการลบบัญชีของคุณ คุณจะสูญเสียข้อมูลทั้งหมดที่เก็บไว้ในคลาวด์อย่างถาวร กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">การตรวจสอบอีเมล</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">โปรดตรวจสอบอีเมลของคุณเพื่อดำเนินการต่อ</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">กำลังโหลดรายชื่อจากโทรศัพท์&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">คำขอ %d รายการได้ถูกส่งไปแล้ว</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">ส่งคำขอเชิญ %d คำขอเรียบร้อยแล้ว</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">ส่งคำขอเชิญ %1$d คำขอแล้ว แต่ยังไม่ได้ส่งอีก %2$d คำขอ</string>
 
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">จาก</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">แชร์โฟลเดอร์ใหม่</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">คำขอติดต่อใหม่</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">ล้างประวัติการแชท</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">ล้างประวัติการแชท</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">เอาผู้ติดต่อออก</string>
 
@@ -1913,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">อัปโหลดไฟล์ไปยังแชท</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">คุณภาพวิดีโอแชท</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">คุณภาพวีดีโอ</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">คุณภาพวีดีโอ</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">การอัปโหลดจากกล้องจำเป็นต้องเข้าถึงภาพถ่ายและสื่ออื่น ๆ บนอุปกรณ์ของคุณ กรุณาไปที่หน้าการตั้งค่าและการให้สิทธิ์</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">กรุณากรอกรหัสผ่านที่คาดเดายากกว่านี้</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">การติดต่อใหม่</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">การใช้ที่เก็บข้อมูล</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">คำขอติดต่อที่รอดำเนินการ %1$d รายการ</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">คำขอติดต่อที่รอดำเนินการ %1$d รายการ</item>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">หากต้องการปิดใช้งานตัวกำหนดเวลาทำความสะอาดถังขยะหรือตั้งระยะเวลาเก็บรักษาที่นานขึ้น คุณต้องสมัครแผน PRO</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">วัน</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">วัน</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">รับลิงก์แชท</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">จัดการลิงก์แชท</string>
 
@@ -2646,7 +2647,7 @@
     <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">วางสายและรับสาย</string>
     <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">วางสายและเข้าร่วมสาย</string>
 
-    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">ดาวน์โหลดไฟล์แล้ว คัดลอกไปยังเส้นทางที่เลือก</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">เข้าร่วมการโทร</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">ในการเข้าร่วมการโทรนี้คุณต้องวางสายปัจจุบันก่อน</string>
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">ข้อมูลประจำตัวของ %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">เอกสาร</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">เอกสาร</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">เอกสาร</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">แชทใหม่</string>
@@ -2907,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น[/B][A] %2$s[/A][B][/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">ล้างประวัติการแชท</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] ปิดใช้งานการล้างข้อความ[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">ลบข้อความและไฟล์ทั้งหมดที่แชร์ในการสนทนานี้จากทั้งสองฝ่าย การกระทำนี้ไม่สามารถย้อนกลับได้</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">ลบข้อความและไฟล์ทั้งหมดที่แชร์ในการสนทนานี้ การดำเนินการนี้จะไม่สามารถยกเลิกได้</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">ล้างประวัติแชท</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">ลบข้อความที่เก่ากว่าในระยะเวลาหนึ่งโดยอัตโนมัติ</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">ปิดใช้งาน</string>
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">นโยบายสิทธิส่วนบุคคล</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">นโยบายคุกกี้</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">เปิดไว้เสมอ</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">สแกนเอกสาร</string>
 </resources>

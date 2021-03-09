@@ -20,6 +20,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_TRANSFER_FINISH = "INTENT_TRANSFER_FINISH";
     public static final String BROADCAST_ACTION_REENABLE_CU_PREFERENCE = "BROADCAST_ACTION_REENABLE_CU_PREFERENCE";
     public static final String BROADCAST_ACTION_UPDATE_HISTORY_BY_RT = "ACTION_UPDATE_HISTORY_BY_RT";
+    public static final String BROADCAST_ACTION_JOINED_SUCCESSFULLY = "ACTION_JOINED_SUCCESSFULLY";
     public static final String BROADCAST_ACTION_CHAT_TRANSFER_START = "INTENT_CHAT_TRANSFER_START";
 
     //    Broadcasts' actions
