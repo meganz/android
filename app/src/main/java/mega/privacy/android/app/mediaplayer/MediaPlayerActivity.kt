@@ -47,12 +47,14 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDevi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeUtil.moveNodeToRubbishBin
+import mega.privacy.android.app.utils.MegaNodeUtil.renameNode
+import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
+import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
-import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToCopy
-import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToMove
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
@@ -536,7 +538,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 AlertsAndWarnings.showRenameDialog(this, node.name, node.isFolder) {
                     playerService?.viewModel?.updateItemName(node.handle, it)
                     updateTrackInfoNodeNameIfNeeded(node.handle, it)
-                    MegaNodeUtilKt.renameNode(node, it, this)
+                    renameNode(node, it, this)
                 }
                 return true
             }
@@ -592,7 +594,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             .setMessage(StringResourcesUtils.getString(R.string.confirmation_move_to_rubbish))
             .setPositiveButton(StringResourcesUtils.getString(R.string.general_move)) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)
-                MegaNodeUtilKt.moveNodeToRubbishBin(node, this)
+                moveNodeToRubbishBin(node, this)
             }
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()

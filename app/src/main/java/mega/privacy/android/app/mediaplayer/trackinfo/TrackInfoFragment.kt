@@ -14,7 +14,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.databinding.FragmentAudioTrackInfoBinding
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.handleLocationClick
+import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.autoCleared
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL
 

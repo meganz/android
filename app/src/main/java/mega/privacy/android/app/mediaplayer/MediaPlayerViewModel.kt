@@ -10,7 +10,8 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
-import mega.privacy.android.app.utils.MegaNodeUtilKt
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
 
 /**
  * ViewModel for main audio player UI logic.
@@ -42,7 +43,7 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
 
         when (requestCode) {
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                val handles = MegaNodeUtilKt.handleSelectFolderToMoveResult(
+                val handles = handleSelectFolderToMoveResult(
                     requestCode, resultCode, data, snackbarShower
                 )
 
@@ -51,7 +52,7 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
                 }
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                MegaNodeUtilKt.handleSelectFolderToCopyResult(
+                handleSelectFolderToCopyResult(
                     requestCode, resultCode, data, snackbarShower, activityLauncher
                 )
             }
