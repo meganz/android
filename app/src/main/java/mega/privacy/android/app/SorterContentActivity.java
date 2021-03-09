@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -86,7 +87,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
         TextView textViewTitle = new TextView(context);
         textViewTitle.setText(context.getString(R.string.action_sort_by));
         textViewTitle.setTextSize(20);
-        textViewTitle.setTextColor(0xde000000);
+        textViewTitle.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
         textViewTitle.setPadding(scaleWidthPx(23, outMetrics), scaleHeightPx(20, outMetrics), 0, 0);
         builder.setCustomTitle(textViewTitle);
 

@@ -7,29 +7,28 @@
 
     <color name="white_alpha_005">#0DFFFFFF</color>
     <color name="white_alpha_008">#14FFFFFF</color>
-    <color name="white_alpha_009">#16FFFFFF</color>
-    <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_009">#17FFFFFF</color>
+    <color name="white_alpha_012">#1FFFFFFF</color>
     <color name="white_alpha_015">#26FFFFFF</color>
     <color name="white_alpha_016">#29FFFFFF</color>
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_020">#33FFFFFF</color>
-    <color name="white_alpha_023">#3AFFFFFF</color>
+    <color name="white_alpha_023">#3BFFFFFF</color>
     <color name="white_alpha_030">#4DFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
-    <color name="white_alpha_038">#60FFFFFF</color>
+    <color name="white_alpha_038">#61FFFFFF</color>
     <color name="white_alpha_045">#73FFFFFF</color>
     <color name="white_alpha_050">#80FFFFFF</color>
-    <color name="white_alpha_054">#89FFFFFF</color>
+    <color name="white_alpha_054">#8AFFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_070">#B3FFFFFF</color>
     <color name="white_alpha_080">#CCFFFFFF</color>
-    <color name="white_alpha_087">#DDFFFFFF</color>
+    <color name="white_alpha_087">#DEFFFFFF</color>
 
     <color name="black">#000000</color>
-    <color name="black_87_opacity">#DE000000</color>
     <color name="dark_grey">#121212</color>
     <color name="dark_grey_alpha_050">#80121212</color>
-    <color name="dark_grey_alpha_054">#89121212</color>
+    <color name="dark_grey_alpha_054">#8A121212</color>
 
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
@@ -52,18 +51,18 @@
     <color name="grey_alpha_003">#08000000</color>
     <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_006">#0F000000</color>
-    <color name="grey_alpha_012">#1E000000</color>
+    <color name="grey_alpha_012">#1F000000</color>
     <color name="grey_alpha_016">#29000000</color>
     <color name="grey_alpha_020">#33000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_033">#54000000</color>
-    <color name="grey_alpha_038">#60000000</color>
+    <color name="grey_alpha_038">#61000000</color>
     <color name="grey_alpha_045">#73000000</color>
     <color name="grey_alpha_050">#80000000</color>
     <color name="grey_alpha_054">#8A000000</color>
     <color name="grey_alpha_060">#99000000</color>
     <color name="grey_alpha_070">#B3000000</color>
-    <color name="grey_alpha_087">#DD000000</color>
+    <color name="grey_alpha_087">#DE000000</color>
 
     <color name="teal_050">#DCF4F0</color>
     <color name="teal_100">#A9E3D8</color>
@@ -92,8 +91,8 @@
     <color name="red_800">#D50004</color>
     <color name="red_900">#C70000</color>
 
-    <color name="red_600_alpha_038">#60F30C14</color>
-    <color name="red_300_alpha_038">#60F46762</color>
+    <color name="red_600_alpha_038">#61F30C14</color>
+    <color name="red_300_alpha_038">#61F46762</color>
     <color name="red_900_alpha_080">#CCC70000</color>
     <color name="red_400_alpha_080">#CCFD3E38</color>
 
@@ -136,6 +135,14 @@
 
     <color name="purple_200">#CE91D3</color>
     <color name="purple_300">#B965C1</color>
+
+    <!-- For action mode under dark mode only, same as getColorForElevation() with 4dp elevation -->
+    <color name="action_mode_background">#282828</color>
+
+    <!-- For fast scroller -->
+    <color name="scroll_bubble">#90727272</color>
+
+    <color name="scroll_handle">#90d90007</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
@@ -375,15 +382,4 @@
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
-
-    <!-- For action mode under dark mode only, same as getColorForElevation() with 4dp elevation -->
-    <color name="action_mode_background">#282828</color>
-
-    <!-- For fast scroller -->
-    <color name="scroll_bubble">#90727272</color>
-
-    <color name="scroll_handle">#90d90007</color>
-
-    <!-- notification -->
-    <color name="mega">#d90007</color>
 </resources>

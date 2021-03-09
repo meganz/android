@@ -55,6 +55,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -456,6 +457,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		if (parentHandle == INVALID_HANDLE) {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
+
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 
 			emptyTextViewFirst.setText(emptyRootText);
 		} else {

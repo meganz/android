@@ -1126,9 +1126,9 @@ public class InboxFragmentLollipop extends RotatableFragment{
 //				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 //				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				}else{
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 				try{
