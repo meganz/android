@@ -15,8 +15,8 @@ public class Constants {
     public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET = 1000;
-    public static final int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-    public static final int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
+    public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
+    public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_GET_LOCAL = 1003;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
@@ -282,6 +282,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
+    public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
@@ -342,7 +343,6 @@ public class Constants {
     public static final int VIDEO_BROWSE_ADAPTER = 2032;
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
-    public static final int FROM_DOWNLOAD = 2035;
 
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";

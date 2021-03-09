@@ -25,6 +25,7 @@ import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import java.util.*
 
@@ -165,11 +166,13 @@ class MediaPlayerFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                         .setCancelable(false)
                         .setMessage(
-                            if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                            else R.string.error_fail_to_open_file_no_network
+                            StringResourcesUtils.getString(
+                                if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                else R.string.error_fail_to_open_file_no_network
+                            )
                         )
                         .setPositiveButton(
-                            resources.getString(R.string.general_ok).toUpperCase(Locale.ROOT)
+                            StringResourcesUtils.getString(R.string.general_ok).toUpperCase(Locale.ROOT)
                         ) { _, _ ->
                             playerService?.stopAudioPlayer()
                             requireActivity().finish()

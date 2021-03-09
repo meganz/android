@@ -31,6 +31,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -78,7 +79,7 @@ public class OfflineUtils {
             if(availableFreeSpace <document.getSize()){
                 RunOnUIThreadUtils.INSTANCE.post(() -> {
                     Util.showErrorAlertDialog(
-                            context.getString(R.string.error_not_enough_free_space)
+                            getString(R.string.error_not_enough_free_space)
                                     + " (" + document.getName() + ")",
                             false, activity);
                     return Unit.INSTANCE;
@@ -254,7 +255,7 @@ public class OfflineUtils {
         if ((grandParentFile != null && OFFLINE_INBOX_DIR.equals(grandParentFile.getName()
                 + File.separator + parentFile.getName()))
                 || OFFLINE_DIR.equals(parentFile.getName())) {
-            return context.getString(R.string.section_saved_for_offline_new);
+            return getString(R.string.section_saved_for_offline_new);
         } else {
             return parentFile.getName();
         }
@@ -695,7 +696,7 @@ public class OfflineUtils {
             path = path.replace(getOfflineFolder(app, OFFLINE_DIR).getPath(), "");
         }
 
-        return app.getString(R.string.section_saved_for_offline_new) + path;
+        return getString(R.string.section_saved_for_offline_new) + path;
     }
 
     /**
@@ -706,7 +707,7 @@ public class OfflineUtils {
      * @return  The path without the "Offline" root parent.
      */
     public static String removeInitialOfflinePath(String path) {
-        return path.replace(MegaApplication.getInstance().getString(R.string.section_saved_for_offline_new), "");
+        return path.replace(getString(R.string.section_saved_for_offline_new), "");
     }
 
     /**

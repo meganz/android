@@ -60,7 +60,7 @@ class TrackInfoFragment : Fragment() {
             binding.duration.text = it.second
         }
 
-        viewModel.nodeInfo.observe(viewLifecycleOwner) {
+        viewModel.audioNodeInfo.observe(viewLifecycleOwner) {
             if (it.thumbnail.exists()) {
                 binding.cover.setImageURI(Uri.fromFile(it.thumbnail))
             }

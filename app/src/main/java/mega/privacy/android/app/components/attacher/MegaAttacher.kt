@@ -14,6 +14,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -417,11 +418,11 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
 
         val message = if (!TextUtils.isEmpty(key)) {
-            app.getString(R.string.link_and_key_sent)
+            getString(R.string.link_and_key_sent)
         } else if (!TextUtils.isEmpty(password)) {
-            app.getString(R.string.link_and_password_sent)
+            getString(R.string.link_and_password_sent)
         } else {
-            app.getString(R.string.link_sent)
+            getString(R.string.link_sent)
         }
 
         snackbarShower.showSnackbarWithChat(

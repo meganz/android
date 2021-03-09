@@ -47,8 +47,8 @@ class TrackInfoViewModel @ViewModelInject constructor(
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
 
-    private val _nodeInfo = MutableLiveData<NodeInfo>()
-    val nodeInfo: LiveData<NodeInfo> = _nodeInfo
+    private val _nodeInfo = MutableLiveData<AudioNodeInfo>()
+    val audioNodeInfo: LiveData<AudioNodeInfo> = _nodeInfo
 
     private var trackInfoArgs: TrackInfoFragmentArgs? = null
     private var metadataOnlyPlayer: Player? = null
@@ -144,7 +144,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
             createThumbnailIfNotExists(thumbnail, args.handle)
 
             _nodeInfo.postValue(
-                NodeInfo(
+                AudioNodeInfo(
                     thumbnail, true, getSizeString(file.length()),
                     location, formatLongDateTime(file.lastModified() / 1000),
                     formatLongDateTime(file.lastModified() / 1000)
@@ -157,7 +157,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
             createThumbnailIfNotExists(thumbnail, args.handle)
 
             _nodeInfo.postValue(
-                NodeInfo(
+                AudioNodeInfo(
                     thumbnail, availableOffline(context, node), getSizeString(node.size),
                     location, formatLongDateTime(node.creationTime),
                     formatLongDateTime(node.modificationTime)

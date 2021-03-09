@@ -36,21 +36,21 @@ class MegaNodeUtilKt {
     companion object {
 
         /**
-         * Start FileExplorerActivityLollipop to select move folder.
+         * Start FileExplorerActivityLollipop to select folder to move nodes.
          *
          * @param activity current Android activity
          * @param handles handles to move
          */
         @JvmStatic
-        fun selectMoveFolder(activity: Activity, handles: LongArray) {
+        fun selectFolderToMove(activity: Activity, handles: LongArray) {
             val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
             intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
             intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, handles)
-            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
+            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
         }
 
         /**
-         * Handle activity result of REQUEST_CODE_SELECT_MOVE_FOLDER.
+         * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
          *
          * @param requestCode requestCode parameter of onActivityResult
          * @param resultCode resultCode parameter of onActivityResult
@@ -58,10 +58,10 @@ class MegaNodeUtilKt {
          * @param snackbarShower interface to show snackbar
          */
         @JvmStatic
-        fun handleSelectMoveFolderResult(
+        fun handleSelectFolderToMoveResult(
             requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower
         ): List<Long> {
-            if (requestCode != REQUEST_CODE_SELECT_MOVE_FOLDER
+            if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
                 || resultCode != RESULT_OK || data == null
             ) {
                 return emptyList()
@@ -95,13 +95,13 @@ class MegaNodeUtilKt {
         }
 
         /**
-         * Start FileExplorerActivityLollipop to select copy folder.
+         * Start FileExplorerActivityLollipop to select folder to copy nodes.
          *
          * @param activity current Android activity
          * @param handles handles to copy
          */
         @JvmStatic
-        fun selectCopyFolder(activity: Activity, handles: LongArray) {
+        fun selectFolderToCopy(activity: Activity, handles: LongArray) {
             if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
                 AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
                 return
@@ -110,11 +110,11 @@ class MegaNodeUtilKt {
             val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
             intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
             intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, handles)
-            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
+            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
         }
 
         /**
-         * Handle activity result of REQUEST_CODE_SELECT_COPY_FOLDER.
+         * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
          *
          * @param requestCode requestCode parameter of onActivityResult
          * @param resultCode resultCode parameter of onActivityResult
@@ -123,11 +123,11 @@ class MegaNodeUtilKt {
          * @param activityLauncher interface to start activity
          */
         @JvmStatic
-        fun handleSelectCopyFolderResult(
+        fun handleSelectFolderToCopyResult(
             requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower,
             activityLauncher: ActivityLauncher
         ): Boolean {
-            if (requestCode != REQUEST_CODE_SELECT_COPY_FOLDER
+            if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
                 || resultCode != RESULT_OK || data == null
             ) {
                 return false
@@ -438,6 +438,14 @@ class MegaNodeUtilKt {
             }
         }
 
+        /**
+         * Create an Intent with ACTION_SEND for an auto play file.
+         *
+         * @param context Android context
+         * @param autoPlayInfo auto play file info
+         * @param activityLauncher interface to launch activity
+         * @param snackbarShower interface to show snackbar
+         */
         private fun sendFile(
             context: Context,
             autoPlayInfo: AutoPlayInfo,

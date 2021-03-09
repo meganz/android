@@ -10,7 +10,7 @@
         android:id="@id/exo_prev"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/player_prev_video"
+        android:src="@drawable/video_player_prev"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -29,7 +29,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/player_play_video"
+        android:src="@drawable/video_player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
@@ -38,7 +38,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/player_pause_video"
+        android:src="@drawable/video_player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
         tools:visibility="invisible" />
@@ -47,7 +47,7 @@
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/player_next_video"
+        android:src="@drawable/video_player_next"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -103,7 +103,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:enabled="false"
-        android:src="@drawable/player_playlist_video"
+        android:src="@drawable/video_player_playlist"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

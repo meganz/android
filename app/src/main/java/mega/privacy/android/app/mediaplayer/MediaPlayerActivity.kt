@@ -48,8 +48,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
-import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
-import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToCopy
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToMove
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
@@ -270,7 +270,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                     viewingTrackInfo = null
                 }
                 R.id.track_info -> {
-                    actionBar.setTitle(R.string.audio_track_info)
+                    actionBar.title = StringResourcesUtils.getString(R.string.audio_track_info)
 
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
@@ -302,7 +302,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         optionsMenu = menu
 
-        menuInflater.inflate(R.menu.audio_player, menu)
+        menuInflater.inflate(R.menu.media_player, menu)
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
@@ -538,11 +538,11 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.move -> {
-                selectMoveFolder(this, longArrayOf(playingHandle))
+                selectFolderToMove(this, longArrayOf(playingHandle))
                 return true
             }
             R.id.copy -> {
-                selectCopyFolder(this, longArrayOf(playingHandle))
+                selectFolderToCopy(this, longArrayOf(playingHandle))
                 return true
             }
             R.id.move_to_trash -> {
@@ -578,19 +578,19 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         logDebug("moveToRubbishBin")
         if (!isOnline(this)) {
             showSnackbar(
-                SNACKBAR_TYPE, getString(R.string.error_server_connection_problem),
+                SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem),
                 MEGACHAT_INVALID_HANDLE
             )
             return
         }
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(R.string.confirmation_move_to_rubbish)
-            .setPositiveButton(R.string.general_move) { _, _ ->
+            .setMessage(StringResourcesUtils.getString(R.string.confirmation_move_to_rubbish))
+            .setPositiveButton(StringResourcesUtils.getString(R.string.general_move)) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)
                 MegaNodeUtilKt.moveNodeToRubbishBin(node, this)
             }
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()
     }
 

@@ -3,10 +3,10 @@ package mega.privacy.android.app.mediaplayer.playlist
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.databinding.ItemPlaylistBinding
-import mega.privacy.android.app.databinding.ItemPlaylistHeaderBinding
-import mega.privacy.android.app.databinding.ItemPlaylistHeaderVideoBinding
-import mega.privacy.android.app.databinding.ItemPlaylistVideoBinding
+import mega.privacy.android.app.databinding.ItemAudioPlaylistBinding
+import mega.privacy.android.app.databinding.ItemAudioPlaylistHeaderBinding
+import mega.privacy.android.app.databinding.ItemVideoPlaylistBinding
+import mega.privacy.android.app.databinding.ItemVideoPlaylistHeaderBinding
 
 /**
  * RecyclerView adapter for playlist screen.
@@ -26,14 +26,14 @@ class PlaylistAdapter(
             PlaylistItem.TYPE_PLAYING_HEADER,
             PlaylistItem.TYPE_NEXT_HEADER -> {
                 if (isAudioPlayer) {
-                    PlaylistHeaderHolder(
-                        ItemPlaylistHeaderBinding.inflate(
+                    AudioPlaylistHeaderHolder(
+                        ItemAudioPlaylistHeaderBinding.inflate(
                             LayoutInflater.from(parent.context), parent, false
                         )
                     )
                 } else {
-                    PlaylistHeaderVideoHolder(
-                        ItemPlaylistHeaderVideoBinding.inflate(
+                    VideoPlaylistHeaderHolder(
+                        ItemVideoPlaylistHeaderBinding.inflate(
                             LayoutInflater.from(parent.context), parent, false
                         )
                     )
@@ -41,14 +41,14 @@ class PlaylistAdapter(
             }
             else -> {
                 if (isAudioPlayer) {
-                    PlaylistItemHolder(
-                        ItemPlaylistBinding.inflate(
+                    AudioPlaylistItemHolder(
+                        ItemAudioPlaylistBinding.inflate(
                             LayoutInflater.from(parent.context), parent, false
                         )
                     )
                 } else {
-                    PlaylistItemVideoHolder(
-                        ItemPlaylistVideoBinding.inflate(
+                    VideoPlaylistItemHolder(
+                        ItemVideoPlaylistBinding.inflate(
                             LayoutInflater.from(parent.context), parent, false
                         )
                     )

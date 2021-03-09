@@ -8,8 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_COPY_FOLDER
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_MOVE_FOLDER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.MegaNodeUtilKt
 
 /**
@@ -41,8 +41,8 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
         }
 
         when (requestCode) {
-            REQUEST_CODE_SELECT_MOVE_FOLDER -> {
-                val handles = MegaNodeUtilKt.handleSelectMoveFolderResult(
+            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
+                val handles = MegaNodeUtilKt.handleSelectFolderToMoveResult(
                     requestCode, resultCode, data, snackbarShower
                 )
 
@@ -50,8 +50,8 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
                     _itemToRemove.value = handle
                 }
             }
-            REQUEST_CODE_SELECT_COPY_FOLDER -> {
-                MegaNodeUtilKt.handleSelectCopyFolderResult(
+            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
+                MegaNodeUtilKt.handleSelectFolderToCopyResult(
                     requestCode, resultCode, data, snackbarShower, activityLauncher
                 )
             }

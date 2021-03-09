@@ -921,7 +921,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
 	}
 
 	public void showCopyLollipop(ArrayList<Long> handleList) {
@@ -933,7 +933,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
 	}
 
 	@Override
@@ -942,7 +942,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
             return;
         }
 
-		if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -987,7 +987,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					}
 				}
 			}
-		} else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}

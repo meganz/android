@@ -24,9 +24,11 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
+import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
@@ -203,12 +205,12 @@ class MediaPlayerServiceViewModel(
                                 buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                             }
                             AUDIO_BROWSE_ADAPTER -> {
-                                playlistTitle = context.getString(R.string.upload_to_audio)
+                                playlistTitle = getString(R.string.upload_to_audio)
 
                                 buildPlaylistForAudio(intent, firstPlayHandle)
                             }
                             VIDEO_BROWSE_ADAPTER -> {
-                                playlistTitle = context.getString(R.string.sortby_type_video_first)
+                                playlistTitle = getString(R.string.sortby_type_video_first)
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
                             }
@@ -230,7 +232,7 @@ class MediaPlayerServiceViewModel(
                                 )
 
                                 if (isInRootLinksLevel(type, parentHandle)) {
-                                    playlistTitle = context.getString(R.string.tab_links_shares)
+                                    playlistTitle = getString(R.string.tab_links_shares)
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getPublicLinks(order), firstPlayHandle
@@ -239,7 +241,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = context.getString(R.string.tab_incoming_shares)
+                                    playlistTitle = getString(R.string.tab_incoming_shares)
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getInShares(order), firstPlayHandle
@@ -248,7 +250,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = context.getString(R.string.tab_outgoing_shares)
+                                    playlistTitle = getString(R.string.tab_outgoing_shares)
 
                                     val nodes = ArrayList<MegaNode>()
                                     var lastHandle = INVALID_HANDLE
@@ -271,7 +273,7 @@ class MediaPlayerServiceViewModel(
                                     val nodes = megaApi.getInShares(contact)
 
                                     playlistTitle =
-                                        context.getString(R.string.title_incoming_shares_with_explorer) +
+                                        getString(R.string.title_incoming_shares_with_explorer) +
                                                 getMegaUserNameDB(contact)
 
                                     buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
@@ -289,7 +291,7 @@ class MediaPlayerServiceViewModel(
                                 }) ?: return@Callable
 
                                 playlistTitle = if (parentHandle == INVALID_HANDLE) {
-                                    context.getString(
+                                    getString(
                                         when (type) {
                                             RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
                                             INBOX_ADAPTER -> R.string.section_inbox
@@ -303,7 +305,7 @@ class MediaPlayerServiceViewModel(
                                 buildPlaylistFromParent(parent, intent, firstPlayHandle)
                             }
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
-                                playlistTitle = context.getString(R.string.section_recents)
+                                playlistTitle = getString(R.string.section_recents)
 
                                 val handles =
                                     intent.getLongArrayExtra(NODE_HANDLES) ?: return@Callable
@@ -408,6 +410,13 @@ class MediaPlayerServiceViewModel(
         val oldIntent = currentIntent ?: return false
         val oldType = oldIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
+        if (
+            intent.getBooleanExtra(INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE, false)
+            && oldIntent.getBooleanExtra(INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE, false)
+        ) {
+            return true
+        }
+
         when (type) {
             OFFLINE_ADAPTER -> {
                 val oldDir = oldIntent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
@@ -425,7 +434,6 @@ class MediaPlayerServiceViewModel(
             }
             AUDIO_BROWSE_ADAPTER,
             FROM_CHAT,
-            FROM_DOWNLOAD,
             FILE_LINK_ADAPTER -> {
                 return oldType == type
             }
@@ -756,21 +764,21 @@ class MediaPlayerServiceViewModel(
         var scrollPosition = playingIndex
 
         if (hasPrevious) {
-            items.add(0, PlaylistItem.headerItem(context, PlaylistItem.TYPE_PREVIOUS_HEADER))
+            items.add(0, PlaylistItem.headerItem(PlaylistItem.TYPE_PREVIOUS_HEADER))
             offset++
             scrollPosition++
         }
 
         items.add(
             playingIndex + offset,
-            PlaylistItem.headerItem(context, PlaylistItem.TYPE_PLAYING_HEADER, paused)
+            PlaylistItem.headerItem(PlaylistItem.TYPE_PLAYING_HEADER, paused)
         )
         offset += 2
 
         if (hasNext) {
             items.add(
                 playingIndex + offset,
-                PlaylistItem.headerItem(context, PlaylistItem.TYPE_NEXT_HEADER)
+                PlaylistItem.headerItem(PlaylistItem.TYPE_NEXT_HEADER)
             )
         }
 

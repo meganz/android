@@ -1599,7 +1599,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
     public void showMove(){
@@ -1615,7 +1615,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
     private void showKeyboardDelayed(final View view) {
@@ -2029,7 +2029,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             return;
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
             if(!isOnline(this)){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -2056,7 +2056,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
             }
         }
-        else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+        else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK){
             if(!isOnline(this)){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;

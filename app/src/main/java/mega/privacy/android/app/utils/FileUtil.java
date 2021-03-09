@@ -149,30 +149,6 @@ public class FileUtil {
         return false;
     }
 
-
-    /**
-     * Setup SDK HTTP streaming server.
-     *
-     * @param api MegaApiAndroid instance to use
-     * @param context Android context
-     */
-    public static void setupStreamingServer(MegaApiAndroid api, Context context) {
-        if (api.httpServerIsRunning() == 0) {
-            api.httpServerStart();
-
-            ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-            ActivityManager activityManager =
-                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            activityManager.getMemoryInfo(memoryInfo);
-
-            if (memoryInfo.totalMem > BUFFER_COMP) {
-                api.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-            } else {
-                api.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-            }
-        }
-    }
-
     public static boolean setStreamingIntentParams(Context context, MegaNode node,
                                                    MegaApiJava megaApi, Intent intent,
                                                    SnackbarShower snackbarShower) {

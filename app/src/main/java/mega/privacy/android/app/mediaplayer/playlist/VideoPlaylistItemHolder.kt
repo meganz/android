@@ -1,11 +1,12 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
-import mega.privacy.android.app.databinding.ItemPlaylistBinding
+import mega.privacy.android.app.databinding.ItemVideoPlaylistBinding
 
 /**
- * ViewHolder for playlist item.
+ * ViewHolder for playlist item, for video. Because video playlist is
+ * always in dark theme, so we need separate layout file and view holder class.
  */
-class PlaylistItemHolder(private val binding: ItemPlaylistBinding) :
+class VideoPlaylistItemHolder(private val binding: ItemVideoPlaylistBinding) :
     PlaylistViewHolder(binding) {
     override fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation) {
         binding.item = item

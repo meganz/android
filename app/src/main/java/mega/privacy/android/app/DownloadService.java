@@ -816,7 +816,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
-							mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_DOWNLOAD);
 							mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());

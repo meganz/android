@@ -109,10 +109,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (bucket == null) {
                 continue;
             }
+
             MegaNodeList nodes = bucket.getNodes();
             if (nodes == null || nodes.size() < 1) {
                 continue;
             }
+
             MegaNode node = nodes.get(0);
             if (node != null && node.getHandle() == handle) {
                 return i;

@@ -8,6 +8,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -22,7 +23,7 @@ class CopyNodeListener(
         if (request.type == MegaRequest.TYPE_COPY) {
             when (e.errorCode) {
                 MegaError.API_OK -> {
-                    snackbarShower.showSnackbar(context.getString(R.string.context_correctly_copied))
+                    snackbarShower.showSnackbar(getString(R.string.context_correctly_copied))
                 }
                 MegaError.API_EOVERQUOTA -> {
                     val intent = Intent(context, ManagerActivityLollipop::class.java)
@@ -35,7 +36,7 @@ class CopyNodeListener(
                     activityLauncher.launchActivity(intent)
                 }
                 else -> {
-                    snackbarShower.showSnackbar(context.getString(R.string.context_no_copied))
+                    snackbarShower.showSnackbar(getString(R.string.context_no_copied))
                 }
             }
         }

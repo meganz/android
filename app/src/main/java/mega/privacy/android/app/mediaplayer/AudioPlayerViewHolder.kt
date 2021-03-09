@@ -18,6 +18,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SimpleAnimatorListener
 
+/**
+ * A view holder for audio player, implementing the UI logic of audio player.
+ */
 class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
     private val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
@@ -27,6 +30,9 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val bgPlayHint = binding.root.findViewById<TextView>(R.id.background_play_hint)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
 
+    /**
+     * Update the layout param of artwork of player view.
+     */
     fun layoutArtwork() {
         post {
             val resources = binding.root.resources
@@ -46,6 +52,11 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         }
     }
 
+    /**
+     * Display node metadata.
+     *
+     * @param metadata metadata to display
+     */
     fun displayMetadata(metadata: Metadata) {
         if (metadata.title != null && metadata.artist != null) {
             if (trackName.text.isEmpty()) {
@@ -120,6 +131,13 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         trackName.layoutParams = params
     }
 
+    /**
+     * Setup background play setting button.
+     *
+     * @param enabled is background play enabled
+     * @param toggleBgPlay a callback when toggle background play, it should return whether
+     * background play is enabled after toggle
+     */
     fun setupBgPlaySetting(enabled: Boolean, toggleBgPlay: () -> Boolean) {
         updateBgPlay(bgPlay, bgPlayHint, enabled)
 
@@ -130,7 +148,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
     private fun updateBgPlay(bgPlay: ImageButton, bgPlayHint: TextView, enabled: Boolean) {
         bgPlay.setImageResource(
-            if (enabled) R.drawable.player_play_bg_on else R.drawable.player_play_bg_off
+            if (enabled) R.drawable.audio_player_play_bg_on else R.drawable.audio_player_play_bg_off
         )
 
         bgPlayHint.setTextColor(
@@ -149,6 +167,12 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
             .alpha(0F)
     }
 
+    /**
+     * Setup playlist button.
+     *
+     * @param playlistItems the playlist
+     * @param openPlaylist the callback when playlist button is clicked
+     */
     fun setupPlaylistButton(playlistItems: List<PlaylistItem>?, openPlaylist: () -> Unit) {
         if (playlistItems != null) {
             togglePlaylistEnabled(playlistItems)
@@ -159,14 +183,27 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         }
     }
 
+    /**
+     * Toggle the playlist button.
+     *
+     * @param playlistItems the new playlist
+     */
     fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
         playlist.isEnabled = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
     }
 
+    /**
+     * Update the visibility of loading animation.
+     *
+     * @param playbackState the state of player
+     */
     fun updateLoadingAnimation(@Player.State playbackState: Int) {
         binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
     }
 
+    /**
+     * Hide player controller.
+     */
     fun hideController() {
         binding.playerView.hideController()
     }

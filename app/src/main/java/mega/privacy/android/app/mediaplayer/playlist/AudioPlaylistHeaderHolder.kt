@@ -1,11 +1,11 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
-import mega.privacy.android.app.databinding.ItemPlaylistHeaderVideoBinding
+import mega.privacy.android.app.databinding.ItemAudioPlaylistHeaderBinding
 
 /**
- * ViewHolder for Previous, Playing, Next headers.
+ * ViewHolder for Previous, Playing, Next headers, for audio.
  */
-class PlaylistHeaderVideoHolder(private val binding: ItemPlaylistHeaderVideoBinding) :
+class AudioPlaylistHeaderHolder(private val binding: ItemAudioPlaylistHeaderBinding) :
     PlaylistViewHolder(binding) {
     override fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation) {
         binding.highlight = item.type == PlaylistItem.TYPE_NEXT_HEADER

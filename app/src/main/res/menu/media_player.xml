@@ -8,7 +8,7 @@
         android:orderInCategory="100"
         android:title="@string/general_save_to_device"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/properties"
@@ -16,7 +16,7 @@
         android:orderInCategory="105"
         android:title="@string/general_file_info"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/share"
@@ -25,7 +25,7 @@
         android:title="@string/general_share"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/send_to_chat"
@@ -33,7 +33,7 @@
         android:orderInCategory="110"
         android:title="@string/general_share"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_search"

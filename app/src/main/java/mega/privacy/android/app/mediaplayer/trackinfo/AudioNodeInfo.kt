@@ -13,7 +13,7 @@ import java.io.File
  * @property added the human readable added time of this node
  * @property lastModified the human readable last modified time of this node
  */
-data class NodeInfo(
+data class AudioNodeInfo(
     val thumbnail: File,
     val availableOffline: Boolean,
     val size: String,

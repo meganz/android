@@ -86,7 +86,7 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
     public void copyNodes(long[] copyHandles, long toHandle) {
@@ -140,7 +140,7 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
     public void moveNodes(long[] moveHandles, long toHandle){

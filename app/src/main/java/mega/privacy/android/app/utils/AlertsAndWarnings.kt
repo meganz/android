@@ -27,6 +27,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import java.util.regex.Pattern
 
@@ -103,10 +104,10 @@ class AlertsAndWarnings {
             val resumeTransfersDialogBuilder =
                 MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-            resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
-                .setMessage(R.string.warning_message_resume_transfers)
+            resumeTransfersDialogBuilder.setTitle(getString(R.string.warning_resume_transfers))
+                .setMessage(getString(R.string.warning_message_resume_transfers))
                 .setCancelable(false)
-                .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, _ ->
+                .setPositiveButton(getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
                     MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
                     if (context is ChatActivityLollipop) {
@@ -115,7 +116,7 @@ class AlertsAndWarnings {
 
                     dialog.dismiss()
                 }
-                .setNegativeButton(R.string.general_cancel) { dialog, _ ->
+                .setNegativeButton(getString(R.string.general_cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }.setOnDismissListener {
                     if (context is BaseActivity) {
@@ -139,7 +140,8 @@ class AlertsAndWarnings {
          */
         @JvmStatic
         fun showConfirmRemoveLinkDialog(context: Context, onPositive: () -> Unit) {
-            val builder = MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            val builder =
+                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_link, null)
 
@@ -157,7 +159,7 @@ class AlertsAndWarnings {
                 0
             )
             removeText.visibility = View.VISIBLE
-            removeText.text = context.getString(R.string.context_remove_link_warning_text)
+            removeText.text = getString(R.string.context_remove_link_warning_text)
 
             val scaleW = Util.getScaleW(displayMetrics, displayMetrics.density)
             removeText.setTextSize(
@@ -165,10 +167,10 @@ class AlertsAndWarnings {
             )
 
             builder.setView(dialogLayout)
-                .setPositiveButton(R.string.context_remove) { _, _ ->
+                .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
                     onPositive()
                 }
-                .setNegativeButton(R.string.general_cancel, null)
+                .setNegativeButton(getString(R.string.general_cancel), null)
                 .create()
                 .show()
         }
@@ -199,7 +201,7 @@ class AlertsAndWarnings {
             input.imeOptions = EditorInfo.IME_ACTION_DONE
 
             input.setImeActionLabel(
-                context.getString(R.string.context_rename),
+                getString(R.string.context_rename),
                 EditorInfo.IME_ACTION_DONE
             )
             input.setText(nodeName)
@@ -321,7 +323,7 @@ class AlertsAndWarnings {
                     input.background.mutate().colorFilter = PorterDuffColorFilter(
                         ColorUtils.getThemeColor(context, R.attr.colorError), PorterDuff.Mode.SRC_IN
                     )
-                    textError.setText(R.string.invalid_string)
+                    textError.text = getString(R.string.invalid_string)
                     errorLayout.visibility = View.VISIBLE
                     input.requestFocus()
                 } else {
@@ -330,7 +332,7 @@ class AlertsAndWarnings {
                             ColorUtils.getThemeColor(context, R.attr.colorError),
                             PorterDuff.Mode.SRC_IN
                         )
-                        textError.setText(R.string.invalid_characters)
+                        textError.text = getString(R.string.invalid_characters)
                         errorLayout.visibility = View.VISIBLE
                         input.requestFocus()
                     } else {
@@ -348,12 +350,13 @@ class AlertsAndWarnings {
                 false
             })
 
-            renameDialog = MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setTitle(context.getString(R.string.context_rename) + " " + nodeName)
-                .setPositiveButton(R.string.context_rename, null)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setView(layout)
-                .show()
+            renameDialog =
+                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    .setTitle(getString(R.string.context_rename) + " " + nodeName)
+                    .setPositiveButton(getString(R.string.context_rename), null)
+                    .setNegativeButton(getString(R.string.general_cancel), null)
+                    .setView(layout)
+                    .show()
 
             // the dialog will be dismissed automatically after positive button listener
             // is executed, but we need check if the input is valid, so we use
@@ -376,11 +379,11 @@ class AlertsAndWarnings {
                     .setView(customView)
                     .setMessage(message)
                     .setPositiveButton(
-                        R.string.general_save_to_device
+                        getString(R.string.general_save_to_device)
                     ) { _, _ ->
                         onConfirmed(notShowAgain.isChecked)
                     }
-                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    .setNegativeButton(getString(R.string.general_cancel)) { _, _ -> }
                     .create()
                     .show()
             }

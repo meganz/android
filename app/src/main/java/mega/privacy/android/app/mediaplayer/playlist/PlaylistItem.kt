@@ -1,8 +1,8 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
-import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
 import java.util.*
 
@@ -63,12 +63,11 @@ data class PlaylistItem(
         /**
          * Create an item for headers.
          *
-         * @param context Android context
          * @param type item type
          * @param paused if the audio player is paused, only used for TYPE_PLAYING_HEADER
          */
-        fun headerItem(context: Context, type: Int, paused: Boolean = false): PlaylistItem {
-            val name = context.getString(
+        fun headerItem(type: Int, paused: Boolean = false): PlaylistItem {
+            val name = getString(
                 when (type) {
                     TYPE_PREVIOUS_HEADER -> R.string.general_previous
                     TYPE_NEXT_HEADER -> R.string.general_next

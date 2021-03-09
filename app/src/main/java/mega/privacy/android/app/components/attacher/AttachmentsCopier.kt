@@ -7,6 +7,7 @@ import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.utils.Constants.CHAT_FOLDER
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER
@@ -52,20 +53,20 @@ class AttachmentsCopier(
                     val legacyChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.rootNode)
 
                     if (legacyChatFolderNode != null) {
-                        megaApi.renameNode(
+                        api.renameNode(
                             legacyChatFolderNode,
-                            context.getString(R.string.my_chat_files_folder),
+                            getString(R.string.my_chat_files_folder),
                             this
                         )
 
-                        megaApi.setMyChatFilesFolder(
+                        api.setMyChatFilesFolder(
                             legacyChatFolderNode.handle, SetAttrUserListener(context)
                         )
 
                         chatFilesFolderHandle = legacyChatFolderNode.handle
                     } else {
-                        megaApi.createFolder(
-                            context.getString(R.string.my_chat_files_folder), megaApi.rootNode, this
+                        api.createFolder(
+                            getString(R.string.my_chat_files_folder), api.rootNode, this
                         )
                     }
                 }
@@ -74,23 +75,23 @@ class AttachmentsCopier(
                     MegaApplication.getInstance().dbH.myChatFilesFolderHandle =
                         chatFilesFolderHandle
 
-                    copy(megaApi.getNodeByHandle(chatFilesFolderHandle))
+                    copy(api.getNodeByHandle(chatFilesFolderHandle))
                 }
             }
             request.type == TYPE_CREATE_FOLDER
-                    && request.name == context.getString(R.string.my_chat_files_folder) -> {
+                    && request.name == getString(R.string.my_chat_files_folder) -> {
 
                 if (e.errorCode == API_OK) {
-                    megaApi.setMyChatFilesFolder(request.nodeHandle, SetAttrUserListener(context))
+                    api.setMyChatFilesFolder(request.nodeHandle, SetAttrUserListener(context))
 
-                    copy(megaApi.getNodeByHandle(request.nodeHandle))
+                    copy(api.getNodeByHandle(request.nodeHandle))
                 } else {
-                    logError("Error creating ${context.getString(R.string.my_chat_files_folder)} folder")
+                    logError("Error creating ${getString(R.string.my_chat_files_folder)} folder")
                 }
             }
             request.type == TYPE_COPY -> {
                 if (e.errorCode == API_OK) {
-                    successNodes.add(megaApi.getNodeByHandle(request.nodeHandle))
+                    successNodes.add(api.getNodeByHandle(request.nodeHandle))
                 } else {
                     failureCount++
                 }

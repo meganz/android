@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -848,5 +849,28 @@ public class MegaNodeUtil {
     public static long getCloudRootHandle() {
         MegaNode rootNode = MegaApplication.getInstance().getMegaApi().getRootNode();
         return rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
+    }
+
+    /**
+     * Setup SDK HTTP streaming server.
+     *
+     * @param api MegaApiAndroid instance to use
+     * @param context Android context
+     */
+    public static void setupStreamingServer(MegaApiAndroid api, Context context) {
+        if (api.httpServerIsRunning() == 0) {
+            api.httpServerStart();
+
+            ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+            ActivityManager activityManager =
+                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            activityManager.getMemoryInfo(memoryInfo);
+
+            if (memoryInfo.totalMem > BUFFER_COMP) {
+                api.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+            } else {
+                api.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+            }
+        }
     }
 }

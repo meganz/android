@@ -1512,7 +1512,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			megaAttacher.handleSelectFileResult(intent, user, this);
-		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -1919,7 +1919,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
     
     public void showCopyLollipop(ArrayList<Long> handleList) {
@@ -1931,7 +1931,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
     
     public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
