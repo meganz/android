@@ -12,15 +12,15 @@
         android:layout_height="56dp"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        app:roundWithOverlayColor="@color/white"
+        app:roundWithOverlayColor="@color/white_black"
         app:roundedCornerRadius="4dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_file_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-8dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="-8dp"
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@+id/edit_icon_layout"
         android:layout_toEndOf="@+id/thumbnail_file"
@@ -30,10 +30,9 @@
             android:id="@+id/text_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
             android:inputType="textNoSuggestions"
             android:singleLine="true"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
             android:theme="@style/TransparentEditText" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -58,11 +57,7 @@
 
     </RelativeLayout>
 
-    <View
-        android:id="@+id/separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/grey_012_white_012" />
+    <include android:id="@+id/separator"
+        layout="@layout/view_relative_layout_separator"/>
 
 </RelativeLayout>

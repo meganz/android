@@ -394,12 +394,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		emptyRootText = HtmlCompat.fromHtml(
-			formatEmptyScreenText(StringResourcesUtils.getString(R.string.context_empty_incoming)),
-			HtmlCompat.FROM_HTML_MODE_LEGACY);
+		emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.context_empty_incoming)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		emptyGeneralText = HtmlCompat.fromHtml(
-				formatEmptyScreenText(StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+		emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
 				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 		super.onViewCreated(view, savedInstanceState);
@@ -458,8 +458,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
 
-			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
-
 			emptyTextViewFirst.setText(emptyRootText);
 		} else {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
@@ -467,6 +465,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 			emptyTextViewFirst.setText(emptyGeneralText);
 		}
+
+		ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 	}
 
 	private void findNodes(){

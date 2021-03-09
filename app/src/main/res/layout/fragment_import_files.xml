@@ -66,11 +66,7 @@
                 android:src="@drawable/ic_collapse_acc"
                 tools:ignore="ContentDescription" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:background="@color/grey_012_white_012" />
+            <include layout="@layout/view_relative_layout_separator"/>
 
         </RelativeLayout>
 

@@ -55,6 +55,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -407,12 +408,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		emptyRootText = HtmlCompat.fromHtml(
-				formatEmptyScreenText(StringResourcesUtils.getString(R.string.context_empty_cloud_drive)),
+		emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.context_empty_cloud_drive)),
 				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		emptyGeneralText = HtmlCompat.fromHtml(
-				formatEmptyScreenText(StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+		emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
 				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 		super.onViewCreated(view, savedInstanceState);
@@ -470,6 +471,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			emptyTextViewFirst.setText(emptyGeneralText);
 		}
+
+		ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 	}
 
 	@Override
