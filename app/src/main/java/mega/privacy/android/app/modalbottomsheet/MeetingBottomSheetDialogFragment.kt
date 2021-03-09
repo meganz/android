@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.lollipop.controllers.ContactController
+import mega.privacy.android.app.meeting.MeetingActivity
 
 class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
     private var cC: ContactController? = null
@@ -35,6 +37,7 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
             R.id.iv_start_meeting -> {
             }
             R.id.iv_join_meeting -> {
+                startActivity(Intent(context, MeetingActivity::class.java))
             }
         }
         setStateBottomSheetBehaviorHidden()

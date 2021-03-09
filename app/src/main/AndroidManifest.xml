@@ -413,6 +413,12 @@
             android:label="@string/app_name">
         </activity>
 
+        <activity
+            android:name=".meeting.MeetingActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:label="@string/app_name" />
+
         <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
 
         <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
