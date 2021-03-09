@@ -47,7 +47,10 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDevi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.MegaNodeUtil.*
+import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
+import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
+import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
+import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectFolderToMove
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -578,7 +581,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         logDebug("moveToRubbishBin")
         if (!isOnline(this)) {
             showSnackbar(
-                SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem),
+                SNACKBAR_TYPE,
+                StringResourcesUtils.getString(R.string.error_server_connection_problem),
                 MEGACHAT_INVALID_HANDLE
             )
             return

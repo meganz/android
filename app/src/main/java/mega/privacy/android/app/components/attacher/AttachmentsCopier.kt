@@ -28,7 +28,7 @@ class AttachmentsCopier(
 
     init {
         if (MegaNodeUtil.existsMyChatFilesFolder()) {
-            copy(MegaNodeUtil.getMyChatFilesFolder())
+            copy(MegaNodeUtil.myChatFilesFolder)
         } else {
             megaApi.getMyChatFilesFolder(this)
         }

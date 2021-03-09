@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -75,9 +76,8 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownDialogHandler.*;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, nodeTakenDownDialogListener, DragThumbnailGetter {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, NodeTakenDownDialogListener, DragThumbnailGetter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -1099,7 +1099,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
                 if (n.isTakenDown() && !isMultipleSelect()) {
-                    takenDownDialog = showTakenDownDialog(n.isFolder(), v, currentPosition, this, context);
+                    takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
                     unHandledItem = currentPosition;
                 } else {
                     fileClicked(currentPosition);
