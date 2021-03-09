@@ -1386,6 +1386,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     isScreenInPortrait(context) ? R.drawable.loading_chat_messages : R.drawable.loading_chat_messages_landscape));
         } else {
             hideLayoutsGiphyAndGifMessages(position, (ViewHolderMessageChat) holder);
+            hideForwardOptions(position, (ViewHolderMessageChat) holder);
 
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
             if (androidMessage.isUploading()) {
@@ -1407,18 +1408,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).ownMessageSelectLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).ownMessageReactionsLayout.setVisibility(View.GONE);
-
-        ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnPortrait.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnLandscape.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnFile.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactRichLinks.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactPreviewPortrait.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactPreviewLandscape.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactFile.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactContact.setVisibility(View.GONE);
-
 
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingContact.setVisibility(View.GONE);
@@ -1670,10 +1659,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).forwardContactRichLinks.setVisibility(View.GONE);
 
         hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
 
@@ -2729,9 +2716,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 //Forwards element (own messages):
-                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                    holder.forwardOwnRichLinks.setVisibility(View.GONE);
-                } else {
+                if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                     holder.forwardOwnRichLinks.setVisibility(View.VISIBLE);
                     holder.forwardOwnRichLinks.setOnClickListener(this);
                 }
@@ -2765,11 +2750,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 holder.contentOwnMessageText.setVisibility(View.GONE);
                 holder.urlOwnMessageLayout.setVisibility(View.VISIBLE);
-
-                holder.forwardOwnPortrait.setVisibility(View.GONE);
-                holder.forwardOwnLandscape.setVisibility(View.GONE);
-                holder.forwardOwnFile.setVisibility(View.GONE);
-                holder.forwardOwnContact.setVisibility(View.GONE);
 
                 holder.previewFrameLand.setVisibility(View.GONE);
                 holder.previewFramePort.setVisibility(View.GONE);
@@ -2870,18 +2850,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
 
                 //Forwards element (contact messages):
-                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                    holder.forwardContactRichLinks.setVisibility(View.GONE);
-                }
-                else {
+                if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                     holder.forwardContactRichLinks.setVisibility(View.VISIBLE);
                     holder.forwardContactRichLinks.setOnClickListener(this);
                 }
-
-                holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-                holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-                holder.forwardContactFile.setVisibility(View.GONE);
-                holder.forwardContactContact.setVisibility(View.GONE);
 
                 holder.contentContactMessageAttachLayout.setVisibility(View.GONE);
                 holder.contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -2969,13 +2941,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.ownManagementMessageLayout.setVisibility(View.GONE);
                 holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
-                //Forward element (own message)
-                holder.forwardOwnRichLinks.setVisibility(View.GONE);
-                holder.forwardOwnPortrait.setVisibility(View.GONE);
-                holder.forwardOwnLandscape.setVisibility(View.GONE);
-                holder.forwardOwnFile.setVisibility(View.GONE);
-                holder.forwardOwnContact.setVisibility(View.GONE);
-
                 holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
                 holder.ownManagementMessageLayout.setVisibility(View.GONE);
                 holder.contentOwnMessageText.setVisibility(View.VISIBLE);
@@ -3032,13 +2997,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }else{
                     holder.titleContactMessage.setPadding(scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
                 }
-
-                //forward element (contact message)
-                holder.forwardContactRichLinks.setVisibility(View.GONE);
-                holder.forwardContactContact.setVisibility(View.GONE);
-                holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-                holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-                holder.forwardContactFile.setVisibility(View.GONE);
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
@@ -3344,18 +3302,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageLayout.setVisibility(View.VISIBLE);
 
             //Forward element (own messages):
-            if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                holder.forwardOwnRichLinks.setVisibility(View.GONE);
-            }
-            else {
+            if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                 holder.forwardOwnRichLinks.setVisibility(View.VISIBLE);
                 holder.forwardOwnRichLinks.setOnClickListener(this);
             }
-
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
 
             holder.urlOwnMessageIconAndLinkLayout.setVisibility(View.GONE);
             holder.previewFrameLand.setVisibility(View.GONE);
@@ -3588,18 +3538,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageLayout.setVisibility(View.VISIBLE);
 
             //Forward element (contact messages):
-            if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                holder.forwardContactRichLinks.setVisibility(View.GONE);
-            }
-            else {
+            if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                 holder.forwardContactRichLinks.setVisibility(View.VISIBLE);
                 holder.forwardContactRichLinks.setOnClickListener(this);
             }
-
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactFile.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
 
             holder.contentContactMessageAttachLayout.setVisibility(View.GONE);
             holder.contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -3736,13 +3678,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageLayout.setVisibility(View.GONE);
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
             holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-
-            //Forward element (own message)
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
 
             String messageContent = "";
 
@@ -3994,13 +3929,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.titleContactMessage.setPadding(scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
             }
 
-            //forward element (contact message)
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactFile.setVisibility(View.GONE);
-
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position -1).getInfoToShow(),
                         formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
@@ -4219,18 +4147,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageLayout.setVisibility(View.GONE);
 
             //Forward element(own message):
-            if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                holder.forwardOwnFile.setVisibility(View.GONE);
-            }
-            else {
+            if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                 holder.forwardOwnFile.setVisibility(View.VISIBLE);
                 holder.forwardOwnFile.setOnClickListener(this);
             }
-
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
 
             holder.previewFrameLand.setVisibility(View.GONE);
             holder.previewFramePort.setVisibility(View.GONE);
@@ -4374,9 +4294,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.transparentCoatingPortrait.setVisibility(View.GONE);
                                     holder.retryAlert.setVisibility(View.GONE);
 
-                                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                        holder.forwardOwnPortrait.setVisibility(View.GONE);
-                                    } else {
+                                    if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                                         holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
                                         holder.forwardOwnPortrait.setOnClickListener(this);
                                     }
@@ -4437,10 +4355,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.transparentCoatingLandscape.setVisibility(View.GONE);
                                     holder.retryAlert.setVisibility(View.GONE);
 
-                                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                        holder.forwardOwnLandscape.setVisibility(View.GONE);
-                                    }
-                                    else {
+                                    if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                                         holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
                                         holder.forwardOwnLandscape.setOnClickListener(this);
                                     }
@@ -4542,18 +4457,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageFile.setVisibility(View.VISIBLE);
 
             //Forward element (contact messages):
-            if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                holder.forwardContactFile.setVisibility(View.GONE);
-            }
-            else {
+            if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                 holder.forwardContactFile.setVisibility(View.VISIBLE);
                 holder.forwardContactFile.setOnClickListener(this);
             }
 
             holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
 
             holder.contentContactMessageFileThumb.setVisibility(View.VISIBLE);
             holder.contentContactMessageFileName.setVisibility(View.VISIBLE);
@@ -4631,10 +4541,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
 
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-                                }
-                                else {
+                                if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                                     holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
                                     holder.forwardContactPreviewPortrait.setOnClickListener(this);
                                 }
@@ -4677,10 +4584,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-                                }
-                                else {
+                                if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                                     holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
                                     holder.forwardContactPreviewLandscape.setOnClickListener(this);
                                 }
@@ -4776,7 +4680,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.transparentCoatingPortrait.setVisibility(View.GONE);
         holder.uploadingProgressBarPort.setVisibility(View.GONE);
         holder.errorUploadingPortrait.setVisibility(View.GONE);
-        holder.forwardOwnPortrait.setVisibility(View.GONE);
 
         holder.previewFrameLand.setVisibility(View.GONE);
         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -4788,12 +4691,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.transparentCoatingLandscape.setVisibility(View.GONE);
         holder.uploadingProgressBarLand.setVisibility(View.GONE);
         holder.errorUploadingLandscape.setVisibility(View.GONE);
-        holder.forwardOwnLandscape.setVisibility(View.GONE);
 
         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
         holder.errorUploadingFile.setVisibility(View.GONE);
         holder.retryAlert.setVisibility(View.GONE);
-        holder.forwardOwnFile.setVisibility(View.GONE);
 
         holder.contentContactMessageFileThumb.setVisibility(View.GONE);
         holder.contentContactMessageFileName.setVisibility(View.GONE);
@@ -4806,7 +4707,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
         holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
-        holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
 
         holder.contentContactMessageThumbLand.setVisibility(View.GONE);
         holder.contentContactMessageThumbLand.setImageBitmap(null);
@@ -4814,10 +4714,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
         holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
-        holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
         holder.contentContactMessageFile.setVisibility(View.GONE);
-        holder.forwardContactFile.setVisibility(View.GONE);
     }
 
     /**
@@ -4877,7 +4775,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.forwardOwnFile.setOnClickListener(this);
                     } else {
                         holder.forwardContactFile.setVisibility(View.VISIBLE);
-                        holder.forwardContactFile.setVisibility(View.VISIBLE);
+                        holder.forwardContactFile.setOnClickListener(this);
                     }
                 }
 
@@ -5307,6 +5205,30 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.gifViewContactMessageThumbLand.setVisibility(View.GONE);
     }
 
+    /**
+     * Hides forward option in messages.
+     *
+     * @param position  Position of holder in adapter.
+     * @param holder    ViewHolderMessageChat from which the forward icons have to be hidden.
+     */
+    private void hideForwardOptions(int position, ViewHolderMessageChat holder){
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+        holder.forwardOwnContact.setVisibility(View.GONE);
+        holder.forwardOwnFile.setVisibility(View.GONE);
+        holder.forwardOwnPortrait.setVisibility(View.GONE);
+        holder.forwardOwnLandscape.setVisibility(View.GONE);
+        holder.forwardOwnMessageLocation.setVisibility(View.GONE);
+        holder.forwardOwnRichLinks.setVisibility(View.GONE);
+        holder.forwardContactContact.setVisibility(View.GONE);
+        holder.forwardContactFile.setVisibility(View.GONE);
+        holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+        holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+        holder.forwardContactMessageLocation.setVisibility(View.GONE);
+        holder.forwardContactRichLinks.setVisibility(View.GONE);
+    }
+
     public void bindVoiceClipAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int positionInAdapter) {
         logDebug("positionInAdapter: " + positionInAdapter);
 
@@ -5371,13 +5293,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
             holder.contentOwnMessageText.setVisibility(View.GONE);
             holder.urlOwnMessageLayout.setVisibility(View.GONE);
-
-            //Forward element(own message):
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
 
             holder.previewFrameLand.setVisibility(View.GONE);
             holder.previewFramePort.setVisibility(View.GONE);
@@ -5574,13 +5489,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageAttachLayout.setVisibility(View.GONE);
             holder.contentContactMessageFile.setVisibility(View.GONE);
 
-            //Forward element (contact messages):
-            holder.forwardContactFile.setVisibility(View.GONE);
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
-
             holder.contentContactMessageFileThumb.setVisibility(View.GONE);
             holder.contentContactMessageFileName.setVisibility(View.GONE);
             holder.contentContactMessageFileSize.setVisibility(View.GONE);
@@ -5730,11 +5638,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
 
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-
             holder.contentOwnMessageContactLayout.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactThumb.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactName.setVisibility(View.VISIBLE);
@@ -5759,10 +5662,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.retryAlert.setVisibility(View.GONE);
                 holder.errorUploadingContact.setVisibility(View.GONE);
 
-                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                    holder.forwardOwnContact.setVisibility(View.GONE);
-                }
-                else {
+                if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                     holder.forwardOwnContact.setVisibility(View.VISIBLE);
                     holder.forwardOwnContact.setOnClickListener(this);
                 }
@@ -5844,15 +5744,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageLayout.setVisibility(View.GONE);
             holder.contentContactMessageContactLayout.setVisibility(View.VISIBLE);
 
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.forwardContactFile.setVisibility(View.GONE);
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-
-            if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                holder.forwardContactContact.setVisibility(View.GONE);
-            }
-            else {
+            if (!cC.isInAnonymousMode() && !isMultipleSelect()) {
                 holder.forwardContactContact.setVisibility(View.VISIBLE);
                 holder.forwardContactContact.setOnClickListener(this);
             }
@@ -6355,12 +6247,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-
             ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbPort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
@@ -6422,13 +6308,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
-
-
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactFile.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).gradientContactMessageThumbLand.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoIconContactMessageThumbLand.setVisibility(View.GONE);
@@ -6516,12 +6395,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
-            holder.forwardOwnPortrait.setVisibility(View.GONE);
-            holder.forwardOwnLandscape.setVisibility(View.GONE);
-            holder.forwardOwnFile.setVisibility(View.GONE);
-            holder.forwardOwnContact.setVisibility(View.GONE);
-            holder.forwardOwnRichLinks.setVisibility(View.GONE);
-
             ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbPort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
@@ -6585,12 +6458,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
-
-            holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-            holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-            holder.forwardContactFile.setVisibility(View.GONE);
-            holder.forwardContactContact.setVisibility(View.GONE);
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).gradientContactMessageThumbLand.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoIconContactMessageThumbLand.setVisibility(View.GONE);

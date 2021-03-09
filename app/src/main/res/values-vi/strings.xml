@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Hộp Thư</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Lưu về Ngoại Tuyến</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Ngoại tuyến</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -229,8 +230,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Sổ Liên Lạc</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Liên Lạc [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Chưa có [/B][A]yêu cầu[/A][B] nào được gửi đi.[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Chưa nhận được [/B][A]yêu cầu[/A][B] nào.[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Chưa có [/B][A]yêu cầu gửi đi nào[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Chưa có [/B][A]yêu cầu được nhận nào[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Các Phiên Truyền Tải</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Trang Tài Khoản</string>
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Số điện thoại đã được xác thực thành công</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong máy</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Bộ nhớ ngoài</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong máy</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Bộ nhớ ngoài</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong máy</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Tất cả dữ liệu tải về từ MEGA lưu vào trong máy sẽ bị xóa, và tài khoản sẽ đăng xuất trong %1d giây</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Thông Tin</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Chính Sách Quyền Riêng Tư</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Chính Sách Quyền Riêng Tư</string>
     <string name="settings_about_terms_of_service" context="">Điều Khoản Dịch Vụ</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Quy Định Bảo Vệ Dữ Liệu</string>
     <string name="settings_about_app_version" context="App means “Application”">Phiên bản ứng dụng</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Tài Khoản Miễn Phí</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Tài Khoản Pro Lite</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Tài Khoản Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Tài khoản hạng Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Tài khoản hạng Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Tài khoản hạng Pro III</string>
@@ -943,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Chỗ điền Mã Khóa Phục Hồi ở đây</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">điền mật khẩu ở đây</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Đây là bước cuối cùng để hoàn tất việc hủy bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu ở dưới đây.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Đây là bước cuối cùng để hoàn tất việc hủy bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu ở dưới đây.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Xác thực email</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Xin kiểm tra hộp thư email để thục hiện bước kế tiếp.</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Đang tải danh bạ từ điện thoại&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d requests already sent.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d lời mời đã được gửi đi thành công.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d lời mời đã được gửi đi thành công nhưng có %2$d lời mời còn lại chưa gửi được.</string>
 
@@ -1596,8 +1598,8 @@
     <string name="attachment_upload_panel_contact">Tên liên lạc</string>
     <string name="attachment_upload_panel_photo">Lấy từ trong điện thoại</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Xoá Bỏ Tài Khoản</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Nếu hủy bỏ tài khoản, bạn sẽ mất hết quyền truy cập vào dữ liệu hiện có, các tên liên lạc trên MEGA và các cuộc trò chuyện.\nMột khi thực hiện, thao tác này sẽ không thể ngừng lại.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Xoá tài khoản</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Nếu xóa bỏ tài khoản, bạn sẽ mất hết quyền truy cập vào dữ liệu hiện có, các tên liên lạc trên MEGA và các cuộc trò chuyện.\nMột khi thực hiện, thao tác này sẽ không thể ngừng lại.</string>
     <string name="delete_button" context="menu item">Xóa</string>
 
     <string name="file_properties_info_info_file">Thông tin</string>
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">Giá từ</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Thư mục chia sẻ mới</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Xóa lịch sử nội dung chát</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Xóa lịch sử nội dung chát</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Xóa tên liên lạc</string>
 
@@ -1826,21 +1828,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Chọn thời gian</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Mời bạn bè vào [/B][A]Chat[/A][B] để cùng tận hưởng công cụ giao lưu với tính năng bảo mật mạnh mẽ.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Mời bạn bè vào [/B][A]Chát[/A][B] để cùng tận hưởng công cụ giao lưu với tính năng bảo mật mạnh mẽ[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Không có nội dung nào trong [/B][A]Camera Uploads[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Không có mục nào trong [/B][A]Thùng Rác[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Không có nội dung nào trong [/B][A]Camera Uploads[/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Không có mục nào trong [/B][A]Thùng Rác[/A]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Không có tệp nào trong [/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A][B].[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Không có tệp nào trong [/B][A]Hộp thư[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Không có tệp trong [/B][A]Lưu về Ngoại Tuyến[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Không có tên [/B][A]Liên Lạc[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Không có[/A] [B]Cuộc Trò Chuyện[/B] nào</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Đang tải[/A] các [B]Cuộc Trò Chuyện&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Không có [/B][A]Thư Mục Chia Sẻ Nhân Được[/A][B] nào.[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Không có [/B][A]Thư Mục Chia Sẻ Gửi Đi[/A][B] nào.[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Không có [/B][A]Thư Mục Chia Sẻ Nhận Được[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Không có [/B][A]Thư Mục Chia Sẻ Gửi Đi[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Không có [/B][A]Liên Kết Công Khai[/A] [B]nào[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Yêu cầu gửi đi</string>
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Xin đặt một mật khẩu mạnh hơn</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Tên liên lạc mới</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Lượng Lưu Trữ</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">Có %1$d lời yêu cầu đang chờ hồi âm</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">Có %1$d lời yêu cầu đang chờ hồi âm</item>
@@ -2048,9 +2049,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào hoạt động.[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]trống[/B][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]Trống[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Viết tin nhắn cho %s&#8230;</string>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Để tắt Lịch Dọn Dẹp Thùng Rác hay gia hạn chờ thời gian tự dọn dẹp được lâu hơn, tài khoản cần phải nâng cấp lên hạng PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">ngày</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">ngày</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Lấy liên kết vào cuộc chát</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Quản lý liên kết cuộc chát</string>
 
@@ -2466,7 +2467,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL key bị lỗi</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA không tạo được liên kết an ninh tới SSL. Thiết bị bạn đang sử dụng có thể đang dùng mạng WiFi công cộng có yêu cầu một số điều kiện khi kết nối.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Không có [/B][A]Thông Báo[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Không có [/B][A]Thông Báo[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Cài đặt MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA cần khả năng truy cập vào kho ảnh, media và tệp tin trong máy để thực hiện việc chia sẻ khi được yêu cầu, trao đổi các tin nhắn được mã hóa và các cuộc gọi bảo mật.</string>
@@ -2509,7 +2510,7 @@
     <string name="label_yesterday" context="label yesterday">Hôm qua</string>
     <string name="label_tomorrow" context="label tomorrow">Ngày mai</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Không có [/B][A]Tệp Tin Chia Sẻ[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Không có [/B][A]Tệp Tin Chia Sẻ[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s vừa tham gia vào cuộc gọi</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s đã rời khỏi cuộc gọi</string>
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Chứng thực của %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Văn bản</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Văn bản</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Tài Liệu</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Cuộc Chát Mới</string>
@@ -2907,7 +2908,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Xóa lịch sử nội dung chát</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Đã vô hiệu</string>
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Chính Sách Quyền Riêng Tư</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Chính Sách Cookie</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Luôn Bật</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 </resources>

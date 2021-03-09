@@ -2,12 +2,12 @@
 <resources>
     <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Crop</string>
     <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Save scan</string>
-    <string name="scan_action_add" context="button">Add</string>
-    <string name="scan_action_save" context="Action of a button to save something">Save</string>
+    <string name="scan_action_add" context="button">Thêm</string>
+    <string name="scan_action_save" context="Action of a button to save something">Lưu</string>
     <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Retake</string>
     <string name="scan_file_name" context="Document scanner file name">File name</string>
     <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">File type</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Quality</string>
+    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Chất lượng</string>
     <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Destination</string>
     <string name="scan_quality_high" context="Document scanner high quality option">High</string>
     <string name="scan_quality_medium" context="Document scanner medium quality option">Medium</string>
