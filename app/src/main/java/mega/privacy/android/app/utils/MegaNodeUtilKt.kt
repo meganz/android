@@ -452,8 +452,6 @@ class MegaNodeUtilKt {
             activityLauncher: ActivityLauncher,
             snackbarShower: SnackbarShower
         ) {
-            snackbarShower.showSnackbar(getString(R.string.intent_not_available))
-
             val intentShare = Intent(Intent.ACTION_SEND)
 
             if (!setLocalIntentParams(
