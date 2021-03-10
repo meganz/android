@@ -204,6 +204,10 @@
         <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.White87White">
+        <item name="android:textColor">@color/white_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.GreyWhite87.16">
         <item name="android:textSize">16sp</item>
     </style>
@@ -384,6 +388,10 @@
 
     <style name="TextAppearance.Mega.Caption.Variant3">
         <item name="android:textColor">@color/grey_054_white_060</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Variant4">
+        <item name="android:textColor">@color/white_087_white</item>
     </style>
 
     <style name="TextAppearance.Mega.Caption.Variant3.14">

@@ -18,7 +18,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -124,11 +124,11 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
         binding.accountTypeText.text = StringResourcesUtils.getString(
             when (accountInfo?.accountType) {
-                0 -> R.string.free_account
-                1 -> R.string.pro1_account
-                2 -> R.string.pro2_account
-                3 -> R.string.pro3_account
-                4 -> R.string.lite_account
+                FREE -> R.string.free_account
+                PRO_I -> R.string.pro1_account
+                PRO_II -> R.string.pro2_account
+                PRO_III -> R.string.pro3_account
+                PRO_LITE -> R.string.lite_account
                 else -> R.string.recovering_info
             }
         )
@@ -186,7 +186,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             getDefaultAvatar(
                 getColorAvatar(megaApi.myUser),
                 accountInfo?.fullName,
-                Constants.AVATAR_SIZE,
+                AVATAR_SIZE,
                 true
             )
         )

@@ -1,5 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_view"
     android:layout_width="match_parent"
@@ -16,8 +16,8 @@
             android:id="@+id/my_account_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="32dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp">
 
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/my_account_thumbnail"
@@ -27,20 +27,15 @@
                 android:layout_marginStart="17dp"
                 android:layout_marginEnd="18dp"
                 android:scaleType="fitCenter"
-                rounded:corner_radius="30dp" />
+                app:corner_radius="30dp" />
 
             <RelativeLayout
                 android:id="@+id/qr_code_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/my_account_thumbnail"
-                android:layout_alignBottom="@+id/my_account_thumbnail">
-
-                <View
-                    android:id="@+id/qr_code_background"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:background="@drawable/shape_white_circle" />
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignBottom="@+id/my_account_thumbnail"
+                android:layout_marginStart="55dp"
+                android:background="@drawable/shape_white_circle">
 
                 <ImageView
                     android:id="@+id/qr_code_icon"
@@ -64,8 +59,8 @@
 
             <ImageView
                 android:id="@+id/view_and_edit_profile_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/name_text"
                 android:src="@drawable/ic_view_and_edit_profile"
                 tools:ignore="ContentDescription" />
@@ -108,8 +103,8 @@
                 android:id="@+id/account_type_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="7dp"
                 android:layout_marginEnd="9dp"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_free_account" />
@@ -118,11 +113,10 @@
                 android:id="@+id/account_type_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/account_type_icon"
-                android:layout_toStartOf="@+id/upgrade_button"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
+                android:layout_toStartOf="@+id/upgrade_button"
+                android:layout_toEndOf="@+id/account_type_icon"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White"
                 tools:text="Free" />
 
@@ -131,6 +125,27 @@
                 style="@style/Widget.Mega.Button.Variant4"
                 android:layout_alignParentEnd="true"
                 android:text="@string/my_account_upgrade_pro" />
+
+            <TextView
+                android:id="@+id/renew_expiry_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/account_type_icon"
+                android:layout_alignStart="@+id/account_type_icon"
+                android:layout_marginBottom="10dp"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
+                tools:text="Renews on" />
+
+            <TextView
+                android:id="@+id/renew_expiry_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/account_type_icon"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="-2dp"
+                android:layout_toEndOf="@+id/renew_expiry_text"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.White87White"
+                tools:text="Monday, 1 Feb 2021" />
 
         </RelativeLayout>
 
@@ -154,6 +169,11 @@
 
 
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/business_account_management_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <RelativeLayout
                 android:id="@+id/add_phone_number_layout"
@@ -192,7 +212,7 @@
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
                     tools:text="@string/sms_add_phone_number_dialog_msg_non_achievement_user" />
 
-                <include layout="@layout/view_relative_layout_separator_72"/>
+                <include layout="@layout/view_relative_layout_separator_72" />
 
             </RelativeLayout>
 
@@ -230,10 +250,10 @@
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="10dp"
                     android:layout_toEndOf="@+id/backup_recovery_key_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
-                    android:text="@string/backup_recovery_key_subtitle" />
+                    android:text="@string/backup_recovery_key_subtitle"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3" />
 
-                <include layout="@layout/view_relative_layout_separator_72"/>
+                <include layout="@layout/view_relative_layout_separator_72" />
 
             </RelativeLayout>
 
@@ -247,8 +267,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
                     android:src="@drawable/ic_contacts_connections"
                     tools:ignore="ContentDescription" />
 
@@ -256,9 +276,9 @@
                     android:id="@+id/contacts_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_marginStart="72dp"
                     android:text="@string/section_contacts"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -267,13 +287,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/contacts_title"
+                    android:layout_marginStart="72dp"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_marginStart="72dp"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
                     tools:text="132 connections" />
 
-                <include layout="@layout/view_relative_layout_separator_72"/>
+                <include layout="@layout/view_relative_layout_separator_72" />
 
             </RelativeLayout>
 
@@ -287,19 +307,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginEnd="32dp"
                     android:src="@drawable/ic_achievement"
+                    app:tint="@color/black_white"
                     tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/achievements_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_marginStart="72dp"
                     android:text="@string/achievements_title"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -308,13 +329,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/achievements_title"
+                    android:layout_marginStart="72dp"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_marginStart="72dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
-                    android:text="@string/achievements_subtitle" />
+                    android:text="@string/achievements_subtitle"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14" />
 
-                <include layout="@layout/view_relative_layout_separator_72"/>
+                <include layout="@layout/view_relative_layout_separator_72" />
 
             </RelativeLayout>
 
@@ -328,18 +349,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
                     android:src="@drawable/ic_last_session"
+                    app:tint="@color/black_white"
                     tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/last_session_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="18dp"
-                    android:layout_marginStart="72dp"
                     android:text="@string/my_account_last_session"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
 
@@ -348,13 +370,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/last_session_title"
+                    android:layout_marginStart="72dp"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:layout_marginStart="72dp"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
                     tools:text="Today 14:53" />
-
-                <include layout="@layout/view_relative_layout_separator_72"/>
 
             </RelativeLayout>
 
