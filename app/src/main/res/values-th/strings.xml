@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">อุปกรณ์ส่วนใหญ่ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดใหญ่กว่า 4GB การดาวน์โหลดของคุณอาจล้มเหลวได้</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">ไม่มีแอปใดที่สามารถเรียกใช้ไฟล์นี้บนอุปกรณ์ของคุณได้</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">ไม่มีแอปบนอุปกรณ์ของคุณเพื่อเปิดตำแหน่งนี้</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">แชร์รูปภาพ</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">แชร์ลิงก์</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">การอัปโหลดกล้องเสร็จสมบูรณ์</string>
+    <string name="settings_appearance" context="settings of the Appearance section">การแสดงผล</string>
     <string name="settings_features" context="settings of the Features section">ฟีเจอร์</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ที่เก็บข้อมูล</string>
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">นำออกจากออฟไลน์หรือไม่</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">ตั้งค่าสถานะ</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">ละทิ้ง</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">ไม่พร้อมใช้งาน</string>
 
@@ -1467,6 +1470,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">อัปโหลดแล้ว %1$d ไฟล์</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">อัปโหลดแล้ว %1$d ไฟล์</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">หยุดการถ่ายโอนชั่วคราวแล้ว</string>
     <string name="attachment_uploading_state_uploading">กำลังอัปโหลด&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">ผิดพลาด ยังไม่ได้ส่ง</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">ดาวน์โหลดไฟล์แล้ว %d ไฟล์</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">ไม่มีโฟลเดอร์ที่จะแชร์</string>
 
     <string name="settings_help" context="Menu item">ช่วยเหลือ</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">ศูนย์ความช่วยเหลือ</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">ส่งคำติชม</string>
     <string name="setting_feedback_subject" context="mail subject">คำติชมเกี่ยวกับ Android</string>
     <string name="setting_feedback_body" context="mail body">กรุณาเขียนคำติชมของคุณที่นี่:</string>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">แนบจาก&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">สร้างแชทเมื่อ %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">เลือกข้อความ</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">เปิดไว้เสมอ</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">สแกนเอกสาร</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">เบา</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">มืด</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>

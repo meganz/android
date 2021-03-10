@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">大多数设备无法下载超过4GB 的文件。您的下载可能会失败。</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">您的设备上没有可用的应用程序执行此文件</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">您的设备上没有可用应用程序打开此位置</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">相机上传完成</string>
+    <string name="settings_appearance" context="settings of the Appearance section">外观</string>
     <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线中删除？</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">无法使用</string>
 
@@ -1467,6 +1470,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">已上传%1$d个文件</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">已上传%1$d个文件</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">传输已暂停！</string>
     <string name="attachment_uploading_state_uploading">正在上传&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">错误！未发送</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">已下载%d的文件。</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">没有分享的文件夹</string>
 
     <string name="settings_help" context="Menu item">帮助</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">帮助中心</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">发送反馈</string>
     <string name="setting_feedback_subject" context="mail subject">安卓反馈</string>
     <string name="setting_feedback_body" context="mail body">请在这里写下您的反馈：</string>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">聊天创建于%s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">选择消息</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">始终开启</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">扫描文件</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">轻度</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>

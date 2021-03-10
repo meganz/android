@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">이 위치를 열 수 있는 앱이 기기에 없습니다</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">카메라 업로드 완료</string>
+    <string name="settings_appearance" context="settings of the Appearance section">외관</string>
     <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">오프라인에서 제거할까요?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">상태 설정</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">해제</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">불가능</string>
 
@@ -1467,6 +1470,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">파일 %1$d개 업로드됨</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">파일 %1$d개 업로드됨</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">전송 일시정지됨!</string>
     <string name="attachment_uploading_state_uploading">업로드 중&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">오류. 전송되지 않음.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d개의 파일이 이미 다운로드 되었습니다.</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">공유된 폴더 없음</string>
 
     <string name="settings_help" context="Menu item">도움말</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">도움 센터</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">피드백 보내기</string>
     <string name="setting_feedback_subject" context="mail subject">Android 피드백</string>
     <string name="setting_feedback_body" context="mail body">여기에 의견을 적으세요:</string>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">다음에서 첨부&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%s에 생성된 대화</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">메시지 선택</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">항상 켬</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">문서 스캔</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">가벼움</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">어두움</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>

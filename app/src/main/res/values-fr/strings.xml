@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Aucune appli n\'est proposée sur votre appareil pour ouvrir cette position</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Les téléversements de l\'appareil photo sont terminés</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Apparence</string>
     <string name="settings_features" context="settings of the Features section">Fonctions</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
@@ -911,7 +913,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte Pro léger</string>
 
-    <string name="backup_title" context="">Sauvegarder votre clé de récupération</string>
+    <string name="backup_title" context="">Sauvegardez votre clé de récupération</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Votre mot de passe déverrouille votre clé de récupération</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Vos données ne sont lisibles qu\'à la suite d\'une chaîne d\'opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Supprimer de Hors Ligne ?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Définir l\'état</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Fermer</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Non disponible</string>
 
@@ -1467,6 +1470,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">%1$d fichier a été téléversé</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers ont été téléversés</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Les transferts ont été mis en pause</string>
     <string name="attachment_uploading_state_uploading">Téléversement&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">Erreur. N\'a pas été envoyé.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d fichiers ont déjà été téléchargés.</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Aucun dossier n\'est partagé</string>
 
     <string name="settings_help" context="Menu item">Aide</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Centre d\'assistance</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer un commentaire</string>
     <string name="setting_feedback_subject" context="mail subject">Rétroaction Android</string>
     <string name="setting_feedback_body" context="mail body">Veuillez rédiger votre commentaire ici :</string>
@@ -2069,7 +2079,7 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">L\'authentification à deux facteurs est activée</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegardez votre clé de récupération</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Le code est invalide</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Vérification de la connexion</string>
@@ -2688,7 +2698,7 @@
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Faire glisser pour annuler</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Ce message vocal n\'est pas disponible</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Inviter un ami par</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Inviter un ou une ami par</string>
     <string name="invite_contact_action_button" context="Action button label">Inviter un ami par&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fichier a déjà été téléchargé.&#160;</item>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Joindre à partir de&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Conversation crée le %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Sélection des messages</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Toujours activés</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Numériser un document</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Léger</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Sombre</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>
