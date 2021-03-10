@@ -425,14 +425,8 @@ class MediaPlayerServiceViewModel(
                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
                 return oldDir == newDir
             }
-            AUDIO_SEARCH_ADAPTER -> {
-                val oldHandles = oldIntent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
-                    ?: return false
-                val newHandles =
-                    intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return false
-                return oldHandles.contentEquals(newHandles)
-            }
             AUDIO_BROWSE_ADAPTER,
+            VIDEO_BROWSE_ADAPTER,
             FROM_CHAT,
             FILE_LINK_ADAPTER -> {
                 return oldType == type

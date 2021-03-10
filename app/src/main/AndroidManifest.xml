@@ -335,8 +335,7 @@
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize" />
+            android:label="@string/app_name" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
@@ -386,8 +385,7 @@
         <activity
             android:name=".mediaplayer.MediaPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable"
-            android:configChanges="orientation|screenSize" />
+            android:theme="@style/Theme.Dark.FullScreen.Draggable" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"

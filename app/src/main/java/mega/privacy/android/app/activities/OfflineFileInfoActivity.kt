@@ -20,10 +20,12 @@ class OfflineFileInfoActivity : BaseActivity() {
             return
         }
 
-        val fragment = OfflineFileInfoFragment()
-        fragment.arguments = OfflineFileInfoFragmentArgs(handle).toBundle()
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container, fragment)
-            .commit()
+        if (savedInstanceState == null) {
+            val fragment = OfflineFileInfoFragment()
+            fragment.arguments = OfflineFileInfoFragmentArgs(handle).toBundle()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.container, fragment)
+                .commit()
+        }
     }
 }
