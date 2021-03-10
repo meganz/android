@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import android.view.ViewGroup;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -124,7 +122,7 @@ public class ImportFilesFragment extends BaseFragment {
                 emptyNames++;
             }
 
-            if (Pattern.compile(NODE_NAME_REGEX).matcher(name).find()) {
+            if (NODE_NAME_REGEX.matcher(name).find()) {
                 wrongNames++;
             }
         }

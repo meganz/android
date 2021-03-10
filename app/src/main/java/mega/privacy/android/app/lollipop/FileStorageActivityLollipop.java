@@ -54,8 +54,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
@@ -1054,12 +1052,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         newFolder.setReadable(true, false);
         newFolder.setExecutable(true, false);
     }
-
-	public static boolean matches(String regex, CharSequence input) {
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
-	}
 
 	/**
 	 * Starts the action mode if needed.

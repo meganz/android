@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -271,7 +270,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         if (isTextEmpty(typedName)) {
             nameLayout.setErrorEnabled(true);
             nameLayout.setError(getString(R.string.empty_name));
-        } else if (Pattern.compile(NODE_NAME_REGEX).matcher(typedName).find()) {
+        } else if (NODE_NAME_REGEX.matcher(typedName).find()) {
             nameLayout.setErrorEnabled(true);
             nameLayout.setError(getString(R.string.invalid_characters));
         } else {

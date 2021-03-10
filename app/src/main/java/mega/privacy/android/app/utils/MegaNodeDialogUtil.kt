@@ -23,7 +23,6 @@ import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaNode
-import java.util.regex.Pattern
 
 class MegaNodeDialogUtil {
 
@@ -298,7 +297,7 @@ class MegaNodeDialogUtil {
                         getString(R.string.invalid_string)
                     )
                 }
-                Pattern.compile(NODE_NAME_REGEX).matcher(typedString).find() -> {
+                NODE_NAME_REGEX.matcher(typedString).find() -> {
                     showDialogError(
                         typeText,
                         errorText,
