@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -35,19 +36,18 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_RENAME dialog to rename a node.
          *
-         * @param activity           Current activity.
+         * @param context            Current context.
          * @param node               A valid node.
          * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
          * @return The rename dialog.
          */
         @JvmStatic
         fun showRenameNodeDialog(
-            activity: Activity,
+            context: Context,
             node: MegaNode,
             actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
-            val renameDialogBuilder =
-                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
             renameDialogBuilder
                 .setTitle(getString(R.string.rename_dialog_title, node.name))
@@ -55,7 +55,7 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                activity,
+                context,
                 node,
                 actionNodeCallback,
                 null,
@@ -68,17 +68,16 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
          *
-         * @param activity           Current activity.
+         * @param context           Current context.
          * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
          * @return The create new folder dialog.
          */
         @JvmStatic
         fun showNewFolderDialog(
-            activity: Activity,
+            context: Context,
             actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
-            val newFolderDialogBuilder =
-                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
             newFolderDialogBuilder
                 .setTitle(R.string.menu_new_folder)
@@ -86,7 +85,7 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                activity,
+                context,
                 null,
                 actionNodeCallback,
                 null,
@@ -99,15 +98,14 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_FILE dialog to create a new file.
          *
-         * @param activity Current activity.
+         * @param context Current context.
          * @param parent   A valid node. Specifically the parent in which the folder will be created.
          * @param data     Valid data. Specifically the content of the new file.
          * @return The create new file dialog.
          */
         @JvmStatic
-        fun showNewFileDialog(activity: Activity, parent: MegaNode, data: String): AlertDialog {
-            val newFileDialogBuilder =
-                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+        fun showNewFileDialog(context: Context, parent: MegaNode, data: String): AlertDialog {
+            val newFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
             newFileDialogBuilder
                 .setTitle(R.string.context_new_file_name)
@@ -115,7 +113,7 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                activity,
+                context,
                 parent,
                 null,
                 data,
@@ -128,7 +126,7 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_URL_FILE dialog to create a new URL file.
          *
-         * @param activity       Current activity.
+         * @param context       Current context.
          * @param parent         A valid node. Specifically the parent in which the folder will be created.
          * @param data           Valid data. Specifically the content of the new URL file.
          * @param defaultURLName Default name of the URL if has, null otherwise.
@@ -136,13 +134,12 @@ class MegaNodeDialogUtil {
          */
         @JvmStatic
         fun showNewURLFileDialog(
-            activity: Activity,
+            context: Context,
             parent: MegaNode,
             data: String,
             defaultURLName: String?
         ): AlertDialog {
-            val newURLFileDialogBuilder =
-                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            val newURLFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
             newURLFileDialogBuilder
                 .setTitle(R.string.dialog_title_new_link)
@@ -150,7 +147,7 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                activity,
+                context,
                 parent,
                 null,
                 data,
@@ -163,7 +160,7 @@ class MegaNodeDialogUtil {
         /**
          * Finish the initialization of the dialog and shows it.
          *
-         * @param activity           Current activity.
+         * @param context           Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param data               Valid data if needed to confirm the action, null otherwise.
@@ -177,7 +174,7 @@ class MegaNodeDialogUtil {
          * @return The created dialog.
          */
         private fun setFinalValuesAndShowDialog(
-            activity: Activity,
+            context: Context,
             node: MegaNode?,
             actionNodeCallback: ActionNodeCallback?,
             data: String?,
@@ -185,64 +182,69 @@ class MegaNodeDialogUtil {
             builder: AlertDialog.Builder,
             dialogType: Int
         ): AlertDialog {
-            val view = activity.layoutInflater.inflate(R.layout.dialog_create_rename_node, null)
-            builder.setView(view)
+            builder.setView(R.layout.dialog_create_rename_node)
+
+            var typeText: EmojiEditText? = null
+            var errorText: TextView? = null
 
             val dialog = builder.create()
-            val typeText = view.findViewById<EditText>(R.id.type_text)
-            val errorText = view.findViewById<TextView>(R.id.error_text)
 
-            typeText?.apply {
-                when (dialogType) {
-                    TYPE_RENAME -> {
-                        if (node != null) {
-                            setText(node.name)
-                            setSelection(0, getCursorPositionOfName(node.isFile, node.name))
+            dialog.apply {
+                setOnShowListener {
+                    typeText = findViewById<EmojiEditText>(R.id.type_text)
+                    errorText = findViewById<TextView>(R.id.error_text)
+
+                    typeText?.apply {
+                        when (dialogType) {
+                            TYPE_RENAME -> {
+                                if (node != null) {
+                                    setText(node.name)
+                                    setSelection(0, getCursorPositionOfName(node.isFile, node.name))
+                                }
+                            }
+                            TYPE_NEW_FOLDER -> {
+                                setHint(R.string.context_new_folder_name)
+                            }
+                            TYPE_NEW_FILE -> {
+                                setHint(R.string.context_new_file_name_hint)
+                            }
+                            TYPE_NEW_URL_FILE -> {
+                                if (isTextEmpty(defaultURLName)) setHint(R.string.context_new_link_name)
+                                else {
+                                    setText(defaultURLName)
+                                    setSelection(0, getCursorPositionOfName(false, defaultURLName))
+                                }
+                            }
+                        }
+
+                        doAfterTextChanged { quitDialogError(typeText, errorText) }
+
+                        setOnEditorActionListener { _, actionId, _ ->
+                            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                checkActionDialogValue(
+                                    context,
+                                    node,
+                                    actionNodeCallback,
+                                    typeText,
+                                    data,
+                                    errorText,
+                                    dialog,
+                                    dialogType
+                                )
+                            }
+
+                            false
                         }
                     }
-                    TYPE_NEW_FOLDER -> {
-                        setHint(R.string.context_new_folder_name)
-                    }
-                    TYPE_NEW_FILE -> {
-                        setHint(R.string.context_new_file_name_hint)
-                    }
-                    TYPE_NEW_URL_FILE -> {
-                        if (isTextEmpty(defaultURLName)) setHint(R.string.context_new_link_name)
-                        else {
-                            setText(defaultURLName)
-                            setSelection(0, getCursorPositionOfName(false, defaultURLName))
-                        }
-                    }
+
+                    quitDialogError(typeText, errorText)
                 }
-
-                doAfterTextChanged { quitDialogError(typeText, errorText) }
-
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        checkActionDialogValue(
-                            activity,
-                            node,
-                            actionNodeCallback,
-                            typeText,
-                            data,
-                            errorText,
-                            dialog,
-                            dialogType
-                        )
-                    }
-
-                    false
-                }
-            }
-
-            quitDialogError(typeText, errorText)
-
-            dialog.show()
+            }.show()
 
             dialog.getButton(BUTTON_POSITIVE)
                 .setOnClickListener {
                     checkActionDialogValue(
-                        activity,
+                        context,
                         node,
                         actionNodeCallback,
                         typeText,
@@ -263,7 +265,7 @@ class MegaNodeDialogUtil {
          * - If so, confirms the action.
          * - If not, shows the error in question.
          *
-         * @param activity           Current activity.
+         * @param context           Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param typeText           The input text field.
@@ -277,7 +279,7 @@ class MegaNodeDialogUtil {
          *                           - TYPE_NEW_URL_FILE: Create new URL file action.
          */
         private fun checkActionDialogValue(
-            activity: Activity,
+            context: Context,
             node: MegaNode?,
             actionNodeCallback: ActionNodeCallback?,
             typeText: EditText?,
@@ -307,7 +309,7 @@ class MegaNodeDialogUtil {
                     when (dialogType) {
                         TYPE_RENAME -> {
                             if (node != null && typedString != node.name) {
-                                NodeController(activity).renameNode(
+                                NodeController(context).renameNode(
                                     node,
                                     typedString,
                                     actionNodeCallback
@@ -320,13 +322,13 @@ class MegaNodeDialogUtil {
                             actionNodeCallback?.createFolder(typedString)
                         }
                         TYPE_NEW_FILE -> {
-                            if (activity is FileExplorerActivityLollipop) {
-                                activity.createFile(typedString, data, node, false)
+                            if (context is FileExplorerActivityLollipop) {
+                                context.createFile(typedString, data, node, false)
                             }
                         }
                         TYPE_NEW_URL_FILE -> {
-                            if (activity is FileExplorerActivityLollipop) {
-                                activity.createFile(typedString, data, node, true)
+                            if (context is FileExplorerActivityLollipop) {
+                                context.createFile(typedString, data, node, true)
                             }
                         }
                     }

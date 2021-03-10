@@ -165,7 +165,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
                 }
 				case R.id.cab_menu_rename: {
 					MegaNode aux = documents.get(0);
-					showRenameNodeDialog((ContactFileListActivityLollipop) context, aux, (ContactFileListActivityLollipop) context);
+					showRenameNodeDialog(context, aux, (ContactFileListActivityLollipop) getActivity());
 					break;
 				}
 			}

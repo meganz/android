@@ -26,7 +26,7 @@
         android:layout_toEndOf="@+id/thumbnail_file"
         app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <mega.privacy.android.app.components.twemoji.EmojiEditText
             android:id="@+id/text_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +34,8 @@
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
             android:textColorHighlight="@color/teal_100_teal_500"
-            android:theme="@style/TransparentEditText" />
+            android:theme="@style/TransparentEditText"
+            app:emojiSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -58,7 +59,8 @@
 
     </RelativeLayout>
 
-    <include android:id="@+id/separator"
-        layout="@layout/view_relative_layout_separator"/>
+    <include
+        android:id="@+id/separator"
+        layout="@layout/view_relative_layout_separator" />
 
 </RelativeLayout>

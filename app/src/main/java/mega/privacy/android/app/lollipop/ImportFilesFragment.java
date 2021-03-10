@@ -36,8 +36,7 @@ public class ImportFilesFragment extends BaseFragment {
 
     private FragmentImportFilesBinding binding;
 
-    private LinearLayoutManager mLayoutManager;
-    public ImportFilesAdapter adapter;
+    private ImportFilesAdapter adapter;
 
     boolean areItemsVisible = false;
 
@@ -78,8 +77,7 @@ public class ImportFilesFragment extends BaseFragment {
         new ListenScrollChangesHelper().addViewToListen(binding.scrollContainerImport,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeActionBarElevation());
 
-        mLayoutManager = new LinearLayoutManager(context);
-        binding.fileListView.setLayoutManager(mLayoutManager);
+        binding.fileListView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.cloudDriveButton.setOnClickListener(v ->
                 confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
         binding.chatButton.setOnClickListener(v ->
@@ -152,11 +150,11 @@ public class ImportFilesFragment extends BaseFragment {
         areItemsVisible = !areItemsVisible;
 
         if (areItemsVisible) {
-            binding.showMoreText.setText(getString(R.string.general_show_less));
-            binding.showMoreImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
+            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_less));
+            binding.showMoreImage.setImageResource(R.drawable.ic_expand);
         } else {
-            binding.showMoreText.setText(getString(R.string.general_show_more));
-            binding.showMoreImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
+            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_more));
+            binding.showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
         }
 
         if (adapter != null) {

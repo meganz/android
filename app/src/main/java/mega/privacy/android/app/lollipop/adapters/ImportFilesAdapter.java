@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ImportFilesFragment;
 import nz.mega.sdk.MegaApiAndroid;
@@ -310,7 +311,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         RelativeLayout itemLayout;
         SimpleDraweeView thumbnail;
         TextInputLayout nameLayout;
-        AppCompatEditText name;
+        EmojiEditText name;
         RelativeLayout editButton;
         View separator;
         int currentPosition;
