@@ -9227,7 +9227,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         } else {
             expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
                     71 : 18, getOutMetrics()), 0, 0);
-            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.black_87_opacity));
+            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.white_black));
             inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
             tB.setVisibility(View.GONE);
