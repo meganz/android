@@ -265,7 +265,7 @@ public class MegaNodeUtil {
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
-                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_NODE, new Intent(android.content.Intent.ACTION_SEND)));
             }
         }
     }
@@ -349,7 +349,7 @@ public class MegaNodeUtil {
         }
 
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
+        ExportListener exportListener = new ExportListener(context, ACTION_SHARE_NODE, notExportedNodes, links,
                 new Intent(android.content.Intent.ACTION_SEND));
         for (MegaNode node : nodes) {
             if (!node.isExported()) {

@@ -961,7 +961,7 @@ public class NodeController {
             megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
         else if(context instanceof GetLinkActivity){
-            megaApi.exportNode(document, new ExportListener(context));
+            megaApi.exportNode(document, new ExportListener(context, ACTION_GET_LINK));
         }
         else  if(context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
@@ -983,7 +983,7 @@ public class NodeController {
             megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
         }
         else if (context instanceof GetLinkActivity){
-            megaApi.exportNode(document, timestamp, new ExportListener(context));
+            megaApi.exportNode(document, timestamp, new ExportListener(context, ACTION_GET_LINK));
         }
         else if (context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
@@ -1004,7 +1004,7 @@ public class NodeController {
             return;
         }
 
-        ExportListener exportListener = new ExportListener(context, true, nodes.size());
+        ExportListener exportListener = new ExportListener(context, ACTION_REMOVE_LINK, nodes.size());
 
         for (MegaNode node : nodes) {
             removeLink(node, exportListener);

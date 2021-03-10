@@ -1424,7 +1424,7 @@ public class ChatUtil {
             }
 
             logDebug("Node is not exported, so export Node");
-            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
+            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_MSG, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
         }
     }
 
@@ -1462,7 +1462,7 @@ public class ChatUtil {
 
         ArrayList<MegaNode> arrayNodesNotExported = getNotExportedNodes(listNodes);
         if (!arrayNodesNotExported.isEmpty()) {
-            ExportListener exportListener = new ExportListener(context, arrayNodesNotExported.size(), links,
+            ExportListener exportListener = new ExportListener(context, ACTION_SHARE_MSG, arrayNodesNotExported.size(), links,
                     new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
 
             for (MegaNode nodeNotExported : arrayNodesNotExported) {
