@@ -118,20 +118,20 @@ object MegaNodeUtil {
         if (node != null) {
             val megaApi = MegaApplication.getInstance().megaApi
             var rootParent = node
-            while (megaApi.getParentNode(node) != null) {
-                rootParent = megaApi.getParentNode(node)
+            while (megaApi.getParentNode(rootParent) != null) {
+                rootParent = megaApi.getParentNode(rootParent)
             }
 
-            val path = megaApi.getNodePath(node)
+            val path = megaApi.getNodePath(rootParent)
             when {
                 rootParent!!.handle == megaApi.rootNode.handle -> {
                     return getString(R.string.section_cloud_drive) + path
                 }
-                node.handle == megaApi.rubbishNode.handle -> {
+                rootParent.handle == megaApi.rubbishNode.handle -> {
                     return getString(R.string.section_rubbish_bin) +
                             path.replace("bin" + Constants.SEPARATOR, "")
                 }
-                node.isInShare -> {
+                rootParent.isInShare -> {
                     return getString(R.string.title_incoming_shares_explorer) +
                             Constants.SEPARATOR + path.substring(path.indexOf(":") + 1)
                 }
@@ -440,8 +440,8 @@ object MegaNodeUtil {
     fun getRootParentNode(node: MegaNode): MegaNode {
         val megaApi = MegaApplication.getInstance().megaApi
         var rootParent = node
-        while (megaApi.getParentNode(node) != null) {
-            rootParent = megaApi.getParentNode(node)
+        while (megaApi.getParentNode(rootParent) != null) {
+            rootParent = megaApi.getParentNode(rootParent)
         }
 
         return rootParent
