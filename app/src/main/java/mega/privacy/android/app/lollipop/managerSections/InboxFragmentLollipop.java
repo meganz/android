@@ -34,7 +34,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +65,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -90,17 +90,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	MegaNodeAdapter adapter;
     public NewHeaderItemDecoration headerItemDecoration;
     private int placeholderCount;
-	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode;
 	
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
@@ -494,8 +490,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -536,19 +530,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
 
-//			emptyImageView.setImageResource(R.drawable.inbox_empty);
-
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
-
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
-//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setListFragment(recyclerView);
-//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
@@ -558,7 +545,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			setContentText();
 
-			return v;	
+			return v;
 		}
 	}
 
@@ -1050,7 +1037,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
 
 			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleInbox()||((ManagerActivityLollipop)context).getParentHandleInbox()==-1) {
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -1059,7 +1045,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
 
-				String textToShow = context.getString(R.string.context_empty_inbox);
+				String textToShow = StringResourcesUtils.getString(R.string.context_empty_inbox);
 				try{
 					textToShow = textToShow.replace(
 							"[A]", "<font color=\'"
@@ -1115,18 +1101,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.GONE);
-
-			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).getParentHandleInbox()||((ManagerActivityLollipop) context).getParentHandleInbox()==-1) {
-
-				contentText.setText(getMegaNodeFolderInfo(inboxNode));
-			} else {
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
-
-				if(parentNode!=null){
-					contentText.setText(getMegaNodeFolderInfo(parentNode));
-				}
-			}
 		}
 	}
 
