@@ -90,7 +90,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_location"
-            app:tint="?android:attr/textColorSecondary" />
+            app:tint="?attr/colorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label"
@@ -123,7 +123,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
+
         android:visibility="gone">
 
         <ImageView
@@ -133,7 +133,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="16dp"
             android:src="@drawable/ic_location"
-            app:tint="?android:attr/textColorSecondary" />
+            app:tint="?attr/colorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label_landscape"
