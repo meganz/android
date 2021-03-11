@@ -2073,8 +2073,22 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            }
-            else if(adapterType == SEARCH_ADAPTER && !fromIncoming){
+            } else if (adapterType == RUBBISH_BIN_ADAPTER){
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                propertiesMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(true);
+                chatMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+                shareMenuItem.setVisible(false);
+            } else if(adapterType == SEARCH_ADAPTER && !fromIncoming){
                 logDebug("SEARCH_ADAPTER");
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
@@ -2350,18 +2364,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                 parent = megaApi.getParentNode(parent);
                             }
 
-                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-
-                                moveToTrashMenuItem.setVisible(true);
-                                removeMenuItem.setVisible(false);
-
-                            }
-                            else{
-                                moveToTrashMenuItem.setVisible(false);
-                                removeMenuItem.setVisible(true);
-                                getlinkMenuItem.setVisible(false);
-                                removelinkMenuItem.setVisible(false);
-                            }
+                            moveToTrashMenuItem.setVisible(true);
+                            removeMenuItem.setVisible(false);
                         }
                     }
 
