@@ -320,6 +320,9 @@
     <!-- Online -->
     <color name="lime_green_500_300">@color/lime_green_500</color>
 
+    <color name="grey_700_white">@color/grey_700</color>
+
+
     <!-- Chat contact text message text color -->
     <color name="grey_087_white">@color/grey_alpha_087</color>
 

@@ -462,6 +462,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
     private FrameLayout unreadMsgsLayout;
+    private RelativeLayout unreadBadgeLayout;
     private TextView unreadBadgeText;
     private ArrayList<Long> msgsReceived = new ArrayList<>();
 
@@ -1053,6 +1054,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         unreadMsgsLayout = findViewById(R.id.new_messages_icon);
         unreadMsgsLayout.setVisibility(View.GONE);
+        unreadBadgeLayout = findViewById(R.id.badge_rl);
         unreadBadgeText = findViewById(R.id.badge_text);
 
         rLKeyboardTwemojiButton = findViewById(R.id.emoji_rl);
@@ -9250,9 +9252,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private void showScrollToLastMsgButton() {
         if (msgsReceived != null && msgsReceived.size() > 0) {
             unreadBadgeText.setText(msgsReceived.size() + "");
-            unreadBadgeText.setVisibility(View.VISIBLE);
+            unreadBadgeLayout.setVisibility(View.VISIBLE);
         } else {
-            unreadBadgeText.setVisibility(View.GONE);
+            unreadBadgeLayout.setVisibility(View.GONE);
         }
 
         if (unreadMsgsLayout.getVisibility() == View.VISIBLE)
