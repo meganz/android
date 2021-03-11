@@ -383,6 +383,9 @@
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
 
+    <!-- Error text highlight color (selection background), import to MEGA screen-->
+    <color name="teal_100_teal_500">@color/teal_100</color>
+
     <!--   my account -->
     <color name="grey_020_black">@color/grey_020</color>
     <color name="grey_050_grey_700">@color/grey_050</color>

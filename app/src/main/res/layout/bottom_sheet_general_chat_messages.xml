@@ -83,7 +83,7 @@
                 <RelativeLayout
                     android:id="@+id/forward_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="start"
                     android:visibility="gone">
 
