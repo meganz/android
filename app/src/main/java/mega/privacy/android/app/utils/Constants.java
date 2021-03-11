@@ -483,6 +483,11 @@ public class Constants {
                     ")+"
     );
 
+    /**
+     * A node name must not contain these characters.
+     */
+    public static final Pattern NODE_NAME_REGEX = Pattern.compile("[*|\\?:\"<>\\\\\\\\/]");
+
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_INBOX = 150;
     public static final int FROM_OTHERS = 0;
@@ -512,6 +517,8 @@ public class Constants {
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
+
+    public static final int SCROLLING_UP_DIRECTION = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";

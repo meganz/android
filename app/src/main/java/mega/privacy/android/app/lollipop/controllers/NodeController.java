@@ -27,11 +27,13 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
+import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -890,20 +892,12 @@ public class NodeController {
         }
     }
 
-    public void renameNode(MegaNode document, String newName){
-        logDebug("renameNode");
-        if (newName.compareTo(document.getName()) == 0) {
+    public void renameNode(MegaNode document, String newName, ActionNodeCallback actionNodeCallback){
+        if (isOffline(context)) {
             return;
         }
 
-        if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        logDebug("Renaming " + document.getName() + " to " + newName);
-
-        megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
+        megaApi.renameNode(document, newName, new RenameListener(context, actionNodeCallback));
     }
 
     public int importLink(String url) {
