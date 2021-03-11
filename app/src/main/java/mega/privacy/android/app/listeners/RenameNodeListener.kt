@@ -14,7 +14,7 @@ class RenameNodeListener(
     private val snackbarShower: SnackbarShower?,
     context: Context,
     private val showSnackbar: Boolean = true,
-    private val isMyChatFilesFolder: Boolean = false,
+    private val isMyChatFilesFolder: Boolean = false
 ) :
     BaseListener(context) {
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {

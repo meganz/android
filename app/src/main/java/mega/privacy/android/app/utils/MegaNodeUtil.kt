@@ -71,6 +71,7 @@ object MegaNodeUtil {
 
         var folderCount = 0
         val safeList = CopyOnWriteArrayList(nodes)
+
         for (node in safeList) {
             if (node == null) {
                 safeList.remove(node)
@@ -118,11 +119,13 @@ object MegaNodeUtil {
         if (node != null) {
             val megaApi = MegaApplication.getInstance().megaApi
             var rootParent = node
+
             while (megaApi.getParentNode(rootParent) != null) {
                 rootParent = megaApi.getParentNode(rootParent)
             }
 
             val path = megaApi.getNodePath(rootParent)
+
             when {
                 rootParent!!.handle == megaApi.rootNode.handle -> {
                     return getString(R.string.section_cloud_drive) + path
@@ -154,6 +157,7 @@ object MegaNodeUtil {
     fun shareNode(context: Context, node: MegaNode) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             val path = FileUtil.getLocalFile(context, node.name, node.size)
+
             if (!TextUtil.isTextEmpty(path) && !node.isFolder) {
                 FileUtil.shareFile(context, File(path))
             } else if (node.isExported) {
@@ -185,9 +189,11 @@ object MegaNodeUtil {
 
         val downloadedFiles: MutableList<File> = ArrayList()
         var allDownloadedFiles = true
+
         for (node in nodes) {
             val path =
                 if (node.isFolder) null else FileUtil.getLocalFile(context, node.name, node.size)
+
             if (TextUtil.isTextEmpty(path)) {
                 allDownloadedFiles = false
                 break
@@ -203,6 +209,7 @@ object MegaNodeUtil {
 
         var notExportedNodes = 0
         val links = StringBuilder()
+
         for (node in nodes) {
             if (!node.isExported) {
                 notExportedNodes++
@@ -253,7 +260,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun startShareIntent(context: Context, shareIntent: Intent, link: String?) {
-        shareIntent.type = Constants.TYPE_TEXT_PLAIN
+        shareIntent.type = TYPE_TEXT_PLAIN
         shareIntent.putExtra(Intent.EXTRA_TEXT, link)
         context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)))
     }
@@ -272,6 +279,7 @@ object MegaNodeUtil {
         node: MegaNode?
     ): Boolean {
         val error = "Error $message. "
+
         if (node == null) {
             LogUtil.logError(error + "Node == NULL")
             return false
@@ -297,6 +305,7 @@ object MegaNodeUtil {
         nodes: List<MegaNode>?
     ): Boolean {
         val error = "Error $message. "
+
         if (nodes == null || nodes.isEmpty()) {
             LogUtil.logError(error + "no nodes")
             return false
@@ -317,7 +326,8 @@ object MegaNodeUtil {
      */
     private fun isMyChatFilesFolder(node: MegaNode?): Boolean {
         val megaApplication = MegaApplication.getInstance()
-        return node != null && node.handle != MegaApiJava.INVALID_HANDLE &&
+
+        return node != null && node.handle != INVALID_HANDLE &&
                 !megaApplication.megaApi.isInRubbish(node) &&
                 existsMyChatFilesFolder() &&
                 node.handle == megaApplication.dbH.myChatFilesFolderHandle
@@ -332,10 +342,12 @@ object MegaNodeUtil {
     fun existsMyChatFilesFolder(): Boolean {
         val dbH = MegaApplication.getInstance().dbH
         val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
-        if (dbH != null && dbH.myChatFilesFolderHandle != MegaApiJava.INVALID_HANDLE) {
+
+        if (dbH != null && dbH.myChatFilesFolderHandle != INVALID_HANDLE) {
             val myChatFilesFolder = megaApi.getNodeByHandle(dbH.myChatFilesFolderHandle)
+
             return myChatFilesFolder != null &&
-                    myChatFilesFolder.handle != MegaApiJava.INVALID_HANDLE &&
+                    myChatFilesFolder.handle != INVALID_HANDLE &&
                     !megaApi.isInRubbish(myChatFilesFolder)
         }
 
@@ -345,7 +357,7 @@ object MegaNodeUtil {
     /**
      * Gets the node of the user attribute "My chat files" from the DB.
      *
-     * Before call this method is neccesary to call existsMyChatFilesFolder() method
+     * Before call this method is neccessary to call existsMyChatFilesFolder() method
      *
      * @return "My chat files" folder node
      * @see MegaNodeUtil.existsMyChatFilesFolder
@@ -362,7 +374,7 @@ object MegaNodeUtil {
      * @param n MegaNode to check
      * @return True if the node is "Camera Uploads" or "Media Uploads" folder, false otherwise
      */
-    fun isCameraUploads(n: MegaNode): Boolean {
+    private fun isCameraUploads(n: MegaNode): Boolean {
         var cameraSyncHandle: String? = null
         var secondaryMediaHandle: String? = null
         val dbH = MegaApplication.getInstance().dbH
@@ -440,6 +452,7 @@ object MegaNodeUtil {
     fun getRootParentNode(node: MegaNode): MegaNode {
         val megaApi = MegaApplication.getInstance().megaApi
         var rootParent = node
+
         while (megaApi.getParentNode(rootParent) != null) {
             rootParent = megaApi.getParentNode(rootParent)
         }
@@ -456,10 +469,10 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun isInRootLinksLevel(adapterType: Int, parentHandle: Long): Boolean {
-        return adapterType == Constants.LINKS_ADAPTER && parentHandle == MegaApiJava.INVALID_HANDLE
+        return adapterType == LINKS_ADAPTER && parentHandle == INVALID_HANDLE
     }
 
-    /*
+    /**
      * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
      *
      * @param adapterType   view in which is required the check
@@ -471,11 +484,12 @@ object MegaNodeUtil {
     fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean {
         if (isFolderLink) {
             return false
-        } else if (adapterType != Constants.OFFLINE_ADAPTER &&
-            adapterType != Constants.ZIP_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER
+        } else if (adapterType != OFFLINE_ADAPTER &&
+            adapterType != ZIP_ADAPTER && adapterType != FILE_LINK_ADAPTER
         ) {
             val megaApi = MegaApplication.getInstance().megaApi
             val node = megaApi.getNodeByHandle(handle)
+
             return node != null && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER
         }
 
@@ -491,6 +505,7 @@ object MegaNodeUtil {
     fun isNodeInRubbish(handle: Long): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         val node = megaApi.getNodeByHandle(handle)
+
         return node != null && megaApi.isInRubbish(node)
     }
 
@@ -504,6 +519,7 @@ object MegaNodeUtil {
     fun isNodeInRubbishOrDeleted(handle: Long): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         val node = megaApi.getNodeByHandle(handle)
+
         return node == null || megaApi.isInRubbish(node)
     }
 
@@ -521,8 +537,10 @@ object MegaNodeUtil {
 
         var parentNode = node
         val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
+
         while (megaApi.getParentNode(parentNode) != null) {
             parentNode = megaApi.getParentNode(parentNode)
+
             if (isOutgoingOrIncomingFolder(parentNode)) {
                 return parentNode
             }
@@ -541,7 +559,7 @@ object MegaNodeUtil {
         return node.isOutShare || node.isInShare
     }
 
-    /*
+    /**
      * Check if all nodes can be moved to rubbish bin.
      *
      * @param nodes nodes to check
@@ -550,6 +568,7 @@ object MegaNodeUtil {
     @JvmStatic
     fun canMoveToRubbish(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
+
         for (node in nodes) {
             if (megaApi.checkMove(node, megaApi.rubbishNode).errorCode != MegaError.API_OK) {
                 return false
@@ -631,6 +650,7 @@ object MegaNodeUtil {
         val onlyOneIncomingShare = n != null && handleList == null
         val numIncomingShares = if (onlyOneIncomingShare) 1 else handleList!!.size
         val builder = MaterialAlertDialogBuilder(context)
+
         builder.setMessage(
             getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares)
         )
@@ -663,6 +683,7 @@ object MegaNodeUtil {
 
         val megaApi = MegaApplication.getInstance().megaApi
         val children: List<MegaNode?>? = megaApi.getChildren(node)
+
         if (children != null && children.isNotEmpty()) {
             for (child in children) {
                 if (child == null) {
@@ -702,8 +723,10 @@ object MegaNodeUtil {
         }
 
         folder.mkdir()
+
         for (i in nodeList.indices) {
             val document = nodeList[i]
+
             if (document.type == MegaNode.TYPE_FOLDER) {
                 val subfolder = File(folder, document.name)
                 getDlList(megaApi, dlFiles, document, subfolder)
@@ -723,7 +746,9 @@ object MegaNodeUtil {
     @JvmStatic
     fun getNodeLabelDrawable(nodeLabel: Int, resources: Resources): Drawable? {
         val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null)
+
         drawable?.setTint(ResourcesCompat.getColor(resources, getNodeLabelColor(nodeLabel), null))
+
         return drawable
     }
 
@@ -775,7 +800,8 @@ object MegaNodeUtil {
     val cloudRootHandle: Long
         get() {
             val rootNode = MegaApplication.getInstance().megaApi.rootNode
-            return rootNode?.handle ?: MegaApiJava.INVALID_HANDLE
+
+            return rootNode?.handle ?: INVALID_HANDLE
         }
 
     /**
@@ -787,15 +813,16 @@ object MegaNodeUtil {
     fun setupStreamingServer(api: MegaApiAndroid, context: Context) {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
+
             val memoryInfo = ActivityManager.MemoryInfo()
             val activityManager =
                 context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             activityManager.getMemoryInfo(memoryInfo)
-            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
-                api.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-            } else {
-                api.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-            }
+
+            api.httpServerSetMaxBufferSize(
+                if (memoryInfo.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
+                else MAX_BUFFER_16MB
+            )
         }
     }
 
@@ -806,15 +833,16 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun showTakenDownAlert(activity: AppCompatActivity?) {
-        if (activity == null || activity.isFinishing
-            || alertTakenDown != null && alertTakenDown!!.isShowing
-        ) {
+        if (activity == null || activity.isFinishing || alertTakenDown != null && alertTakenDown!!.isShowing) {
             return
         }
+
         val dialogBuilder = AlertDialog.Builder(activity)
+
         dialogBuilder.setTitle(getString(R.string.general_not_available))
             .setMessage(getString(R.string.error_download_takendown_node))
             .setNegativeButton(getString(R.string.general_dismiss)) { _, _ -> activity.finish() }
+
         alertTakenDown = dialogBuilder.create()
         alertTakenDown!!.setCancelable(false)
         alertTakenDown!!.show()
@@ -855,8 +883,11 @@ object MegaNodeUtil {
         params.gravity = Gravity.END
 
         title.text = getString(R.string.general_error_word)
-        text.text =
-            getString(if (isFolder) R.string.message_folder_takedown_pop_out_notification else R.string.message_file_takedown_pop_out_notification)
+        text.text = getString(
+            if (isFolder) R.string.message_folder_takedown_pop_out_notification
+            else R.string.message_file_takedown_pop_out_notification
+        )
+
         openButton.text = getString(R.string.context_open_link)
         disputeButton.text = getString(R.string.dispute_takendown_file)
         cancelButton.text = getString(R.string.general_cancel)
@@ -1264,9 +1295,11 @@ object MegaNodeUtil {
 
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
                 if (opusFile) {
                     mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
                 }
+
                 if (internalIntent) {
                     activityLauncher.launchActivity(mediaIntent)
                 } else {
@@ -1329,6 +1362,8 @@ object MegaNodeUtil {
         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         if (isIntentAvailable(context, intentShare)) {
             activityLauncher.launchActivity(intentShare)
+        } else {
+            snackbarShower.showSnackbar(getString(R.string.intent_not_available))
         }
     }
 }
