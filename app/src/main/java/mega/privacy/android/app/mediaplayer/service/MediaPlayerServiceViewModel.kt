@@ -32,9 +32,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
@@ -51,7 +50,7 @@ class MediaPlayerServiceViewModel(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-) : ExposedShuffleOrder.ShuffleChangeListener {
+) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
     private val compositeDisposable = CompositeDisposable()
 
     private val downloadLocationDefaultPath = getDownloadLocation()
@@ -88,6 +87,9 @@ class MediaPlayerServiceViewModel(
 
     private val _retry = MutableLiveData<Boolean>()
     val retry: LiveData<Boolean> = _retry
+
+    private val _error = MutableLiveData<Int>()
+    val error: LiveData<Int> = _error
 
     var currentIntent: Intent? = null
         private set
@@ -130,6 +132,8 @@ class MediaPlayerServiceViewModel(
                     logErr("AudioPlayerServiceViewModel creatingThumbnailFinished")
                 )
         )
+
+        megaApi.addTransferListener(this)
     }
 
     /**
@@ -877,6 +881,8 @@ class MediaPlayerServiceViewModel(
         compositeDisposable.dispose()
         megaApi.httpServerStop()
         megaApiFolder.httpServerStop()
+
+        megaApi.removeTransferListener(this)
     }
 
     private fun getApi(type: Int) =
@@ -909,4 +915,21 @@ class MediaPlayerServiceViewModel(
                 .apply()
         }
     }
+
+    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
+    }
+
+    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
+    }
+
+    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
+    }
+
+    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
+        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
+            _error.value = e.errorCode
+        }
+    }
+
+    override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
 }

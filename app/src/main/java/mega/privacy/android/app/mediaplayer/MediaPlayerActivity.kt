@@ -54,11 +54,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
+import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import javax.inject.Inject
@@ -120,6 +122,10 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 service.service.metadata.observe(this@MediaPlayerActivity) {
                     dragToExit.nodeChanged(service.service.viewModel.playingHandle)
                 }
+
+                service.service.viewModel.error.observe(
+                    this@MediaPlayerActivity, this@MediaPlayerActivity::onError
+                )
             }
         }
     }
@@ -697,6 +703,13 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private fun onDragActivated(activated: Boolean) {
         getFragmentFromNavHost(R.id.nav_host_fragment, MediaPlayerFragment::class.java)
             ?.onDragActivated(dragToExit, activated)
+    }
+
+    private fun onError(code: Int) {
+        when (code) {
+            MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
+            MegaError.API_EBLOCKED -> showTakenDownAlert(this)
+        }
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
