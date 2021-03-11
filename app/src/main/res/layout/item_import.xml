@@ -1,46 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_import_layout"
-    android:layout_width="match_parent"
-    android:layout_height="56dp">
+    android:layout_width="0dp"
+    android:layout_height="wrap_content">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/thumbnail_file"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_centerVertical="true"
-        android:layout_marginStart="16dp" />
+        android:scaleType="centerCrop"
+        app:roundWithOverlayColor="@color/white_black"
+        app:roundedCornerRadius="4dp" />
 
-    <TextView
-        android:id="@+id/text_file"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_file_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginEnd="16dp"
         android:layout_toStartOf="@+id/edit_icon_layout"
         android:layout_toEndOf="@+id/thumbnail_file"
-        android:ellipsize="middle"
-        android:gravity="start|center_vertical"
-        android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
+
+        <mega.privacy.android.app.components.twemoji.EmojiEditText
+            android:id="@+id/text_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+            android:textColorHighlight="@color/teal_100_teal_500"
+            android:theme="@style/TransparentEditText"
+            app:emojiSize="18sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <RelativeLayout
         android:id="@+id/edit_icon_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp">
 
         <ImageView
             android:id="@+id/edit_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="4dp"
             android:src="@drawable/ic_rename"
-            app:tint="?android:attr/textColorSecondary" />
+            app:tint="?android:attr/textColorSecondary"
+            tools:ignore="ContentDescription" />
 
     </RelativeLayout>
+
+    <include
+        android:id="@+id/separator"
+        layout="@layout/view_relative_layout_separator" />
 
 </RelativeLayout>

@@ -93,8 +93,9 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		holder.imageView.setImageBitmap(null);
 		logDebug("Get the MegaContactRequest");
-		MegaContactRequest contact = (MegaContactRequest) getItem(position);
-
+		MegaContactRequest contact = getItem(position);
+		if (contact == null)
+			return;
 						
 		if(type==OUTGOING_REQUEST_ADAPTER)
 		{
@@ -372,10 +373,14 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		}
 		return requests;
 	}
-	
-    public Object getItem(int position) {
-        return contacts.get(position);
-    }
+
+	public MegaContactRequest getItem(int position) {
+		if (contacts != null && !contacts.isEmpty() && position < contacts.size()) {
+			return contacts.get(position);
+		}
+
+		return null;
+	}
  
     @Override
     public long getItemId(int position) {
@@ -404,7 +409,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);
+		MegaContactRequest c = getItem(currentPosition);
 		
 		switch (v.getId()){	
 			case R.id.contact_request_three_dots_layout:{
