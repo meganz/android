@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">This link will not be publicly available anymore.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Open link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
@@ -546,7 +548,6 @@
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
     <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
-
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -724,8 +725,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">External storage</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">External storage</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
@@ -792,7 +793,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Privacy Policy</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Privacy Policy</string>
     <string name="settings_about_terms_of_service" context="">Terms of Service</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">App version</string>
@@ -907,7 +908,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite Account</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro Lite Account</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
@@ -947,7 +948,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Your Recovery Key goes here</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password goes here</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">This is the last step to delete your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Email verification</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Please check your email to proceed.</string>
@@ -1648,7 +1649,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">from</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Clear chat history</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
@@ -1764,7 +1765,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Set day</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Date required is not valid</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Invalid characters</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: \" * / : &lt; > \? \\ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 
@@ -1926,7 +1935,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat video quality</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Video quality</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Quality</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2051,8 +2060,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Storage Usage</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d pending contact request</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d pending contact requests</item>
@@ -2238,6 +2246,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Message</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
@@ -2284,7 +2293,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">days</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
 
@@ -2891,7 +2900,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Docs</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New chat</string>
@@ -2921,7 +2930,7 @@
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear chat history</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>

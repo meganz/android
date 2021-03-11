@@ -1,87 +1,53 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.Display;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.databinding.FragmentImportFilesBinding;
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter.MAX_VISIBLE_ITEMS_AT_BEGINNING;
+import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
-public class ImportFilesFragment extends Fragment implements View.OnClickListener {
+public class ImportFilesFragment extends BaseFragment {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
 
-    MegaApiAndroid megaApi;
+    private FragmentImportFilesBinding binding;
 
-    Context context;
+    private ImportFilesAdapter adapter;
 
-    NestedScrollView scrollView;
-    ImportFilesAdapter adapter;
-
-    TextView contentText;
-    LinearLayoutManager mLayoutManager;
-    RecyclerView recyclerView;
-    View cloudDriveButton;
-    View incomingButton;
-    View chatButton;
-    RelativeLayout showMoreLayout;
-    TextView showMoreText;
-    ImageView showMoreIcon;
-
-    boolean itemsVisibles = false;
+    boolean areItemsVisible = false;
 
     private List<ShareInfo> filePreparedInfos;
-    HashMap<String, String> nameFiles = new HashMap<>();
 
     public static ImportFilesFragment newInstance() {
-        logDebug("newInstance");
-        ImportFilesFragment fragment = new ImportFilesFragment();
-        return fragment;
+        return new ImportFilesFragment();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
-    }
-
-    public void changeActionBarElevation () {
-        if (scrollView == null) return;
-
-        ((FileExplorerActivityLollipop) context).changeActionBarElevation(scrollView.canScrollVertically(-1)
-                , FileExplorerActivityLollipop.IMPORT_FRAGMENT);
+    public void changeActionBarElevation() {
+        ((FileExplorerActivityLollipop) context).changeActionBarElevation(
+                binding.scrollContainerImport.canScrollVertically(SCROLLING_UP_DIRECTION),
+                FileExplorerActivityLollipop.IMPORT_FRAGMENT);
     }
 
     @Override
@@ -91,171 +57,125 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
         if (filePreparedInfos != null) {
-            nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
-            if (nameFiles == null || nameFiles.size() <= 0) {
+            HashMap<String, String> nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
+            if (nameFiles == null || nameFiles.isEmpty()) {
                 new GetNamesAsyncTask().execute();
             }
         }
 
-        View v = inflater.inflate(R.layout.fragment_importfile, container, false);
+        binding = FragmentImportFilesBinding.inflate(inflater);
+        return binding.getRoot();
+    }
 
-        scrollView = (NestedScrollView) v.findViewById(R.id.scroll_container_import);
-        new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                changeActionBarElevation();
-            }
-        });
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        new ListenScrollChangesHelper().addViewToListen(binding.scrollContainerImport,
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeActionBarElevation());
 
-        contentText = (TextView) v.findViewById(R.id.content_text);
-        recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view);
-        mLayoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(mLayoutManager);
-        cloudDriveButton = v.findViewById(R.id.cloud_drive_layout);
-        cloudDriveButton.setOnClickListener(this);
-        incomingButton = v.findViewById(R.id.incoming_layout);
-        incomingButton.setOnClickListener(this);
-        ArrayList<MegaNode> inShares = megaApi.getInShares();
-        if (inShares == null || inShares.size() <= 0) {
-            incomingButton.setVisibility(View.GONE);
-        }
-        else {
-            incomingButton.setVisibility(View.VISIBLE);
-        }
-
-        chatButton = v.findViewById(R.id.chat_layout);
-        chatButton.setOnClickListener(this);
-        chatButton.setVisibility(View.VISIBLE);
-
-        showMoreLayout = (RelativeLayout) v.findViewById(R.id.show_more_layout);
-        showMoreLayout.setOnClickListener(this);
-        showMoreText  = (TextView) v.findViewById(R.id.show_more_text);
-        showMoreIcon = (ImageView) v.findViewById(R.id.show_more_image);
+        binding.fileListView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.cloudDriveButton.setOnClickListener(v ->
+                confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
+        binding.chatButton.setOnClickListener(v ->
+                confirmImport(FileExplorerActivityLollipop.CHAT_FRAGMENT));
+        binding.showMoreLayout.setOnClickListener(v -> showMoreClick());
 
         if (filePreparedInfos != null) {
+            binding.showMoreLayout.setVisibility(filePreparedInfos.size() <= MAX_VISIBLE_ITEMS_AT_BEGINNING
+                    ? GONE : VISIBLE);
 
-            if (filePreparedInfos.size() <= 4) {
-                showMoreLayout.setVisibility(View.GONE);
-            }
-            else {
-                showMoreLayout.setVisibility(View.VISIBLE);
-            }
-
-            contentText.setText(StringResourcesUtils.getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
+            binding.contentText.setText(getResources().getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
-                adapter = new ImportFilesAdapter(context, this, filePreparedInfos, nameFiles);
+                adapter = new ImportFilesAdapter(context, this, filePreparedInfos, getNameFiles());
+            }
 
-                adapter.SetOnItemClickListener(new ImportFilesAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        logDebug("Item click listener trigger!!");
-                        itemClick(view, position);
-                    }
-                });
-            }
-            adapter.setImportNameFiles(nameFiles);
-            if (showMoreLayout.getVisibility() == View.VISIBLE) {
-                itemsVisibles = false;
-                adapter.setItemsVisibility(itemsVisibles);
-            }
-            else {
-                itemsVisibles = true;
-                adapter.setItemsVisibility(itemsVisibles);
-            }
-            recyclerView.setAdapter(adapter);
+            adapter.setImportNameFiles(getNameFiles());
+            areItemsVisible = binding.showMoreLayout.getVisibility() != VISIBLE;
+            adapter.setItemsVisibility(areItemsVisible);
+            binding.fileListView.setAdapter(adapter);
         }
 
-        return v;
+        super.onViewCreated(view, savedInstanceState);
     }
 
-    public void itemClick(View view, int position) {
-        logDebug("Position: " + position);
+    /**
+     * Checks if all the files to import have a right name.
+     * - If so, shows the fragment which the user chose to import.
+     * - If not, shows an error warning.
+     *
+     * @param fragment The fragment chosen by the user.
+     */
+    private void confirmImport(int fragment) {
+        if (adapter != null) {
+            adapter.updateCurrentFocusPosition(binding.fileListView);
+        }
 
-        if (view.getId() == R.id.edit_icon_layout) {
-            if (adapter != null) {
-                ShareInfo info = (ShareInfo) adapter.getItem(position);
-                if (info != null) {
-                    File file =  new File(info.getFileAbsolutePath());
-                    if (file != null) {
-                        ((FileExplorerActivityLollipop) context).showRenameDialog(file, nameFiles.get(info.getTitle()));
-                    }
-                }
+        HashMap<String, String> nameFiles = getNameFiles();
+        int emptyNames = 0;
+        int wrongNames = 0;
+
+        for (String name : nameFiles.values()) {
+            if (name.trim().isEmpty()) {
+                emptyNames++;
+            }
+
+            if (NODE_NAME_REGEX.matcher(name).find()) {
+                wrongNames++;
             }
         }
 
-    }
+        if (wrongNames > 0 || emptyNames > 0) {
+            String warning;
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
-    }
+            if (emptyNames > 0 && wrongNames > 0) {
+                warning = StringResourcesUtils.getString(R.string.general_incorrect_names);
+            } else if (emptyNames > 0) {
+                warning = StringResourcesUtils.getQuantityString(R.plurals.empty_names, emptyNames);
+            } else {
+                warning = StringResourcesUtils.getString(R.string.invalid_characters_defined);
+            }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.cloud_drive_layout: {
-                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CLOUD_FRAGMENT);
-                break;
-            }
-            case R.id.incoming_layout: {
-                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.INCOMING_FRAGMENT);
-                break;
-            }
-            case R.id.chat_layout: {
-                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CHAT_FRAGMENT);
-                break;
-            }
-            case R.id.show_more_layout: {
-                if (!itemsVisibles) {
-                    itemsVisibles = true;
-                    if (adapter != null) {
-                        adapter.setItemsVisibility(itemsVisibles);
-                    }
-                    showMoreText.setText(getString(R.string.general_show_less));
-                    showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
-                }
-                else {
-                    itemsVisibles = false;
-                    if (adapter != null) {
-                        adapter.setItemsVisibility(itemsVisibles);
-                    }
-                    showMoreText.setText(getString(R.string.general_show_more));
-                    showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
-                }
-                break;
-            }
+            ((FileExplorerActivityLollipop) context).showSnackbar(warning);
+        } else {
+            ((FileExplorerActivityLollipop) context).chooseFragment(fragment);
         }
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
+    private void showMoreClick() {
+        areItemsVisible = !areItemsVisible;
+
+        if (areItemsVisible) {
+            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_less));
+            binding.showMoreImage.setImageResource(R.drawable.ic_expand);
+        } else {
+            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_more));
+            binding.showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
+        }
+
+        if (adapter != null) {
+            adapter.setItemsVisibility(areItemsVisible);
+        }
     }
 
-    public void setNameFiles (HashMap<String, String> nameFiles) {
-        this.nameFiles = nameFiles;
-    }
-
-    public HashMap<String, String> getNameFiles() {
-        return nameFiles;
+    private HashMap<String, String> getNameFiles() {
+        return ((FileExplorerActivityLollipop) context).getNameFiles();
     }
 
     class GetNamesAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            for (int i=0; i<filePreparedInfos.size(); i++) {
-                nameFiles.put(filePreparedInfos.get(i).getTitle(), filePreparedInfos.get(i).getTitle());
+            HashMap<String, String> nameFiles = new HashMap<>();
+
+            for (int i = 0; i < filePreparedInfos.size(); i++) {
+                String name = filePreparedInfos.get(i).getTitle();
+                nameFiles.put(name, name);
             }
+
+            ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
             return null;
         }
     }

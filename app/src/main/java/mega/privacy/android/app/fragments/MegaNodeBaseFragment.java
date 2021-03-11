@@ -177,7 +177,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         logWarning("The selected node is NULL");
                         break;
                     }
-                    managerActivity.showRenameDialog(selected.get(0), selected.get(0).getName());
+                    managerActivity.showRenameDialog(selected.get(0));
                     hideActionMode();
                     break;
 
@@ -800,9 +800,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     private String getGeneralEmptyView() {
         if (isScreenInPortrait(context)) {
-            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+            emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
         } else {
-            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+            emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
         }
 
         return context.getString(R.string.file_browser_empty_folder_new);
