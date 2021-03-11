@@ -437,5 +437,4 @@
         <item name="android:colorControlActivated">?attr/colorSecondary</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>
-
 </resources>
