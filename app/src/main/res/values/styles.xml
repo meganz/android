@@ -217,6 +217,17 @@
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
 
+    <style name="Widget.Mega.Button.Transparent" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">10dp</item>
+        <item name="android:textColor">?android:attr/colorAccent</item>
+        <item name="android:paddingStart">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+    </style>
+
     <!-- For date picker dialog -->
     <style name="Widget.Mega.DatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Calendar">
         <item name="android:datePickerStyle">@style/Widget.Mega.DatePicker</item>
@@ -392,6 +403,24 @@
         <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark</item>
     </style>
 
+    <style name="messageForwardIconStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:src">@drawable/ic_forward_file</item>
+    </style>
+
+    <style name="MessageForwardIconStyleEnd" parent="messageForwardIconStyle">
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="MessageForwardIconStyleStart" parent="messageForwardIconStyle">
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+
     <style name="Widget.MaterialComponents.CompoundButton.CheckBox.Dark">
         <item name="useMaterialThemeColors">false</item>
     </style>
@@ -401,5 +430,11 @@
         <item name="android:minHeight">0dp</item>
         <item name="android:textColor">?attr/colorSecondary</item>
         <item name="android:textAppearance">?textAppearanceCaption</item>
+    </style>
+
+    <style name="TransparentEditText">
+        <item name="android:colorControlNormal">@android:color/transparent</item>
+        <item name="android:colorControlActivated">?attr/colorSecondary</item>
+        <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>
 </resources>

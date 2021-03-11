@@ -34,13 +34,11 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -53,6 +51,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -67,10 +67,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -133,7 +133,10 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends PinActivityLollipop
+		implements MegaChatRequestListenerInterface, OnClickListener,
+		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
+		MegaGlobalListenerInterface, ActionNodeCallback {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 	private ChatController chatC;
@@ -176,6 +179,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     private String newMuteOption = null;
 
     boolean startVideo = false;
+    private boolean isChatOpen;
 
 	private RelativeLayout verifyCredentialsLayout;
 	private TextView verifiedText;
@@ -580,7 +584,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			removeContactChatLayout = findViewById(R.id.chat_contact_properties_remove_contact_layout);
 			removeContactChatLayout.setOnClickListener(this);
 
-			chatHandle = extras.getLong("handle",-1);
+			chatHandle = extras.getLong(HANDLE, MEGACHAT_INVALID_HANDLE);
 			userEmailExtra = extras.getString(NAME);
 
 			//isChatOpen is:
@@ -588,7 +592,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//  and the changes related to history clearing will be listened from there.
 			//- False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
 			//  This will happen when ContactInfoActivityLollipop is opened from other parts of the app than the Chat room.
-			boolean isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
+			isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
 
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
@@ -623,59 +627,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				} else {
 					withoutNickname(userEmailExtra);
 					chat = null;
-
-				}
-
-				if (chat != null) {
-					chatHandle = chat.getChatId();
-					if (chatHandle == -1) {
-						notificationsLayout.setVisibility(View.GONE);
-						dividerNotificationsLayout.setVisibility(View.GONE);
-
-						sharedFilesLayout.setVisibility(View.GONE);
-						dividerSharedFilesLayout.setVisibility(View.GONE);
-					}
-				} else {
-					notificationsLayout.setVisibility(View.GONE);
-					dividerNotificationsLayout.setVisibility(View.GONE);
-
-					sharedFilesLayout.setVisibility(View.GONE);
-					dividerSharedFilesLayout.setVisibility(View.GONE);
 				}
 			}
 
-			if (chat != null) {
-				if(!isChatOpen) {
-					MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
-				}
-
-				updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chat.getChatId()));
-			} else {
-				retentionTimeText.setVisibility(View.GONE);
-			}
-
+			updateUI();
 			updateVerifyCredentialsLayout();
 			checkScreenRotationToShowCall();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
-				setAvatar();
-
 				if(user!=null){
 					sharedFoldersLayout.setVisibility(View.VISIBLE);
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
 
 					ArrayList<MegaNode> nodes = megaApi.getInShares(user);
-                    setFoldersButtonText(nodes);
+					setFoldersButtonText(nodes);
 					emailText.setText(user.getEmail());
-
-					if (chat != null) {
-						manageChatLayout.setVisibility(View.VISIBLE);
-						dividerClearChatLayout.setVisibility(View.VISIBLE);
-					} else {
-						manageChatLayout.setVisibility(View.GONE);
-						dividerClearChatLayout.setVisibility(View.GONE);
-					}
 
 					shareContactLayout.setVisibility(View.VISIBLE);
 					dividerShareContactLayout.setVisibility(View.VISIBLE);
@@ -691,11 +658,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					if (chat != null) {
 						emailText.setText(user.getEmail());
-						manageChatLayout.setVisibility(View.VISIBLE);
-						dividerClearChatLayout.setVisibility(View.VISIBLE);
-					} else {
-						manageChatLayout.setVisibility(View.GONE);
-						dividerClearChatLayout.setVisibility(View.GONE);
 					}
 
 					shareContactLayout.setVisibility(View.VISIBLE);
@@ -711,8 +673,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
-				manageChatLayout.setVisibility(View.GONE);
-				dividerClearChatLayout.setVisibility(View.GONE);
 
 				shareContactLayout.setVisibility(View.GONE);
 				dividerShareContactLayout.setVisibility(View.GONE);
@@ -720,10 +680,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				chatOptionsLayout.setVisibility(View.VISIBLE);
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
-
-			checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
-			notificationsLayout.setVisibility(View.VISIBLE);
-			dividerNotificationsLayout.setVisibility(View.VISIBLE);
 
 		} else {
 			logWarning("Extras is NULL");
@@ -1312,11 +1268,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.chat_contact_properties_layout:
-				if (notificationsSwitch.isChecked()) {
-					createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
-				} else {
-					MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
-				}
+				chatNotificationsClicked();
 				break;
 
 			case R.id.chat_contact_properties_chat_files_shared_layout:{
@@ -1666,31 +1618,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     sharedFoldersFragment.setNodes();
                 }
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_RENAME){
-            
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-            
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    sharedFoldersFragment.clearSelections();
-                    sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-                }
-            }
-            else{
-                if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    sharedFoldersFragment.clearSelections();
-                    sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-                }
-            }
-			logDebug("Rename nodes request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_COPY) {
+        } else if (request.getType() == MegaRequest.TYPE_COPY) {
             try {
                 statusDialog.dismiss();
             } catch (Exception ex) {
@@ -1910,6 +1838,78 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 		isShareFolderExpanded = !isShareFolderExpanded;
 	}
+
+	/**
+	 * Update UI elements if chat exists.
+	 */
+	private void updateUI() {
+		if (chat == null || chat.getChatId() == MEGACHAT_INVALID_HANDLE) {
+			sharedFilesLayout.setVisibility(View.GONE);
+			dividerSharedFilesLayout.setVisibility(View.GONE);
+			manageChatLayout.setVisibility(View.GONE);
+			dividerClearChatLayout.setVisibility(View.GONE);
+			retentionTimeText.setVisibility(View.GONE);
+		} else {
+			chatHandle = chat.getChatId();
+
+			if (!isChatOpen) {
+				MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
+			}
+
+			updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chatHandle));
+
+			if(isOnline(this)){
+				manageChatLayout.setVisibility(View.VISIBLE);
+				dividerClearChatLayout.setVisibility(View.VISIBLE);
+			}else{
+				manageChatLayout.setVisibility(View.GONE);
+				dividerClearChatLayout.setVisibility(View.GONE);
+			}
+
+			sharedFilesLayout.setVisibility(View.VISIBLE);
+			dividerSharedFilesLayout.setVisibility(View.VISIBLE);
+		}
+
+		checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+		notificationsLayout.setVisibility(View.VISIBLE);
+		dividerNotificationsLayout.setVisibility(View.VISIBLE);
+	}
+
+	/**
+	 * Method that makes the necessary updates when the chat has been created.
+	 *
+	 * @param newChat The created chat.
+	 */
+	public void chatCreated(MegaChatRoom newChat) {
+		if (newChat != null && newChat.getChatId() != MEGACHAT_INVALID_HANDLE) {
+			chat = newChat;
+			updateUI();
+			chatNotificationsClicked();
+		}
+	}
+
+	/**
+	 * Make the necessary actions when clicking on the Chat Notifications layout.
+	 */
+	private void chatNotificationsClicked() {
+		if (chatHandle == MEGACHAT_INVALID_HANDLE) {
+			logDebug("The chat doesn't exist, create it");
+			ArrayList<MegaChatRoom> chats = new ArrayList<>();
+			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+			usersNoChat.add(user);
+			CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.CONFIGURE_DND);
+			MegaChatPeerList peers = MegaChatPeerList.createInstance();
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, listener);
+		} else {
+			logDebug("The chat exists");
+			if (notificationsSwitch.isChecked()) {
+				createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
+			} else {
+				MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
+			}
+		}
+	}
     
     public void showOptionsPanel(MegaNode node){
 		logDebug("showOptionsPanel");
@@ -2050,204 +2050,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             return;
         }
     }
-    
-    public void showRenameDialog(final MegaNode document, String text){
-		logDebug("Node Handle: " + document.getHandle());
-        
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-        
-        final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-        input.setSingleLine();
-        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-        input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
-        input.setText(text);
-        input.requestFocus();
-
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(final View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (document.isFolder()){
-                        input.setSelection(0, input.getText().length());
-                    }
-                    else{
-                        String [] s = document.getName().split("\\.");
-                        if (s != null){
-                            int numParts = s.length;
-                            int lastSelectedPos = 0;
-                            if (numParts == 1){
-                                input.setSelection(0, input.getText().length());
-                            }
-                            else if (numParts > 1){
-                                for (int i=0; i<(numParts-1);i++){
-                                    lastSelectedPos += s[i].length();
-                                    lastSelectedPos++;
-                                }
-                                lastSelectedPos--; //The last point should not be selected)
-                                input.setSelection(0, lastSelectedPos);
-                            }
-                        }
-                        showKeyboardDelayed(v);
-                    }
-                }
-            }
-        });
-        
-        layout.addView(input, params);
-        
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-        
-        final RelativeLayout error_layout = new RelativeLayout(ContactInfoActivityLollipop.this);
-        layout.addView(error_layout, params1);
-        
-        final ImageView error_icon = new ImageView(ContactInfoActivityLollipop.this);
-        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-        error_layout.addView(error_icon);
-        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-        
-        
-        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        error_icon.setLayoutParams(params_icon);
-        
-        error_icon.setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300));
-        
-        final TextView textError = new TextView(ContactInfoActivityLollipop.this);
-        error_layout.addView(textError);
-        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-        textError.setLayoutParams(params_text_error);
-        
-        textError.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300));
-        
-        error_layout.setVisibility(View.GONE);
-        
-        input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            
-            }
-            
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            
-            }
-            
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(error_layout.getVisibility() == View.VISIBLE){
-                    error_layout.setVisibility(View.GONE);
-                    input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
-                }
-            }
-        });
-        
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-					logDebug("actionId is IME_ACTION_DONE");
-                    String value = v.getText().toString().trim();
-                    if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
-                        textError.setText(getString(R.string.invalid_string));
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-                    }
-                    else{
-                        rename(document, value);
-                        renameDialog.dismiss();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ document.getName());
-        builder.setPositiveButton(getString(R.string.context_rename),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString().trim();
-                        if (value.length() == 0) {
-                            return;
-                        }
-                        rename(document, value);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                input.getBackground().clearColorFilter();
-            }
-        });
-        builder.setView(layout);
-        renameDialog = builder.create();
-        renameDialog.show();
-        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                String value = input.getText().toString().trim();
-                if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_IN);
-                    textError.setText(getString(R.string.invalid_string));
-                    error_layout.setVisibility(View.VISIBLE);
-                    input.requestFocus();
-                }
-                else{
-                    rename(document, value);
-                    renameDialog.dismiss();
-                }
-            }
-        });
-    }
-
-    private void rename(MegaNode document, String newName) {
-        if (newName.equals(document.getName())) {
-            return;
-        }
-        
-        if (!isOnline(this)) {
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-        
-        if (isFinishing()) {
-            return;
-        }
-        
-        ProgressDialog temp = null;
-        try {
-            temp = new ProgressDialog(this);
-            temp.setMessage(getString(R.string.context_renaming));
-            temp.show();
-        } catch (Exception e) {
-            return;
-        }
-        statusDialog = temp;
-
-		logDebug("Renaming " + document.getName() + " to " + newName);
-        
-        megaApi.renameNode(document, newName, this);
-    }
-    
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
     }
@@ -2505,5 +2308,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
+	}
+
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No update needed
+	}
+
+	@Override
+	public void actionConfirmed() {
+		if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+			sharedFoldersFragment.clearSelections();
+			sharedFoldersFragment.hideMultipleSelect();
+		}
+	}
+
+	@Override
+	public void createFolder(@NotNull String folderName) {
+		//No action needed
 	}
 }
