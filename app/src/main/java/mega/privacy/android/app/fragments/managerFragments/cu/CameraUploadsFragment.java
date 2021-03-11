@@ -16,8 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -298,7 +298,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     .setTitle(getString(R.string.section_photo_sync))
                     .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
                         resetCUTimestampsAndCache();
-                        dbH.setCamSyncEnabled(true);
                         dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                         File localFile =
                                 Environment.getExternalStoragePublicDirectory(
@@ -306,6 +305,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                         String localPath = localFile.getAbsolutePath();
                         dbH.setCamSyncLocalPath(localPath);
                         dbH.setCameraFolderExternalSDCard(false);
+                        // After target and local folder setup, then enable CU.
+                        dbH.setCamSyncEnabled(true);
 
                         switch (which) {
                             case 0: {
@@ -616,12 +617,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
             mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
             if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
+                RelativeLayout.LayoutParams params =
+                        (RelativeLayout.LayoutParams) mBinding.cuList.getLayoutParams();
                 params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.cuList.setLayoutParams(params);
 
-                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
+                params = (RelativeLayout.LayoutParams) mBinding.scroller.getLayoutParams();
                 params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.scroller.setLayoutParams(params);
             }

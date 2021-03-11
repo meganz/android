@@ -190,8 +190,9 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center"
+                    android:textAllCaps="true"
                     android:textColor="@color/adapters_background"
-                    android:textSize="18sp" />
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/invite_button"
