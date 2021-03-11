@@ -313,7 +313,9 @@ public class NodeController {
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
             showSnackbar(context, context.getString(R.string.error_server_connection_problem));
-        } else if (context instanceof MegaRequestListenerInterface){
+        } else if (context instanceof GetLinkActivity) {
+            megaApi.exportNode(document, timestamp, new ExportListener(context));
+        } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
     }
