@@ -3757,39 +3757,39 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		setStatusBarColor(this, R.color.teal_500_teal_400);
 	}
 
-	void actionOpenFolder (long handleIntent) {
-		logDebug("Handle Intent: " + handleIntent);
-		int access = -1;
-		if (handleIntent != -1) {
-			MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
-			if (parentIntentN != null) {
-				access = megaApi.getAccess(parentIntentN);
-				switch (access) {
-					case MegaShare.ACCESS_OWNER:
-					case MegaShare.ACCESS_UNKNOWN: {
-						logDebug("The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
-					case MegaShare.ACCESS_READ:
-					case MegaShare.ACCESS_READWRITE:
-					case MegaShare.ACCESS_FULL: {
-						logDebug("The intent set the parentHandleIncoming to " + handleIntent);
-						parentHandleIncoming = handleIntent;
-						drawerItem = DrawerItem.SHARED_ITEMS;
-						deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
-						logDebug("After calculate deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
-						break;
-					}
-					default: {
-						logDebug("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
+	void actionOpenFolder(long handleIntent) {
+		if (handleIntent == INVALID_HANDLE) {
+			logWarning("handleIntent is not valid");
+			return;
+		}
+
+		MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+		if (parentIntentN == null) {
+			logWarning("parentIntentN is null");
+			return;
+		}
+
+		switch (megaApi.getAccess(parentIntentN)) {
+			case MegaShare.ACCESS_READ:
+			case MegaShare.ACCESS_READWRITE:
+			case MegaShare.ACCESS_FULL:
+				parentHandleIncoming = handleIntent;
+				deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
+				drawerItem = DrawerItem.SHARED_ITEMS;
+				break;
+
+			default:
+				if (megaApi.isInRubbish(parentIntentN)) {
+					parentHandleRubbish = handleIntent;
+					drawerItem = DrawerItem.RUBBISH_BIN;
+				} else if (megaApi.isInInbox(parentIntentN)) {
+					parentHandleInbox = handleIntent;
+					drawerItem = DrawerItem.INBOX;
+				} else {
+					parentHandleBrowser = handleIntent;
+					drawerItem = DrawerItem.CLOUD_DRIVE;
 				}
-			}
+				break;
 		}
 	}
 
