@@ -104,6 +104,7 @@ public class Constants {
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_FORWARD_MESSAGES = 11;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
+    public static final int MULTIPLE_IMPORT_CONTACT_MESSAGES = 13;
 
     public static final int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES + 1;
 
@@ -171,6 +172,10 @@ public class Constants {
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
+
+    public static final int IMPORT_ONLY_OPTION = 0;
+    public static final int FORWARD_ONLY_OPTION = 1;
+    public static final int IMPORT_TO_SHARE_OPTION = 2;
 
     public static final int FREE = 0;
     public static final int PRO_I = 1;
@@ -255,6 +260,11 @@ public class Constants {
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
     public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
+
+    public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
+    public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
+    public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
+    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";

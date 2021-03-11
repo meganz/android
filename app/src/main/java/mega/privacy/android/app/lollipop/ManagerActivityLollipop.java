@@ -9918,7 +9918,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 							return;
 						}
-						nC.removeLink(finalNode, new ExportListener(managerActivity, true, 1));
+						nC.removeLink(finalNode, new ExportListener(managerActivity, ACTION_REMOVE_LINK, 1));
 					} else {
 						nC.removeLinks(nodes);
 					}
