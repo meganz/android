@@ -183,6 +183,14 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         return true
     }
 
+    /**
+     * Show attach fail snackbar.
+     *
+     * @param nodeHandles node handles if it's attaching nodes
+     * @param contactHandles contact handles if it's attaching contacts
+     * @param totalChats total chats number
+     * @param snackbarShower interface to show snackbar
+     */
     private fun showAttachFailSnackbar(
         nodeHandles: LongArray?,
         contactHandles: LongArray?,
@@ -307,6 +315,11 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
     }
 
+    /**
+     * Select chats to attach nodes.
+     *
+     * @param nodes nodes to attach
+     */
     private fun selectChatsToAttach(nodes: List<MegaNode>) {
         val handles = LongArray(nodes.size)
 
@@ -320,6 +333,16 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_CHAT)
     }
 
+    /**
+     * Process contacts and chats of the select result, so we can attach nodes or contacts to them.
+     *
+     * If there are contacts without chat, we will create chat before attach. The full chat id
+     * array will be provided in the callback parameter.
+     *
+     * @param chatIds the id of existing chats
+     * @param contactEmails the email of no chat contacts
+     * @param onFinish the callback for process finished
+     */
     private fun processContactsAndChats(
         chatIds: LongArray?,
         contactEmails: List<String>,
@@ -360,6 +383,15 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
     }
 
+    /**
+     * Attach nodes to chats.
+     *
+     * @param handles handle of nodes to attach
+     * @param chatIds id of chats to attach
+     * @param snackbarShower interface to show snackbar
+     * @param forceNonChatSnackbar if we should show snackbar without chat id
+     * @param attachNodeToChatListener optional listener for attach
+     */
     private fun attachNodesToChats(
         handles: LongArray,
         chatIds: List<Long>,
@@ -382,6 +414,13 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
     }
 
+    /**
+     * Attach contacts to chats.
+     *
+     * @param contactHandles handle of contacts to attach
+     * @param chatIds id of chats to attach
+     * @param snackbarShower interface to show snackbar
+     */
     private fun attachContactsToChats(
         contactHandles: LongArray,
         chatIds: List<Long>,
