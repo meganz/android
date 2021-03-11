@@ -10,10 +10,7 @@ class PasscodePreferencesActivity : PreferencesBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        aB?.title = StringResourcesUtils.getString(R.string.settings_passcode_lock_switch)
-            .toUpperCase(Locale.getDefault())
-
+        setTitle(R.string.settings_passcode_lock)
         replaceFragment(SettingsPasscodeLockFragment())
     }
 }

@@ -38,9 +38,9 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
@@ -177,7 +177,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                         params1.setMargins(0, -12, -12, 0);
                         holder.iconDownloadUploadView.setLayoutParams(params1);
 
-                        holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+                        holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
                     } else {
                         params.height = params.width = dp2px(48, outMetrics);
                         params.setMargins(36, 0, 0, 0);

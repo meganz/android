@@ -382,4 +382,7 @@
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
+
+    <!-- Error text highlight color (selection background), import to MEGA screen-->
+    <color name="teal_100_teal_500">@color/teal_100</color>
 </resources>

@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">This link will not be publicly available anymore.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Open link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
@@ -1772,7 +1774,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Set day</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Date required is not valid</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Invalid characters</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: \" * / : &lt; > \? \\ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 
@@ -2245,6 +2255,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Message</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
@@ -3023,6 +3034,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes has been saved.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
