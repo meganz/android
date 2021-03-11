@@ -336,53 +336,53 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
 
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY,"                  	//0
-                + KEY_FIRST_LOGIN + " BOOLEAN, "                    	//1
-                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               	//2
-                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   	//3
-                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               	//4
-                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  	//5
-                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              	//6
-                + KEY_PASSCODE_LOCK_ENABLED + " TEXT, "                 //7
-                + KEY_PASSCODE_LOCK_CODE + " TEXT, "                    //8
-                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                	//9
-                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         	//10
-                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                	//11
-                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              	//12
-                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                	//13
-                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          	//14
-                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                	//15
-                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             	//16
-                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 	//17
-                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                	//18
-                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                	//19
-                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       	//20
-                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            	//21
-                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     	//22
-                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              	//23
-                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 	//24
-                + KEY_PASSCODE_LOCK_TYPE + " TEXT, "                    //25
-                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              	//26
-                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           	//27
-                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              	//28
-                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               	//29
-                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               	//30
-                + KEY_AUTO_PLAY + " BOOLEAN,"                       	//31
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               	//32
-                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          	//33
-                + KEY_CHARGING_ON_SIZE + " TEXT,"                   	//34
-                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       	//35
-                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//36
-                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//37
-                + KEY_REMOVE_GPS + " TEXT,"                         	//38
-                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 	//39
-                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       	//40
-				+ KEY_SD_CARD_URI + " TEXT,"                        	//41
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"					//42
-				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"			//43
-				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"				//44
-				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 		//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT" + ")";		//46
+                + KEY_ID + " INTEGER PRIMARY KEY,"                  															//0
+                + KEY_FIRST_LOGIN + " BOOLEAN, "                    															//1
+                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               															//2
+                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   															//3
+                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               															//4
+                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  															//5
+                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              															//6
+                + KEY_PASSCODE_LOCK_ENABLED + " TEXT, "               														    //7
+                + KEY_PASSCODE_LOCK_CODE + " TEXT, "                   														    //8
+                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                															//9
+                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         															//10
+                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                															//11
+                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              															//12
+                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                															//13
+                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          															//14
+                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                															//15
+                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             															//16
+                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 															//17
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                															//18
+                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                															//19
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       															//20
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            															//21
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     															//22
+                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              															//23
+                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 															//24
+                + KEY_PASSCODE_LOCK_TYPE + " TEXT, "                  														    //25
+                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              															//26
+                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           															//27
+                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              															//28
+                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//29
+                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               															//30
+                + KEY_AUTO_PLAY + " BOOLEAN,"                       															//31
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               															//32
+                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//33
+                + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//34
+                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//35
+                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//36
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//37
+                + KEY_REMOVE_GPS + " TEXT,"                         															//38
+                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 															//39
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       															//40
+				+ KEY_SD_CARD_URI + " TEXT,"                        															//41
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"																			//42
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//43
+				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//44
+				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//45
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	//46
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -3490,7 +3490,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @return The time required before ask for the passcode.
 	 */
 	public int getPasscodeRequiredTime() {
-		return Integer.parseInt(getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + ""));
+		String string = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + "");
+		return !isTextEmpty(string) ? Integer.parseInt(string) : REQUIRE_PASSCODE_INVALID;
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {
