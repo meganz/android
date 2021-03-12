@@ -7,8 +7,10 @@ import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.widget.TextView
 import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import nz.mega.sdk.MegaApiJava.*
@@ -27,8 +29,18 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
-        val managerActivity = requireActivity() as ManagerActivityLollipop
-        when (managerActivity.orderCloud) {
+        val order = if (requireActivity() is ManagerActivityLollipop) {
+            (requireActivity() as ManagerActivityLollipop).orderCloud
+        } else if (requireActivity() is FileExplorerActivityLollipop) {
+            val prefs = MegaApplication.getInstance().dbH.preferences
+
+            if (prefs != null && prefs.preferredSortCloud != null) prefs.preferredSortCloud.toInt()
+            else ORDER_DEFAULT_ASC
+        } else {
+            ORDER_DEFAULT_ASC
+        }
+
+        when (order) {
             ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
             ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
             ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
@@ -38,22 +50,22 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.sortByNameAsc.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_DEFAULT_ASC)
+            setCloudOrder(ORDER_DEFAULT_ASC)
         }
         binding.sortByNameDesc.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_DEFAULT_DESC)
+            setCloudOrder(ORDER_DEFAULT_DESC)
         }
         binding.sortByNewestDate.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_MODIFICATION_DESC)
+            setCloudOrder(ORDER_MODIFICATION_DESC)
         }
         binding.sortByOldestDate.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_MODIFICATION_ASC)
+            setCloudOrder(ORDER_MODIFICATION_ASC)
         }
         binding.sortByLargestSize.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_SIZE_DESC)
+            setCloudOrder(ORDER_SIZE_DESC)
         }
         binding.sortBySmallestSize.setOnClickListener {
-            setCloudOrder(managerActivity, ORDER_SIZE_ASC)
+            setCloudOrder(ORDER_SIZE_ASC)
         }
 
         contentView = binding.root
@@ -73,8 +85,15 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         text.setCompoundDrawablesRelative(icon, null, null, null)
     }
 
-    private fun setCloudOrder(managerActivity: ManagerActivityLollipop, order: Int) {
-        managerActivity.refreshCloudOrder(order)
+    private fun setCloudOrder(order: Int) {
+        MegaApplication.getInstance().dbH.setPreferredSortCloud(order.toString())
+
+        if (requireActivity() is ManagerActivityLollipop) {
+            (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
+        } else if (requireActivity() is FileExplorerActivityLollipop) {
+            (requireActivity() as FileExplorerActivityLollipop).refreshOrderNodes(order)
+        }
+
         setStateBottomSheetBehaviorHidden()
     }
 }

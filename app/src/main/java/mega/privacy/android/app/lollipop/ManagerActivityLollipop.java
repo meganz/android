@@ -133,12 +133,11 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.SorterContentActivity;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
@@ -157,8 +156,6 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -313,7 +310,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity
+public class ManagerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaChatListenerInterface,
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,

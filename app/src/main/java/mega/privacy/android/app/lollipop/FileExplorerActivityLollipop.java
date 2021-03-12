@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -47,7 +48,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.SorterContentActivity;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -64,6 +65,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -91,6 +93,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMessage;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
@@ -107,7 +110,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class FileExplorerActivityLollipop extends SorterContentActivity
+public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
 		ActionNodeCallback {
@@ -257,6 +260,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	private boolean shouldRestartSearch;
 	private String queryAfterSearch;
 	private String currentAction;
+
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -2305,7 +2310,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 				break;
 			}
 			case R.id.cab_menu_sort:{
-				showSortOptions(fileExplorerActivityLollipop, outMetrics);
+				showSortByPanel();
 				break;
 			}
 		}
@@ -2934,5 +2939,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 
 		// If no tab should be shown, keep hide.
 		tabLayoutExplorer.setVisibility(hide || (tabShown == NO_TABS) ? View.GONE : View.VISIBLE);
+	}
+
+	public void showSortByPanel() {
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+			return;
+		}
+
+		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(),
+				bottomSheetDialogFragment.getTag());
 	}
 }
