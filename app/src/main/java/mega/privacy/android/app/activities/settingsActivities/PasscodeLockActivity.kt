@@ -176,6 +176,8 @@ class PasscodeLockActivity : BaseActivity() {
                         binding.passThirdInput.requestFocus()
                     }
                 }
+
+                setEt(binding.passFirstInput)
             }
 
 
@@ -187,6 +189,8 @@ class PasscodeLockActivity : BaseActivity() {
                         binding.passFourthInput.requestFocus()
                     }
                 }
+
+                setEt(binding.passSecondInput)
             }
 
             binding.passFourthInput.apply {
@@ -201,6 +205,8 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                     }
                 }
+
+                setEt(binding.passThirdInput)
             }
 
             val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
@@ -225,6 +231,8 @@ class PasscodeLockActivity : BaseActivity() {
                             binding.passSixthInput.requestFocus()
                         }
                     }
+
+                    setEt(binding.passFourthInput)
                 }
 
                 binding.passSixthInput.apply {
@@ -235,6 +243,8 @@ class PasscodeLockActivity : BaseActivity() {
                             checkPasscode()
                         }
                     }
+
+                    setEt(binding.passFifthInput)
                 }
             }
 
