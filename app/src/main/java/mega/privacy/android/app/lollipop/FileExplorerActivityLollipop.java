@@ -2,19 +2,15 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -22,39 +18,29 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -64,8 +50,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
@@ -111,6 +97,9 @@ import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFileDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewURLFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -118,7 +107,10 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
+public class FileExplorerActivityLollipop extends SorterContentActivity
+		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
+		ActionNodeCallback {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -222,8 +214,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private ChatExplorerFragment chatExplorer;
 	private ImportFilesFragment importFileFragment;
 
-	private AlertDialog newFolderDialog;
-
 	private ProgressDialog statusDialog;
 
 	private List<ShareInfo> filePreparedInfos;
@@ -235,8 +225,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private ArrayList<MegaNode> nodes;
 
-	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
-
 	private long parentHandleIncoming;
 	private long parentHandleCloud;
 	private int deepBrowserTree;
@@ -245,7 +233,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private boolean importFileF;
 	private int importFragmentSelected = -1;
 	private String action;
-    private androidx.appcompat.app.AlertDialog renameDialog;
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
@@ -698,8 +685,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				}
 
 				if(isChatFirst){
-					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
-					setView(SHOW_TABS, true, -1);
+					aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
+					setView(SHOW_TABS, true, INCOMING_TAB);
 				}
 				else{
 					aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
@@ -738,7 +725,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		viewPagerExplorer.setCurrentItem(position);
 		tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
+		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2
+				&& ((!isChatFirst && tabToRemove == CHAT_TAB) || (isChatFirst && tabToRemove == INCOMING_TAB))) {
 			mTabsAdapterExplorer.setTabRemoved(true);
 			tabLayoutExplorer.removeTabAt(2);
 			mTabsAdapterExplorer.notifyDataSetChanged();
@@ -842,12 +830,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void showFabButton(boolean show){
-		if(show){
-			fabButton.setVisibility(View.VISIBLE);
-		}
-		else{
-			fabButton.setVisibility(View.GONE);
-		}
+		fabButton.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 
     public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
@@ -1060,12 +1043,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			return;
 		}
 
-		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
-			createFolderMenuItem.setVisible(false);
-		}
-		else{
-			createFolderMenuItem.setVisible(true);
-		}
+		createFolderMenuItem.setVisible(!intent.getAction().equals(ACTION_MULTISELECT_FILE));
 	}
 
 	@Override
@@ -1248,7 +1226,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 		}
 		else if(mode == UPLOAD && !importFileF){
-			aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
+			aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 		}
 		else if (mode == UPLOAD && importFileF) {
 			if (importFragmentSelected == -1) {
@@ -1281,40 +1259,28 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		cDriveExplorer = getCloudExplorerFragment();
 		iSharesExplorer = getIncomingExplorerFragment();
 
+		aB.setSubtitle(null);
+
 		if(tabShown==NO_TABS){
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					switch (importFragmentSelected) {
 						case CLOUD_FRAGMENT: {
 							if(cDriveExplorer!=null){
-								if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
+								if (cDriveExplorer.getParentHandle() == INVALID_HANDLE
+										|| cDriveExplorer.getParentHandle() == megaApi.getRootNode().getHandle()) {
 									setRootTitle();
-								}
-								else{
-									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
+									aB.setSubtitle(R.string.general_select_to_download);
+								} else {
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName().toUpperCase());
 								}
 							}
 							break;
 						}
-						case INCOMING_FRAGMENT:{
-							if(iSharesExplorer!=null){
-								if(deepBrowserTree==0){
-									setRootTitle();
-								}
-								else{
-									aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()).getName());
-								}
-							}
-							break;
-						}
-						case CHAT_FRAGMENT:{
+						case CHAT_FRAGMENT:
+						case IMPORT_FRAGMENT:
 							setRootTitle();
 							break;
-						}
-						case IMPORT_FRAGMENT:{
-							setRootTitle();
-							break;
-						}
 					}
 				}
 			}
@@ -1342,7 +1308,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						tabShown=CHAT_TAB;
 					}
 
-					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+					aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 				}
 				else if(f instanceof CloudDriveExplorerFragmentLollipop){
 					if(tabShown!=NO_TABS){
@@ -1381,7 +1347,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						setRootTitle();
 					}
 					else{
-						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName());
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName().toUpperCase());
 					}
 				}
 				showFabButton(false);
@@ -1465,20 +1431,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 		bundle.putString(CURRENT_ACTION, currentAction);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (getIntent() != null){
-			if (mode == UPLOAD) {
-				if (folderSelected){
-					if (filePreparedInfos == null){
-						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-						ownFilePrepareTask.execute(getIntent());
-						createAndShowProgressDialog(false, R.string.upload_prepare);
-					}
-				}
-			}
+		if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
+			OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+			ownFilePrepareTask.execute(getIntent());
+			createAndShowProgressDialog(false, R.string.upload_prepare);
 		}
 	}
 	
@@ -1537,8 +1497,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		else {
 			super.onBackPressed();
 		}
-
-		setToolbarSubtitle(null);
 	}
 
 	private boolean isCloudVisible() {
@@ -1834,7 +1792,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			logDebug("mode UPLOAD");
 
 			if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-				if ("text/plain".equals(intent.getType())) {
+				if (TYPE_TEXT_PLAIN.equals(intent.getType())) {
 					logDebug("Handle intent of text plain");
 
 					Bundle extras = intent.getExtras();
@@ -1868,13 +1826,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 								body.append(sharedText3);
 							}
 
-							long parentHandle = handle;
-							MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+							MegaNode parentNode = megaApi.getNodeByHandle(handle);
 							if(parentNode == null){
 								parentNode = megaApi.getRootNode();
 							}
 
-							showNewFileDialog(parentNode,body.toString(), isURL);
+							if (isURL) {
+								showNewURLFileDialog(this, parentNode, body.toString(), sharedText2);
+							} else {
+								showNewFileDialog(this, parentNode, body.toString());
+							}
+
 							return;
 						}
 					}
@@ -1973,7 +1935,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		showSnackbar(fragmentContainer, s);
     }
 
-    private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+    public void createFile(String name, String data, MegaNode parentNode, boolean isURL){
 		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
 			showOverDiskQuotaPaywallWarning();
 			return;
@@ -2003,18 +1965,29 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void createFolder(String title) {
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No action needed
+	}
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
+	}
+
+	@Override
+	public void createFolder(@NotNull String title) {
 
 		logDebug("createFolder");
 		if (!isOnline(this)){
             showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
-		
+
 		if(isFinishing()){
-			return;	
+			return;
 		}
-		
+
 		long parentHandle = -1;
 
 		cDriveExplorer = getCloudExplorerFragment();
@@ -2028,7 +2001,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-		
+
 		if (parentNode != null){
 			logDebug("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
@@ -2038,7 +2011,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					exists = true;
 				}
 			}
-			
+
 			if (!exists){
 				statusDialog = null;
 				try {
@@ -2049,7 +2022,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				catch(Exception e){
 					return;
 				}
-				
+
 				megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 			}
 			else{
@@ -2086,11 +2059,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
-			else{
-				return;
-			}
 		}
-		
 	}
 
 	/*
@@ -2239,17 +2208,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	
 	@Override
 	public void onDestroy(){
-		if(megaApi != null)
-		{	
+		if (megaApi != null) {
 			megaApi.removeGlobalListener(this);
 		}
 
 		File childThumbDir = new File(getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
-		if (childThumbDir != null){
-			if (childThumbDir.exists()){
-				try {
-					deleteFile(childThumbDir);
-				} catch (IOException e) {}
+		if (isFileAvailable(childThumbDir)){
+			try {
+				deleteFile(childThumbDir);
+			} catch (IOException e) {
+				logWarning("IOException deleting childThumbDir.", e);
 			}
 		}
 		
@@ -2305,7 +2273,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case R.id.cab_menu_create_folder:{
-	        	showNewFolderDialog(); 
+	        	showNewFolderDialog(this, this);
         		break;
 			}
 			case R.id.cab_menu_new_chat:{
@@ -2346,6 +2314,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		logDebug("Request code: " + requestCode + ", Result code: " + resultCode);
 
 		if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
@@ -2358,20 +2327,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
-			if (contactsData != null){
-				if(contactsData.size()==1){
+			if (contactsData != null) {
+				if (contactsData.size() == 1) {
 					MegaUser user = megaApi.getContact(contactsData.get(0));
-					if(user!=null){
+					if (user != null) {
 						logDebug("Chat with contact: " + contactsData.size());
 						startOneToOneChat(user);
 					}
-				}
-				else{
+				} else {
 					logDebug("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
-					for (int i=0; i<contactsData.size(); i++){
+					for (int i = 0; i < contactsData.size(); i++) {
 						MegaUser user = megaApi.getContact(contactsData.get(i));
-						if(user!=null){
+						if (user != null) {
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
@@ -2381,20 +2349,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
 					if (isEKR) {
 						megaChatApi.createChat(true, peers, chatTitle, this);
-					}
-					else {
+					} else {
 						final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
 
-						if(chatLink){
-							if(chatTitle!=null && !chatTitle.isEmpty()){
+						if (chatLink) {
+							if (chatTitle != null && !chatTitle.isEmpty()) {
 								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
 								megaChatApi.createPublicChat(peers, chatTitle, listener);
-							}
-							else{
+							} else {
 								showAlert(this, getString(R.string.message_error_set_title_get_link), null);
 							}
-						}
-						else{
+						} else {
 							megaChatApi.createPublicChat(peers, chatTitle, this);
 						}
 					}
@@ -2435,162 +2400,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			logDebug("There is already a chat, open it!");
 			showSnackbar(getString(R.string.chat_already_exists));
 		}
-	}
-
-	private void showNewFolderDialog(){
-		logDebug("showNewFolderDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-
-		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
 	}
 
 	private void getChatAdded (ArrayList<ChatExplorerListItem> listItems) {
@@ -2749,405 +2558,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL){
-		logDebug("showNewFileDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-
-		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-		if (isURL) {
-			input.setHint(getString(R.string.context_new_link_name));
-		}
-		else {
-			input.setHint(getString(R.string.context_new_file_name_hint));
-		}
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFile(value, data, parentNode, isURL);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		if (isURL) {
-			builder.setTitle(getString(R.string.dialog_title_new_link));
-		}
-		else {
-			builder.setTitle(getString(R.string.context_new_file_name));
-		}
-		builder.setPositiveButton(getString(R.string.general_ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFile(value, data, parentNode, isURL);
-					}
-				});
-
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						createFile(value, data, parentNode, isURL);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
-	}
-
-	private void changeName (String name, String rename) {
-		String[] params = {name, rename};
-		new ChangeNameTask().execute(params);
-    }
-
-	private class ChangeNameTask extends AsyncTask<String, Void, Void> {
-
-		HashMap<String, String> temp = new HashMap<>();
-
-		@Override
-		protected Void doInBackground(String... strings) {
-			String name = strings[0];
-			String rename = strings[1];
-
-			if (importFileFragment != null && importFileFragment.isAdded()) {
-				HashMap<String, String> names = importFileFragment.getNameFiles();
-				Iterator it = names.entrySet().iterator();
-
-				while (it.hasNext()) {
-					Map.Entry entry = (Map.Entry) it.next();
-					if (entry.getKey().equals(name)) {
-						temp.put((String)entry.getKey(), rename);
-					}
-					else {
-						temp.put((String)entry.getKey(), (String)entry.getValue());
-					}
-				}
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void aVoid) {
-			nameFiles = temp;
-			importFileFragment.setNameFiles(temp);
-			if (importFileFragment.adapter != null) {
-				importFileFragment.adapter.setImportNameFiles(temp);
-			}
-		}
-	}
-
-	public void showRenameDialog(final File document, final String text){
-		logDebug("showRenameDialog");
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-//	    layout.setLayoutParams(params);
-
-        final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isDirectory());
-//		input.setId(EDIT_TEXT_ID);
-        input.setSingleLine();
-        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-//		input.setHint(getString(R.string.context_new_folder_name));
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-        input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
-        input.setText(text);
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(final View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (document.isDirectory()){
-                        input.setSelection(0, input.getText().length());
-                    }
-                    else{
-                        String [] s = text.split("\\.");
-                        if (s != null){
-
-                            int numParts = s.length;
-                            int lastSelectedPos = 0;
-                            if (numParts == 1){
-                                input.setSelection(0, input.getText().length());
-                            }
-                            else if (numParts > 1){
-                                for (int i=0; i<(numParts-1);i++){
-                                    lastSelectedPos += s[i].length();
-                                    lastSelectedPos++;
-                                }
-                                lastSelectedPos--; //The last point should not be selected)
-                                input.setSelection(0, lastSelectedPos);
-                            }
-                        }
-                        showKeyboardDelayed(v);
-                    }
-                }
-            }
-        });
-
-        layout.addView(input, params);
-
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-        final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
-        layout.addView(error_layout, params1);
-
-        final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-        error_layout.addView(error_icon);
-        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        error_icon.setLayoutParams(params_icon);
-
-        error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-
-        final TextView textError = new TextView(FileExplorerActivityLollipop.this);
-        error_layout.addView(textError);
-        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-        textError.setLayoutParams(params_text_error);
-
-        textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300));
-
-        error_layout.setVisibility(View.GONE);
-
-        input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(error_layout.getVisibility() == View.VISIBLE){
-                    error_layout.setVisibility(View.GONE);
-                    input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-                }
-            }
-        });
-
-        input.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-                    String value = v.getText().toString().trim();
-                    if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(getString(R.string.invalid_string));
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-
-                    }else{
-                        boolean result=matches(regex, value);
-                        if(result){
-                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                            textError.setText(getString(R.string.invalid_characters));
-                            error_layout.setVisibility(View.VISIBLE);
-                            input.requestFocus();
-
-                        }
-                        else{
-                            changeName(document.getName(), value);
-//                            nC.renameNode(document, value);
-                            renameDialog.dismiss();
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ document.getName());
-        builder.setPositiveButton(getString(R.string.context_rename),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                input.getBackground().clearColorFilter();
-            }
-        });
-        builder.setView(layout);
-        renameDialog = builder.create();
-        renameDialog.show();
-        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String value = input.getText().toString().trim();
-
-                if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                    textError.setText(getString(R.string.invalid_string));
-                    error_layout.setVisibility(View.VISIBLE);
-                    input.requestFocus();
-                }
-                else{
-                    boolean result=matches(regex, value);
-                    if(result){
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(getString(R.string.invalid_characters));
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-
-                    }
-                    else{
-                        changeName(document.getName(), value);
-//                        nC.renameNode(document, value);
-                        renameDialog.dismiss();
-                    }
-                }
-            }
-        });
-    }
-
-	private static boolean matches(String regex, CharSequence input) {
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
-	}
-
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 
@@ -3211,24 +2621,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return null;
 	}
 
-	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment () {
-		IncomingSharesExplorerFragmentLollipop iS;
-
-		if (importFileF) {
-			return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
-		}
-
+	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment() {
 		if (mTabsAdapterExplorer == null) return null;
 
-		if (isChatFirst) {
-			iS =  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
-		}
-		else {
-			iS = (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
-		}
+		if (!isChatFirst) {
+			IncomingSharesExplorerFragmentLollipop iS =
+					(IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 
-		if (iS.isAdded()) {
-			return iS;
+			if (iS.isAdded()) {
+				return iS;
+			}
 		}
 
 		return null;
@@ -3341,9 +2743,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public long getParentHandleIncoming() {
-		if (iSharesExplorer != null) {
-			parentHandleIncoming = iSharesExplorer.getParentHandle();
-		}
 		return parentHandleIncoming;
 	}
 

@@ -13,7 +13,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -35,13 +34,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,13 +45,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -90,6 +83,8 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,8 +92,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -107,7 +100,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
@@ -117,6 +109,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -163,6 +156,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -174,8 +168,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener,
+        View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener,
+        MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface,
+        DraggableView.DraggableListener, ActionNodeCallback {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -298,8 +294,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private boolean fromShared = false;
     private int typeExport = -1;
-    private AlertDialog renameDialog;
-    private String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
     private ProgressDialog moveToTrashStatusDialog;
     private boolean loop = false;
@@ -864,6 +858,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         exoPlayerName.setLayoutParams(paramsName);
         controlsButtonsLayout.setLayoutParams(paramsControlButtons);
         audioContainer.setLayoutParams(paramsAudioContainer);
+    }
+
+    @Override
+    public void finishRenameActionWithSuccess() {
+        updateFile();
+    }
+
+    @Override
+    public void actionConfirmed() {
+        //No update needed
+    }
+
+    @Override
+    public void createFolder(@NotNull String folderName) {
+        //No action needed
     }
 
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
@@ -2473,7 +2482,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_rename: {
-                showRenameDialog();
+                showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
                 break;
             }
             case R.id.full_video_viewer_move: {
@@ -2793,243 +2802,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         intent.putExtra("MOVE_FROM", longArray);
         startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
-    }
-
-    private void showKeyboardDelayed(final View view) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 50);
-    }
-
-    public void showRenameDialog() {
-        logDebug("showRenameDialog");
-        final MegaNode node = megaApi.getNodeByHandle(handle);
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(
-                scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics),
-                scaleHeightPx(DIALOG_VIEW_MARGIN_TOP_LARGE_DP, outMetrics),
-                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics),
-                0);
-
-        final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-        input.setSingleLine();
-        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
-        input.setText(node.getName());
-
-
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(final View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (node.isFolder()) {
-                        input.setSelection(0, input.getText().length());
-                    } else {
-                        String[] s = node.getName().split("\\.");
-                        if (s != null) {
-                            int numParts = s.length;
-                            int lastSelectedPos = 0;
-                            if (numParts == 1) {
-                                input.setSelection(0, input.getText().length());
-                            } else if (numParts > 1) {
-                                for (int i = 0; i < (numParts - 1); i++) {
-                                    lastSelectedPos += s[i].length();
-                                    lastSelectedPos++;
-                                }
-                                lastSelectedPos--; //The last point should not be selected)
-                                input.setSelection(0, lastSelectedPos);
-                            }
-                        }
-                        showKeyboardDelayed(v);
-                    }
-                }
-            }
-        });
-
-
-        layout.addView(input, params);
-
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics), 0,
-                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics), 0);
-
-        final RelativeLayout error_layout = new RelativeLayout(AudioVideoPlayerLollipop.this);
-        layout.addView(error_layout, params1);
-
-        final ImageView error_icon = new ImageView(AudioVideoPlayerLollipop.this);
-        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-        error_layout.addView(error_icon);
-        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        error_icon.setLayoutParams(params_icon);
-
-        error_icon.setColorFilter(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.red_600));
-
-        final TextView textError = new TextView(AudioVideoPlayerLollipop.this);
-        error_layout.addView(textError);
-        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(scaleWidthPx(RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT_DP, outMetrics),
-                0, 0, 0);
-        textError.setLayoutParams(params_text_error);
-
-        textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.red_600));
-
-        error_layout.setVisibility(View.GONE);
-
-        input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (error_layout.getVisibility() == View.VISIBLE) {
-                    error_layout.setVisibility(View.GONE);
-                    input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.teal_300), PorterDuff.Mode.SRC_ATOP);
-                }
-            }
-        });
-
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-                    String value = v.getText().toString().trim();
-                    if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(getString(R.string.invalid_string));
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-
-                    } else {
-                        boolean result = matches(regex, value);
-                        if (result) {
-                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
-                            textError.setText(getString(R.string.invalid_characters));
-                            error_layout.setVisibility(View.VISIBLE);
-                            input.requestFocus();
-
-                        } else {
-                            //						nC.renameNode(node, value);
-                            renameDialog.dismiss();
-                            rename(value, node);
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ node.getName());
-        builder.setPositiveButton(getString(R.string.context_rename),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String value = input.getText().toString().trim();
-                        if (value.length() == 0) {
-                            return;
-                        }
-                        rename(value, node);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                input.getBackground().clearColorFilter();
-            }
-        });
-        builder.setView(layout);
-        renameDialog = builder.create();
-        renameDialog.show();
-        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                String value = input.getText().toString().trim();
-
-                if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
-                    textError.setText(getString(R.string.invalid_string));
-                    error_layout.setVisibility(View.VISIBLE);
-                    input.requestFocus();
-                }
-                else{
-                    boolean result=matches(regex, value);
-                    if(result){
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.red_600), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(getString(R.string.invalid_characters));
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-
-                    }else{
-                        //nC.renameNode(node, value);
-                        renameDialog.dismiss();
-                        rename(value, node);
-                    }
-                }
-            }
-        });
-    }
-
-    private void rename(String newName, MegaNode node){
-        if (newName.equals(node.getName())) {
-            return;
-        }
-
-        if (checkNoNetwork()) {
-            return;
-        }
-
-        if (isFinishing()){
-            return;
-        }
-
-        ProgressDialog temp = null;
-        try{
-            temp = new ProgressDialog(this);
-            temp.setMessage(getString(R.string.context_renaming));
-            temp.show();
-        }
-        catch(Exception e){
-            return;
-        }
-        statusDialog = temp;
-
-        logDebug("Renaming " + node.getName() + " to " + newName);
-
-        megaApi.renameNode(node, newName, this);
-    }
-
-    public static boolean matches(String regex, CharSequence input) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(input);
-        return m.find();
     }
 
     public void showRemoveLink(){
@@ -3966,22 +3738,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish");
 
-        if (request.getType() == MegaRequest.TYPE_RENAME){
-
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-                updateFile();
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MOVE){
+        if (request.getType() == MegaRequest.TYPE_MOVE){
             try {
                 statusDialog.dismiss();
             }
