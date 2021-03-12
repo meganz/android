@@ -199,6 +199,11 @@ class PasscodeLockActivity : BaseActivity() {
                 doAfterTextChanged {
                     if (this.text.toString().isNotEmpty()) {
                         if (passcodeType == PIN_4) {
+                            binding.passFirstInput.apply {
+                                isCursorVisible = false
+                                requestFocus()
+                            }
+
                             checkPasscode()
                         } else {
                             binding.passFifthInput.requestFocus()
@@ -240,6 +245,11 @@ class PasscodeLockActivity : BaseActivity() {
 
                     doAfterTextChanged {
                         if (this.text.toString().isNotEmpty()) {
+                            binding.passFirstInput.apply {
+                                isCursorVisible = false
+                                requestFocus()
+                            }
+
                             checkPasscode()
                         }
                     }
