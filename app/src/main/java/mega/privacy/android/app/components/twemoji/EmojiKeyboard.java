@@ -205,8 +205,8 @@ public class EmojiKeyboard extends LinearLayout {
             drawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
         } else {
             drawable = getResources().getDrawable(editInterface.isTextEmpty() ?
-                    R.drawable.ic_emoji_light :
-                    R.drawable.ic_emoji_dark);
+                    R.drawable.ic_emoji_unchecked :
+                    R.drawable.ic_emoji_checked);
         }
         emojiIcon.setImageDrawable(drawable);
     }

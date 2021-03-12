@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="bottom"
     android:layout_gravity="bottom"
-    android:background="@color/white">
+    android:background="@color/white_black">
 
     <RelativeLayout
         android:id="@+id/more_options_rl"
@@ -123,8 +123,7 @@
                         android:layout_height="24dp"
                         android:layout_alignParentBottom="true"
                         android:background="@null"
-                        android:src="@drawable/ic_emoji_light"
-                        app:tint="@color/grey_054_white_054"/>
+                        android:src="@drawable/ic_emoji_unchecked"/>
                 </RelativeLayout>
             </LinearLayout>
 
@@ -144,7 +143,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_expand_text_input"
-                    app:tint="@color/grey_054_white_054"
+                    android:background="@null"
                     android:visibility="visible" />
             </RelativeLayout>
 
@@ -161,8 +160,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:src="@drawable/ic_send_white"
-                    app:tint="@color/grey_054_white_054"
                     android:visibility="visible" />
             </RelativeLayout>
         </RelativeLayout>

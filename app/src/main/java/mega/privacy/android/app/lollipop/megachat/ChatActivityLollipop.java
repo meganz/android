@@ -1124,8 +1124,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         recordLayout = findViewById(R.id.layout_button_layout);
         recordButtonLayout = findViewById(R.id.record_button_layout);
         recordButton = findViewById(R.id.record_button);
-        recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
-                PorterDuff.Mode.SRC_IN);
         recordButton.setEnabled(true);
         recordButton.setHapticFeedbackEnabled(true);
         recordView = findViewById(R.id.record_view);
@@ -1583,7 +1581,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         collapseInputText();
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
-        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
+        logDebug("***************** GRIS/BLANCO");
+        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
         sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
 
         if (chatRoom != null) {
@@ -2794,7 +2793,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         disableButton(rLPickAttachButton, pickAttachButton);
         disableButton(rLPickFileStorageButton, pickFileStorageButton);
         disableButton(rlGifButton, gifButton);
-        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
+        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
     }
 
     private void disableButton(final RelativeLayout layout, final  ImageButton button){
@@ -2833,15 +2832,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         sendIcon.setEnabled(true);
         if(editingMessage){
-            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_select_thumbnail));
+            sendIcon.setImageResource(R.drawable.ic_select_thumbnail);
         }else{
-            sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.teal_500));
+            sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white,
+                    ColorUtils.getThemeColor(this, android.R.attr.colorAccent)));
         }
 
         textChat.setHint(" ");
         setSizeInputText(false);
         sendIcon.setVisibility(View.VISIBLE);
-        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_dark));
+        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_checked);
         currentRecordButtonState = 0;
         recordLayout.setVisibility(View.GONE);
         recordButtonLayout.setVisibility(View.GONE);
@@ -2855,13 +2855,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
             showSendIcon();
         } else {
             recordButtonLayout.setBackground(null);
-            keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
+            keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
             sendIcon.setVisibility(View.GONE);
             recordButton.setVisibility(View.VISIBLE);
 
             if(isDeactivated){
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_voice_clip_outline, R.color.grey_054_white_054));
+                recordButton.setImageResource(R.drawable.ic_record_voice_clip);
                 return;
             }
 
@@ -2891,7 +2891,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
                 recordButton.activateOnTouchListener(true);
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_voice_clip_outline, R.color.white));
+                recordButton.setImageResource(R.drawable.ic_record_voice_clip);
             }
 
         }else if(currentRecordButtonState == RECORD_BUTTON_DEACTIVATED){
@@ -3957,8 +3957,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     private void changeKeyboard(ImageButton btn){
         Drawable currentDrawable = btn.getDrawable();
-        Drawable emojiDrawableLight = getResources().getDrawable(R.drawable.ic_emoji_light);
-        Drawable emojiDrawableDark = getResources().getDrawable(R.drawable.ic_emoji_dark);
+        Drawable emojiDrawableLight = getDrawable(R.drawable.ic_emoji_unchecked);
+        Drawable emojiDrawableDark = getDrawable(R.drawable.ic_emoji_checked);
         Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
         if ((areDrawablesIdentical(currentDrawable, emojiDrawableLight) ||
                 areDrawablesIdentical(currentDrawable, emojiDrawableDark)) &&
@@ -9313,7 +9313,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             inputTextLayout.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
             tB.setVisibility(View.VISIBLE);
-            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_expand_text_input));
+            expandCollapseInputTextIcon.setImageResource(R.drawable.ic_expand_text_input);
             writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
             bottomItems.getLayoutParams().height = WRAP_CONTENT;
             inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
@@ -9326,7 +9326,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
             tB.setVisibility(View.GONE);
-            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_collapse_text_input));
+            expandCollapseInputTextIcon.setImageResource(R.drawable.ic_collapse_text_input);
             writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
             bottomItems.getLayoutParams().height = MATCH_PARENT;
             inputTextLayout.getLayoutParams().height = MATCH_PARENT;

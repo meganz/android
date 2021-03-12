@@ -49,7 +49,7 @@
     <color name="grey_700_alpha_026">#424F4F4F</color>
     <color name="grey_800_alpha_070">#B32E2E2E</color>
 
-    <color name="grey_alpha_003">#08000000</color>
+    <color name="grey_alpha_003">#07000000</color>
     <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1F000000</color>
@@ -192,6 +192,9 @@
 
     <!-- chat reaction add/own emoji background fill -->
     <color name="grey_003_white_018">@color/grey_alpha_003</color>
+
+    <!-- input text chat background-->
+    <color name="grey_003_white_015">@color/grey_alpha_003</color>
 
     <!-- chat reaction add/own emoji background border -->
     <color name="grey_012_white_015">@color/grey_alpha_012</color>

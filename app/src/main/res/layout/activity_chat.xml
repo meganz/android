@@ -230,8 +230,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:src="@drawable/ic_emoji_dark"
-                                app:tint="@color/grey_054_white_054"/>
+                                android:src="@drawable/ic_emoji_checked"/>
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -552,7 +551,7 @@
                                 android:layout_height="24dp"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_voice_clip_outline"
+                                android:src="@drawable/ic_record_voice_clip"
                                 android:visibility="visible" />
                         </RelativeLayout>
 
