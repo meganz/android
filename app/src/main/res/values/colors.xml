@@ -29,6 +29,7 @@
     <color name="dark_grey">#121212</color>
     <color name="dark_grey_alpha_050">#80121212</color>
     <color name="dark_grey_alpha_054">#8A121212</color>
+    <color name="dark_grey_alpha_070">#B3121212</color>
 
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
@@ -170,6 +171,9 @@
     <color name="teal_300_black">@color/teal_300</color>
     <!-- background tint for FAB above images or scrim -->
     <color name="white_teal_200">@color/white</color>
+
+    <!-- Homepage scrim -->
+    <color name="grey_600_085_dark_grey_070">@color/grey_600_alpha_085</color>
 
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>

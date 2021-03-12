@@ -191,6 +191,9 @@
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_300</color>
 
+    <!-- Homepage scrim -->
+    <color name="grey_600_085_dark_grey_070">@color/dark_grey_alpha_070</color>
+
     <!--    Mask color for current plan-->
     <color name="white_054_dark_grey_054">@color/dark_grey_alpha_054</color>
 
