@@ -204,10 +204,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			}
 
 			if (isMultipleSelect() && isItemChecked(position)) {
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			} else {
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageView.setImageResource(node.isInShare()
 						? R.drawable.ic_folder_incoming_list
 						: R.drawable.ic_folder_list);
@@ -221,11 +219,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			if (isMultipleSelect() && isItemChecked(position)) {
 				params.height = params.width = dp2px(ICON_SIZE_DP);
 				params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			} else {
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 				Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 
 				if (thumb == null) {
