@@ -186,7 +186,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     private TextView fileNameTextView;
     int typeExport = -1;
     private Handler handler;
-    private AlertDialog renameDialog;
     boolean moveToRubbish = false;
     ProgressDialog moveToTrashStatusDialog;
 
@@ -784,7 +783,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     }
 
     @Override
-    public void finishRenameActionWithSuccess() {
+    public void finishRenameActionWithSuccess(@NonNull String newName) {
         updateFile();
     }
 
@@ -1419,7 +1418,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                 break;
             }
             case R.id.pdf_viewer_rename: {
-                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
+                showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this, this);
                 break;
             }
             case R.id.pdf_viewer_move: {
@@ -1430,10 +1429,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                 showCopy();
                 break;
             }
-            case R.id.pdf_viewer_move_to_trash: {
-                moveToTrash();
-                break;
-            }
+            case R.id.pdf_viewer_move_to_trash:
             case R.id.pdf_viewer_remove: {
                 moveToTrash();
                 break;

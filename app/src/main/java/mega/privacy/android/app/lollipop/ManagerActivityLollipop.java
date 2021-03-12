@@ -684,9 +684,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	ProgressDialog statusDialog;
 
-	private AlertDialog renameDialog;
-	private AlertDialog newFolderDialog;
-	private AlertDialog addContactDialog;
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
@@ -8017,7 +8014,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	public void showRenameDialog(final MegaNode document){
-		renameDialog = showRenameNodeDialog(this, document, this);
+		showRenameNodeDialog(this, document, this, this);
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -9211,8 +9208,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@Override
 	public void showNewFolderDialog() {
-
-		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
+		MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
 	public long getParentHandleBrowser() {
@@ -15032,7 +15028,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
 				refreshCloudDrive();

@@ -32,7 +32,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.CopyNodeListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveNodeListener
-import mega.privacy.android.app.listeners.RenameNodeListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
@@ -1081,21 +1080,6 @@ object MegaNodeUtil {
         val megaApi = megaApp.megaApi
 
         megaApi.moveNode(node, megaApi.rubbishNode, MoveNodeListener(snackbarShower, megaApp))
-    }
-
-    /**
-     * Rename a node.
-     *
-     * @param node node to rename
-     * @param newName new name of the node
-     * @param snackbarShower interface to show snackbar
-     */
-    @JvmStatic
-    fun renameNode(node: MegaNode, newName: String, snackbarShower: SnackbarShower) {
-        val megaApp = MegaApplication.getInstance()
-        val megaApi = megaApp.megaApi
-
-        megaApi.renameNode(node, newName, RenameNodeListener(snackbarShower, megaApp))
     }
 
     /**

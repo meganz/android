@@ -2,34 +2,21 @@ package mega.privacy.android.app.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.*
-import android.widget.TextView.OnEditorActionListener
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.components.EditTextCursorWatcher
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
-import java.util.regex.Pattern
 
 class AlertsAndWarnings {
 
@@ -38,13 +25,6 @@ class AlertsAndWarnings {
         private const val REMOVE_LINK_DIALOG_TEXT_MARGIN_TOP = 20
         private const val REMOVE_LINK_DIALOG_TEXT_MARGIN_RIGHT = 10
         private const val REMOVE_LINK_DIALOG_TEXT_SIZE = 15
-
-        private const val RENAME_DIALOG_TEXT_MARGIN_LEFT = 20
-        private const val RENAME_DIALOG_TEXT_MARGIN_TOP = 20
-        private const val RENAME_DIALOG_TEXT_MARGIN_RIGHT = 17
-        private const val RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT = 3
-
-        private const val RENAME_REGEX = "[*|\\?:\"<>\\\\\\\\/]"
 
         /**
          * Shows the ODQ Paywall warning. It will not be shown if it is already being displayed or if
@@ -173,199 +153,6 @@ class AlertsAndWarnings {
                 .setNegativeButton(getString(R.string.general_cancel), null)
                 .create()
                 .show()
-        }
-
-        /**
-         * Shows a rename node alert dialog.
-         *
-         * @param context current Context
-         * @param nodeName the old node name
-         * @param isFolder if is the node is a folder
-         * @param rename callback when valid new name is set
-         */
-        @JvmStatic
-        fun showRenameDialog(
-            context: Context,
-            nodeName: String,
-            isFolder: Boolean,
-            rename: (String) -> Unit
-        ) {
-            val displayMetrics = context.resources.displayMetrics
-
-            val layout = LinearLayout(context)
-            layout.orientation = LinearLayout.VERTICAL
-
-            val input = EditTextCursorWatcher(context, isFolder)
-            input.setSingleLine()
-            input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary))
-            input.imeOptions = EditorInfo.IME_ACTION_DONE
-
-            input.setImeActionLabel(
-                getString(R.string.context_rename),
-                EditorInfo.IME_ACTION_DONE
-            )
-            input.setText(nodeName)
-
-            input.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-                if (hasFocus) {
-                    if (isFolder) {
-                        input.setSelection(0, input.text.length)
-                    } else {
-                        val s = nodeName.split("\\.".toRegex()).toTypedArray()
-                        val numParts = s.size
-                        var lastSelectedPos = 0
-                        if (numParts == 1) {
-                            input.setSelection(0, input.text.length)
-                        } else if (numParts > 1) {
-                            for (i in 0 until numParts - 1) {
-                                lastSelectedPos += s[i].length
-                                lastSelectedPos++
-                            }
-                            lastSelectedPos-- // The last point should not be selected)
-                            input.setSelection(0, lastSelectedPos)
-                        }
-                        showKeyboardDelayed(v)
-                    }
-                }
-            }
-
-            val paramsInput = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            paramsInput.setMargins(
-                Util.scaleWidthPx(RENAME_DIALOG_TEXT_MARGIN_LEFT, displayMetrics),
-                Util.scaleHeightPx(RENAME_DIALOG_TEXT_MARGIN_TOP, displayMetrics),
-                Util.scaleWidthPx(RENAME_DIALOG_TEXT_MARGIN_RIGHT, displayMetrics),
-                0
-            )
-            layout.addView(input, paramsInput)
-
-            val paramsErrorLayout = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            paramsErrorLayout.setMargins(
-                Util.scaleWidthPx(RENAME_DIALOG_TEXT_MARGIN_LEFT, displayMetrics),
-                0,
-                Util.scaleWidthPx(RENAME_DIALOG_TEXT_MARGIN_RIGHT, displayMetrics),
-                0
-            )
-
-            val errorLayout = RelativeLayout(context)
-            layout.addView(errorLayout, paramsErrorLayout)
-
-            val errorIcon = ImageView(context)
-            errorIcon.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_input_warning)
-            )
-            errorLayout.addView(errorIcon)
-            val paramsIcon = errorIcon.layoutParams as RelativeLayout.LayoutParams
-
-            paramsIcon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-            errorIcon.layoutParams = paramsIcon
-
-            errorIcon.setColorFilter(ColorUtils.getThemeColor(context, R.attr.colorError))
-
-            val textError = TextView(context)
-            errorLayout.addView(textError)
-            val paramsTextError = textError.layoutParams as RelativeLayout.LayoutParams
-            paramsTextError.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            paramsTextError.width = ViewGroup.LayoutParams.WRAP_CONTENT
-            paramsTextError.addRule(RelativeLayout.CENTER_VERTICAL)
-            paramsTextError.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-            paramsTextError.setMargins(
-                Util.scaleWidthPx(RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT, displayMetrics), 0, 0, 0
-            )
-            textError.layoutParams = paramsTextError
-
-            textError.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError))
-
-            errorLayout.visibility = View.GONE
-
-            input.background.mutate().clearColorFilter()
-            input.background.mutate().colorFilter = PorterDuffColorFilter(
-                ColorUtils.getThemeColor(context, R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
-            )
-            input.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    charSequence: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(
-                    charSequence: CharSequence,
-                    start: Int,
-                    before: Int,
-                    count: Int
-                ) {
-                }
-
-                override fun afterTextChanged(editable: Editable) {
-                    if (errorLayout.visibility == View.VISIBLE) {
-                        errorLayout.visibility = View.GONE
-                        input.background.mutate().clearColorFilter()
-                        input.background.mutate().colorFilter = PorterDuffColorFilter(
-                            ColorUtils.getThemeColor(context, R.attr.colorSecondary),
-                            PorterDuff.Mode.SRC_IN
-                        )
-                    }
-                }
-            })
-
-            var renameDialog: AlertDialog? = null
-            val checkInput: (String) -> Unit = { text ->
-                val value = text.trim { it <= ' ' }
-                if (value.isEmpty()) {
-                    input.background.mutate().colorFilter = PorterDuffColorFilter(
-                        ColorUtils.getThemeColor(context, R.attr.colorError), PorterDuff.Mode.SRC_IN
-                    )
-                    textError.text = getString(R.string.invalid_string)
-                    errorLayout.visibility = View.VISIBLE
-                    input.requestFocus()
-                } else {
-                    if (Pattern.compile(RENAME_REGEX).matcher(value).find()) {
-                        input.background.mutate().colorFilter = PorterDuffColorFilter(
-                            ColorUtils.getThemeColor(context, R.attr.colorError),
-                            PorterDuff.Mode.SRC_IN
-                        )
-                        textError.text = getString(R.string.invalid_characters)
-                        errorLayout.visibility = View.VISIBLE
-                        input.requestFocus()
-                    } else {
-                        renameDialog?.dismiss()
-                        rename(value)
-                    }
-                }
-            }
-
-            input.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    checkInput(input.text.toString())
-                    return@OnEditorActionListener true
-                }
-                false
-            })
-
-            renameDialog =
-                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                    .setTitle(getString(R.string.context_rename) + " " + nodeName)
-                    .setPositiveButton(getString(R.string.context_rename), null)
-                    .setNegativeButton(getString(R.string.general_cancel), null)
-                    .setView(layout)
-                    .show()
-
-            // the dialog will be dismissed automatically after positive button listener
-            // is executed, but we need check if the input is valid, so we use
-            // getButton.setOnClickListener to override it.
-            renameDialog?.getButton(BUTTON_POSITIVE)?.setOnClickListener {
-                checkInput(input.text.toString())
-            }
-
-            input.requestFocus()
         }
 
         @JvmStatic

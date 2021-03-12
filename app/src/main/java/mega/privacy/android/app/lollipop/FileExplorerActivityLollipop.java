@@ -11,6 +11,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -1966,7 +1967,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		//No action needed
 	}
 

@@ -15,6 +15,7 @@ import android.os.Handler;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.ActionBar;
@@ -1147,8 +1148,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
-		//No update needed
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
+		// No update needed
 	}
 
 	@Override

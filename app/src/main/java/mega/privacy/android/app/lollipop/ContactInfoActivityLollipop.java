@@ -19,6 +19,7 @@ import android.os.Bundle;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -2190,7 +2191,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		//No update needed
 	}
 

@@ -51,6 +51,8 @@ import java.util.Stack;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -143,8 +145,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
                     break;
                 }
 				case R.id.cab_menu_rename: {
-					MegaNode aux = documents.get(0);
-					showRenameNodeDialog(context, aux, (ContactFileListActivityLollipop) getActivity());
+					MegaNode node = documents.get(0);
+					showRenameNodeDialog(context, node, (SnackbarShower) getActivity(),
+							(ActionNodeCallback) getActivity());
 					break;
 				}
 			}

@@ -270,8 +270,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	private Handler handler;
 
-	private AlertDialog renameDialog;
-
 	boolean moveToRubbish = false;
 
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
@@ -366,7 +364,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     @Override
-    public void finishRenameActionWithSuccess() {
+    public void finishRenameActionWithSuccess(@NonNull String newName) {
         node = megaApi.getNodeByHandle(node.getHandle());
 
         if (node != null && collapsingToolbar != null) {
@@ -1144,7 +1142,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.cab_menu_file_info_rename: {
-			    renameDialog = showRenameNodeDialog(this, node, this);
+			    showRenameNodeDialog(this, node, this, this);
 				break;
 			}
 			case R.id.cab_menu_file_info_leave:

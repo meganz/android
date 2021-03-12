@@ -178,8 +178,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 	private Handler handler;
 
-	private AlertDialog renameDialog;
-
 	int orderGetChildren = ORDER_DEFAULT_ASC;
 
 	DatabaseHandler dbH = null;
@@ -718,7 +716,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 				break;
 			}
 			case R.id.full_image_viewer_rename: {
-				renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(imageHandles.get(positionG)), null);
+				showRenameNodeDialog(this, megaApi.getNodeByHandle(imageHandles.get(positionG)),
+						this, null);
 				break;
 			}
 			case R.id.full_image_viewer_move: {

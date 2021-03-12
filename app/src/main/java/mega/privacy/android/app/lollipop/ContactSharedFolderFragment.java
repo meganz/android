@@ -26,6 +26,8 @@ import java.util.Stack;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -298,8 +300,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     break;
                 }
                 case R.id.cab_menu_rename: {
-                    MegaNode aux = documents.get(0);
-                    showRenameNodeDialog(context, aux, (ContactInfoActivityLollipop) getActivity());
+                    MegaNode node = documents.get(0);
+                    showRenameNodeDialog(context, node, (SnackbarShower) getActivity(),
+                            (ActionNodeCallback) getActivity());
                     break;
                 }
             }

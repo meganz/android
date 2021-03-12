@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
@@ -46,8 +47,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDevi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.moveNodeToRubbishBin
-import mega.privacy.android.app.utils.MegaNodeUtil.renameNode
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -544,11 +545,12 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             }
             R.id.rename -> {
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
-                AlertsAndWarnings.showRenameDialog(this, node.name, node.isFolder) {
-                    playerService?.viewModel?.updateItemName(node.handle, it)
-                    updateTrackInfoNodeNameIfNeeded(node.handle, it)
-                    renameNode(node, it, this)
-                }
+                showRenameNodeDialog(this, node, this, object : ActionNodeCallback {
+                    override fun finishRenameActionWithSuccess(newName: String) {
+                        playerService?.viewModel?.updateItemName(node.handle, newName)
+                        updateTrackInfoNodeNameIfNeeded(node.handle, newName)
+                    }
+                })
                 return true
             }
             R.id.move -> {

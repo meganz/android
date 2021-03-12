@@ -304,7 +304,7 @@ public class CameraUploadUtil {
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(primaryHandle),
                         getString(R.string.section_photo_sync),
-                        new RenameNodeListener(null, context, false, false));
+                        new RenameNodeListener(null, context, false, false, null));
             }
         }
     }
@@ -320,7 +320,7 @@ public class CameraUploadUtil {
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle),
                         getString(R.string.section_secondary_media_uploads),
-                        new RenameNodeListener(null, context, false, false));
+                        new RenameNodeListener(null, context, false, false, null));
             }
         }
     }
