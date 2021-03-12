@@ -1,10 +1,13 @@
 package mega.privacy.android.app.psa
 
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Consumer
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RxUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -16,6 +19,8 @@ import java.util.concurrent.TimeUnit
  */
 object PsaManager : LifecycleObserver {
 
+    private const val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
+
     /**
      * The minimum interval in milliseconds that we should keep between two calls to
      * SDK to get PSA from server.
@@ -25,9 +30,19 @@ object PsaManager : LifecycleObserver {
     private val application = MegaApplication.getInstance()
     private val megaApi = application.megaApi
 
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
+
     private var getPsaDisposable: Disposable? = null
     private var processLifecycleObserved = false
-    private var startCheckingOnForeground = false
+
+    private var appInBackground = false
+
+    /**
+     * When we skipped a checking in background, to avoid redundant waiting,
+     * we should check immediately and reschedule future checking,
+     * rescheduleOnForeground is whether we should do that.
+     */
+    private var rescheduleOnForeground = false
 
     /**
      * LiveData for PSA, mutable, used to emit value.
@@ -44,7 +59,6 @@ object PsaManager : LifecycleObserver {
      */
     fun startChecking() {
         doStartChecking()
-        startCheckingOnForeground = true
 
         if (!processLifecycleObserved) {
             processLifecycleObserved = true
@@ -56,8 +70,15 @@ object PsaManager : LifecycleObserver {
      * Stop checking PSA periodically.
      */
     fun stopChecking() {
-        startCheckingOnForeground = false
+        rescheduleOnForeground = false
         doStopChecking()
+
+        // If user logout while there is a PSA displaying (not shown yet), if we don't
+        // reset mutablePsa, it will be displayed in LoginActivity again, which is not
+        // desired.
+        mutablePsa.value = null
+
+        preferences.edit().remove(LAST_PSA_CHECK_TIME_KEY).apply()
     }
 
     private fun doStartChecking() {
@@ -65,8 +86,31 @@ object PsaManager : LifecycleObserver {
             return
         }
 
-        getPsaDisposable = Observable.interval(0L, GET_PSA_INTERVAL_MS, TimeUnit.MILLISECONDS)
-            .subscribe({
+        val timeSinceLastCheck =
+            System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
+
+        logDebug("doStartChecking timeSinceLastCheck $timeSinceLastCheck")
+
+        getPsaDisposable = Observable.interval(
+            // minus initial delay will be treated as 0
+            GET_PSA_INTERVAL_MS - timeSinceLastCheck,
+            GET_PSA_INTERVAL_MS, TimeUnit.MILLISECONDS
+        )
+            .subscribe(Consumer {
+                if (appInBackground) {
+                    logDebug("skip getPSAWithUrl")
+
+                    rescheduleOnForeground = true
+
+                    return@Consumer
+                }
+
+                preferences.edit()
+                    .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
+                    .apply()
+
+                logDebug("getPSAWithUrl ${System.currentTimeMillis()}")
+
                 megaApi.getPSAWithUrl(object : BaseListener(application) {
                     override fun onRequestFinish(
                         api: MegaApiJava,
@@ -75,7 +119,9 @@ object PsaManager : LifecycleObserver {
                     ) {
                         super.onRequestFinish(api, request, e)
 
-                        if (e.errorCode == MegaError.API_OK) {
+                        // API response may arrive after stopChecking, in this case we shouldn't
+                        // emit PSA anymore.
+                        if (e.errorCode == MegaError.API_OK && getPsaDisposable != null) {
                             mutablePsa.value = Psa(
                                 request.number.toInt(), request.name, request.text, request.file,
                                 request.password, request.link, request.email
@@ -121,13 +167,20 @@ object PsaManager : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
-        if (startCheckingOnForeground) {
+        appInBackground = false
+
+        // When we skipped a checking in background, to avoid redundant waiting,
+        // we should check immediately and reschedule future checking.
+        if (rescheduleOnForeground) {
+            rescheduleOnForeground = false
+
+            doStopChecking()
             doStartChecking()
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
-        doStopChecking()
+        appInBackground = true
     }
 }

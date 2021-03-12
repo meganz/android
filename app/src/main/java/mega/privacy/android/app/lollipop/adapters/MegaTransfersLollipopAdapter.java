@@ -38,9 +38,9 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
@@ -141,7 +141,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         int transferState = transfer.getState();
 
         if (transferType == TYPE_DOWNLOAD) {
-            holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.green_unlocked_rewards));
+            holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.green_500_green_400));
             holder.document = transfer.getNodeHandle();
 
             if (!isItemChecked) {
@@ -177,7 +177,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                         params1.setMargins(0, -12, -12, 0);
                         holder.iconDownloadUploadView.setLayoutParams(params1);
 
-                        holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+                        holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
                     } else {
                         params.height = params.width = dp2px(48, outMetrics);
                         params.setMargins(36, 0, 0, 0);
@@ -201,7 +201,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                 holder.imageView.setLayoutParams(params);
             }
 
-            holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.business_color));
+            holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.dark_blue_500_200));
             holder.currentPath = transfer.getPath();
         }
 
@@ -211,9 +211,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
             params.height = params.width = dp2px(48, outMetrics);
             params.setMargins(36, 0, 0, 0);
             holder.imageView.setLayoutParams(params);
-            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
         } else {
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.iconDownloadUploadView.setVisibility(VISIBLE);
         }
 
@@ -263,7 +261,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                 case STATE_QUEUED:
                     if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
                             || (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
-                        holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
+                        holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 
                         if (transferType == TYPE_DOWNLOAD) {
                             holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));

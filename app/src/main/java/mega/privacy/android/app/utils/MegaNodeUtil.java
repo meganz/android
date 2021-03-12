@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Bundle;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Gravity;
@@ -20,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,12 +34,12 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
@@ -50,6 +50,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class MegaNodeUtil {
@@ -259,15 +260,59 @@ public class MegaNodeUtil {
     public static void shareNode(Context context, MegaNode node) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
-
             if (!isTextEmpty(path) && !node.isFolder()) {
                 shareFile(context, new File(path));
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
-                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_NODE, new Intent(android.content.Intent.ACTION_SEND)));
             }
         }
+    }
+
+    /**
+     * Method to know if all nodes are unloaded. If so, share them.
+     *
+     * @param context   The Activity context.
+     * @param listNodes The list of nodes to be checked.
+     * @return True, if all are downloaded. False, otherwise.
+     */
+    public static boolean areAllNodesDownloaded(Context context, ArrayList<MegaNode> listNodes) {
+        List<File> downloadedFiles = new ArrayList<>();
+        for (MegaNode node : listNodes) {
+            String path = node.isFolder() ? null
+                    : getLocalFile(context, node.getName(), node.getSize());
+            if (isTextEmpty(path)) {
+                return false;
+            } else {
+                downloadedFiles.add(new File(path));
+            }
+        }
+
+        logDebug("All nodes are downloaded, so share the files");
+        shareFiles(context, downloadedFiles);
+        return true;
+    }
+
+    /**
+     * Method to get the link to the exported nodes.
+     *
+     * @param listNodes The list of nodes to be checked.
+     * @return The link with all exported nodes
+     */
+    public static StringBuilder getExportNodesLink(ArrayList<MegaNode> listNodes) {
+        StringBuilder links = new StringBuilder();
+        for (MegaNode node : listNodes) {
+            if (node.isExported()) {
+                links.append(node.getPublicLink())
+                        .append("\n\n");
+            }
+        }
+        return links;
+    }
+
+    public static void shareNodes(Context context, List<MegaNode> nodes){
+        shareNodes(context, new ArrayList<>(nodes));
     }
 
     /**
@@ -281,46 +326,31 @@ public class MegaNodeUtil {
      * @param context the context where nodes are shared
      * @param nodes nodes to share
      */
-    public static void shareNodes(Context context, List<MegaNode> nodes) {
+    public static void shareNodes(Context context, ArrayList<MegaNode> nodes) {
         if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
             return;
         }
-        List<File> downloadedFiles = new ArrayList<>();
-        boolean allDownloadedFiles = true;
-        for (MegaNode node : nodes) {
-            String path = node.isFolder() ? null
-                : getLocalFile(context, node.getName(), node.getSize());
-            if (isTextEmpty(path)) {
-                allDownloadedFiles = false;
-                break;
-            } else {
-                downloadedFiles.add(new File(path));
-            }
-        }
-        if (allDownloadedFiles) {
-            shareFiles(context, downloadedFiles);
+
+        if(areAllNodesDownloaded(context, nodes)){
             return;
         }
 
         int notExportedNodes = 0;
-        StringBuilder links = new StringBuilder();
+        StringBuilder links = getExportNodesLink(nodes);
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
                 notExportedNodes++;
-            } else {
-                links.append(node.getPublicLink())
-                    .append("\n\n");
             }
         }
         if (notExportedNodes == 0) {
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
-                links.toString());
+                    links.toString());
             return;
         }
 
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
-            new Intent(android.content.Intent.ACTION_SEND));
+        ExportListener exportListener = new ExportListener(context, ACTION_SHARE_NODE, notExportedNodes, links,
+                new Intent(android.content.Intent.ACTION_SEND));
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
                 megaApi.exportNode(node, exportListener);
@@ -359,7 +389,7 @@ public class MegaNodeUtil {
      * @param node      node involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
+    public static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
         String error = "Error " + message + ". ";
 
         if (node == null) {
@@ -382,7 +412,7 @@ public class MegaNodeUtil {
      * @param nodes      nodes involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private static boolean shouldContinueWithoutError(Context context, String message,
+    public static boolean shouldContinueWithoutError(Context context, String message,
         List<MegaNode> nodes) {
         String error = "Error " + message + ". ";
 
@@ -700,7 +730,7 @@ public class MegaNodeUtil {
         boolean onlyOneIncomingShare = n != null && handleList == null;
         int numIncomingShares = onlyOneIncomingShare ? 1 : handleList.size();
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setMessage(context.getResources().getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares))
                 .setPositiveButton(R.string.general_leave, (dialog, which) -> {
                     if (onlyOneIncomingShare) {
@@ -794,19 +824,19 @@ public class MegaNodeUtil {
     public static int getNodeLabelColor(int nodeLabel) {
         switch (nodeLabel) {
             case MegaNode.NODE_LBL_RED:
-                return R.color.label_red;
+                return R.color.salmon_400_salmon_300;
             case MegaNode.NODE_LBL_ORANGE:
-                return R.color.label_orange;
+                return R.color.orange_400_orange_300;
             case MegaNode.NODE_LBL_YELLOW:
-                return R.color.label_yellow;
+                return R.color.yellow_600_yellow_300;
             case MegaNode.NODE_LBL_GREEN:
-                return R.color.label_green;
+                return R.color.green_400_green_300;
             case MegaNode.NODE_LBL_BLUE:
-                return R.color.label_blue;
+                return R.color.blue_300_blue_200;
             case MegaNode.NODE_LBL_PURPLE:
-                return R.color.label_purple;
+                return R.color.purple_300_purple_200;
             default:
-                return R.color.label_grey;
+                return R.color.grey_300;
         }
     }
 

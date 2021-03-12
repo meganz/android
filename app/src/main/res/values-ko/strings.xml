@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 휴대 기기를 위한 전용 앱과 함께 이용자 제어 암호화 클라우드 저장소와 대화를 표준 웹 브라우저를 통해 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 당신의 클라이언트 기기에서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로그하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제하세요. 당신의 지인들과 폴더를 공유하고 그들의 변경 사항을 실시간으로 보세요. 암호화 과정은 당신의 비밀번호를 재설정하거나 접근할 수 없다는 것을 의미하며 당신은 반드시 비밀번호를 기억해야하며 (복구 키를 백업하지 않았다면) 그렇지 않았다면 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 암호화 MEGA 영상 대화는 완전한 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 우리의 모바일 앱으로도 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 그들의 MEGA 클라우드 드라이브로부터 파일을 대화에 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전과제와 함께 가입한 모든 이용자에게 50 GB의 넉넉한 무료 용량을 제공하며, 훨씬 높은 한도의 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장  공간과 월 8 TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭한 후, Google ID로 로그인(만약 하지 않았다면)한 후 MEGA 앱을 클릭하세요. 그곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 당신의 사진을 MEGA에 업로드합니다\n연락처 읽기 -> 당신의 기기의 연락처를 쉽게 MEGA 연락처로 추가합니다\n오디오 녹음과 영상 출력 캡처 (마이크와 카메라) -> MEGA는 종단간 암호화 음성/영상 통화를 제공합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰 향상을 위해, 모든 클라이언트측 코드는 공개되며, 흥미있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android\n\n자세한 정보는, 우리의 웹사이트를 확인하세요: \nhttps://mega.nz/terms를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 뷰어</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">개째 진행중. 전체:</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">로그아웃</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">업로드</string>
     <string name="action_create_folder" context="Menu item">새 폴더 생성</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">링크 열기</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">링크 열기</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">설정</string>
     <string name="action_search" context="Search button">검색</string>
     <string name="action_search_country" context="Select country page title">국가를 선택하세요</string>
-    <string name="action_play" context="Search button">재생</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">재생</string>
     <string name="action_pause" context="Search button">일시정지</string>
     <string name="action_refresh" context="Menu item">새로 고침</string>
     <string name="action_sort_by" context="Menu item">정렬 기준</string>
@@ -129,8 +131,8 @@
     </plurals>
 
     <plurals name="general_num_shared_with">
-        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
-        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">%1$s님과 공유됨</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">%1$d개의 연락처와 공유됨</item>
     </plurals>
 
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s(이)가 다운로드 됩니다.</string>
@@ -141,8 +143,8 @@
 
     <string name="login_text" context="Login button">로그인</string>
     <string name="email_text" context="email label">이메일</string>
-    <string name="password_text" context="password label">비밀번호</string>
-    <string name="confirm_password_text" context="Hint of the confirmation dialog to get link with password">비밀번호 확인</string>
+    <string name="password_text" context="password label">암호</string>
+    <string name="confirm_password_text" context="Hint of the confirmation dialog to get link with password">암호 확인</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">가나다</string>
     <!--
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
@@ -151,7 +153,7 @@
     <string name="create_account" context="button that allows the user to create an account">계정 생성</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">이메일 주소를 입력하세요</string>
     <string name="error_invalid_email" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">잘못된 이메일 주소</string>
-    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">비밀번호를 입력하세요</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">암호를 입력하세요</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">네트워크 연결 없음</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">다른 위치에서 이 기기를 로그아웃하였습니다.</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">암호화 키 계산중</string>
@@ -189,8 +191,8 @@
     <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">비밀번호를 잊는 것에 대한 위험성을 이해하였다는데에 동의해야합니다</string>
     <string name="error_enter_username" context="Warning message when the first name is a required field to submit a form. For example during the create account process.">이름을 입력하세요</string>
     <string name="error_enter_userlastname" context="Warning dialog">이름을 입력하세요.</string>
-    <string name="error_short_password" context="when creating the account">비밀번호가 너무 짧습니다</string>
-    <string name="error_passwords_dont_match" context="when creating the account">비밀번호가 일치하지 않습니다</string>
+    <string name="error_short_password" context="when creating the account">암호가 너무 짧습니다</string>
+    <string name="error_passwords_dont_match" context="when creating the account">암호가 일치하지 않습니다</string>
     <string name="error_email_registered" contect="when creating the account">이 이메일 주소는 이미 MEGA에 가입되어 있습니다.</string>
 
     <!--
@@ -205,11 +207,11 @@
     -->
     <string name="cancel_transfer_confirmation">이 전송을 취소할까요?</string>
     <string name="cancel_all_transfer_confirmation">모든 전송을 취소할까요?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">모두 취소</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">모두 취소</string>
 
     <plurals name="cancel_selected_transfers">
-        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">The selected transfer will be cancelled.</item>
-        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">The selected transfers will be cancelled.</item>
+        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">선택된 전송이 취소됩니다.</item>
+        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">선택된 전송이 취소됩니다.</item>
     </plurals>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
@@ -218,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -227,8 +230,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">연락처</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">연락처 [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[A]발신된 요청[/A] [B]없음[/B][B].[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[A]수신된 요청[/A] [B]없음[/B][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[A]발송된 요청[/A][B] 없음[/B]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[A]수신된 요청[/A][B] 없음[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">내 계정</string>
@@ -266,7 +269,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">크기</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">마지막으로 수정한 날짜</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">추가됨</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">추가됨</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -283,7 +286,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
     <string name="contact_decline" context="option to decline a contact invitation">거절</string>
     <string name="contact_accept" context="option to accept a contact invitation">수락</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">연락처 정보</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">연락처 정보</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -343,7 +346,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">전송 보기</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
-    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There are no apps available on your device to open this location</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">이 위치를 열 수 있는 앱이 기기에 없습니다</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
@@ -362,7 +365,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">이 링크들은 더 이상 공개적으로 이용할 수 없습니다.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">이름 바꾸기</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">링크 열기</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">링크 열기</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">열기</string>
     <string name="context_renaming" context="while renaming a file or folder">이름을 바꾸는중</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">파일 준비중</string>
@@ -586,7 +589,7 @@
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     -->
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">사용된 공간</string>
-    <string name="my_account_change_password" context="menu item">비밀번호 변경</string>
+    <string name="my_account_change_password" context="menu item">암호 변경</string>
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
@@ -598,10 +601,10 @@
     <string name="my_account_last_session" context="when did the last session happen">최근 세션</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">연결</string>
 
-    <string name="my_account_changing_password" context="message displayed while the app is changing the password">비밀번호 변경중</string>
-    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">현재 비밀번호</string>
-    <string name="my_account_change_password_newPassword1" context="when changing the password">새 비밀번호</string>
-    <string name="my_account_change_password_newPassword2" context="when changing the password">새 비밀번호 확인</string>
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">암호 변경중</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">현재 암호</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">새 암호</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">새 암호 확인</string>
     <!--
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again</string>
     -->
@@ -611,7 +614,7 @@
     <!--
     <string name="my_account_change_password_OK" context="Success text">Password changed successfully</string>
     -->
-    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">비밀번호가 일치하지 않습니다</string>
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">암호가 일치하지 않습니다</string>
 
     <!--
     <string name="upgrade_activity" context="title of the Upgrade screen">PRO Membership</string>
@@ -718,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">전화번호가 성공적으로 인증되었습니다</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</string>
@@ -786,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">개인정보 보호정책</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
@@ -901,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">무료 계정</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite 계정</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro Lite 계정</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 계정</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 계정</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 계정</string>
@@ -909,7 +912,7 @@
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Pro Lite 계정</string>
 
     <string name="backup_title" context="">복구 키를 백업하세요</string>
-    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">당신의 비밀번호는 복구 키로 잠금 해제됩니다</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">당신의 암호는 복구 키로 잠금 해제됩니다</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">당신의 데이터는 우리가 암호화하여 저장한 당신의 비밀번호로 만든, 마스터 암호화 키로 시작하는 해독 작업의 연속을 통해서만 읽을 수 있습니다. 이것은 당신이 비밀번호를 잊으면, 마스터 키가 해독될 수 없으며, 당신의 데이터를 해독할 수 없다는 것을 의미합니다.</string>
     <string name="backup_second_paragraph" context="Summary of the preference Recovery key on Settings section">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 비밀번호를 설정할 수 있도록 해줍니다.</string>
@@ -924,8 +927,8 @@
     <string name="general_positive_button" context="Positive button to perform a general action">예</string>
     <string name="general_negative_button" context="Negative button to perform a general action">아니오</string>
 
-    <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">비밀번호를 잊었나요?</string>
-    <string name="forgot_pass" context="Button in the Login screen to reset the password">비밀번호를 잊으셨나요?</string>
+    <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">암호를 잊었나요?</string>
+    <string name="forgot_pass" context="Button in the Login screen to reset the password">암호를 잊으셨나요?</string>
     <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">복구 키의 백업을 가지고 있다면, 예를 눌러서 비밀번호를 재설정할 수 있습니다. 데이터가 손실되지 않습니다.</string>
     <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">이 컴퓨터의 다른 브라우저 또는 다른 컴퓨터에 활성화된 MEGA 세션이 있다면 복구 키를 내보낼 수 있습니다. 만약 없다면, 당신은 더 이상 기존 계정을 해독할 수 없습니다, 그러나 아니오를 선택하여 같은 이메일 주소에 새 계정을 시작할 수 있습니다.</string>
     <!--
@@ -940,8 +943,8 @@
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">당신의 복구 키를 여기에 입력하세요</string>
 
-    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">여기에 비밀번호 입력</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">계정을 취소하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
+    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">여기에 암호 입력</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">이메일 인증</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">진행하려면 이메일을 확인하세요.</string>
@@ -960,10 +963,10 @@
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
     -->
 
-    <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">비밀번호 재설정</string>
+    <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">암호 재설정</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">복구 키를 아래에 입력하세요</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">비밀번호 변경됨!</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">암호가 변경되었습니다.</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">계정 보류</string>
     <string name="park_account_button" context="Button to park an account">보류</string>
@@ -974,11 +977,11 @@
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">아래에 이메일 주소를 입력하세요. 계정을 보류할 수 있는 복구 링크를 받게 됩니다.</string>
     <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">이것은 당신의 계정을 보류하는 마지막 단계입니다, 당신의 새 비밀번호를 입력하세요. 당신의 데이터는 최소 60일간 저장됩니다. 만약 보류된 계정의 비밀번호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
 
-    <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">새 비밀번호를 입력하세요</string>
+    <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">새 암호를 입력하세요</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">이 복구 링크는 만료된 것으로 보입니다. 다시 시도하세요.</string>
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">복구 키는 비밀번호를 재설정하는데에 사용됩니다. 새 비밀번호를 입력하세요.</string>
-    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">비밀번호를 재설정할 수 있는 복구 링크를 받게 됩니다.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">암호를 재설정할 수 있는 복구 링크를 받게 됩니다.</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">업그레이드</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">지금 업그레이드</string>
@@ -1022,16 +1025,16 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user’s account">수정</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">만료일 설정</string>
-    <string name="title_set_password_protection" context="Title of the dialog to get link with password">비밀번호 보호 설정</string>
+    <string name="title_set_password_protection" context="Title of the dialog to get link with password">암호 보호 설정</string>
     <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(PRO 전용)</string>
-    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">비밀번호 설정</string>
-    <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">비밀번호 입력</string>
-    <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">비밀번호 확인</string>
+    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">암호 설정</string>
+    <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">암호 입력</string>
+    <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">암호 확인</string>
     <string name="link_request_status" context="Status text at the beginning of getting a link">처리중&#8230;</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">링크 관리</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password">입력하신 현재 비밀번호가 맞지 않습니다.</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password">입력하신 현재 암호가 맞지 않습니다.</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d개의 재초대 요청이 발송됨</string>
 
@@ -1045,8 +1048,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d개의 요청 응답이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
 
     <plurals name="general_num_request">
-        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">요청</item>
-        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">요청</item>
+        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">1개의 요청</item>
+        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">%1$d개의 요청</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1054,7 +1057,7 @@
         <item context="Confirmation before removing the outgoing shares of a folder" quantity="other">폴더가 %1$d개의 연락처와 공유되어 있습니다. 모든 공유를 제거할까요?</item>
     </plurals>
 
-    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">잘못된 이메일/비밀번호. 다시 시도하세요.</string>
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">잘못된 이메일 또는 암호. 다시 시도하세요.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.co.nz로 연락주세요.</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">이 계정은 아직 확인되지 않았습니다. 이메일을 확인하세요.</string>
@@ -1071,8 +1074,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">당신의 이메일을 확인하고 계정 확인을 위한 링크를 클릭하세요.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. 1 item" quantity="one">항목</item>
-        <item context="Plural of items which contains a folder. 2 items" quantity="other">항목</item>
+        <item context="Singular of items which contains a folder. 1 item" quantity="one">1개의 항목</item>
+        <item context="Plural of items which contains a folder. 2 items" quantity="other">%1$d개의 항목</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">관련된 이용자 계정이 여러 번의 이용 약관 위반으로 제거되었습니다.</string>
@@ -1126,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">전화에서 연락처를 불러오는 중&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d개의 요청이 이미 발송되었습니다.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d개의 초대 요청이 성공적으로 발송되었습니다.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
 
@@ -1146,12 +1150,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">내가 다시 켤 때까지</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">%s 동안 대화 알림을 끕니다</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">%1$s까지 대화 알림을 끕니다</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">%1$s %2$s까지 대화 알림을 끕니다</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">%1$s까지 대화 알림을 끕니다</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">%1$s까지 대화 알림을 끕니다</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">%2$s %1$s까지 대화 알림을 끕니다</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">%2$s %1$s까지 대화 알림을 끕니다</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">대화 알림이 꺼져있습니다</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">대화 알림 활성화됨</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">%1$s까지 조용히</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">%1$s까지 알림 끔</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">%1$s까지 알림 끔</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">알림</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">메시지 소리</string>
@@ -1160,8 +1173,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">전화 벨소리</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">알림음</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">지운 이후에는 %s님이나 당신 모두 이 대화의 메시지를 볼 수 없습니다.</string>
 
     <string name="general_clear" context="Button to clear the chat history">비우기</string>
     <!--
@@ -1224,10 +1235,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">떠나면 더 이상 메시지를 읽거나 전송할 수 없습니다.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">단체 대화를 떠날까요?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">이 대화 안의 모든 메시지와 미디어가 삭제됩니다.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">기록을 삭제할까요?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">참가자가 이미 이 그룹 대화에 존재합니다.</string>
 
@@ -1414,7 +1421,7 @@
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">전송을 재개 할까요?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">재개</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">완료된 전송을 지울까요?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">모든 전송을 지울까요?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">진행중</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">완료</string>
@@ -1591,8 +1598,8 @@
     <string name="attachment_upload_panel_contact">연락처</string>
     <string name="attachment_upload_panel_photo">장치에서</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">계정 취소</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">계정을 취소하면 계정 데이터, MEGA 연락처 또는 대화에 더 이상 접근할 수 없게 됩니다.\n이 행동은 되돌릴 수 없습니다.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">계정 삭제</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">계정을 삭제하면 계정 데이터, MEGA 연락처 또는 대화에 더 이상 접근할 수 없게 됩니다.\n이 행동은 되돌릴 수 없습니다.</string>
     <string name="delete_button" context="menu item">삭제</string>
 
     <string name="file_properties_info_info_file">정보</string>
@@ -1625,14 +1632,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">자동 업로드 설정</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">조용히</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">조용히</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">메시지</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">폴더가 공유됨, 공유자:</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">새 공유 폴더</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">대화 기록 삭제</string>
 
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">대화 기록 삭제</string>
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">연락처 삭제</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">대화 알림</string>
@@ -1721,8 +1728,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">새 파일</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">파일 이름</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">링크 이름</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">링크 URL</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">링크 이름</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">링크 URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">제목</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">내용</string>
@@ -1736,10 +1743,10 @@
 
     <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">더 이상의 연락처가 추가될 수 없습니다.</string>
 
-    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">새 비밀번호는 기존 비밀번호와 동일할 수 없습니다.</string>
+    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">새 암호는 기존 암호와 동일할 수 없습니다.</string>
 
     <string name="action_search_by_date" context="Menu item">날짜로 찾기</string>
-    <string name="general_apply" context="title of a button to apply search by date">적용</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">적용</string>
     <string name="general_search_month" context="title of a button to apply search by month">지난 달</string>
     <string name="general_search_year" context="title of a button to apply search by year">지난 해</string>
 
@@ -1794,7 +1801,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">오류로 인해 QR 코드가 초기화되지 않았습니다. 다시 시도하세요.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">오류로 인해 QR 코드가 삭제되지 않았습니다. 다시 시도하세요.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">초대를 발송하였습니다</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">이용자 %s님이 초대되었고 승락하면 당신의 연락처 목록에 나타날 것입니다.</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">이용자가 초대되었으며 수락되면 당신의 연락처 목록에 나타날 것입니다.</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">이용자들이 초대되었으며 수락되면 당신의 연락처 목록에 나타날 것입니다.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">QR 파일을 공유하던 중 오류가 발생하였습니다. 파일이 존재하지 않을 수도 있습니다. 다시 시도하세요.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">QR 파일을 업로드하던 중 오류가 발생하였습니다. 파일이 존재하지 않을 수도 있습니다. 다시 시도하세요.</string>
@@ -1823,19 +1830,19 @@
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[A]대화[/A]에 [B]친구들을 초대하여[/B] [B]보안과 프라이버시를 갖춘 우리의 암호화된 플랫폼을 즐기세요[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]카메라 업로드에[/A] [B]미디어가 없습니다[/B][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]휴지통[/A] [B]비우기[/B][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]카메라 업로드에[/A] [B]미디어가 없음[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]휴지통[/A] [B]비우기[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]수신함[/A][B]에 파일이 없음[/B][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]오프라인[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]수신함[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]오프라인용으로 저장[/A][B]에 파일 없음[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[A]연락처[/A] [B]없음[/B]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[B]대화[/B] [A]없음[/A]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[B]대화[/B] [A]불러오는 중&#8230;[/A]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]공개 링크[/A][B] 없음[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">보낸 요청</string>
@@ -1843,7 +1850,7 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">할당량 초과</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">잘못된 링크, 새 유효한 링크를 요청하세요</string>
-    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">잘못된 링크 비밀번호</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">잘못된 링크 암호</string>
 
     <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">열려고 하는 링크는 유효한 MEGA 링크가 아닙니다.</string>
 
@@ -1908,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">대화 업로드중</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 동영상 품질</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">동영상 품질</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">동영상 품질</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -1954,14 +1961,14 @@
 
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">대화</string>
 
-    <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">비밀번호가 기억났나요?</string>
+    <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">암호가 기억났나요?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">다시 보여주지 마세요</string>
-    <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">비밀번호 시험</string>
-    <string name="test_pwd_title" context="Title of the activity that permits user test his password">비밀번호를 시험하세요</string>
-    <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">비밀번호 확인됨</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">잘못된 비밀번호.\n최대한 빨리 복구 키를 백업하세요!</string>
+    <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">암호 시험</string>
+    <string name="test_pwd_title" context="Title of the activity that permits user test his password">암호를 시험하세요</string>
+    <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">암호 확인됨</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">잘못된 암호입니다.\n최대한 빨리 복구 키를 백업하세요!</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">클립보드로 복사됨</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">복구 키 내보내기</string>
@@ -2030,11 +2037,10 @@
 
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">해독 키를 입력하려면 탭하세요</string>
 
-    <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">더 강력한 비밀번호를 입력하세요</string>
+    <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">더 강력한 암호를 입력하세요</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">새 연락처</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">저장소 이용량</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d개의 대기중인 연락처 요청</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d개의 대기중인 연락처 요청</item>
@@ -2043,9 +2049,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]활성화된[/B] [A]전송[/A] [B]없음.[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]완료된[/B] [A]전송[/A] [B]없음.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]활성화된 [A]전송[/A] 없음[/B]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]완료된 [A]전송[/A] 없음[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">%s에게 메시지 쓰는 중&#8230;</string>
@@ -2067,7 +2073,7 @@
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">잘못된 코드</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">인증기 장치를 잃어버렸나요?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">로그인 인증</string>
-    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">2단계 인증\n비밀번호 변경</string>
+    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">2단계 인증\n암호 변경</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">2단계 인증\n계정 취소</string>
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">2단계 인증\n계정 변경</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">2단계 인증 비활성화</string>
@@ -2195,7 +2201,7 @@
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">로그아웃됨</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">당신의 계정은 활성화되었습니다. 로그인 하세요.</string>
-    <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">계정을 확인하려면 비밀번호를 입력하세요</string>
+    <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">계정을 확인하려면 암호를 입력하세요</string>
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">당신의 이메일을 추가할 필요는 없습니다</string>
 
@@ -2266,14 +2272,14 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, PRO 요금제를 구독하여야 합니다.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">일</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">일</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">대화 링크 얻기</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">암호화 키 순환 활성화</string>
     <string name="private_chat" context="Title of the view to inform that a chat is private">암호화된 키 순환 활성화</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">키 순환은 100명 이상의 참여자가 있는 대화에서는 해제됩니다.</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">암호화 키 순환은 100명 이상의 참여자가 있는 대화에서는 해제됩니다.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">참여자 수가 제한을 초과하였기 때문이 이 대화를 비밀 대화로 전환할 수 없습니다.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
@@ -2305,9 +2311,9 @@
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">잘못된 대화 링크</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">암호화 키 순환</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
     <string name="action_open_chat_link" context="Menu item">대화 링크 열기</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">연락처 %s에 대한 초대장이 이전에 발송되었으며, 발송된 요청 탭에서 찾아볼 수 있습니다.</string>
@@ -2386,13 +2392,13 @@
     <string name="button_continue" context="dialog option continue in alert dialog">계속</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (구독)</string>
-    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (구독)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]신용카드[/A] (구독)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 고객지원에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 우리의 고객지원 팀에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">파일명</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">최근 접속 시간 보기&#8230;</string>
@@ -2407,8 +2413,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">동영상 압축중 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">잘못된 폴더 선택됨</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 folder. 1 file</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 folder. %1$d files</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더 · 1개의 파일</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1개의 폴더 · %1$d개의 파일</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d개의 파일</item>
@@ -2421,8 +2427,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d folders. 1 file</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d folders. %2$d files</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d개의 폴더 · 1개의 파일</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d개의 폴더 · %2$d개의 파일</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s님이[/A][B] %2$s와/과 %3$s을/를 추가하였습니다[/B]</string>
@@ -2461,7 +2467,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL 키 오류</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA가 SSL을 통하여 안전하게 연결할 수 없습니다. 추가적인 요구사항이 있는 공개 와이파이에 접속했을 수 있습니다.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A][B] 없음[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">MEGA 설정</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA가 당신이 친구와 사진, 미디어와 파일을 공유하고, 암호화된 메시지를 교환하며 안전한 통화를 할 수 있도록 접근 권한이 필요합니다.</string>
@@ -2504,7 +2510,7 @@
     <string name="label_yesterday" context="label yesterday">어제</string>
     <string name="label_tomorrow" context="label tomorrow">내일</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A][B] 없음[/B]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s님이 통화에 참여하셨습니다</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s님이 통화에서 떠났습니다</string>
@@ -2588,8 +2594,8 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d개의 버전이 삭제되지 않았습니다</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d개의 버전이 삭제되지 않았습니다</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%d개의 버전이 삭제되지 않았습니다</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%d개의 버전이 삭제되지 않았습니다</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">MEGA 연락처가 없습니다. 연락처 부문에서 친구들을 초대하세요.</string>
@@ -2604,10 +2610,10 @@
     <string name="title_tour_four" cotext="Title of fourth tour screen">클라우드 속 당신의 사진</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 계정을 만드세요.</string>
 
-    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">비밀번호를 입력하세요</string>
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">암호를 입력하세요</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s은/는 비밀번호로 보호된 PDF 문서입니다. PDF를 열려면 비밀번호를 입력하세요.</string>
-    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">잘못된 비밀번호입니다, 다시 시도하세요.</string>
-    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">입력한 비밀번호가 올바르지 않습니다.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">잘못된 암호입니다, 다시 시도하세요.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">입력한 암호가 올바르지 않습니다.</string>
 
     <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">파일을 열 수 없었습니다. 알려지지 않은 파일 유형이거나 파일을 성공적으로 압축 해제할 수 없었습니다.</string>
 
@@ -2623,7 +2629,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">암호화 키 순환은 새 단체 대화를 만드는 것 없이 대화 링크를 만드는 것을 허용하지 않습니다.</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">새 단체 대화를 만들고 대화 링크를 생성할까요?</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">성공적으로 대화에 참여하였습니다.</string>
 
@@ -2700,7 +2706,7 @@
     <string name="recents_label" context="Label to reference a recents section">최근</string>
     <string name="chats_label" context="Label to reference a chats section">대화</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]최근 항목[/A][B]에 출력할 파일 활동이 없습니다[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]최근 항목[/A][B]에 파일이 없습니다[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s 그리고 %2$d개 더</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">이미지 %d개</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">동영상 %d개</string>
@@ -2831,7 +2837,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]데이터를 지키려면 즉시 조치하세요.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1일</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1일</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d일</item>
     </plurals>
 
@@ -2872,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">문서</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">문서</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">문서</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">새 대화</string>
@@ -2884,7 +2890,7 @@
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">GIPHY 검색</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF[/A] 찾지 못함</string>
-    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">No available GIFs. Please try again later</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">이용 가능한 GIF가 없습니다. 나중에 다시 시도하세요</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">결과의 [A]끝[/A]</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">전송을 재개할까요?</string>
@@ -2899,32 +2905,83 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">당신은 최대 반응 한도 %d개에 도달하였습니다.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">이 메시지는 최대 반응 한도 %d개에 도달하였습니다.</string>
 
-    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]님이 메시지 삭제 시간을[/B][A] %2$s[/A][B]로 변경하였습니다.[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">대화 기록 삭제</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]님이 메시지 삭제를 해제하였습니다.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">이 대화 내의 모든 메시지와 공유된 파일을 삭제합니다. 이 행동은 되돌릴 수 없습니다.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">기록 삭제</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">특정 시간보다 오래된 메시지는 자동으로 삭제합니다.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">해제됨</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">1일</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">1주</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">1개월</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">사용자 지정</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">대화 기록 관리</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">다음보다 오래된 메시지를 자동 삭제:</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">이 대화의 모든 메시지 기록을 삭제할까요?</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">The priority change of the transfer ’%1$s’ failed.</string>
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1년</string>
 
-    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
-    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
-    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
-    <string name="key_label" context="Label key referring to a link decryption key">Key</string>
-    <string name="button_share_key" context="Button which action is share the decryption key of a link">Share key</string>
-    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copy key</string>
-    <string name="button_copy_password" context="Button which action is copy the password of a link">Copy password</string>
-    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Link copied to the clipboard.</string>
-    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">Key copied to the clipboard.</string>
-    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Password copied to the clipboard.</string>
-    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Link successfully sent.</string>
-    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and key successfully sent.</string>
-    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and password successfully sent.</string>
-    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
-    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
-    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
-    <string name="reset_password_label" context="Reset password label">Reset password</string>
-    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Share the key for this link?</string>
-    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Share the password for this link?</string>
-    <string name="button_share_password" context="Button which action is share the password of a link">Share password</string>
-    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nKey: %2$s</string>
-    <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Link: %1$s\n\nPassword: %2$s</string>
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">시간</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">시간</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">일</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">일</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">주</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">주</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">월</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">개월</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1시간</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d시간</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1주</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d주</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1개월</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d개월</item>
+    </plurals>
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">전송 선택</string>
+
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">전송 ‘%1$s\'의 우선 순위 변경을 실패하였습니다.</string>
+
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">해독 키 따로 보내기</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">링크와 해독 키를 따로 내보내기</string>
+    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">더 알아보기</string>
+    <string name="key_label" context="Label key referring to a link decryption key">키</string>
+    <string name="button_share_key" context="Button which action is share the decryption key of a link">키 공유</string>
+    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">키 복사</string>
+    <string name="button_copy_password" context="Button which action is copy the password of a link">암호 복사</string>
+    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">클립보드에 링크를 복사하였습니다.</string>
+    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">클립보드에 키를 복사하였습니다.</string>
+    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">클립보드에 암호를 복사하였습니다.</string>
+    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">링크를 성공적으로 보냈습니다.</string>
+    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">링크와 키를 성공적으로 보냈습니다.</string>
+    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">링크와 암호를 성공적으로 보냈습니다.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Pro로 업그레이드</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro 이용자는 계정을 더욱 안전하게 만드는 추가적인 링크 보안 기능에 대한 독점적 접근이 가능합니다.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">우리의 종단간 암호화 시스템은 이 파일을 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키가 있는 링크는 자동으로 생성되지만, 추가적인 보안을 위해 해독 키를 따로 내보낼 수 있습니다.</string>
+    <string name="reset_password_label" context="Reset password label">암호 재설정</string>
+    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">이 링크의 키를 공유할까요?</string>
+    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">이 링크의 암호를 공유할까요?</string>
+    <string name="button_share_password" context="Button which action is share the password of a link">암호 공유</string>
+    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">링크: %1$s\n\n키: %2$s</string>
+    <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">링크: %1$s\n\n암호: %2$s</string>
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">파일을 공유하려면 권한 허용이 필요합니다.</string>
 
@@ -2942,26 +2999,28 @@
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">회색</string>
 
     <string name="action_more_information" context="Action to get more information">자세한 정보</string>
-    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
-    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
-    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
-    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
-    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
-    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
-    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
-    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
-    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
-    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
-    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
-    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">쿠키 정책</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">쿠키 설정</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">진행하기 전에</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키\')를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">제3자 쿠키</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">구글 광고 쿠키</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">분류: 광고 쿠키</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">이러한 이유로 Google에 의해 사용됨:\n• 당신의 위치와 당신이 이전에 방문했던 웹사이트와 같은 것들을 기반으로 우리와 다른 서비스와 웹사이트에 Google이 광고를 개인화하여 보여줍니다\n• 특정 광고를 당신이 얼마나 자주 봤는지 모니터합니다;\n• 사기 방지를 제공합니다; 그리고\n• 당신이 언제 특정한 광고를 클릭하고 그 광고에 대해 어떤 행동을 취하였는지 식별합니다.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">쿠키 허용</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">필수 쿠키</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">중요한 기능과 우리 서비스에 대한 안전한 접근을 제공하기 위해 필수적입니다. 이러한 이유로, 동의가 필요하지 않습니다.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">선호 쿠키</string>
     <string name="preference_cookies_preference_summary" context="Preference screen item summary">당신이 선택한 어떠한 표기나 형식 설정을 기억하도록 허용합니다. 이 쿠키를 허용하지 않으면 당신이 선호하는 화면 배치 등을 저장할 수 없습니다.</string>
     <string name="preference_cookies_performance_title" context="Preference screen item title">성능과 분석 쿠키</string>
     <string name="preference_cookies_performance_summary" context="Preference screen item summary">당신이 우리의 서비스를 어떻게 이용하는지 이해하도록 돕고 우리가 향상시킬 수 있도록 데이터를 제공해주세요. 이 쿠키를 허용하지 않는다면 설계를 향상시킬 수 있는 데이터가 우리에게 덜 제공됩니다.</string>
     <string name="preference_cookies_advertising_title" context="Preference screen item title">광고 쿠키</string>
     <string name="preference_cookies_advertising_summary" context="Preference screen item summary">당신의 브라우징 기록을 우리 또는 우리의 승인된 광고 파트너들이 활용하여 당신이 우리 서비스와 다른 웹사이트에서 보는 광고를 개인화 하도록 합니다. 이 쿠키를 허용하지 않는다면 덜 관련있는 광고를 보게 됩니다.</string>
     <string name="preference_cookies_thirdparty_title" context="Preference screen item title">제3자 쿠키</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것이냐에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보\'를 클릭하세요.</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보\'를 클릭하세요.</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">쿠키 정책</string>
-    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">항상 켬</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">문서 스캔</string>
 </resources>

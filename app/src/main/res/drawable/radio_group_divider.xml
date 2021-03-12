@@ -3,6 +3,6 @@
     android:insetLeft="72dp">
     <shape>
         <size android:height="1dp" />
-        <solid android:color="@color/black_12_alpha" />
+        <solid android:color="@color/grey_012_white_012" />
     </shape>
 </inset>

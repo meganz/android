@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,10 +40,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -63,7 +63,8 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -94,10 +95,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
-    private AlertDialog insertMailDialog;
     private AlertDialog insertMKDialog;
-
-    private LoginFragmentLollipop loginFragment = this;
 
     private TextView loginTitle;
     private TextView newToMega;
@@ -123,20 +121,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private TextView prepareNodesText;
     private TextView serversBusyText;
     private ScrollView scrollView;
-
-    private RelativeLayout forgotPassLayout;
-    private TextView forgotPassTitle;
-    private TextView forgotPassFirstP;
-    private TextView forgotPassSecondP;
-    private TextView forgotPassAction;
-    private Button yesMK;
-    private Button noMK;
-
-    private RelativeLayout parkAccountLayout;
-    private TextView parkAccountTitle;
-    private TextView parkAccountFirstP;
-    private TextView parkAccountSecondP;
-    private Button parkAccountButton;
 
     private ProgressBar loginInProgressPb;
     private TextView loginInProgressInfo;
@@ -180,7 +164,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String emailTemp = null;
     private String passwdTemp = null;
 
-    Toolbar tB;
+    MaterialToolbar tB;
     LinearLayout loginVerificationLayout;
     InputMethodManager imm;
     private EditTextPIN firstPin;
@@ -293,6 +277,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         et_passwordLayout = v.findViewById(R.id.login_password_text_layout);
+        et_passwordLayout.setEndIconVisible(false);
         et_password = v.findViewById(R.id.login_password_text);
         et_passwordError = v.findViewById(R.id.login_password_text_error_icon);
         et_passwordError.setVisibility(View.GONE);
@@ -327,17 +312,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        et_password.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(et_passwordLayout, hasFocus));
+        et_password.setOnFocusChangeListener((v1, hasFocus) ->
+                et_passwordLayout.setEndIconVisible(hasFocus));
 
         bLogin = (Button) v.findViewById(R.id.button_login_login);
-        bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+        bLogin.setText(StringResourcesUtils.getString(R.string.login_text));
         bLogin.setOnClickListener(this);
 
         loginInProgressPb = v.findViewById(R.id.pb_login_in_progress);
         loginInProgressInfo = v.findViewById(R.id.text_login_tip);
 
         bForgotPass = (TextView) v.findViewById(R.id.button_forgot_pass);
-        bForgotPass.setText(getString(R.string.forgot_pass).toUpperCase(Locale.getDefault()));
         bForgotPass.setOnClickListener(this);
 
         loginCreateAccount = (LinearLayout) v.findViewById(R.id.login_create_account_layout);
@@ -347,7 +332,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_login);
 
-        bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
         bRegister.setOnClickListener(this);
 
         loginLogin = (LinearLayout) v.findViewById(R.id.login_login_layout);
@@ -374,64 +358,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         confirmingAccountText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
 
-        forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
-        forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
-        RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
-        forgotPassTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassTitle.setLayoutParams(forgotPassTitleParams);
-
-        forgotPassFirstP = (TextView) v.findViewById(R.id.first_par_forgot_pass_layout);
-        RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
-        firstParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassFirstP.setLayoutParams(firstParParams);
-
-        forgotPassSecondP = (TextView) v.findViewById(R.id.second_par_forgot_pass_layout);
-        RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
-        secondParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassSecondP.setLayoutParams(secondParParams);
-
-        forgotPassAction = (TextView) v.findViewById(R.id.action_forgot_pass_layout);
-        RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
-        actionParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(25, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassAction.setLayoutParams(actionParams);
-
-        yesMK = (Button) v.findViewById(R.id.yes_MK_button);
-        LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
-        yesMKParams.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
-        yesMK.setLayoutParams(yesMKParams);
-        yesMK.setOnClickListener(this);
-        yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-
-        noMK = (Button) v.findViewById(R.id.no_MK_button);
-        LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
-        noMKParams.setMargins(scaleWidthPx(16, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
-        noMK.setLayoutParams(noMKParams);
-        noMK.setOnClickListener(this);
-        noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-
-        parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
-        parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountTitleParams = (RelativeLayout.LayoutParams)parkAccountTitle.getLayoutParams();
-        parkAccountTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountTitle.setLayoutParams(parkAccountTitleParams);
-
-        parkAccountFirstP = (TextView) v.findViewById(R.id.first_par_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountFParams = (RelativeLayout.LayoutParams)parkAccountFirstP.getLayoutParams();
-        parkAccountFParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountFirstP.setLayoutParams(parkAccountFParams);
-
-        parkAccountSecondP = (TextView) v.findViewById(R.id.second_par_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountSParams = (RelativeLayout.LayoutParams)parkAccountSecondP.getLayoutParams();
-        parkAccountSParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountSecondP.setLayoutParams(parkAccountSParams);
-
-        parkAccountButton = (Button) v.findViewById(R.id.park_account_button);
-        RelativeLayout.LayoutParams parkButtonParams = (RelativeLayout.LayoutParams)parkAccountButton.getLayoutParams();
-        parkButtonParams.setMargins(0, scaleHeightPx(25, outMetrics),  scaleWidthPx(24, outMetrics), 0);
-        parkAccountButton.setLayoutParams(parkButtonParams);
-        parkAccountButton.setOnClickListener(this);
-
-        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
+        tB  = v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -1038,7 +965,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLoggingIn.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
         loginCreateAccount.setVisibility(View.VISIBLE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -1094,12 +1020,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     void verifyQuitError(){
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-        secondPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
     }
 
     void verifyShowError(){
@@ -1107,12 +1033,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        firstPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
     }
 
     void permitVerify(){
@@ -1151,9 +1077,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-//					generatingKeysText.setVisibility(View.VISIBLE);
-//					megaApi.fastLogin(gSession, this);
 
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1171,12 +1094,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         gSession = credentials.getSession();
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-//						generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
         loggingInText.setVisibility(View.VISIBLE);
@@ -1240,7 +1161,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1255,10 +1175,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1287,7 +1205,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1303,7 +1220,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         generatingKeysText.setVisibility(View.VISIBLE);
@@ -1336,10 +1252,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             loginLogin.setVisibility(View.GONE);
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             loginCreateAccount.setVisibility(View.GONE);
             loginLoggingIn.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             generatingKeysText.setVisibility(View.VISIBLE);
             loginProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1392,7 +1306,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1462,7 +1375,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void disableLoginButton() {
         logDebug("Disable login button");
         //disbale login button
-        bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
         bLogin.setEnabled(false);
         //display login info
         loginInProgressPb.setVisibility(View.VISIBLE);
@@ -1473,7 +1385,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void enableLoginButton() {
         logDebug("Enable login button");
         bLogin.setEnabled(true);
-        bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
         loginInProgressPb.setVisibility(View.GONE);
         loginInProgressInfo.setVisibility(View.GONE);
     }
@@ -1520,17 +1431,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 logDebug("Click on button_login_login");
                 loginClicked = true;
                 backWhileLogin = false;
+                LoginActivityLollipop.isBackFromLoginPage = false;
                 onLoginClick(v);
                 break;
             }
             case R.id.button_create_account_login:{
                 logDebug("Click on button_create_account_login");
                 onRegisterClick(v);
-                break;
-            }
-            case R.id.park_account_button:{
-                logDebug("Click to park account");
-                showDialogInsertMail(false);
                 break;
             }
             case R.id.button_forgot_pass:{
@@ -1549,17 +1456,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 break;
             }
-            case R.id.yes_MK_button:{
-                logDebug("Click on yes_MK_button");
-                showDialogInsertMail(true);
-                break;
-            }
-            case R.id.no_MK_button:{
-                logDebug("Click on no_MK_button");
-                showParkAccountLayout();
-                break;
-            }
-
             case R.id.login_text_view:
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5){
@@ -1612,45 +1508,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
-
-    public void showForgotPassLayout(){
-        logDebug("showForgotPassLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-    }
-
-    public void hideForgotPassLayout(){
-        logDebug("hideForgotPassLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.VISIBLE);
-        closeCancelDialog();
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
-    }
-
-    public void showParkAccountLayout(){
-        logDebug("showParkAccountLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-    }
-
-    public void hideParkAccountLayout(){
-        logDebug("hideParkAccountLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.VISIBLE);
-        closeCancelDialog();
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
-    }
-
     /*
      * Get email address from confirmation code and set to emailView
      */
@@ -1661,10 +1518,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.VISIBLE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -1681,8 +1536,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
  */
     public void handleConfirmationIntent(Intent intent) {
         confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
-        loginTitle.setText(R.string.login_confirm_account);
-        bLogin.setText(getString(R.string.login_confirm_account).toUpperCase(Locale.getDefault()));
+        loginTitle.setText(StringResourcesUtils.getString(R.string.login_confirm_account));
+        bLogin.setText(StringResourcesUtils.getString(R.string.login_confirm_account));
         updateConfirmEmail(confirmLink);
     }
 
@@ -1759,6 +1614,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         LoginActivityLollipop loginActivityLollipop = ((LoginActivityLollipop) context);
 
         if(confirmLink==null && !accountConfirmed){
+            if (MegaApplication.getChatManagement().isPendingJoinLink()) {
+                LoginActivityLollipop.isBackFromLoginPage = false;
+                MegaApplication.getChatManagement().setPendingJoinLink(null);
+            }
+
             logDebug("confirmLink==null");
 
             logDebug("OK fetch nodes");
@@ -1923,7 +1783,20 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         else{
             logDebug("Go to ChooseAccountFragment");
             accountConfirmed = false;
-            loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+
+            if (MegaApplication.getChatManagement().isPendingJoinLink()) {
+                LoginActivityLollipop.isBackFromLoginPage = false;
+
+                Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                intent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
+                intent.setData(Uri.parse(MegaApplication.getChatManagement().getPendingJoinLink()));
+                startActivity(intent);
+
+                MegaApplication.getChatManagement().setPendingJoinLink(null);
+                loginActivityLollipop.finish();
+            } else {
+                loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+            }
         }
     }
 
@@ -1982,7 +1855,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     is2FAEnabled = true;
                     ((LoginActivityLollipop) context).showAB(tB);
                     loginLogin.setVisibility(View.GONE);
-                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
                     loginCreateAccount.setVisibility(View.GONE);
                     loginLoggingIn.setVisibility(View.GONE);
                     generatingKeysText.setVisibility(View.GONE);
@@ -2051,7 +1923,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop) context).hideAB();
                 }
 
-                scrollView.setBackgroundColor(getResources().getColor(R.color.white));
                 loginLogin.setVisibility(View.GONE);
                 loginLoggingIn.setVisibility(View.VISIBLE);
                 loginProgressBar.setVisibility(View.VISIBLE);
@@ -2138,7 +2009,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 closeCancelDialog();
-                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.GONE);
@@ -2178,7 +2048,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             bForgotPass.setVisibility(View.INVISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             loginLoggingIn.setVisibility(View.GONE);
@@ -2195,8 +2064,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     bForgotPass.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.GONE);
 
-                    loginTitle.setText(R.string.login_to_mega);
-                    bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+                    loginTitle.setText(StringResourcesUtils.getString(R.string.login_to_mega));
+                    bLogin.setText(StringResourcesUtils.getString(R.string.login_text));
                     confirmLink = null;
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.account_confirmed));
                     accountConfirmed = true;
@@ -2228,7 +2097,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 loginLogin.setVisibility(View.VISIBLE);
                 closeCancelDialog();
-                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 loginLoggingIn.setVisibility(View.GONE);
                 generatingKeysText.setVisibility(View.GONE);
@@ -2347,188 +2215,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
-    public void showDialogInsertMail(final boolean reset){
-        logDebug("reset: " + reset);
-
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-        final EditText input = new EditText(context);
-        layout.addView(input, params);
-
-        final RelativeLayout error_layout = new RelativeLayout(context);
-        layout.addView(error_layout, params1);
-
-        final ImageView error_icon = new ImageView(context);
-        error_icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_input_warning));
-        error_layout.addView(error_icon);
-        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        error_icon.setLayoutParams(params_icon);
-
-        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.login_warning));
-
-        final TextView textError = new TextView(context);
-        error_layout.addView(textError);
-        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-        textError.setLayoutParams(params_text_error);
-
-        textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-
-        error_layout.setVisibility(View.GONE);
-
-//		input.setId(EDIT_TEXT_ID);
-        input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(error_layout.getVisibility() == View.VISIBLE){
-                    error_layout.setVisibility(View.GONE);
-                    input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-                }
-            }
-        });
-        input.setSingleLine();
-        input.setHint(getString(R.string.edit_text_insert_mail));
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-//		input.setSelectAllOnFocus(true);
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-                logDebug("OK RESET PASSWORD");
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    String value = input.getText().toString().trim();
-                    String emailError = Util.getEmailError(value, context);
-                    if (emailError != null) {
-                        logWarning("Mail incorrect");
-//                        input.setError(emailError);
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(emailError);
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-                    } else {
-                        if(reset){
-                            logDebug("Ask for link to reset pass");
-                            megaApi.resetPassword(value, true, loginFragment);
-                        }
-                        else{
-                            logDebug("Ask for link to park account");
-                            megaApi.resetPassword(value, false, loginFragment);
-                        }
-                        insertMailDialog.dismiss();
-                    }
-                }
-                else{
-                    logDebug("Other IME" + actionId);
-                }
-                return false;
-            }
-        });
-        input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showKeyboardDelayed(v);
-                }
-                else{
-                    hideKeyboardDelayed(v);
-                }
-            }
-        });
-        String title;
-        String text;
-        String buttonText;
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        if(reset){
-            title= getString(R.string.title_alert_reset_with_MK);
-            text = getString(R.string.text_alert_reset_with_MK);
-            buttonText=getString(R.string.context_send);
-        }
-        else{
-            title= getString(R.string.park_account_dialog_title);
-            text = getString(R.string.dialog_park_account);
-            buttonText=getString(R.string.park_account_button);
-        }
-        builder.setTitle(title);
-        builder.setMessage(text);
-        builder.setPositiveButton(buttonText,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                    }
-                });
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                input.getBackground().mutate().clearColorFilter();
-            }
-        });
-        builder.setView(layout);
-        insertMailDialog = builder.create();
-        insertMailDialog.show();
-        insertMailDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logDebug("OK BTTN PASSWORD");
-                String value = input.getText().toString().trim();
-                String emailError = Util.getEmailError(value, context);
-                if (emailError != null) {
-                    logWarning("Mail incorrect");
-//                    input.setError(emailError);
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-                    textError.setText(emailError);
-                    error_layout.setVisibility(View.VISIBLE);
-                    input.requestFocus();
-                } else {
-                    if(reset){
-                        logDebug("Ask for link to reset pass");
-                        megaApi.resetPassword(value, true, loginFragment);
-                    }
-                    else{
-                        logDebug("Ask for link to park account");
-                        megaApi.resetPassword(value, false, loginFragment);
-                    }
-
-                    insertMailDialog.dismiss();
-                }
-            }
-        });
-    }
-
     /*
      * Display keyboard
      */
@@ -2570,7 +2256,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //		input.setId(EDIT_TEXT_ID);
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mk));
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2605,7 +2291,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getString(R.string.title_dialog_insert_MK));
         builder.setMessage(getString(R.string.text_dialog_insert_MK));
         builder.setPositiveButton(getString(R.string.general_ok),
@@ -2664,29 +2350,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private AlertDialog confirmLogoutDialog;
     private void showConfirmLogoutDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog,int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        backToLoginForm();
-                        backWhileLogin = true;
-                        MegaApplication.setLoggingIn(false);
-                        LoginActivityLollipop.isFetchingNodes = false;
-                        loginClicked = false;
-                        firstTime = true;
-                        if (megaChatApi == null){
-                            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                        }
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
-                        megaApi.localLogout(LoginFragmentLollipop.this);
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        dialog.dismiss();
-                        break;
-                }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    backToLoginForm();
+                    backWhileLogin = true;
+                    MegaApplication.setLoggingIn(false);
+                    LoginActivityLollipop.isFetchingNodes = false;
+                    loginClicked = false;
+                    firstTime = true;
+                    if (megaChatApi == null){
+                        megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                    }
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+                    megaApi.localLogout(LoginFragmentLollipop.this);
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    dialog.dismiss();
+                    break;
             }
         };
         String message= getString(R.string.confirm_cancel_login);
@@ -2711,22 +2393,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return 2;
         }
         else{
-
-            if(forgotPassLayout.getVisibility()==View.VISIBLE){
-                logDebug("Forgot Pass layout is VISIBLE");
-                hideForgotPassLayout();
-                return 1;
-            }
             if(on2faPage) {
                 logDebug("Back from 2fa page");
                 showConfirmLogoutDialog();
                 return 2;
-            }
-
-            if(parkAccountLayout.getVisibility()==View.VISIBLE){
-                logDebug("Park account layout is VISIBLE");
-                hideParkAccountLayout();
-                return 1;
             }
 
             ((LoginActivityLollipop) context).isBackFromLoginPage = true;
@@ -2797,13 +2467,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         switch (editText.getId()){
             case R.id.login_email_text:{
                 et_userLayout.setError(error);
-                et_userLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                et_userLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_userError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.login_password_text:{
                 et_passwordLayout.setError(error);
-                et_passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                et_passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_passwordError.setVisibility(View.VISIBLE);
                 break;
             }

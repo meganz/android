@@ -4,3 +4,4 @@
 /curl-*
 !/c-ares-*.sha1
 !/curl-*.sha1
+*.ready

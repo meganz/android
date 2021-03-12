@@ -5,6 +5,5 @@
     android:layout_height="match_parent"
     android:paddingEnd="10dp"
     android:paddingTop="16dp"
-    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-    android:textColor="@color/secondary_text"
+    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
     android:text="@string/preference_cookies_always_on" />

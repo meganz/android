@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +33,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -79,7 +79,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
             listView.addItemDecoration(new SimpleDividerItemDecoration(context));
             listView.setLayoutManager(mLayoutManager);
-            listView.setItemAnimator(new DefaultItemAnimator());
+            listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
             
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -304,7 +304,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 }
                 case R.id.cab_menu_rename: {
                     MegaNode aux = documents.get(0);
-                    ((ContactInfoActivityLollipop) context).showRenameDialog(aux, aux.getName());
+                    showRenameNodeDialog(context, aux, (ContactInfoActivityLollipop) getActivity());
                     break;
                 }
             }
@@ -319,7 +319,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 1);
             return true;
         }
         
@@ -328,7 +327,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             logDebug("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
         }
         
         @Override

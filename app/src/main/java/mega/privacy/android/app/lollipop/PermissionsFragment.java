@@ -72,7 +72,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         display.getMetrics(metrics);
 
         View v = inflater.inflate(R.layout.fragment_permissions, container, false);
-        ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
         setupLayout = v.findViewById(R.id.setup_fragment_container);
         Button notNowButton, setupButton, notNow2Button, enableButton;
@@ -162,10 +161,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 showSetupLayout();
             }
         }
-
-        if (isAllowingAccessShown) {
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
-        }
     }
 
     @Override
@@ -176,7 +171,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 break;
             }
             case R.id.setup_button: {
-                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
                 showAllowAccessLayout();
                 break;
             }

@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,10 +10,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,34 +25,36 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -84,7 +86,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
     ActionBar aB;
 	DisplayMetrics outMetrics;
 	String url;
-	Handler handler;
 	ProgressDialog statusDialog;
 
 	File previewFile = null;
@@ -96,22 +97,19 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 
 	CoordinatorLayout fragmentContainer;
+	AppBarLayout appBarLayout;
 	CollapsingToolbarLayout collapsingToolbar;
 	ImageView iconView;
 	ImageView imageView;
 	RelativeLayout iconViewLayout;
 	RelativeLayout imageViewLayout;
 
-	ScrollView scrollView;
 	TextView sizeTextView;
-	TextView importButton;
-	TextView downloadButton;
+	Button importButton;
+	Button downloadButton;
 	Button buttonPreviewContent;
-	LinearLayout optionsBar;
 	MegaNode document = null;
-	RelativeLayout infoLayout;
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
 
@@ -122,8 +120,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	private String mKey;
 
+	private MenuItem shareMenuItem;
+	private Drawable upArrow;
+	private Drawable drawableShare;
+
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+    CookieDialogHandler cookieDialogHandler;
 
 	private GoogleAdsLoader mAdsLoader;
 
@@ -193,6 +195,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		setContentView(R.layout.activity_file_link);
 		fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_link_fragment_container);
 
+		appBarLayout = findViewById(R.id.app_bar);
 		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_link_info_collapse_toolbar);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -200,7 +203,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}else{
 			collapsingToolbar.setExpandedTitleMarginBottom(scaleHeightPx(35, outMetrics));
 		}
-		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
+		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.divider_width));
 		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
@@ -208,7 +211,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
 		/*Icon & image in Toolbar*/
 		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
@@ -226,13 +228,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		buttonPreviewContent.setVisibility(View.GONE);
 
-		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
-		downloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
+		downloadButton = findViewById(R.id.file_link_button_download);
 		downloadButton.setOnClickListener(this);
 		downloadButton.setVisibility(View.INVISIBLE);
 
-		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+		importButton = findViewById(R.id.file_link_button_import);
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
@@ -252,8 +252,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
 		initAdsLoader();
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	/**
@@ -272,12 +279,17 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		// Inflate the menu items for use in the action bar
 		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
 
-		collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-		collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-//		collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+		upArrow = upArrow.mutate();
+
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_social_share_white);
+		drawableShare = drawableShare.mutate();
+
+		shareMenuItem = menu.findItem(R.id.share_link);
+
+		trySetupCollapsingToolbar();
 
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	@Override
@@ -296,6 +308,62 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			}
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void trySetupCollapsingToolbar() {
+		if (shareMenuItem == null || document == null) {
+			return;
+		}
+
+        int statusBarColor = ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation));
+        if (isDarkMode(this)) {
+            collapsingToolbar.setContentScrimColor(statusBarColor);
+        }
+
+		if (preview != null) {
+			appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
+				if (offset == 0) {
+					// Expanded
+					setColorFilterWhite();
+				} else {
+					if (offset < 0 && Math.abs(offset) >= appBarLayout.getTotalScrollRange() / 2) {
+						// Collapsed
+						setColorFilterBlack();
+					} else {
+						setColorFilterWhite();
+					}
+				}
+			});
+
+			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white_alpha_087));
+			collapsingToolbar.setStatusBarScrimColor(statusBarColor);
+		} else {
+			collapsingToolbar.setStatusBarScrimColor(statusBarColor);
+			setColorFilterBlack();
+		}
+	}
+
+	private void setColorFilterBlack () {
+		int color = getResources().getColor(R.color.grey_087_white_087);
+		upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+	}
+
+	private void setColorFilterWhite () {
+		int color = getResources().getColor(R.color.white_alpha_087);
+		upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
 	}
 
 	public void askForDecryptionKeyDialog(){
@@ -486,6 +554,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					}
 				}
 
+				trySetupCollapsingToolbar();
+
 				if (importClicked){
 					if ((document != null) && (target != null)){
 						megaApi.copyNode(document, target, this);
@@ -494,7 +564,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			}
 			else{
 				logWarning("ERROR: " + e.getErrorCode());
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setCancelable(false);
 				if(e.getErrorCode() == MegaError.API_EBLOCKED){
 					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_ToS_violation));
@@ -809,22 +879,23 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (intent == null) {
 			return;
 		}
-		
+
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			logDebug("URL: " + url + ", SIZE: " + size);
+
+			storeDownloadLocationIfNeeded(parentPath);
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
-        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();

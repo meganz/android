@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.transferWidget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -12,12 +13,13 @@ import androidx.core.content.ContextCompat;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
 public class TransferWidget {
@@ -40,6 +42,13 @@ public class TransferWidget {
         button = transfersWidget.findViewById(R.id.transfers_button);
         progressBar = transfersWidget.findViewById(R.id.transfers_progress);
         status = transfersWidget.findViewById(R.id.transfers_status);
+
+        if (Util.isDarkMode(context)) {
+            int color = ColorUtils.getColorForElevation(context, 6f);
+            ((GradientDrawable) transfersWidget.findViewById(R.id.transfers_relative_layout)
+                    .getBackground()).setColor(color);
+            ((GradientDrawable) button.getBackground()).setColor(color);
+        }
     }
 
     /**
@@ -68,7 +77,7 @@ public class TransferWidget {
      */
     public void update(int transferType) {
         if (context instanceof ManagerActivityLollipop) {
-            if (ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+            if (((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);
             }
 
@@ -83,7 +92,7 @@ public class TransferWidget {
         if (getPendingTransfers() > 0 && !transfersManagement.shouldShowNetWorkWarning()) {
             setProgress(getProgress(), transferType);
             updateState();
-        } else if (transfersManagement.shouldShowNetWorkWarning()
+        } else if ((getPendingTransfers() > 0 && transfersManagement.shouldShowNetWorkWarning())
                 || transfersManagement.thereAreFailedTransfers()) {
             setFailedTransfers();
         } else {
@@ -97,7 +106,7 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.getDrawerItem();
+        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
 
         return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.CONTACTS

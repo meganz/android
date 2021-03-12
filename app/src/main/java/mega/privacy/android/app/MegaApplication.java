@@ -28,7 +28,6 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -74,6 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
 import nz.mega.sdk.MegaAccountSession;
@@ -124,9 +124,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/4.0.0_352";
-
-    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
 	private static ChatManagement chatManagement;
 
@@ -161,8 +159,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
-
-	private static final boolean USE_BUNDLED_EMOJI = false;
 
 	private static boolean showInfoChatMessages = false;
 
@@ -201,7 +197,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
-	private static boolean isCookieBannerEnabled = false;
 	private static boolean arePreferenceCookiesEnabled = false;
 	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
@@ -219,7 +214,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private CallListener callListener = new CallListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
-	@Override
+    @Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
@@ -718,6 +713,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		super.onCreate();
 
+		ThemeHelper.INSTANCE.initTheme(this);
+
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -799,37 +796,32 @@ public class MegaApplication extends MultiDexApplication implements Application.
         };
 
 		registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
-		EmojiManager.install(new TwitterEmojiProvider());
 
+		EmojiManager.install(new TwitterEmojiProvider());
 		EmojiManagerShortcodes.initEmojiData(getApplicationContext());
 		EmojiManager.install(new TwitterEmojiProvider());
 		final EmojiCompat.Config config;
-		if (USE_BUNDLED_EMOJI) {
-			logDebug("Use Bundle emoji");
-			// Use the bundled font for EmojiCompat
-			config = new BundledEmojiCompatConfig(getApplicationContext());
-		} else {
-			logDebug("Use downloadable font for EmojiCompat");
-			// Use a downloadable font for EmojiCompat
-			final FontRequest fontRequest = new FontRequest(
-					"com.google.android.gms.fonts",
-					"com.google.android.gms",
-					"Noto Color Emoji Compat",
-					R.array.com_google_android_gms_fonts_certs);
-			config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
-					.setReplaceAll(false)
-					.registerInitCallback(new EmojiCompat.InitCallback() {
-						@Override
-						public void onInitialized() {
-							logDebug("EmojiCompat initialized");
-						}
-						@Override
-						public void onFailed(@Nullable Throwable throwable) {
-							logWarning("EmojiCompat initialization failed");
-						}
-					});
-		}
+		logDebug("Use downloadable font for EmojiCompat");
+		// Use a downloadable font for EmojiCompat
+		final FontRequest fontRequest = new FontRequest(
+				"com.google.android.gms.fonts",
+				"com.google.android.gms",
+				"Noto Color Emoji Compat",
+				R.array.com_google_android_gms_fonts_certs);
+		config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
+				.setReplaceAll(false)
+				.registerInitCallback(new EmojiCompat.InitCallback() {
+					@Override
+					public void onInitialized() {
+						logDebug("EmojiCompat initialized");
+					}
+					@Override
+					public void onFailed(@Nullable Throwable throwable) {
+						logWarning("EmojiCompat initialization failed");
+					}
+				});
 		EmojiCompat.init(config);
+
 		// clear the cache files stored in the external cache folder.
         clearPublicCache(this);
 
@@ -921,7 +913,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					MegaApplication.USER_AGENT, path);
+					BuildConfig.USER_AGENT, path);
 
 			megaApiFolder.retrySSLerrors(true);
 
@@ -1159,7 +1151,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setAutoCancel(true)
 						.setSound(defaultSoundUri)
 						.setContentIntent(pendingIntent)
-						.setColor(ContextCompat.getColor(this, R.color.mega));
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 				Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
 				notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
@@ -1178,7 +1170,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setContentIntent(pendingIntent);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 				}
 
 				Drawable d;
@@ -1318,6 +1310,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			else{
 				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
 			}
+		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+			chatManagement.removeJoiningChatId(request.getChatHandle());
+			chatManagement.removeJoiningChatId(request.getUserHandle());
+		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+				&& request.getUserHandle() == INVALID_HANDLE) {
+			chatManagement.removeLeavingChatId(request.getChatHandle());
 		}
 	}
 
@@ -1979,14 +1977,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
-	}
-
-	public void setCookieBannerEnabled(boolean enabled) {
-		isCookieBannerEnabled = enabled;
-	}
-
-	public static boolean isCookieBannerEnabled() {
-		return isCookieBannerEnabled;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {

@@ -1,9 +1,13 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
 import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
+import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -13,6 +17,13 @@ public class TextUtil {
 
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
+    }
+
+    public static boolean isTextEmpty(StringBuilder string) {
+        if (string == null)
+            return true;
+
+        return isTextEmpty(string.toString());
     }
 
     /**
@@ -38,18 +49,25 @@ public class TextUtil {
     /**
      * Add the appropriate format in the chat messages.
      *
+     * @param context Current Context object, to get a resource(for example, color) should not use application context, need to pass it from the caller.
      * @param textToShow   The message text
      * @param isOwnMessage If it is a sent or received message
      * @return The formatted text
      */
-    public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
+    public static Spanned replaceFormatChatMessages(Context context, String textToShow, boolean isOwnMessage) {
         try {
-            textToShow = textToShow.replace("[A]", "<font color='#060000'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
             if (isOwnMessage) {
-                textToShow = textToShow.replace("[B]", "<font color='#868686'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
             } else {
-                textToShow = textToShow.replace("[B]", "<font color='#00BFA5'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary)
+                        + "\'>");
             }
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
@@ -61,6 +79,64 @@ public class TextUtil {
 
     public static boolean isEmail(String str) {
         return !isTextEmpty(str) && EMAIL_ADDRESS.matcher(str).matches();
+    }
+
+    /**
+     * Gets the latest position of a file name before the .extension in order to set the cursor
+     * or select the entire file name.
+     *
+     * @param isFile True if is file, false otherwise.
+     * @param text   Current text of the input view.
+     * @return The latest position of a file name before the .extension.
+     */
+    public static int getCursorPositionOfName(boolean isFile, String text) {
+        if (isTextEmpty(text)) {
+            return 0;
+        }
+
+        if (isFile) {
+            String[] s = text.split("\\.");
+            if (s != null) {
+                int numParts = s.length;
+                int lastSelectedPos = 0;
+
+                if (numParts > 1) {
+                    for (int i = 0; i < (numParts - 1); i++) {
+                        lastSelectedPos += s[i].length();
+                        lastSelectedPos++;
+                    }
+
+                    //The last point should not be selected)
+                    lastSelectedPos--;
+                    return lastSelectedPos;
+                }
+            }
+        }
+
+        return text.length();
+    }
+
+    /**
+     * Formats a String of an empty screen.
+     *
+     * @param context     Current Context object, to get a resource(for example, color)
+     *                    should not use application context, need to pass it from the caller.
+     * @param emptyString The text to format.
+     * @return The string formatted.
+     */
+    public static String formatEmptyScreenText(Context context, String emptyString) {
+        try {
+            emptyString = emptyString.replace("[A]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
+            emptyString = emptyString.replace("[/A]", "</font>");
+            emptyString = emptyString.replace("[B]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "'>");
+            emptyString = emptyString.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
+        }
+
+        return emptyString;
     }
 
     /**
@@ -84,5 +160,15 @@ public class TextUtil {
         } else {
             return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
         }
+    }
+
+    /**
+     * If the string received is not null, neither empty, adds a STRING_SEPARATOR at the end.
+     *
+     * @param text Initial text without separator.
+     * @return Text with separator.
+     */
+    public static String addStringSeparator(String text) {
+        return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
     }
 }

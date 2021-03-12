@@ -19,8 +19,8 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 android:elevation="4dp"
-                android:background="@color/transparent_black"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:background="@color/grey_alpha_050"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 android:fitsSystemWindows="true"/>
 
@@ -66,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:id="@+id/upload_container_layout_bottom"
-                android:background="@color/transparent_black2"
+                android:background="@color/grey_alpha_060"
                 android:layout_alignParentBottom="true">
 
                 <RelativeLayout
@@ -104,7 +104,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:id="@+id/pdf_viewer_layout_bottom"
-                android:background="@color/transparent_black"
+                android:background="@color/grey_alpha_050"
                 android:layout_alignParentBottom="true">
 
                 <TextView

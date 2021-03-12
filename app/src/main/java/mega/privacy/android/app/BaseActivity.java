@@ -12,7 +12,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
@@ -44,6 +45,8 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -161,6 +164,9 @@ public class BaseActivity extends AppCompatActivity {
         registerReceiver(resumeTransfersReceiver,
                 new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
 
+        registerReceiver(cookieSettingsReceiver,
+                new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -184,6 +190,14 @@ public class BaseActivity extends AppCompatActivity {
                 launchPsaWebBrowser(psa);
             }
         });
+
+        if (shouldSetStatusBarTextColor()) {
+            ColorUtils.setStatusBarTextColor(this);
+        }
+    }
+
+    protected boolean shouldSetStatusBarTextColor() {
+        return true;
     }
 
     /**
@@ -508,6 +522,23 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
+     * Broadcast to show a snackbar when the Cookie settings has been saved
+     */
+    protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || !isActivityInForeground() || intent == null) {
+                return;
+            }
+
+            View view = getWindow().getDecorView().findViewById(android.R.id.content);
+            if (view != null) {
+                showSnackbar(view, StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved));
+            }
+        }
+    };
+
+    /**
      * Method to display an alert dialog indicating that the MEGA SSL key
      * can't be verified (API_ESSL Error) and giving the user several options.
      */
@@ -634,7 +665,25 @@ public class BaseActivity extends AppCompatActivity {
      * @param s Text to shown in the snackbar
      */
     public void showSnackbar (int type, View view, String s) {
-        showSnackbar(type, view, s, -1);
+        showSnackbar(type, view, s, MEGACHAT_INVALID_HANDLE);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type   There are three possible values to this param:
+     *               - SNACKBAR_TYPE: creates a simple snackbar
+     *               - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *               - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *               - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *               - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view   Layout where the snackbar is going to show.
+     * @param s      Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     */
+    public void showSnackbar(int type, View view, String s, long idChat) {
+        showSnackbar(type, view, s, idChat, null);
     }
 
     /**
@@ -644,12 +693,15 @@ public class BaseActivity extends AppCompatActivity {
      *            - SNACKBAR_TYPE: creates a simple snackbar
      *            - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
      *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *            - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *            - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     * @param userEmail Email of the user to be invited.
      */
-    public void showSnackbar (int type, View view, String s, long idChat) {
+    public void showSnackbar (int type, View view, String s, long idChat, String userEmail) {
         logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -677,18 +729,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-
-        if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
-            final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
-        else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
+        snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
 
         switch (type) {
             case SNACKBAR_TYPE: {
@@ -708,12 +749,17 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
-                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
 
             case PERMISSIONS_TYPE:
                 snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
+
+            case INVITE_CONTACT_TYPE:
+                snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
         }
@@ -759,12 +805,12 @@ public class BaseActivity extends AppCompatActivity {
      * The message is different depending if the account belongs to an admin or an user.
      *
      */
-    private void showExpiredBusinessAlert(){
+    protected void showExpiredBusinessAlert(){
         if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(R.string.expired_business_title);
 
         if (megaApi.isMasterBusinessAccount()) {
@@ -772,7 +818,9 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.black_white)
+                        + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
@@ -920,10 +968,12 @@ public class BaseActivity extends AppCompatActivity {
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        new MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.enable_log_text_dialog)
+                .setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener)
+                .show()
+                .setCanceledOnTouchOutside(false);
     }
 
     /**
@@ -932,7 +982,7 @@ public class BaseActivity extends AppCompatActivity {
     public void showGeneralTransferOverQuotaWarning() {
         if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
         builder.setView(dialogView)
                 .setOnDismissListener(dialog -> {

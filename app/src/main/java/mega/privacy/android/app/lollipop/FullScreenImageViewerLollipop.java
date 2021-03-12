@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,21 +10,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -35,18 +34,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import java.io.File;
@@ -56,8 +52,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -67,7 +61,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -89,7 +82,9 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -122,12 +117,15 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop
+		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		MegaChatRequestListenerInterface, DraggableView.DraggableListener {
 
 	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
 			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -157,7 +155,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String url;
 
 	int positionToRemove = -1;
-	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	NodeController nC;
 	private OfflineNodeSaver offlineNodeSaver;
@@ -183,7 +180,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
-	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+	private AlertDialog downloadConfirmationDialog;
 
 	MegaOffline currentNode;
 
@@ -218,7 +215,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
-	private androidx.appcompat.app.AlertDialog renameDialog;
+	private AlertDialog renameDialog;
 
 	int orderGetChildren = ORDER_DEFAULT_ASC;
 
@@ -307,7 +304,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
-		chatIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -683,8 +679,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}
-				androidx.appcompat.app.AlertDialog removeLinkDialog;
-				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				AlertDialog removeLinkDialog;
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -833,7 +829,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			case R.id.full_image_viewer_rename: {
-				showRenameDialog();
+				renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(imageHandles.get(positionG)), null);
 				break;
 			}
 			case R.id.full_image_viewer_move: {
@@ -858,8 +854,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
+	protected boolean shouldSetStatusBarTextColor() {
+		return false;
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
+
+		Window window = getWindow();
+		window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
@@ -959,12 +965,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
-
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
@@ -1675,236 +1678,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	}
 
-	public void showRenameDialog(){
-		logDebug("showRenameDialog");
-		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-	//	    layout.setLayoutParams(params);
-
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
-		input.setText(node.getName());
-
-
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-				@Override
-				public void onFocusChange(final View v, boolean hasFocus) {
-					if (hasFocus) {
-						if (node.isFolder()){
-							input.setSelection(0, input.getText().length());
-						}
-						else{
-							String [] s = node.getName().split("\\.");
-							if (s != null){
-								int numParts = s.length;
-								int lastSelectedPos = 0;
-								if (numParts == 1){
-									input.setSelection(0, input.getText().length());
-								}
-								else if (numParts > 1){
-									for (int i=0; i<(numParts-1);i++){
-										lastSelectedPos += s[i].length();
-										lastSelectedPos++;
-									}
-									lastSelectedPos--; //The last point should not be selected)
-									input.setSelection(0, lastSelectedPos);
-								}
-							}
-							showKeyboardDelayed(v);
-						}
-					}
-				}
-			});
-
-
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FullScreenImageViewerLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FullScreenImageViewerLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(FullScreenImageViewerLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-										  KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-	//						nC.renameNode(node, value);
-							renameDialog.dismiss();
-							rename(value);
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-							if (value.length() == 0) {
-								return;
-							}
-							rename(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		renameDialog = builder.create();
-		renameDialog.show();
-		renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}
-				else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						//nC.renameNode(node, value);
-						renameDialog.dismiss();
-						rename(value);
-					}
-				}
-			}
-		});
-	}
-
-	public static boolean matches(String regex, CharSequence input) {
-		logDebug("matches");
-
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
-	}
-
-	private void rename(String newName){
-		logDebug("rename");
-
-		if (newName.equals(node.getName())) {
-			return;
-		}
-
-		if(!isOnline(this)){
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-			return;
-		}
-
-		if (isFinishing()){
-			return;
-		}
-
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_renaming));
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
-
-		logDebug("Renaming " + node.getName() + " to " + newName);
-
-		megaApi.renameNode(node, newName, this);
-	}
-
 	public void showMove(){
 		logDebug("showMove");
 
@@ -2016,13 +1789,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		};
 
 		if (moveToRubbish){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -2033,20 +1806,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		logDebug("Value: " + value);
 
 		this.isGetLink = value;
-	}
-
-
-	//Display keyboard
-	private void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
 	}
 
 	@Override
@@ -2062,21 +1821,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 
 		logDebug("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_RENAME){
-
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_MOVE){
+		if (request.getType() == MegaRequest.TYPE_MOVE){
 			try {
 				statusDialog.dismiss();
 			}
@@ -2237,6 +1982,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
             if(adapterType == FILE_LINK_ADAPTER){
 				if (nC == null) {
 					nC = new NodeController(this);
@@ -2420,7 +2168,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2428,13 +2176,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
 		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
 		builder.setPositiveButton(getString(R.string.general_save_to_device),
@@ -2469,7 +2215,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2477,7 +2223,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -2543,7 +2289,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(400L).start();
 				bottomLayout.animate().translationY(0).setDuration(400L).start();
-				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 			}
 		}
 	}
@@ -2701,7 +2446,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		draggableView.setDraggableListener(this);
 		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 		container.addView(ivShadow, params);
 		container.addView(draggableView);

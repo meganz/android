@@ -2,24 +2,22 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 
 import android.os.Looper;
 import android.text.Html;
@@ -31,13 +29,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,6 +63,8 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -85,9 +87,12 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
+import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -103,7 +108,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
-	Toolbar tB;
+	MaterialToolbar tB;
 	NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
@@ -153,6 +158,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private final BroadcastReceiver errorCopyingNodesReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || !BROADCAST_ACTION_ERROR_COPYING_NODES.equals(intent.getAction())) {
+				return;
+			}
+
+			removeProgressDialog();
+			showSnackbar(SNACKBAR_TYPE, intent.getStringExtra(ERROR_MESSAGE_TEXT));
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
@@ -191,12 +208,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
+		registerReceiver(errorCopyingNodesReceiver,
+				new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
 
 		setContentView(R.layout.activity_node_history);
 
@@ -205,18 +218,15 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
+		tB = findViewById(R.id.toolbar_node_history);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
 		aB.setTitle(getString(R.string.title_chat_shared_files_info).toUpperCase());
 
 		container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
-
-//		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
 		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
@@ -230,9 +240,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		String textToShow = String.format(getString(R.string.context_empty_shared_files));
 		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'" + getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'" + getColorHexString(this, R.color.grey_300_grey_600) + "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		}
 		catch (Exception e){}
@@ -256,7 +266,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		}
 		else{
 			linearLayoutList.setVisibility(View.GONE);
@@ -265,7 +275,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			listView = (NewGridRecyclerView)findViewById(R.id.file_grid_view_browser);
 		}
 
-		listView.setPadding(0,scaleHeightPx(8, outMetrics),0,scaleHeightPx(16, outMetrics));
 		listView.setClipToPadding(false);
 		listView.setHasFixedSize(true);
 
@@ -356,6 +365,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
     protected void onDestroy(){
 		logDebug("onDestroy");
     	super.onDestroy();
+		unregisterReceiver(errorCopyingNodesReceiver);
+
 		if (megaChatApi != null) {
 			megaChatApi.removeChatListener(this);
 			megaChatApi.removeNodeHistoryListener(chatId, this);
@@ -810,7 +821,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void handleStoredData() {
-		chatC.proceedWithForward(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId);
+		chatC.proceedWithForwardOrShare(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId, FORWARD_ONLY_OPTION);
 		preservedMessagesSelected = null;
 		preservedMessagesToImport = null;
 	}
@@ -867,7 +878,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
 						list.add(megaNodeList);
 					}
-					chatC.prepareForChatDownload(list);
+					chatC.prepareForChatDownload(list, false);
 					break;
 				}
 				case R.id.chat_cab_menu_import:{
@@ -893,9 +904,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			inflater.inflate(R.menu.messages_node_history_action, menu);
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
-			menu.findItem(R.id.chat_cab_menu_offline).setIcon(mutateIconSecondary(nodeAttachmentHistoryActivity, R.drawable.ic_b_save_offline, R.color.white));
-			changeViewElevation(aB, true, outMetrics);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+            checkScroll();
 			return true;
 		}
 
@@ -905,7 +914,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			checkScroll();
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -1047,13 +1055,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		if(messages.size()==1){
 			builder.setMessage(R.string.confirmation_delete_one_message);
@@ -1072,6 +1074,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		logDebug("Result Code: " + resultCode);
 		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if(!isOnline(this) || megaApi==null) {
@@ -1108,16 +1111,16 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
 				if (contactHandles != null && contactHandles.length > 0) {
 					ArrayList<MegaUser> users = new ArrayList<>();
-					ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+					ArrayList<MegaChatRoom> chats = new ArrayList<>();
 
-					for (int i=0; i<contactHandles.length; i++) {
+					for (int i = 0; i < contactHandles.length; i++) {
 						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
 						if (user != null) {
 							users.add(user);
 						}
 					}
 
-					for (int i=0; i<chatHandles.length; i++) {
+					for (int i = 0; i < chatHandles.length; i++) {
 						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
 						if (chatRoom != null) {
 							chats.add(chatRoom);
@@ -1131,22 +1134,21 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						megaChatApi.createChat(false, peers, listener);
 					}
-				}
-				else {
+				} else {
 					int countChat = chatHandles.length;
 					logDebug("Selected: " + countChat + " chats to send");
 
 					MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
 					forwardChatProcessor.forward(chatRoom);
 				}
-			}
-			else {
+			} else {
 				logError("Error on sending to chat");
 			}
 		}
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			Util.storeDownloadLocationIfNeeded(parentPath);
 			chatC.prepareForDownload(intent, parentPath);
 		}
 	}
@@ -1560,7 +1562,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1568,7 +1570,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -1596,11 +1598,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		downloadConfirmationDialog.show();
 	}
 
-	public void checkScroll () {
-		if (listView != null) {
-			changeViewElevation(aB, listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
-		}
-	}
+    public void checkScroll() {
+        boolean withElevation = (listView != null && listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect());
+		AppBarLayout abL = findViewById(R.id.app_bar_layout);
+		Util.changeActionBarElevation(this, abL, withElevation);
+    }
 
 	public MegaChatRoom getChatRoom () {
 		return chatRoom;

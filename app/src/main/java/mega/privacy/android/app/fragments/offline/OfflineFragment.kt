@@ -19,7 +19,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,19 +32,26 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -53,8 +59,6 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -78,7 +82,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             ) {
                 val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
 
-                when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
+                when (intent.getIntExtra(ACTION_TYPE, -1)) {
                     SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
                     }
@@ -265,13 +269,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
-        var textToShow = getString(R.string.context_empty_offline).toUpperCase(Locale.ROOT)
+        var textToShow = StringResourcesUtils.getString(R.string.context_empty_offline)
 
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
-            textToShow = textToShow.replace("[/A]", "</font>")
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>")
-            textToShow = textToShow.replace("[/B]", "</font>")
+            textToShow = textToShow.replace(
+                "[A]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.grey_900_grey_100)
+                        + "\'>"
+            ).replace("[/A]", "</font>").replace(
+                "[B]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.grey_300_grey_600)
+                        + "\'>"
+            ).replace("[/B]", "</font>")
         } catch (e: Exception) {
             e.printStackTrace()
             logError("Exception formatting string", e)
@@ -284,7 +293,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
         rv.clipToPadding = false
         rv.setHasFixedSize(true)
-        rv.itemAnimator = DefaultItemAnimator()
+        rv.itemAnimator = noChangeRecyclerViewItemAnimator()
         rv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -713,7 +722,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (rv != null) {
             callManager {
-                it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
+                it.changeAppBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
             LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
                 .post(Pair(this, rv.canScrollVertically(-1)))
@@ -889,7 +898,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.offline_browser_action, menu)
-        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
 
         return true
@@ -909,7 +917,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
-        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
     }
 

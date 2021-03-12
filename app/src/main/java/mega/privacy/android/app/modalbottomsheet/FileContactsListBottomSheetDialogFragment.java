@@ -14,6 +14,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
@@ -85,7 +86,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         titleNameContactPanel.setMaxWidthEmojis(scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
-        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorInfo = contentView.findViewById(R.id.separator_info);
 
         String fullName = contact != null ? getMegaUserNameDB(contact) : nonContactEmail;
 
@@ -148,9 +149,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                 break;
 
             case R.id.file_contact_list_option_info_layout:
-                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, share.getUser());
-                context.startActivity(i);
+                ContactUtil.openContactInfoActivity(context, share.getUser());
                 break;
         }
 

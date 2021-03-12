@@ -3,14 +3,10 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,6 +14,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -25,33 +23,29 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,26 +54,28 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener,
+		ActionNodeCallback {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -183,13 +179,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ActionBar aB;
 	
 	private ActionMode actionMode;
-	
-	private AlertDialog newFolderDialog;
+
 	private AlertDialog setDownloadLocationDialog;
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
-
-	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private Handler handler;
 
@@ -206,7 +199,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 return true;
 
             case R.id.cab_menu_create_folder:
-                showNewFolderDialog();
+				showNewFolderDialog(this, this);
                 return true;
 
             case R.id.cab_menu_select_all:
@@ -244,9 +237,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
-			MenuItem newFolderItem = menu.findItem(R.id.cab_menu_create_folder);
-			newFolderItem.setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_b_new_folder, R.color.white));
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
+			tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
 			return true;
 		}
 
@@ -254,7 +245,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
+			tB.setElevation(0);
 		}
 
 		@Override
@@ -314,7 +305,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-
         newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
@@ -342,7 +332,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						REQUEST_WRITE_STORAGE);
 			}
 		}
-		changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
@@ -357,7 +346,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
@@ -409,8 +397,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
-		boolean actionButtonAccentStyle = true;
-
 		if (fromSaveRecoveryKey) {
 			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
 		} else if (fromSettings) {
@@ -418,18 +404,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		} else if (mode == Mode.PICK_FOLDER) {
 			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.PICK_FILE){
-			actionButtonAccentStyle = false;
 			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.BROWSE_FILES) {
 			buttonsContainer.setVisibility(View.GONE);
-		}
-
-		if (actionButtonAccentStyle) {
-			button.setTextColor(ContextCompat.getColor(this, R.color.white));
-			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_accent_button));
-		} else {
-			button.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
 		}
 
 		rootLevelLayout = findViewById(R.id.root_level_layout);
@@ -441,13 +418,17 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		emptyImageView = findViewById(R.id.file_storage_empty_image);
 		emptyTextView = findViewById(R.id.file_storage_empty_text);
-		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
 
-		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
+		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		} catch (Exception e) {
 			logWarning("Exception formatting text, ", e);
@@ -458,7 +439,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		
 		if (adapter == null){
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);
@@ -550,7 +531,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
-		if (mode.equals(Mode.PICK_FILE) || sdCardOperator.canWriteWithFile(sdCardRoot)) {
+
+		if (mode.equals(Mode.PICK_FILE)) {
 			sdRoot = sdCardRoot;
 		} else if (isBasedOnFileStorage()) {
 			try {
@@ -657,7 +639,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
 	}
 
 	@Override
@@ -867,7 +849,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			prefs = dbH.getPreferences();
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
 		builder.setView(v);
 
@@ -1027,182 +1009,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	
-	public void showNewFolderDialog(){
-		logDebug("showNewFolderDialog");
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleWidthPx(20, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, getOutMetrics()), 0, scaleWidthPx(17, getOutMetrics()), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileStorageActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileStorageActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(FileStorageActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, getOutMetrics()), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-
-
-		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-
-
-			}
-		});
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No action needed
 	}
-	
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		view.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) FileStorageActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
 	}
-	
-	/*
-	 * Create new folder and reload file list
-	 */
-	private void createFolder(String value) {
+
+	@Override
+	public void createFolder(@NotNull String value) {
 		logDebug(value + " Of value");
         SDCardOperator sdCardOperator = null;
         try {
@@ -1212,7 +1030,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             logError("Initialize SDCardOperator failed", e);
         }
 
-        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath())) {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.createFolder(path.getAbsolutePath(), value);
@@ -1234,12 +1052,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         newFolder.setReadable(true, false);
         newFolder.setExecutable(true, false);
     }
-
-	public static boolean matches(String regex, CharSequence input) {
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
-	}
 
 	/**
 	 * Starts the action mode if needed.

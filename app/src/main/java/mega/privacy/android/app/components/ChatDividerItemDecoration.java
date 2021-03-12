@@ -8,7 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 
 import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter.*;
 
@@ -30,7 +29,7 @@ public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-        int left = (int) context.getResources().getDimension(R.dimen.recycler_view_separator);
+        int left = (int) context.getResources().getDimension(R.dimen.divider_width);
         int right = parent.getWidth() - parent.getPaddingRight();
 
         int childCount = parent.getChildCount();
@@ -40,7 +39,7 @@ public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
             int position = parent.getChildAdapterPosition(child);
             int viewType = parent.getAdapter().getItemViewType(position);
 
-            if (viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
+            if (viewType == ITEM_VIEW_TYPE_NORMAL_CHATS) {
                 RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
                 int top = child.getBottom() + params.bottomMargin;

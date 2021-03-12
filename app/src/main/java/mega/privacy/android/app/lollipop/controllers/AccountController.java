@@ -38,6 +38,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
@@ -48,16 +49,20 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AccountController {
 
@@ -565,5 +570,56 @@ public class AccountController {
 
     static public void setCount(int countUa) {
         count = countUa;
+    }
+
+    /**
+     * Updates own firstName/lastName and fullName data.
+     *
+     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
+     * @param newName   New firstName/lastName text.
+     * @param e         MegaError of the request.
+     */
+    public static void updateMyData(boolean firstName, String newName, MegaError e) {
+        MegaApplication app = MegaApplication.getInstance();
+        MyAccountInfo accountInfo = app.getMyAccountInfo();
+        DatabaseHandler dbH = app.getDbH();
+        long handle = app.getMegaApi().getMyUser() != null
+                ? app.getMegaApi().getMyUser().getHandle() : INVALID_HANDLE;
+
+        if (e.getErrorCode() == MegaError.API_OK) {
+            logDebug("request.getText(): " + newName);
+
+            if (accountInfo != null) {
+                if (firstName) {
+                    accountInfo.setFirstNameText(newName);
+                } else {
+                    accountInfo.setLastNameText(newName);
+                }
+            }
+
+            if (firstName) {
+                dbH.saveMyFirstName(newName);
+
+                if (handle != INVALID_HANDLE) {
+                    notifyFirstNameUpdate(app, handle);
+                }
+            } else {
+                dbH.saveMyLastName(newName);
+
+                if (handle != INVALID_HANDLE) {
+                    notifyLastNameUpdate(app, handle);
+                }
+            }
+        } else {
+            logError("ERROR - request.getText(): " + newName);
+
+            if (accountInfo != null) {
+                if (firstName) {
+                    accountInfo.setFirstNameText("");
+                } else {
+                    accountInfo.setLastNameText("");
+                }
+            }
+        }
     }
 }

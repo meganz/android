@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -> Neem een foto en upload je foto\'s naar MEGA \nREAD_CONTACTS -> Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA is Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">van de</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Log uit</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Uploaden</string>
     <string name="action_create_folder" context="Menu item">Nieuwe map maken</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Open koppeling</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Open koppeling</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">Instellingen</string>
     <string name="action_search" context="Search button">Zoek</string>
     <string name="action_search_country" context="Select country page title">Kies uw regio</string>
-    <string name="action_play" context="Search button">Afspelen</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">Afspelen</string>
     <string name="action_pause" context="Search button">Pauzeer</string>
     <string name="action_refresh" context="Menu item">Vernieuw</string>
     <string name="action_sort_by" context="Menu item">Sorteer op</string>
@@ -205,7 +207,7 @@
     -->
     <string name="cancel_transfer_confirmation">Deze overdracht annuleren?</string>
     <string name="cancel_all_transfer_confirmation">Alle overdrachten annuleren?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Alles annuleren</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">Alles annuleren</string>
 
     <plurals name="cancel_selected_transfers">
         <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">De geselecteerde overdracht wordt geannuleerd.</item>
@@ -218,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Opgeslagen voor Offline gebruik</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -227,8 +230,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacten</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacten [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Geen [/B][A]verzoeken verzonden[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Geen [/B][A]ontvangen verzoeken[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Geen [/B][A]verzonden verzoeken[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Geen [/B][A]ontvangen verzoeken[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Overdrachten</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Mijn Account</string>
@@ -266,7 +269,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">Grootte</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">Laatst aangepast</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Toegevoegd</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">Toegevoegd</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -283,7 +286,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Negeren</string>
     <string name="contact_decline" context="option to decline a contact invitation">Weigeren</string>
     <string name="contact_accept" context="option to accept a contact invitation">Accepteren</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Contact info</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -362,7 +365,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Deze links zijn niet meer openbaar beschikbaar.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Naam wijzigen</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open koppeling</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Open koppeling</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_renaming" context="while renaming a file or folder">Naam wijzigen</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Bestand voorbereiden</string>
@@ -718,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Uw telefoonnummer is succesvol geverifieerd</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Interne opslag</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Externe opslag</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Interne opslag</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Externe opslag</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Interne opslag</string>
@@ -786,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All uw lokale gegevens worden verwijderd en u wordt uitgelogd over %1d seconden</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Over</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Privacybeleid</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Privacybeleid</string>
     <string name="settings_about_terms_of_service" context="">Algemene Voorwaarden</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Applicatie versie</string>
@@ -901,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Gratis Account</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">PRO Lite Account</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
@@ -941,7 +944,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Uw Herstelsleutel komt hier</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">Wachtwoord komt hier</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Dit is de laatste stap om uw account te annuleren. U verliest alle gegevens die zijn opgeslagen in de cloud permanent. Voer alstublieft uw wachtwoord hieronder in.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Dit is de laatste stap om uw account te verwijderen. U verlies al uw gegevens die opgeslagen zijn in de cloud. Voer uw wachtwoord hieronder in.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">E-mail verificatie</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Controleer uw email alstublieft om door te gaan.</string>
@@ -963,7 +966,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Wijzig wachtwoord</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Voer uw Herstelsleutel hieronder in</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Wachtwoord is gewijzigd!</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Uw wachtwoord is gewijzigd.</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Parkeer account</string>
     <string name="park_account_button" context="Button to park an account">Parkeren</string>
@@ -1126,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Contacten laden van de telefoon&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d verzoeken al verzonden.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d uitnodiging verzoek succesvol verzonden.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d uitnodiging verzoeken succesvol verzonden maar %2$d verzoeken waren niet verzonden.</string>
 
@@ -1146,12 +1150,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Totdat ik ze weer aanzet</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Gesprek notificaties worden gedempt voor %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Gespreksnotificaties worden gedempt tot %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Gespreksmeldingen worden gedempt tot %1$s at %2$s</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chatmeldingen worden gedempt tot %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chatmeldingen worden gedempt tot %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chatmeldingen worden gedempt tot %1$s op %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chatmeldingen worden gedempt tot %1$s op %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Gespreksmeldingen worden gedempt</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Gespreksmeldingen ingeschakeld</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Dempen tot %1$s</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Gedempt tot %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Gedempt tot %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Meldingen</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Bericht geluid</string>
@@ -1160,8 +1173,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Bel geluid</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notificatie geluid</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Nadat het is gewist, kunnen zowel %s als u de berichten  van deze chat zien.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Leegmaken</string>
     <!--
@@ -1224,10 +1235,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">Als u de groep chat verlaat, heeft u niet langer toegang om berichten te lezen of te verzenden.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Groep chat verlaten?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">Alle berichten en media in dit bericht worden gewist.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Geschiedenis wissen?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">De deelnemer is al in deze groep chat.</string>
 
@@ -1591,8 +1598,8 @@
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">Van apparaat</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Annuleer Account</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Als u uw account annuleert heeft u geen toegang meer tot uw account gegevens, uw MEGA contacten of gesprekken.\n U kunt deze actie niet ongedaan maken.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Verwijder account</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Als u uw account verwijdert, heeft u geen toegang tot uw accountgegevens, uw MEGA-contacten of gesprekken. \nU kunt deze actie niet ongedaan maken.</string>
     <string name="delete_button" context="menu item">Verwijder</string>
 
     <string name="file_properties_info_info_file">Info</string>
@@ -1625,14 +1632,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Automatische uploads instellen</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Stil</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">Stil</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">berichten</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">vanaf</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nieuwe gedeelde map</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Nieuw contact verzoek</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Chatgeschiedenis wissen</string>
 
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Chatgeschiedenis wissen</string>
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Contact verwijderen</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notificaties</string>
@@ -1721,8 +1728,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">Nieuw bestand</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">Bestand Naam</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Koppeling naam</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">Koppeling URL</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Koppeling naam</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Koppeling URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">ONDERWERP</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">INHOUD</string>
@@ -1739,7 +1746,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Het nieuwe wachtwoord kan niet hetzelfde zijn als het oude wachtwoord</string>
 
     <string name="action_search_by_date" context="Menu item">Zoeken op datum</string>
-    <string name="general_apply" context="title of a button to apply search by date">Toepassen</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">Toepassen</string>
     <string name="general_search_month" context="title of a button to apply search by month">Laatste maand</string>
     <string name="general_search_year" context="title of a button to apply search by year">Laatste jaar</string>
 
@@ -1821,21 +1828,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Periode instellen</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Nodig vrienden uit tot [/B][A]Gesprek[/A][B] en geniet van onze gecodeerde platform met privacy en beveiliging.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Nodig vrienden uit bij [/B][A]Gesprek[/A][B] en geniet van uw gecodeerde platform met privacy en veiligheid[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Geen media op [/B][A]Camera Uploads[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Prullenbak [/B][A]Leegmaken[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Geen media op [/B][A]Camera Uploads[/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Leegmaken[/B][A]Prullenbak[/A]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Geen bestanden in uw[/B][A]Postvak[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Geen bestanden [/B][A]Offline[/A]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Geen bestanden in uw [/B][A]Inbox[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Geen bestanden[/B][A]Opgeslagen voor Offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Geen [/B][A]Contacten[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Geen[/A] [B]Gesprekken[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Gesprekken[/A] [B]Laden&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Geen[/B][A]Binnenkomende Gedeelde mappen[/A][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Geen[/B][A]Uitgaande Gedeelde mappen[/A][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Geen [/B][A]Binnenkomende Gedeelde mappen[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Geen [/B][A]Uitgaande Gedeelde mappen[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Nee [/B][A]Openbare Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Verstuur aanvragen</string>
@@ -1908,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Uploaden gesprek</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Gesprek video kwaliteit</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Video kwaliteit</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Kwaliteit</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads heeft toegang nodig tot uw foto\'s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2033,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Voer een sterker wachtwoord in</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Nieuw contact</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Opslag Verbruik</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d afwachtend contact verzoek</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d afwachtende contact verzoeken</item>
@@ -2043,9 +2049,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nieuw contact verzoek</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Geen actieve[/B][A]Overdrachten[/A][B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Geen voltooide[/B][A] Overdrachten[/A][B].[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Leeg[/B][A] Map[/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Geen actieve[/B][A] Overdrachten[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Geen voltooide [/B][A] Overdrachten[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]Leegmaken[/B][A]Map[/A]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Schrijf bericht naar %s&#8230;</string>
@@ -2266,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Om het Wis Schema van de Prullenbak uit te schakelen of een langer bewaarperiode in te stellen, zal u een PRO abonnement nodig hebben.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">dagen</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">dagen</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Haal gesprekslink</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Beheer Gesprek Koppeling</string>
 
@@ -2299,7 +2305,7 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Deze chat weergave is niet langer beschikbaar. Als u deze weergave verlaat, bent u niet in staat het te heropenen.</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s [/A][B] ingeschakeld gecodeerde sleutelrotatie.[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ingeschakelde coderingssleutelrotatie.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Dit gesprek is niet langer beschikbaar</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Ongeldige Gesprekskoppeling</string>
@@ -2407,8 +2413,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">Video\'s comprimeren %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Ongeldige map geselecteerd</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 map. 1 bestand</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 map. %1$d bestanden</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 map · 1 bestand</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 map ·%1$d bestanden</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d bestand</item>
@@ -2421,8 +2427,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d mappen. 1 file</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d mappen. %2$d bestanden</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d mappen · 1 bestand</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d mappen ·%2$d bestanden</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] toegevoegd %2$s en %3$s[/B]</string>
@@ -2461,7 +2467,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL sleutel fout</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA kan geen veilige verbinding maken via SSL. Mogelijk gebruikt u openbare wifi met aanvullende vereisten.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Geen [/B][A]Notificaties[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Geen [/B][A]Notificaties[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">MEGA Instellen</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA heeft toegang nodig tot uw foto\'s, media en bestanden, zodat u ze kunt delen met vrienden, gecodeerde berichten kunt uitwisselen en veilig kunt bellen.</string>
@@ -2504,7 +2510,7 @@
     <string name="label_yesterday" context="label yesterday">Gisteren</string>
     <string name="label_tomorrow" context="label tomorrow">Morgen</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Geen [/B][A]Gedeelde Bestanden[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s is toegetreden tot de oproep</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s heeft de oproep verlaten</string>
@@ -2588,8 +2594,8 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d versie niet verwijderd</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d versies niet verwijderd</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%d versie niet verwijderd</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%d versies niet verwijderd</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">U heegt geen MEGA contacten. Nodig vrienden uit vanuit de Contacten sectie.</string>
@@ -2831,7 +2837,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]U moet onmiddellijk handelen om uw gegevens op te slaan. [/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 dag</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1 dag</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d dagen</item>
     </plurals>
 
@@ -2872,10 +2878,10 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s\'s inloggegevens</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Docs</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documenten</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nieuw Gesprek</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nieuw gesprek</string>
 
     <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">Geen foto\'s gevonden</string>
     <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Geen documenten gevonden</string>
@@ -2899,9 +2905,60 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">U Heeft de maximale limiet van %d reacties bereikt.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Dit bericht heeft de maximale limiet van %d reacties bereikt.</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] heeft de tijd voor het wissen van berichten gewijzigd in [/B][A]%2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Chatgeschiedenis wissen</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s [/A][B] heeft het wissen van berichten uitgeschakeld. [/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Verwijder alle berichten en bestanden gedeeld in dit gesprek. Deze actie onomkeerbaar.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">Geschiedenis wissen</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Verwijder automatisch berichten die ouder zijn dan een bepaalde tijd.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Uitgezet</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">Een dag</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">Een week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">Een maand</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Aangepast</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Beheer chat geschiedenis</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatisch berichten verwijderen ouder dan:</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">De volledige berichtgeschiedenis voor dit gesprek wissen?</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 jaar</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">uur</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">uren</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">dag</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">dagen</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weken</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">maand</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">maanden</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 uur</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d uur</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weken</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 maand</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d maanden</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Selecteer overdrachten</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">De prioriteitswijziging van de overdracht \'%1$s\' is mislukt.</string>
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">De prioriteitswijziging van de overdracht ‘%1$s\' is mislukt.</string>
 
     <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Verzend de decoderingssleutel afzonderlijk</string>
     <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Exporteer link en decoderingssleutel afzonderlijk.</string>
@@ -2960,8 +3017,10 @@
     <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertentie Cookies</string>
     <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Gebruikt door ons en onze goedgekeurde advertentiepartners om de advertenties die u op onze diensten en op andere websites ziet, aan te passen op basis van uw browsegeschiedenis. Als u deze Cookies niet accepteert, kunnen we advertenties laten zien die minder relevant zijn.</string>
     <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Cookies van derden</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">Dit zijn cookies die worden beheerd door iemand anders dan wij; we gebruiken deze Cookies om de soorten functionaliteit te bieden die hierboven zijn beschreven. Het niet accepteren van deze Cookies heeft verschillende gevolgen, afhankelijk van het type Cookie dat elke Cookie van een derde partij is. Klik op ‘Meer informatie\' hieronder voor details over alle Cookies van derden die we gebruiken.</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">Dit zijn Cookies die worden beheerd door iemand anders dan wij; we gebruiken deze Cookies om de soorten functionaliteit te bieden die hierboven zijn beschreven. Het niet accepteren van deze Cookies heeft verschillende gevolgen, afhankelijk van het type cookie dat elke Cookie van een derde partij is. Klik op “Meer Informatie” hieronder voor details over alle Cookies van derden die we gebruiken.</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacybeleid</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie beleid</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Altijd aan</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Document scannen</string>
 </resources>

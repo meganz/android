@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -22,12 +24,16 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected static final int HEIGHT_HEADER_RADIO_GROUP = 56;
@@ -78,6 +84,36 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Dialog dialog = getDialog();
+        if (dialog == null) {
+            return;
+        }
+
+        Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+
+        // In landscape mode, we need limit the bottom sheet dialog width.
+        if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            int maxSize = displayMetrics.heightPixels;
+            window.setLayout(maxSize, MATCH_PARENT);
+        }
+
+        // But `setLayout` causes navigation buttons almost invisible in light mode,
+        // in this case we set navigation bar background with light grey to make
+        // navigation buttons visible.
+        if (!Util.isDarkMode(requireContext())) {
+            // Only set navigation bar elements colour, View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010
+            window.getDecorView().setSystemUiVisibility(0x00000010);
+        }
     }
 
     /**

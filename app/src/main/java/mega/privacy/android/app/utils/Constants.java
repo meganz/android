@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
+    public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -82,6 +83,8 @@ public class Constants {
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
+    public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
@@ -101,6 +104,7 @@ public class Constants {
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_FORWARD_MESSAGES = 11;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
+    public static final int MULTIPLE_IMPORT_CONTACT_MESSAGES = 13;
 
     public static final int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES + 1;
 
@@ -169,6 +173,10 @@ public class Constants {
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
 
+    public static final int IMPORT_ONLY_OPTION = 0;
+    public static final int FORWARD_ONLY_OPTION = 1;
+    public static final int IMPORT_TO_SHARE_OPTION = 2;
+
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
@@ -188,7 +196,6 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
     public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
-    public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
@@ -254,6 +261,11 @@ public class Constants {
 
     public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
 
+    public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
+    public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
+    public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
+    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
+
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
@@ -286,7 +298,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
     public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
-    public static final String INTENT_EXTRA_KEY_ACTION_TYPE = "actionType";
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
@@ -482,6 +493,11 @@ public class Constants {
                     ")+"
     );
 
+    /**
+     * A node name must not contain these characters.
+     */
+    public static final Pattern NODE_NAME_REGEX = Pattern.compile("[*|\\?:\"<>\\\\\\\\/]");
+
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_INBOX = 150;
     public static final int FROM_OTHERS = 0;
@@ -491,6 +507,7 @@ public class Constants {
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
+    public static final int INVITE_CONTACT_TYPE = 5;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -510,6 +527,8 @@ public class Constants {
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
+
+    public static final int SCROLLING_UP_DIRECTION = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
@@ -561,6 +580,7 @@ public class Constants {
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
+    public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
     public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
@@ -579,6 +599,13 @@ public class Constants {
     public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
     public static final int AVATAR_SIZE = 150;
+
+    //Thumbnail dimens
+    public static final float THUMB_CORNER_RADIUS_DP = 4;
+    public static final int THUMB_SIZE_DP = 40;
+    public static final int THUMB_MARGIN_DP = 16;
+    public static final int ICON_SIZE_DP = 48;
+    public static final int ICON_MARGIN_DP = 12;
 
     public static final String SEPARATOR = File.separator;
 
@@ -731,6 +758,8 @@ public class Constants {
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 
+    public static final int MAX_BADGE_NUM = 9;
+
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
@@ -741,7 +770,14 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+    public static final String EVENT_PSA_VISIBILITY = "psa_visibility";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
+
+    public static final String STRING_SEPARATOR = " · ";
+
+    public static final int NOT_OVERQUOTA_STATE = 0;
+    public static final int OVERQUOTA_STORAGE_STATE = 1;
+    public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 }

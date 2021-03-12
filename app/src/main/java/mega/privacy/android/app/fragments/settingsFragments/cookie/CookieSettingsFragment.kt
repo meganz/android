@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.net.toUri
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,11 +19,13 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.*
+import mega.privacy.android.app.utils.StringResourcesUtils
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment() {
 
-    private val viewModel by viewModels<CookieSettingsViewModel>()
+    private val viewModel by activityViewModels<CookieSettingsViewModel>()
+    private var isThirdPartyDialogShowing = false
 
     private lateinit var acceptCookiesPreference: SwitchPreferenceCompat
     private lateinit var preferenceCookiesPreference: SwitchPreferenceCompat
@@ -57,8 +59,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             } else if (isVisible) {
                 Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_LONG).show()
             }
-
-            enableSwitches()
         }
     }
 
@@ -69,15 +69,15 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
 
-        thirdPartyCookiesPreference.setSummaryText(getString(R.string.preference_cookies_thirdparty_summary))
-        thirdPartyCookiesPreference.setClickableText(getString(R.string.action_more_information)) {
+        thirdPartyCookiesPreference.setSummaryText(StringResourcesUtils.getString(R.string.preference_cookies_thirdparty_summary))
+        thirdPartyCookiesPreference.setClickableText(StringResourcesUtils.getString(R.string.action_more_information)) {
             showThirdPartyInfoDialog()
         }
 
-        policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
+        policiesPreference.setButton1(StringResourcesUtils.getString(R.string.preference_cookies_policies_cookie)) {
             openBrowser("https://mega.nz/cookie".toUri())
         }
-        policiesPreference.setButton2(getString(R.string.preference_cookies_policies_privacy)) {
+        policiesPreference.setButton2(StringResourcesUtils.getString(R.string.preference_cookies_policies_privacy)) {
             openBrowser("https://mega.nz/privacy".toUri())
         }
     }
@@ -109,8 +109,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      */
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
-        preference?.shouldDisableView = true
-        preference?.isEnabled = false
 
         when (preference?.key) {
             acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
@@ -124,30 +122,19 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Enable all cookie switches
-     */
-    private fun enableSwitches() {
-        preferenceCookiesPreference.shouldDisableView = false
-        analyticsCookiesPreference.shouldDisableView = false
-        advertisingCookiesPreference.shouldDisableView = false
-        thirdPartyCookiesPreference.shouldDisableView = false
-        acceptCookiesPreference.shouldDisableView = false
-        preferenceCookiesPreference.isEnabled = true
-        analyticsCookiesPreference.isEnabled = true
-        advertisingCookiesPreference.isEnabled = true
-        thirdPartyCookiesPreference.isEnabled = true
-        acceptCookiesPreference.isEnabled = true
-    }
-
-    /**
      * Show third party cookie information dialog.
      */
     private fun showThirdPartyInfoDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
-            .setView(R.layout.dialog_cookie_thirdparty)
-            .setPositiveButton(android.R.string.yes, null)
-            .create()
-            .show()
+        if (!isThirdPartyDialogShowing) {
+            isThirdPartyDialogShowing = true
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setView(R.layout.dialog_cookie_thirdparty)
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes), null)
+                .setOnDismissListener { isThirdPartyDialogShowing = false }
+                .create()
+                .show()
+        }
     }
 
     /**

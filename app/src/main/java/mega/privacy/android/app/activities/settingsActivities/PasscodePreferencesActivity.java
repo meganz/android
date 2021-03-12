@@ -5,6 +5,8 @@ import android.view.KeyEvent;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsPasscodeLockFragment;
 
@@ -23,7 +25,7 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        aB.setTitle(getString(R.string.settings_pin_lock_switch).toUpperCase());
+        setTitle(R.string.settings_pin_lock_switch);
         sttPasscodeLock = new SettingsPasscodeLockFragment();
         replaceFragment(sttPasscodeLock);
     }
@@ -35,7 +37,7 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
         if (sttPasscodeLock == null)
             return;
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
         final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
         dialogBuilder.setSingleChoiceItems(items, INVALID_OPTION, (dialog, item) -> {
