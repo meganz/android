@@ -240,10 +240,10 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         return binder
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         mainHandler.removeCallbacks(resumePlayRunnable)
 
-        when (intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
+        when (intent.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
             COMMAND_PAUSE -> {
                 if (playing()) {
                     exoPlayer.playWhenReady = false

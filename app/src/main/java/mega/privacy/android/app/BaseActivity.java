@@ -51,6 +51,7 @@ import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -167,6 +168,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         registerReceiver(resumeTransfersReceiver,
                 new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
+
+        registerReceiver(cookieSettingsReceiver,
+                new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -519,6 +523,23 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
             MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
+        }
+    };
+
+    /**
+     * Broadcast to show a snackbar when the Cookie settings has been saved
+     */
+    protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || !isActivityInForeground() || intent == null) {
+                return;
+            }
+
+            View view = getWindow().getDecorView().findViewById(android.R.id.content);
+            if (view != null) {
+                showSnackbar(view, StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved));
+            }
         }
     };
 

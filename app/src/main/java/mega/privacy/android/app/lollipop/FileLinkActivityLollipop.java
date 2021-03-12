@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -49,9 +50,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
@@ -128,7 +129,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	private Drawable drawableShare;
 
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+    CookieDialogHandler cookieDialogHandler;
 
 	private GoogleAdsLoader mAdsLoader;
 
@@ -257,8 +258,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
 		initAdsLoader();
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	/**

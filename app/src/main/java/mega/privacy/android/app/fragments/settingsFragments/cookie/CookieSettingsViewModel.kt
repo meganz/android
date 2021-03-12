@@ -21,6 +21,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
     private val updateResult = MutableLiveData<Boolean>()
+    private var cookiesSaved = true
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
     fun onUpdateResult(): LiveData<Boolean> = updateResult
@@ -42,8 +43,8 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             enabledCookies.value?.remove(cookie)
         }
 
+        cookiesSaved = false
         enabledCookies.notifyObserver()
-        updateCookieSettings()
     }
 
     /**
@@ -59,7 +60,32 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             resetCookies()
         }
 
-        updateCookieSettings()
+        cookiesSaved = false
+    }
+
+    /**
+     * Check if current cookie settings are saved
+     */
+    fun areCookiesSaved(): Boolean = cookiesSaved
+
+    /**
+     * Save cookie settings to SDK
+     */
+    fun saveCookieSettings() {
+        updateCookieSettingsUseCase.update(enabledCookies.value)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    updateResult.value = true
+                    cookiesSaved = true
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                    updateResult.value = false
+                    getCookieSettings()
+                }
+            )
     }
 
     /**
@@ -70,12 +96,9 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { configuration ->
-                    if (configuration.isNullOrEmpty()) {
-                        updateCookieSettings() // Save essential cookie settings by default
-                    } else {
-                        enabledCookies.value?.addAll(configuration)
-                        enabledCookies.notifyObserver()
+                onSuccess = { settings ->
+                    if (!settings.isNullOrEmpty()) {
+                        enabledCookies.value = settings.toMutableSet()
                     }
 
                     updateResult.value = true
@@ -87,27 +110,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
-    }
-
-    /**
-     * Save cookie settings to SDK
-     */
-    private fun updateCookieSettings() {
-        composite.clear()
-
-        updateCookieSettingsUseCase.update(enabledCookies.value)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    updateResult.value = true
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                    updateResult.value = false
-                    getCookieSettings()
-                }
-            ).addTo(composite)
     }
 
     /**

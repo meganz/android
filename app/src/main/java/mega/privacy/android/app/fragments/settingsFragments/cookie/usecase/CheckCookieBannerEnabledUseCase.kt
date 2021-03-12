@@ -2,28 +2,24 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
-import java.util.*
 import javax.inject.Inject
 
 /**
- * Use Case to get cookie settings from SDK
+ * Use Case to check if Cookie Banner is enabled on SDK
  */
-class GetCookieSettingsUseCase @Inject constructor(
+class CheckCookieBannerEnabledUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
     /**
-     * Get current cookie settings from SDK
-     *
-     * @return Observable with a set of enabled cookies
+     * Check if the app can start showing the cookie banner
      */
-    fun get(): Single<Set<CookieType>> =
+    fun check(): Single<Boolean> =
         Single.create { emitter ->
-            megaApi.getCookieSettings(object : MegaRequestListenerInterface {
+            megaApi.getMiscFlags(object : MegaRequestListenerInterface {
                 override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
 
                 override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
@@ -36,20 +32,8 @@ class GetCookieSettingsUseCase @Inject constructor(
                     if (emitter.isDisposed) return
 
                     when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            val result = mutableSetOf<CookieType>()
-
-                            val bitSet = BitSet.valueOf(longArrayOf(request.numDetails.toLong()))
-                            for (i in 0..bitSet.length()) {
-                                if (bitSet[i]) {
-                                    result.add(CookieType.valueOf(i))
-                                }
-                            }
-
-                            emitter.onSuccess(result)
-                        }
-                        MegaError.API_ENOENT -> {
-                            emitter.onSuccess(emptySet()) // Cookie Settings has not been set before
+                        MegaError.API_OK, MegaError.API_EACCESS -> {
+                            emitter.onSuccess(api.isCookieBannerEnabled)
                         }
                         else -> {
                             emitter.onError(error.toThrowable())
@@ -66,12 +50,4 @@ class GetCookieSettingsUseCase @Inject constructor(
                 }
             })
         }
-
-    /**
-     * Check if the cookie dialog should be shown
-     *
-     * @return Observable with the boolean flag
-     */
-    fun shouldShowDialog(): Single<Boolean> =
-        get().map { it.isNullOrEmpty() }
 }

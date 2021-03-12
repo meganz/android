@@ -67,7 +67,7 @@ import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
@@ -169,7 +169,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+	CookieDialogHandler cookieDialogHandler;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -587,9 +587,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 
-		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
-
 		observeDragSupportEvents(this, listView);
+
+		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
     }
 
 	@Override
@@ -605,7 +605,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
         boolean canScroll = listView.canScrollVertically(-1);
         Util.changeToolBarElevation(this, tB, canScroll || adapterList.isMultipleSelect());
     }
-	
+
 	public void askForDecryptionKeyDialog(){
 		logDebug("askForDecryptionKeyDialog");
 
@@ -648,6 +648,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 		}
 
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	@Override
