@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
@@ -66,7 +65,7 @@ import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
+abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     @MegaApi
     @Inject
@@ -87,13 +86,9 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
 
-    private val nodeAttacher = MegaAttacher(this)
-    private val nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
-
-    private val dragToExit = DragToExitSupport(this, this::onDragActivated) {
-        finish()
-        overridePendingTransition(0, android.R.anim.fade_out)
-    }
+    private lateinit var nodeAttacher: MegaAttacher
+    private lateinit var nodeSaver: NodeSaver
+    private lateinit var dragToExit: DragToExitSupport
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -133,6 +128,14 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        nodeAttacher = MegaAttacher(this)
+        nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
+
+        dragToExit = DragToExitSupport(this, this::onDragActivated) {
+            finish()
+            overridePendingTransition(0, android.R.anim.fade_out)
+        }
 
         val extras = intent.extras
         if (extras == null) {
@@ -213,9 +216,7 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             }
         }
 
-        if (isAudioPlayer) {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        } else {
+        if (!isAudioPlayer) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -223,6 +224,8 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         }
     }
+
+    abstract fun isAudioPlayer(): Boolean
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -724,8 +727,6 @@ class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }
-
-    fun isAudioPlayer() = isAudioPlayer(intent)
 
     companion object {
         fun isAudioPlayer(intent: Intent?): Boolean {

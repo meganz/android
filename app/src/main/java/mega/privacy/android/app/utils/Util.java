@@ -102,8 +102,8 @@ import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity;
 import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -114,6 +114,8 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
+import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -1759,7 +1761,11 @@ public class Util {
 	 * @return the Intent with corresponding target activity class
 	 */
 	public static Intent getMediaIntent(Context context, String nodeName) {
-		return new Intent(context, MediaPlayerActivity.class);
+		if (MimeTypeList.typeForName(nodeName).isAudio()) {
+			return new Intent(context, AudioPlayerActivity.class);
+		} else {
+			return new Intent(context, VideoPlayerActivity.class);
+		}
 	}
 
 	public static void resetActionBar(ActionBar aB) {

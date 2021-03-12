@@ -384,9 +384,14 @@
         </activity>
 
         <activity
-            android:name=".mediaplayer.MediaPlayerActivity"
+            android:name=".mediaplayer.VideoPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.Dark.FullScreen.Draggable" />
+
+        <activity
+            android:name=".mediaplayer.AudioPlayerActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
