@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer
 import android.animation.Animator
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +30,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val bgPlay = binding.root.findViewById<ImageButton>(R.id.background_play_toggle)
     private val bgPlayHint = binding.root.findViewById<TextView>(R.id.background_play_hint)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
+
+    private val shuffle = binding.root.findViewById<ImageView>(R.id.exo_shuffle)
 
     /**
      * Update the layout param of artwork of player view.
@@ -190,6 +193,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
         playlist.isEnabled = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
+
+        shuffle.isEnabled = playlist.isEnabled
     }
 
     /**
