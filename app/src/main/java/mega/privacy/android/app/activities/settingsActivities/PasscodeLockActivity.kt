@@ -582,8 +582,6 @@ class PasscodeLockActivity : BaseActivity() {
                 RESET_MODE -> MegaApplication.getPasscodeManagement().showPasscodeScreen = false
                 else -> finish()
             }
-        } else {
-            moveTaskToBack(false)
         }
 
         setResult(RESULT_CANCELED)
