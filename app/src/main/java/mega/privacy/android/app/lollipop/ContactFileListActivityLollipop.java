@@ -660,6 +660,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
