@@ -2,9 +2,11 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -85,6 +87,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
+import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
@@ -156,6 +160,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private final BroadcastReceiver errorCopyingNodesReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || !BROADCAST_ACTION_ERROR_COPYING_NODES.equals(intent.getAction())) {
+				return;
+			}
+
+			removeProgressDialog();
+			showSnackbar(SNACKBAR_TYPE, intent.getStringExtra(ERROR_MESSAGE_TEXT));
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
@@ -193,6 +209,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
+
+		registerReceiver(errorCopyingNodesReceiver,
+				new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
 
 		setContentView(R.layout.activity_node_history);
 
@@ -350,6 +369,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
     protected void onDestroy(){
 		logDebug("onDestroy");
     	super.onDestroy();
+		unregisterReceiver(errorCopyingNodesReceiver);
+
 		if (megaChatApi != null) {
 			megaChatApi.removeChatListener(this);
 			megaChatApi.removeNodeHistoryListener(chatId, this);
@@ -808,7 +829,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void handleStoredData() {
-		chatC.proceedWithForward(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId);
+		chatC.proceedWithForwardOrShare(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId, FORWARD_ONLY_OPTION);
 		preservedMessagesSelected = null;
 		preservedMessagesToImport = null;
 	}

@@ -22,13 +22,14 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
+import mega.privacy.android.app.listeners.CopyListener;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -57,6 +58,8 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -69,6 +72,7 @@ public class ChatController {
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH;
+    private ExportListener exportListener;
 
     public ChatController(Context context){
         logDebug("ChatController created");
@@ -545,13 +549,19 @@ public class ChatController {
 
                 }else if(message.getType() == MegaChatMessage.TYPE_CONTAINS_META){
                     MegaChatContainsMeta meta = message.getContainsMeta();
-                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                       String text = meta.getRichPreview().getText();
-                       builder.append(text);
-                       return builder.toString();
-                    }else{
-                       return "";
+                    if (meta != null) {
+                        if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
+                            String text = meta.getRichPreview().getText();
+                            builder.append(text);
+                            return builder.toString();
+                        } else if (isGeolocation(message)) {
+                            String text = message.getContainsMeta().getTextMessage();
+                            builder.append(text);
+                            return builder.toString();
+                        }
                     }
+
+                    return "";
                 }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
                     String textToShow = context.getResources().getString(R.string.call_started_messages);
                     builder.append(textToShow);
@@ -1046,7 +1056,7 @@ public class ChatController {
 
     }
 
-    public void importNode(long idMessage, long idChat) {
+    public void importNode(long idMessage, long idChat, int typeImport) {
         logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
         MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
@@ -1054,7 +1064,7 @@ public class ChatController {
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
             messages.add(aMessage);
-            importNodesFromAndroidMessages(messages);
+            importNodesFromAndroidMessages(messages, typeImport);
         }
         else{
             logWarning("Message cannot be recovered - null");
@@ -1078,7 +1088,7 @@ public class ChatController {
         }
     }
 
-    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
+    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, int typeImport){
         logDebug("importNodesFromAndroidMessages");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -1091,24 +1101,43 @@ public class ChatController {
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
         if(context instanceof  ChatActivityLollipop){
-            ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
+            if (typeImport == IMPORT_TO_SHARE_OPTION) {
+                ((ChatActivityLollipop) context).importNodeToShare(messages, exportListener);
+            } else {
+                ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
+            }
         }
         else if(context instanceof  NodeAttachmentHistoryActivity){
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
         }
     }
 
-    public void prepareMessageToForward(long idMessage, long idChat) {
-        logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
-        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-        MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
+    /**
+     * Method to prepare selected messages that are of type TYPE_NODE_ATTACHMENT or type TYPE_VOICE_CLIP to be imported and shared.
+     *
+     * @param androidMessagesSelected The selected messages.
+     * @param idChat                  The chat ID.
+     */
+    public void prepareMessagesToShare(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat) {
+        if (androidMessagesSelected == null || androidMessagesSelected.isEmpty())
+            return;
 
-        if(m!=null){
-            messagesSelected.add(m);
-            prepareMessagesToForward(messagesSelected, idChat);
+        logDebug("Number of messages: " + androidMessagesSelected.size() + ",Chat ID: " + idChat);
+        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
+        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+        for (AndroidMegaChatMessage androidMsg : androidMessagesSelected) {
+            messagesSelected.add(androidMsg.getMessage());
+            int type = androidMsg.getMessage().getType();
+            if (type == MegaChatMessage.TYPE_NODE_ATTACHMENT || type == MegaChatMessage.TYPE_VOICE_CLIP) {
+                messagesToImport.add(androidMsg.getMessage());
+            }
+
         }
-        else{
-            logError("Message null");
+
+        if (!messagesToImport.isEmpty() && context instanceof ChatActivityLollipop) {
+            ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+            ((ChatActivityLollipop) context).setExportListener(exportListener);
+            ((ChatActivityLollipop) context).handleStoredData();
         }
     }
 
@@ -1157,37 +1186,49 @@ public class ChatController {
         }
     }
 
-    public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
-        ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+    /**
+     * Method for copying nodes to My Chat Files folder.
+     *
+     * @param myChatFilesFolder The node myChatFilesFolder.
+     * @param messagesSelected  The list of selected msgs.
+     * @param messagesToImport  The list of messages to import.
+     * @param idChat            The chat ID.
+     * @param typeImport        IMPORT_TO_SHARE_OPTION, indicates that the node will be shared.
+     *                          FORWARD_ONLY_OPTION, indicates that the node will be forwarded.
+     */
+    public void proceedWithForwardOrShare(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat, int typeImport) {
+        CopyListener listener;
+        if (typeImport == IMPORT_TO_SHARE_OPTION) {
+            listener = new CopyListener(MULTIPLE_IMPORT_CONTACT_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat, exportListener);
+        } else {
+            listener = new CopyListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+        }
+
         int errors = 0;
 
-        for(int j=0; j<messagesToImport.size();j++){
-            MegaChatMessage message = messagesToImport.get(j);
-
-            if(message!=null){
-
-                MegaNodeList nodeList = message.getMegaNodeList();
-
-                for(int i=0;i<nodeList.size();i++){
+        for (MegaChatMessage msgToImport : messagesToImport) {
+            if (msgToImport == null) {
+                logWarning("MESSAGE is null");
+                errors++;
+            } else {
+                MegaNodeList nodeList = msgToImport.getMegaNodeList();
+                for (int i = 0; i < nodeList.size(); i++) {
                     MegaNode document = nodeList.get(i);
                     if (document != null) {
-                        logDebug("DOCUMENT: " + document.getHandle());
+                        logDebug("DOCUMENT to copy: " + document.getHandle());
                         document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
                         megaApi.copyNode(document, myChatFilesFolder, listener);
                     }
-                    else{
-                        logWarning("DOCUMENT: null");
-                    }
                 }
-            }
-            else{
-                logWarning("MESSAGE is null");
-                errors++;
             }
         }
 
         if (errors > 0) {
-            showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
+            if (typeImport == IMPORT_TO_SHARE_OPTION) {
+                showSnackbar(context, getString(R.string.number_no_imported_from_chat, errors));
+            } else {
+                showSnackbar(context, getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
+            }
         }
     }
 
@@ -1341,5 +1382,9 @@ public class ChatController {
         }
 
         return email;
+    }
+
+    public void setExportListener(ExportListener exportListener) {
+        this.exportListener = exportListener;
     }
 }

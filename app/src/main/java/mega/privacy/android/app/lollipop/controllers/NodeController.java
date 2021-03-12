@@ -15,10 +15,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
+import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -39,6 +41,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
@@ -93,7 +96,7 @@ public class NodeController {
         logDebug("copyNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -147,7 +150,7 @@ public class NodeController {
         logDebug("moveNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -238,20 +241,12 @@ public class NodeController {
         return dBT;
     }
 
-    public void renameNode(MegaNode document, String newName){
-        logDebug("renameNode");
-        if (newName.compareTo(document.getName()) == 0) {
+    public void renameNode(MegaNode document, String newName, ActionNodeCallback actionNodeCallback){
+        if (isOffline(context)) {
             return;
         }
 
-        if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        logDebug("Renaming " + document.getName() + " to " + newName);
-
-        megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
+        megaApi.renameNode(document, newName, new RenameListener(context, actionNodeCallback));
     }
 
     public int importLink(String url) {
@@ -301,9 +296,9 @@ public class NodeController {
     public void exportLink(MegaNode document){
         logDebug("exportLink");
         if (!isOnline(context)) {
-            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            showSnackbar(context, getString(R.string.error_server_connection_problem));
         } else if(context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, new ExportListener(context));
+            megaApi.exportNode(document, new ExportListener(context, ACTION_GET_LINK));
         } else if(context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -312,9 +307,9 @@ public class NodeController {
     public void exportLinkTimestamp(MegaNode document, int timestamp){
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
-            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            showSnackbar(context, getString(R.string.error_server_connection_problem));
         } else if (context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, timestamp, new ExportListener(context));
+            megaApi.exportNode(document, timestamp, new ExportListener(context, ACTION_GET_LINK));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
@@ -326,11 +321,11 @@ public class NodeController {
 
     public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
-        ExportListener exportListener = new ExportListener(context, true, nodes.size());
+        ExportListener exportListener = new ExportListener(context, ACTION_REMOVE_LINK, nodes.size());
 
         for (MegaNode node : nodes) {
             removeLink(node, exportListener);
@@ -343,7 +338,7 @@ public class NodeController {
         //TODO shareMultipleFolders
 
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -634,7 +629,7 @@ public class NodeController {
 
     public void shareFolder(MegaNode node, ArrayList<String> selectedContacts, int permissions) {
         if (!isOnline(context)) {
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -650,7 +645,7 @@ public class NodeController {
     public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions){
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 

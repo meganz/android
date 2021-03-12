@@ -60,6 +60,8 @@ public class FileUtil {
 
     static final String MAIN_DIR = File.separator + "MEGA";
 
+    public static final String CAMERA_FOLDER = "Camera";
+
     public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
 
     public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
@@ -845,10 +847,7 @@ public class FileUtil {
      * @return The copied file on DCIM.
      */
     public static File copyFileToDCIM(File fileToCopy) {
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
-        if (!storageDir.exists()) {
-            storageDir.mkdir();
-        }
+        File storageDir = getCameraFolder();
 
         File copyFile = new File(storageDir, fileToCopy.getName());
         try {
@@ -893,6 +892,16 @@ public class FileUtil {
         } catch (Exception e) {
             logWarning("Exception scanning file.", e);
         }
+    }
+
+    public static File getCameraFolder() {
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), CAMERA_FOLDER);
+
+        if (!storageDir.exists()) {
+            storageDir.mkdir();
+        }
+
+        return storageDir;
     }
 }
 

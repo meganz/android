@@ -201,6 +201,10 @@
         <item name="android:textColor">@color/grey_070_white_070</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey">
+        <item name="android:textColor">@color/grey_054_white_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>

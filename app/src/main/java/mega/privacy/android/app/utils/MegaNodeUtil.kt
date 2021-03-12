@@ -40,16 +40,19 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+
 
 object MegaNodeUtil {
     /**
@@ -156,18 +159,64 @@ object MegaNodeUtil {
     @JvmStatic
     fun shareNode(context: Context, node: MegaNode) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
-            val path = FileUtil.getLocalFile(context, node.name, node.size)
+            val path = getLocalFile(context, node.name, node.size)
 
-            if (!TextUtil.isTextEmpty(path) && !node.isFolder) {
+            if (!isTextEmpty(path) && !node.isFolder) {
                 FileUtil.shareFile(context, File(path))
             } else if (node.isExported) {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
                 MegaApplication.getInstance().megaApi.exportNode(
-                    node, ExportListener(context, Intent(Intent.ACTION_SEND))
+                    node, ExportListener(context, ACTION_SHARE_NODE, Intent(Intent.ACTION_SEND))
                 )
             }
         }
+    }
+
+    /**
+     * Method to know if all nodes are unloaded. If so, share them.
+     *
+     * @param context   The Activity context.
+     * @param listNodes The list of nodes to be checked.
+     * @return True, if all are downloaded. False, otherwise.
+     */
+    @JvmStatic
+    fun areAllNodesDownloaded(context: Context, listNodes: List<MegaNode>): Boolean {
+        val downloadedFiles = ArrayList<File>()
+
+        for (node in listNodes) {
+            val path = if (node.isFolder) null else getLocalFile(context, node.name, node.size)
+
+            if (isTextEmpty(path)) {
+                return false
+            } else {
+                downloadedFiles.add(File(path!!))
+            }
+        }
+
+        logDebug("All nodes are downloaded, so share the files")
+        shareFiles(context, downloadedFiles)
+
+        return true
+    }
+
+    /**
+     * Method to get the link to the exported nodes.
+     *
+     * @param listNodes The list of nodes to be checked.
+     * @return The link with all exported nodes
+     */
+    @JvmStatic
+    fun getExportNodesLink(listNodes: List<MegaNode>): StringBuilder {
+        val links = StringBuilder()
+
+        for (node in listNodes) {
+            if (node.isExported) {
+                links.append(node.publicLink).append("\n\n")
+            }
+        }
+
+        return links
     }
 
     /**
@@ -187,50 +236,26 @@ object MegaNodeUtil {
             return
         }
 
-        val downloadedFiles: MutableList<File> = ArrayList()
-        var allDownloadedFiles = true
-
-        for (node in nodes) {
-            val path =
-                if (node.isFolder) null else FileUtil.getLocalFile(context, node.name, node.size)
-
-            if (TextUtil.isTextEmpty(path)) {
-                allDownloadedFiles = false
-                break
-            } else {
-                downloadedFiles.add(File(path!!))
-            }
-        }
-
-        if (allDownloadedFiles) {
-            FileUtil.shareFiles(context, downloadedFiles)
+        if (areAllNodesDownloaded(context, nodes)) {
             return
         }
 
         var notExportedNodes = 0
-        val links = StringBuilder()
-
+        val links = getExportNodesLink(nodes)
         for (node in nodes) {
             if (!node.isExported) {
                 notExportedNodes++
-            } else {
-                links.append(node.publicLink)
-                    .append("\n\n")
             }
         }
 
         if (notExportedNodes == 0) {
-            startShareIntent(
-                context, Intent(Intent.ACTION_SEND),
-                links.toString()
-            )
+            startShareIntent(context, Intent(Intent.ACTION_SEND), links.toString())
             return
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
         val exportListener = ExportListener(
-            context, notExportedNodes, links,
-            Intent(Intent.ACTION_SEND)
+            context, ACTION_SHARE_NODE, notExportedNodes, links, Intent(Intent.ACTION_SEND)
         )
 
         for (node in nodes) {
@@ -273,7 +298,8 @@ object MegaNodeUtil {
      * @param node      node involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private fun shouldContinueWithoutError(
+    @JvmStatic
+    public fun shouldContinueWithoutError(
         context: Context,
         message: String,
         node: MegaNode?
@@ -300,7 +326,8 @@ object MegaNodeUtil {
      * @param nodes      nodes involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private fun shouldContinueWithoutError(
+    @JvmStatic
+    public fun shouldContinueWithoutError(
         context: Context, message: String,
         nodes: List<MegaNode>?
     ): Boolean {

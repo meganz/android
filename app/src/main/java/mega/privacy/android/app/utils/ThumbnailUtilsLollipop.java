@@ -63,8 +63,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.dp2px;
 import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
 /*
@@ -75,7 +77,6 @@ public class ThumbnailUtilsLollipop {
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
 	public static Boolean isDeviceMemoryLow = false;
-	public static final int THUMB_ROUND_PIXEL = 5;
 
 	static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<Long, ThumbnailDownloadListenerListBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerGridBrowser> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGridBrowser>();
@@ -260,21 +261,21 @@ public class ThumbnailUtilsLollipop {
 				if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
 					if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
 						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(
-								getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+								getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
 					}
 				}
 				else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 					if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
 						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(
-								getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+								getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
 					}
 				}
 				else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
 					if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(
-								getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+								getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
 					}
 				}
@@ -429,7 +430,7 @@ public class ThumbnailUtilsLollipop {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) {
 										MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop holderList = (MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) holder;
-										holderList.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+										holderList.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 										holderList.imageView.startAnimation(fadeInAnimation);
 										adapter.notifyItemChanged(holderList.getAdapterPosition());
 									}
@@ -635,7 +636,7 @@ public class ThumbnailUtilsLollipop {
 							if (bitmap != null) {
 								thumbnailCache.put(handle, bitmap);
 								if ((holder.document == handle)){
-									holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+									holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.imageView.startAnimation(fadeInAnimation);
 									adapter.notifyItemChanged(holder.getAdapterPosition());
@@ -952,7 +953,7 @@ public class ThumbnailUtilsLollipop {
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 		if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) {
 			MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop holderList = (MegaExplorerLollipopAdapter.ViewHolderListExplorerLollipop) holder;
-			holderList.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+			holderList.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 			adapter.notifyItemChanged(holderList.getAdapterPosition());
 		}
 		else if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) {
@@ -1204,7 +1205,7 @@ public class ThumbnailUtilsLollipop {
 		// if the thumbnail bitmap is cached in memory cache
 		Bitmap bitmap = getThumbnailFromCache(key);
 		if (bitmap != null) {
-			holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+			holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 			return;
 		}
 
@@ -1215,7 +1216,7 @@ public class ThumbnailUtilsLollipop {
 		if (directoryCachedFile.exists()) {
             bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
             if (bitmap != null) {
-                holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
+                holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
                 return;
             }
         }
@@ -1505,7 +1506,7 @@ public class ThumbnailUtilsLollipop {
 		}
 
 		if (thumb != null) {
-			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
 		}
 	}
 
@@ -1515,7 +1516,7 @@ public class ThumbnailUtilsLollipop {
 		if ((thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node)) != null ||
 				(thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context)) != null) {
 			setThumbLayoutParamsForList(context, imageView);
-			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
 		} else {
 			logDebug("NOT thumbnail");
 			imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
