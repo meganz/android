@@ -3,10 +3,12 @@ package mega.privacy.android.app.activities.settingsActivities
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
+import android.os.Handler
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo.*
+import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.widget.doAfterTextChanged
@@ -554,6 +556,14 @@ class PasscodeLockActivity : BaseActivity() {
         this.passcodeType = passcodeType
         initPasscodeScreen()
         clearTypedPasscode(false)
+
+
+        Handler().postDelayed({
+            (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(
+                currentFocus,
+                InputMethodManager.SHOW_IMPLICIT
+            )
+        }, 300)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
