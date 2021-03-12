@@ -26,6 +26,8 @@ abstract class Saving : Parcelable {
 
     abstract fun fromMediaViewer(): Boolean
 
+    abstract fun downloadToGallery(): Boolean
+
     /**
      * The final step to download a node into a file.
      *
@@ -50,6 +52,8 @@ abstract class Saving : Parcelable {
             override fun hasUnsupportedFile(context: Context): Boolean = false
 
             override fun fromMediaViewer() = false
+
+            override fun downloadToGallery() = false
 
             override fun doDownload(
                 parentPath: String,

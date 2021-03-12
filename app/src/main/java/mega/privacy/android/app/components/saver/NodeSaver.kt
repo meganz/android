@@ -199,13 +199,15 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
+     * @param downloadToGallery whether nodes should be downloaded into gallery
      */
     fun saveNodeLists(
         nodeLists: List<MegaNodeList>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
+        downloadToGallery: Boolean = false,
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -218,7 +220,7 @@ class NodeSaver(
 
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize
+                needSerialize, downloadToGallery = downloadToGallery
             )
         }
     }
@@ -475,10 +477,13 @@ class NodeSaver(
     }
 
     private fun doSave() {
-        if (Util.askMe(app)) {
+        if (!saving.downloadToGallery() && Util.askMe(app)) {
             requestLocalFolder(null, activityLauncher)
         } else {
-            checkSizeBeforeDownload(getDownloadLocation())
+            checkSizeBeforeDownload(
+                if (saving.downloadToGallery()) getCameraFolder().absolutePath
+                else getDownloadLocation()
+            )
         }
     }
 

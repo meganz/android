@@ -891,7 +891,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
 						list.add(megaNodeList);
 					}
-					nodeSaver.saveNodeLists(list, false, false, false, true);
+					nodeSaver.saveNodeLists(list, false, false, false, true, false);
 					break;
 				}
 				case R.id.chat_cab_menu_import:{

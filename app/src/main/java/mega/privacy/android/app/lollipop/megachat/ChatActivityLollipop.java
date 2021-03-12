@@ -518,8 +518,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
 
-    private boolean downloadToGallery;
-
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
         this.preservedMessagesSelected = preservedData;
@@ -1470,7 +1468,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                         isTurn = lastIdMsgSeen != MEGACHAT_INVALID_HANDLE;
 
                         generalUnreadCount = savedInstanceState.getLong(GENERAL_UNREAD_COUNT, 0);
-                        downloadToGallery = savedInstanceState.getBoolean(DOWNLOAD_TO_GALLERY, false);
 
                         boolean isPlaying = savedInstanceState.getBoolean(PLAYING, false);
                         if (isPlaying) {
@@ -4361,14 +4358,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 case R.id.chat_cab_menu_download:
                 case R.id.chat_cab_menu_download_gallery:
                     logDebug("chat_cab_menu_download ");
-                    downloadToGallery = item.getItemId() == R.id.chat_cab_menu_download_gallery;
-
                     ArrayList<MegaNodeList> list = new ArrayList<>();
                     for (int i = 0; i < messagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
-                    nodeSaver.saveNodeLists(list, false, false, false, true);
+                    nodeSaver.saveNodeLists(list, false, false, false, true,
+                            item.getItemId() == R.id.chat_cab_menu_download_gallery);
                     break;
 
                 case R.id.chat_cab_menu_import:
@@ -4748,7 +4744,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     public void downloadNodeList(MegaNodeList nodeList) {
-        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
+        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true,
+                false);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
@@ -8232,7 +8229,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
         outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
-        outState.putBoolean(DOWNLOAD_TO_GALLERY, downloadToGallery);
 
         nodeSaver.saveState(outState);
 

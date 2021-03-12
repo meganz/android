@@ -27,7 +27,8 @@ class MegaNodeSaving(
     private val nodes: List<MegaNode>,
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
-    private val isVoiceClip: Boolean = false
+    private val isVoiceClip: Boolean = false,
+    private val downloadToGallery: Boolean = false
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -56,6 +57,8 @@ class MegaNodeSaving(
     }
 
     override fun fromMediaViewer() = fromMediaViewer
+
+    override fun downloadToGallery() = downloadToGallery
 
     override fun doDownload(
         parentPath: String,
