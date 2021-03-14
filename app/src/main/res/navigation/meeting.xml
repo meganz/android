@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_meeting"
+    app:startDestination="@id/createMeetingFragment">
+    <fragment
+        android:id="@+id/createMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
+        android:label="fragment_create_meeting"
+        tools:layout="@layout/create_meeting_fragment">
+    </fragment>
+    <fragment
+        android:id="@+id/joinMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingFragment"
+        android:label="fragment_join_meeting"
+        tools:layout="@layout/join_meeting_fragment">
+    </fragment>
+</navigation>

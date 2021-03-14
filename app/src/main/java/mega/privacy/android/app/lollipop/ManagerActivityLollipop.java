@@ -169,6 +169,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
+import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -218,6 +219,7 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -284,6 +286,8 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -326,7 +330,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		View.OnFocusChangeListener, View.OnLongClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		BillingUpdatesListener, ChatManagementCallback {
+		BillingUpdatesListener, ChatManagementCallback, MeetingBottomSheetDialogActionListener {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -10221,6 +10225,20 @@ public class ManagerActivityLollipop extends SorterContentActivity
                 	.alpha(ALPHA_OPAQUE)
 					.start();
 		}
+	}
+
+	@Override
+	public void onJoinMeeting() {
+		Intent meetingIntent = new Intent(this, MeetingActivity.class);
+		meetingIntent.putExtra("meetingType", MEETING_TYPE_JOIN);
+		startActivity(meetingIntent);
+	}
+
+	@Override
+	public void onCreateMeeting() {
+		Intent meetingIntent = new Intent(this, MeetingActivity.class);
+		meetingIntent.putExtra("meetingType", MEETING_TYPE_CREATE);
+		startActivity(meetingIntent);
 	}
 
 	public void addContactFromPhone() {

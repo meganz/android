@@ -2,16 +2,20 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
+import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
+import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.ContactController
 
 class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
     private var cC: ContactController? = null
+    private var listener: MeetingBottomSheetDialogActionListener? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         cC = ContactController(context)
@@ -33,8 +37,10 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
     override fun onClick(v: View) {
         when (v.id) {
             R.id.iv_start_meeting -> {
+                listener?.onCreateMeeting()
             }
             R.id.iv_join_meeting -> {
+                listener?.onJoinMeeting()
             }
         }
         setStateBottomSheetBehaviorHidden()
@@ -42,5 +48,10 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as MeetingBottomSheetDialogActionListener
     }
 }

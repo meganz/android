@@ -131,7 +131,9 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
@@ -181,6 +183,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -2322,7 +2325,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_054_white_054));
             if (chatRoom.isGroup()) {
-                videoMenuItem.setVisible(false);
+                videoMenuItem.setVisible(true);
+                videoMenuItem.setTitle(R.string.context_meeting);
             }else{
                 videoMenuItem.setEnabled(false);
                 videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_054_white_054));
@@ -2343,7 +2347,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     }
 
                     if (chatRoom.isGroup()) {
-                        videoMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(true);
+                        videoMenuItem.setTitle(R.string.context_meeting);
                     } else {
                         videoMenuItem.setEnabled(true);
                         videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
@@ -2515,7 +2520,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
             case R.id.cab_menu_video_chat:{
                 logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
-
+                if(chatRoom.isGroup()){
+//                    showMeetingOptionsPanel();
+                    onCreateMeeting();
+                    break;
+                }
                 startVideo = true;
                 if(checkPermissionsCall()){
                     startCall();
@@ -2571,6 +2580,18 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showMeetingOptionsPanel(){
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+        bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
+    private void onCreateMeeting() {
+        Intent meetingIntent = new Intent(this, MeetingActivity.class);
+        meetingIntent.putExtra("meetingType", MEETING_TYPE_CREATE);
+        startActivity(meetingIntent);
     }
 
     /*

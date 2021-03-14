@@ -497,6 +497,10 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity android:name=".meeting.activity.MeetingActivity">
+
+        </activity>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
