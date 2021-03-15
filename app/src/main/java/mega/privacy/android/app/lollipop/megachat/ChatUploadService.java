@@ -1602,6 +1602,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			return;
 		}
 
+		try {
+			fileName = fileName.substring(0, fileName.lastIndexOf("."));
+		} catch (Exception e) {
+			logWarning("Exception getting file name without extension.", e);
+		}
+
 		for (String downSamplingPath: mapVideoDownsampling.keySet()) {
 			if (downSamplingPath.contains(fileName)) {
 				//Video message already compressing

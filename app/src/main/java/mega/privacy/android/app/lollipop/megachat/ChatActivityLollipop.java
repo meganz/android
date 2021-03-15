@@ -969,7 +969,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
 
         registerReceiver(retryPendingMessageReceiver,
-                new IntentFilter(ACTION_CHECK_COMPRESSING_MESSAGE));
+                new IntentFilter(BROADCAST_ACTION_RETRY_PENDING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -3618,7 +3618,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         if (pendMsg.getNodeHandle() != INVALID_HANDLE) {
-            removePendingMsg(pendMsg.getId());
+            removePendingMsg(pendMsg);
             retryNodeAttachment(pendMsg.getNodeHandle());
         } else {
             ////Retry to send
@@ -3630,7 +3630,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             }
 
             //Remove the old message from the UI and DB
-            removePendingMsg(pendMsg.getId());
+            removePendingMsg(pendMsg);
             PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
                     f.getAbsolutePath(), f.getName(), false);
 
@@ -7505,32 +7505,67 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
+    /**
+     * Removes a pending message from UI and DB if exists.
+     *
+     * @param id The identifier of the pending message.
+     */
     public void removePendingMsg(long id){
-        logDebug("Selected message ID: " + selectedMessageId);
+        removePendingMsg(dbH.findPendingMessageById(id));
+    }
 
-        PendingMessageSingle pMsg = dbH.findPendingMessageById(id);
-        if(pMsg!=null && pMsg.getState()==PendingMessageSingle.STATE_UPLOADING) {
-            if (pMsg.getTransferTag() != -1) {
-                logDebug("Transfer tag: " + pMsg.getTransferTag());
-                if (megaApi != null) {
-                    megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
-                }
+    /**
+     * Removes a pending message from UI and DB if exists.
+     *
+     * @param pMsg The pending message.
+     */
+    public void removePendingMsg(PendingMessageSingle pMsg) {
+        if (pMsg == null) {
+            logWarning("pMsg is null, cannot remove it");
+            return;
+        }
+
+        int pMsgState = pMsg.getState();
+
+        if (pMsgState == PendingMessageSingle.STATE_UPLOADING
+                && pMsg.getTransferTag() != INVALID_ID) {
+            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
+        }
+
+        if (pMsgState == PendingMessageSingle.STATE_SENT) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), MEGACHAT_INVALID_HANDLE);
+            return;
+        }
+
+        try {
+            dbH.removePendingMessageById(pMsg.getId());
+            int positionToRemove = selectedPosition == INVALID_POSITION
+                    ? findPendingMessagePosition(pMsg.getId())
+                    : selectedPosition;
+
+            messages.remove(positionToRemove);
+            adapter.removeMessage(positionToRemove, messages);
+        } catch (IndexOutOfBoundsException e) {
+            logError("EXCEPTION", e);
+        }
+    }
+
+    /**
+     * Gets a pending message position from its id.
+     *
+     * @param pendingMsgId Identifier of the pending message.
+     * @return The position of the pending message if exist, INVALID_POSITION otherwise.
+     */
+    public int findPendingMessagePosition(long pendingMsgId) {
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+
+        while (itr.hasPrevious()) {
+            if (pendingMsgId == itr.previous().getMessage().getTempId()) {
+                return itr.nextIndex();
             }
         }
 
-        if(pMsg!=null && pMsg.getState()!=PendingMessageSingle.STATE_SENT){
-            try{
-                dbH.removePendingMessageById(id);
-                messages.remove(selectedPosition);
-                adapter.removeMessage(selectedPosition, messages);
-            }
-            catch (IndexOutOfBoundsException e){
-                logError("EXCEPTION", e);
-            }
-        }
-        else{
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), -1);
-        }
+        return INVALID_POSITION;
     }
 
     /**
