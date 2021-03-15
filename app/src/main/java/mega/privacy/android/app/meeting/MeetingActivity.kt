@@ -3,7 +3,10 @@ package mega.privacy.android.app.meeting
 import android.os.Bundle
 import android.widget.Toast
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     private lateinit var binding: ActivityMeetingBinding
@@ -24,6 +27,27 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
+
+        val megaApi = MegaApplication.getInstance().megaApi
+        val avatar = buildAvatarFile(this, megaApi.myEmail + JPG_EXTENSION)
+
+        bottomFloatingPanelViewHolder.setParticipants(
+            listOf(
+                Participant("Joanna Zhao", avatar, false, true, false, false),
+                Participant("Yeray Rosales", avatar, true, false, true, false),
+                Participant("Harmen Porter", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+                Participant("Katayama Fumiki", avatar, false, false, false, true),
+            )
+        )
 
         updateRole()
     }
@@ -54,6 +78,10 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     override fun onInviteParticipants() {
         Toast.makeText(this, "onInviteParticipants", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onParticipantOption(participant: Participant) {
+        Toast.makeText(this, "onParticipantOption ${participant.name}", Toast.LENGTH_SHORT).show()
     }
 
     companion object {

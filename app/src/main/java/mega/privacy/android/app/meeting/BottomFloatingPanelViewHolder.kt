@@ -4,11 +4,14 @@ import android.content.res.ColorStateList
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 
 class BottomFloatingPanelViewHolder(
     private val binding: ActivityMeetingBinding,
@@ -16,14 +19,18 @@ class BottomFloatingPanelViewHolder(
     private var isGuest: Boolean,
     private var isModerator: Boolean
 ) {
+    private val context = binding.root.context
 
     private val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomFloatingPanel.root)
     private val propertyUpdaters = ArrayList<(Float) -> Unit>()
     private var bottomFloatingPanelExpanded = false
 
+    private val participantsAdapter = ParticipantsAdapter(listener)
+
     init {
         setupBottomSheet()
         listenButtons()
+        setupRecyclerView()
 
         if (isGuest) {
             binding.bottomFloatingPanel.shareLink.isVisible = false
@@ -39,6 +46,14 @@ class BottomFloatingPanelViewHolder(
             bottomFloatingPanelExpanded = true
             onBottomFloatingPanelSlide(1F)
         }
+    }
+
+    fun setParticipants(participants: List<Participant>) {
+        participantsAdapter.submitList(participants)
+
+        binding.bottomFloatingPanel.participantsNum.text = getString(
+            R.string.participants_number, participants.size
+        )
     }
 
     private fun setupBottomSheet() {
@@ -106,6 +121,17 @@ class BottomFloatingPanelViewHolder(
         binding.bottomFloatingPanel.invite.setOnClickListener {
             listener.onInviteParticipants()
         }
+    }
+
+    private fun setupRecyclerView() {
+        val rv = binding.bottomFloatingPanel.participants
+        rv.layoutManager = LinearLayoutManager(context)
+        rv.itemAnimator = noChangeRecyclerViewItemAnimator()
+        rv.clipToPadding = false
+        rv.setHasFixedSize(true)
+
+        rv.adapter = participantsAdapter
+        //participantsAdapter.setHasStableIds(true)
     }
 
     private fun updateBottomFloatingPanelIfNeeded() {

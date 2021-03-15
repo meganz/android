@@ -9,4 +9,6 @@ interface BottomFloatingPanelListener {
 
     fun onShareLink()
     fun onInviteParticipants()
+
+    fun onParticipantOption(participant: Participant)
 }
