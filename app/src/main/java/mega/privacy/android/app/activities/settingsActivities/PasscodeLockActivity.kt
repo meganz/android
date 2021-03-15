@@ -79,10 +79,15 @@ class PasscodeLockActivity : BaseActivity() {
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbarPasscode)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title =
-            StringResourcesUtils.getString(R.string.settings_passcode_lock).toUpperCase(Locale.ROOT)
+        if (mode == UNLOCK_MODE) {
+            binding.toolbarPasscodeLockTitle.visibility = VISIBLE
+        } else {
+            setSupportActionBar(binding.toolbarPasscode)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title =
+                StringResourcesUtils.getString(R.string.settings_passcode_lock)
+                    .toUpperCase(Locale.ROOT)
+        }
 
         initPasscodeScreen()
         setListeners()
@@ -578,7 +583,7 @@ class PasscodeLockActivity : BaseActivity() {
     override fun onBackPressed() {
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
-                UNLOCK_MODE -> moveTaskToBack(true)
+                UNLOCK_MODE -> return
                 RESET_MODE -> MegaApplication.getPasscodeManagement().showPasscodeScreen = false
                 else -> finish()
             }

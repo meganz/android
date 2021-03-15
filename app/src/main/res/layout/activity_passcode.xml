@@ -10,7 +10,19 @@
         android:id="@+id/toolbar_passcode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize" />
+        android:minHeight="?attr/actionBarSize">
+
+        <TextView
+            android:id="@+id/toolbar_passcode_lock_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/settings_passcode_lock"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+            android:visibility="gone" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <ScrollView
         android:id="@+id/passcode_scroll_view"
