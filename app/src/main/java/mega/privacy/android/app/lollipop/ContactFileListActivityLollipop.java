@@ -605,6 +605,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
         if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
