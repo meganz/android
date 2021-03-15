@@ -1595,16 +1595,18 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	 * @param intent Intent containing the pending message with all the needed info.
 	 */
 	private void checkCompressingMessage(Intent intent) {
-		String pendingMsgPath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH);
+		String fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME);
 
-		if (isTextEmpty(INTENT_EXTRA_KEY_PATH)) {
-			logWarning("pendingMsgPath is not valid, no check is needed.");
+		if (isTextEmpty(fileName)) {
+			logWarning("fileName is not valid, no check is needed.");
 			return;
 		}
 
-		if (mapVideoDownsampling.get(pendingMsgPath) != null) {
-			//Video message already compressing
-			return;
+		for (String downSamplingPath: mapVideoDownsampling.keySet()) {
+			if (downSamplingPath.contains(fileName)) {
+				//Video message already compressing
+				return;
+			}
 		}
 
 		//Video message not compressing, need to retry upload
