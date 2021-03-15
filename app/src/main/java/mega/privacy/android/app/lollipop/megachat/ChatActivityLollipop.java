@@ -179,6 +179,7 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
@@ -822,6 +823,24 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
+    private final BroadcastReceiver retryPendingMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_RETRY_PENDING_MESSAGE.equals(intent.getAction())) {
+                return;
+            }
+
+            long pendingMsgId = intent.getLongExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
+            long chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+
+            if (pendingMsgId == MEGACHAT_INVALID_HANDLE || chatId != idChat) {
+                logWarning("pendingMsd is not valid or is not the same chat. Cannot retry");
+            }
+
+            retryPendingMessage(pendingMsgId);
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -948,6 +967,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         registerReceiver(errorCopyingNodesReceiver,
                 new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
+
+        registerReceiver(retryPendingMessageReceiver,
+                new IntentFilter(ACTION_CHECK_COMPRESSING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -6860,6 +6882,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     int tag = transfer != null ? transfer.getTag() : INVALID_ID;
                     dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
                     pendingMsg.setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                    msg.setPendingMessage(pendingMsg);
                 } else if (transfer.getState() == MegaTransfer.STATE_COMPLETED || transfer.getState() == MegaTransfer.STATE_CANCELLED) {
                     dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageSingle.STATE_SENT);
                     continue;
@@ -6867,6 +6890,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
             } else if (pendingMsg.getState() == PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER) {
                 dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageSingle.STATE_PREPARING);
                 pendingMsg.setState(PendingMessageSingle.STATE_PREPARING);
+                msg.setPendingMessage(pendingMsg);
+            } else if (pendingMsg.getState() == PendingMessageSingle.STATE_COMPRESSING) {
+                if (isServiceRunning(ChatUploadService.class)) {
+                    startService(new Intent(this, ChatUploadService.class)
+                            .putExtra(CHAT_ID, pendingMsg.getChatId())
+                            .putExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMsg.getId())
+                            .putExtra(INTENT_EXTRA_KEY_PATH, pendingMsg.getFilePath()));
+                } else {
+                    retryPendingMessage(pendingMsg.getId());
+                }
             }
 
             appendMessagePosition(msg);
@@ -7966,6 +7999,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         unregisterReceiver(joinedSuccessfullyReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
         unregisterReceiver(errorCopyingNodesReceiver);
+        unregisterReceiver(retryPendingMessageReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
