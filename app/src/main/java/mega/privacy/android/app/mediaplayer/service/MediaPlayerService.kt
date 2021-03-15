@@ -229,6 +229,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         ).apply {
             setSmallIcon(R.drawable.ic_stat_notify)
             setUseChronometer(false)
+            setUseNavigationActionsInCompactView(true)
 
             setPlayer(exoPlayer)
             setControlDispatcher(CallAwareControlDispatcher(exoPlayer.repeatMode))
