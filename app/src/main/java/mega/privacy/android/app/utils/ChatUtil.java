@@ -101,6 +101,33 @@ public class ChatUtil {
     private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
     private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
 
+    /**
+     * Where is the status icon placed, according to the design,
+     * according to the design,
+     * on dark mode the status icon image is different based on the place where it's placed.
+     */
+    public enum StatusIconLocation {
+
+        /**
+         * On chat list
+         * Contact list
+         * Contact info
+         * Flat app bar no chat room
+         */
+        STANDARD,
+
+        /**
+         * Raised app bar on chat room
+         */
+        APPBAR,
+
+        /**
+         * On nav drawer
+         * Bottom sheets
+         */
+        DRAWER
+    }
+
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
     }
@@ -507,8 +534,9 @@ public class ChatUtil {
      *
      * @param userStatus         contact's status
      * @param contactStateIcon  view in which the status icon has to be set
+     * @param where Where the icon is placed.
      */
-    public static void setContactStatus(int userStatus, ImageView contactStateIcon) {
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, StatusIconLocation where) {
         if (contactStateIcon == null) {
             return;
         }
@@ -516,27 +544,117 @@ public class ChatUtil {
         Context context = contactStateIcon.getContext();
         contactStateIcon.setVisibility(View.VISIBLE);
 
+        int statusImageResId = getIconResourceIdByLocation(context, userStatus, where);
+
+        // Hide the icon ImageView.
+        if(statusImageResId == 0) {
+            contactStateIcon.setVisibility(View.GONE);
+        } else {
+            contactStateIcon.setImageResource(statusImageResId);
+        }
+    }
+
+    /**
+     * Get status icon image resource id by display mode and where the icon is placed.
+     *
+     * @param context Context object.
+     * @param userStatus User online status.
+     * @param where Where the icon is placed.
+     * @return Image resource id based on where the icon is placed.
+     * NOTE: when the user has an invalid online status, returns 0.
+     * Caller should verify the return value, 0 is an invalid value for resource id.
+     *
+     */
+    public static int getIconResourceIdByLocation(Context context,int userStatus, StatusIconLocation where) {
+        int statusImageResId = 0;
+
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_online_dark_standard : R.drawable.ic_online_light);
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_online_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_online_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_online_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_online_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_away_dark_standard : R.drawable.ic_away_light);
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_away_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_away_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_away_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_away_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_busy_dark_standard : R.drawable.ic_busy_light);
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_busy_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_busy_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_busy_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_busy_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_offline_dark_standard : R.drawable.ic_offline_light);
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_offline_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_offline_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_offline_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_offline_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_INVALID:
             default:
-                contactStateIcon.setVisibility(View.GONE);
+                // Do nothing, let statusImageResId be 0.
         }
+
+        return statusImageResId;
     }
 
     /**
@@ -545,10 +663,11 @@ public class ChatUtil {
      * @param userStatus         contact's status
      * @param contactStateIcon  view in which the status icon has to be set
      * @param contactStateText  view in which the status text has to be set
+     * @param where The status icon image resource is different based on the place where it's placed.
      */
-    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText) {
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText, StatusIconLocation where) {
         MegaApplication app = MegaApplication.getInstance();
-        setContactStatus(userStatus, contactStateIcon);
+        setContactStatus(userStatus, contactStateIcon, where);
 
         if (contactStateText == null) {
             return;

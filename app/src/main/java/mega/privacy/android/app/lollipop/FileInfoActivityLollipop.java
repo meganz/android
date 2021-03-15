@@ -1019,7 +1019,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     void setOwnerState(long userHandle) {
-        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState);
+        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState, StatusIconLocation.STANDARD);
     }
 
     @Override
@@ -2281,6 +2281,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         logDebug("onActivityResult " + requestCode + "____" + resultCode);
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT) {
@@ -2288,101 +2289,95 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             isSelectingChat = false;
         }
 
-		if (intent == null) {
-			return;
-		}
+        if (intent == null) {
+            return;
+        }
 
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
             logDebug("URL: " + url + "___SIZE: " + size);
 
-            Util.storeDownloadLocationIfNeeded(parentPath);
+            storeDownloadLocationIfNeeded(parentPath);
 
-            if(nC==null){
+            if (nC == null) {
                 nC = new NodeController(this);
             }
-            nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+            nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
+        } else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
-			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-			final int totalMoves = moveHandles.length;
+            final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
+            final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+            final int totalMoves = moveHandles.length;
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			moveToRubbish = false;
+            MegaNode parent = megaApi.getNodeByHandle(toHandle);
+            moveToRubbish = false;
 
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+            ProgressDialog temp = null;
+            try {
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.context_moving));
+                temp.show();
+            } catch (Exception e) {
+                return;
+            }
+            statusDialog = temp;
 
-			for(int i=0; i<moveHandles.length;i++){
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
-			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+            for (int i = 0; i < moveHandles.length; i++) {
+                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+            }
+        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-			final long toHandle = intent.getLongExtra("COPY_TO", 0);
-			final int totalCopy = copyHandles.length;
+            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
+            final long toHandle = intent.getLongExtra("COPY_TO", 0);
+            final int totalCopy = copyHandles.length;
 
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+            ProgressDialog temp = null;
+            try {
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.context_copying));
+                temp.show();
+            } catch (Exception e) {
+                return;
+            }
+            statusDialog = temp;
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			for(int i=0; i<copyHandles.length;i++){
-				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-				if (cN != null){
+            MegaNode parent = megaApi.getNodeByHandle(toHandle);
+            for (int i = 0; i < copyHandles.length; i++) {
+                MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+                if (cN != null) {
                     logDebug("cN != null, i = " + i + " of " + copyHandles.length);
-					megaApi.copyNode(cN, parent, this);
-				}
-				else{
+                    megaApi.copyNode(cN, parent, this);
+                } else {
                     logDebug("cN == null, i = " + i + " of " + copyHandles.length);
-					try {
-						statusDialog.dismiss();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-					}
-					catch (Exception ex) {}
-				}
-			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+                    try {
+                        statusDialog.dismiss();
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+        } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
-            if (node.isFolder()){
+            if (node.isFolder()) {
                 MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(fileInfoActivityLollipop, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -2395,12 +2390,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 });
                 permissionsDialog = dialogBuilder.create();
                 permissionsDialog.show();
-            }
-            else{
+            } else {
                 logWarning("ERROR, the file is not folder");
             }
-		}
-        else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
             long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
             long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
             long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
@@ -2410,7 +2403,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     ArrayList<MegaChatRoom> chats = new ArrayList<>();
                     ArrayList<MegaUser> users = new ArrayList<>();
 
-                    for (int i=0; i<contactHandles.length; i++) {
+                    for (int i = 0; i < contactHandles.length; i++) {
                         MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
                         if (user != null) {
                             users.add(user);
@@ -2426,40 +2419,37 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     }
 
-                    if(nodeHandles!=null){
+                    if (nodeHandles != null) {
                         CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
                             megaChatApi.createChat(false, peers, listener);
                         }
-                    }
-                    else{
+                    } else {
                         logWarning("Error on sending to chat");
                     }
-                }
-                else {
+                } else {
                     countChat = chatHandles.length;
                     for (int i = 0; i < chatHandles.length; i++) {
                         megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
                     }
                 }
             }
-		}
-		else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
-            if(!isOnline(this)){
+        } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
             if (intent.getBooleanExtra("deleteVersionHistory", false)) {
                 ArrayList<MegaNode> versions = megaApi.getVersions(node);
-                versionsToRemove = versions.size() -1;
-                for (int i=1; i<versions.size(); i++) {
+                versionsToRemove = versions.size() - 1;
+                for (int i = 1; i < versions.size(); i++) {
                     megaApi.removeVersion(versions.get(i), this);
                 }
             }
         }
-	}
+    }
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {

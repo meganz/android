@@ -116,7 +116,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        setContactStatus(getUserStatus(participantHandle), stateIcon);
+        setContactStatus(getUserStatus(participantHandle), stateIcon, StatusIconLocation.DRAWER);
 
         if (participantHandle == megaApi.getMyUser().getHandle()) {
             String myFullName = chatC.getMyFullName();
