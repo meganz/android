@@ -13,7 +13,7 @@ import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
@@ -99,7 +99,7 @@ class MiniAudioPlayerController(
 
         playerView.setOnClickListener {
             if (!CallUtil.participatingInACall()) {
-                val intent = Intent(context, MediaPlayerActivity::class.java)
+                val intent = Intent(context, AudioPlayerActivity::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
                 context.startActivity(intent)
             }
