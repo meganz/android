@@ -44,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:layout_marginBottom="14dp"
+            app:tint="@color/green_500_300"
             android:layout_toEndOf="@id/manage_transfer_thumbnail"
             android:layout_below="@id/manage_transfer_filename"
             android:layout_alignStart="@id/manage_transfer_filename" />

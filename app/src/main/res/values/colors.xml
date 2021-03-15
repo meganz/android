@@ -306,6 +306,9 @@
 
     <color name="lite_account">#FFA500</color>
 
+    <!-- Transfer completed icon tint -->
+    <color name="green_500_300">@color/green_500</color>
+
     <!-- chat status color -->
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>

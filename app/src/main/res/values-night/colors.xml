@@ -89,6 +89,9 @@
 
     <color name="grey_054_white_087">@color/white_alpha_087</color>
 
+    <!-- Transfer completed icon tint -->
+    <color name="green_500_300">@color/green_300</color>
+
     <!-- Notification badge -->
     <color name="white_dark_grey">@color/dark_grey</color>
 
