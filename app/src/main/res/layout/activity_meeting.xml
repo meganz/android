@@ -19,6 +19,15 @@
         app:title="meeting" />
 
     <include
+        android:id="@+id/small_camera_parent"
+        layout="@layout/local_camera_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_floating_panel"
+        android:layout_below="@id/toolbar"
+        android:background="@android:color/transparent" />
+
+    <include
         android:id="@+id/bottom_floating_panel"
         layout="@layout/meeting_bottom_floating_panel" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

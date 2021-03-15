@@ -394,28 +394,13 @@
             <RelativeLayout
                 android:id="@+id/small_elements_individual_call"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <!--Local camera-->
-                <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_below="@id/mutate_contact_call"
+                android:layout_above="@id/linear_buttons_hang"
+                android:background="@android:color/transparent">
+                <include
                     android:id="@+id/small_camera_parent"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="60dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="110dp">
-
-                    <FrameLayout
-                        android:id="@+id/small_camera_fragment"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginEnd="20dp"
-                        android:layout_marginBottom="10dp"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-                </RelativeLayout>
+                    layout="@layout/local_camera_fragment" />
             </RelativeLayout>
 
 
