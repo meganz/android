@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/self_feed_floating_window"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".meeting.fragments.SelfFeedFloatingWindowFragment">
+
+    <RelativeLayout
+        android:layout_width="80dp"
+        android:layout_height="120dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="13dp"
+        android:background="@drawable/self_feed_floating_window_background">
+        <SurfaceView
+            android:id="@+id/video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:visibility="gone"/>
+
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/avatar_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter"
+            rounded:border_color="@color/white_alpha_030"
+            rounded:border_width="2.73dp"
+            rounded:corner_radius="60dp" />
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
