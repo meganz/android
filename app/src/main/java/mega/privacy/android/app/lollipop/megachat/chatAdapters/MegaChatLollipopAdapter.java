@@ -8360,13 +8360,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Method for updating reactions if necessary.
      *
      * @param chatId   Chat ID.
-     * @param message  Message ID.
+     * @param message  Message.
      * @param reaction The reaction.
      * @param count    total number of users who have used that reaction in that message.
      */
     public void checkReactionUpdated(long chatId, MegaChatMessage message, String reaction, int count) {
-        if (chatRoom.getChatId() != chatId) {
-            logDebug("Different chat ");
+        if (message == null || chatRoom.getChatId() != chatId) {
+            logDebug("Message is null or is a different chat ");
             return;
         }
 
@@ -8374,6 +8374,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         AndroidMegaChatMessage megaMessage = null;
 
         for (AndroidMegaChatMessage msg : messages) {
+            if (msg == null || msg.getMessage() == null) {
+                logWarning("The message is not valid");
+                continue;
+            }
+
             if (msg.getMessage().getMsgId() == message.getMsgId()) {
                 positionInAdapter = messages.indexOf(msg) + 1;
                 megaMessage = msg;
