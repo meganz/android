@@ -39,6 +39,12 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 
+    <style name="Widget.Mega.Button.OutlinedButton.Grey">
+        <item name="strokeColor">@color/grey_050</item>
+        <item name="android:textColor">@color/grey_600</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
+    </style>
+
     <style name="Widget.Mega.NumberPicker" parent="">
         <item name="android:textSize">20sp</item>
         <item name="android:colorControlNormal">?attr/colorSecondary</item>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="listener"
+            type="mega.privacy.android.app.meeting.BottomFloatingPanelListener" />
+
+        <variable
+            name="participant"
+            type="mega.privacy.android.app.meeting.adapter.Participant" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:participantAvatar="@{participant.avatar}"
+            app:roundedCornerRadius="20dp" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textColor="@color/grey_alpha_087"
+            app:isMe="@{participant.isMe}"
+            app:isModerator="@{participant.isModerator}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@id/avatar"
+            app:layout_constraintEnd_toStartOf="@id/audio_status"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="@id/avatar"
+            app:participantName="@{participant.name}"
+            tools:drawableEndCompat="@drawable/ic_moderator"
+            tools:text="Yeray RosalesRosalesRosalesRosalesRosalesRosales" />
+
+        <ImageView
+            android:id="@+id/audio_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            app:isAudioOn="@{participant.isAudioOn}"
+            app:layout_constraintBottom_toBottomOf="@id/video_status"
+            app:layout_constraintEnd_toStartOf="@id/video_status"
+            app:layout_constraintTop_toTopOf="@id/video_status"
+            tools:src="@drawable/ic_mic_off_grey_red" />
+
+        <ImageView
+            android:id="@+id/video_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:isVideoOn="@{participant.isVideoOn}"
+            app:layout_constraintBottom_toBottomOf="@id/three_dots"
+            app:layout_constraintEnd_toStartOf="@id/three_dots"
+            app:layout_constraintTop_toTopOf="@id/three_dots"
+            tools:src="@drawable/ic_video_off_grey_red" />
+
+        <ImageView
+            android:id="@+id/three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:onClick="@{()->listener.onParticipantOption(participant)}"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:src="@drawable/ic_dots_vertical_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/grey_alpha_054" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

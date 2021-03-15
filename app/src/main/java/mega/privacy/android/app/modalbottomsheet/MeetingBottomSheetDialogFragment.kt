@@ -10,7 +10,6 @@ import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.ContactController
 
 class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
@@ -44,10 +43,6 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
             }
         }
         setStateBottomSheetBehaviorHidden()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
     }
 
     override fun onAttach(context: Context) {
