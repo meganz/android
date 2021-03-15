@@ -30,6 +30,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -307,6 +308,8 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         newIndexForCurrentItem: Int,
         nameToDisplay: String?
     ) {
+        logDebug("playSource ${mediaItems.size} items")
+
         if (!audioFocusRequested) {
             audioFocusRequested = true
             getAudioFocus(

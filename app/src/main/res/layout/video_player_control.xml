@@ -106,7 +106,9 @@
         android:layout_marginBottom="10dp"
         android:enabled="false"
         android:src="@drawable/video_player_playlist"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

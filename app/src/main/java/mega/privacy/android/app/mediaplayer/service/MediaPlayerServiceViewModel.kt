@@ -23,6 +23,7 @@ import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.OfflineUtils.*
@@ -695,12 +696,16 @@ class MediaPlayerServiceViewModel(
     }
 
     private fun postPlaylistItems() {
+        logDebug("postPlaylistItems")
+
         compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems() }
             .subscribeOn(Schedulers.single())
             .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
     }
 
     private fun doPostPlaylistItems() {
+        logDebug("doPostPlaylistItems ${playlistItems.size} items")
+
         if (playlistItems.isEmpty()) {
             return
         }
@@ -780,6 +785,7 @@ class MediaPlayerServiceViewModel(
             )
         }
 
+        logDebug("doPostPlaylistItems post ${items.size} items")
         _playlist.postValue(Triple(items, scrollPosition, playlistTitle))
     }
 

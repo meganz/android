@@ -24,6 +24,7 @@ import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -153,6 +154,8 @@ class MediaPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
+                logDebug("MediaPlayerService observed playlist ${it.first.size} items")
+
                 if (service.viewModel.playlistSearchQuery != null) {
                     return@observe
                 }
