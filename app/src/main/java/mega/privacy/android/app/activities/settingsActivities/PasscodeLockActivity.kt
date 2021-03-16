@@ -513,7 +513,7 @@ class PasscodeLockActivity : BaseActivity() {
                 currentFocus,
                 InputMethodManager.SHOW_IMPLICIT
             )
-        }, 300)
+        }, 1000)
     }
 
     override fun onBackPressed() {
