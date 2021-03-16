@@ -14,6 +14,7 @@
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_020">#33FFFFFF</color>
     <color name="white_alpha_023">#3BFFFFFF</color>
+    <color name="white_alpha_026">#42FFFFFF</color>
     <color name="white_alpha_030">#4DFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#61FFFFFF</color>
@@ -23,6 +24,7 @@
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_070">#B3FFFFFF</color>
     <color name="white_alpha_080">#CCFFFFFF</color>
+    <color name="white_alpha_085">#D9FFFFFF</color>
     <color name="white_alpha_087">#DEFFFFFF</color>
 
     <color name="black">#000000</color>
@@ -229,6 +231,9 @@
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
 
+    <!-- Recording voice clip feedback component background -->
+    <color name="grey_087_white_085">@color/grey_alpha_087</color>
+
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/white_alpha_087</color>
 
@@ -389,4 +394,7 @@
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
+    
+    <!-- Contact voice clip progress bar indicator color-->
+    <color name="white_018_026">@color/white_alpha_018</color>
 </resources>
