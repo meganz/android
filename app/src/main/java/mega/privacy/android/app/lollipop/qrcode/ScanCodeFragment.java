@@ -304,6 +304,16 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             builder.setView(v);
 
             requestedAlertDialog = builder.create();
+            requestedAlertDialog.setOnDismissListener(dialog -> {
+                if (success) {
+                    dialogshown = false;
+                    codeScanner.releaseResources();
+                    getActivity().finish();
+                } else {
+                    codeScanner.startPreview();
+                }
+            });
+
             dialogTitle = v.findViewById(R.id.dialog_invite_title);
             dialogText = v.findViewById(R.id.dialog_invite_text);
             dialogButton = v.findViewById(R.id.dialog_invite_button);
@@ -324,15 +334,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         } else {
             dialogText.setText(StringResourcesUtils.getString(dialogTextContent));
         }
-        requestedAlertDialog.setOnDismissListener(dialog -> {
-            if (success) {
-                dialogshown = false;
-                codeScanner.releaseResources();
-                getActivity().finish();
-            } else {
-                codeScanner.startPreview();
-            }
-        });
         dialogshown = true;
         requestedAlertDialog.show();
     }
