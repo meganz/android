@@ -16,9 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -140,7 +138,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -2213,9 +2210,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
             return;
         }
 
-        boolean withELevation = listView.canScrollVertically(-1) || adapter.isMultipleSelect();
-        StatusIconLocation where = withELevation ? StatusIconLocation.APPBAR : StatusIconLocation.STANDARD;
-        ChatUtil.setContactStatus(contactOnlineStatus, iconStateToolbar, individualSubtitleToobar, where);
+        boolean withElevation = listView.canScrollVertically(-1) || adapter.isMultipleSelect();
+        StatusIconLocation where = withElevation ? StatusIconLocation.APPBAR : StatusIconLocation.STANDARD;
+        setContactStatus(contactOnlineStatus, iconStateToolbar, individualSubtitleToobar, where);
     }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){

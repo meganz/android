@@ -84,7 +84,6 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -820,7 +819,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		logDebug("setContactPresenceStatus");
 		if (megaChatApi != null){
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
-			contactStateIcon = ChatUtil.getIconResourceIdByLocation(this,userStatus,StatusIconLocation.STANDARD);
+			contactStateIcon = getIconResourceIdByLocation(this,userStatus,StatusIconLocation.STANDARD);
 
 			// Reset as default value.
 			if(contactStateIcon == 0) {
