@@ -98,10 +98,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	private TextView selectPaymentMethod;
 
 	private RelativeLayout googlePlayLayout;
-	private RelativeLayout fortumoLayout;
 
 	private RelativeLayout googlePlayLayer;
-	private RelativeLayout fortumoLayer;
 
 	private LinearLayout optionsBilling;
 	private RadioGroup billingPeriod;
@@ -452,26 +450,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
             googleWalletText.setText(HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY));
             selectPaymentMethodClicked.<ImageView>findViewById(R.id.payment_method_google_wallet_icon).setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID);
 
-			fortumoLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
-			fortumoLayout.setOnClickListener(this);
-
-			fortumoLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_layer);
-			fortumoLayer.setVisibility(View.GONE);
-
-			TextView fortumoText = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_text);
-
-			String textFortumoText = getString(R.string.payment_method_fortumo);
-			try{
-				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
-				textFortumoText = textFortumoText.replace("[/A]", "</font>");
-			} catch (Exception e) {
-				logError("Exception formatting string", e);
-			}
-
-			fortumoText.setText(HtmlCompat.fromHtml(textFortumoText, HtmlCompat.FROM_HTML_MODE_LEGACY));
-
 			optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options);
 
 			billingPeriod = selectPaymentMethodClicked.findViewById(R.id.billing_period);
@@ -490,7 +468,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.grey_700_026_grey_300_026)));
 
 			googlePlayLayout.setVisibility(View.GONE);
-			fortumoLayout.setVisibility(View.GONE);
 			layoutButtons.setVisibility(View.GONE);
 			optionsBilling.setVisibility(View.GONE);
 
@@ -614,45 +591,29 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					switch (parameterType) {
 						case PRO_I: {
 							//PRO I
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_MONTH);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_MONTH);
 							}
 							break;
 						}
 						case PRO_II: {
 							//PRO II
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_MONTH);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_MONTH);
 							}
 							break;
 						}
 						case PRO_III: {
 							//PRO III
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_MONTH);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_MONTH);
 							}
 							break;
 						}
 						case PRO_LITE: {
 							//LITE
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_MONTH);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									((ManagerActivityLollipop) context).showFortumo();
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_MONTH);
 							}
 							break;
 						}
@@ -662,41 +623,29 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					switch (parameterType) {
 						case PRO_I: {
 							//PRO I
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_YEAR);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_YEAR);
 							}
 							break;
 						}
 						case PRO_II: {
 							//PRO II
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_YEAR);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_YEAR);
 							}
 							break;
 						}
 						case PRO_III: {
 							//PRO III
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_YEAR);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_YEAR);
 							}
 							break;
 						}
 						case PRO_LITE: {
 							//LITE
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_YEAR);
-									break;
-								}
+							if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+								((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_YEAR);
 							}
 							break;
 						}
@@ -775,10 +724,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
 				break;
 			}
-			case R.id.payment_method_fortumo:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
-				break;
-			}
 			case R.id.upgrade_business_layout:{
 				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
@@ -811,8 +756,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
                         }
 					}
 
-					fortumoLayout.setVisibility(View.GONE);
-
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 					}
@@ -824,7 +767,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					logWarning("Not payment bit set received!!!");
 					selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 					googlePlayLayout.setVisibility(View.GONE);
-					fortumoLayout.setVisibility(View.GONE);
 				}
 
 				break;
@@ -842,8 +784,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
                             layoutButtons.setVisibility(View.VISIBLE);
                         }
 					}
-
-					fortumoLayout.setVisibility(View.GONE);
 
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -872,8 +812,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
                         }
 					}
 
-					fortumoLayout.setVisibility(View.GONE);
-
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 					}
@@ -897,12 +835,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
                             layoutButtons.setVisibility(View.VISIBLE);
                         }
 					}
-
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-						fortumoLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
 
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -995,42 +927,27 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_I:
 				logDebug("case PRO I");
 
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro I - PAYMENT_METHOD_FORTUMO");
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+					logDebug("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
+					googlePlayLayer.setVisibility(View.GONE);
+					optionsBilling.setVisibility(View.VISIBLE);
+					buttonContinue.setEnabled(true);
+					buttonContinue.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+					billedMonthly.setVisibility(View.VISIBLE);
+					billedYearly.setVisibility(View.VISIBLE);
+
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+							billedYearly.setChecked(true);
+						}
+						billedMonthly.setVisibility(View.GONE);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
 
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+							billedMonthly.setChecked(true);
 						}
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
+						billedYearly.setVisibility(View.GONE);
 					}
 				}
 
@@ -1039,42 +956,27 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_II:
 				logDebug(" case PRO II");
 
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro II - PAYMENT_METHOD_FORTUMO");
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+					logDebug("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
+					googlePlayLayer.setVisibility(View.GONE);
+					optionsBilling.setVisibility(View.VISIBLE);
+					buttonContinue.setEnabled(true);
+					buttonContinue.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+					billedMonthly.setVisibility(View.VISIBLE);
+					billedYearly.setVisibility(View.VISIBLE);
+
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+							billedYearly.setChecked(true);
+						}
+						billedMonthly.setVisibility(View.GONE);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
 
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+							billedMonthly.setChecked(true);
 						}
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
+						billedYearly.setVisibility(View.GONE);
 					}
 				}
 
@@ -1083,41 +985,26 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_III:
 				logDebug("case PRO III");
 
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro III - PAYMENT_METHOD_FORTUMO");
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+					logDebug("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
+					googlePlayLayer.setVisibility(View.GONE);
+					optionsBilling.setVisibility(View.VISIBLE);
+					buttonContinue.setEnabled(true);
+					buttonContinue.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+					billedMonthly.setVisibility(View.VISIBLE);
+					billedYearly.setVisibility(View.VISIBLE);
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+							billedYearly.setChecked(true);
+						}
+						billedMonthly.setVisibility(View.GONE);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
-						}
 
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+							billedMonthly.setChecked(true);
 						}
-						break;
+						billedYearly.setVisibility(View.GONE);
 					}
 				}
 
@@ -1125,42 +1012,26 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			case PRO_LITE:
 				logDebug("case LITE");
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Lite - PAYMENT_METHOD_FORTUMO");
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedMonthly.setChecked(true);
-						billedYearly.setVisibility(View.GONE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
+				if (paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET) {
+					logDebug("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
+					googlePlayLayer.setVisibility(View.GONE);
+					optionsBilling.setVisibility(View.VISIBLE);
+					buttonContinue.setEnabled(true);
+					buttonContinue.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+					billedMonthly.setVisibility(View.VISIBLE);
+					billedYearly.setVisibility(View.VISIBLE);
 
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+							billedYearly.setChecked(true);
 						}
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
+						billedMonthly.setVisibility(View.GONE);
+					}
+					if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
+						if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+							billedMonthly.setChecked(true);
 						}
-						break;
+						billedYearly.setVisibility(View.GONE);
 					}
 				}
 				break;
