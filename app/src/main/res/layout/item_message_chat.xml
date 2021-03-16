@@ -1692,7 +1692,7 @@
                             style="@style/SimpleDraweeViewMessages"
                             app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderColor="@color/grey_012_white_012"
                             app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
@@ -1789,7 +1789,7 @@
                             style="@style/SimpleDraweeViewMessages"
                             app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderColor="@color/grey_012_white_012"
                             app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView

@@ -1140,7 +1140,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(1);
-            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
+            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentContactMessageThumbLand.setOval(false);
 
             holder.gifIconContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape_gif);
@@ -1184,7 +1184,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
             holder.contentContactMessageThumbPort.setBorderWidth(1);
-            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
+            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentContactMessageThumbPort.setOval(false);
 
             holder.gifIconContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait_gif);
