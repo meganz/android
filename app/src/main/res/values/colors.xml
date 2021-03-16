@@ -241,6 +241,9 @@
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/white</color>
 
+    <!-- Meeting bottom floating panel background -->
+    <color name="white_grey_900">@color/white</color>
+
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
 

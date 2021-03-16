@@ -39,7 +39,6 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textColor="@color/grey_alpha_087"
             app:isMe="@{participant.isMe}"
             app:isModerator="@{participant.isModerator}"
             app:layout_constrainedWidth="true"
@@ -85,7 +84,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/grey_alpha_054" />
+            app:tint="?android:attr/textColorSecondary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

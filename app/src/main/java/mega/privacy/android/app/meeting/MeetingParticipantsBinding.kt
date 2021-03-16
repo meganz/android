@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
+import java.util.*
 
 @BindingAdapter("participantAvatar")
 fun setMeetingParticipantAvatar(imageView: SimpleDraweeView, avatar: File?) {
@@ -46,7 +47,7 @@ fun setMeetingParticipantName(
         textView.text = HtmlCompat.fromHtml(
             "$name <font color='${
                 getColorHexString(textView.context, R.color.grey_600)
-            }'>(${getString(R.string.bucket_word_me)})</font>",
+            }'>(${getString(R.string.bucket_word_me).toLowerCase(Locale.ROOT)})</font>",
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
     } else {
@@ -59,7 +60,7 @@ fun setMeetingParticipantIsAudioOn(imageView: ImageView, isAudioOn: Boolean) {
     if (isAudioOn) {
         imageView.setImageResource(R.drawable.ic_mic_on)
         imageView.setColorFilter(
-            ContextCompat.getColor(imageView.context, R.color.grey_alpha_054),
+            ContextCompat.getColor(imageView.context, R.color.grey_054_white_054),
             PorterDuff.Mode.SRC_IN
         )
     } else {
@@ -73,7 +74,7 @@ fun setMeetingParticipantIsVideoOn(imageView: ImageView, isVideoOn: Boolean) {
     if (isVideoOn) {
         imageView.setImageResource(R.drawable.ic_video)
         imageView.setColorFilter(
-            ContextCompat.getColor(imageView.context, R.color.grey_alpha_054),
+            ContextCompat.getColor(imageView.context, R.color.grey_054_white_054),
             PorterDuff.Mode.SRC_IN
         )
     } else {
