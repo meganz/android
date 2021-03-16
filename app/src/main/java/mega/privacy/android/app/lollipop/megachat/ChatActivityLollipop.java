@@ -201,6 +201,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Util.dp2px;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -243,7 +244,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
     private final static int MAX_LINES_INPUT_TEXT_COLLAPSED = 5;
-    private final static int MAX_LINES_INPUT_TEXT_EXPANDED = 20;
+    private final static int MAX_LINES_INPUT_TEXT_EXPANDED = Integer.MAX_VALUE;
 
     private final static int TITLE_TOOLBAR_PORT = 140;
     private final static int TITLE_TOOLBAR_LAND = 250;
@@ -964,7 +965,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         setContentView(R.layout.activity_chat);
-
         //Set toolbar
         tB = findViewById(R.id.toolbar_chat);
 
@@ -1581,7 +1581,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         collapseInputText();
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
-        logDebug("***************** GRIS/BLANCO");
         keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
         sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
 
@@ -3661,12 +3660,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
             textChat.setMaxLines(1);
         } else {
             int maxLines;
-            if (textChat.getMaxLines() < (isInputTextExpanded ? MAX_LINES_INPUT_TEXT_EXPANDED : MAX_LINES_INPUT_TEXT_COLLAPSED) && textChat.getLineCount() == textChat.getMaxLines()) {
+            if (textChat.getMaxLines() < (isInputTextExpanded ? MAX_LINES_INPUT_TEXT_EXPANDED : MAX_LINES_INPUT_TEXT_COLLAPSED) &&
+                    textChat.getLineCount() == textChat.getMaxLines()) {
                 maxLines = textChat.getLineCount() + 1;
             } else {
                 maxLines = isInputTextExpanded ? MAX_LINES_INPUT_TEXT_EXPANDED : MAX_LINES_INPUT_TEXT_COLLAPSED;
             }
-
             textChat.setEllipsize(null);
             textChat.setMaxLines(maxLines);
         }
@@ -4490,7 +4489,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
-
             ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, true);
             // No App bar in this activity, control tool bar instead.
             tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
@@ -6210,6 +6208,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     mLayoutManager.scrollToPosition(messages.size());
                 }
             }
+
             showScrollToLastMsgButton();
         }
 
@@ -9250,6 +9249,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
      * Method of showing the button to scroll to the last message in a chat room.
      */
     private void showScrollToLastMsgButton() {
+        if(isInputTextExpanded){
+            return;
+        }
         if (msgsReceived != null && msgsReceived.size() > 0) {
             unreadBadgeText.setText(msgsReceived.size() + "");
             unreadBadgeLayout.setVisibility(View.VISIBLE);
@@ -9309,9 +9311,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
             expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
                     58 : 18, getOutMetrics()), 0, 0);
 
+            ColorUtils.changeStatusBarColor(this, R.color.white_transparent);
             writingContainerLayout.setBackgroundColor(Color.TRANSPARENT);
             inputTextLayout.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
+
             tB.setVisibility(View.VISIBLE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_expand_text_input);
             writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
@@ -9319,12 +9323,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
             inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
             writeMsgLayout.getLayoutParams().height = WRAP_CONTENT;
             textChat.getLayoutParams().height = WRAP_CONTENT;
+            textChat.setPadding(0, dp2px(10, getOutMetrics()), 0, dp2px(8, getOutMetrics()));
         } else {
             expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
                     71 : 18, getOutMetrics()), 0, 0);
-            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.white_black));
+
+            ColorUtils.changeStatusBarColor(this, R.color.dark_grey_alpha_050);
+            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.dark_grey_alpha_050));
             inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
+
             tB.setVisibility(View.GONE);
             expandCollapseInputTextIcon.setImageResource(R.drawable.ic_collapse_text_input);
             writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
@@ -9332,6 +9340,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             inputTextLayout.getLayoutParams().height = MATCH_PARENT;
             writeMsgLayout.getLayoutParams().height = MATCH_PARENT;
             textChat.getLayoutParams().height = MATCH_PARENT;
+            textChat.setPadding(0, dp2px(10, getOutMetrics()), 0, dp2px(40, getOutMetrics()));
         }
 
         writingContainerLayout.requestLayout();

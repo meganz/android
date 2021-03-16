@@ -193,8 +193,11 @@
     <!-- chat reaction add/own emoji background fill -->
     <color name="grey_003_white_018">@color/grey_alpha_003</color>
 
-    <!-- input text chat background-->
+    <!-- collapsed input text chat background-->
     <color name="grey_003_white_015">@color/grey_alpha_003</color>
+
+    <!-- expanded input text chat background-->
+    <color name="white_white_015">@color/white</color>
 
     <!-- chat reaction add/own emoji background border -->
     <color name="grey_012_white_015">@color/grey_alpha_012</color>
