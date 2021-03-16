@@ -3063,4 +3063,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Dark</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
 </resources>
