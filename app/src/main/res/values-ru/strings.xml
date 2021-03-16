@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">От больших к маленьким</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">От маленьких к большим</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">в месяц</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">в год</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Введите свои платёжные реквизиты:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Адрес 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Адрес 2 (дополнительно)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Город</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Штат/провинция</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Страна</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Почтовый индекс</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Введите свои платёжные данные:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Имя</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Фамилия</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Номер кредитной карты</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Месяц</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Год</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Перейти</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Аккаунт успешно улучшен!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Операция не выполнена. Средства не были списаны с карты</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Неверная информация по карте. Средства не будут списаны</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Тип кода блокировки</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4-значный код</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6-значный код</string>

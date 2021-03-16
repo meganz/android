@@ -866,34 +866,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">City</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State/Province</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First name</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last name</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Credit Card Number</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Month</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Year</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation failed. Your credit card has not been charged</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information was not correct. The credit card will not be charged</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
@@ -2414,7 +2386,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
 
@@ -2963,6 +2934,8 @@
         <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
     </plurals>
+
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">year</string>
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>

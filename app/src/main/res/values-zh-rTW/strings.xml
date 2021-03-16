@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">最大檔案尺寸</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小檔案尺寸</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">輸入您的帳單資料：</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">地址1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">地址2（可選）</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">城市</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">州/省</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">國家</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">郵編</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">輸入您的付款資料：</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">名</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">姓</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">信用卡卡號</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">月</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">年</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">校驗碼</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">繼續</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">帳戶已成功升級！</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">操作失敗，此信用卡仍未被扣款</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">因信用卡資訊不正確，此信用卡仍未被扣款</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">密碼類型</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">四位密碼</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">六位密碼</string>

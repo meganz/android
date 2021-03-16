@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">最大サイズ</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小サイズ</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">月につき</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">年につき</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">請求書送付に関する詳細を入力:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">アドレス1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">住所２（オプション）</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">市</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">都道府県</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">国</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">郵便番号</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">支払いに関する詳細を入力:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">名</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">氏</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">クレジットカード番号</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">月</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">年</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CW</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">次に進む</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">アカウントのアップグレード完了！</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">操作は失敗しました。あなたのクレジットカードは請求されていません</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">クレジットカード情報が正しくありませんでした。このクレジットカードは請求されません</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">パスコードタイプ</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4桁のパスコード</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6桁のパスコード</string>

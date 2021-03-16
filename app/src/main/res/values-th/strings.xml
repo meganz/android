@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">ขนาดใหญ่ที่สุด</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">ขนาดเล็กที่สุด</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">ต่อเดือน</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">ต่อปี</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">กรอกรายละเอียดการเรียกเก็บเงินของคุณ:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">ที่อยู่ 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">ที่อยู่ 2 (ตัวเลือก)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">เมือง/อำเภอ</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">รัฐ/จังหวัด</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">รหัสไปรษณีย์</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">กรอกรายละเอียดการชำระเงิน:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">ชื่อ</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">นามสกุล</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">หมายเลขบัตรเครดิต</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">เดือน</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">ปี</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">ดำเนินการ</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">อัปเกรดบัญชีเรียบร้อยแล้ว</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">การดำเนินการล้มเหลว บัตรเครดิตของคุณจะไม่ถูกเรียกเก็บเงิน</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">ข้อมูลบัตรเครดิตไม่ถูกต้อง บัตรเครดิตจะไม่ถูกเรียกเก็บเงิน</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">ประเภทรหัสผ่าน</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">รหัสผ่าน 4 หลัก</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">รหัสผ่าน 6 หลัก</string>

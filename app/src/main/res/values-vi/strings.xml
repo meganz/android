@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Kích thước lớn nhất</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Kích thước nhỏ nhất</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">hàng tháng</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">hàng năm</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Xin nhập thông tin thanh toán:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Địa chỉ 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Địa chỉ 2 (nếu muốn)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Thành phố</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Bang / Tỉnh</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Quốc gia</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Mã bưu chính</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Xin nhập phương thức giao dịch:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Tên</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Họ</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Số Thẻ Tín Dụng</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Tháng</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Năm</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">Mã CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Tiến hành</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Tài khoản đã được nâng cấp thành công!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Quá trình giao dịch thất bại. Thẻ tín dụng của quý khách chưa bị tính phí</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Thông tin thẻ không đúng, vì vậy chưa có quá trình tính phí đã được thực hiện</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Dạng Mã Số</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Mã 4 số</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">Mã 6 số</string>

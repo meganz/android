@@ -862,34 +862,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Grandezza più grande</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Grandezza più piccola</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">al mese</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">all\'anno</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Inserisci i dettagli di fatturazione:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Indirizzo 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Indirizzo 2 (opzionale)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Città</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stato/Provincia</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Nazione</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Codice postale</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Inserisci i dettagli di pagamento:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nome</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Cognome</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numero Carta di Credito</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Mese</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Anno</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CW</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Procedi</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Upgrade dell\'account effettuato con successo!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'operazione è fallita. Sulla tua carta di credito non è stata accreditata alcuna somma</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Le informazioni della carta di credito non erano corrette. La tua carta di credito non è stata accettata</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipo del codice</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Codice a 4 cifre</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">Codice a 6 cifre</string>
