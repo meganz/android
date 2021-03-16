@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -86,7 +87,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.section_chat).toUpperCase());
+        binding.toolbarSettings.setTitle(StringResourcesUtils.getString(R.string.section_chat).toUpperCase());
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
 

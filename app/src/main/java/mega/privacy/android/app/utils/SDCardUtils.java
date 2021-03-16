@@ -29,6 +29,25 @@ public class SDCardUtils {
     public static final int APP_DATA_TARGET_URI_POSITION = 2;
     public static final int APP_DATA_SD_CARD_PARTS = 2;
 
+    public static final String COLON_ASCII = "%3A";
+
+    /**
+     * Check if a uri is root uri, a SD card root uri must end with ":"(in ASCII, it's "%3A").
+     * And:
+     * 1. ":" is INVALID character for folder name in both local file system and cloud drive.
+     * So there will never be a non-root uri like "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%3A"
+     *
+     * 2. "%" in ASCII is "%25",
+     * so the uri for a folder with name "X%3A" is alright,
+     * the uri will be "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%253A"
+     *
+     * @param uri The uri to check.
+     * @return true, if it's not a root uri, otherwise, false.
+     */
+    public static boolean isNotRootUri(Uri uri) {
+        return !uri.toString().endsWith(COLON_ASCII);
+    }
+
     public static String getSDCardRoot(String path) {
         int i = 0, x = 0;
         char[] chars = path.toCharArray();

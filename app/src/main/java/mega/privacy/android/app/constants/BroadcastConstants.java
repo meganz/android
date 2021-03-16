@@ -22,6 +22,9 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_UPDATE_HISTORY_BY_RT = "ACTION_UPDATE_HISTORY_BY_RT";
     public static final String BROADCAST_ACTION_JOINED_SUCCESSFULLY = "ACTION_JOINED_SUCCESSFULLY";
     public static final String BROADCAST_ACTION_CHAT_TRANSFER_START = "INTENT_CHAT_TRANSFER_START";
+    public static final String BROADCAST_ACTION_COOKIE_SETTINGS_SAVED = "BROADCAST_ACTION_COOKIE_SETTINGS_SAVED";
+    public static final String BROADCAST_ACTION_ERROR_COPYING_NODES = "INTENT_ERROR_COPYING_NODES";
+    public static final String BROADCAST_ACTION_RETRY_PENDING_MESSAGE = "INTENT_RETRY_PENDING_MESSAGE";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -95,5 +98,5 @@ public class BroadcastConstants {
     public static final String KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE";
     public static final String RETENTION_TIME = "RETENTION_TIME";
     public static final String PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
-
+    public static final String ERROR_MESSAGE_TEXT = "ERROR_MESSAGE_TEXT";
 }

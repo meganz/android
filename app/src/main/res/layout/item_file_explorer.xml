@@ -16,7 +16,6 @@
         android:id="@+id/scroll_view_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
         android:overScrollMode="never"
@@ -38,7 +37,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/scroll_view_filename"
-        android:layout_marginStart="13dp"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
         android:ellipsize="end"
@@ -55,9 +53,9 @@
         android:layout_marginEnd="16dp"
         android:background="@null"
         android:paddingStart="10dp"
-        app:tint="?android:attr/textColorSecondary"
         android:src="@drawable/ic_permissions_full_access"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:tint="?android:attr/textColorSecondary" />
 
 </RelativeLayout>
 
