@@ -82,12 +82,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	protected TextView bandwidthSectionPro3;
 	private RelativeLayout pro3TransparentLayout;
 
-	//Business elements
-	protected RelativeLayout businessLayout;
-	protected TextView monthSectionBusiness;
-	protected TextView storageSectionBusiness;
-	protected TextView bandwidthSectionBusiness;
-
 	private TextView labelCustomPlan;
 
 	//Payment layout
@@ -186,14 +180,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		labelCustomPlan.setText(resultB);
 		//END -- PRO III ACCOUNT
 
-		//BUSINESS ACCOUNT
-		businessLayout = v.findViewById(R.id.upgrade_business_layout);
-		businessLayout.setOnClickListener(this);
-		monthSectionBusiness = v.findViewById(R.id.month_business);
-		storageSectionBusiness = v.findViewById(R.id.storage_business);
-		bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
-		//END -- BUSINESS ACCOUNT
-
 		refreshAccountInfo();
 
 		setPricingInfo();
@@ -217,7 +203,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	}
 
 	/**
-	 * Sets pricing info of PRO and Business plans.
+	 * Sets pricing info of PRO plans.
 	 */
 	public void setPricingInfo() {
 		if (myAccountInfo == null) {
@@ -264,25 +250,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						monthSectionLite.setText(textToShow);
 						storageSectionLite.setText(textStorage);
 						bandwidthSectionLite.setText(textTransfer);
-						break;
-
-					case BUSINESS:
-						// The initial amount of storage space for business account is 15TB
-						String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
-						String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
-
-						try {
-							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
-							businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
-							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
-							businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
-						} catch (Exception e) {
-							logError("Exception formatting string", e);
-						}
-
-						monthSectionBusiness.setText(textToShow);
-						storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
-						bandwidthSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
 						break;
 				}
 			}
@@ -334,13 +301,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case PRO_LITE:
 					color = String.valueOf(ContextCompat.getColor(context,R.color.orange_400_orange_300));
 					break;
-				case BUSINESS:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.dark_blue_500_200));
-					break;
 			}
 
-			stringPrice = getString(product.getLevel() == BUSINESS ?
-					R.string.type_business_month : R.string.type_month, stringPrice);
+			stringPrice = getString(R.string.type_month, stringPrice);
 		} else {
 			stringPrice = getString(product.getMonths() == 12 ?
 					R.string.billed_yearly_text : R.string.billed_monthly_text, stringPrice);
@@ -391,9 +354,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_III:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro3;
 				break;
-			case BUSINESS:
-				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
-				return;
 			default:
 				return;
 		}
@@ -722,10 +682,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			}
 			case R.id.payment_method_google_wallet:{
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
-				break;
-			}
-			case R.id.upgrade_business_layout:{
-				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
 			}
 		}

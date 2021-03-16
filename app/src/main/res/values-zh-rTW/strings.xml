@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">聊天連結已複製至剪貼簿</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]自[/A] %s / [A]月[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">%s 每用戶 / [A]月[/A] [A]起[/A]*</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*在下次自動更新日期前，自動續訂可隨時取消</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通話開始</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">儘管MEGA無權存取您的資料，但您的商業帳戶管理員是可以控制和檢視您使用者帳戶中的相機上傳。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出錯了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">請聯繫您的商業帳戶管理員來解決問題並啟用您的帳戶。</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 將自動增加，沒有額外費用，純粹用於商業目的。</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]儲存空間[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">無限制的[A]傳輸配額[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">當您登出時，裝置中可離線存取的檔案將會被刪除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">當您登出時，正在進行中的傳輸將取消。</string>

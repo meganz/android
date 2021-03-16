@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Tautan Obrolan disalin ke papan klip</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Dari[/A] %s / [A]bulan[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Dari[/A] %s per pengguna /[A]bulan[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Panggilan Dimulai</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Meskipun MEGA tidak dapat mengakses data anda, administrator akun bisnis anda memiliki kemampuan untuk mengontrol dan melihat Unggahan Kamera di akun pengguna anda</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ada yang salah</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Hubungi administrator akun bisnis Anda untuk menyelesaikan masalah dan aktifkan akun Anda.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Akan otomatis naik, tanpa biaya tambahan, untuk tujuan usaha yang benar.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Penyimpanan[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">TANPA BATAS [A]Kuota transfer[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Saat anda keluar, file dari bagian Offline anda akan dihapus dari perangkat anda.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Saat anda keluar, transfer yang sedang berlangsung akan dibatalkan.</string>

@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Enlace del chat copiado al portapapeles</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Desde[/A] %s / [A]mes[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Desde[/A] %s por usuario/[A]mes[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* La suscripción automática se puede cancelar en cualquier momento antes de la fecha de renovación.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Llamada iniciada</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Si bien MEGA no tiene acceso a tus datos, el administrador de la cuenta Business puede controlar y ver las Subídas de la cámara en tu cuenta de usuario</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo ha ido mal</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Ponte en contacto con el administrador de tu cuenta Business para resolver el problema y activar tu cuenta.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Aumentará automáticamente, sin cargos adicionales y sujeto a uso comercial legítimo.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Almacenamiento[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Cuota de transferencia[/A] ilimitada</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Cuando cierres sesión, los archivos de la sección Sin conexión se eliminarán de tu dispositivo.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Cuando cierres sesión, las transferencias en curso se cancelarán.</string>

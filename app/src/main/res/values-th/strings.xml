@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">คัดลอกลิงก์แชทไปยังคลิปบอร์ดแล้ว</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]จาก[/A] %s / [A]เดือน[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]เริ่มต้น[/A] %s ต่อผู้ใช้งาน/[A]เดือน[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* การสมัครสมาชิกแบบจ่ายเป็นประจำสามารถยกเลิกได้ทุกเมื่อก่อนวันที่ต่ออายุจะมาถึง</string>
     <string name="call_started_messages" context="Message shown when a call starts.">เริ่มการโทร</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">แม้ว่า MEGA จะไม่สามารถเข้าถึงข้อมูลของคุณได้ แต่ผู้ดูแลระบบบัญชีธุรกิจของคุณก็มีความสามารถในการควบคุมและดูการอัปโหลดจากกล้องในบัญชีผู้ใช้ของคุณได้</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">มีบางอย่างผิดพลาด</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">ติดต่อผู้ดูแลระบบบัญชีธุรกิจของคุณเพื่อแก้ไขปัญหาและเปิดใช้งานบัญชีของคุณ</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** จะเพิ่มให้โดยอัตโนมัติและไม่มีการคิดค่าธรรมเนียมเพิ่มเติม เพื่อให้ตรงตามวัตถุประสงค์ทางธุรกิจที่แท้จริง</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]พื้นที่เก็บข้อมูล[/A] %s **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">ไม่จำกัด[A]โควต้าการถ่ายโอน[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิก</string>

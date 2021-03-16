@@ -124,14 +124,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         bandwidthSectionPro3 = v.findViewById(R.id.bandwidth_pro_iii);
         //END -- PRO III ACCOUNT
 
-        //BUSINESS
-        businessLayout = v.findViewById(R.id.choose_account_business_layout);
-        businessLayout.setOnClickListener(this);
-        monthSectionBusiness = v.findViewById(R.id.month_business);
-        storageSectionBusiness = v.findViewById(R.id.storage_business);
-        bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
-        //END -- BUSINESS
-
         setPricingInfo();
         return v;
     }
@@ -164,10 +156,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
             case R.id.choose_account_pro_iii_layout:
                 intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
                 intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
-                break;
-            case R.id.choose_account_business_layout:
-                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-                intent.putExtra(EXTRA_ACCOUNT_TYPE, BUSINESS);
                 break;
         }
 

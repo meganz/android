@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">تم نسخ رابط المحادثة إلى الحافظة</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]من[/A] %s / [A]شهر[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]من[/A] %s لكل مستخدم/[A]شهرياً[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* الاشتراكات المجددة تلقائيا يمكن إلغاؤها في أي وقت قبل وقت التجديد.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">المكالمة بدأت</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">بينما لا يمكن لميغا MEGA الوصول إلى بياناتك، فإن مسؤول حساب الأعمال الخاص بك لديه القدرة على التحكم في ترفيعات الكاميرا وعرضها في حساب المستخدم الخاص بك</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">حدث خطأ ما</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">تواصل مع مشرف حساب الأعمال الخاص بك لحل هذه المشكلة وتفعيل حسابك.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** ستزيد تلقائيًا، بدون أي رسوم إضافية ، لأغراض تجارية صريحة.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]مساحة تخزين[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]حجم تراسل[/A] متاح غير محدود</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">عند تسجيل الخروج، سيتم حذف الملفات من قسم غير متصل إلى الانترنت من جهازك.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">عند تسجيل الخروج، سيتم إلغاء عمليات النقل الجارية.</string>

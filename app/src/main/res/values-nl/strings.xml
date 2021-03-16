@@ -2429,7 +2429,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Gesprekskoppeling gekopieerd naar het klembord</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Van[/A] %s / [A]maand[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Van[/A] %s per gebruiker/[A]maand[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*Periodieke abonnement kan op elk moment gestopt worden voor de herhaaldatum.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Oproep Gestart</string>
 
@@ -2722,9 +2721,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Hoewel MEGA geen toegang heeft tot uw gegevens, heeft uw zakelijke accountbeheerder de mogelijkheid om de camera-uploads in uw gebruikersaccount te beheren en te bekijken</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Er is iets fout gegaan</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**Wordt automatisch verhoogd, zonder koste, voor echte zakelijke doelen.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Opslag[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Ongelimiteerde [A]Overdracht tegoed[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
