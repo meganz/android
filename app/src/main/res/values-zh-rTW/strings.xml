@@ -2365,7 +2365,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (訂閱)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]華為支付[/A] (訂閱)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]電信商[/A] (一次性)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">想升級您目前的訂閱方案，請聯繫我們客服團隊以取得[A]客製化方案[/A]。</string>

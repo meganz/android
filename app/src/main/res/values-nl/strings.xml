@@ -2365,7 +2365,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonnement)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay [/A] (abonnement)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile provider[/A] (éénmalig)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NIEUW</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Als u uw huidige abonnement wilt upgraden, neem dan contact op met ons ondersteuningsteam voor een [A]aangepast plan [/A].</string>
