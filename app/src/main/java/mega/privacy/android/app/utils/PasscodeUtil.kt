@@ -9,7 +9,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class PasscodeUtil @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
     private val dbH: DatabaseHandler
 ) {
 
