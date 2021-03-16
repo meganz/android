@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -22,7 +23,9 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PasscodeLockActivity : BaseActivity() {
 
     companion object {
@@ -43,7 +46,8 @@ class PasscodeLockActivity : BaseActivity() {
     private var mode = UNLOCK_MODE
     private var setOrUnlockMode = true
 
-    private lateinit var passcodeUtil: PasscodeUtil
+    @Inject
+    lateinit var passcodeUtil: PasscodeUtil
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
 
@@ -56,8 +60,6 @@ class PasscodeLockActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        passcodeUtil = PasscodeUtil(this, dbH)
 
         mode = when (intent.action) {
             ACTION_SET_PASSCODE_LOCK -> SET_MODE

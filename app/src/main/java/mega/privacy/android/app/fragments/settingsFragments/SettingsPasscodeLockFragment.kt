@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
@@ -15,10 +16,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
-    private lateinit var passcodeUtil: PasscodeUtil
+    @Inject
+    lateinit var passcodeUtil: PasscodeUtil
     private lateinit var requirePasscodeDialog: AlertDialog
 
     private var passcodeSwitch: SwitchPreferenceCompat? = null
@@ -28,8 +32,6 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private var passcodeLock = false
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        passcodeUtil = PasscodeUtil(context, dbH)
-
         addPreferencesFromResource(R.xml.preferences_passcode)
         passcodeSwitch = findPreference(KEY_PASSCODE_ENABLE)
         passcodeSwitch?.setOnPreferenceClickListener {

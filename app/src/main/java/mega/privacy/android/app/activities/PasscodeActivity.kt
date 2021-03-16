@@ -1,14 +1,19 @@
 package mega.privacy.android.app.activities
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.setAppFontSize
+import javax.inject.Inject
 
+@AndroidEntryPoint
 open class PasscodeActivity : BaseActivity() {
-    private lateinit var passcodeUtil: PasscodeUtil
+
+    @Inject
+    lateinit var passcodeUtil: PasscodeUtil
     private var lastStart = 0L
 
     /**
@@ -22,7 +27,6 @@ open class PasscodeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        passcodeUtil = PasscodeUtil(this, dbH)
 
         if (savedInstanceState != null) {
             isScreenRotation = true

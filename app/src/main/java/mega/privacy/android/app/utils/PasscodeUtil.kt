@@ -332,6 +332,9 @@ class PasscodeUtil @Inject constructor(
      * Launches an intent to show passcode screen when the app is locked.
      */
     private fun showLockScreen() {
-        context.startActivity(Intent(context, PasscodeLockActivity::class.java))
+        context.startActivity(
+            Intent(context, PasscodeLockActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
     }
 }
