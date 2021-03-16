@@ -28,7 +28,6 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -162,8 +161,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
-
-	private static final boolean USE_BUNDLED_EMOJI = false;
 
 	private static boolean showInfoChatMessages = false;
 
@@ -800,37 +797,32 @@ public class MegaApplication extends MultiDexApplication implements Application.
         };
 
 		registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
-		EmojiManager.install(new TwitterEmojiProvider());
 
+		EmojiManager.install(new TwitterEmojiProvider());
 		EmojiManagerShortcodes.initEmojiData(getApplicationContext());
 		EmojiManager.install(new TwitterEmojiProvider());
 		final EmojiCompat.Config config;
-		if (USE_BUNDLED_EMOJI) {
-			logDebug("Use Bundle emoji");
-			// Use the bundled font for EmojiCompat
-			config = new BundledEmojiCompatConfig(getApplicationContext());
-		} else {
-			logDebug("Use downloadable font for EmojiCompat");
-			// Use a downloadable font for EmojiCompat
-			final FontRequest fontRequest = new FontRequest(
-					"com.google.android.gms.fonts",
-					"com.google.android.gms",
-					"Noto Color Emoji Compat",
-					R.array.com_google_android_gms_fonts_certs);
-			config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
-					.setReplaceAll(false)
-					.registerInitCallback(new EmojiCompat.InitCallback() {
-						@Override
-						public void onInitialized() {
-							logDebug("EmojiCompat initialized");
-						}
-						@Override
-						public void onFailed(@Nullable Throwable throwable) {
-							logWarning("EmojiCompat initialization failed");
-						}
-					});
-		}
+		logDebug("Use downloadable font for EmojiCompat");
+		// Use a downloadable font for EmojiCompat
+		final FontRequest fontRequest = new FontRequest(
+				"com.google.android.gms.fonts",
+				"com.google.android.gms",
+				"Noto Color Emoji Compat",
+				R.array.com_google_android_gms_fonts_certs);
+		config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
+				.setReplaceAll(false)
+				.registerInitCallback(new EmojiCompat.InitCallback() {
+					@Override
+					public void onInitialized() {
+						logDebug("EmojiCompat initialized");
+					}
+					@Override
+					public void onFailed(@Nullable Throwable throwable) {
+						logWarning("EmojiCompat initialization failed");
+					}
+				});
 		EmojiCompat.init(config);
+
 		// clear the cache files stored in the external cache folder.
         clearPublicCache(this);
 
