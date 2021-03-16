@@ -834,7 +834,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
             long chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
             if (pendingMsgId == MEGACHAT_INVALID_HANDLE || chatId != idChat) {
-                logWarning("pendingMsd is not valid or is not the same chat. Cannot retry");
+                logWarning("pendingMsgId is not valid or is not the same chat. Cannot retry");
+                return;
             }
 
             retryPendingMessage(pendingMsgId);
