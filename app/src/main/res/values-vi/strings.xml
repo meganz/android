@@ -2365,9 +2365,7 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (đình kỳ)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (đình kỳ)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Thẻ Ngân Hàng[/A] (đình kỳ)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mạng Di Động[/A] (một lần duy nhất)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mạng Di Động[/A] (một lần duy nhất)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">MỚI</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Để nâng cấp thuê bao hiện tại, quý khách xin liên hệ bộ trợ giúp để đặt [A]thuê bao theo nhu cầu[/A].</string>

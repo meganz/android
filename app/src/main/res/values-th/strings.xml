@@ -2365,9 +2365,7 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (การสมัครใช้งาน)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (การสมัครใช้งาน)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]บัตรเครดิต[/A] (การสมัครใช้งาน)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]ผู้ให้บริการโทรศัพท์เคลื่อนที่[/A] (ครั้งเดียว)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]ผู้ให้บริการโทรศัพท์เคลื่อนที่[/A] (ครั้งเดียว)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">ใหม่</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">หากต้องการอัปเกรดการสมัครสมาชิกปัจจุบันของคุณ กรุณาติดต่อฝ่ายสนับสนุนของเราเพื่อเลือก[A]แผนกำหนดเอง[/A]</string>

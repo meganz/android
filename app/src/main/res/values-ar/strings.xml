@@ -2365,9 +2365,7 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]دفع عن طريق غوغل[/A] (اشتراك)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay هواوي باي[/A] (اشتراك)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]بطاقة الإئتمان[/A] (اشتراك)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">جديد</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">لترقية اشتراكك الحالي، يرجى الاتصال بقسم الدعم للحصول على [A]باقة مخصصة[/A].</string>
