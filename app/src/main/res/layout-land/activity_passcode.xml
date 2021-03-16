@@ -39,7 +39,7 @@
                 android:id="@+id/title_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif"
                 android:text="@string/unlock_pin_title"
                 android:textColor="@color/grey_087_white_087"
@@ -151,20 +151,18 @@
             <Button
                 android:id="@+id/logout_button"
                 style="@style/Widget.Mega.Button.Transparent.Stroke"
-                android:layout_marginTop="92dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
                 android:text="@string/action_logout"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text" />
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
             <Button
                 android:id="@+id/passcode_options_button"
                 style="@style/Widget.Mega.Button.Transparent"
-                android:layout_marginBottom="40dp"
                 android:text="@string/settings_passcode_option"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/title_text" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

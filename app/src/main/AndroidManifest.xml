@@ -291,7 +291,6 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
-            android:configChanges="orientation|screenSize"
             android:label="@string/settings_passcode_lock"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize|stateVisible"/>

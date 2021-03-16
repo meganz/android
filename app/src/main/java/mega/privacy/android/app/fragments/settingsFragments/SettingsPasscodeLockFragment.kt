@@ -14,7 +14,6 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 
 class SettingsPasscodeLockFragment : SettingsBaseFragment() {

@@ -1,16 +1,12 @@
 package mega.privacy.android.app.activities.settingsActivities
 
-import android.content.res.Configuration
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo.*
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -32,18 +28,20 @@ class PasscodeLockActivity : BaseActivity() {
     companion object {
         const val ACTION_SET_PASSCODE_LOCK = "ACTION_SET"
         const val ACTION_RESET_PASSCODE_LOCK = "ACTION_RESET"
-        const val MAX_ATTEMPTS = 10
-        const val MIN_ATTEMPTS_TO_SHOW_WARNING = 5
-        const val UNLOCK_MODE = 0
-        const val SET_MODE = 1
-        const val RESET_MODE = 2
+        private const val MAX_ATTEMPTS = 10
+        private const val MIN_ATTEMPTS_TO_SHOW_WARNING = 5
+        private const val UNLOCK_MODE = 0
+        private const val SET_MODE = 1
+        private const val RESET_MODE = 2
+        private const val SECOND_ROUND = "SECOND_ROUND"
+        private const val SB_FIRST = "SB_FIRST"
+        private const val ATTEMPTS = "ATTEMPTS"
+        private const val PASSCODE_TYPE = "PASSCODE_TYPE"
     }
 
     private var attempts = 0
     private var mode = UNLOCK_MODE
     private var setOrUnlockMode = true
-
-    private var screenOrientation = 0
 
     private lateinit var passcodeUtil: PasscodeUtil
     private lateinit var binding: ActivityPasscodeBinding
@@ -69,18 +67,27 @@ class PasscodeLockActivity : BaseActivity() {
 
         setOrUnlockMode = mode == SET_MODE || mode == UNLOCK_MODE
 
-        val prefs = dbH.preferences
+        if (savedInstanceState != null) {
+            secondRound = savedInstanceState.getBoolean(SECOND_ROUND, false)
 
-        passcodeType =
-            if (prefs != null && !isTextEmpty(prefs.passcodeLockType)) prefs.passcodeLockType else PIN_4
+            if (secondRound) {
+                sbFirst.append(savedInstanceState.get(SB_FIRST))
+            }
 
-        screenOrientation = resources.configuration.orientation
+            attempts = savedInstanceState.getInt(ATTEMPTS, 0)
+            passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
+        } else {
+            val prefs = dbH.preferences
+
+            passcodeType =
+                if (prefs != null && !isTextEmpty(prefs.passcodeLockType)) prefs.passcodeLockType else PIN_4
+        }
 
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         if (mode == UNLOCK_MODE) {
-            binding.toolbarPasscodeLockTitle.visibility = VISIBLE
+            binding.toolbarPasscodeLockTitle.isVisible = true
         } else {
             setSupportActionBar(binding.toolbarPasscode)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -121,38 +128,33 @@ class PasscodeLockActivity : BaseActivity() {
      * Sets the whole initial passcode screen.
      */
     private fun initPasscodeScreen() {
-        updateViewOrientation()
-
-        binding.titleText.text = StringResourcesUtils.getString(
-            if (setOrUnlockMode) R.string.unlock_pin_title
-            else R.string.reset_pin_title
-        )
+        setTitleText()
 
         if (mode == UNLOCK_MODE) {
             attempts = dbH.attributes.attemps
-            binding.passcodeOptionsButton.visibility = GONE
+            binding.passcodeOptionsButton.isVisible = false
         }
 
-        binding.doNotMatchWarning.visibility = GONE
+        binding.doNotMatchWarning.isVisible = false
 
         if (attempts > 0) {
             showAttemptsError()
         } else {
-            binding.failedAttemptsText.visibility = GONE
-            binding.failedAttemptsErrorText.visibility = GONE
-            binding.logoutButton.visibility = GONE
+            binding.failedAttemptsText.isVisible = false
+            binding.failedAttemptsErrorText.isVisible = false
+            binding.logoutButton.isVisible = false
         }
 
         if (passcodeType == PIN_ALPHANUMERIC) {
-            binding.passFirstInput.visibility = GONE
-            binding.passSecondInput.visibility = GONE
-            binding.passThirdInput.visibility = GONE
-            binding.passFourthInput.visibility = GONE
-            binding.passFifthInput.visibility = GONE
-            binding.passSixthInput.visibility = GONE
+            binding.passFirstInput.isVisible = false
+            binding.passSecondInput.isVisible = false
+            binding.passThirdInput.isVisible = false
+            binding.passFourthInput.isVisible = false
+            binding.passFifthInput.isVisible = false
+            binding.passSixthInput.isVisible = false
 
             binding.passwordInput.apply {
-                visibility = VISIBLE
+                isVisible = true
                 requestFocus()
 
                 setOnEditorActionListener { _, actionId, _ ->
@@ -165,7 +167,7 @@ class PasscodeLockActivity : BaseActivity() {
             }
         } else {
             binding.passFirstInput.apply {
-                visibility = VISIBLE
+                isVisible = true
                 requestFocus()
 
                 doAfterTextChanged {
@@ -176,7 +178,7 @@ class PasscodeLockActivity : BaseActivity() {
             }
 
             binding.passSecondInput.apply {
-                visibility = VISIBLE
+                isVisible = true
 
                 doAfterTextChanged {
                     if (this.text.toString().isNotEmpty()) {
@@ -189,7 +191,7 @@ class PasscodeLockActivity : BaseActivity() {
 
 
             binding.passThirdInput.apply {
-                visibility = VISIBLE
+                isVisible = true
 
                 doAfterTextChanged {
                     if (this.text.toString().isNotEmpty()) {
@@ -201,7 +203,7 @@ class PasscodeLockActivity : BaseActivity() {
             }
 
             binding.passFourthInput.apply {
-                visibility = VISIBLE
+                isVisible = true
 
                 doAfterTextChanged {
                     if (this.text.toString().isNotEmpty()) {
@@ -228,15 +230,15 @@ class PasscodeLockActivity : BaseActivity() {
 
                 params.marginEnd = 0
 
-                binding.passFifthInput.visibility = GONE
-                binding.passSixthInput.visibility = GONE
+                binding.passFifthInput.isVisible = false
+                binding.passSixthInput.isVisible = false
             } else {
                 binding.passFourthInput.imeOptions = IME_ACTION_NEXT or IME_FLAG_NO_FULLSCREEN
 
                 params.marginEnd = dp2px(16F, resources.displayMetrics)
 
                 binding.passFifthInput.apply {
-                    visibility = VISIBLE
+                    isVisible = true
 
                     doAfterTextChanged {
                         if (this.text.toString().isNotEmpty()) {
@@ -248,7 +250,7 @@ class PasscodeLockActivity : BaseActivity() {
                 }
 
                 binding.passSixthInput.apply {
-                    visibility = VISIBLE
+                    isVisible = true
 
                     doAfterTextChanged {
                         if (this.text.toString().isNotEmpty()) {
@@ -267,8 +269,20 @@ class PasscodeLockActivity : BaseActivity() {
 
             binding.passFourthInput.layoutParams = params
 
-            binding.passwordInput.visibility = GONE
+            binding.passwordInput.isVisible = false
         }
+    }
+
+    /**
+     * Sets the text of the title depending on the current situation.
+     */
+    private fun setTitleText() {
+        binding.titleText.text = StringResourcesUtils.getString(
+            if (secondRound && setOrUnlockMode) R.string.unlock_pin_title_2
+            else if (secondRound) R.string.reset_pin_title_2
+            else if (setOrUnlockMode) R.string.unlock_pin_title
+            else R.string.reset_pin_title
+        )
     }
 
     /**
@@ -294,72 +308,6 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     /**
-     * Updates the layout params of some views depending on de orientation of the screen.
-     */
-    private fun updateViewOrientation() {
-        val titleParams = binding.titleText.layoutParams as ConstraintLayout.LayoutParams
-        titleParams.topMargin = dp2px(
-            if (screenOrientation == ORIENTATION_PORTRAIT) 40F else 20F,
-            resources.displayMetrics
-        )
-
-
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(binding.passcodeParentView)
-        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.BOTTOM)
-        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.END)
-        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.START)
-        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.TOP)
-        constraintSet.clear(binding.logoutButton.id, ConstraintSet.END)
-        constraintSet.clear(binding.logoutButton.id, ConstraintSet.START)
-        constraintSet.clear(binding.logoutButton.id, ConstraintSet.TOP)
-        constraintSet.applyTo(binding.passcodeParentView)
-
-        val passcodeOptionsParams =
-            binding.passcodeOptionsButton.layoutParams as ConstraintLayout.LayoutParams
-
-        passcodeOptionsParams.apply {
-            if (screenOrientation == ORIENTATION_PORTRAIT) {
-                bottomToBottom = binding.passcodeParentView.id
-                endToEnd = binding.passcodeParentView.id
-                startToStart = binding.passcodeParentView.id
-
-                topMargin = 0
-                bottomMargin = dp2px(40F, resources.displayMetrics)
-            } else {
-                endToEnd = binding.passcodeParentView.id
-                topToBottom = binding.titleText.id
-
-                topMargin = dp2px(20F, resources.displayMetrics)
-                bottomMargin = 0
-            }
-        }
-
-        binding.passcodeOptionsButton.layoutParams = passcodeOptionsParams
-
-        val logoutParams = binding.logoutButton.layoutParams as ConstraintLayout.LayoutParams
-
-        logoutParams.apply {
-            if (screenOrientation == ORIENTATION_PORTRAIT) {
-                endToEnd = binding.passcodeParentView.id
-                startToStart = binding.passcodeParentView.id
-                topToBottom = binding.failedAttemptsText.id
-
-                topMargin = dp2px(92F, resources.displayMetrics)
-                marginEnd = 0
-            } else {
-                endToEnd = binding.passcodeParentView.id
-                topToBottom = binding.titleText.id
-
-                topMargin = dp2px(20F, resources.displayMetrics)
-                marginEnd = dp2px(20F, resources.displayMetrics)
-            }
-        }
-
-        binding.logoutButton.layoutParams = logoutParams
-    }
-
-    /**
      * Saves the typed passcode after check if it is completed and confirms it:
      *  - After the first time the passcode was typed if it's unlocking.
      *  - After the second time the passcode was typed if it's setting or resetting.
@@ -382,8 +330,8 @@ class PasscodeLockActivity : BaseActivity() {
             mode == UNLOCK_MODE -> confirmUnlockPasscode()
             else -> {
                 secondRound = true
-                clearTypedPasscode(true)
-                binding.passcodeOptionsButton.visibility = GONE
+                clearTypedPasscode()
+                binding.passcodeOptionsButton.isVisible = false
             }
         }
     }
@@ -426,9 +374,9 @@ class PasscodeLockActivity : BaseActivity() {
             setResult(RESULT_OK)
             finish()
         } else {
-            clearTypedPasscode(true)
+            clearTypedPasscode()
             sbSecond.clear()
-            binding.doNotMatchWarning.visibility = VISIBLE
+            binding.doNotMatchWarning.isVisible = true
         }
     }
 
@@ -445,7 +393,7 @@ class PasscodeLockActivity : BaseActivity() {
         } else {
             sbFirst.clear()
             incrementAttempts()
-            clearTypedPasscode(false)
+            clearTypedPasscode()
             showAttemptsError()
         }
     }
@@ -455,7 +403,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun showAttemptsError() {
         binding.failedAttemptsText.apply {
-            visibility = VISIBLE
+            isVisible = true
             text = StringResourcesUtils.getQuantityString(
                 R.plurals.passcode_lock_alert_attempts,
                 attempts,
@@ -470,16 +418,16 @@ class PasscodeLockActivity : BaseActivity() {
                 logout()
             }
             attempts >= MIN_ATTEMPTS_TO_SHOW_WARNING -> {
-                binding.failedAttemptsErrorText.visibility = VISIBLE
-                binding.logoutButton.visibility = VISIBLE
+                binding.failedAttemptsErrorText.isVisible = true
+                binding.logoutButton.isVisible = true
             }
             attempts > 0 -> {
-                binding.failedAttemptsErrorText.visibility = GONE
-                binding.logoutButton.visibility = VISIBLE
+                binding.failedAttemptsErrorText.isVisible = false
+                binding.logoutButton.isVisible = true
             }
             else -> {
-                binding.failedAttemptsErrorText.visibility = GONE
-                binding.logoutButton.visibility = GONE
+                binding.failedAttemptsErrorText.isVisible = false
+                binding.logoutButton.isVisible = false
             }
         }
     }
@@ -514,7 +462,7 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * Clears the passcode fields.
      */
-    private fun clearTypedPasscode(reEnter: Boolean) {
+    private fun clearTypedPasscode() {
         binding.passFirstInput.text.clear()
         binding.passSecondInput.text.clear()
         binding.passThirdInput.text.clear()
@@ -524,12 +472,7 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding.passwordInput.text.clear()
 
-        binding.titleText.text = StringResourcesUtils.getString(
-            if (reEnter && setOrUnlockMode) R.string.unlock_pin_title_2
-            else if (reEnter) R.string.reset_pin_title_2
-            else if (setOrUnlockMode) R.string.reset_pin_title
-            else R.string.unlock_pin_title
-        )
+        setTitleText()
 
         if (passcodeType == PIN_ALPHANUMERIC) {
             binding.passwordInput.requestFocus()
@@ -560,7 +503,7 @@ class PasscodeLockActivity : BaseActivity() {
     fun setPasscodeType(passcodeType: String) {
         this.passcodeType = passcodeType
         initPasscodeScreen()
-        clearTypedPasscode(false)
+        clearTypedPasscode()
 
 
         Handler().postDelayed({
@@ -569,15 +512,6 @@ class PasscodeLockActivity : BaseActivity() {
                 InputMethodManager.SHOW_IMPLICIT
             )
         }, 300)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        if (newConfig.orientation == screenOrientation) return
-
-        screenOrientation = newConfig.orientation
-        updateViewOrientation()
     }
 
     override fun onBackPressed() {
@@ -609,5 +543,18 @@ class PasscodeLockActivity : BaseActivity() {
         if (mode != UNLOCK_MODE) {
             finish()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(SECOND_ROUND, secondRound)
+
+        if (secondRound) {
+            outState.putString(SB_FIRST, sbFirst.toString())
+        }
+
+        outState.putInt(ATTEMPTS, attempts)
+        outState.putString(PASSCODE_TYPE, passcodeType)
+
+        super.onSaveInstanceState(outState)
     }
 }
