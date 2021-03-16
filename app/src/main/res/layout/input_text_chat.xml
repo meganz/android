@@ -54,13 +54,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:gravity="center_vertical"
-                        android:paddingTop="10dp">
+                        android:paddingTop="10dp"
+                        android:paddingEnd="14dp">
 
-                        <RelativeLayout
+                        <View
                             android:id="@+id/edit_icon"
                             android:layout_width="2dp"
                             android:layout_height="31dp"
-                            android:layout_marginEnd="12dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@color/teal_500"
                             android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
 
                         <RelativeLayout
@@ -74,7 +76,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
                                 android:text="@string/edit_message"
-                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
+                                android:textColor="@color/teal_500"
                                 android:textSize="12sp" />
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -83,6 +85,9 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/edit_msg_title"
                                 android:fontFamily="sans-serif"
+                                android:text="Hi, I have an appointment with adfgdfgd fgdfg dfgdfgd fgdfgd fgdfg"
+                                android:ellipsize="end"
+                                android:singleLine="true"
                                 android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                                 android:textSize="13sp" />
                         </RelativeLayout>
@@ -120,8 +125,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="12dp"
                     android:background="@null"
-                    android:src="@drawable/ic_remove_chat_toolbar"
-                    app:tint="@color/grey_054_white_054" />
+                    android:src="@drawable/ic_remove_chat_toolbar" />
 
                 <ImageButton
                     android:id="@+id/emoji_icon"
