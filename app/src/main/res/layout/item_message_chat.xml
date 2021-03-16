@@ -384,9 +384,8 @@
                 <!--forward rich links-->
                 <ImageView
                     android:id="@+id/forward_own_rich_links"
-                    android:layout_toStartOf="@+id/url_own_message_layout"
-                    style="@style/MessageForwardIconStyleEnd"/>
-
+                    style="@style/MessageForwardIconStyleEnd"
+                    android:layout_toStartOf="@id/url_own_message_layout" />
                 <!--End Rich links-->
 
                 <!-- Send a voice clip-->
@@ -613,9 +612,7 @@
                     <ImageView
                         android:id="@+id/forward_own_location"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/own_main_item_location_rl"/>
-
-
+                        android:layout_toStartOf="@id/own_main_item_location_rl" />
                 </RelativeLayout>
                 <!-- End location-->
 
@@ -754,7 +751,7 @@
                     <ImageView
                         android:id="@+id/forward_own_preview_portrait"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/preview_frame_portrait_rl"/>
+                        android:layout_toStartOf="@id/preview_frame_portrait_rl" />
                 </RelativeLayout>
 
                 <!-- own elements landscape -->
@@ -891,8 +888,7 @@
                     <ImageView
                         android:id="@+id/forward_own_preview_landscape"
                         style="@style/MessageForwardIconStyleEnd"
-                        android:layout_toStartOf="@+id/preview_frame_landscape_rl"/>
-
+                        android:layout_toStartOf="@id/preview_frame_landscape_rl" />
                 </RelativeLayout>
 
                 <!-- send a file-->
@@ -961,7 +957,7 @@
                 <ImageView
                     android:id="@+id/forward_own_file"
                     style="@style/MessageForwardIconStyleEnd"
-                    android:layout_toStartOf="@+id/content_own_message_file_layout"/>
+                    android:layout_toStartOf="@id/content_own_message_file_layout" />
                 <!--End RelativeLayout file-->
 
                 <!-- send a contact-->
@@ -1053,8 +1049,7 @@
                 <ImageView
                     android:id="@+id/forward_own_contact"
                     style="@style/MessageForwardIconStyleEnd"
-                    android:layout_toStartOf="@+id/content_own_message_contact_layout"/>
-
+                    android:layout_toStartOf="@id/content_own_message_contact_layout" />
             </RelativeLayout>
             <!--End RelativeLayout own content message-->
 
@@ -1389,7 +1384,7 @@
                 <ImageView
                     android:id="@+id/forward_contact_rich_links"
                     style="@style/MessageForwardIconStyleStart"
-                    android:layout_toEndOf="@+id/url_contact_message_layout"/>
+                    android:layout_toEndOf="@id/url_contact_message_layout" />
 
                 <!--Received a voice clip-->
                 <RelativeLayout
@@ -1540,7 +1535,7 @@
                     <ImageView
                         android:id="@+id/forward_contact_location"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/contact_main_item_location" />
+                        android:layout_toEndOf="@id/contact_main_item_location" />
                 </RelativeLayout>
                 <!-- End location-->
 
@@ -1629,7 +1624,7 @@
                     <ImageView
                         android:id="@+id/forward_contact_preview_portrait"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_portrait"/>
+                        android:layout_toEndOf="@id/content_contact_message_portrait" />
 
                     <!-- contact elements landscape -->
                     <RelativeLayout
@@ -1708,7 +1703,7 @@
                     <ImageView
                         android:id="@+id/forward_contact_preview_landscape"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_landscape"/>
+                        android:layout_toEndOf="@id/content_contact_message_landscape" />
                     <!--End contact elements landscape-->
 
                     <!-- Receive a file-->
@@ -1767,7 +1762,7 @@
                     <ImageView
                         android:id="@+id/forward_contact_file"
                         style="@style/MessageForwardIconStyleStart"
-                        android:layout_toEndOf="@+id/content_contact_message_file"/>
+                        android:layout_toEndOf="@id/content_contact_message_file" />
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
 
@@ -1840,7 +1835,7 @@
                 <ImageView
                     android:id="@+id/forward_contact_contact"
                     style="@style/MessageForwardIconStyleStart"
-                    android:layout_toEndOf="@+id/content_contact_message_contact_layout"/>
+                    android:layout_toEndOf="@id/content_contact_message_contact_layout" />
                 <!--End RelativeLayout contact-->
             </RelativeLayout>
 
