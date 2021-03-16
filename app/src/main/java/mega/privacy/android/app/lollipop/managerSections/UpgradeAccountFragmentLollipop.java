@@ -99,11 +99,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 	private RelativeLayout googlePlayLayout;
 	private RelativeLayout fortumoLayout;
-	private RelativeLayout centiliLayout;
 
 	private RelativeLayout googlePlayLayer;
 	private RelativeLayout fortumoLayer;
-	private RelativeLayout centiliLayer;
 
 	private LinearLayout optionsBilling;
 	private RadioGroup billingPeriod;
@@ -474,26 +472,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			fortumoText.setText(HtmlCompat.fromHtml(textFortumoText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-			centiliLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
-			centiliLayout.setOnClickListener(this);
-
-			centiliLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_layer);
-			centiliLayer.setVisibility(View.GONE);
-
-			TextView centiliText = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_text);
-
-			String textCentiliText = getString(R.string.payment_method_centili);
-			try{
-				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
-				textCentiliText = textCentiliText.replace("[/A]", "</font>");
-			} catch (Exception e) {
-				logError("Exception formatting string", e);
-			}
-
-			centiliText.setText(HtmlCompat.fromHtml(textCentiliText, HtmlCompat.FROM_HTML_MODE_LEGACY));
-
 			optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options);
 
 			billingPeriod = selectPaymentMethodClicked.findViewById(R.id.billing_period);
@@ -513,8 +491,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			googlePlayLayout.setVisibility(View.GONE);
 			fortumoLayout.setVisibility(View.GONE);
-			centiliLayout.setVisibility(View.GONE);
-            layoutButtons.setVisibility(View.GONE);
+			layoutButtons.setVisibility(View.GONE);
 			optionsBilling.setVisibility(View.GONE);
 
 			showPaymentMethods(account);
@@ -676,10 +653,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 									((ManagerActivityLollipop) context).showFortumo();
 									break;
 								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
-									((ManagerActivityLollipop) context).showCentili();
-									break;
-								}
 							}
 							break;
 						}
@@ -806,10 +779,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
 				break;
 			}
-			case R.id.payment_method_centili:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CENTILI);
-				break;
-			}
 			case R.id.upgrade_business_layout:{
 				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
@@ -843,7 +812,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					}
 
 					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
 
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -857,7 +825,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 					googlePlayLayout.setVisibility(View.GONE);
 					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
 				}
 
 				break;
@@ -877,7 +844,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					}
 
 					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
 
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -907,7 +873,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					}
 
 					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
 
 					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -935,11 +900,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 						fortumoLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-						centiliLayout.setVisibility(View.VISIBLE);
                         layoutButtons.setVisibility(View.VISIBLE);
 
                     }
@@ -1039,20 +999,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						logDebug("Pro I - PAYMENT_METHOD_FORTUMO");
 						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro I - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
 						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
@@ -1063,7 +1010,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						logDebug("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
@@ -1097,20 +1043,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						logDebug("Pro II - PAYMENT_METHOD_FORTUMO");
 						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro II - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
 						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
@@ -1121,7 +1054,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						logDebug("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
@@ -1155,20 +1087,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						logDebug("Pro III - PAYMENT_METHOD_FORTUMO");
 						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro III - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
 						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
@@ -1179,7 +1098,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						logDebug("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
@@ -1211,21 +1129,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						logDebug("Lite - PAYMENT_METHOD_FORTUMO");
 						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedMonthly.setChecked(true);
-						billedYearly.setVisibility(View.GONE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Lite - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);
 						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
@@ -1237,7 +1141,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						logDebug("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
 						fortumoLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
 						buttonContinue.setEnabled(true);

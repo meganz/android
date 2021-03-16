@@ -116,7 +116,6 @@ public class Constants {
     public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
     public static final int OVERQUOTA_ALERT = 5003;
     public static final int FORTUMO_FRAGMENT = 5005;
-    public static final int CENTILI_FRAGMENT = 5007;
     public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
     public static final int TOUR_FRAGMENT = 6000;
