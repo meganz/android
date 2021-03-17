@@ -279,20 +279,20 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
-        int color = ContextCompat.getColor(context, R.color.dark_grey_white);
+        int color = ContextCompat.getColor(context, R.color.dark_grey);
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(ContextCompat.getColor(context, R.color.white_dark_grey));
+        paint.setColor(ContextCompat.getColor(context, R.color.white_grey_700));
         c.drawRect(0, 0, WIDTH, WIDTH, paint);
         paint.setColor(color);
 
         for (int y = 0; y < h; y++) {
             int offset = y * w;
             for (int x = 0; x < w; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ? color : ContextCompat.getColor(context, R.color.white_dark_grey);
+                pixels[offset + x] = bitMatrix.get(x, y) ? color : ContextCompat.getColor(context, R.color.white_grey_700);
             }
         }
 
