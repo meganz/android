@@ -13,13 +13,21 @@
         android:paddingBottom="9dp">
 
         <TextView
-            android:id="@+id/sort_by_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:text="@string/action_sort_by"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey54White54" />
+
+        <TextView
+            android:id="@+id/sort_by_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/sortby_owner_mail"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/sort_by_name_asc"
@@ -64,7 +72,7 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="@string/sort_by_largest_size"
+            android:text="@string/sortby_size_largest_first"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             app:drawableStartCompat="@drawable/ic_sort_largest"
             app:drawableTint="?android:attr/textColorSecondary" />
@@ -77,7 +85,7 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="@string/sort_by_smallest_size"
+            android:text="@string/sortby_size_smallest_first"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             app:drawableStartCompat="@drawable/ic_sort_smallest"
             app:drawableTint="?android:attr/textColorSecondary" />
@@ -97,7 +105,7 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="@string/sort_by_newest_date"
+            android:text="@string/sortby_date_newest"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             app:drawableStartCompat="@drawable/ic_sort_newest"
             app:drawableTint="?android:attr/textColorSecondary" />
@@ -110,7 +118,7 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="@string/sort_by_oldest_date"
+            android:text="@string/sortby_date_newest"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             app:drawableStartCompat="@drawable/ic_sort_oldest"
             app:drawableTint="?android:attr/textColorSecondary" />
@@ -134,7 +142,7 @@
             android:text="@string/sortby_type_photo_first"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_sort_newest"
+            app:drawableStartCompat="@drawable/ic_cu_photos"
             app:drawableTint="?android:attr/textColorSecondary" />
 
         <TextView
@@ -148,7 +156,7 @@
             android:text="@string/sortby_type_video_first"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_sort_oldest"
+            app:drawableStartCompat="@drawable/ic_cu_videos"
             app:drawableTint="?android:attr/textColorSecondary" />
 
     </LinearLayout>

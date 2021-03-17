@@ -91,10 +91,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_OTHERS -> {
                 if (isIncomingRootOrder) {
-                    binding.sortByTitle.text =
-                        StringResourcesUtils.getString(R.string.action_sort_by) + "\n" + StringResourcesUtils.getString(
-                            R.string.sortby_owner_mail
-                        )
+                    binding.sortBySubtitle.isVisible = true
                 }
 
                 binding.sortByNameSeparator.isVisible = false
