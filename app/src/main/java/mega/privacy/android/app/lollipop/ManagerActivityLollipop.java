@@ -982,18 +982,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
-	private BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
+	private final BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
-				int order = intent.getIntExtra("order", ORDER_DEFAULT_ASC);
-				if (cloudOrder) {
-					refreshCloudOrder(order);
-				}
-				else {
-					refreshOthersOrder(order);
-				}
+			if (intent == null || !BROADCAST_ACTION_INTENT_UPDATE_ORDER.equals(intent.getAction())) {
+				return;
+			}
+
+			if (intent.getBooleanExtra(IS_CLOUD_ORDER, true)) {
+				refreshCloudOrder(intent.getIntExtra(NEW_ORDER, ORDER_DEFAULT_ASC));
+			} else {
+				refreshOthersOrder();
 			}
 		}
 	};
@@ -10248,16 +10247,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         usedSpacePB.setProgressDrawable(drawable);
 	}
 
-	public void selectSortByContacts(int _orderContacts){
-		logDebug("selectSortByContacts");
-
-		if (MegaApplication.getSortOrderManagement().getOrderContacts() == _orderContacts) {
-			return;
-		}
-
-		MegaApplication.getSortOrderManagement().setOrderContacts(_orderContacts);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		if (cFLol != null){
+	public void refreshContactsOrder() {
+		if (getContactsFragment() != null) {
 			cFLol.sortBy();
 		}
 	}
@@ -10300,12 +10291,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void refreshCloudOrder(int newOrderCloud){
-		logDebug("New order: " + newOrderCloud);
-		MegaApplication.getSortOrderManagement().setOrderCloud(newOrderCloud);
-
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class)
-				.post(MegaApplication.getSortOrderManagement().getOrderCloud());
+	public void refreshCloudOrder(int order) {
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(order);
 
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
@@ -10315,11 +10302,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		onNodesSharedUpdate();
 
-		if (getInboxFragment() != null){
+		if (getInboxFragment() != null) {
 			MegaNode inboxNode = megaApi.getInboxNode();
-			if(inboxNode!=null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode,
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+			if (inboxNode != null) {
+				ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, order);
 				iFLol.setNodes(nodes);
 				iFLol.getRecyclerView().invalidate();
 			}
@@ -10328,27 +10314,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		refreshSearch();
 	}
 
-	public void refreshOthersOrder(int newOrderOthers){
-		if (MegaApplication.getSortOrderManagement().getOrderOthers() == newOrderOthers) {
-			return;
-		}
-
-		logDebug("New order: " + newOrderOthers);
-
-		MegaApplication.getSortOrderManagement().setOrderOthers(newOrderOthers);
+	public void refreshOthersOrder(){
 		refreshSharesPageAdapter();
 		refreshSearch();
 	}
 
-	public void selectSortUploads(int orderCamera) {
-		logDebug("selectSortUploads");
-
-		if (MegaApplication.getSortOrderManagement().getOrderCamera() == orderCamera) {
-			return;
-		}
-
-		MegaApplication.getSortOrderManagement().setOrderCamera(orderCamera);
-
+	public void refreshCameraOrder(int orderCamera) {
 		if (getCameraUploadFragment() != null) {
 			cuFragment.setOrderBy(orderCamera);
 		}

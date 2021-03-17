@@ -2,7 +2,7 @@ package mega.privacy.android.app;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import androidx.appcompat.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -330,14 +330,14 @@ public class SorterContentActivity extends TransfersManagementActivity {
 
             switch (drawerItem) {
                 case CONTACTS:
-                    managerActivityLollipop.selectSortByContacts(order1);
+                    managerActivityLollipop.refreshContactsOrder();
                     break;
 
                 case SHARED_ITEMS:
                     if (context instanceof ManagerActivityLollipop) {
                         if (managerActivityLollipop.isFirstNavigationLevel()
                                 && isIncomingOrOutgoingRootLevel) {
-                            managerActivityLollipop.refreshOthersOrder(order1);
+                            managerActivityLollipop.refreshOthersOrder();
                         } else {
                             managerActivityLollipop.refreshCloudOrder(order1);
                         }
@@ -353,7 +353,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
 
                 case CAMERA_UPLOADS:
                 case MEDIA_UPLOADS:
-                    managerActivityLollipop.selectSortUploads(order1);
+                    managerActivityLollipop.refreshCameraOrder(order1);
                     break;
 
                 default:

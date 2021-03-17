@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -23,6 +25,8 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
     BaseBottomSheetDialogFragment() {
 
     private var isIncomingRootOrder = false
+    private lateinit var sortOrderManagement: SortOrderManagement
+    private var oldOrder: Int = ORDER_DEFAULT_ASC
 
     constructor(orderType: Int, isIncomingRootOrder: Boolean) : this(orderType) {
         this.isIncomingRootOrder = isIncomingRootOrder
@@ -40,9 +44,9 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
-        val sortOrderManagement = MegaApplication.getSortOrderManagement()
+        sortOrderManagement = MegaApplication.getSortOrderManagement()
 
-        val order = when (orderType) {
+        oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
             ORDER_CONTACTS -> sortOrderManagement.getOrderContacts()
             ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
@@ -85,13 +89,15 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
             }
         }
 
-        when (order) {
+        when (oldOrder) {
             ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
             ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
             ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
             ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
             ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
             ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
+            ORDER_PHOTO_ASC -> setSelectedColor(binding.sortByPhotosMediaType)
+            ORDER_VIDEO_ASC -> setSelectedColor(binding.sortByVideosMediaType)
         }
 
         binding.sortByNameAsc.setOnClickListener {
@@ -137,14 +143,56 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
     }
 
     private fun setNewOrder(order: Int) {
-        MegaApplication.getInstance().dbH.setPreferredSortCloud(order.toString())
+        if (oldOrder == order) {
+            return
+        }
 
-        if (requireActivity() is ManagerActivityLollipop) {
-            (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
-        } else if (requireActivity() is FileExplorerActivityLollipop) {
-            (requireActivity() as FileExplorerActivityLollipop).refreshOrderNodes(order)
+        when (orderType) {
+            ORDER_CLOUD -> {
+                sortOrderManagement.setOrderCloud(order)
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
+                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                    updateFileExplorerOrder(order)
+                }
+            }
+            ORDER_CONTACTS -> {
+                sortOrderManagement.setOrderContacts(order)
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshContactsOrder()
+                }
+            }
+            ORDER_CAMERA -> {
+                sortOrderManagement.setOrderCamera(order)
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshCameraOrder(order)
+                }
+            }
+            ORDER_OTHERS -> {
+                sortOrderManagement.setOrderOthers(order)
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
+                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                    updateFileExplorerOrder(order)
+                }
+            }
         }
 
         setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun updateFileExplorerOrder(order: Int) {
+        (requireActivity() as FileExplorerActivityLollipop).refreshOrderNodes(order)
+
+        requireActivity().sendBroadcast(
+            Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER).putExtra(
+                IS_CLOUD_ORDER,
+                orderType == ORDER_CLOUD
+            ).putExtra(NEW_ORDER, order)
+        )
     }
 }
