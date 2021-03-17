@@ -829,7 +829,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void handleStoredData() {
-		chatC.proceedWithForwardOrShare(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId, FORWARD_ONLY_OPTION);
+		chatC.proceedWithForwardOrShare(this, myChatFilesFolder, preservedMessagesSelected,
+				preservedMessagesToImport, chatId, FORWARD_ONLY_OPTION);
 		preservedMessagesSelected = null;
 		preservedMessagesToImport = null;
 	}

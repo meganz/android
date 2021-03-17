@@ -29,7 +29,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.CopyNodeListener
+import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
@@ -1056,7 +1056,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
-        val listener = CopyNodeListener(snackbarShower, activityLauncher, megaApp)
+        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
 
         for (handle in copyHandles) {
             val node = megaApi.getNodeByHandle(handle)

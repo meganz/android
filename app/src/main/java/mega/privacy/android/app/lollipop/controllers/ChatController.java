@@ -22,6 +22,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CopyListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -1189,6 +1190,7 @@ public class ChatController {
     /**
      * Method for copying nodes to My Chat Files folder.
      *
+     * @param snackbarShower The interface to show snackbar.
      * @param myChatFilesFolder The node myChatFilesFolder.
      * @param messagesSelected  The list of selected msgs.
      * @param messagesToImport  The list of messages to import.
@@ -1196,12 +1198,18 @@ public class ChatController {
      * @param typeImport        IMPORT_TO_SHARE_OPTION, indicates that the node will be shared.
      *                          FORWARD_ONLY_OPTION, indicates that the node will be forwarded.
      */
-    public void proceedWithForwardOrShare(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat, int typeImport) {
+    public void proceedWithForwardOrShare(SnackbarShower snackbarShower, MegaNode myChatFilesFolder,
+                                          ArrayList<MegaChatMessage> messagesSelected,
+                                          ArrayList<MegaChatMessage> messagesToImport,
+                                          long idChat, int typeImport) {
         CopyListener listener;
         if (typeImport == IMPORT_TO_SHARE_OPTION) {
-            listener = new CopyListener(MULTIPLE_IMPORT_CONTACT_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat, exportListener);
+            listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
+                    messagesSelected, messagesToImport.size(), context, snackbarShower, this,
+                    idChat, exportListener);
         } else {
-            listener = new CopyListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+            listener = new CopyListener(CopyListener.MULTIPLE_FORWARD_MESSAGES, messagesSelected,
+                    messagesToImport.size(), context, snackbarShower, this, idChat);
         }
 
         int errors = 0;

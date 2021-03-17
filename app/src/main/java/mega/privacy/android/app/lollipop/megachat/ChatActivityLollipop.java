@@ -529,7 +529,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
             forwardMessages(preservedMessagesSelected);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
-            chatC.proceedWithForwardOrShare(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, typeImport);
+            chatC.proceedWithForwardOrShare(this, myChatFilesFolder, preservedMsgSelected,
+                    preservedMsgToImport, idChat, typeImport);
             isForwardingFromNC = false;
             preservedMsgSelected = null;
             preservedMsgToImport = null;
