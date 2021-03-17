@@ -182,6 +182,7 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -827,6 +828,25 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
+    private final BroadcastReceiver retryPendingMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_RETRY_PENDING_MESSAGE.equals(intent.getAction())) {
+                return;
+            }
+
+            long pendingMsgId = intent.getLongExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
+            long chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+
+            if (pendingMsgId == MEGACHAT_INVALID_HANDLE || chatId != idChat) {
+                logWarning("pendingMsgId is not valid or is not the same chat. Cannot retry");
+                return;
+            }
+
+            retryPendingMessage(pendingMsgId);
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -953,6 +973,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         registerReceiver(errorCopyingNodesReceiver,
                 new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
+
+        registerReceiver(retryPendingMessageReceiver,
+                new IntentFilter(BROADCAST_ACTION_RETRY_PENDING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -3553,63 +3576,58 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
-    public void retryPendingMessage(long idMessage){
-        logDebug("retryPendingMessage: " + idMessage);
+    /**
+     * Retries the sending of a pending message.
+     *
+     * @param idMessage The identifier of the pending message.
+     */
+    public void retryPendingMessage(long idMessage) {
+        retryPendingMessage(dbH.findPendingMessageById(idMessage));
+    }
 
-        PendingMessageSingle pendMsg = dbH.findPendingMessageById(idMessage);
-
-        if(pendMsg!=null){
-
-            if(pendMsg.getNodeHandle()!=-1){
-                removePendingMsg(idMessage);
-                retryNodeAttachment(pendMsg.getNodeHandle());
-            }
-            else{
-                logDebug("The file was not uploaded yet");
-
-                ////Retry to send
-
-                String filePath = pendMsg.getFilePath();
-
-                File f = new File(filePath);
-                if (!f.exists()) {
-                    showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), -1);
-                    return;
-                }
-
-                //Remove the old message from the UI and DB
-                removePendingMsg(idMessage);
-
-                Intent intent = new Intent(this, ChatUploadService.class);
-
-                PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
-                        f.getAbsolutePath(), f.getName(), false);
-
-                long idMessageDb = pMsgSingle.getId();
-
-                if(idMessageDb!=-1){
-                    intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessageDb);
-
-                    if(!isLoadingHistory){
-                        AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(pMsgSingle, true);
-                        sendMessageToUI(newNodeAttachmentMsg);
-                    }
-
-//                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
-//                filePaths.add("/home/jfjf.jpg");
-
-                    intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-
-                    checkIfServiceCanStart(intent);
-                }
-                else{
-                    logError("Error when adding pending msg to the database");
-                }
-            }
-        }
-        else{
+    /**
+     * Retries the sending of a pending message.
+     *
+     * @param pendMsg The pending message.
+     */
+    private void retryPendingMessage(PendingMessageSingle pendMsg) {
+        if (pendMsg == null) {
             logError("Pending message does not exist");
-            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), -1);
+            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.messages_forwarded_error_not_available,
+                    1, 1), MEGACHAT_INVALID_HANDLE);
+            return;
+        }
+
+        if (pendMsg.getNodeHandle() != INVALID_HANDLE) {
+            removePendingMsg(pendMsg);
+            retryNodeAttachment(pendMsg.getNodeHandle());
+        } else {
+            ////Retry to send
+            File f = new File(pendMsg.getFilePath());
+            if (!f.exists()) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.messages_forwarded_error_not_available,
+                        1, 1), MEGACHAT_INVALID_HANDLE);
+                return;
+            }
+
+            //Remove the old message from the UI and DB
+            removePendingMsg(pendMsg);
+            PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
+                    f.getAbsolutePath(), f.getName(), false);
+
+            long idMessageDb = pMsgSingle.getId();
+            if (idMessageDb == INVALID_ID) {
+                logError("Error when adding pending msg to the database");
+                return;
+            }
+
+            if (!isLoadingHistory) {
+                sendMessageToUI(new AndroidMegaChatMessage(pMsgSingle, true));
+            }
+
+            checkIfServiceCanStart(new Intent(this, ChatUploadService.class)
+                    .putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessageDb)
+                    .putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat));
         }
     }
 
@@ -6847,6 +6865,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     int tag = transfer != null ? transfer.getTag() : INVALID_ID;
                     dbH.updatePendingMessage(pendingMsg.getId(), tag, INVALID_OPTION, PendingMessageSingle.STATE_ERROR_UPLOADING);
                     pendingMsg.setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                    msg.setPendingMessage(pendingMsg);
                 } else if (transfer.getState() == MegaTransfer.STATE_COMPLETED || transfer.getState() == MegaTransfer.STATE_CANCELLED) {
                     dbH.updatePendingMessage(pendingMsg.getId(), transfer.getTag(), INVALID_OPTION, PendingMessageSingle.STATE_SENT);
                     continue;
@@ -6854,6 +6873,18 @@ public class ChatActivityLollipop extends PinActivityLollipop
             } else if (pendingMsg.getState() == PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER) {
                 dbH.updatePendingMessage(pendingMsg.getId(), INVALID_ID, INVALID_OPTION, PendingMessageSingle.STATE_PREPARING);
                 pendingMsg.setState(PendingMessageSingle.STATE_PREPARING);
+                msg.setPendingMessage(pendingMsg);
+            } else if (pendingMsg.getState() == PendingMessageSingle.STATE_COMPRESSING) {
+                if (isServiceRunning(ChatUploadService.class)) {
+                    startService(new Intent(this, ChatUploadService.class)
+                            .setAction(ACTION_CHECK_COMPRESSING_MESSAGE)
+                            .putExtra(CHAT_ID, pendingMsg.getChatId())
+                            .putExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMsg.getId())
+                            .putExtra(INTENT_EXTRA_KEY_FILE_NAME, pendingMsg.getName()));
+                } else {
+                    retryPendingMessage(pendingMsg);
+                    continue;
+                }
             }
 
             appendMessagePosition(msg);
@@ -7462,32 +7493,67 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
+    /**
+     * Removes a pending message from UI and DB if exists.
+     *
+     * @param id The identifier of the pending message.
+     */
     public void removePendingMsg(long id){
-        logDebug("Selected message ID: " + selectedMessageId);
+        removePendingMsg(dbH.findPendingMessageById(id));
+    }
 
-        PendingMessageSingle pMsg = dbH.findPendingMessageById(id);
-        if(pMsg!=null && pMsg.getState()==PendingMessageSingle.STATE_UPLOADING) {
-            if (pMsg.getTransferTag() != -1) {
-                logDebug("Transfer tag: " + pMsg.getTransferTag());
-                if (megaApi != null) {
-                    megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
-                }
+    /**
+     * Removes a pending message from UI and DB if exists.
+     *
+     * @param pMsg The pending message.
+     */
+    public void removePendingMsg(PendingMessageSingle pMsg) {
+        if (pMsg == null) {
+            logWarning("pMsg is null, cannot remove it");
+            return;
+        }
+
+        int pMsgState = pMsg.getState();
+
+        if (pMsgState == PendingMessageSingle.STATE_UPLOADING
+                && pMsg.getTransferTag() != INVALID_ID) {
+            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
+        }
+
+        if (pMsgState == PendingMessageSingle.STATE_SENT) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), MEGACHAT_INVALID_HANDLE);
+            return;
+        }
+
+        try {
+            dbH.removePendingMessageById(pMsg.getId());
+            int positionToRemove = selectedPosition == INVALID_POSITION
+                    ? findPendingMessagePosition(pMsg.getId())
+                    : selectedPosition;
+
+            messages.remove(positionToRemove);
+            adapter.removeMessage(positionToRemove, messages);
+        } catch (IndexOutOfBoundsException e) {
+            logError("EXCEPTION", e);
+        }
+    }
+
+    /**
+     * Gets a pending message position from its id.
+     *
+     * @param pendingMsgId Identifier of the pending message.
+     * @return The position of the pending message if exist, INVALID_POSITION otherwise.
+     */
+    public int findPendingMessagePosition(long pendingMsgId) {
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+
+        while (itr.hasPrevious()) {
+            if (pendingMsgId == itr.previous().getMessage().getTempId()) {
+                return itr.nextIndex();
             }
         }
 
-        if(pMsg!=null && pMsg.getState()!=PendingMessageSingle.STATE_SENT){
-            try{
-                dbH.removePendingMessageById(id);
-                messages.remove(selectedPosition);
-                adapter.removeMessage(selectedPosition, messages);
-            }
-            catch (IndexOutOfBoundsException e){
-                logError("EXCEPTION", e);
-            }
-        }
-        else{
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), -1);
-        }
+        return INVALID_POSITION;
     }
 
     /**
@@ -7949,6 +8015,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         unregisterReceiver(joinedSuccessfullyReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
         unregisterReceiver(errorCopyingNodesReceiver);
+        unregisterReceiver(retryPendingMessageReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);

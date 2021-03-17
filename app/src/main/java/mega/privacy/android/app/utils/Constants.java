@@ -257,6 +257,7 @@ public class Constants {
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
     public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
+    public static final String ACTION_CHECK_COMPRESSING_MESSAGE = "ACTION_CHECK_COMPRESSING_MESSAGE";
 
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
@@ -315,6 +316,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "PARENT_HANDLE";
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
+    public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
