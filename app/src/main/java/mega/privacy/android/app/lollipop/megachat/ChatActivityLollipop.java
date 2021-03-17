@@ -2831,7 +2831,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         sendIcon.setEnabled(true);
         if(editingMessage){
-            sendIcon.setImageResource(R.drawable.ic_select_thumbnail);
+            sendIcon.setImageResource(R.drawable.ic_select_folder);
         }else{
             sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white,
                     ColorUtils.getThemeColor(this, android.R.attr.colorAccent)));

@@ -62,7 +62,7 @@
                             android:layout_width="2dp"
                             android:layout_height="31dp"
                             android:layout_marginEnd="6dp"
-                            android:background="@color/teal_500"
+                            android:background="@color/teal_200"
                             android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
 
                         <RelativeLayout
@@ -76,7 +76,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
                                 android:text="@string/edit_message"
-                                android:textColor="@color/teal_500"
+                                android:textColor="@color/teal_200"
                                 android:textSize="12sp" />
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
