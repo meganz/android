@@ -87,7 +87,7 @@
         android:id="@+id/track_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="72dp"
         android:ellipsize="marquee"
         android:gravity="center"
         android:singleLine="true"
