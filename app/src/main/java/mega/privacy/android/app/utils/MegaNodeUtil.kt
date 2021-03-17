@@ -31,7 +31,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.CopyNodeListener
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.listeners.MoveNodeListener
+import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
@@ -89,7 +89,7 @@ object MegaNodeUtil {
      * @param node the detected node
      * @return whether the node is taken down
      */
-    fun isNodeTakenDown(node: MegaNode?): Boolean {
+    private fun isNodeTakenDown(node: MegaNode?): Boolean {
         return node != null && node.isTakenDown
     }
 
@@ -161,7 +161,7 @@ object MegaNodeUtil {
             val path = getLocalFile(context, node.name, node.size)
 
             if (!isTextEmpty(path) && !node.isFolder) {
-                FileUtil.shareFile(context, File(path))
+                shareFile(context, File(path))
             } else if (node.isExported) {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
@@ -241,6 +241,7 @@ object MegaNodeUtil {
 
         var notExportedNodes = 0
         val links = getExportNodesLink(nodes)
+
         for (node in nodes) {
             if (!node.isExported) {
                 notExportedNodes++
@@ -298,7 +299,7 @@ object MegaNodeUtil {
      * @return True if there is not any error, false otherwise.
      */
     @JvmStatic
-    public fun shouldContinueWithoutError(
+    fun shouldContinueWithoutError(
         context: Context,
         message: String,
         node: MegaNode?
@@ -326,7 +327,7 @@ object MegaNodeUtil {
      * @return True if there is not any error, false otherwise.
      */
     @JvmStatic
-    public fun shouldContinueWithoutError(
+    fun shouldContinueWithoutError(
         context: Context, message: String,
         nodes: List<MegaNode>?
     ): Boolean {
@@ -989,7 +990,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveNodeListener(snackbarShower, megaApp)
+        val listener = MoveListener(snackbarShower, megaApp)
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1079,7 +1080,7 @@ object MegaNodeUtil {
         val megaApp = MegaApplication.getInstance()
         val megaApi = megaApp.megaApi
 
-        megaApi.moveNode(node, megaApi.rubbishNode, MoveNodeListener(snackbarShower, megaApp))
+        megaApi.moveNode(node, megaApi.rubbishNode, MoveListener(snackbarShower, megaApp))
     }
 
     /**

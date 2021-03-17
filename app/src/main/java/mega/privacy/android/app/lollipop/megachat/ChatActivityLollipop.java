@@ -3449,7 +3449,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Send location [longLatitude]: " + latitude + " [longLongitude]: " + longitude);
                 sendLocationMessage(longitude, latitude, encodedSnapshot);
             }
-        } if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
+        } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));
         } else{
             logError("Error onActivityResult");

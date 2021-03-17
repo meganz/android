@@ -189,8 +189,7 @@ public class GetAttrUserListener extends BaseListener {
                 String name = context.getString(R.string.my_chat_files_folder);
 
                 if (!myChatFolderNode.getName().equals(name)) {
-                    api.renameNode(myChatFolderNode, name,
-                            new RenameNodeListener(null, context, false, true, null));
+                    api.renameNode(myChatFolderNode, name, new RenameListener(context, true));
                 }
                 api.setMyChatFilesFolder(myChatFolderNode.getHandle(), new SetAttrUserListener(context));
             }

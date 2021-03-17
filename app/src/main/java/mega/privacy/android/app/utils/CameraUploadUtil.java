@@ -12,7 +12,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.listeners.RenameNodeListener;
+import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -303,8 +303,7 @@ public class CameraUploadUtil {
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(primaryHandle),
-                        getString(R.string.section_photo_sync),
-                        new RenameNodeListener(null, context, false, false, null));
+                        getString(R.string.section_photo_sync), new RenameListener(context));
             }
         }
     }
@@ -320,7 +319,7 @@ public class CameraUploadUtil {
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle),
                         getString(R.string.section_secondary_media_uploads),
-                        new RenameNodeListener(null, context, false, false, null));
+                        new RenameListener(context));
             }
         }
     }

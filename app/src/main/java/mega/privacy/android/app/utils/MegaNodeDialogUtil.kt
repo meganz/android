@@ -16,7 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.RenameNodeListener
+import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
@@ -292,7 +292,7 @@ class MegaNodeDialogUtil {
 
                                 megaApi.renameNode(
                                     node, typedString,
-                                    RenameNodeListener(
+                                    RenameListener(
                                         snackbarShower, context,
                                         showSnackbar = true,
                                         isMyChatFilesFolder = false,

@@ -819,8 +819,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         }
 
         //Location Layout
-        locationLayout = (RelativeLayout) findViewById(R.id.file_properties_location_layout);
-        locationTextView = (TextView) findViewById(R.id.file_properties_info_data_location);
+        locationLayout = findViewById(R.id.file_properties_location_layout);
+        locationTextView = findViewById(R.id.file_properties_info_data_location);
 
         LocationInfo locationInfo = getNodeLocationInfo(adapterType, from == FROM_INCOMING_SHARES,
                 node.getHandle());
@@ -879,21 +879,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (drawableChat != null) {
             drawableChat.mutate();
         }
-    }
-	
-	private String getTranslatedNameForParentNodes(long parentHandle){
-        String translated;
-        Context context = getApplicationContext();
-        if(parentHandle == megaApi.getRootNode().getHandle()){
-            translated = context.getString(R.string.section_cloud_drive);
-        }else if(parentHandle == megaApi.getRubbishNode().getHandle()){
-            translated = context.getString(R.string.section_rubbish_bin);
-        }else if(parentHandle == megaApi.getInboxNode().getHandle()){
-            translated = context.getString(R.string.section_inbox);
-        }else {
-            translated = megaApi.getNodeByHandle(parentHandle).getName();
-        }
-        return translated;
     }
 
     void setOwnerState(long userHandle) {

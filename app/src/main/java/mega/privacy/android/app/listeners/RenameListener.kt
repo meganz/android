@@ -11,13 +11,19 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-class RenameNodeListener(
+class RenameListener(
     private val snackbarShower: SnackbarShower?,
     context: Context,
     private val showSnackbar: Boolean = true,
     private val isMyChatFilesFolder: Boolean = false,
     private val actionNodeCallback: ActionNodeCallback?
 ) : BaseListener(context) {
+    constructor(context: Context) : this(null, context, false, false, null)
+
+    constructor(context: Context, isMyChatFilesFolder: Boolean) : this(
+        null, context, false, isMyChatFilesFolder, null
+    )
+
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type != MegaRequest.TYPE_RENAME) {
             return

@@ -9,7 +9,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-class MoveNodeListener(private val snackbarShower: SnackbarShower, context: Context) :
+class MoveListener(private val snackbarShower: SnackbarShower, context: Context) :
     BaseListener(context) {
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_MOVE) {
