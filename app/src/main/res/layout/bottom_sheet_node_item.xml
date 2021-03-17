@@ -609,7 +609,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:tint="?android:attr/textColorPrimary"
+                    app:tint="?android:attr/textColorSecondary"
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
