@@ -36,6 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -53,12 +55,13 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.components.CustomViewPager;
+import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -111,7 +114,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class FileExplorerActivityLollipop extends SorterContentActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
-		ActionNodeCallback {
+		ActionNodeCallback, SnackbarShower {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -208,7 +211,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	
 	private int tabShown = CLOUD_TAB;
 
-	private ArrayList<MegaChatRoom> chatListItems;
+	private ArrayList<MegaChatRoom> chatListItems = new ArrayList<>();
 
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
@@ -316,6 +319,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
 	/*
@@ -2422,7 +2430,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 		}
 
 		if (!users.isEmpty()) {
-			CreateChatListener listener = new CreateChatListener(chats, users, -1, this, CreateChatListener.SEND_FILE_EXPLORER_CONTENT);
+			CreateChatListener listener = new CreateChatListener(
+					CreateChatListener.SEND_FILE_EXPLORER_CONTENT, chats, users, this, this,
+					this::sendToChats);
 
 			for (MegaUser user : users) {
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -2477,7 +2487,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 		}
 	}
 
-	public void sendToChats(ArrayList<MegaChatRoom> chatListItems){
+	private Unit sendToChats(List<? extends MegaChatRoom> chats){
 
 		if (statusDialog != null) {
 			try {
@@ -2486,7 +2496,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 			catch(Exception ex){}
 		}
 
-		this.chatListItems = chatListItems;
+		chatListItems.addAll(chats);
 
 		if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 			Bundle extras = intent.getExtras();
@@ -2557,6 +2567,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 				onIntentChatProcessed(filePreparedInfos);
 			}
 		}
+
+		return Unit.INSTANCE;
 	}
 
 	@Override

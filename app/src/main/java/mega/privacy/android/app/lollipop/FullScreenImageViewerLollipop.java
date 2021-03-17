@@ -125,7 +125,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		finish();
 		overridePendingTransition(0, android.R.anim.fade_out);
 
-		return null;
+		return Unit.INSTANCE;
 	});
 
 	NodeController nC;

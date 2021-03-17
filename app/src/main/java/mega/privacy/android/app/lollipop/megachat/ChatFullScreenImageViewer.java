@@ -138,7 +138,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		finish();
 		overridePendingTransition(0, android.R.anim.fade_out);
 
-		return null;
+		return Unit.INSTANCE;
 	});
 
 	@Override

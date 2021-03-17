@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
@@ -73,11 +74,11 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -142,7 +143,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 
 	private ChatController chatC;
 	private ContactController cC;
-    private AlertDialog renameDialog;
 
 	private final static int MAX_WIDTH_APPBAR_LAND = 400;
 	private final static int MAX_WIDTH_APPBAR_PORT = 200;
@@ -1028,12 +1028,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 			usersNoChat.add(user);
-			CreateChatListener listener = null;
+			CreateChatListener listener;
 
 			if (startVideo) {
-				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_VIDEO_CALL);
+				listener = new CreateChatListener(CreateChatListener.START_VIDEO_CALL, chats,
+						usersNoChat, this, this);
 			} else {
-				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_AUDIO_CALL);
+				listener = new CreateChatListener(CreateChatListener.START_AUDIO_CALL, chats,
+						usersNoChat, this, this);
 			}
 
 			MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -1843,14 +1845,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 	/**
 	 * Method that makes the necessary updates when the chat has been created.
 	 *
-	 * @param newChat The created chat.
+	 * @param newChats The created chats.
 	 */
-	public void chatCreated(MegaChatRoom newChat) {
+	private Unit chatsCreated(List<? extends MegaChatRoom> newChats) {
+		if (newChats.isEmpty()) {
+			return Unit.INSTANCE;
+		}
+
+		MegaChatRoom newChat = newChats.get(0);
+
 		if (newChat != null && newChat.getChatId() != MEGACHAT_INVALID_HANDLE) {
 			chat = newChat;
 			updateUI();
 			chatNotificationsClicked();
 		}
+
+		return Unit.INSTANCE;
 	}
 
 	/**
@@ -1862,7 +1872,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 			usersNoChat.add(user);
-			CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.CONFIGURE_DND);
+			CreateChatListener listener = new CreateChatListener(
+					CreateChatListener.CONFIGURE_DND, chats, usersNoChat, this, this,
+					this::chatsCreated);
 			MegaChatPeerList peers = MegaChatPeerList.createInstance();
 			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 			megaChatApi.createChat(false, peers, listener);

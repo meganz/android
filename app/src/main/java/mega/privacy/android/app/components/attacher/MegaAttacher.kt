@@ -8,7 +8,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.listeners.AttachNodesListener
-import mega.privacy.android.app.listeners.CreateChatsListener
+import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -359,7 +359,9 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                 }
             }
 
-            val listener = CreateChatsListener(users.size) { successChats, _ ->
+            val listener = CreateChatListener(
+                app, CreateChatListener.ATTACH, users.size
+            ) { successChats, _ ->
                 val chatIdsList = if (chatIds != null && chatIds.isNotEmpty()) {
                     chatIds.toList() + successChats
                 } else {
