@@ -257,7 +257,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     override fun onBackPressed() {
         if (!navController.navigateUp()) {
-            playerService?.mainPlayerUIClosed()
             finish()
         }
     }
@@ -302,6 +301,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     override fun onDestroy() {
         super.onDestroy()
+
+        playerService?.mainPlayerUIClosed()
 
         playerService = null
         if (serviceBound) {
