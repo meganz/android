@@ -112,7 +112,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 	float scaleText;
 
-	Context context;
 	MegaNode currentDocument;
 	String url;
 
@@ -572,7 +571,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+					if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
 						return false;
 					}
 
@@ -592,7 +591,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 				shareIt = false;
 
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+				if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
 					return false;
 				}
 				AlertDialog removeLinkDialog;
@@ -1575,7 +1574,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
 				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
-				String path = getCacheFolder(context, TEMPORAL_FOLDER).getAbsolutePath();
+				String path = getCacheFolder(this, TEMPORAL_FOLDER).getAbsolutePath();
 				service.putExtra(DownloadService.EXTRA_PATH, path);
 				service.putExtra("fromMV", true);
 				service.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
