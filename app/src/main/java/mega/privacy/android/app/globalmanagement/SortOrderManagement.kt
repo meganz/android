@@ -15,18 +15,21 @@ class SortOrderManagement(var dbH: DatabaseHandler) {
     fun getOrders() {
         val prefs = dbH.preferences ?: return
 
-        getOrderCloudFromDB(prefs)
-        getOrderContactsFromDB(prefs)
-        getOrderCameraFromDB(prefs)
-        getOrderOthersFromDB(prefs)
-    }
-
-    fun getOrderCloudFromDB(prefs: MegaPreferences): Int {
         if (prefs.preferredSortCloud != null) {
             orderCloud = prefs.preferredSortCloud.toInt()
         }
 
-        return orderCloud
+        if (prefs.preferredSortContacts != null) {
+            orderContacts = prefs.preferredSortContacts.toInt()
+        }
+
+        if (prefs.preferredSortCameraUpload != null) {
+            orderCamera = prefs.preferredSortCameraUpload.toInt()
+        }
+
+        if (prefs.preferredSortOthers != null) {
+            orderOthers = prefs.preferredSortOthers.toInt()
+        }
     }
 
     fun getOrderCloud(): Int {
@@ -38,14 +41,6 @@ class SortOrderManagement(var dbH: DatabaseHandler) {
         dbH.setPreferredSortCloud(orderCloud.toString())
     }
 
-    fun getOrderContactsFromDB(prefs: MegaPreferences): Int {
-        if (prefs.preferredSortContacts != null) {
-            orderContacts = prefs.preferredSortContacts.toInt()
-        }
-
-        return orderContacts
-    }
-
     fun getOrderContacts(): Int {
         return orderContacts
     }
@@ -55,14 +50,6 @@ class SortOrderManagement(var dbH: DatabaseHandler) {
         dbH.setPreferredSortContacts(orderContacts.toString())
     }
 
-    fun getOrderCameraFromDB(prefs: MegaPreferences): Int {
-        if (prefs.preferredSortCameraUpload != null) {
-            orderCamera = prefs.preferredSortCameraUpload.toInt()
-        }
-
-        return orderCamera
-    }
-
     fun getOrderCamera(): Int {
         return orderCamera
     }
@@ -70,14 +57,6 @@ class SortOrderManagement(var dbH: DatabaseHandler) {
     fun setOrderCamera(newOrderCamera: Int) {
         orderCamera = newOrderCamera
         dbH.setPreferredSortCameraUpload(orderCamera.toString())
-    }
-
-    fun getOrderOthersFromDB(prefs: MegaPreferences): Int {
-        if (prefs.preferredSortOthers != null) {
-            orderOthers = prefs.preferredSortOthers.toInt()
-        }
-
-        return orderOthers
     }
 
     fun getOrderOthers(): Int {

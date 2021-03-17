@@ -6,6 +6,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -13,11 +14,19 @@ import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
 
 class SortByBottomSheetDialogFragment(private val orderType: Int) :
     BaseBottomSheetDialogFragment() {
+
+    private var isIncomingRootOrder = false
+
+    constructor(orderType: Int, isIncomingRootOrder: Boolean) : this(orderType) {
+        this.isIncomingRootOrder = isIncomingRootOrder
+    }
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
@@ -31,7 +40,52 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
-        when (MegaApplication.getSortOrderManagement().getOrderCloud()) {
+        val sortOrderManagement = MegaApplication.getSortOrderManagement()
+
+        val order = when (orderType) {
+            ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
+            ORDER_CONTACTS -> sortOrderManagement.getOrderContacts()
+            ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
+            ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
+            else -> ORDER_DEFAULT_ASC
+        }
+
+        when (orderType) {
+            ORDER_CONTACTS -> {
+                binding.sortByLargestSize.isVisible = false
+                binding.sortBySmallestSize.isVisible = false
+                binding.sortBySizeSeparator.isVisible = false
+            }
+            ORDER_CAMERA -> {
+                binding.sortByNameAsc.isVisible = false
+                binding.sortByNameDesc.isVisible = false
+                binding.sortByNameSeparator.isVisible = false
+                binding.sortByLargestSize.isVisible = false
+                binding.sortBySmallestSize.isVisible = false
+                binding.sortBySizeSeparator.isVisible = false
+                binding.sortByDateSeparator.isVisible = true
+                binding.sortByPhotosMediaType.isVisible = true
+                binding.sortByVideosMediaType.isVisible = true
+            }
+            ORDER_OTHERS -> {
+                if (isIncomingRootOrder) {
+                    binding.sortByTitle.text =
+                        StringResourcesUtils.getString(R.string.action_sort_by) + "\n" + StringResourcesUtils.getString(
+                            R.string.sortby_owner_mail
+                        )
+                }
+
+                binding.sortByNameSeparator.isVisible = false
+                binding.sortByLargestSize.isVisible = false
+                binding.sortBySmallestSize.isVisible = false
+                binding.sortBySizeSeparator.isVisible = false
+                binding.sortByNewestDate.isVisible = false
+                binding.sortByOldestDate.isVisible = false
+                binding.sortByDateSeparator.isVisible = false
+            }
+        }
+
+        when (order) {
             ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
             ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
             ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
@@ -57,6 +111,12 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
         }
         binding.sortBySmallestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_ASC)
+        }
+        binding.sortByPhotosMediaType.setOnClickListener {
+            setNewOrder(ORDER_PHOTO_DESC)
+        }
+        binding.sortByVideosMediaType.setOnClickListener {
+            setNewOrder(ORDER_VIDEO_DESC)
         }
 
         contentView = binding.root

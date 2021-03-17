@@ -2946,12 +2946,13 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		int orderType = getIncomingExplorerFragment() != null && deepBrowserTree == 0
-				&& viewPagerExplorer != null && viewPagerExplorer.getCurrentItem() == INCOMING_TAB
-				? ORDER_OTHERS
-				: ORDER_CLOUD;
+		if (getIncomingExplorerFragment() != null && deepBrowserTree == 0
+				&& viewPagerExplorer != null && viewPagerExplorer.getCurrentItem() == INCOMING_TAB) {
+			bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(ORDER_OTHERS, true);
+		} else {
+			bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(ORDER_CLOUD);
+		}
 
-		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(orderType);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
 	}

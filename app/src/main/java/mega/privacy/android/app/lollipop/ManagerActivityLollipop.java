@@ -7458,11 +7458,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					case CAMERA_UPLOADS:
 					case MEDIA_UPLOADS:
 						orderType = ORDER_CAMERA;
+						break;
 
 					default:
 						if (drawerItem == DrawerItem.SHARED_ITEMS
-								&& (getTabItemShares() == INCOMING_TAB && deepBrowserTreeIncoming == 0)
-								|| (getTabItemShares() == OUTGOING_TAB && deepBrowserTreeOutgoing == 0)) {
+								&& getTabItemShares() == INCOMING_TAB && deepBrowserTreeIncoming == 0) {
+							showNewSortByPanel(ORDER_OTHERS, true);
+							return true;
+						}
+
+						if (drawerItem == DrawerItem.SHARED_ITEMS
+								&& getTabItemShares() == OUTGOING_TAB && deepBrowserTreeOutgoing == 0) {
 							orderType = ORDER_OTHERS;
 						} else {
 							orderType = ORDER_CLOUD;
@@ -10067,10 +10073,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showNewSortByPanel(int orderType) {
+		showNewSortByPanel(orderType, false);
+	}
+
+	public void showNewSortByPanel(int orderType, boolean isIncomingRootOrder) {
 		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
 			return;
 		}
-		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(orderType);
+
+		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(orderType, isIncomingRootOrder);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
 	}
