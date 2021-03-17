@@ -7,7 +7,7 @@
         android:icon="@drawable/ic_remove"
         android:orderInCategory="100"
         android:title="@string/option_cancel_transfer"
-        app:iconTint="@color/white"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom" />
 
     <item

@@ -35,6 +35,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.InfoReactionPagerAdapter;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaHandleList;
@@ -45,7 +46,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
+public class InfoReactionsBottomSheet extends BaseBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
     private static final int HEIGHT_HEADER = 96;
     private static final int HEIGHT_USERS = 56;
@@ -93,22 +94,6 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
         }
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-        dialog.setOnShowListener(d -> {
-            FrameLayout bottomSheet = ((BottomSheetDialog) d).findViewById(R.id.design_bottom_sheet);
-            if (bottomSheet != null) {
-                BottomSheetBehavior.from(bottomSheet)
-                        .setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
-
-        return dialog;
     }
 
     @SuppressLint("RestrictedApi")

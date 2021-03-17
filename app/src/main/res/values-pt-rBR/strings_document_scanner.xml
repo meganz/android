@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<resources>
+    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Cortar</string>
+    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Salvar documento escaneado</string>
+    <string name="scan_action_add" context="button">Adicionar</string>
+    <string name="scan_action_save" context="Action of a button to save something">Salvar</string>
+    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Escanear novamente</string>
+    <string name="scan_file_name" context="Document scanner file name">Nome do arquivo</string>
+    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Tipo de arquivo</string>
+    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Qualidade</string>
+    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Destino</string>
+    <string name="scan_quality_high" context="Document scanner high quality option">Alta</string>
+    <string name="scan_quality_medium" context="Document scanner medium quality option">Média</string>
+    <string name="scan_quality_low" context="Document scanner low quality option">Baixa</string>
+    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Descartar este documento escaneado?</string>
+    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Este documento escaneado será eliminado</string>
+    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Descartar todos os documentos escaneados?</string>
+    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">O documento atual será eliminado</string>
+    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Descartar</string>
+    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Deletar esta digitalização?</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Permita o acesso à sua câmera para escanear documentos.</string>
+    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Entrada inválida</string>
+</resources>

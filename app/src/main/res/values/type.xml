@@ -110,6 +110,11 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <!-- For title in CollapsingToolbarLayout, text size must be lager than 16sp, otherwise maxLine=3 cannot take effect -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps.Variant">
+        <item name="android:textSize">16.5sp</item>
+    </style>
+
     <!-- Medium, normal, 16sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant">
         <item name="android:letterSpacing">0</item>
@@ -142,6 +147,16 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.DateDisabled">
+        <item name="android:textColor">@color/grey_012_white_012</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.DateEnabled">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
     <!--===============  Subtitle 2 =====================-->
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
@@ -162,6 +177,10 @@
 
     <style name="TextAppearance.Mega.Subtitle2.Normal.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey">
+        <item name="android:textColor">@color/grey_054_white_087</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.Secondary">

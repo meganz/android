@@ -108,5 +108,7 @@
     <!-- My account page button padding -->
     <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
 
+    <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
     <dimen name="meeting_bottom_floating_panel_fab_size">48dp</dimen>
 </resources>

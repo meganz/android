@@ -38,7 +38,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:textAllCaps="true"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
         </RelativeLayout>
         
         <RelativeLayout
@@ -67,7 +67,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.DateDisabled"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -118,7 +118,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:textAllCaps="true"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -150,17 +150,16 @@
                     android:layout_marginBottom="10dp"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
                 <TextView
                     android:id="@+id/text_view_from"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" "
                     android:layout_below="@+id/title_text_view_from"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.DateDisabled"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -204,17 +203,16 @@
                     android:layout_marginBottom="10dp"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
                 <TextView
                     android:id="@+id/text_view_to"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" "
                     android:layout_below="@+id/title_text_view_to"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="16dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.DateDisabled"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>

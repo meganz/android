@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Boîte de réception</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Enregistré Hors ligne</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Hors ligne</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -720,8 +721,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Votre numéro de téléphone a été confirmé avec succès</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Mémoire interne</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Mémoire externe</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Mémoire interne</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Mémoire externe</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Mémoire interne</string>
@@ -788,7 +789,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toutes vos données locales seront supprimées et vous serez déconnecté dans %1d secondes</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">À propos</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">Politique de confidentialité</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">Politique de confidentialité</string>
     <string name="settings_about_terms_of_service" context="">Conditions générales d\'utilisation</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Règlement sur la protection des données</string>
     <string name="settings_about_app_version" context="App means “Application”">Version de l\'appli</string>
@@ -903,7 +904,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Compte Gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Pro léger</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Compte Pro léger</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Compte Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Compte Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Compte Pro III</string>
@@ -936,14 +937,14 @@
 
     <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Avez-vous une sauvegarde de votre clé de récupération ?</string>
 
-    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Très bien !</string>
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Parfait !</string>
     <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">Saisissez votre adresse courriel ici</string>
     <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de fournir votre clé de récupération et de réinitialiser votre mot de passe.</string>
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Saisissez votre clé de récupération ici</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">Saisissez votre mot de passe ici</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Ceci est la dernière étape pour annuler votre compte. Vous perdrez irrémédiablement toutes les données stockées dans le nuage. Veuillez saisir votre mot de passe ci-dessous.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Ceci est la dernière étape pour supprimer votre compte. Vous perdrez irrémédiablement toutes les données stockées dans le nuage. Veuillez saisir votre mot de passe ci-dessous.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Confirmation de l\'adresse courriel</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Veuillez vérifier vos courriels afin de poursuivre.</string>
@@ -1128,6 +1129,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Chargement des contacts du téléphone&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">%d demandes ont déjà été envoyées.</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invitations ont été envoyées avec succès</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invitations ont été envoyées avec succès, mais %2$d n\'ont pas été envoyées.</string>
 
@@ -1149,19 +1151,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Les notifications de la conversation seront mises en sourdine pendant %s</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Les notifications des conversations seront en sourdine jusqu\'à %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Les notifications des conversations seront en sourdine jusqu\'à %1$s</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Les notifications des conversations seront en sourdine jusqu\'à %1$s %2$s h</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Les notifications des conversations seront en sourdine jusqu\'à %1$s %2$s h</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Les notifications des conversations sont en sourdine</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Les notifications de la conversation sont activées</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">En sourdine jusqu\'à %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">En sourdine jusqu\'à %1$s</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications </string>
@@ -1443,7 +1445,7 @@
     -->
 
     <plurals name="upload_service_notification">
-        <item context="Text of the notification shown when the upload service is running, Singular" quantity="one">Téléversement d\'%1$d de %2$d fichier</item>
+        <item context="Text of the notification shown when the upload service is running, Singular" quantity="one">Téléversement d\'un %1$d de %2$d fichier</item>
         <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Téléversement de %1$d de %2$d fichiers</item>
     </plurals>
 
@@ -1453,7 +1455,7 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Téléversement d\'%1$d dossier de %2$d</item>
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Téléversement d\'un %1$d dossier de %2$d</item>
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Téléversement de %1$d dossiers de %2$d</item>
 	</plurals>
 
@@ -1505,7 +1507,7 @@
     </plurals>
 
     <plurals name="download_service_notification">
-        <item context="Text of the notification shown when the download service is running, Singular" quantity="one">Téléchargement d\'%1$d de %2$d fichier</item>
+        <item context="Text of the notification shown when the download service is running, Singular" quantity="one">Téléchargement d\'un %1$d de %2$d fichier</item>
         <item context="Text of the notification shown when the download service is running, Plural" quantity="other">Téléchargement de %1$d de %2$d fichiers</item>
     </plurals>
 
@@ -1636,7 +1638,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">à partir de</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nouveau dossier partagé</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Nouvelle demande de contact</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Effacer l\'historique de la conversation</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Effacer l\'historique de la conversation</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Supprimer le contact</string>
 
@@ -1828,7 +1830,7 @@
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée en toute confidentialité et sécurité.[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Aucun média dans [/B][A]Téléversements de l\'appareil photo[/A]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Il n\'y a aucun média dans [/B][A]Téléversements de l\'appareil photo[/A]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]La corbeille[/A] [B]est vide[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Aucun fichier dans votre [/B][A]boîte de réception[/A]</string>
@@ -1854,7 +1856,7 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">Traitement du lien&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. N\'utilisez pas de noms ou de mots du dictionnaire.</string>
+    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. N\'utilisez pas des noms ou des mots du dictionnaire.</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Votre mot de passe est assez bon pour poursuivre, mais il est recommandé de le renforcer.</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Ce mot de passe résistera à la plupart des attaques en force typiques. Veuillez vous assurer de vous en souvenir.</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Ce mot de passe résistera à la plupart des attaques en force sophistiquées. Veuillez vous assurer de vous en souvenir.</string>
@@ -1913,7 +1915,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Téléversement vers la conversation</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualité des vidéos des conversations</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualité des vidéos</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Qualité des vidéos</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Les téléversements de l\'appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l\'autorisation.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2040,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Veuillez saisir un mot de passe plus robuste</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Nouveau contact</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Utilisation de l\'espace de stockage</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d demande de contact en attente</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d demandes de contact en attente</item>
@@ -2271,7 +2272,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Pour désactiver le programmateur de vidage de la corbeille ou pour définir une période de conservation plus longue, vous devez détenir un abonnement PRO.</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">jours</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">jours</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obtenir le lien vers la conversation</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gérer le lien de conversation</string>
 
@@ -2877,7 +2878,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Numéro d\'identification de %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">Documents</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nouvelle conversation</string>
@@ -2904,20 +2905,20 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] a changé la durée avant effacement du message à[/B][A] %2$s[/A][B].[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Effacer l\'historique de la conversation</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] a désactivé l\'effacement des messages.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Supprimer tous les messages et fichiers partagés dans cette conversation. Cette action est irréversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">Effacement de l\'historique</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Supprimer automatiquement les messages plus anciens qu\'une certaine durée.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Désactivé</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">Un jour</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">Une semaine</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">Un mois</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Personnalisé</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Gérer l\'historique de la conversation</string>
     <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Supprimer automatiquement les messages de plus de :</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Effacer tout l\'historique de cette conversation ?</string>
 
     <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 an</string>
 
@@ -2943,17 +2944,17 @@
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 heure</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d heures</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 semaine</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d semaines</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 mois</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d mois</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Sélectionner des transferts</string>
 
@@ -3020,4 +3021,6 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Politique de confidentialité</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Politique sur les Témoins de navigation</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Toujours activés</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Numériser un document</string>
 </resources>

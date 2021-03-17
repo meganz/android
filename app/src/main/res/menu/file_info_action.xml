@@ -6,12 +6,14 @@
         android:icon="@drawable/ic_download_white"
         android:orderInCategory="95"
         android:title="@string/general_save_to_device"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_share_folder"
         android:icon="@drawable/ic_share"
         android:orderInCategory="100"
+        app:tint="@color/white"
         android:title="@string/context_share_folder"
         android:visible="false"
         app:showAsAction="never" />
@@ -21,6 +23,7 @@
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="100"
         android:title="@string/context_get_link_menu"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
@@ -28,12 +31,14 @@
         android:icon="@drawable/ic_send_to_contact"
         android:orderInCategory="115"
         android:title="@string/context_send_file_to_chat"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_edit_link"
         android:orderInCategory="100"
         android:title="@string/edit_link_option"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
@@ -41,18 +46,21 @@
         android:icon="@drawable/ic_remove_link"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_rename"
         android:orderInCategory="105"
         android:title="@string/context_rename"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_move"
         android:orderInCategory="110"
         android:title="@string/general_move"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
@@ -60,12 +68,14 @@
         android:icon="@drawable/ic_copy_white"
         android:orderInCategory="110"
         android:title="@string/context_copy"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_rubbish"
         android:orderInCategory="110"
         android:title="@string/context_move_to_trash"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
@@ -73,11 +83,14 @@
         android:icon="@drawable/ic_leave_share_w"
         android:orderInCategory="100"
         android:title="@string/general_leave"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_delete"
         android:orderInCategory="110"
         android:title="@string/general_remove"
+        android:visible="false"
         app:showAsAction="never" />
+
 </menu>
