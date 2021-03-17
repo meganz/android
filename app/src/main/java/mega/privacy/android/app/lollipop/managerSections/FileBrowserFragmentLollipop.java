@@ -499,11 +499,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		if (((ManagerActivityLollipop) context).getParentHandleBrowser() == -1 || ((ManagerActivityLollipop) context).getParentHandleBrowser() == megaApi.getRootNode().getHandle()) {
 			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).getParentHandleBrowser());
 
-			nodes = megaApi.getChildren(megaApi.getRootNode(), ((ManagerActivityLollipop) context).orderCloud);
+			nodes = megaApi.getChildren(megaApi.getRootNode(), MegaApplication.getSortOrderManagement().getOrderCloud());
 		} else {
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser());
 
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop) context).orderCloud);
+			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
 		}
 		((ManagerActivityLollipop) context).setToolbarTitle();
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
@@ -669,7 +669,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 
-			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+			intent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
 			intent.putExtra("screenPosition", screenPosition);
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -700,7 +700,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			} else {
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
-			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+			mediaIntent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
 			mediaIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
 			mediaIntent.putExtra("screenPosition", screenPosition);
 
@@ -1065,7 +1065,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         ((ManagerActivityLollipop)context).setToolbarTitle();
         
         adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleBrowser());
-        nodes = megaApi.getChildren(n,((ManagerActivityLollipop)context).orderCloud);
+        nodes = megaApi.getChildren(n, MegaApplication.getSortOrderManagement().getOrderCloud());
         addSectionTitle(nodes,adapter.getAdapterType());
         adapter.setNodes(nodes);
         recyclerView.scrollToPosition(0);
@@ -1249,7 +1249,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					((ManagerActivityLollipop)context).setToolbarTitle();
 
-					nodes = megaApi.getChildren(parentNode,((ManagerActivityLollipop)context).orderCloud);
+					nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
 					addSectionTitle(nodes,adapter.getAdapterType());
 					adapter.setNodes(nodes);
 

@@ -338,7 +338,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            callManager { it.showNewSortByPanel() }
+            callManager { it.showNewSortByPanel(ORDER_CLOUD) }
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {

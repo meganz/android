@@ -108,7 +108,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
         if (context instanceof ManagerActivityLollipop) {
             switch (drawerItem) {
                 case CONTACTS:
-                    order = managerActivityLollipop.getOrderContacts();
+                    order = MegaApplication.getSortOrderManagement().getOrderContacts();
 
                     sortByDateTV.setText(R.string.sortby_date);
 
@@ -123,10 +123,10 @@ public class SorterContentActivity extends TransfersManagementActivity {
                     if ((index == 0 && managerActivityLollipop.getDeepBrowserTreeIncoming() == 0)
                             || (index == 1 && managerActivityLollipop.getDeepBrowserTreeOutgoing() == 0)) {
                         isIncomingOrOutgoingRootLevel = true;
-                        order = managerActivityLollipop.getOrderOthers();
+                        order = MegaApplication.getSortOrderManagement().getOrderOthers();
                     } else {
                         isIncomingOrOutgoingRootLevel = false;
-                        order = managerActivityLollipop.orderCloud;
+                        order = MegaApplication.getSortOrderManagement().getOrderCloud();
                     }
 
                     if (managerActivityLollipop.isFirstNavigationLevel()) {
@@ -153,7 +153,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
 
                 case CAMERA_UPLOADS:
                 case MEDIA_UPLOADS:
-                    order = managerActivityLollipop.orderCamera;
+                    order = MegaApplication.getSortOrderManagement().getOrderCamera();
 
                     sortByNameTV.setVisibility(View.GONE);
                     ascendingCheck.setVisibility(View.GONE);
@@ -168,7 +168,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
                     break;
 
                 default:
-                    order = managerActivityLollipop.orderCloud;
+                    order = MegaApplication.getSortOrderManagement().getOrderCloud();
             }
         } else if (context instanceof FileExplorerActivityLollipop) {
             MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();

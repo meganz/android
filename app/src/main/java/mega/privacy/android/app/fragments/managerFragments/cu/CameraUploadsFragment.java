@@ -165,7 +165,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(mManagerActivity.orderCamera);
+            reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
@@ -647,7 +647,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         super.onResume();
 
         mDraggingNodeHandle = INVALID_HANDLE;
-        reloadNodes(mManagerActivity.orderCamera);
+        reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
     }
 
     private void openNode(int position, CuNode cuNode) {
@@ -719,7 +719,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void putExtras(Intent intent, int indexForViewer, MegaNode node,
             int[] thumbnailLocation) {
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                MegaApplication.getSortOrderManagement().getOrderCamera());
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {

@@ -1304,7 +1304,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void sortBy(){
 		logDebug("sortBy");
 
-		switch (((ManagerActivityLollipop)context).orderContacts) {
+		switch (MegaApplication.getSortOrderManagement().getOrderContacts()) {
 			case ORDER_DEFAULT_DESC:
 				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					String name1 = getContactOrderName(c1);

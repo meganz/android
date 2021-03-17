@@ -782,4 +782,10 @@ public class Constants {
     public static final int NOT_OVERQUOTA_STATE = 0;
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
+
+    //Sort order management
+    public static final int ORDER_CLOUD = 0;
+    public static final int ORDER_CONTACTS = 1;
+    public static final int ORDER_OTHERS = 2;
+    public static final int ORDER_CAMERA = 3;
 }

@@ -345,7 +345,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		if (((ManagerActivityLollipop)context).getParentHandleRubbish() == -1||((ManagerActivityLollipop)context).getParentHandleRubbish()==megaApi.getRubbishNode().getHandle()){
 			logDebug("Parent is the Rubbish: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
 
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), MegaApplication.getSortOrderManagement().getOrderCloud());
 
 		}
 		else{
@@ -353,11 +353,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 			if (parentNode != null){
 				logDebug("The parent node is: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
 		}
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
@@ -618,7 +618,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(nodes.get(position), MegaApplication.getSortOrderManagement().getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
@@ -706,7 +706,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
 					intent.putExtra("screenPosition", screenPosition);
 					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -1043,7 +1043,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 

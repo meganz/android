@@ -774,7 +774,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
 					intent.putExtra("screenPosition", screenPosition);
 					manageNodes(intent);
 					startActivity(intent);
@@ -812,7 +812,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					mediaIntent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					manageNodes(mediaIntent);
 

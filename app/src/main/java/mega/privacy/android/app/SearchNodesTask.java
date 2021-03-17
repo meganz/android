@@ -257,7 +257,8 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      */
     private void getLinks() {
         if (isTextEmpty(query)) {
-            nodes = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
+            nodes = megaApi.getPublicLinks(getLinksOrderCloud(
+                    MegaApplication.getSortOrderManagement().getOrderCloud(), managerA.isFirstNavigationLevel()));
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
             nodes = megaApi.searchOnPublicLinks(query, megaCancelToken, orderCloud);

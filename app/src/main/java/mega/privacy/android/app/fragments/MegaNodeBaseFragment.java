@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -719,16 +720,17 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
-                return getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel());
+                return getLinksOrderCloud(MegaApplication.getSortOrderManagement().getOrderCloud(),
+                        managerActivity.isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
                 if (managerActivity.isFirstNavigationLevel()) {
-                    return managerActivity.getOrderOthers();
+                    return MegaApplication.getSortOrderManagement().getOrderOthers();
                 }
 
             default:
-                return managerActivity.orderCloud;
+                return MegaApplication.getSortOrderManagement().getOrderCloud();
         }
     }
 

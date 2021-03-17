@@ -2946,7 +2946,12 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment();
+		int orderType = getIncomingExplorerFragment() != null && deepBrowserTree == 0
+				&& viewPagerExplorer != null && viewPagerExplorer.getCurrentItem() == INCOMING_TAB
+				? ORDER_OTHERS
+				: ORDER_CLOUD;
+
+		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(orderType);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
 	}

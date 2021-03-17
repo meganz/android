@@ -43,6 +43,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -127,6 +128,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
 	private static ChatManagement chatManagement;
+	private static SortOrderManagement sortOrderManagement;
 
 	@Inject
 	MegaApiAndroid megaApi;
@@ -744,6 +746,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
         chatManagement = new ChatManagement();
+        sortOrderManagement = new SortOrderManagement(dbH);
+        sortOrderManagement.getOrders();
 
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
@@ -1993,5 +1997,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setAdvertisingCookiesEnabled(boolean enabled) {
 		areAdvertisingCookiesEnabled = enabled;
+	}
+
+	public static SortOrderManagement getSortOrderManagement() {
+		return sortOrderManagement;
 	}
 }

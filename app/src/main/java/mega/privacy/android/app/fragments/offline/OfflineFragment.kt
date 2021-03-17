@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -186,7 +187,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            callManager { it.orderCloud } ?: ORDER_DEFAULT_ASC
+            MegaApplication.getSortOrderManagement().getOrderCloud()
         )
     }
 
@@ -409,7 +410,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
@@ -417,7 +418,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
