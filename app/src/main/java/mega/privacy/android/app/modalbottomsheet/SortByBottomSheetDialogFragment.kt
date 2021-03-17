@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -21,15 +22,30 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
 
-class SortByBottomSheetDialogFragment(private val orderType: Int) :
-    BaseBottomSheetDialogFragment() {
+class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
-    private var isIncomingRootOrder = false
+    companion object {
+        private const val ORDER_TYPE = "ORDER_TYPE"
+        private const val IS_INCOMING_ROOT_ORDER = "IS_INCOMING_ROOT_ORDER"
+    }
+
     private lateinit var sortOrderManagement: SortOrderManagement
     private var oldOrder: Int = ORDER_DEFAULT_ASC
+    private var orderType: Int = ORDER_CLOUD
+    private var isIncomingRootOrder: Boolean = false
 
-    constructor(orderType: Int, isIncomingRootOrder: Boolean) : this(orderType) {
-        this.isIncomingRootOrder = isIncomingRootOrder
+    fun newInstance(
+        orderType: Int,
+        isIncomingRootOrder: Boolean = false
+    ): SortByBottomSheetDialogFragment {
+        val fragment = SortByBottomSheetDialogFragment()
+        val args = Bundle()
+
+        args.putInt(ORDER_TYPE, orderType)
+        args.putBoolean(IS_INCOMING_ROOT_ORDER, isIncomingRootOrder)
+        fragment.arguments = args
+
+        return fragment
     }
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
@@ -45,6 +61,8 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
         sortOrderManagement = MegaApplication.getSortOrderManagement()
+        orderType = arguments?.getInt(ORDER_TYPE)!!
+        isIncomingRootOrder = arguments?.getBoolean(IS_INCOMING_ROOT_ORDER)!!
 
         oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
@@ -92,12 +110,14 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
         when (oldOrder) {
             ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
             ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
+            ORDER_CREATION_ASC -> setSelectedColor(binding.sortByNewestDate)
             ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
+            ORDER_CREATION_DESC -> setSelectedColor(binding.sortByOldestDate)
             ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
             ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
             ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
-            ORDER_PHOTO_ASC -> setSelectedColor(binding.sortByPhotosMediaType)
-            ORDER_VIDEO_ASC -> setSelectedColor(binding.sortByVideosMediaType)
+            ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
+            ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
         }
 
         binding.sortByNameAsc.setOnClickListener {
@@ -107,10 +127,10 @@ class SortByBottomSheetDialogFragment(private val orderType: Int) :
             setNewOrder(ORDER_DEFAULT_DESC)
         }
         binding.sortByNewestDate.setOnClickListener {
-            setNewOrder(ORDER_MODIFICATION_DESC)
+            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_ASC else ORDER_MODIFICATION_DESC)
         }
         binding.sortByOldestDate.setOnClickListener {
-            setNewOrder(ORDER_MODIFICATION_ASC)
+            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_DESC else ORDER_MODIFICATION_ASC)
         }
         binding.sortByLargestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_DESC)

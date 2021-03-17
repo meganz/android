@@ -10080,7 +10080,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment(orderType, isIncomingRootOrder);
+		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment()
+				.newInstance(orderType, isIncomingRootOrder);
+
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
 	}
