@@ -46,15 +46,19 @@
 
     <item
         android:id="@+id/get_link"
+        android:icon="@drawable/link_ic_white"
         android:orderInCategory="115"
         android:title="@string/context_get_link_menu"
-        app:showAsAction="never" />
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/remove_link"
+        android:icon="@drawable/ic_remove_link"
         android:orderInCategory="115"
         android:title="@string/context_remove_link_menu"
-        app:showAsAction="never" />
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/rename"
