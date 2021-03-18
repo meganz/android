@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
@@ -30,6 +31,9 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
+
+    private SortOrderManagement sortOrderManagement;
+
     private Context context;
     private ManagerActivityLollipop managerA;
     private FileExplorerActivityLollipop fileExplorerA;
@@ -47,9 +51,11 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     private int orderCloud;
     private int orderOthers;
 
-    public SearchNodesTask(Context mContext, Fragment mFragment, String mQuery, long mParentHandleSearch, ArrayList<MegaNode> mNodes){
+    public SearchNodesTask(Context mContext, Fragment mFragment, String mQuery, long mParentHandleSearch,
+                           ArrayList<MegaNode> mNodes, SortOrderManagement sortOrderManagement){
 
         context = mContext;
+        this.sortOrderManagement = sortOrderManagement;
 
         if (context instanceof ManagerActivityLollipop) {
             managerA = (ManagerActivityLollipop) context;
@@ -258,7 +264,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     private void getLinks() {
         if (isTextEmpty(query)) {
             nodes = megaApi.getPublicLinks(getLinksOrderCloud(
-                    MegaApplication.getSortOrderManagement().getOrderCloud(), managerA.isFirstNavigationLevel()));
+                    sortOrderManagement.getOrderCloud(), managerA.isFirstNavigationLevel()));
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
             nodes = megaApi.searchOnPublicLinks(query, megaCancelToken, orderCloud);

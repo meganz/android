@@ -154,6 +154,7 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
@@ -375,6 +376,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Inject
 	CookieDialogHandler cookieDialogHandler;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	public int accountFragment;
 
@@ -2211,8 +2214,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class)
-				.post(MegaApplication.getSortOrderManagement().getOrderCloud());
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(sortOrderManagement.getOrderCloud());
 
 		handler = new Handler();
 
@@ -7069,8 +7071,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 						if (cuFragment != null) {
-							cuFragment.setSearchDate(null,
-									MegaApplication.getSortOrderManagement().getOrderCamera());
+							cuFragment.setSearchDate(null, sortOrderManagement.getOrderCamera());
 							isSearchEnabled = false;
 							setToolbarTitle();
 							invalidateOptionsMenu();
@@ -7080,8 +7081,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						muFragment = (CameraUploadsFragment) getSupportFragmentManager()
 								.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 						if (muFragment != null) {
-							muFragment.setSearchDate(null,
-									MegaApplication.getSortOrderManagement().getOrderCamera());
+							muFragment.setSearchDate(null, sortOrderManagement.getOrderCamera());
 							isSearchEnabled = false;
 							setToolbarTitle();
 							invalidateOptionsMenu();
@@ -7775,12 +7775,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (rubbishBinFLol != null){
 			ArrayList<MegaNode> nodes;
 			if(parentHandleRubbish == -1){
-				nodes = megaApi.getChildren(megaApi.getRubbishNode(),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
 			}
 			else{
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+						sortOrderManagement.getOrderCloud());
 			}
 
 			rubbishBinFLol.hideMultipleSelect();
@@ -7841,7 +7840,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				isClearRubbishBin = false;
 				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
 				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+						sortOrderManagement.getOrderCloud());
 				rubbishBinFLol.setNodes(nodes);
 				rubbishBinFLol.getRecyclerView().invalidate();
 			}
@@ -10270,14 +10269,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (isCloudAdded()) {
 			ArrayList<MegaNode> nodes;
 			if (parentHandleBrowser == -1) {
-				nodes = megaApi.getChildren(parentNode,
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			} else {
 				parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 				if (parentNode == null) return;
 
-				nodes = megaApi.getChildren(parentNode,
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			}
 			logDebug("Nodes: " + nodes.size());
 			fbFLol.hideMultipleSelect();
@@ -10923,8 +10920,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 			if (cuFragment != null && searchDate != null) {
-				cuFragment.setSearchDate(searchDate,
-						MegaApplication.getSortOrderManagement().getOrderCamera());
+				cuFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
 				isSearchEnabled = true;
 				setToolbarTitle();
 			}
@@ -10932,8 +10928,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 			if (muFragment != null && searchDate != null) {
-				muFragment.setSearchDate(searchDate,
-						MegaApplication.getSortOrderManagement().getOrderCamera());
+				muFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
 				isSearchEnabled = true;
 				setToolbarTitle();
 			}
@@ -11090,7 +11085,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
 								? parentNode
 								: megaApi.getRootNode(),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+						sortOrderManagement.getOrderCloud());
 
 				fbFLol.setNodes(nodes);
 				fbFLol.getRecyclerView().invalidate();
@@ -11117,7 +11112,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
 								? parentNode
 								: megaApi.getRootNode(),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+						sortOrderManagement.getOrderCloud());
 
 				fbFLol.setNodes(nodes);
 				fbFLol.getRecyclerView().invalidate();
@@ -13182,7 +13177,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					if (isCloudAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser),
-								MegaApplication.getSortOrderManagement().getOrderCloud());
+								sortOrderManagement.getOrderCloud());
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
@@ -13221,7 +13216,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					if (isCloudAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser),
-								MegaApplication.getSortOrderManagement().getOrderCloud());
+								sortOrderManagement.getOrderCloud());
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
@@ -13616,7 +13611,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				isClearRubbishBin = false;
 				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
 				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(),
-						MegaApplication.getSortOrderManagement().getOrderCloud());
+						sortOrderManagement.getOrderCloud());
 				rubbishBinFLol.setNodes(nodes);
 				rubbishBinFLol.getRecyclerView().invalidate();
 			} else {
@@ -13733,13 +13728,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFragment != null) {
-			cuFragment.reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
+			cuFragment.reloadNodes(sortOrderManagement.getOrderCamera());
 		}
 
 		muFragment = (CameraUploadsFragment) getSupportFragmentManager()
 				.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 		if (muFragment != null) {
-			muFragment.reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
+			muFragment.reloadNodes(sortOrderManagement.getOrderCamera());
 		}
 
 		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);

@@ -35,6 +35,9 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -44,6 +47,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -89,11 +93,15 @@ import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
     public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
     public static final int TYPE_MEDIA = MegaNodeRepo.CU_TYPE_MEDIA;
 
     private static final String ARG_TYPE = "type";
+
+    @Inject
+    SortOrderManagement sortOrderManagement;
 
     // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
     private static final int SPAN_LARGE_GRID = 3;
@@ -165,7 +173,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
+            reloadNodes(sortOrderManagement.getOrderCamera());
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
@@ -647,7 +655,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         super.onResume();
 
         mDraggingNodeHandle = INVALID_HANDLE;
-        reloadNodes(MegaApplication.getSortOrderManagement().getOrderCamera());
+        reloadNodes(sortOrderManagement.getOrderCamera());
     }
 
     private void openNode(int position, CuNode cuNode) {
@@ -719,8 +727,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void putExtras(Intent intent, int indexForViewer, MegaNode node,
             int[] thumbnailLocation) {
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApplication.getSortOrderManagement().getOrderCamera());
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera());
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {

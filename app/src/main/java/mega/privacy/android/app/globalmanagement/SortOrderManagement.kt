@@ -1,34 +1,38 @@
 package mega.privacy.android.app.globalmanagement
 
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaPreferences
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SortOrderManagement(var dbH: DatabaseHandler) {
+@Singleton
+class SortOrderManagement @Inject constructor(private val dbH: DatabaseHandler) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderContacts: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
     private var orderCamera: Int = ORDER_MODIFICATION_DESC
 
-    fun getOrders() {
-        val prefs = dbH.preferences ?: return
+    init {
+        val prefs = dbH.preferences
 
-        if (prefs.preferredSortCloud != null) {
-            orderCloud = prefs.preferredSortCloud.toInt()
-        }
+        if (prefs != null) {
+            if (prefs.preferredSortCloud != null) {
+                orderCloud = prefs.preferredSortCloud.toInt()
+            }
 
-        if (prefs.preferredSortContacts != null) {
-            orderContacts = prefs.preferredSortContacts.toInt()
-        }
+            if (prefs.preferredSortContacts != null) {
+                orderContacts = prefs.preferredSortContacts.toInt()
+            }
 
-        if (prefs.preferredSortCameraUpload != null) {
-            orderCamera = prefs.preferredSortCameraUpload.toInt()
-        }
+            if (prefs.preferredSortCameraUpload != null) {
+                orderCamera = prefs.preferredSortCameraUpload.toInt()
+            }
 
-        if (prefs.preferredSortOthers != null) {
-            orderOthers = prefs.preferredSortOthers.toInt()
+            if (prefs.preferredSortOthers != null) {
+                orderOthers = prefs.preferredSortOthers.toInt()
+            }
         }
     }
 

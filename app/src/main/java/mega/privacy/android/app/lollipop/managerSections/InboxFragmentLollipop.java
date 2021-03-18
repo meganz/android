@@ -46,6 +46,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -54,6 +57,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -75,8 +79,11 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-
+@AndroidEntryPoint
 public class InboxFragmentLollipop extends RotatableFragment{
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	public static ImageView imageDrag;
 
@@ -494,7 +501,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			if (megaApi.getInboxNode() != null){
 				logDebug("InboxNode != null");
 				inboxNode = megaApi.getInboxNode();
-				nodes = megaApi.getChildren(inboxNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud());
 			}
 		}
 		else{
@@ -503,7 +510,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			}
 
 		}
@@ -594,13 +601,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void refresh(){
 		logDebug("refresh");
 		if(inboxNode != null && (((ManagerActivityLollipop) context).getParentHandleInbox()==-1||((ManagerActivityLollipop) context).getParentHandleInbox()==inboxNode.getHandle())){
-			nodes = megaApi.getChildren(inboxNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud());
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			}
 		}
 
@@ -626,7 +633,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 
-			intent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
+			intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			intent.putExtra("screenPosition", screenPosition);
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -656,7 +663,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			} else {
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
-			mediaIntent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
+			mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 			mediaIntent.putExtra("screenPosition", screenPosition);
 			mediaIntent.putExtra("placeholder", placeholderCount);
@@ -895,7 +902,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
-				nodes = megaApi.getChildren(nodes.get(position), MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes, adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
@@ -1022,7 +1029,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
-				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				setNodes(nodes);
 
 				int lastVisiblePosition = 0;

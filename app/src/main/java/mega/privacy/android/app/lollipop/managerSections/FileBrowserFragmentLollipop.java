@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -59,6 +62,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -83,7 +87,11 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+@AndroidEntryPoint
 public class FileBrowserFragmentLollipop extends RotatableFragment{
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	public static ImageView imageDrag;
 
@@ -499,11 +507,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		if (((ManagerActivityLollipop) context).getParentHandleBrowser() == -1 || ((ManagerActivityLollipop) context).getParentHandleBrowser() == megaApi.getRootNode().getHandle()) {
 			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).getParentHandleBrowser());
 
-			nodes = megaApi.getChildren(megaApi.getRootNode(), MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
 		} else {
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser());
 
-			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 		}
 		((ManagerActivityLollipop) context).setToolbarTitle();
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
@@ -669,7 +677,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 
-			intent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
+			intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			intent.putExtra("screenPosition", screenPosition);
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -700,7 +708,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			} else {
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
-			mediaIntent.putExtra("orderGetChildren", MegaApplication.getSortOrderManagement().getOrderCloud());
+			mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			mediaIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
 			mediaIntent.putExtra("screenPosition", screenPosition);
 
@@ -1065,7 +1073,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         ((ManagerActivityLollipop)context).setToolbarTitle();
         
         adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleBrowser());
-        nodes = megaApi.getChildren(n, MegaApplication.getSortOrderManagement().getOrderCloud());
+        nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
         addSectionTitle(nodes,adapter.getAdapterType());
         adapter.setNodes(nodes);
         recyclerView.scrollToPosition(0);
@@ -1249,7 +1257,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					((ManagerActivityLollipop)context).setToolbarTitle();
 
-					nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+					nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 					addSectionTitle(nodes,adapter.getAdapterType());
 					adapter.setNodes(nodes);
 

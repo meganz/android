@@ -166,7 +166,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			logDebug("Parent Handle: " + managerActivity.getParentHandleOutgoing());
 
-			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -192,7 +192,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode n = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(n, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -260,7 +260,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.supportInvalidateOptionsMenu();
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(nodes.get(position), MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 
 			adapter.setNodes(nodes);
@@ -282,7 +282,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	protected void orderNodes() {
-		if (MegaApplication.getSortOrderManagement().getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
+		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByNameDescending(this.nodes);
 		} else {
 			sortByNameAscending(this.nodes);
@@ -347,7 +347,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				managerActivity.setToolbarTitle();
 				managerActivity.supportInvalidateOptionsMenu();
 
-				nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes, adapter.getAdapterType());
 
 				adapter.setNodes(nodes);

@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
@@ -18,10 +18,11 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
@@ -44,7 +45,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private lateinit var sortOrderManagement: SortOrderManagement
+    @Inject
+    lateinit var sortOrderManagement: SortOrderManagement
+
     private var oldOrder: Int = ORDER_DEFAULT_ASC
     private var orderType: Int = ORDER_CLOUD
     private var isIncomingRootOrder: Boolean = false
@@ -61,7 +64,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
-        sortOrderManagement = MegaApplication.getSortOrderManagement()
         orderType = arguments?.getInt(ORDER_TYPE)!!
         isIncomingRootOrder = arguments?.getBoolean(IS_INCOMING_ROOT_ORDER)!!
 

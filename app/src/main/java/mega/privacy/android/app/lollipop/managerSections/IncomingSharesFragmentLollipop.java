@@ -155,7 +155,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 
-			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -181,7 +181,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			findNodes();
 		} else {
 			parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
-			nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -225,7 +225,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.supportInvalidateOptionsMenu();
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(nodes.get(position), MegaApplication.getSortOrderManagement().getOrderCloud());
+			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 
 			adapter.setNodes(nodes);
@@ -242,7 +242,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void findNodes() {
 		nodes = megaApi.getInShares();
 
-		if (MegaApplication.getSortOrderManagement().getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
+		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByMailDescending(nodes);
 		}
 		addSectionTitle(nodes, adapter.getAdapterType());
@@ -319,7 +319,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					managerActivity.supportInvalidateOptionsMenu();
 					managerActivity.setToolbarTitle();
 
-					nodes = megaApi.getChildren(parentNode, MegaApplication.getSortOrderManagement().getOrderCloud());
+					nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 					addSectionTitle(nodes, adapter.getAdapterType());
 
 					adapter.setNodes(nodes);
