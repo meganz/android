@@ -56,6 +56,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -76,6 +77,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     final int AVATAR_WIDTH = 135;
     public final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
     public final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
+
+    /** Avatar's border width */
+    public final static int BORDER_WIDTH = 3;
 
     MegaUser myUser;
     String myEmail;
@@ -249,17 +253,17 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
         int width = AVATAR_WIDTH;
+        float offset = (float)(width / 2);
+
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
+        // Avatar border's color
         paint.setColor(ContextCompat.getColor(context, R.color.white_dark_grey));
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
-        c.drawBitmap(qr, 0f, 0f, null);
-        c.drawRect(AVATAR_LEFT,
-                AVATAR_LEFT,
-                AVATAR_RIGHT,
-                AVATAR_RIGHT, paint);
+        c.drawBitmap(qr, 0f, 0f, null); // Util.dp2px(3)
+        c.drawCircle(AVATAR_LEFT + offset, AVATAR_LEFT + offset, offset + Util.dp2px(BORDER_WIDTH),paint);
         c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
