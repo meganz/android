@@ -82,6 +82,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -9281,6 +9282,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				verify2FADialogIsShown = false;
 			}
 		});
+
+        Window window = verify2FADialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
 		verify2FADialog.show();
 		verify2FADialogIsShown = true;
 	}
