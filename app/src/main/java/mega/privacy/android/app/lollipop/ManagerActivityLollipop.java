@@ -15566,7 +15566,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
 				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
-				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+				drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
 		}
