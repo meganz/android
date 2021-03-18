@@ -27,26 +27,27 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     companion object {
         private const val ORDER_TYPE = "ORDER_TYPE"
         private const val IS_INCOMING_ROOT_ORDER = "IS_INCOMING_ROOT_ORDER"
+
+        @JvmStatic
+        fun newInstance(
+            orderType: Int,
+            isIncomingRootOrder: Boolean = false
+        ): SortByBottomSheetDialogFragment {
+            val fragment = SortByBottomSheetDialogFragment()
+            val args = Bundle()
+
+            args.putInt(ORDER_TYPE, orderType)
+            args.putBoolean(IS_INCOMING_ROOT_ORDER, isIncomingRootOrder)
+            fragment.arguments = args
+
+            return fragment
+        }
     }
 
     private lateinit var sortOrderManagement: SortOrderManagement
     private var oldOrder: Int = ORDER_DEFAULT_ASC
     private var orderType: Int = ORDER_CLOUD
     private var isIncomingRootOrder: Boolean = false
-
-    fun newInstance(
-        orderType: Int,
-        isIncomingRootOrder: Boolean = false
-    ): SortByBottomSheetDialogFragment {
-        val fragment = SortByBottomSheetDialogFragment()
-        val args = Bundle()
-
-        args.putInt(ORDER_TYPE, orderType)
-        args.putBoolean(IS_INCOMING_ROOT_ORDER, isIncomingRootOrder)
-        fragment.arguments = args
-
-        return fragment
-    }
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
