@@ -1,6 +1,8 @@
 package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.view.View.GONE
@@ -16,13 +18,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.listeners.MoveListener
+import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaNode
 
@@ -358,6 +365,78 @@ class MegaNodeDialogUtil {
 
             typeText?.requestFocus()
             errorText?.visibility = GONE
+        }
+
+        /**
+         * Move a node into rubbish bin, or remove it if it's already moved into rubbish bin.
+         *
+         * @param handle handle of the node
+         * @param activity Android activity
+         * @param snackbarShower interface to show snackbar
+         */
+        @JvmStatic
+        @Suppress("DEPRECATION")
+        fun moveToRubbishOrRemove(
+            handle: Long,
+            activity: Activity,
+            snackbarShower: SnackbarShower
+        ) {
+            val megaApi = MegaApplication.getInstance().megaApi
+
+            if (!isOnline(activity)) {
+                snackbarShower.showSnackbar(getString(R.string.error_server_connection_problem))
+                return
+            }
+
+            val node = megaApi.getNodeByHandle(handle) ?: return
+            val rubbishNode = megaApi.rubbishNode
+
+            if (rubbishNode.handle != getRootParentNode(node).handle) {
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    .setMessage(getString(R.string.confirmation_move_to_rubbish))
+                    .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                        val progress = ProgressDialog(activity)
+                        progress.setMessage(getString(R.string.context_move_to_trash))
+
+                        megaApi.moveNode(
+                            node, rubbishNode,
+                            MoveListener {
+                                progress.dismiss()
+
+                                if (it) {
+                                    activity.finish()
+                                } else {
+                                    snackbarShower.showSnackbar(getString(R.string.context_no_moved))
+                                }
+                            })
+
+                        progress.show()
+                    }
+                    .setNegativeButton(getString(R.string.general_cancel), null)
+                    .show()
+            } else {
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    .setMessage(getString(R.string.confirmation_delete_from_mega))
+                    .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                        val progress = ProgressDialog(activity)
+                        progress.setMessage(getString(R.string.context_delete_from_mega))
+
+                        megaApi.remove(node, RemoveListener {
+                            progress.dismiss()
+
+                            if (it) {
+                                snackbarShower.showSnackbar(getString(R.string.context_correctly_removed))
+                                activity.finish()
+                            } else {
+                                snackbarShower.showSnackbar(getString(R.string.context_no_removed))
+                            }
+                        })
+
+                        progress.show()
+                    }
+                    .setNegativeButton(getString(R.string.general_cancel), null)
+                    .show()
+            }
         }
     }
 }

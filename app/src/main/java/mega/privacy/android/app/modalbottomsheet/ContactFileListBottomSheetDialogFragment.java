@@ -229,7 +229,8 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case R.id.option_leave_layout:
-                showConfirmationLeaveIncomingShare(context, node);
+                showConfirmationLeaveIncomingShare(requireActivity(),
+                        (SnackbarShower) requireActivity(), node);
                 break;
 
             case R.id.option_rename_layout:

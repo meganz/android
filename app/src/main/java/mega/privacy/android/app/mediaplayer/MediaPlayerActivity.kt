@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
@@ -47,9 +46,8 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.moveNodeToRubbishBin
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -58,9 +56,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -387,6 +383,19 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     return
                 }
 
+                if (adapterType == RUBBISH_BIN_ADAPTER) {
+                    toggleAllMenuItemsVisibility(menu, false)
+
+                    menu.findItem(R.id.properties).isVisible =
+                        currentFragment == R.id.main_player
+
+                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+                    moveToTrash.isVisible = true
+                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
+
+                    return
+                }
+
                 if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
                     toggleAllMenuItemsVisibility(menu, false)
                 }
@@ -573,8 +582,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 return true
             }
             R.id.move_to_trash -> {
-                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
-                moveToRubbishBin(node)
+                moveToRubbishOrRemove(playingHandle, this, this)
                 return true
             }
         }
@@ -594,32 +602,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         if (firstChild is TrackInfoFragment) {
             firstChild.updateNodeNameIfNeeded(handle, newName)
         }
-    }
-
-    /**
-     * Shows a confirmation warning before moves a node to rubbish bin.
-     *
-     * @param node node to be moved to rubbish bin
-     */
-    private fun moveToRubbishBin(node: MegaNode) {
-        logDebug("moveToRubbishBin")
-        if (!isOnline(this)) {
-            showSnackbar(
-                SNACKBAR_TYPE,
-                StringResourcesUtils.getString(R.string.error_server_connection_problem),
-                MEGACHAT_INVALID_HANDLE
-            )
-            return
-        }
-
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(StringResourcesUtils.getString(R.string.confirmation_move_to_rubbish))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_move)) { _, _ ->
-                playerService?.viewModel?.removeItem(node.handle)
-                moveNodeToRubbishBin(node, this)
-            }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-            .show()
     }
 
     override fun onRequestPermissionsResult(

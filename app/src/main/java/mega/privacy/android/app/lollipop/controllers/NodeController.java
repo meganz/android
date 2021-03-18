@@ -17,7 +17,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
-import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -557,26 +556,6 @@ public class NodeController {
             }
         }
         return -1;
-    }
-
-    public void leaveIncomingShare (final MegaNode n){
-        logDebug("Node handle: " + n.getHandle());
-        megaApi.remove(n, new RemoveListener(context, true));
-    }
-
-    public void leaveMultipleIncomingShares (final ArrayList<Long> handleList){
-        logDebug("Leaving " + handleList.size() + " incoming shares");
-
-        if (handleList.size() == 1) {
-            leaveIncomingShare(megaApi.getNodeByHandle(handleList.get(0)));
-            return;
-        }
-
-        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
-        for (int i = 0; i < handleList.size(); i++) {
-            MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-            megaApi.remove(node, moveMultipleListener);
-        }
     }
 
     public void removeShares(ArrayList<MegaShare> listShares, MegaNode node){

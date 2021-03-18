@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -222,7 +223,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_leave_share:
-                    showConfirmationLeaveIncomingShares(context, handleList);
+                    showConfirmationLeaveIncomingShares(requireActivity(),
+                            (SnackbarShower) requireActivity(), handleList);
                     break;
 
                 case R.id.cab_menu_send_to_chat:

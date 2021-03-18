@@ -23,6 +23,7 @@ import java.util.Collections;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -999,7 +1000,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                showConfirmationLeaveIncomingShare(context, node);
+                showConfirmationLeaveIncomingShare(requireActivity(),
+                        (SnackbarShower) requireActivity(), node);
                 break;
 
             case R.id.option_send_chat_layout:

@@ -133,7 +133,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					showConfirmationLeaveIncomingShares(context, handleList);
+					showConfirmationLeaveIncomingShares(requireActivity(),
+							(SnackbarShower) requireActivity(), handleList);
                     break;
 				}
                 case R.id.cab_menu_trash: {

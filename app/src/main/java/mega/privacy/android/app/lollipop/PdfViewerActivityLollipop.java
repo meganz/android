@@ -76,6 +76,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -103,6 +104,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -186,8 +188,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     private TextView fileNameTextView;
     int typeExport = -1;
     private Handler handler;
-    boolean moveToRubbish = false;
-    ProgressDialog moveToTrashStatusDialog;
 
     private TextView actualPage;
     private TextView totalPages;
@@ -1431,7 +1431,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             }
             case R.id.pdf_viewer_move_to_trash:
             case R.id.pdf_viewer_remove: {
-                moveToTrash();
+                moveToRubbishOrRemove(handle, this, this);
                 break;
             }
             case R.id.chat_pdf_viewer_import:{
@@ -1503,92 +1503,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             }
         });
     }
-
-    public void moveToTrash(){
-        logDebug("moveToTrash");
-
-        moveToRubbish = false;
-        if (!isOnline(this)){
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        if(isFinishing()){
-            return;
-        }
-
-        final MegaNode rubbishNode = megaApi.getRubbishNode();
-
-        MegaNode parent = megaApi.getNodeByHandle(handle);
-        while (megaApi.getParentNode(parent) != null){
-            parent = megaApi.getParentNode(parent);
-        }
-
-        if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-            moveToRubbish = true;
-        }
-        else{
-            moveToRubbish = false;
-        }
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        //Check if the node is not yet in the rubbish bin (if so, remove it)
-
-                        if (moveToRubbish){
-                            megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, PdfViewerActivityLollipop.this);
-                            ProgressDialog temp = null;
-                            try{
-                                temp = new ProgressDialog(PdfViewerActivityLollipop.this);
-                                temp.setMessage(getString(R.string.context_move_to_trash));
-                                temp.show();
-                            }
-                            catch(Exception e){
-                                return;
-                            }
-                            moveToTrashStatusDialog = temp;
-                        }
-                        else{
-                            megaApi.remove(megaApi.getNodeByHandle(handle), PdfViewerActivityLollipop.this);
-                            ProgressDialog temp = null;
-                            try{
-                                temp = new ProgressDialog(PdfViewerActivityLollipop.this);
-                                temp.setMessage(getString(R.string.context_delete_from_mega));
-                                temp.show();
-                            }
-                            catch(Exception e){
-                                return;
-                            }
-                            moveToTrashStatusDialog = temp;
-                        }
-
-
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        if (moveToRubbish){
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-            String message= getResources().getString(R.string.confirmation_move_to_rubbish);
-            builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
-                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-        }
-        else{
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-            String message= getResources().getString(R.string.confirmation_delete_from_mega);
-            builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-        }
-    }
-
 
     public void showCopy(){
         logDebug("showCopy");
@@ -1787,6 +1701,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
         logDebug("onActivityResult: " + requestCode + "____" + resultCode);
         if (intent == null) {
             return;
@@ -1810,7 +1726,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
             final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
-            moveToRubbish = false;
 
             ProgressDialog temp = null;
             try{
@@ -2029,52 +1944,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                 MegaApplication.setLoggingIn(false);
                 download();
             }
-        } else if (request.getType() == MegaRequest.TYPE_MOVE){
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
+        } else if (request.getType() == MegaRequest.TYPE_MOVE) {
+            logDebug("Move nodes request finished");
 
-            if (moveToRubbish){
-                if (e.getErrorCode() == MegaError.API_OK){
-                    this.finish();
-                }
-                else{
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                }
-                moveToRubbish = false;
-                logDebug("Move to rubbish request finished");
-            }
-            else{
-                if (e.getErrorCode() == MegaError.API_OK){
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-                    finish();
-                }
-                else{
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                }
-                logDebug("Move nodes request finished");
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_REMOVE){
-
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                if (moveToTrashStatusDialog.isShowing()){
-                    try {
-                        moveToTrashStatusDialog.dismiss();
-                    }
-                    catch (Exception ex) {}
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
-                }
+            if (e.getErrorCode() == MegaError.API_OK) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
+            } else {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
-            }
-            logDebug("Remove request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_COPY){
+        } else if (request.getType() == MegaRequest.TYPE_COPY) {
             try {
                 statusDialog.dismiss();
             }

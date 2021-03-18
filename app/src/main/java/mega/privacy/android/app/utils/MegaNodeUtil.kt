@@ -32,12 +32,13 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveListener
+import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -643,55 +644,111 @@ object MegaNodeUtil {
     /**
      * Shows a confirmation warning before leave an incoming share.
      *
-     * @param context   current Context
-     * @param n         incoming share to leave
+     * @param activity current Activity
+     * @param snackbarShower interface to show snackbar
+     * @param node incoming share to leave
      */
     @JvmStatic
-    fun showConfirmationLeaveIncomingShare(context: Context, n: MegaNode?) {
-        showConfirmationLeaveIncomingShares(context, n, null)
+    fun showConfirmationLeaveIncomingShare(
+        activity: Activity,
+        snackbarShower: SnackbarShower,
+        node: MegaNode
+    ) {
+        showConfirmationLeaveIncomingShares(activity, snackbarShower, node, null)
     }
 
     /**
      * Shows a confirmation warning before leave some incoming shares.
      *
-     * @param context       current Context
+     * @param activity current Activity
+     * @param snackbarShower interface to show snackbar
      * @param handleList    handles list of the incoming shares to leave
      */
     @JvmStatic
-    fun showConfirmationLeaveIncomingShares(context: Context, handleList: ArrayList<Long>?) {
-        showConfirmationLeaveIncomingShares(context, null, handleList)
+    fun showConfirmationLeaveIncomingShares(
+        activity: Activity,
+        snackbarShower: SnackbarShower,
+        handleList: ArrayList<Long>
+    ) {
+        showConfirmationLeaveIncomingShares(activity, snackbarShower, null, handleList)
     }
 
     /**
      * Shows a confirmation warning before leave one or more incoming shares.
      *
-     * @param context       current Context
-     * @param n             if only one incoming share to leave, its node, null otherwise
-     * @param handleList    if mode than one incoming shares to leave, list of its handles, null otherwise
+     * @param activity current Activity
+     * @param snackbarShower interface to show snackbar
+     * @param node if only one incoming share to leave, its node, null otherwise
+     * @param handles if mode than one incoming shares to leave, list of its handles, null otherwise
      */
     private fun showConfirmationLeaveIncomingShares(
-        context: Context,
-        n: MegaNode?,
-        handleList: ArrayList<Long>?
+        activity: Activity,
+        snackbarShower: SnackbarShower,
+        node: MegaNode?,
+        handles: ArrayList<Long>?
     ) {
-        val onlyOneIncomingShare = n != null && handleList == null
-        val numIncomingShares = if (onlyOneIncomingShare) 1 else handleList!!.size
-        val builder = MaterialAlertDialogBuilder(context)
+        val onlyOneIncomingShare = node != null && handles == null
+        val numIncomingShares = if (onlyOneIncomingShare) 1 else handles!!.size
+        val builder = MaterialAlertDialogBuilder(activity)
 
         builder.setMessage(
             getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares)
         )
             .setPositiveButton(getString(R.string.general_leave)) { _, _ ->
                 if (onlyOneIncomingShare) {
-                    NodeController(context).leaveIncomingShare(n)
+                    leaveIncomingShare(snackbarShower, node!!)
                 } else {
-                    NodeController(context).leaveMultipleIncomingShares(handleList)
+                    leaveMultipleIncomingShares(activity, snackbarShower, handles!!)
                 }
                 MegaApplication.getInstance()
                     .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE))
             }
             .setNegativeButton(getString(R.string.general_cancel), null)
             .show()
+    }
+
+    /**
+     * Leave incoming share.
+     *
+     * @param snackbarShower interface to show snackbar
+     * @param node node to leave incoming share
+     */
+    private fun leaveIncomingShare(
+        snackbarShower: SnackbarShower,
+        node: MegaNode
+    ) {
+        logDebug("Node handle: " + node.handle)
+        MegaApplication.getInstance().megaApi.remove(
+            node, RemoveListener(snackbarShower, true)
+        )
+    }
+
+    /**
+     * Leave multiple incoming shares.
+     *
+     * @param activity current Activity
+     * @param snackbarShower interface to show snackbar
+     * @param handles handles of nodes to leave incoming share
+     */
+    private fun leaveMultipleIncomingShares(
+        activity: Activity,
+        snackbarShower: SnackbarShower,
+        handles: List<Long>
+    ) {
+        logDebug("Leaving ${handles.size} incoming shares");
+
+        val megaApi = MegaApplication.getInstance().megaApi
+
+        if (handles.size == 1) {
+            leaveIncomingShare(snackbarShower, megaApi.getNodeByHandle(handles[0]))
+            return
+        }
+
+        val moveMultipleListener = MultipleRequestListener(MULTIPLE_LEAVE_SHARE, activity)
+        for (handle in handles) {
+            val node = megaApi.getNodeByHandle(handle)
+            megaApi.remove(node, moveMultipleListener)
+        }
     }
 
     /**
@@ -990,7 +1047,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveListener(snackbarShower, megaApp)
+        val listener = MoveListener(snackbarShower)
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1067,20 +1124,6 @@ object MegaNodeUtil {
         }
 
         return true
-    }
-
-    /**
-     * Move a node into rubbish bin.
-     *
-     * @param node node to move
-     * @param snackbarShower interface to show snackbar
-     */
-    @JvmStatic
-    fun moveNodeToRubbishBin(node: MegaNode, snackbarShower: SnackbarShower) {
-        val megaApp = MegaApplication.getInstance()
-        val megaApi = megaApp.megaApi
-
-        megaApi.moveNode(node, megaApi.rubbishNode, MoveListener(snackbarShower, megaApp))
     }
 
     /**

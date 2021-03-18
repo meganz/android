@@ -1131,7 +1131,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.cab_menu_file_info_leave:
-				showConfirmationLeaveIncomingShare(this, node);
+				showConfirmationLeaveIncomingShare(this, this, node);
 				break;
 
 			case R.id.cab_menu_file_info_rubbish:

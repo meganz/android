@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLoll
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -88,6 +89,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -173,7 +175,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	int typeExport = -1;
 
 	boolean shareIt = true;
-	boolean moveToRubbish = false;
 
 	private Handler handler;
 
@@ -727,13 +728,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 				showCopy();
 				break;
 			}
-			case R.id.full_image_viewer_move_to_trash: {
-				positionToRemove = positionG;
-				moveToTrash();
-				break;
-			}
+			case R.id.full_image_viewer_move_to_trash:
 			case R.id.full_image_viewer_remove: {
-				moveToTrash();
+				positionToRemove = positionG;
+				moveToRubbishOrRemove(imageHandles.get(positionG), this, this);
 				break;
 			}
 		}
@@ -1285,94 +1283,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 	}
 
-	public void moveToTrash(){
-		logDebug("moveToTrash");
-
-		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-
-		final long handle = node.getHandle();
-		moveToRubbish = false;
-		if (!isOnline(this)){
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-			return;
-		}
-
-		if(isFinishing()){
-			return;
-		}
-
-		final MegaNode rubbishNode = megaApi.getRubbishNode();
-
-		MegaNode parent = megaApi.getNodeByHandle(handle);
-		while (megaApi.getParentNode(parent) != null){
-			parent = megaApi.getParentNode(parent);
-		}
-
-		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;
-		}
-		else{
-			moveToRubbish = false;
-		}
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
-
-		    		if (moveToRubbish){
-		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fullScreenImageViewer);
-		    			ProgressDialog temp = null;
-		    			try{
-		    				temp = new ProgressDialog(fullScreenImageViewer);
-		    				temp.setMessage(getString(R.string.context_move_to_trash));
-		    				temp.show();
-		    			}
-		    			catch(Exception e){
-		    				return;
-		    			}
-		    			statusDialog = temp;
-		    		}
-		    		else{
-		    			megaApi.remove(megaApi.getNodeByHandle(handle), fullScreenImageViewer);
-		    			ProgressDialog temp = null;
-		    			try{
-		    				temp = new ProgressDialog(fullScreenImageViewer);
-		    				temp.setMessage(getString(R.string.context_delete_from_mega));
-		    				temp.show();
-		    			}
-		    			catch(Exception e){
-		    				return;
-		    			}
-		    			statusDialog = temp;
-		    		}
-
-
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		if (moveToRubbish){
-			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
-			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
-		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
-		else{
-			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-			String message= getResources().getString(R.string.confirmation_delete_from_mega);
-			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		logDebug("onRequestStart: " + request.getRequestString());
@@ -1386,71 +1296,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 
 		logDebug("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_MOVE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+        if (request.getType() == MegaRequest.TYPE_MOVE) {
+            logDebug("Move nodes request finished");
 
-			if (moveToRubbish){
-				if (e.getErrorCode() == MegaError.API_OK){
-					if(positionToRemove!=-1){
-						logDebug("Position to remove: " + positionToRemove);
-						logDebug("Position in: " + positionG);
-						imageHandles.remove(positionToRemove);
-						if(imageHandles.size()==0){
-							finish();
-						}
-						else{
-							adapterMega.refreshImageHandles(imageHandles);
-							viewPager.setAdapter(adapterMega);
-							if(positionG>imageHandles.size()-1){
-								logDebug("Last item deleted, go to new last position");
-								positionG=imageHandles.size()-1;
-							}
-							viewPager.setCurrentItem(positionG);
-							positionToRemove=-1;
-							supportInvalidateOptionsMenu();
-
-						}
-					}
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-				}
-				moveToRubbish = false;
-				logDebug("Move to rubbish request finished");
-			}
-			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-					finish();
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-				}
-				logDebug("Move nodes request finished");
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				if (statusDialog.isShowing()){
-					try {
-						statusDialog.dismiss();
-					}
-					catch (Exception ex) {}
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
-				}
-				finish();
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
-			}
-			logDebug("Remove request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
+            if (e.getErrorCode() == MegaError.API_OK) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
+                finish();
+            } else {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
+            }
+        } else if (request.getType() == MegaRequest.TYPE_COPY) {
 			try {
 				statusDialog.dismiss();
 			}
@@ -1534,6 +1389,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
 		logDebug("onActivityResult");
 
 		if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
@@ -1593,7 +1450,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			final int totalMoves = moveHandles.length;
 
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			moveToRubbish = false;
 
 			ProgressDialog temp = null;
 			try{
