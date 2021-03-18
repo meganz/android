@@ -432,7 +432,6 @@
                         android:layout_below="@id/empty_image_view_chat"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
-                        android:text="@string/chat_loading_messages"
                         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
                 </RelativeLayout>
 
