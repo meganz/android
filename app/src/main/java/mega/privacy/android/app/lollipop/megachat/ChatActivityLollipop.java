@@ -7427,7 +7427,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Found index to update: " + indexToChange);
 
                 messages.set(indexToChange, new AndroidMegaChatMessage(pendingMsg,
-                        pendingMsg.getState() == PendingMessageSingle.STATE_UPLOADING));
+                        pendingMsg.getState() >= PendingMessageSingle.STATE_PREPARING
+                                && pendingMsg.getState() <= PendingMessageSingle.STATE_COMPRESSING));
 
                 adapter.modifyMessage(messages, indexToChange + 1);
                 break;
