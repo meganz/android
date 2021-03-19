@@ -431,7 +431,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
     MaterialToolbar toolbar;
     AppBarLayout abL;
 
-	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
 
@@ -1973,7 +1972,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
-			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -14383,9 +14381,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		return selectedOfflineNode;
 	}
 
-	public void setSelectedPaymentMethod(int selectedPaymentMethod) {
-		this.selectedPaymentMethod = selectedPaymentMethod;
-	}
 	public void visibilitySearch(boolean visibility){
 		searchByDate.setVisible(visibility);
 	}

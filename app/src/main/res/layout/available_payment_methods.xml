@@ -41,7 +41,7 @@
                     android:layout_gravity="start"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="15dp"
-                    android:text="@string/select_payment_method"
+                    android:text="@string/payment_method"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
             </RelativeLayout>
 

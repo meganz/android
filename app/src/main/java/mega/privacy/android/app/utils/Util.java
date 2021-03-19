@@ -749,45 +749,20 @@ public class Util {
 	    }
 	    return bits;
 	}
-	
-	public static boolean checkBitSet(BitSet paymentBitSet, int position){
-		logDebug("checkBitSet");
-		if (paymentBitSet != null){
-			if (paymentBitSet.get(position)){
-				return true;
-			}
-			else{
-				return false;
-			}
-		}
-		else{
+
+	/**
+	 * Method to check if a payment method is available.
+	 * @param paymentBitSet Bit set of payment methods.
+	 * @param paymentMethod Payment method bit position to check (e.g. MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)
+	 * @see nz.mega.sdk.MegaApiJava
+	 * @return TRUE if the payment method is available or FALSE otherwise.
+	 */
+	public static boolean isPaymentMethodAvailable(BitSet paymentBitSet, int paymentMethod){
+		if (paymentBitSet == null) {
 			return false;
 		}
-	}
-	
-	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
-		
-		boolean r = false;
-		if (paymentBitSet != null){
-			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-				r = true;
-			}
-			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-				r = true;
-			}
-			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-				if (plan == 4){
-					r = true;
-				}
-			}
-			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-				if (plan == 4){
-					r = true;
-				}
-			}
-		}
-		
-		return r;
+
+		return paymentBitSet.get(paymentMethod);
 	}
 	
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
