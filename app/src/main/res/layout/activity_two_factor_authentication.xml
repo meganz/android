@@ -96,7 +96,7 @@
         android:id="@+id/scroll_container_verify"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:attr/colorBackground"
+        android:background="@color/white_grey_700"
         android:layout_below="@+id/toolbar">
 
         <RelativeLayout
@@ -114,6 +114,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/explain_qr_seed_2fa_1"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
+                    android:background="?android:attr/colorBackground"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="17dp" />
@@ -126,6 +127,8 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="3dp"
+                    android:background="?android:attr/colorBackground"
+                    android:paddingBottom="24dp"
                     android:layout_below="@+id/explain_qr_seed_2fa_1"/>
 
                 <RelativeLayout
@@ -337,8 +340,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/seed_2fa"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
                     style="?attr/materialButtonStyle"
                     android:text="@string/open_app_button"/>
 
@@ -346,9 +350,11 @@
                     android:id="@+id/button_next_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/button_open_with_2fa"
-                    android:layout_centerHorizontal="true"
+                    android:layout_toEndOf="@+id/button_open_with_2fa"
+                    android:layout_below="@+id/seed_2fa"
+                    android:layout_marginStart="15dp"
                     android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
                     android:text="@string/general_next"
                     style="?attr/borderlessButtonStyle"/>
 
@@ -544,7 +550,7 @@
                 android:fontFamily="roboto"
                 android:text="@string/recommendation_2fa_enabled"
                 android:textColor="?android:attr/textColorPrimary"/>
-            
+
             <LinearLayout
                 android:id="@+id/container_rk_2fa"
                 android:layout_width="wrap_content"
@@ -553,7 +559,7 @@
                 android:background="@drawable/background_button_border_white"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="27dp">
-                
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -570,7 +576,7 @@
                     android:fontFamily="roboto"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="25dp"/>
-                
+
             </LinearLayout>
 
             <RelativeLayout

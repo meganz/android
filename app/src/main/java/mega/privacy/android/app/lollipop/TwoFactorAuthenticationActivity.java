@@ -6,13 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -47,7 +45,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,14 +53,13 @@ import java.util.Map;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -191,10 +187,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             rkSaved = savedInstanceState.getBoolean("rkSaved", false);
             seed = savedInstanceState.getString("seed");
             arraySeed = savedInstanceState.getStringArrayList("arraySeed");
-            byte[] qrByteArray = savedInstanceState.getByteArray("qr");
-            if (qrByteArray != null){
-                qr = BitmapFactory.decodeByteArray(qrByteArray, 0, qrByteArray.length);
-            }
             isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
             isHelpDialogShown = savedInstanceState.getBoolean("isHelpDialogShown", false);
         }
@@ -218,6 +210,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
         SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
         Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_question_mark);
+        questionMarck.setColorFilter(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary), PorterDuff.Mode.SRC_IN);
         questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
         ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
         text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
@@ -805,57 +798,49 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             int width = (w * WIDTH) / FACTOR;
 
             qr = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+            int colorBackground = ContextCompat.getColor(this,R.color.white_grey_700);
+            int colorCode = ContextCompat.getColor(this,R.color.dark_grey);
+
             Canvas c = new Canvas(qr);
             Paint paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setColor(WHITE);
+            paint.setColor(colorBackground);
             c.drawRect(0, 0, width, width, paint);
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
 
             float size = w - 12;
 
             for (int y = 0; y < h; y++) {
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
-                    pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
-                    if (pixels[offset + x] == BLACK){
+                    pixels[offset + x] = bitMatrix.get(x, y) ? colorCode : colorBackground;
+                    if (pixels[offset + x] == colorCode){
                         c.drawCircle(x*RESIZE, y*RESIZE, 3.5f, paint);
                     }
                 }
             }
 
 //            8.5 width
-            paint.setColor(WHITE);
+            paint.setColor(colorBackground);
             c.drawRect(3*RESIZE, 3*RESIZE, 11.5f*RESIZE, 11.5f*RESIZE, paint);
             c.drawRect(size*RESIZE, 3*RESIZE, (size+8.5f)*RESIZE, 11.5f*RESIZE, paint);
             c.drawRect(3*RESIZE, size*RESIZE, 11.5f*RESIZE, (size+8.5f)*RESIZE, paint);
 
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
 
-            if (Build.VERSION.SDK_INT >= 21) {
-                c.drawRoundRect(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+            c.drawRoundRect(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE, 15, 15, paint);
 //                7 width, 0.75 more than last
-                c.drawRoundRect((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE, 15, 15, paint);
-                c.drawRoundRect(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE, 15, 15, paint);
+            c.drawRoundRect((size + 0.75f) * RESIZE, 3.75f * RESIZE, (size + 0.75f + 7f) * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+            c.drawRoundRect(3.75f * RESIZE, (size + 0.75f) * RESIZE, 10.75f * RESIZE, (size + 0.75f + 7f) * RESIZE, 15, 15, paint);
 
-                paint.setColor(WHITE);
-                c.drawRoundRect(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+            paint.setColor(colorBackground);
+            c.drawRoundRect(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
 //                5 width, 1.75 more than first
-                c.drawRoundRect((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
-                c.drawRoundRect(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE, 12.5f, 12.5f, paint);
-            }
-            else {
-                c.drawRoundRect(new RectF(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE), 15, 15, paint);
-                c.drawRoundRect(new RectF((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE), 15, 15, paint);
-                c.drawRoundRect(new RectF(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE), 15, 15, paint);
+            c.drawRoundRect((size + 1.75f) * RESIZE, 4.75f * RESIZE, (size + 1.75f + 5f) * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+            c.drawRoundRect(4.75f * RESIZE, (size + 1.75f) * RESIZE, 9.75f * RESIZE, (size + 1.75f + 5f) * RESIZE, 12.5f, 12.5f, paint);
 
-                paint.setColor(WHITE);
-                c.drawRoundRect(new RectF(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
-                c.drawRoundRect(new RectF((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
-                c.drawRoundRect(new RectF(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE), 12.5f, 12.5f, paint);
-            }
 
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
             c.drawCircle(7.25f*RESIZE, 7.25f*RESIZE, 12f, paint);
 //            4.25 more than first
             c.drawCircle((size+4.25f)*RESIZE, 7.25f*RESIZE, 12f, paint);
@@ -887,13 +872,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         if (scanOrCopyIsShown){
             logDebug("scanOrCopyIsShown");
-            if (qr != null) {
-                logDebug("QR not null");
-                ByteArrayOutputStream qrOutputStream = new ByteArrayOutputStream();
-                qr.compress(Bitmap.CompressFormat.JPEG, 100, qrOutputStream);
-                byte[] qrByteArray = qrOutputStream.toByteArray();
-                outState.putByteArray("qr", qrByteArray);
-            }
             outState.putString("seed", seed);
             outState.putStringArrayList("arraySeed", arraySeed);
         }

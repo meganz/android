@@ -225,4 +225,7 @@
 
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_500</color>
+
+    <!-- QR code page background color -->
+    <color name="white_grey_700">@color/grey_700</color>
 </resources>
