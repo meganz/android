@@ -549,7 +549,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_RUBBISH_BIN);
 	}
 
 	@Override
@@ -686,7 +686,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
-					putThumbnailLocation(intent, recyclerView, position, adapter);
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 
 					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -713,7 +713,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
-					putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
+					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 
@@ -827,7 +827,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
+					putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}

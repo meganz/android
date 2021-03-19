@@ -188,7 +188,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
 
-        observeDragSupportEvents(getViewLifecycleOwner(), listView);
+        observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_RECETS);
     }
 
     @Override
@@ -342,7 +342,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-            putThumbnailLocation(intent, listView, index, adapter);
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -407,7 +407,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         if (paramsSetSuccessfully) {
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-            putThumbnailLocation(intent, listView, index, adapter);
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);

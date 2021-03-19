@@ -47,6 +47,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 	}
 
+	@Override
+	protected int viewerFrom() {
+		return VIEWER_FROM_OUTGOING_SHARES;
+	}
+
 	private class ActionBarCallBack extends BaseActionBarCallBack {
 
 		public ActionBarCallBack(int currentTab) {

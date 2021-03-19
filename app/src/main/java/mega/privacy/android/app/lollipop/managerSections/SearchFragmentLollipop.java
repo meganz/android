@@ -630,7 +630,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop) context).showFabButton();
 		}
 
-		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_SEARCH);
 	}
 
 	public void newSearchNodesTask() {
@@ -734,7 +734,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
-					putThumbnailLocation(intent, recyclerView, position, adapter);
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 
 					manageNodes(intent);
 					startActivity(intent);
@@ -773,7 +773,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
+					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					manageNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
@@ -876,7 +876,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
+					putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						context.startActivity(pdfIntent);
 					}

@@ -297,7 +297,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 
 		recyclerView.setAdapter(adapterList);
 
-		observeDragSupportEvents(this, recyclerView);
+		observeDragSupportEvents(this, recyclerView, VIEWER_FROM_ZIP_BROWSER);
 	}
 
 	void orderZips () {
@@ -379,7 +379,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			intent.putExtra("orderGetChildren", orderGetChildren);
 
 			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, (long) name.hashCode());
-			putThumbnailLocation(intent, recyclerView, position, adapterList);
+			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_ZIP_BROWSER, adapterList);
 
 			startActivity(intent);
 			overridePendingTransition(0,0);
@@ -411,7 +411,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			mediaIntent.putExtra("parentNodeHandle", -1L);
 			mediaIntent.putExtra("offlinePathDirectory", absolutePath);
 			mediaIntent.putExtra("orderGetChildren", orderGetChildren);
-			putThumbnailLocation(mediaIntent, recyclerView, position, adapterList);
+			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_ZIP_BROWSER, adapterList);
 			mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && absolutePath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -456,7 +456,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", ZIP_ADAPTER);
 			pdfIntent.putExtra("path", currentFile.getAbsolutePath());
-			putThumbnailLocation(pdfIntent, recyclerView, position, adapterList);
+			putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_ZIP_BROWSER, adapterList);
 			pdfIntent.putExtra("offlinePathDirectory", absolutePath);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && absolutePath.contains(Environment.getExternalStorageDirectory().getPath())) {
 				pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());

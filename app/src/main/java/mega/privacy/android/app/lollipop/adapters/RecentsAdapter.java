@@ -229,6 +229,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
             holder.time.setText(item.getTime());
 
+            holder.imageThumbnail.setVisibility(View.VISIBLE);
+
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();
             params.width = params.height = dp2px(48, outMetrics);
             int margin = dp2px(12, outMetrics);

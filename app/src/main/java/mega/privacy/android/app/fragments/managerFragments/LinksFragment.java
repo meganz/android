@@ -47,6 +47,11 @@ public class LinksFragment extends MegaNodeBaseFragment {
         }
     }
 
+    @Override
+    protected int viewerFrom() {
+        return VIEWER_FROM_LINKS;
+    }
+
     private class ActionBarCallBack extends BaseActionBarCallBack {
 
         public ActionBarCallBack(int currentTab) {

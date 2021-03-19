@@ -149,7 +149,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             setViewModelDisplayParam(viewModel.path)
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!)
+        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!, VIEWER_FROM_OFFLINE)
     }
 
     private fun setViewModelDisplayParam(path: String) {
@@ -527,7 +527,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
                 intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle)
-                putThumbnailLocation(intent, recyclerView!!, position, adapter!!)
+                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
 
                 intent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
@@ -562,7 +562,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
-                putThumbnailLocation(mediaIntent, recyclerView!!, position, adapter!!)
+                putThumbnailLocation(mediaIntent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
 
                 mediaIntent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
@@ -620,7 +620,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
-                putThumbnailLocation(pdfIntent, recyclerView!!, position, adapter!!)
+                putThumbnailLocation(pdfIntent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
 
                 if (setLocalIntentParams(
                         context, node.node, pdfIntent, file.absolutePath, false,

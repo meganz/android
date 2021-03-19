@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemNodeGridBinding
@@ -29,12 +30,16 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi
+
+                    thumbnail.isVisible = true
                 }
                 is ItemNodeListBinding -> {
                     this.itemOperationViewModel = itemOperationViewModel
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi
+
+                    thumbnail.isVisible = true
                 }
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =

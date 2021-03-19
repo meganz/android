@@ -587,7 +587,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 
-		observeDragSupportEvents(this, listView);
+		observeDragSupportEvents(this, listView, VIEWER_FROM_FOLDER_LINK);
 
 		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
     }
@@ -1298,7 +1298,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					intent.putExtra("isFolderLink", true);
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
-					putThumbnailLocation(intent, listView, position, adapterList);
+					putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 
 					startActivity(intent);
 					overridePendingTransition(0,0);
@@ -1328,7 +1328,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					mediaIntent.putExtra("isFolderLink", true);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					putThumbnailLocation(mediaIntent, listView, position, adapterList);
+					putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1400,7 +1400,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);
 					pdfIntent.putExtra("inside", true);
-					putThumbnailLocation(pdfIntent, listView, position, adapterList);
+					putThumbnailLocation(pdfIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					if (isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
 						startActivity(pdfIntent);
 					}

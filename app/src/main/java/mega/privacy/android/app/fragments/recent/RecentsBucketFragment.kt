@@ -80,7 +80,7 @@ class RecentsBucketFragment : BaseFragment() {
             checkScroll()
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, listView)
+        observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
@@ -200,7 +200,7 @@ class RecentsBucketFragment : BaseFragment() {
         val intent = Intent(context, PdfViewerActivityLollipop::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
@@ -241,7 +241,7 @@ class RecentsBucketFragment : BaseFragment() {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
 
         if (isMedia) {
@@ -298,7 +298,7 @@ class RecentsBucketFragment : BaseFragment() {
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
 
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
-        putThumbnailLocation(intent, listView, index, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
 
         intent.putExtra(HANDLE, node.handle)
         intent.putExtra(NODE_HANDLES, getNodesHandles(true))

@@ -171,7 +171,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getNodePosition(long handle) {
         for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getHandle() == handle) {
+            MegaNode node = nodes.get(i);
+            if (node != null && node.getHandle() == handle) {
                 return i;
             }
         }
@@ -866,6 +867,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
         }
+
+        holder.imageView.setVisibility(View.VISIBLE);
 
         if (node.isFolder()) {
 

@@ -144,6 +144,8 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 
 		String nameFile = zipNode.getName();
 
+		holder.imageView.setVisibility(View.VISIBLE);
+
 		if (nameFile.equals(context.getString(R.string.transfer_unknown))) {
 			holder.isUnknownFile = true;
 			holder.textViewFileName.setText(nameFile);

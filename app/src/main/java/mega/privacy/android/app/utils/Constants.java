@@ -290,6 +290,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
+    public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
@@ -353,6 +354,23 @@ public class Constants {
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
 
+    public static final int VIEWER_FROM_PHOTOS = 1;
+    public static final int VIEWER_FROM_INCOMING_SHARES = 2;
+    public static final int VIEWER_FROM_OUTGOING_SHARES = 3;
+    public static final int VIEWER_FROM_LINKS = 4;
+    public static final int VIEWER_FROM_DOCUMENTS = 5;
+    public static final int VIEWER_FROM_VIDEOS = 6;
+    public static final int VIEWER_FROM_OFFLINE = 7;
+    public static final int VIEWER_FROM_RECETS_BUCKET = 8;
+    public static final int VIEWER_FROM_CUMU = 9;
+    public static final int VIEWER_FROM_RECETS = 10;
+    public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
+    public static final int VIEWER_FROM_FOLDER_LINK = 12;
+    public static final int VIEWER_FROM_ZIP_BROWSER = 13;
+    public static final int VIEWER_FROM_FILE_BROWSER = 14;
+    public static final int VIEWER_FROM_INBOX = 15;
+    public static final int VIEWER_FROM_RUBBISH_BIN = 16;
+    public static final int VIEWER_FROM_SEARCH = 17;
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
     public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";

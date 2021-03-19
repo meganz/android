@@ -90,7 +90,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, listView)
+        observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_PHOTOS)
     }
 
     private fun setupEmptyHint() {
@@ -376,7 +376,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
             (listView.adapter as? DragThumbnailGetter)?.let {
-                putThumbnailLocation(intent, listView, nodeItem.index, it)
+                putThumbnailLocation(intent, listView, nodeItem.index, VIEWER_FROM_PHOTOS, it)
             }
 
             startActivity(intent)

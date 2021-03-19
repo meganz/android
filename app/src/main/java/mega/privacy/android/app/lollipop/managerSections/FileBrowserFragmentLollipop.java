@@ -590,7 +590,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_FILE_BROWSER);
 	}
 
 	@Override
@@ -636,7 +636,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
 
 			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-			putThumbnailLocation(intent, recyclerView, position, adapter);
+			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -668,7 +668,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
 			mediaIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
-			putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
+			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 
 			mediaIntent.putExtra("FILENAME", file.getName());
 
@@ -871,7 +871,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 			}
 			pdfIntent.putExtra("HANDLE", file.getHandle());
-			putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
+			putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 			if (isIntentAvailable(context, pdfIntent)) {
 				context.startActivity(pdfIntent);
 			} else {

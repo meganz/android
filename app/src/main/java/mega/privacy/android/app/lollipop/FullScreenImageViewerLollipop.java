@@ -755,8 +755,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		super.onCreate(savedInstanceState);
 		setContentView(dragToExit.wrapContentView(R.layout.activity_full_screen_image_viewer));
 
-		dragToExit.observeThumbnailLocation(this);
-
 		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
 
 		handler = new Handler();
@@ -786,6 +784,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		fragmentContainer = findViewById(R.id.full_image_viewer_parent_layout);
 
 		Intent intent = getIntent();
+
+		dragToExit.setViewerFrom(intent.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE));
+		dragToExit.observeThumbnailLocation(this);
+
 		positionG = intent.getIntExtra("position", 0);
 		//If inserted a placehoder in MegaNodeAdapter,here the position need to be remove the placeholder.
         placeholderCount = intent.getIntExtra("placeholder",0 );

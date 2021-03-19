@@ -666,7 +666,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         if (intent != null) {
             if (internalIntent || isIntentAvailable(context, intent)) {
-                putThumbnailLocation(intent, recyclerView, position, adapter);
+                putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
                 context.startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
 
@@ -678,6 +678,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
+
+    protected abstract int viewerFrom();
 
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
@@ -823,6 +825,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
                 managerActivity.getOutMetrics());
 
-        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
     }
 }

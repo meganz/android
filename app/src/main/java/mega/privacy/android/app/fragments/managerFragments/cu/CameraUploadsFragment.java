@@ -69,6 +69,7 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
 import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
 import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
@@ -547,7 +548,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 .observe(getViewLifecycleOwner(), enabled -> mBinding.turnOnCuButton.setVisibility(
                         enabled ? View.GONE : View.VISIBLE));
 
-        observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList);
+        observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList, VIEWER_FROM_CUMU);
     }
 
     @Override
@@ -653,7 +654,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
         }
 
-        putThumbnailLocation(intent, mBinding.cuList, position, mAdapter);
+        putThumbnailLocation(intent, mBinding.cuList, position, VIEWER_FROM_CUMU, mAdapter);
     }
 
     private void launchNodeViewer(Intent intent) {

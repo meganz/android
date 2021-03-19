@@ -399,7 +399,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		observeDragSupportEvents(getViewLifecycleOwner(), listView);
+		observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_CONTACT_FILE_LIST);
 	}
 
     public void checkScroll() {
@@ -567,7 +567,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, contactNodes.get(position).getHandle());
-					putThumbnailLocation(intent, listView, position, adapter);
+					putThumbnailLocation(intent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
 
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
@@ -602,7 +602,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
-					putThumbnailLocation(mediaIntent, listView, position, adapter);
+					putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 
@@ -700,7 +700,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					putThumbnailLocation(pdfIntent, listView, position, adapter);
+					putThumbnailLocation(pdfIntent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}

@@ -553,7 +553,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView);
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_INBOX);
 	}
 
 	public void refresh(){
@@ -594,7 +594,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
 
 			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-			putThumbnailLocation(intent, recyclerView, position, adapter);
+			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
 
 			context.startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -624,7 +624,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
-			putThumbnailLocation(mediaIntent, recyclerView, position, adapter);
+			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
 			mediaIntent.putExtra("placeholder", placeholderCount);
 			mediaIntent.putExtra("HANDLE", file.getHandle());
 			mediaIntent.putExtra("FILENAME", file.getName());
@@ -720,7 +720,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 			}
 			pdfIntent.putExtra("HANDLE", file.getHandle());
-			putThumbnailLocation(pdfIntent, recyclerView, position, adapter);
+			putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
 			if (isIntentAvailable(context, pdfIntent)) {
 				startActivity(pdfIntent);
 			} else {

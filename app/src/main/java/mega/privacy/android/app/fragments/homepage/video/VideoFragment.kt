@@ -98,7 +98,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, listView)
+        observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_VIDEOS)
     }
 
     private fun setupEmptyHint() {
@@ -380,7 +380,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         (listView.adapter as? DragThumbnailGetter)?.let {
-            putThumbnailLocation(intent, listView, index, it)
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_VIDEOS, it)
         }
 
         val localPath = FileUtil.getLocalFile(context, file.name, file.size)

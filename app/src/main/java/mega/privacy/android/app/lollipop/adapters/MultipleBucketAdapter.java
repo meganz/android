@@ -115,7 +115,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     @Override
     public int getNodePosition(long handle) {
         for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getHandle() == handle) {
+            MegaNode node = nodes.get(i);
+            if (node != null && node.getHandle() == handle) {
                 return i;
             }
         }
@@ -199,6 +200,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 holder.videoLayout.setVisibility(View.GONE);
             }
 
+            holder.thumbnailMedia.setVisibility(View.VISIBLE);
+
             int size;
             if (isScreenInPortrait(context)) {
                 size = outMetrics.widthPixels / 4;
@@ -220,6 +223,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(node.getName());
             holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
+
+            holder.thumbnailList.setVisibility(View.VISIBLE);
 
             if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
                 Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
