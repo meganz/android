@@ -2,12 +2,12 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import androidx.core.view.isVisible
+import android.view.View
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetUploadBinding
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
-class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
 
     private lateinit var listener: UploadBottomSheetDialogActionListener
 
@@ -24,37 +24,27 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         mainLinearLayout = binding.uploadBottomSheet
         items_layout = binding.itemsLayout
 
-        if (context is ManagerActivityLollipop) {
-            binding.newFolderLayout.isVisible = true
-            binding.createFolderSeparator.isVisible = true
-        }
-
-        binding.uploadFromDeviceLayout.setOnClickListener {
-            listener.uploadFromDevice()
-            setStateBottomSheetBehaviorHidden()
-        }
-
-        binding.uploadFromSystemLayout.setOnClickListener {
-            listener.uploadFromSystem()
-            setStateBottomSheetBehaviorHidden()
-        }
-
-        binding.scanDocumentLayout.setOnClickListener {
-            listener.scanDocument()
-            setStateBottomSheetBehaviorHidden()
-        }
-
-        binding.takePictureLayout.setOnClickListener {
-            listener.takePictureAndUpload()
-            setStateBottomSheetBehaviorHidden()
-        }
-
-        binding.newFolderLayout.setOnClickListener {
-            listener.showNewFolderDialog()
-            setStateBottomSheetBehaviorHidden()
-        }
+        binding.uploadFromDeviceLayout.setOnClickListener(this)
+        binding.uploadFromSystemLayout.setOnClickListener(this)
+        binding.scanDocumentLayout.setOnClickListener(this)
+        binding.takePictureLayout.setOnClickListener(this)
+        binding.newFolderLayout.setOnClickListener(this)
+        binding.newTxtLayout.setOnClickListener(this)
 
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.upload_from_device_layout -> listener.uploadFromDevice()
+            R.id.upload_from_system_layout -> listener.uploadFromSystem()
+            R.id.scan_document -> listener.scanDocument()
+            R.id.take_picture_layout -> listener.takePictureAndUpload()
+            R.id.new_folder_layout -> listener.showNewFolderDialog()
+            R.id.new_txt_layout -> listener.createAndOpenNewTextFile()
+        }
+
+        setStateBottomSheetBehaviorHidden()
     }
 }

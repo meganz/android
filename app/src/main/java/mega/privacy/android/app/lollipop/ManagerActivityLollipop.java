@@ -9577,6 +9577,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
+	@Override
+	public void createAndOpenNewTextFile() {
+
+	}
+
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();

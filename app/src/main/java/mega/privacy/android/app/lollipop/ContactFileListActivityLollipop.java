@@ -251,6 +251,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
+	public void createAndOpenNewTextFile() {
+
+	}
+
+	@Override
 	public void createFolder(@NotNull String title) {
 
 		logDebug("createFolder");

@@ -135,6 +135,7 @@
                     android:paddingBottom="2dp"
                     android:text="@string/menu_scan_document"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -204,6 +205,38 @@
                     android:text="@string/action_create_folder"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/new_txt_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/new_txt"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_new_folder"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
+
+                <TextView
+                    android:id="@+id/new_txt_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/action_create_txt"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

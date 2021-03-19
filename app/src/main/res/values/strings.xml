@@ -98,6 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
+    <string name="action_create_txt" context="Option which allows create a new text file">Create new text file</string>
     <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Open link</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
