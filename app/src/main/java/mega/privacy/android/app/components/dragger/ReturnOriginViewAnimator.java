@@ -49,6 +49,8 @@ public class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAn
                         dragListener.onDrag(draggableView, 0, 0);
                     }
                     draggableView.setAnimating(false);
+
+                    ViewCompat.animate(draggableView).setListener(null);
                 }
             });
 

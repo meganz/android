@@ -89,12 +89,14 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
                                 DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
                                 if (dragListener != null) {
-                                    dragListener.onDragCancelled(draggableView);
+                                    dragListener.onDraggedEnded(draggableView, direction);
                                     dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                                 }
 
                                 draggableView.setAnimating(false);
                                 listener.fadeOutFinish();
+
+                                ViewCompat.animate(draggableView).setListener(null);
                             }
                         });
             }
@@ -124,12 +126,14 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
                                 DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
                                 if (dragListener != null) {
-                                    dragListener.onDragCancelled(draggableView);
+                                    dragListener.onDraggedEnded(draggableView, direction);
                                     dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                                 }
 
                                 draggableView.setAnimating(false);
                                 listener.fadeOutFinish();
+
+                                ViewCompat.animate(draggableView).setListener(null);
                             }
                         });
             }
@@ -159,12 +163,14 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
                             DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
                             if (dragListener != null) {
-                                dragListener.onDragCancelled(draggableView);
+                                dragListener.onDraggedEnded(draggableView, direction);
                                 dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                             }
 
                             draggableView.setAnimating(false);
                             listener.fadeOutFinish();
+
+                            ViewCompat.animate(draggableView).setListener(null);
                         }
                     });
         }

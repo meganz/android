@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -36,7 +37,7 @@ class DragToExitSupport(
     private val context: Context,
     private val dragActivated: ((Boolean) -> Unit)?,
     private val fadeOutFinishCallback: (() -> Unit)?
-) : DraggableView.DraggableListener, ViewAnimator.Listener {
+) : DraggableView.DraggableListener, ViewAnimator.Listener, DraggableView.DraggableViewListener {
     private var draggableView: DraggableView? = null
     private var ivShadow: ImageView? = null
 
@@ -65,6 +66,7 @@ class DragToExitSupport(
         draggable.setDraggableListener(this)
         draggable.setViewAnimator(ExitViewAnimator())
         draggable.addView(contentView)
+        draggable.setDragListener(this)
 
         val shadow = ImageView(context)
         shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_alpha_060));
@@ -176,6 +178,7 @@ class DragToExitSupport(
                     .setInterpolator(DecelerateInterpolator())
                     .withEndAction {
                         animationCallback(false)
+                        ivShadow?.isVisible = false
                     }
 
                 ivShadow?.animate()
@@ -238,6 +241,9 @@ class DragToExitSupport(
     }
 
     override fun onDragActivated(activated: Boolean) {
+        if (activated) {
+            ivShadow?.isVisible = true
+        }
         dragActivated?.invoke(activated)
     }
 
@@ -249,6 +255,19 @@ class DragToExitSupport(
 
     override fun fadeOutFinish() {
         fadeOutFinishCallback?.invoke()
+    }
+
+    override fun onDrag(draggableView: DraggableView?, percentX: Float, percentY: Float) {
+    }
+
+    override fun onDraggedStarted(draggableView: DraggableView?, direction: Direction?) {
+    }
+
+    override fun onDraggedEnded(draggableView: DraggableView?, direction: Direction?) {
+    }
+
+    override fun onDragCancelled(draggableView: DraggableView?) {
+        ivShadow?.isVisible = false
     }
 
     companion object {
