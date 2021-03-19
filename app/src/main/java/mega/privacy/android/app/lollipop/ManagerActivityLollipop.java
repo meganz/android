@@ -14371,50 +14371,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 	}
 
-	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
-		logDebug("openAdvancedDevices");
-//		handleToDownload = handle;
-		String externalPath = getExternalCardPath();
-
-		if(externalPath!=null){
-			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
-			if(node!=null){
-
-//				File newFile =  new File(externalPath+"/"+node.getName());
-				File newFile =  new File(node.getName());
-				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-
-				// Filter to only show results that can be "opened", such as
-				// a file (as opposed to a list of contacts or timezones).
-				intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-				// Create a file with the requested MIME type.
-				String mimeType = MimeTypeList.getMimeType(newFile);
-				logDebug("Mimetype: " + mimeType);
-				intent.setType(mimeType);
-				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
-				intent.putExtra("handleToDownload", handleToDownload);
-				intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
-
-				try{
-					startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
-				}
-				catch(Exception e){
-					logError("Exception in External SDCARD", e);
-					Environment.getExternalStorageDirectory();
-					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-					toast.show();
-				}
-			}
-		}
-		else{
-			logWarning("No external SD card");
-			Environment.getExternalStorageDirectory();
-			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-			toast.show();
-		}
-	}
-
 	public AndroidCompletedTransfer getSelectedTransfer() {
 		return selectedTransfer;
 	}
