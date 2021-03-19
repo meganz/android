@@ -313,7 +313,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			if (request.getType() == MegaRequest.TYPE_LOGIN) {
+				if (e.getErrorCode() == MegaError.API_OK) {
+					sortOrderManagement.createInstance();
+				}
+			} else if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("END logout sdk request - wait chat logout");
@@ -1230,6 +1234,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+
+			sortOrderManagement.destroyInstance();
 
 			try{
 				if (megaChatApi != null){

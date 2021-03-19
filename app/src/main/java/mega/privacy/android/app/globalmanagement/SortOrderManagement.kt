@@ -15,6 +15,13 @@ class SortOrderManagement @Inject constructor(private val dbH: DatabaseHandler) 
     private var orderCamera: Int = ORDER_MODIFICATION_DESC
 
     init {
+        initInstance()
+    }
+
+    /**
+     * Initializes all the available orders getting their values from database if exist.
+     */
+    private fun initInstance() {
         val prefs = dbH.preferences
 
         if (prefs != null) {
@@ -34,6 +41,25 @@ class SortOrderManagement @Inject constructor(private val dbH: DatabaseHandler) 
                 orderOthers = prefs.preferredSortOthers.toInt()
             }
         }
+    }
+
+    /**
+     * Sets all the available orders to the value by default
+     * and initializes them getting their values from database if exist.
+     */
+    fun createInstance() {
+        destroyInstance()
+        initInstance()
+    }
+
+    /**
+     * Sets all the available orders to the value by default.
+     */
+    fun destroyInstance() {
+        orderCloud = ORDER_DEFAULT_ASC
+        orderContacts = ORDER_DEFAULT_ASC
+        orderOthers = ORDER_DEFAULT_ASC
+        orderCamera = ORDER_MODIFICATION_DESC
     }
 
     fun getOrderCloud(): Int {
