@@ -24,12 +24,12 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         mainLinearLayout = binding.uploadBottomSheet
         items_layout = binding.itemsLayout
 
-        binding.uploadFromDeviceLayout.setOnClickListener(this)
-        binding.uploadFromSystemLayout.setOnClickListener(this)
-        binding.scanDocumentLayout.setOnClickListener(this)
-        binding.takePictureLayout.setOnClickListener(this)
-        binding.newFolderLayout.setOnClickListener(this)
-        binding.newTxtLayout.setOnClickListener(this)
+        binding.uploadFromDeviceOption.setOnClickListener(this)
+        binding.uploadFromSystemOption.setOnClickListener(this)
+        binding.scanDocumentOption.setOnClickListener(this)
+        binding.takePictureOption.setOnClickListener(this)
+        binding.newFolderOption.setOnClickListener(this)
+        binding.newTxtOption.setOnClickListener(this)
 
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
@@ -37,12 +37,12 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.upload_from_device_layout -> listener.uploadFromDevice()
-            R.id.upload_from_system_layout -> listener.uploadFromSystem()
-            R.id.scan_document -> listener.scanDocument()
-            R.id.take_picture_layout -> listener.takePictureAndUpload()
-            R.id.new_folder_layout -> listener.showNewFolderDialog()
-            R.id.new_txt_layout -> listener.createAndOpenNewTextFile()
+            R.id.upload_from_device_option -> listener.uploadFromDevice()
+            R.id.upload_from_system_option -> listener.uploadFromSystem()
+            R.id.scan_document_option -> listener.scanDocument()
+            R.id.take_picture_option -> listener.takePictureAndUpload()
+            R.id.new_folder_option -> listener.showNewFolderDialog()
+            R.id.new_txt_option -> listener.createAndOpenNewTextFile()
         }
 
         setStateBottomSheetBehaviorHidden()
