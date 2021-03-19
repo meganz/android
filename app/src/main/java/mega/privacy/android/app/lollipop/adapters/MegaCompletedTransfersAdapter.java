@@ -2,11 +2,11 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.PorterDuff;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -150,6 +150,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:
 				holder.textViewCompleted.setText(transfer.getPath());
+				holder.imageViewCompleted.setColorFilter(ContextCompat.getColor(context, R.color.green_500_300), PorterDuff.Mode.SRC_IN);
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed);
 				break;
 
@@ -168,6 +169,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 			default:
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
+				holder.imageViewCompleted.clearColorFilter();
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
 		}

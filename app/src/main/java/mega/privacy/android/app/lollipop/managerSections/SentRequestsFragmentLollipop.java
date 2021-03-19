@@ -277,9 +277,9 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			if (adapterList.getItemCount() == 0) {
 				logDebug("adapterList.getItemCount() == 0");
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.sent_request_empty_landscape);
+					emptyImageView.setImageResource(R.drawable.empty_sent_request_landscape);
 				}else{
-					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
+					emptyImageView.setImageResource(R.drawable.empty_sent_request_portrait);
 				}
 				String textToShow = String.format(getString(R.string.sent_requests_empty)).toUpperCase();
 				try{
@@ -388,11 +388,11 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.sent_request_empty_landscape);
-				}else{
-					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
-				}
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    emptyImageView.setImageResource(R.drawable.empty_sent_request_landscape);
+                }else{
+                    emptyImageView.setImageResource(R.drawable.empty_sent_request_portrait);
+                }
 				String textToShow = String.format(getString(R.string.sent_requests_empty).toUpperCase());
 				try{
 					textToShow = textToShow.replace(

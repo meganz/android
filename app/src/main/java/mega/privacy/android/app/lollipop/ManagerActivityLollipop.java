@@ -82,6 +82,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -225,6 +226,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
@@ -3598,50 +3600,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		int chatStatus = megaChatApi.getOnlineStatus();
 		if (contactStatus != null) {
-			switch (chatStatus) {
-				case MegaChatApi.STATUS_ONLINE: {
-					logDebug("Online");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_online_dark_drawer
-									: R.drawable.ic_online_light));
-					break;
-				}
-				case MegaChatApi.STATUS_AWAY: {
-					logDebug("Away");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_away_dark_drawer
-									: R.drawable.ic_away_light));
-					break;
-				}
-				case MegaChatApi.STATUS_BUSY: {
-					logDebug("Busy");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_busy_dark_drawer
-									: R.drawable.ic_busy_light));
-					break;
-				}
-				case MegaChatApi.STATUS_OFFLINE: {
-					logDebug("Offline");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_offline_dark_drawer
-									: R.drawable.ic_offline_light));
-					break;
-				}
-				case MegaChatApi.STATUS_INVALID: {
-					logWarning("Invalid");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-				default: {
-					logDebug("Default");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-			}
+			ChatUtil.setContactStatus(chatStatus, contactStatus, StatusIconLocation.DRAWER);
 		}
 	}
 
@@ -9323,6 +9282,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				verify2FADialogIsShown = false;
 			}
 		});
+
+        Window window = verify2FADialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
 		verify2FADialog.show();
 		verify2FADialogIsShown = true;
 	}
@@ -15603,7 +15566,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
 				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
-				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+				drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
 		}

@@ -16,9 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -508,6 +506,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
+
+    /**
+     * Current contact online status.
+     */
+    private int contactOnlineStatus;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -1381,6 +1384,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (listView == null) return;
 
         Util.changeToolBarElevation(this, tB, listView.canScrollVertically(-1) || adapter.isMultipleSelect());
+        setStatusIcon();
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
@@ -2193,51 +2197,22 @@ public class ChatActivityLollipop extends PinActivityLollipop
             individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
         }
         else if(!chatRoom.isGroup()){
-            int state = megaChatApi.getUserOnlineStatus(userHandle);
-
-            if(state == MegaChatApi.STATUS_ONLINE){
-                logDebug("This user is connected");
-                individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.online_status)));
-                iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
-                        Util.isDarkMode(this) ? R.drawable.ic_online_dark_appbar
-                                : R.drawable.ic_online_light));
-            }
-            else if(state == MegaChatApi.STATUS_AWAY){
-                logDebug("This user is away");
-                individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
-                iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
-                        Util.isDarkMode(this) ? R.drawable.ic_away_dark_appbar
-                                : R.drawable.ic_away_light));
-            }
-            else if(state == MegaChatApi.STATUS_BUSY){
-                logDebug("This user is busy");
-                individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
-                iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
-                        Util.isDarkMode(this) ? R.drawable.ic_busy_dark_appbar
-                                : R.drawable.ic_busy_light));
-            }
-            else if(state == MegaChatApi.STATUS_OFFLINE){
-                logDebug("This user is offline");
-                individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
-                iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
-                        Util.isDarkMode(this) ? R.drawable.ic_offline_dark_appbar
-                                : R.drawable.ic_offline_light));
-            }
-            else if(state == MegaChatApi.STATUS_INVALID){
-                logWarning("INVALID status: " + state);
-                individualSubtitleToobar.setText(null);
-                individualSubtitleToobar.setVisibility(View.GONE);
-            }
-            else{
-                logDebug("This user status is: " + state);
-                individualSubtitleToobar.setText(null);
-                individualSubtitleToobar.setVisibility(View.GONE);
-            }
+            contactOnlineStatus = megaChatApi.getUserOnlineStatus(userHandle);
+            setStatusIcon();
         }
+    }
+
+    /**
+     * Set status icon image resource depends on online state and toolbar's elevation.
+     */
+    private void setStatusIcon() {
+        if(listView == null || adapter == null || iconStateToolbar == null || individualSubtitleToobar == null) {
+            return;
+        }
+
+        boolean withElevation = listView.canScrollVertically(-1) || adapter.isMultipleSelect();
+        StatusIconLocation where = withElevation ? StatusIconLocation.APPBAR : StatusIconLocation.STANDARD;
+        setContactStatus(contactOnlineStatus, iconStateToolbar, individualSubtitleToobar, where);
     }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){

@@ -103,6 +103,7 @@ import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1896,7 +1897,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
