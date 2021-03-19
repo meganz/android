@@ -21,7 +21,7 @@
                 android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
                 app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps.Variant"
                 app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleTextAppearance="?attr/textAppearanceSubtitle1"
+                app:expandedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <RelativeLayout
