@@ -126,7 +126,9 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
 
-        mBehavior.setPeekHeight(getPeekHeight());
+        if (items_layout != null) {
+            mBehavior.setPeekHeight(getPeekHeight());
+        }
         mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         if (addBottomSheetCallBack) {
@@ -165,7 +167,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
                         int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
                         int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                        if (mainLinearLayout.getHeight() > maxHeight) {
+                        if (mainLinearLayout != null && mainLinearLayout.getHeight() > maxHeight) {
                             params.height = maxHeight;
                             bottomSheet.setLayoutParams(params);
                         }

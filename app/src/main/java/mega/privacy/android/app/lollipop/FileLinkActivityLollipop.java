@@ -54,7 +54,6 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -203,7 +202,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}else{
 			collapsingToolbar.setExpandedTitleMarginBottom(scaleHeightPx(35, outMetrics));
 		}
-		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.divider_width));
+		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.bottom_sheet_item_divider_margin_start));
 		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();

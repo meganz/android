@@ -11,6 +11,7 @@ import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 
@@ -128,6 +129,31 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onParticipantOption(participant: Participant) {
-        Toast.makeText(this, "onParticipantOption ${participant.name}", Toast.LENGTH_SHORT).show()
+        val bottomSheetDialogFragment = MeetingParticipantBottomSheetDialogFragment()
+        bottomSheetDialogFragment.show(supportFragmentManager, bottomSheetDialogFragment.tag)
+    }
+
+    override fun onAddContact() {
+        Toast.makeText(this, "onAddContact", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onContactInfo() {
+        Toast.makeText(this, "onContactInfo", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onSendMessage() {
+        Toast.makeText(this, "onSendMessage", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onPingToSpeakerView() {
+        Toast.makeText(this, "onPingToSpeakerView", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMakeModerator() {
+        Toast.makeText(this, "onMakeModerator", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onRemoveParticipant() {
+        Toast.makeText(this, "onRemoveParticipant", Toast.LENGTH_SHORT).show()
     }
 }

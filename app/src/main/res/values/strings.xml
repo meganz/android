@@ -3072,5 +3072,8 @@
     <string name="meeting_end" context="Label for end meeting">End</string>
     <string name="invite_participants" context="Invite contacts as participants of the meeting">Invite Participants</string>
     <string name="participants_number" context="The number of participants in the meeting">In the meeting (%d)</string>
+    <string name="ping_to_speaker" context="Ping the participant to speaker view in the meeting">Pin to Speaker View</string>
+    <string name="make_moderator" context="Make the participant as moderator in the meeting">Make moderator</string>
+    <string name="remove_participant" context="Remove the participant from meeting">Remove participant</string>
 
 </resources>
