@@ -1,18 +1,27 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+
 
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     companion object{
@@ -39,17 +48,24 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
+    private val networkReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null) return
+
+            when (intent.getIntExtra(BroadcastConstants.ACTION_TYPE, -1)) {
+                Constants.GO_OFFLINE -> getCurrentFragment()?.processOfflineMode()
+                Constants.GO_ONLINE -> getCurrentFragment()?.processOnlineMode()
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-
-        val actionBar = supportActionBar ?: return
-        actionBar.setHomeButtonEnabled(true)
-        actionBar.setDisplayHomeAsUpEnabled(true)
+        initReceiver()
+        initActionBar()
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -66,8 +82,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         }
         val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
         when(intent.getStringExtra(MEETING_TYPE)){
-            MEETING_TYPE_JOIN->navGraph.startDestination = R.id.joinMeetingFragment
-            MEETING_TYPE_CREATE->navGraph.startDestination = R.id.createMeetingFragment
+            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
+            MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
         }
         navController.graph = navGraph
 
@@ -99,6 +115,29 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         updateRole()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(networkReceiver)
+    }
+
+    private fun initReceiver() {
+        registerReceiver(
+            networkReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
+        )
+    }
+
+    private fun initActionBar() {
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar ?: return
+        actionBar.setHomeButtonEnabled(true)
+        actionBar.setDisplayHomeAsUpEnabled(true)
+    }
+
+    fun getCurrentFragment(): MeetingBaseFragment? {
+        val navHostFragment: Fragment? =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
+    }
     override fun onChangeMicState(micOn: Boolean) {
         Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
     }

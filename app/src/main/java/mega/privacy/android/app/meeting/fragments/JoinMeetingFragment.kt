@@ -17,7 +17,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [JoinMeetingFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class JoinMeetingFragment : Fragment() {
+class JoinMeetingFragment : MeetingBaseFragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var viewModel: JoinMeetingViewModel
