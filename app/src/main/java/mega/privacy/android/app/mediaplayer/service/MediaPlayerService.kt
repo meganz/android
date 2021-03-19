@@ -48,7 +48,8 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     @Inject
     lateinit var dbHandler: DatabaseHandler
 
-    private val binder = MediaPlayerServiceBinder(this)
+    private lateinit var binder: MediaPlayerServiceBinder
+    private var initialized = false
 
     lateinit var viewModel: MediaPlayerServiceViewModel
 
@@ -90,6 +91,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
 
+        binder = MediaPlayerServiceBinder(this)
         viewModel = MediaPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
@@ -248,13 +250,21 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
         when (intent.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
             COMMAND_PAUSE -> {
-                if (playing()) {
-                    exoPlayer.playWhenReady = false
-                    needPlayWhenReceiveResumeCommand = true
+                if (initialized) {
+                    if (playing()) {
+                        exoPlayer.playWhenReady = false
+                        needPlayWhenReceiveResumeCommand = true
+                    }
+                } else {
+                    stopSelf()
                 }
             }
             COMMAND_RESUME -> {
-                mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
+                if (initialized) {
+                    mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
+                } else {
+                    stopSelf()
+                }
             }
             COMMAND_STOP -> {
                 stopAudioPlayer()
@@ -264,8 +274,12 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     createPlayerControlNotification()
                 }
 
-                if (viewModel.buildPlayerSource(intent) && viewModel.audioPlayer) {
-                    MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                if (viewModel.buildPlayerSource(intent)) {
+                    initialized = true
+
+                    if (viewModel.audioPlayer) {
+                        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                    }
                 }
             }
         }
