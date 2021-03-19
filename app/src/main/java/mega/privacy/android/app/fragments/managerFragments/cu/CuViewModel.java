@@ -73,13 +73,13 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-                       Context context, int type) {
+                       Context context, int type, long[] cuSearchDate) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mAppContext = context.getApplicationContext();
         mType = type;
-
+        mSearchDate = cuSearchDate;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {

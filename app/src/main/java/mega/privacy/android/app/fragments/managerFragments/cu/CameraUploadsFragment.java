@@ -112,6 +112,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private long mDraggingNodeHandle = INVALID_HANDLE;
 
     private static final String AD_SLOT = "and3";
+    private static long[] cuSearchDate = null;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -132,6 +133,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public void setSearchDate(long[] searchDate, int orderBy) {
+        cuSearchDate = searchDate;
         mViewModel.setSearchDate(searchDate, orderBy);
     }
 
@@ -165,7 +167,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(mManagerActivity.orderCamera);
+            // When press back, reload all files.
+            setSearchDate(null, mManagerActivity.orderCamera);
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
@@ -377,7 +380,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
@@ -647,7 +650,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         super.onResume();
 
         mDraggingNodeHandle = INVALID_HANDLE;
-        reloadNodes(mManagerActivity.orderCamera);
     }
 
     private void openNode(int position, CuNode cuNode) {
