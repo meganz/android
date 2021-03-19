@@ -7,7 +7,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SortOrderManagement @Inject constructor(private val dbH: DatabaseHandler) {
+class SortOrderManagement @Inject constructor(
+    private val dbH: DatabaseHandler
+) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
     private var orderContacts: Int = ORDER_DEFAULT_ASC
@@ -15,83 +17,59 @@ class SortOrderManagement @Inject constructor(private val dbH: DatabaseHandler) 
     private var orderCamera: Int = ORDER_MODIFICATION_DESC
 
     init {
-        initInstance()
+        initialize()
     }
 
     /**
      * Initializes all the available orders getting their values from database if exist.
      */
-    private fun initInstance() {
-        val prefs = dbH.preferences
+    fun initialize() {
+        resetDefaults()
 
-        if (prefs != null) {
-            if (prefs.preferredSortCloud != null) {
-                orderCloud = prefs.preferredSortCloud.toInt()
-            }
-
-            if (prefs.preferredSortContacts != null) {
-                orderContacts = prefs.preferredSortContacts.toInt()
-            }
-
-            if (prefs.preferredSortCameraUpload != null) {
-                orderCamera = prefs.preferredSortCameraUpload.toInt()
-            }
-
-            if (prefs.preferredSortOthers != null) {
-                orderOthers = prefs.preferredSortOthers.toInt()
-            }
+        dbH.preferences?.apply {
+            preferredSortCloud?.toInt()?.let { orderCloud = it }
+            preferredSortContacts?.toInt()?.let { orderContacts = it }
+            preferredSortCameraUpload?.toInt()?.let { orderCamera = it }
+            preferredSortOthers?.toInt()?.let { orderOthers = it }
         }
     }
 
     /**
      * Sets all the available orders to the value by default
-     * and initializes them getting their values from database if exist.
      */
-    fun createInstance() {
-        destroyInstance()
-        initInstance()
-    }
-
-    /**
-     * Sets all the available orders to the value by default.
-     */
-    fun destroyInstance() {
+    fun resetDefaults() {
         orderCloud = ORDER_DEFAULT_ASC
         orderContacts = ORDER_DEFAULT_ASC
         orderOthers = ORDER_DEFAULT_ASC
         orderCamera = ORDER_MODIFICATION_DESC
     }
 
-    fun getOrderCloud(): Int {
-        return orderCloud
-    }
+    fun getOrderCloud(): Int =
+        orderCloud
 
     fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud
         dbH.setPreferredSortCloud(orderCloud.toString())
     }
 
-    fun getOrderContacts(): Int {
-        return orderContacts
-    }
+    fun getOrderContacts(): Int =
+        orderContacts
 
     fun setOrderContacts(newOrderContacts: Int) {
         orderContacts = newOrderContacts
         dbH.setPreferredSortContacts(orderContacts.toString())
     }
 
-    fun getOrderCamera(): Int {
-        return orderCamera
-    }
+    fun getOrderCamera(): Int =
+        orderCamera
 
     fun setOrderCamera(newOrderCamera: Int) {
         orderCamera = newOrderCamera
         dbH.setPreferredSortCameraUpload(orderCamera.toString())
     }
 
-    fun getOrderOthers(): Int {
-        return orderOthers
-    }
+    fun getOrderOthers(): Int =
+        orderOthers
 
     fun setOrderOthers(newOrderOthers: Int) {
         orderOthers = newOrderOthers
