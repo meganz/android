@@ -193,7 +193,7 @@
     </style>
 
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
@@ -235,7 +235,9 @@
     </style>
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
-        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
+        <item name="android:headerMonthTextAppearance">
+            @style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary
+        </item>
     </style>
 
     <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary">
@@ -397,10 +399,11 @@
     </style>
 
     <!-- For dropdown menu in AudioVideoPlayerLollipop, fix to dark mode -->
-    <style name="ThemeOverlay.MaterialComponents.MenuDark" >
+    <style name="ThemeOverlay.MaterialComponents.MenuDark">
         <item name="colorSurface">@color/grey_900</item>
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
-        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark</item>
+        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark
+        </item>
     </style>
 
     <style name="messageForwardIconStyle">
@@ -437,4 +440,23 @@
         <item name="android:colorControlActivated">?attr/colorSecondary</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>
+
+    <style name="BottomSheetItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="drawableTint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="BottomSheetItemDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">@dimen/bottom_sheet_item_divider_margin_start</item>
+        <item name="android:background">@color/grey_012_white_012</item>
+    </style>
+
 </resources>

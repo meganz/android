@@ -13,4 +13,11 @@ interface BottomFloatingPanelListener {
     fun onInviteParticipants()
 
     fun onParticipantOption(participant: Participant)
+
+    fun onAddContact()
+    fun onContactInfo()
+    fun onSendMessage()
+    fun onPingToSpeakerView()
+    fun onMakeModerator()
+    fun onRemoveParticipant()
 }
