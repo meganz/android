@@ -43,6 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
         android:scaleType="fitCenter"
         app:border_width="0dp"
         app:corner_radius="30dp"

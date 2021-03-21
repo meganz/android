@@ -62,7 +62,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
         initReceiver()
         initActionBar()
@@ -168,5 +167,29 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     override fun onParticipantOption(participant: Participant) {
         Toast.makeText(this, "onParticipantOption ${participant.name}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAddContact() {
+
+    }
+
+    override fun onContactInfo() {
+
+    }
+
+    override fun onSendMessage() {
+
+    }
+
+    override fun onPingToSpeakerView() {
+
+    }
+
+    override fun onMakeModerator() {
+
+    }
+
+    override fun onRemoveParticipant() {
+
     }
 }
