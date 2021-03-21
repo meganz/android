@@ -84,6 +84,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
         }
+        // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
+        // Change start destination dynamically
         navController.graph = navGraph
 
         bottomFloatingPanelViewHolder =
