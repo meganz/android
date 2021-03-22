@@ -791,7 +791,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">關於</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">私隱條款</string>
     <string name="settings_about_terms_of_service" context="">服務條款</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">資料保護條例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK軟體開發包版本</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK版本</string>
