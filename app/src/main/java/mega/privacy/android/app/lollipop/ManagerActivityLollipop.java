@@ -25,7 +25,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
@@ -97,7 +96,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -127,7 +125,6 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -277,7 +274,6 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -3317,7 +3313,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		PsaManager.INSTANCE.startChecking();
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-			createAndOpenNewTextFile(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+			showNewTxtFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
 		}
 
 		logDebug("END onCreate");
@@ -9594,8 +9590,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	@Override
-	public void createAndOpenNewTextFile(String typedName) {
-		newTextFileDialog = showNewTxtFileDialog(this,
+	public void showNewTxtFileDialog(String typedName) {
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
 				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName);
 	}
 

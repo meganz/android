@@ -82,7 +82,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -258,8 +257,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
-	public void createAndOpenNewTextFile(String typedName) {
-		newTextFileDialog = showNewTxtFileDialog(this, megaApi.getNodeByHandle(parentHandle), typedName);
+	public void showNewTxtFileDialog(String typedName) {
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, megaApi.getNodeByHandle(parentHandle), typedName);
 	}
 
 	@Override
@@ -506,7 +505,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			coordinatorLayout.invalidate();
 
 			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-				createAndOpenNewTextFile(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+				showNewTxtFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
 			}
 		}
 	}

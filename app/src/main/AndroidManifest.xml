@@ -498,6 +498,11 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.activities.TextFileEditor"
+            android:launchMode="singleTop">
+        </activity>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >

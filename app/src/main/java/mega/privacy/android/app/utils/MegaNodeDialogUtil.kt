@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
+import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -13,12 +14,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.TextFileEditor
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -371,6 +373,14 @@ class MegaNodeDialogUtil {
                             if (context is FileExplorerActivityLollipop) {
                                 context.createFile(typedString, data, node, true)
                             }
+                        }
+                        TYPE_NEW_TXT_FILE -> {
+                            val textFileEditor = Intent(context, TextFileEditor::class.java)
+                                .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
+                                .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
+                                .putExtra(INTENT_EXTRA_KEY_IS_NEW_TXT_FILE, true)
+
+                            context.startActivity(textFileEditor)
                         }
                     }
 
