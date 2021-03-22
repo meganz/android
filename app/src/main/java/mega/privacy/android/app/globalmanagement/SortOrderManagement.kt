@@ -17,20 +17,11 @@ class SortOrderManagement @Inject constructor(
     private var orderCamera: Int = ORDER_MODIFICATION_DESC
 
     init {
-        initialize()
-    }
-
-    /**
-     * Initializes all the available orders getting their values from database if exist.
-     */
-    fun initialize() {
-        resetDefaults()
-
         dbH.preferences?.apply {
             preferredSortCloud?.toInt()?.let { orderCloud = it }
             preferredSortContacts?.toInt()?.let { orderContacts = it }
-            preferredSortCameraUpload?.toInt()?.let { orderCamera = it }
             preferredSortOthers?.toInt()?.let { orderOthers = it }
+            preferredSortCameraUpload?.toInt()?.let { orderCamera = it }
         }
     }
 
@@ -44,35 +35,31 @@ class SortOrderManagement @Inject constructor(
         orderCamera = ORDER_MODIFICATION_DESC
     }
 
-    fun getOrderCloud(): Int =
-        orderCloud
+    fun getOrderCloud(): Int = orderCloud
 
     fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud
         dbH.setPreferredSortCloud(orderCloud.toString())
     }
 
-    fun getOrderContacts(): Int =
-        orderContacts
+    fun getOrderContacts(): Int = orderContacts
 
     fun setOrderContacts(newOrderContacts: Int) {
         orderContacts = newOrderContacts
         dbH.setPreferredSortContacts(orderContacts.toString())
     }
 
-    fun getOrderCamera(): Int =
-        orderCamera
-
-    fun setOrderCamera(newOrderCamera: Int) {
-        orderCamera = newOrderCamera
-        dbH.setPreferredSortCameraUpload(orderCamera.toString())
-    }
-
-    fun getOrderOthers(): Int =
-        orderOthers
+    fun getOrderOthers(): Int = orderOthers
 
     fun setOrderOthers(newOrderOthers: Int) {
         orderOthers = newOrderOthers
         dbH.setPreferredSortOthers(orderOthers.toString())
+    }
+
+    fun getOrderCamera(): Int = orderCamera
+
+    fun setOrderCamera(newOrderCamera: Int) {
+        orderCamera = newOrderCamera
+        dbH.setPreferredSortCameraUpload(orderCamera.toString())
     }
 }
