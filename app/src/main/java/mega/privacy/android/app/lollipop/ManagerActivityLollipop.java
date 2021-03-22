@@ -273,6 +273,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -10149,8 +10150,21 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	/**
+	 * Shows the GENERAL_UPLOAD upload bottom sheet fragment.
+	 */
 	public void showUploadPanel() {
-		logDebug("showUploadPanel");
+		showUploadPanel(GENERAL_UPLOAD);
+	}
+
+	/**
+	 * Shows the upload bottom sheet fragment taking into account the upload type received as param.
+	 *
+	 * @param uploadType Indicates the type of upload:
+	 *                   - GENERAL_UPLOAD if nothing special has to be taken into account.
+	 *                   - DOCUMENTS_UPLOAD if an upload from Documents section.
+	 */
+	public void showUploadPanel(int uploadType) {
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 			return;
@@ -10158,8 +10172,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-        bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(uploadType);
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void updateAccountDetailsVisibleInfo(){

@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
+import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
@@ -89,9 +90,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         setupActionMode()
         setupNavigation()
         setupDraggingThumbnailCallback()
+        setupAddFabButton()
 
         viewModel.items.observe(viewLifecycleOwner) {
-            if (!viewModel.searchMode) {
+            if (viewModel.searchMode) {
+                binding.addFabButton.hide()
+            } else {
                 callManager { manager ->
                     manager.invalidateOptionsMenu()  // Hide the search icon if no file
                 }
@@ -251,6 +255,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
+
+                    binding.addFabButton.hide()
                 } else {
                     actionMode?.invalidate()  // Update the action items based on the selected nodes
                 }
@@ -329,6 +335,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
+            binding.addFabButton.show()
             callManager { manager ->
                 manager.showKeyboardForSearch()
             }
@@ -379,6 +386,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         viewModel.searchMode = true
         viewModel.searchQuery = ""
         viewModel.refreshUi()
+
+        binding.addFabButton.hide()
     }
 
     override fun exitSearch() {
@@ -390,6 +399,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         viewModel.searchMode = false
         viewModel.searchQuery = ""
         viewModel.refreshUi()
+
+        binding.addFabButton.show()
+
     }
 
     override fun searchQuery(query: String) {
@@ -457,6 +469,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
 
         NodeController(activity).prepareForDownload(arrayListOf(node.handle), true)
+    }
+
+    private fun setupAddFabButton() {
+        binding.addFabButton.setOnClickListener {
+            (requireActivity() as ManagerActivityLollipop).showUploadPanel(DOCUMENTS_UPLOAD)
+        }
     }
 
     companion object {
