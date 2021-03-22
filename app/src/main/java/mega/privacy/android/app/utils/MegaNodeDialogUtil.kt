@@ -237,6 +237,7 @@ class MegaNodeDialogUtil {
                     }
 
                     quitDialogError(typeText, errorText)
+                    showKeyboardDelayed(typeText)
                 }
             }.show()
 
@@ -253,8 +254,6 @@ class MegaNodeDialogUtil {
                         dialogType
                     )
                 }
-
-            showKeyboardDelayed(typeText)
 
             return dialog
         }
