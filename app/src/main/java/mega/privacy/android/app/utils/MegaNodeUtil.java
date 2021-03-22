@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Bundle;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Gravity;
@@ -36,12 +34,12 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
@@ -52,6 +50,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class MegaNodeUtil {
@@ -261,15 +260,59 @@ public class MegaNodeUtil {
     public static void shareNode(Context context, MegaNode node) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
-
             if (!isTextEmpty(path) && !node.isFolder()) {
                 shareFile(context, new File(path));
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
-                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_NODE, new Intent(android.content.Intent.ACTION_SEND)));
             }
         }
+    }
+
+    /**
+     * Method to know if all nodes are unloaded. If so, share them.
+     *
+     * @param context   The Activity context.
+     * @param listNodes The list of nodes to be checked.
+     * @return True, if all are downloaded. False, otherwise.
+     */
+    public static boolean areAllNodesDownloaded(Context context, ArrayList<MegaNode> listNodes) {
+        List<File> downloadedFiles = new ArrayList<>();
+        for (MegaNode node : listNodes) {
+            String path = node.isFolder() ? null
+                    : getLocalFile(context, node.getName(), node.getSize());
+            if (isTextEmpty(path)) {
+                return false;
+            } else {
+                downloadedFiles.add(new File(path));
+            }
+        }
+
+        logDebug("All nodes are downloaded, so share the files");
+        shareFiles(context, downloadedFiles);
+        return true;
+    }
+
+    /**
+     * Method to get the link to the exported nodes.
+     *
+     * @param listNodes The list of nodes to be checked.
+     * @return The link with all exported nodes
+     */
+    public static StringBuilder getExportNodesLink(ArrayList<MegaNode> listNodes) {
+        StringBuilder links = new StringBuilder();
+        for (MegaNode node : listNodes) {
+            if (node.isExported()) {
+                links.append(node.getPublicLink())
+                        .append("\n\n");
+            }
+        }
+        return links;
+    }
+
+    public static void shareNodes(Context context, List<MegaNode> nodes){
+        shareNodes(context, new ArrayList<>(nodes));
     }
 
     /**
@@ -283,46 +326,31 @@ public class MegaNodeUtil {
      * @param context the context where nodes are shared
      * @param nodes nodes to share
      */
-    public static void shareNodes(Context context, List<MegaNode> nodes) {
+    public static void shareNodes(Context context, ArrayList<MegaNode> nodes) {
         if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
             return;
         }
-        List<File> downloadedFiles = new ArrayList<>();
-        boolean allDownloadedFiles = true;
-        for (MegaNode node : nodes) {
-            String path = node.isFolder() ? null
-                : getLocalFile(context, node.getName(), node.getSize());
-            if (isTextEmpty(path)) {
-                allDownloadedFiles = false;
-                break;
-            } else {
-                downloadedFiles.add(new File(path));
-            }
-        }
-        if (allDownloadedFiles) {
-            shareFiles(context, downloadedFiles);
+
+        if(areAllNodesDownloaded(context, nodes)){
             return;
         }
 
         int notExportedNodes = 0;
-        StringBuilder links = new StringBuilder();
+        StringBuilder links = getExportNodesLink(nodes);
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
                 notExportedNodes++;
-            } else {
-                links.append(node.getPublicLink())
-                    .append("\n\n");
             }
         }
         if (notExportedNodes == 0) {
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
-                links.toString());
+                    links.toString());
             return;
         }
 
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
-            new Intent(android.content.Intent.ACTION_SEND));
+        ExportListener exportListener = new ExportListener(context, ACTION_SHARE_NODE, notExportedNodes, links,
+                new Intent(android.content.Intent.ACTION_SEND));
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
                 megaApi.exportNode(node, exportListener);
@@ -361,7 +389,7 @@ public class MegaNodeUtil {
      * @param node      node involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
+    public static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
         String error = "Error " + message + ". ";
 
         if (node == null) {
@@ -384,7 +412,7 @@ public class MegaNodeUtil {
      * @param nodes      nodes involved in the action.
      * @return True if there is not any error, false otherwise.
      */
-    private static boolean shouldContinueWithoutError(Context context, String message,
+    public static boolean shouldContinueWithoutError(Context context, String message,
         List<MegaNode> nodes) {
         String error = "Error " + message + ". ";
 

@@ -5,6 +5,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button</item>
+        <item name="backgroundTint">@color/mega_btn_bg_color_selector</item>
+        <item name="android:textColor">@color/mega_btn_text_color_selector</item>
     </style>
 
     <style name="ThemeOverlay.Mega.Button" parent="">
@@ -35,13 +37,8 @@
     <style name="Widget.Mega.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="strokeColor">?attr/colorSecondary</item>
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
-    </style>
-
-    <style name="Widget.Mega.Button.OutlinedButton.Grey">
-        <item name="strokeColor">@color/grey_050</item>
-        <item name="android:textColor">@color/grey_600</item>
+        <item name="android:textColor">@color/mega_text_btn_text_color_selector</item>
+        <item name="strokeColor">@color/mega_text_btn_text_color_selector</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 
@@ -196,7 +193,7 @@
     </style>
 
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
         <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
@@ -220,6 +217,17 @@
         <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
 
+    <style name="Widget.Mega.Button.Transparent" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">10dp</item>
+        <item name="android:textColor">?android:attr/colorAccent</item>
+        <item name="android:paddingStart">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+    </style>
+
     <!-- For date picker dialog -->
     <style name="Widget.Mega.DatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Calendar">
         <item name="android:datePickerStyle">@style/Widget.Mega.DatePicker</item>
@@ -227,7 +235,9 @@
     </style>
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
-        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
+        <item name="android:headerMonthTextAppearance">
+            @style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary
+        </item>
     </style>
 
     <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary">
@@ -389,10 +399,29 @@
     </style>
 
     <!-- For dropdown menu in AudioVideoPlayerLollipop, fix to dark mode -->
-    <style name="ThemeOverlay.MaterialComponents.MenuDark" >
+    <style name="ThemeOverlay.MaterialComponents.MenuDark">
         <item name="colorSurface">@color/grey_900</item>
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
-        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark</item>
+        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark
+        </item>
+    </style>
+
+    <style name="messageForwardIconStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:src">@drawable/ic_forward_file</item>
+    </style>
+
+    <style name="MessageForwardIconStyleEnd" parent="messageForwardIconStyle">
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="MessageForwardIconStyleStart" parent="messageForwardIconStyle">
+        <item name="android:layout_marginStart">8dp</item>
     </style>
 
     <style name="Widget.MaterialComponents.CompoundButton.CheckBox.Dark">
@@ -404,6 +433,30 @@
         <item name="android:minHeight">0dp</item>
         <item name="android:textColor">?attr/colorSecondary</item>
         <item name="android:textAppearance">?textAppearanceCaption</item>
+    </style>
+
+    <style name="TransparentEditText">
+        <item name="android:colorControlNormal">@android:color/transparent</item>
+        <item name="android:colorControlActivated">?attr/colorSecondary</item>
+        <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
+    </style>
+
+    <style name="BottomSheetItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="drawableTint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="BottomSheetItemDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">@dimen/bottom_sheet_item_divider_margin_start</item>
+        <item name="android:background">@color/grey_012_white_012</item>
     </style>
 
 </resources>

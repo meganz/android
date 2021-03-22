@@ -104,6 +104,7 @@ public class Constants {
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_FORWARD_MESSAGES = 11;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
+    public static final int MULTIPLE_IMPORT_CONTACT_MESSAGES = 13;
 
     public static final int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES + 1;
 
@@ -171,6 +172,10 @@ public class Constants {
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
+
+    public static final int IMPORT_ONLY_OPTION = 0;
+    public static final int FORWARD_ONLY_OPTION = 1;
+    public static final int IMPORT_TO_SHARE_OPTION = 2;
 
     public static final int FREE = 0;
     public static final int PRO_I = 1;
@@ -255,6 +260,12 @@ public class Constants {
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
     public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
+    public static final String ACTION_CHECK_COMPRESSING_MESSAGE = "ACTION_CHECK_COMPRESSING_MESSAGE";
+
+    public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
+    public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
+    public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
+    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
@@ -292,6 +303,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
     public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
+    public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -483,6 +495,11 @@ public class Constants {
                     ")+"
     );
 
+    /**
+     * A node name must not contain these characters.
+     */
+    public static final Pattern NODE_NAME_REGEX = Pattern.compile("[*|\\?:\"<>\\\\\\\\/]");
+
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_INBOX = 150;
     public static final int FROM_OTHERS = 0;
@@ -512,6 +529,8 @@ public class Constants {
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
+
+    public static final int SCROLLING_UP_DIRECTION = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
@@ -582,6 +601,13 @@ public class Constants {
     public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
     public static final int AVATAR_SIZE = 150;
+
+    //Thumbnail dimens
+    public static final float THUMB_CORNER_RADIUS_DP = 4;
+    public static final int THUMB_SIZE_DP = 40;
+    public static final int THUMB_MARGIN_DP = 16;
+    public static final int ICON_SIZE_DP = 48;
+    public static final int ICON_MARGIN_DP = 12;
 
     public static final String SEPARATOR = File.separator;
 

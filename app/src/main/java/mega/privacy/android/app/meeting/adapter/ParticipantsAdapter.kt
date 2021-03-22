@@ -17,7 +17,9 @@ class ParticipantsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return ParticipantViewHolder(
-            ItemMeetingParticipantBinding.inflate(inflater, parent, false), listener
-        )
+            ItemMeetingParticipantBinding.inflate(inflater, parent, false)
+        ) {
+            listener.onParticipantOption(getItem(it))
+        }
     }
 }

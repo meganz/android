@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting
 import android.content.res.ColorStateList
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -13,6 +14,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 
 class BottomFloatingPanelViewHolder(
@@ -76,11 +78,11 @@ class BottomFloatingPanelViewHolder(
                 BOTTOM_PANEL_MIN_ALPHA, 1F
             ) { view, value -> view.alpha = value })
 
-        val grey700Component = 0x4F
-        val grey200Component = 0xBD
+        val indicatorColorStart = 0x4F
+        val indicatorColorEnd = 0xBD
         propertyUpdaters.add(
             propertyUpdater(
-                binding.bottomFloatingPanel.indicator, grey700Component, grey200Component
+                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
             ) { view, value ->
                 view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
             })
@@ -143,8 +145,14 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun onBottomFloatingPanelSlide(slideOffset: Float) {
+        val ratio = if (slideOffset < BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD) {
+            slideOffset / BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD
+        } else {
+            1F
+        }
+
         for (updater in propertyUpdaters) {
-            updater(slideOffset)
+            updater(ratio)
         }
     }
 
@@ -157,13 +165,17 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun setupFabLabelUpdater(label: TextView) {
-        val whiteComponent = 0xFF
-        val grey900Component = 0x21
+        if (Util.isDarkMode(context)) {
+            label.setTextColor(ContextCompat.getColor(context, R.color.white_alpha_087))
+        } else {
+            val fabLabelColorStart = 0xFF
+            val fabLabelColorEnd = 0x21
 
-        propertyUpdaters.add(
-            propertyUpdater(
-                label, whiteComponent, grey900Component
-            ) { view, value -> view.setTextColor(composeColor(value)) })
+            propertyUpdaters.add(
+                propertyUpdater(
+                    label, fabLabelColorStart, fabLabelColorEnd
+                ) { view, value -> view.setTextColor(composeColor(value)) })
+        }
     }
 
     private fun setupFabUpdater() {
@@ -174,17 +186,22 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun setupFabBackgroundTintUpdater(fab: OnOffFab) {
-        val grey700Component = 0x4F
-        val grey500Component = 0x75
+        if (Util.isDarkMode(context)) {
+            fab.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054))
+        } else {
+            val fabBackgroundTintStart = 0x4F
+            val fabBackgroundTintEnd = 0x75
 
-        propertyUpdaters.add(
-            propertyUpdater(
-                fab, grey700Component, grey500Component
-            ) { view, value ->
-                if (view.isOn) {
-                    view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
-                }
-            })
+            propertyUpdaters.add(
+                propertyUpdater(
+                    fab, fabBackgroundTintStart, fabBackgroundTintEnd
+                ) { view, value ->
+                    if (view.isOn) {
+                        view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
+                    }
+                })
+        }
     }
 
     private fun <V : View> propertyUpdater(
@@ -214,6 +231,7 @@ class BottomFloatingPanelViewHolder(
     }
 
     companion object {
-        private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F
+        private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F
+        private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F
     }
 }
