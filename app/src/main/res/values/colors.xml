@@ -155,6 +155,9 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
+    <!-- The record voice clip bubble -->
+    <color name="grey_800_white">@color/grey_800</color>
+
     <!--  Same as colorOnSecondary  -->
     <color name="white_087_dark_grey">@color/white_alpha_087</color>
 

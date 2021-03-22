@@ -2704,7 +2704,7 @@
 
     <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
 
-    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 

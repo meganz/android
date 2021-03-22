@@ -560,11 +560,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_above="@+id/record_button_layout"
-                            android:minHeight="36dp"
-                            android:minWidth="234dp"
+                            android:minHeight="37dp"
+                            android:minWidth="168dp"
                             android:layout_alignParentEnd="true"
-                            android:layout_marginEnd="25dp"
-                            android:layout_marginBottom="-10dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_marginBottom="5dp"
                             android:orientation="vertical"
                             android:visibility="visible">
 
@@ -574,6 +574,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:maxWidth="350dp"
                                 android:text="@string/recording_less_than_second"
                                 android:textAppearance="@style/TextAppearance.Mega.Caption.OnSecondary" />
                         </LinearLayout>

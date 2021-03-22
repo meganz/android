@@ -134,6 +134,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
@@ -269,7 +270,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     private final static int PADDING_BUBBLE = 25;
     private final static int CORNER_RADIUS_BUBBLE = 30;
-    private final static int MAX_WIDTH_BUBBLE = 350;
     private final static int MARGIN_BUTTON_DEACTIVATED = 20;
     private final static int MARGIN_BUTTON_ACTIVATED = 24;
     private final static int MARGIN_BOTTOM = 80;
@@ -419,6 +419,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private Chronometer callInProgressChrono;
     private boolean startVideo = false;
 
+    private RelativeLayout chatRoomOptions;
     private EmojiEditText textChat;
     private ImageButton sendIcon;
     private RelativeLayout expandCollapseInputTextLayout;
@@ -454,6 +455,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     DatabaseHandler dbH = null;
 
     FrameLayout fileStorageLayout;
+    private FrameLayout galleryFragment;
     private ChatFileStorageFragment fileStorageF;
 
     private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
@@ -482,7 +484,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private RecordButton recordButton;
     private MediaRecorder myAudioRecorder = null;
     private LinearLayout bubbleLayout;
-    private TextView bubbleText;
     private RecordView recordView;
     private FrameLayout fragmentVoiceClip;
     private RelativeLayout voiceClipLayout;
@@ -997,6 +998,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         participantsLayout = tB.findViewById(R.id.ll_participants);
         participantsText = tB.findViewById(R.id.participants_text);
 
+        chatRoomOptions = findViewById(R.id.more_options_rl);
+        chatRoomOptions.setOnClickListener(this);
+
         textChat = findViewById(R.id.input_text_chat);
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
@@ -1129,18 +1133,18 @@ public class ChatActivityLollipop extends PinActivityLollipop
         recordView = findViewById(R.id.record_view);
         recordView.setVisibility(View.GONE);
         bubbleLayout = findViewById(R.id.bubble_layout);
-        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.grey_900_grey_100));
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this, R.color.grey_800_white));
         myBubble.setCornerRadius(CORNER_RADIUS_BUBBLE);
         myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
+        myBubble.setPointerWidth(dp2px(8, getOutMetrics()));
+        myBubble.setPointerHeight(dp2px(5, getOutMetrics()));
+        myBubble.setPointerMarginEnd(dp2px(15, getOutMetrics()));
         myBubble.setPadding(PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE);
         bubbleLayout.setBackground(myBubble);
         bubbleLayout.setVisibility(View.GONE);
-        bubbleText = findViewById(R.id.bubble_text);
-        bubbleText.setMaxWidth(dp2px(MAX_WIDTH_BUBBLE, getOutMetrics()));
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
         showInputText();
-
         //Input text:
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
@@ -2562,25 +2566,15 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 ifAnonymousModeLogin(false);
                 break;
             }
-            case R.id.cab_menu_call_chat:{
-                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
-
-                startVideo = false;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+            case R.id.cab_menu_call_chat:
+                optionCall(false);
                 break;
-            }
-            case R.id.cab_menu_video_chat:{
+
+            case R.id.cab_menu_video_chat:
                 logDebug("cab_menu_video_chat");
-                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
-
-                startVideo = true;
-                if(checkPermissionsCall()){
-                    startCall();
-                }
+                optionCall(true);
                 break;
-            }
+
             case R.id.cab_menu_select_messages:
                 activateActionMode();
                 break;
@@ -3161,12 +3155,13 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 }
                 break;
             }
-            case REQUEST_READ_STORAGE:{
-                if (checkPermissionsReadStorage()) {
-                    this.attachFromFileStorage();
+            case REQUEST_READ_STORAGE:
+                logDebug("********* Permission Read storage granted");
+                if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).showGallery();
                 }
                 break;
-            }
+
             case LOCATION_PERMISSION_REQUEST_CODE: {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
@@ -3828,6 +3823,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 controlExpandableInputText(1);
                 break;
 
+            case R.id.more_options_rl:
+                showChatRoomToolbarByPanel();
+                break;
+
             case R.id.cancel_edit:
                 editingMessage = false;
                 messageToEdit = null;
@@ -3944,6 +3943,27 @@ public class ChatActivityLollipop extends PinActivityLollipop
 		}
     }
 
+    public void optionCall(boolean isVideoCall){
+        if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom))
+            return;
+
+        if(startVideo){
+            startVideo = true;
+        }else{
+            startVideo = false;
+        }
+
+        if(checkPermissionsCall()){
+            startCall();
+        }
+    }
+
+    public void sendGif(){
+        logDebug("Send GIF");
+        startActivityForResult(
+                new Intent(this, GiphyPickerActivity.class), REQUEST_CODE_PICK_GIF);
+    }
+
     public void sendLocation(){
         logDebug("sendLocation");
         if(MegaApplication.isEnabledGeoLocation()){
@@ -4027,6 +4047,16 @@ public class ChatActivityLollipop extends PinActivityLollipop
         locationDialog.setCanceledOnTouchOutside(false);
         locationDialog.show();
         isLocationDialogShown = true;
+    }
+
+    private void attachtGalleryFiels(){
+        fileStorageF = ChatFileStorageFragment.newInstance();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
+        hideInputText();
+        fileStorageLayout.setVisibility(View.VISIBLE);
+        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200),
+                PorterDuff.Mode.SRC_IN);
+        placeRecordButton(RECORD_BUTTON_DEACTIVATED);
     }
 
     public void attachFromFileStorage(){
@@ -7508,6 +7538,15 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             bottomSheetDialogFragment.dismissAllowingStateLoss();
         }
+    }
+
+    public void showChatRoomToolbarByPanel() {
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            return;
+        }
+        bottomSheetDialogFragment = new ChatRoomToolbarBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(),
+                bottomSheetDialogFragment.getTag());
     }
 
     private void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {

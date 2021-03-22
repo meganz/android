@@ -93,6 +93,9 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
+    <!-- The record voice clip bubble -->
+    <color name="grey_800_white">@color/white</color>
+
     <color name="grey_054_white_087">@color/white_alpha_087</color>
 
     <!-- Notification badge -->

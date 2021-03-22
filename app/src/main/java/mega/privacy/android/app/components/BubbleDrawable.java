@@ -9,10 +9,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.ColorInt;
-
 public class BubbleDrawable extends Drawable {
-
-
     public static final int LEFT = 0;
     public static final int CENTER = 1;
     public static final int RIGHT = 2;
@@ -28,6 +25,7 @@ public class BubbleDrawable extends Drawable {
 
     private Path mPointer;
     private int mPointerWidth;
+    private int mPointerMarginEnd;
     private int mPointerHeight;
     private int mPointerAlignment;
 
@@ -58,6 +56,10 @@ public class BubbleDrawable extends Drawable {
         mPointerWidth = pointerWidth;
     }
 
+    public void setPointerMarginEnd(int marginEnd) {
+        mPointerMarginEnd = marginEnd;
+    }
+
     public void setPointerHeight(int pointerHeight) {
         mPointerHeight = pointerHeight;
     }
@@ -81,7 +83,6 @@ public class BubbleDrawable extends Drawable {
 
         // Set the starting point
         mPointer.moveTo(pointerHorizontalStart(), mBoxHeight);
-
         // Define the lines
         mPointer.rLineTo(mPointerWidth, 0);
         mPointer.rLineTo(-(mPointerWidth / 2), mPointerHeight);
@@ -99,7 +100,7 @@ public class BubbleDrawable extends Drawable {
                 x = (mBoxWidth / 2) - (mPointerWidth / 2);
                 break;
             case RIGHT:
-                x = mBoxWidth - mCornerRad - mPointerWidth;
+                x = mBoxWidth - mPointerMarginEnd - mPointerWidth;
         }
         return x;
     }

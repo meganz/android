@@ -46,13 +46,12 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     RecyclerView recyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
     TextView emptyTextView;
     public ArrayList<String> mPhotoUris;
     public ArrayList<String> imagesPath = new ArrayList<>();
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
-    public static int GRID_LARGE = 2;
+    public static int GRID_LARGE = 1;
     MegaChatApiAndroid megaChatApi;
     Context context;
     ActionBar aB;
@@ -142,7 +141,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             int numberOfCells = GRID_LARGE;
             int dimImages = heightFrag / numberOfCells;
 
-            mLayoutManager = new GridLayoutManager(context, numberOfCells, GridLayoutManager.HORIZONTAL,false);
+            RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(context, numberOfCells, GridLayoutManager.HORIZONTAL,false);
             ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
