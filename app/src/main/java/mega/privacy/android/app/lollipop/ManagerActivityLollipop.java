@@ -274,6 +274,10 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -716,6 +720,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
+	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -1933,6 +1938,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
+
+		checkNewTextFileDialogState(newTextFileDialog, outState);
 	}
 
 	@Override
@@ -3309,6 +3316,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		PsaManager.INSTANCE.startChecking();
 
+		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+			createAndOpenNewTextFile(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+		}
+
 		logDebug("END onCreate");
 	}
 
@@ -4606,6 +4617,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
         if (confirmationTransfersDialog != null) {
             confirmationTransfersDialog.dismiss();
         }
+
+        if (newTextFileDialog != null) {
+        	newTextFileDialog.dismiss();
+		}
 
     	super.onDestroy();
 	}
@@ -9579,8 +9594,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	}
 
 	@Override
-	public void createAndOpenNewTextFile() {
-
+	public void createAndOpenNewTextFile(String typedName) {
+		newTextFileDialog = showNewTxtFileDialog(this,
+				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName);
 	}
 
 	public long getParentHandleBrowser() {

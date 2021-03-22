@@ -15,5 +15,5 @@ public interface UploadBottomSheetDialogActionListener {
 
     void showNewFolderDialog();
 
-    void createAndOpenNewTextFile();
+    void createAndOpenNewTextFile(String typedName);
 }

@@ -1738,6 +1738,7 @@
     <string name="settings_feedback_body_device_model" context="mail body">Device model</string>
     <string name="settings_feedback_body_android_version" context="mail body">Android version</string>
 
+    <string name="dialog_title_new_text_file" context="Title of the dialog to create a new text file by inserting the name">New text file</string>
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">New file</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">File Name</string>
 

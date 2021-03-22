@@ -79,6 +79,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -138,6 +142,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private AlertDialog newTextFileDialog;
+
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -173,6 +179,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(PARENT_HANDLE, parentHandle);
+		checkNewTextFileDialogState(newTextFileDialog, outState);
 	}
 
 	@Override
@@ -251,8 +258,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
-	public void createAndOpenNewTextFile() {
-
+	public void createAndOpenNewTextFile(String typedName) {
+		newTextFileDialog = showNewTxtFileDialog(this, megaApi.getNodeByHandle(parentHandle), typedName);
 	}
 
 	@Override
@@ -497,6 +504,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
+
+			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+				createAndOpenNewTextFile(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+			}
 		}
 	}
 

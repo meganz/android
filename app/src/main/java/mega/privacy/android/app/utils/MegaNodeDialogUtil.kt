@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
+import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -31,6 +32,9 @@ class MegaNodeDialogUtil {
         private const val TYPE_NEW_FOLDER = 1
         private const val TYPE_NEW_FILE = 2
         private const val TYPE_NEW_URL_FILE = 3
+        private const val TYPE_NEW_TXT_FILE = 4
+        const val IS_NEW_TEXT_FILE_SHOWN = "IS_NEW_TEXT_FILE_SHOWN"
+        const val NEW_TEXT_FILE_TEXT = "NEW_TEXT_FILE_TEXT"
 
         /**
          * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -67,7 +71,7 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
          *
-         * @param context           Current context.
+         * @param context            Current context.
          * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
          * @return The create new folder dialog.
          */
@@ -98,8 +102,8 @@ class MegaNodeDialogUtil {
          * Creates and shows a TYPE_NEW_FILE dialog to create a new file.
          *
          * @param context Current context.
-         * @param parent   A valid node. Specifically the parent in which the folder will be created.
-         * @param data     Valid data. Specifically the content of the new file.
+         * @param parent  A valid node. Specifically the parent in which the folder will be created.
+         * @param data    Valid data. Specifically the content of the new file.
          * @return The create new file dialog.
          */
         @JvmStatic
@@ -125,7 +129,7 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_URL_FILE dialog to create a new URL file.
          *
-         * @param context       Current context.
+         * @param context        Current context.
          * @param parent         A valid node. Specifically the parent in which the folder will be created.
          * @param data           Valid data. Specifically the content of the new URL file.
          * @param defaultURLName Default name of the URL if has, null otherwise.
@@ -157,9 +161,48 @@ class MegaNodeDialogUtil {
         }
 
         /**
-         * Finish the initialization of the dialog and shows it.
+         * Creates and shows a TYPE_NEW_TXT_FILE dialog to create a new text file.
          *
-         * @param context           Current context.
+         * @param context   Current context.
+         * @param parent    A valid node. Specifically the parent in which the file will be created.
+         * @param typedName The previous typed text.
+         * @return The create new text file dialog.
+         */
+        @JvmStatic
+        fun showNewTxtFileDialog(
+            context: Context,
+            parent: MegaNode,
+            typedName: String?
+        ): AlertDialog {
+            val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
+
+            newTxtFileDialogBuilder
+                .setTitle(R.string.dialog_title_new_text_file)
+                .setPositiveButton(R.string.general_create, null)
+                .setNegativeButton(R.string.general_cancel, null)
+
+            val dialog = setFinalValuesAndShowDialog(
+                context,
+                parent,
+                null,
+                null,
+                null,
+                newTxtFileDialogBuilder,
+                TYPE_NEW_TXT_FILE
+            )
+
+            if (!isTextEmpty(typedName)) {
+                dialog.findViewById<EmojiEditText>(R.id.type_text)?.setText(typedName)
+            }
+
+            return dialog
+        }
+
+
+        /**
+         * Finishes the initialization of the dialog and shows it.
+         *
+         * @param context            Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param data               Valid data if needed to confirm the action, null otherwise.
@@ -210,6 +253,9 @@ class MegaNodeDialogUtil {
                                     setText(defaultURLName)
                                     setSelection(0, getCursorPositionOfName(false, defaultURLName))
                                 }
+                            }
+                            TYPE_NEW_TXT_FILE -> {
+                                setHint(R.string.context_new_file_name)
                             }
                         }
 
@@ -368,6 +414,26 @@ class MegaNodeDialogUtil {
 
             typeText?.requestFocus()
             errorText?.visibility = GONE
+        }
+
+        /**
+         * Checks if the newTextFileDialog is shown. If so, saves it's state on outState.
+         *
+         * @param newTextFileDialog The dialog to check.
+         * @param outState          Bundle where the state of the dialog will be save.
+         */
+        @JvmStatic
+        fun checkNewTextFileDialogState(newTextFileDialog: AlertDialog?, outState: Bundle) {
+            val isNewTextFileDialogShown = newTextFileDialog != null && newTextFileDialog.isShowing
+
+            if (isNewTextFileDialogShown) {
+                outState.putBoolean(IS_NEW_TEXT_FILE_SHOWN, true)
+                val typeText = newTextFileDialog?.findViewById<EmojiEditText>(R.id.type_text)
+
+                if (typeText != null) {
+                    outState.putString(NEW_TEXT_FILE_TEXT, typeText.text.toString())
+                }
+            }
         }
     }
 }

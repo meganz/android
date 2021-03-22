@@ -66,7 +66,7 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
             R.id.scan_document_option -> listener.scanDocument()
             R.id.take_picture_option -> listener.takePictureAndUpload()
             R.id.new_folder_option -> listener.showNewFolderDialog()
-            R.id.new_txt_option -> listener.createAndOpenNewTextFile()
+            R.id.new_txt_option -> listener.createAndOpenNewTextFile(null)
         }
 
         setStateBottomSheetBehaviorHidden()
