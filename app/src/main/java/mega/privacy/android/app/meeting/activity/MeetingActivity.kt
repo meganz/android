@@ -17,7 +17,6 @@ import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -63,8 +62,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        var meetType = intent.getStringExtra(MEETING_TYPE)
         initReceiver()
-        initActionBar()
+        initActionBar(meetType)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -80,7 +80,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 //                .commitNow()
         }
         val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
-        when(intent.getStringExtra(MEETING_TYPE)){
+        when(meetType){
             MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
         }
@@ -127,11 +127,16 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
     }
 
-    private fun initActionBar() {
+    private fun initActionBar(meetType: String?) {
         setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
+        when(meetType) {
+            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+        }
+
     }
 
     fun getCurrentFragment(): MeetingBaseFragment? {

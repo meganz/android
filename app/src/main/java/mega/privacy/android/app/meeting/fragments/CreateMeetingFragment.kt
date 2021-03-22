@@ -49,7 +49,7 @@ class CreateMeetingFragment : MeetingBaseFragment(), MegaRequestListenerInterfac
                 CacheFolderManager.buildAvatarFile(
                     requireContext(),
                     megaApi.myEmail + FileUtil.JPG_EXTENSION
-                ).absolutePath!!,
+                ).absolutePath,
                 this
             )
         }

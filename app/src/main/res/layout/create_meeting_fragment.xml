@@ -9,17 +9,6 @@
     app:behavior_hideable="false"
     tools:context=".meeting.fragments.CreateMeetingFragment">
 
-    <ImageView
-        android:id="@+id/view_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_close_white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:backgroundTint="@color/grey_700" />
-
 
     <EditText
         android:id="@+id/type_meeting_edit_text"
@@ -27,16 +16,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="?attr/colorSurface"
+        android:gravity="center"
         android:hint="@string/type_meeting_name"
         android:inputType="text"
         android:maxLines="1"
         android:minWidth="100dp"
         android:singleLine="true"
-        android:backgroundTint="?attr/colorSurface"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant8"
-        app:layout_constraintTop_toBottomOf="@id/view_close"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.OnSecondary"
+        android:textColorHint="#9B9B9B"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/meeting_thumbnail"
@@ -47,35 +40,41 @@
         android:scaleType="fitCenter"
         app:border_width="0dp"
         app:corner_radius="30dp"
-        app:layout_constraintTop_toBottomOf="@id/type_meeting_edit_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/type_meeting_edit_text" />
+
 
     <TextView
         android:id="@+id/action_tips"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:background="@drawable/meeting_grey_text_bk_corners"
+        android:padding="10dp"
         android:text="@string/general_mic"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.OnSecondary"
+        app:layout_constraintBottom_toTopOf="@+id/fab_cam"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/meeting_thumbnail" />
+        app:layout_constraintTop_toBottomOf="@+id/meeting_thumbnail" />
+
 
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_mic"
         android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="100dp"
         android:background="@null"
         app:borderWidth="0dp"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        app:is_on="true"
+        app:is_on="false"
         app:layout_constraintEnd_toStartOf="@+id/fab_cam"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action_tips"
+        app:layout_constraintTop_toBottomOf="@id/meeting_thumbnail"
         app:off_background_tint="@color/white"
         app:off_icon="@drawable/ic_mic_off"
         app:off_icon_tint="@color/red_600"
@@ -104,7 +103,7 @@
         android:background="@null"
         app:borderWidth="0dp"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        app:is_on="true"
+        app:is_on="false"
         app:layout_constraintEnd_toStartOf="@+id/fab_speaker"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -152,7 +151,7 @@
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
         tools:ignore="ContentDescription"
-        tools:is_on="false" />
+        tools:is_on="true" />
 
     <TextView
         android:id="@+id/fab_speaker_label"
@@ -172,16 +171,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginTop="30dp"
+        android:layout_marginRight="16dp"
         android:backgroundTint="@color/drawer_upgrade_button_background_selector"
         android:gravity="center"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:text="@string/btn_start_meeting"
         android:textColor="@color/white_dark_grey"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
