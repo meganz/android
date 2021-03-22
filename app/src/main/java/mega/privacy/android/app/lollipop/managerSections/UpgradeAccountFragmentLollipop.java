@@ -719,14 +719,14 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_I:
 				logDebug("case PRO I");
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+					if (isMonthlyBillingPeriodSelected()) {
 						billedYearly.setChecked(true);
 					}
 					billedMonthly.setVisibility(View.GONE);
 				}
 
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+					if (!isMonthlyBillingPeriodSelected()) {
 						billedMonthly.setChecked(true);
 					}
 					billedYearly.setVisibility(View.GONE);
@@ -737,14 +737,14 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_II:
 				logDebug(" case PRO II");
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+					if (isMonthlyBillingPeriodSelected()) {
 						billedYearly.setChecked(true);
 					}
 					billedMonthly.setVisibility(View.GONE);
 				}
 
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+					if (!isMonthlyBillingPeriodSelected()) {
 						billedMonthly.setChecked(true);
 					}
 					billedYearly.setVisibility(View.GONE);
@@ -754,14 +754,14 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_III:
 				logDebug("case PRO III");
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+					if (isMonthlyBillingPeriodSelected()) {
 						billedYearly.setChecked(true);
 					}
 					billedMonthly.setVisibility(View.GONE);
 				}
 
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+					if (!isMonthlyBillingPeriodSelected()) {
 						billedMonthly.setChecked(true);
 					}
 					billedYearly.setVisibility(View.GONE);
@@ -771,13 +771,13 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_LITE:
 				logDebug("case LITE");
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly) {
+					if (isMonthlyBillingPeriodSelected()) {
 						billedYearly.setChecked(true);
 					}
 					billedMonthly.setVisibility(View.GONE);
 				}
 				if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
-					if (billingPeriod.getCheckedRadioButtonId() == R.id.billed_yearly) {
+					if (!isMonthlyBillingPeriodSelected()) {
 						billedMonthly.setChecked(true);
 					}
 					billedYearly.setVisibility(View.GONE);
