@@ -347,7 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">La maggior parte dei dispositivi non possono scaricare file più grandi di 4GB. Il tuo download probabilmente fallirà</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Non c\'è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Non c\'è nessuna app disponibile sul tuo dispositivo per aprire questa posizione</string>
-    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">Potresti non avere alcuna app installata che supporta questo tipo di file.</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Condividi foto usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Condividi link</string>
@@ -654,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Annulla tutti i trasferimenti</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Scatta foto</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Cattura</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Attiva le notifiche delle chiamate MEGA in arrivo</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA ha bisogno della tua autorizzazione di permettere l\'interfaccia delle chiamate di apparire dal background.</string>
@@ -1010,7 +1010,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Prendi tutti i vantaggi dell\'account MEGA aggiornandolo a Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Modifica immagine di profilo</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Scatta foto</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Cattura</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Scegli un\'immagine</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Cancella immagine</string>
 
@@ -1366,7 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Rimuovere dall\'Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Imposta lo status</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Tema dei colori</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Annulla</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Non disponibile</string>
 
@@ -1473,8 +1473,8 @@
     </plurals>
 
     <plurals name="upload_service_notification_already_uploaded">
-        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
-        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file già caricato</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d file già caricati</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1621,7 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Trasferimenti in pausa!</string>
     <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
-    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressione in corso&#8230;</string>
     <string name="attachment_uploading_state_error">Errore. Non inviato.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d file già scaricati.</string>
@@ -2646,7 +2646,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d di %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Cerca&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Rispondi</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Rispondi</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignora</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s ha mutato questa chiamata</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Mutata</string>
@@ -2757,15 +2757,15 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Non puoi rimuovere %1$s come contatto in quanto fa parte del tuo account Business.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">C\'è stato un problema con il tuo ultimo pagamento. Per favore, accedi a MEGA utilizzando un browser desktop per maggiori informazioni.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Il tuo account business è scaduto</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Il tuo account Business è scaduto</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">C\'è stato un problema nel processo del tuo ultimo pagamento. MEGA è limitato alla visualizzazione finché questo problema non sarà aggiustato su un browser desktop.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Il tuo account è [B]sospeso[/B] al momento. Puoi solo sfogliare tra i tuoi dati.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Mentre MEGA non può accedere ai tuoi dati, l\'amministratore della tua organizzazione ha l\'abilità di controllare e vedere i Caricamenti da fotocamera nel tuo account utente</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Qualcosa è andato storto</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contatta l\'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Aumenterà automaticamente, senza costi addizionali, per vere intenzioni di business.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Spazio[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Banda di trasferimento[/A] illimitata</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Spazio di archiviazione [A]**[/A]</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Banda di trasferimento [A]illimitata[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando effettui il logout, i file presenti nella sezione Offline verranno eliminati dal tuo dispositivo.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quando effettui il logout, i trasferimenti in corso verranno annullati.</string>
@@ -2821,7 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Allega da&#8230;</string>
 
-    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat creata %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creata con %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleziona messaggi</string>
 
@@ -3035,11 +3035,11 @@
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scansiona documento</string>
 
-    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s non è nella tua lista dei contatti</string>
 
 
     <string name="theme_light" context="Option of color theme, light mode.">Leggero</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">Scuro</string>
-    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
-    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Predefinito di sistema</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Impostato dal Risparmio energetico</string>
 </resources>
