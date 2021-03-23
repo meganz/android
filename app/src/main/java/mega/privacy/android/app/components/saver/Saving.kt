@@ -5,6 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.SDCardOperator
+import nz.mega.sdk.MegaApiAndroid
 
 abstract class Saving : Parcelable {
     var unsupportedFileName = ""
@@ -31,6 +32,8 @@ abstract class Saving : Parcelable {
     /**
      * The final step to download a node into a file.
      *
+     * @param megaApi MegaApi instance
+     * @param megaApiFolder MegaApi instance for folder link
      * @param parentPath the parent path where the file should be inside
      * @param externalSDCard whether it's download into external sdcard
      * @param sdCardOperator SDCardOperator used when download to external sdcard,
@@ -39,6 +42,8 @@ abstract class Saving : Parcelable {
      * @return info about auto play
      */
     abstract fun doDownload(
+        megaApi: MegaApiAndroid,
+        megaApiFolder: MegaApiAndroid,
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
@@ -56,6 +61,8 @@ abstract class Saving : Parcelable {
             override fun downloadToGallery() = false
 
             override fun doDownload(
+                megaApi: MegaApiAndroid,
+                megaApiFolder: MegaApiAndroid,
                 parentPath: String,
                 externalSDCard: Boolean,
                 sdCardOperator: SDCardOperator?,

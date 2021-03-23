@@ -12,7 +12,8 @@ import androidx.documentfile.provider.DocumentFile
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -31,7 +32,6 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -48,7 +48,7 @@ import java.util.concurrent.Callable
  * A class that encapsulate all the procedure of saving nodes into device,
  * including choose save to internal storage or external sdcard,
  * choose save path, check download size, check other apps that could open this file, etc,
- * the final step that really download the node into a file is handled in sub-classes,
+ * the final step that really download the node into a file is handled in sub-classes of Saving,
  * by implementing the abstract doDownload function.
  *
  * The initiation API of save should also be added by sub-classes, because it's usually
@@ -256,27 +256,26 @@ class NodeSaver(
      * @param parentPath parent path
      */
     fun saveNode(node: MegaNode, parentPath: String) {
-        add(
-            Completable
-                .fromCallable(Callable {
-                    this.saving = MegaNodeSaving(
-                        node.size,
-                        highPriority = false,
-                        isFolderLink = false,
-                        nodes = listOf(node),
-                        fromMediaViewer = false,
-                        needSerialize = false
-                    )
+        Completable
+            .fromCallable(Callable {
+                this.saving = MegaNodeSaving(
+                    node.size,
+                    highPriority = false,
+                    isFolderLink = false,
+                    nodes = listOf(node),
+                    fromMediaViewer = false,
+                    needSerialize = false
+                )
 
-                    if (lackPermission()) {
-                        return@Callable
-                    }
+                if (lackPermission()) {
+                    return@Callable
+                }
 
-                    checkSizeBeforeDownload(parentPath)
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver saveNode"))
-        )
+                checkSizeBeforeDownload(parentPath)
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(onError = { logErr("NodeSaver saveNode") })
+            .addTo(compositeDisposable)
     }
 
     /**
@@ -285,38 +284,39 @@ class NodeSaver(
      * @param nodeList voice clip to download
      */
     fun downloadVoiceClip(nodeList: MegaNodeList) {
-        add(
-            Completable
-                .fromCallable(Callable {
-                    val nodes = nodeListToArray(nodeList)
-                    if (nodes == null || nodes.isEmpty()) {
-                        return@Callable
-                    }
+        Completable
+            .fromCallable(Callable {
+                val nodes = nodeListToArray(nodeList)
+                if (nodes == null || nodes.isEmpty()) {
+                    return@Callable
+                }
 
-                    val parentPath =
-                        buildVoiceClipFile(app, nodes[0].name)?.parentFile?.path ?: return@Callable
+                val parentPath =
+                    buildVoiceClipFile(app, nodes[0].name)?.parentFile?.path ?: return@Callable
 
-                    val totalSize = nodesTotalSize(nodes)
+                val totalSize = nodesTotalSize(nodes)
 
-                    if (notEnoughSpace(parentPath, totalSize)) {
-                        return@Callable
-                    }
+                if (notEnoughSpace(parentPath, totalSize)) {
+                    return@Callable
+                }
 
-                    val voiceClipSaving = MegaNodeSaving(
-                        totalSize,
-                        highPriority = true,
-                        isFolderLink = false,
-                        nodes = nodes,
-                        fromMediaViewer = false,
-                        needSerialize = true,
-                        isVoiceClip = true
-                    )
+                val voiceClipSaving = MegaNodeSaving(
+                    totalSize,
+                    highPriority = true,
+                    isFolderLink = false,
+                    nodes = nodes,
+                    fromMediaViewer = false,
+                    needSerialize = true,
+                    isVoiceClip = true
+                )
 
-                    voiceClipSaving.doDownload(parentPath, false, null, snackbarShower)
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver downloadVoiceClip"))
-        )
+                voiceClipSaving.doDownload(
+                    megaApi, megaApiFolder, parentPath, false, null, snackbarShower
+                )
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(onError = { logErr("NodeSaver downloadVoiceClip") })
+            .addTo(compositeDisposable)
     }
 
     /**
@@ -350,13 +350,14 @@ class NodeSaver(
             }
             storeDownloadLocationIfNeeded(parentPath)
 
-            add(Completable
+            Completable
                 .fromCallable {
                     storeDownloadLocationIfNeeded(parentPath)
                     checkSizeBeforeDownload(parentPath)
                 }
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
+                .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
+                .addTo(compositeDisposable)
 
             return true
         } else if (requestCode == REQUEST_CODE_TREE) {
@@ -394,9 +395,10 @@ class NodeSaver(
                 return false
             }
 
-            add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+            Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
+                .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
+                .addTo(compositeDisposable)
 
             return true
         }
@@ -420,10 +422,11 @@ class NodeSaver(
         }
 
         if (hasWriteExternalStoragePermission()) {
-            add(Completable
+            Completable
                 .fromCallable { doSave() }
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver save")))
+                .subscribeBy(onError = { logErr("NodeSaver handleRequestPermissionsResult") })
+                .addTo(compositeDisposable)
         }
 
         return true
@@ -459,21 +462,20 @@ class NodeSaver(
     }
 
     private fun save(savingProducer: () -> Saving?) {
-        add(
-            Completable
-                .fromCallable(Callable {
-                    val saving = savingProducer() ?: return@Callable
-                    this.saving = saving
+        Completable
+            .fromCallable(Callable {
+                val saving = savingProducer() ?: return@Callable
+                this.saving = saving
 
-                    if (lackPermission()) {
-                        return@Callable
-                    }
+                if (lackPermission()) {
+                    return@Callable
+                }
 
-                    doSave()
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver save"))
-        )
+                doSave()
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(onError = { logErr("NodeSaver save") })
+            .addTo(compositeDisposable)
     }
 
     private fun doSave() {
@@ -546,9 +548,10 @@ class NodeSaver(
             getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
         ) { notShowAgain ->
             if (notShowAgain) {
-                add(Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
+                Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
                     .subscribeOn(Schedulers.io())
-                    .subscribe(IGNORE, logErr("NodeSaver setAttrAskSizeDownload")))
+                    .subscribeBy(onError = { logErr("NodeSaver checkSizeBeforeDownload") })
+                    .addTo(compositeDisposable)
             }
 
             checkInstalledAppBeforeDownload(parentPath)
@@ -570,9 +573,10 @@ class NodeSaver(
             getString(R.string.alert_no_app, saving.unsupportedFileName)
         ) { notShowAgain ->
             if (notShowAgain) {
-                add(Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
+                Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
                     .subscribeOn(Schedulers.io())
-                    .subscribe(IGNORE, logErr("NodeSaver setAttrAskNoAppDownload")))
+                    .subscribeBy(onError = { logErr("NodeSaver checkInstalledAppBeforeDownload") })
+                    .addTo(compositeDisposable)
             }
 
             download(parentPath)
@@ -580,14 +584,14 @@ class NodeSaver(
     }
 
     private fun download(parentPath: String) {
-        add(Completable
+        Completable
             .fromCallable {
                 checkParentPathAndDownload(parentPath)
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(IGNORE, logErr("NodeSaver download"))
-        )
+            .subscribeBy(onError = { logErr("NodeSaver download") })
+            .addTo(compositeDisposable)
     }
 
     private fun checkParentPathAndDownload(parentPath: String) {
@@ -606,10 +610,8 @@ class NodeSaver(
         }
 
         val autoPlayInfo = saving.doDownload(
-            parentPath,
-            SDCardOperator.isSDCardPath(parentPath),
-            sdCardOperator,
-            snackbarShower
+            megaApi, megaApiFolder, parentPath, SDCardOperator.isSDCardPath(parentPath),
+            sdCardOperator, snackbarShower
         )
 
         if (!autoPlayInfo.couldAutoPlay || dbHandler.autoPlayEnabled != true.toString()) {
@@ -639,10 +641,6 @@ class NodeSaver(
             return true
         }
         return false
-    }
-
-    private fun add(disposable: Disposable) {
-        compositeDisposable.add(disposable)
     }
 
     companion object {

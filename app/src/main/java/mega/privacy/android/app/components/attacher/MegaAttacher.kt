@@ -84,7 +84,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
             return
         }
 
-        AttachmentsCopier(nodes) { successNodes, _ ->
+        AttachmentsCopier(megaApi, nodes) { successNodes, _ ->
             val nodesToAttach = ownerNodes + successNodes
             if (nodesToAttach.isNotEmpty()) {
                 selectChatsToAttach(nodesToAttach)

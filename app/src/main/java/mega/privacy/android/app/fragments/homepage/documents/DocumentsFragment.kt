@@ -419,7 +419,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
 
             (listView.adapter as? DragThumbnailGetter)?.let {
-                putThumbnailLocation(intent, listView, index, VIEWER_FROM_DOCUMENTS, it)
+                putThumbnailLocation(intent, listView, index, INVALID_VALUE, it)
             }
 
             val paramsSetSuccessfully =

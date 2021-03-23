@@ -82,9 +82,18 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
 
-    private lateinit var nodeAttacher: MegaAttacher
-    private lateinit var nodeSaver: NodeSaver
-    private lateinit var dragToExit: DragToExitSupport
+    private val nodeAttacher by lazy { MegaAttacher(this) }
+
+    private val nodeSaver by lazy {
+        NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
+    }
+
+    private val dragToExit by lazy {
+        DragToExitSupport(this, this::onDragActivated) {
+            finish()
+            overridePendingTransition(0, android.R.anim.fade_out)
+        }
+    }
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -123,14 +132,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        nodeAttacher = MegaAttacher(this)
-        nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
-
-        dragToExit = DragToExitSupport(this, this::onDragActivated) {
-            finish()
-            overridePendingTransition(0, android.R.anim.fade_out)
-        }
 
         val extras = intent.extras
         if (extras == null) {

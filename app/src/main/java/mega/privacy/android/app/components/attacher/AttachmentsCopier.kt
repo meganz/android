@@ -8,20 +8,17 @@ import mega.privacy.android.app.utils.Constants.CHAT_FOLDER
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_OK
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.*
 
 class AttachmentsCopier(
+    private val megaApi: MegaApiAndroid,
     private val nodes: List<MegaNode>,
     private val callback: (ArrayList<MegaNode>, Int) -> Unit
 ) : BaseListener(MegaApplication.getInstance()) {
-    private val megaApi = MegaApplication.getInstance().megaApi
 
     private var successNodes = ArrayList<MegaNode>()
     private var failureCount = 0

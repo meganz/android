@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.*
@@ -61,13 +62,15 @@ class MegaNodeSaving(
     override fun downloadToGallery() = downloadToGallery
 
     override fun doDownload(
+        megaApi: MegaApiAndroid,
+        megaApiFolder: MegaApiAndroid,
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
         snackbarShower: SnackbarShower,
     ): AutoPlayInfo {
         val app = MegaApplication.getInstance()
-        val megaApi = if (isFolderLink) app.megaApiFolder else app.megaApi
+        val api = if (isFolderLink) megaApiFolder else megaApi
         val dbHandler = DatabaseHandler.getDbHandler(app)
 
         var numberOfNodesAlreadyDownloaded = 0
@@ -82,10 +85,10 @@ class MegaNodeSaving(
 
             if (node.type == MegaNode.TYPE_FOLDER) {
                 if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
-                    sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node)
-                    getDlList(megaApi, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
+                    sdCardOperator.buildFileStructure(targets, parentPath, api, node)
+                    getDlList(api, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
                 } else {
-                    getDlList(megaApi, dlFiles, node, File(parentPath, node.name))
+                    getDlList(api, dlFiles, node, File(parentPath, node.name))
                 }
             } else {
                 if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
@@ -111,7 +114,7 @@ class MegaNodeSaving(
                 val destFile = if (destDir.isDirectory) {
                     File(
                         destDir,
-                        app.megaApi.escapeFsIncompatible(
+                        megaApi.escapeFsIncompatible(
                             document.name, destDir.absolutePath + SEPARATOR
                         )
                     )

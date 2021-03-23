@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 
 @Parcelize
@@ -54,6 +55,8 @@ class OfflineSaving(
     override fun downloadToGallery() = false
 
     override fun doDownload(
+        megaApi: MegaApiAndroid,
+        megaApiFolder: MegaApiAndroid,
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
