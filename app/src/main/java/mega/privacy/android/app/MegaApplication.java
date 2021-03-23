@@ -1612,6 +1612,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.remove(chatId);
 	}
 
+	public AppRTCAudioManager getAudioManager(){
+		return rtcAudioManager;
+	}
+
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
