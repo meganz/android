@@ -893,8 +893,9 @@ object MegaNodeUtil {
      *
      * @param api MegaApiAndroid instance to use
      * @param context Android context
+     * @return whether this function call really starts SDK HTTP streaming server
      */
-    fun setupStreamingServer(api: MegaApiAndroid, context: Context) {
+    fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
 
@@ -907,7 +908,11 @@ object MegaNodeUtil {
                 if (memoryInfo.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
                 else MAX_BUFFER_16MB
             )
+
+            return true
         }
+
+        return false
     }
 
     /**

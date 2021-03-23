@@ -853,6 +853,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			} else {
 				if (megaApi.httpServerIsRunning() == 0) {
 					megaApi.httpServerStart();
+					pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 				}
 
 				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();

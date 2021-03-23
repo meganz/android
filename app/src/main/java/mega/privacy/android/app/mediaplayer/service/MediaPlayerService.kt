@@ -48,7 +48,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     @Inject
     lateinit var dbHandler: DatabaseHandler
 
-    private lateinit var binder: MediaPlayerServiceBinder
+    private val binder by lazy { MediaPlayerServiceBinder(this) }
     private var initialized = false
 
     lateinit var viewModel: MediaPlayerServiceViewModel
@@ -91,7 +91,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
 
-        binder = MediaPlayerServiceBinder(this)
         viewModel = MediaPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
 
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
@@ -367,11 +366,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
         mainHandler.removeCallbacks(resumePlayRunnable)
 
-        if (audioManager != null) {
-            abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
-        }
+        if (initialized) {
+            if (audioManager != null) {
+                abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
+            }
 
-        viewModel.clear()
+            viewModel.clear()
+        }
 
         playerNotificationManager?.setPlayer(null)
         exoPlayer.release()

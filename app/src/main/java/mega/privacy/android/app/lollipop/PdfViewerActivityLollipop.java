@@ -2054,13 +2054,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     protected void onDestroy() {
         logDebug("onDestroy()");
 
+        boolean needStopHttpServer = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false);
+
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
-            megaApi.httpServerStop();
+
+            if (needStopHttpServer) {
+                megaApi.httpServerStop();
+            }
         }
 
-        if (megaApiFolder != null) {
+        if (megaApiFolder != null && needStopHttpServer) {
             megaApiFolder.httpServerStop();
         }
 

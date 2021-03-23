@@ -346,9 +346,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
-		megaApiFolder.httpServerStop();
 		megaApi = app.getMegaApi();
-		megaApi.httpServerStop();
 
 		registerTransfersReceiver();
 

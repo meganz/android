@@ -156,6 +156,7 @@ public class FileUtil {
                                                    SnackbarShower snackbarShower) {
         if (megaApi.httpServerIsRunning() == 0) {
             megaApi.httpServerStart();
+            intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
         }
 
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();

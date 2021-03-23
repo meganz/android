@@ -125,6 +125,8 @@ class MediaPlayerServiceViewModel(
 
     private var playerRetry = 0
 
+    private var needStopStreamingServer = false
+
     init {
         compositeDisposable.add(
             createThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
@@ -197,7 +199,7 @@ class MediaPlayerServiceViewModel(
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
-                setupStreamingServer(getApi(type), context)
+                needStopStreamingServer = setupStreamingServer(getApi(type), context)
             }
 
             compositeDisposable.add(
@@ -595,10 +597,15 @@ class MediaPlayerServiceViewModel(
                 ) {
                     mediaItemFromFile(File(localPath), it.handle.toString())
                 } else if (dbHandler.credentials != null) {
-                    MediaItem.Builder()
-                        .setUri(Uri.parse(api.httpServerGetLocalLink(it)))
-                        .setMediaId(it.handle.toString())
-                        .build()
+                    val url = api.httpServerGetLocalLink(it)
+                    if (url == null) {
+                        null
+                    } else {
+                        MediaItem.Builder()
+                            .setUri(Uri.parse(url))
+                            .setMediaId(it.handle.toString())
+                            .build()
+                    }
                 } else {
                     null
                 }
@@ -885,8 +892,11 @@ class MediaPlayerServiceViewModel(
      */
     fun clear() {
         compositeDisposable.dispose()
-        megaApi.httpServerStop()
-        megaApiFolder.httpServerStop()
+
+        if (needStopStreamingServer) {
+            megaApi.httpServerStop()
+            megaApiFolder.httpServerStop()
+        }
 
         megaApi.removeTransferListener(this)
     }
