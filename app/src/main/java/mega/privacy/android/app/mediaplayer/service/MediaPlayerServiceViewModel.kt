@@ -361,7 +361,7 @@ class MediaPlayerServiceViewModel(
 
                         postPlayingThumbnail()
                     })
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.single())
                     .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel buildPlayerSource"))
             )
         } else {
