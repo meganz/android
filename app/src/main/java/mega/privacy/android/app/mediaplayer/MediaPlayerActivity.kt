@@ -366,7 +366,13 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         val currentFragment = navController.currentDestination?.id ?: return
 
         val adapterType = playerService?.viewModel?.currentIntent
-            ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE) ?: return
+            ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+
+        val playingHandle = playerService?.viewModel?.playingHandle
+        if (adapterType == null || playingHandle == null) {
+            toggleAllMenuItemsVisibility(menu, false)
+            return
+        }
 
         when (currentFragment) {
             R.id.playlist -> {
@@ -386,7 +392,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     return
                 }
 
-                if (adapterType == RUBBISH_BIN_ADAPTER) {
+                if (adapterType == RUBBISH_BIN_ADAPTER
+                    || megaApi.isInRubbish(megaApi.getNodeByHandle(playingHandle))
+                ) {
                     toggleAllMenuItemsVisibility(menu, false)
 
                     menu.findItem(R.id.properties).isVisible =
