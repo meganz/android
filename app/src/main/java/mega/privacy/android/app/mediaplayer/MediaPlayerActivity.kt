@@ -56,6 +56,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
 import javax.inject.Inject
 
@@ -557,7 +558,11 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                             api: MegaApiJava, request: MegaRequest, e: MegaError
                         ) {
                             if (e.errorCode == MegaError.API_OK) {
-                                refreshMenuOptionsVisibility()
+                                // Some times checking node.isExported immediately will still
+                                // get true, so let's add some delay here.
+                                runDelay(100L) {
+                                    refreshMenuOptionsVisibility()
+                                }
                             }
                         }
                     })
