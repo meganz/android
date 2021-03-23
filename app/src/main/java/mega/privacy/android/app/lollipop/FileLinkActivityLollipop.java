@@ -785,6 +785,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 			if (megaApi.httpServerIsRunning() == 0) {
 				megaApi.httpServerStart();
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 			} else {
 				logWarning("ERROR: HTTP server already running");
 			}

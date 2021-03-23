@@ -621,6 +621,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					else {
 						if (megaApi.httpServerIsRunning() == 0) {
 							megaApi.httpServerStart();
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();

@@ -174,6 +174,14 @@ class MediaPlayerServiceViewModel(
             return false
         }
 
+        // Because the same instance will be used if user creates another audio playlist,
+        // so if we need stop streaming server in previous creation, we still need
+        // stop it even if the new creation indicates we don't need to stop it,
+        // otherwise the streaming server won't be stopped at the end.
+        needStopStreamingServer = needStopStreamingServer || intent.getBooleanExtra(
+            INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false
+        )
+
         playerRetry = 0
         audioPlayer = MimeTypeList.typeForName(firstPlayNodeName).isAudio
 
@@ -199,7 +207,8 @@ class MediaPlayerServiceViewModel(
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
-                needStopStreamingServer = setupStreamingServer(getApi(type), context)
+                needStopStreamingServer =
+                    needStopStreamingServer || setupStreamingServer(getApi(type), context)
             }
 
             compositeDisposable.add(
