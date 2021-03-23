@@ -410,7 +410,6 @@ class MegaNodeDialogUtil {
                             val textFileEditor = Intent(context, TextFileEditorActivity::class.java)
                                 .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
                                 .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
-                                .putExtra(INTENT_EXTRA_KEY_IS_NEW_TXT_FILE, true)
 
                             context.startActivity(textFileEditor)
                         }

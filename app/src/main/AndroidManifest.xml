@@ -499,7 +499,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.TextFileEditor"
+            android:name="mega.privacy.android.app.activities.TextFileEditorActivity"
             android:launchMode="singleTop">
         </activity>
 
