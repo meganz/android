@@ -134,7 +134,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void setSearchDate(long[] searchDate, int orderBy) {
         cuSearchDate = searchDate;
-        mViewModel.setSearchDate(searchDate, orderBy);
+        if (mViewModel != null) {
+            mViewModel.setSearchDate(searchDate, orderBy);
+        }
     }
 
     public void reloadNodes(int orderBy) {
@@ -371,17 +373,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mManagerActivity = (ManagerActivityLollipop) context;
 
+        CuViewModelFactory viewModelFactory =
+                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
+        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+
         initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-
-        CuViewModelFactory viewModelFactory =
-                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
-        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
             return createCameraUploadsViewForFirstLogin(inflater, container);
@@ -432,6 +434,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
     }
 
     /**
