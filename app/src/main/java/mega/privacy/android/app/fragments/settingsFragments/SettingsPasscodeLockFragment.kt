@@ -13,6 +13,7 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -20,6 +21,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsPasscodeLockFragment : SettingsBaseFragment() {
+
+    companion object {
+        private const val IS_REQUIRE_PASSCODE_DIALOG_SHOWN = "IS_REQUIRE_PASSCODE_DIALOG_SHOWN"
+        private const val REQUIRE_PASSCODE_DIALOG_OPTION = "REQUIRE_PASSCODE_DIALOG_OPTION"
+    }
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
@@ -53,9 +59,10 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
-            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog()
+            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(INVALID_POSITION)
             requirePasscodeDialog.setOnDismissListener {
-                requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
+                requirePasscode?.summary =
+                    passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
             }
             true
         }
@@ -69,6 +76,26 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         } else {
             enablePasscode()
         }
+
+        if (savedInstanceState != null
+            && savedInstanceState.getBoolean(IS_REQUIRE_PASSCODE_DIALOG_SHOWN, false)
+        ) {
+            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(
+                savedInstanceState.getInt(REQUIRE_PASSCODE_DIALOG_OPTION)
+            )
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (this::requirePasscodeDialog.isInitialized && requirePasscodeDialog.isShowing) {
+            outState.putBoolean(IS_REQUIRE_PASSCODE_DIALOG_SHOWN, true)
+            outState.putInt(
+                REQUIRE_PASSCODE_DIALOG_OPTION,
+                requirePasscodeDialog.listView.checkedItemPosition
+            )
+        }
+
+        super.onSaveInstanceState(outState)
     }
 
     private fun enablePasscode() {

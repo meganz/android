@@ -47,9 +47,10 @@ class PasscodeUtil @Inject constructor(
 
     /**
      * Shows a dialog to choose the required time to ask for passcode.
+     * @param itemChecked The option to set as selected if after rotation, invalid option otherwise.
      * @return The AlertDialog.
      */
-    fun showRequirePasscodeDialog(): AlertDialog {
+    fun showRequirePasscodeDialog(itemChecked: Int): AlertDialog {
         val dialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         dialogBuilder.setTitle(getString(R.string.settings_require_passcode))
@@ -129,7 +130,7 @@ class PasscodeUtil @Inject constructor(
 
         dialogBuilder.setSingleChoiceItems(
             optionsAdapter,
-            initialRequiredTime
+            if (itemChecked != INVALID_POSITION) itemChecked else initialRequiredTime
         ) { dialog: DialogInterface, item: Int ->
             itemClicked.set(item)
             enableOrDisableDialogButton(
@@ -152,7 +153,7 @@ class PasscodeUtil @Inject constructor(
         requirePasscodeDialog.show()
 
         enableOrDisableDialogButton(
-            false,
+            itemChecked != INVALID_POSITION && itemChecked != initialRequiredTime,
             requirePasscodeDialog.getButton(AlertDialog.BUTTON_POSITIVE)
         )
 

@@ -131,6 +131,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun initPasscodeScreen() {
         setTitleText()
+        binding.passcodeOptionsButton.isVisible = !secondRound
 
         if (mode == UNLOCK_MODE) {
             attempts = dbH.attributes.attemps
@@ -506,7 +507,6 @@ class PasscodeLockActivity : BaseActivity() {
         this.passcodeType = passcodeType
         initPasscodeScreen()
         clearTypedPasscode()
-
 
         Handler().postDelayed({
             (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(
