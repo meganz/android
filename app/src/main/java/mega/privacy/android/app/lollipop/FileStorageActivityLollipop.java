@@ -112,6 +112,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_PATH = "filepath";
+	/** Currently for exporting recovery key use. */
+	public static final String EXTRA_SD_URI = "sdcarduri";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
 
@@ -192,6 +194,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
+
+    /**
+     * Pass to exporting recovery key oepreration.
+     */
+	private String sdCardUriString;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -920,6 +927,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void finishPickFolder() {
 		Intent intent = new Intent();
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
+		intent.putExtra(EXTRA_SD_URI, sdCardUriString);
 		intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
 		intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
 		intent.putExtra(EXTRA_URL, url);
@@ -1180,6 +1188,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
                     dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
+                } else if (fromSaveRecoveryKey) {
+                    // For temporary use, don't store the uri to database.
+                    sdCardUriString = uriString;
                 } else {
                     dbH.setSDCardUri(uriString);
                 }
