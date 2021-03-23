@@ -215,7 +215,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
 				if (isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+//					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
@@ -246,7 +246,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 
 				if (isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+//					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
