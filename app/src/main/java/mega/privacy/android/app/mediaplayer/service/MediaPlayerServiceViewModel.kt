@@ -910,6 +910,27 @@ class MediaPlayerServiceViewModel(
         postPlaylistItems()
     }
 
+    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
+    }
+
+    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
+    }
+
+    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
+    }
+
+    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
+        if (transfer.nodeHandle != playingHandle) {
+            return
+        }
+
+        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
+            _error.value = e.errorCode
+        }
+    }
+
+    override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
+
     companion object {
         private const val SETTINGS_FILE = "audio_player_settings"
         private const val KEY_BACKGROUND_PLAY_ENABLED = "background_play_enabled"
@@ -931,21 +952,4 @@ class MediaPlayerServiceViewModel(
                 .apply()
         }
     }
-
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
-    }
-
-    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-    }
-
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
-    }
-
-    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
-            _error.value = e.errorCode
-        }
-    }
-
-    override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
 }
