@@ -350,7 +350,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
 			chatIcon.setVisible(false);
-		} else if (adapterType == RUBBISH_BIN_ADAPTER){
+		} else if (adapterType == RUBBISH_BIN_ADAPTER
+				|| megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG)))){
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
 			copyIcon .setVisible(false);

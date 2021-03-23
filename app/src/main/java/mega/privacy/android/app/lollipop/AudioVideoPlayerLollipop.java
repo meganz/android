@@ -2073,7 +2073,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            } else if (adapterType == RUBBISH_BIN_ADAPTER){
+            } else if (adapterType == RUBBISH_BIN_ADAPTER
+                    || megaApi.isInRubbish(megaApi.getNodeByHandle(handle))){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
