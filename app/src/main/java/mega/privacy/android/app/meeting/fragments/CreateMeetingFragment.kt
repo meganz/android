@@ -1,11 +1,18 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.create_meeting_fragment.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.*
@@ -33,6 +40,11 @@ class CreateMeetingFragment : MeetingBaseFragment(), MegaRequestListenerInterfac
         return inflater.inflate(R.layout.create_meeting_fragment, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        showKeyboardDelayed(type_meeting_edit_text)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CreateMeetingViewModel::class.java)
@@ -52,6 +64,16 @@ class CreateMeetingFragment : MeetingBaseFragment(), MegaRequestListenerInterfac
                 ).absolutePath,
                 this
             )
+        }
+    }
+    private fun showKeyboardDelayed(view: EditText) {
+        GlobalScope.async {
+            delay(50)
+            view.isFocusable = true;
+            view.isFocusableInTouchMode = true;
+            view.requestFocus();
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
     }
     fun setDefaultAvatar() {
