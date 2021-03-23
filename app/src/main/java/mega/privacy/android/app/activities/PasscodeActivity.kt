@@ -12,6 +12,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 open class PasscodeActivity : BaseActivity() {
 
+    companion object {
+        private const val SCREEN_ORIENTATION = "SCREEN_ORIENTATION"
+    }
+
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
     private var lastStart = 0L
@@ -28,9 +32,16 @@ open class PasscodeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null &&
+            resources.configuration.orientation != savedInstanceState.getInt(SCREEN_ORIENTATION)
+        ) {
             isScreenRotation = true
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(SCREEN_ORIENTATION, resources.configuration.orientation)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onPause() {
