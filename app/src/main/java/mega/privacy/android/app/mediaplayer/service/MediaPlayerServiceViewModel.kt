@@ -54,8 +54,6 @@ class MediaPlayerServiceViewModel(
 ) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
     private val compositeDisposable = CompositeDisposable()
 
-    private val downloadLocationDefaultPath = getDownloadLocation()
-
     private val preferences = context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
 
     private var backgroundPlayEnabled = preferences.getBoolean(KEY_BACKGROUND_PLAY_ENABLED, true)
@@ -193,8 +191,29 @@ class MediaPlayerServiceViewModel(
             displayNodeNameFirst = false
         }
 
+        val firstPlayUri = if (type == FOLDER_LINK_ADAPTER) {
+            val node = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(firstPlayHandle))
+            if (node == null) {
+                null
+            } else {
+                val url = getApi(type).httpServerGetLocalLink(node)
+                if (url == null) {
+                    null
+                } else {
+                    Uri.parse(url)
+                }
+            }
+        } else {
+            uri
+        }
+
+        if (firstPlayUri == null) {
+            _retry.value = false
+            return false
+        }
+
         val mediaItem = MediaItem.Builder()
-            .setUri(uri)
+            .setUri(firstPlayUri)
             .setMediaId(firstPlayHandle.toString())
             .build()
         _playerSource.value = Triple(
@@ -347,7 +366,7 @@ class MediaPlayerServiceViewModel(
 
                                 buildPlaylistFromNodes(
                                     getApi(type), megaApiFolder.getChildren(parent, order),
-                                    firstPlayHandle
+                                    firstPlayHandle, true
                                 )
                             }
                             ZIP_ADAPTER -> {
@@ -582,7 +601,10 @@ class MediaPlayerServiceViewModel(
     }
 
     private fun buildPlaylistFromNodes(
-        api: MegaApiAndroid, nodes: List<MegaNode>, firstPlayHandle: Long
+        api: MegaApiAndroid,
+        nodes: List<MegaNode>,
+        firstPlayHandle: Long,
+        isFolderLink: Boolean = false
     ) {
         doBuildPlaylist(
             api, nodes, firstPlayHandle,
@@ -590,23 +612,17 @@ class MediaPlayerServiceViewModel(
                 filterByNodeName(it.name)
             },
             {
-                var isOnMegaDownloads = false
-                val f = File(downloadLocationDefaultPath, it.name)
-                if (f.exists() && f.length() == it.size) {
-                    isOnMegaDownloads = true
-                }
-
                 val localPath = getLocalFile(context, it.name, it.size)
-                val nodeFingerPrint = api.getFingerprint(it)
-                val localPathFingerPrint = api.getFingerprint(localPath)
-
-                if (localPath != null
-                    && (isOnMegaDownloads || nodeFingerPrint != null
-                            && nodeFingerPrint == localPathFingerPrint)
-                ) {
+                if (isLocalFile(it, api, localPath)) {
                     mediaItemFromFile(File(localPath), it.handle.toString())
-                } else if (dbHandler.credentials != null) {
-                    val url = api.httpServerGetLocalLink(it)
+                } else {
+                    val authorizedNode = if (isFolderLink) {
+                        megaApiFolder.authorizeNode(it)
+                    } else {
+                        it
+                    }
+
+                    val url = api.httpServerGetLocalLink(authorizedNode)
                     if (url == null) {
                         null
                     } else {
@@ -615,8 +631,6 @@ class MediaPlayerServiceViewModel(
                             .setMediaId(it.handle.toString())
                             .build()
                     }
-                } else {
-                    null
                 }
             },
             {
