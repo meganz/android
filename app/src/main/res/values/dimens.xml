@@ -102,11 +102,14 @@
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="drawer_item_height">48dp</dimen>
 
-    <dimen name="bottom_sheet_drawable_padding">32dp</dimen>
-    <dimen name="divider_width">72dp</dimen>
-
     <!-- My account page button padding -->
     <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
 
+    <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
     <dimen name="meeting_bottom_floating_panel_fab_size">48dp</dimen>
+    <dimen name="bottom_sheet_item_height">56dp</dimen>
+    <dimen name="bottom_sheet_item_padding_horizontal">18dp</dimen>
+    <dimen name="bottom_sheet_item_drawable_padding">32dp</dimen>
+    <dimen name="bottom_sheet_item_divider_margin_start">72dp</dimen>
 </resources>

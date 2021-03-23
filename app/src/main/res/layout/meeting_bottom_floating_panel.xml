@@ -134,7 +134,6 @@
         android:background="@null"
         app:borderWidth="0dp"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        app:is_on="false"
         app:layout_constraintEnd_toStartOf="@id/fab_end"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_hold"
@@ -146,7 +145,8 @@
         app:on_icon="@drawable/ic_speaker_on"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:is_on="false" />
 
     <TextView
         android:id="@+id/fab_speaker_label"
@@ -191,14 +191,14 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="13dp"
-        android:background="@color/grey_alpha_012"
+        android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fab_mic_label" />
 
     <Button
         android:id="@+id/share_link"
-        style="@style/Widget.Mega.Button.OutlinedButton.Grey"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="6dp"
@@ -206,7 +206,7 @@
         android:drawableTop="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
-        app:drawableTint="@color/teal_300"
+        app:drawableTint="@color/teal_300_teal_200"
         app:layout_constraintEnd_toStartOf="@id/invite"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
@@ -215,14 +215,14 @@
 
     <Button
         android:id="@+id/invite"
-        style="@style/Widget.Mega.Button.OutlinedButton.Grey"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="15dp"
         android:drawableTop="@drawable/ic_invite_contact"
         android:text="@string/invite_participants"
         android:textAllCaps="false"
-        app:drawableTint="@color/teal_300"
+        app:drawableTint="@color/teal_300_teal_200"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/share_link"
@@ -236,20 +236,19 @@
         android:layout_marginStart="17dp"
         android:layout_marginTop="21dp"
         android:textAppearance="?attr/textAppearanceSubtitle2"
-        android:textColor="@color/grey_alpha_087"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/share_link"
         tools:text="@string/participants_number" />
 
     <Button
         android:id="@+id/guest_share_link"
-        style="@style/Widget.Mega.Button.OutlinedButton.Grey"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="13dp"
         android:drawableLeft="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
-        app:drawableTint="@color/teal_300"
+        app:drawableTint="@color/teal_300_teal_200"
         app:layout_constraintBottom_toBottomOf="@id/participants_num"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"

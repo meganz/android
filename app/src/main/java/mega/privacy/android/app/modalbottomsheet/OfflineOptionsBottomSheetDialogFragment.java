@@ -21,8 +21,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_MARGIN_DP;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

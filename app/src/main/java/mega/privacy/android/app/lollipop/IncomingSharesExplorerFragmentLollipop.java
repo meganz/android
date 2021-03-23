@@ -2,11 +2,11 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -24,9 +24,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,15 +56,18 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.COPY;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -112,6 +118,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
 	private boolean hasWritePermissions = true;
+
+	private Spanned emptyRootText;
+	private Spanned emptyGeneralText;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -332,27 +341,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
 
-		
-		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
-			if (((FileExplorerActivityLollipop)context).getDeepBrowserTree() > 0){
-				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-				if(parent != null){
-					if(parent.getHandle() == parentHandle) {
-						activateButton(false);
-					}else{
-						activateButton(true);
-					}
-				}else{
-					activateButton(true);
-				}
+		if (modeCloud == MOVE || modeCloud == COPY) {
+			optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE ? R.string.context_move
+					: R.string.context_copy).toUpperCase(Locale.getDefault()));
+
+			if (((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
+				checkCopyMoveButton();
 			}
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
+		} else if (modeCloud == FileExplorerActivityLollipop.UPLOAD) {
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
@@ -385,7 +382,31 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		return v;
 	}
 
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.context_empty_incoming)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+		emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
+				StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		updateEmptyScreen();
+	}
+
 	private void setOptionsBarVisibility() {
+		if (optionsBar == null) {
+			return;
+		}
+
 		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
 				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
 			optionsBar.setVisibility(View.GONE);
@@ -418,53 +439,24 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			recyclerView.setVisibility(View.GONE);
-
-			String textToShow;
-
-			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
-
-			if (parentHandle == -1) {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-				} else {
-					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
-				}
-
-				textToShow = String.format(context.getString(R.string.context_empty_incoming));
-			} else {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-				}
-
-				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-			}
-
-			try {
-				textToShow = textToShow.replace(
-						"[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
-								+ "\'>"
-				).replace("[/A]", "</font>").replace(
-						"[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
-								+ "\'>"
-				).replace("[/B]", "</font>");
-			} catch (Exception e) {
-				logWarning("Error formatting string", e);
-			}
-
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-
-			emptyTextViewFirst.setText(result);
-			emptyTextViewFirst.setVisibility(View.VISIBLE);
+			updateEmptyScreen();
 		}
+	}
+
+	private void updateEmptyScreen() {
+		if (parentHandle == INVALID_HANDLE) {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
+
+			emptyTextViewFirst.setText(emptyRootText);
+		} else {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+
+			emptyTextViewFirst.setText(emptyGeneralText);
+		}
+
+		ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 	}
 
 	private void findNodes(){
@@ -576,7 +568,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		recyclerView.scrollToPosition(0);
 
-		if (modeCloud == FileExplorerActivityLollipop.COPY){
+		if (modeCloud == COPY || modeCloud == MOVE){
 			activateButton(true);
 		}
 	}
@@ -625,14 +617,11 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			setNodes(megaApi.getChildren(nodes.get(position), order));
 			recyclerView.scrollToPosition(0);
 
-			if (adapter.getItemCount() == 0 && modeCloud == FileExplorerActivityLollipop.COPY) {
-				activateButton(true);
-			} else if (modeCloud == FileExplorerActivityLollipop.COPY && ((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
-				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-				if (parent != null && parent.getHandle() == parentHandle) {
-					activateButton(false);
-				} else {
+			if (modeCloud == COPY || modeCloud == MOVE) {
+				if (adapter.getItemCount() == 0) {
 					activateButton(true);
+				} else if (((FileExplorerActivityLollipop) context).getDeepBrowserTree() > 0) {
+					checkCopyMoveButton();
 				}
 			}
 		}
@@ -700,24 +689,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 				setParentHandle(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, order);
+				setNodes(nodes);
 
-				if (modeCloud == FileExplorerActivityLollipop.COPY){
-					if (((FileExplorerActivityLollipop)context).getDeepBrowserTree() > 0){
-						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
-						if(parent != null){
-							if(parent.getHandle() == parentHandle) {
-								activateButton(false);
-							}else{
-								activateButton(true);
-							}
-						}else{
-							activateButton(true);
-
-						}
-					}
+				if (modeCloud == COPY || modeCloud == MOVE) {
+					checkCopyMoveButton();
 				}
 
-				setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
@@ -996,5 +973,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	public boolean isFolderEmpty() {
 		return adapter == null || adapter.getItemCount() <= 0;
+	}
+
+	/**
+	 * Checks if copy or move button should be shown or hidden depending on the current navigation level.
+	 * Shows it if the current navigation level is not the parent of moving/copying nodes.
+	 * Hides it otherwise.
+	 */
+	private void checkCopyMoveButton() {
+		MegaNode parentMove = ((FileExplorerActivityLollipop) context).parentMoveCopy();
+		activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
 	}
 }

@@ -45,7 +45,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     protected void initItemDecoration(Canvas c, RecyclerView parent) {
-        left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.divider_width) + parent.getPaddingLeft();
+        left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.bottom_sheet_item_divider_margin_start) + parent.getPaddingLeft();
         right = parent.getWidth() - parent.getPaddingRight();
 
         c.clipRect(left, parent.getPaddingTop(), right,
