@@ -125,7 +125,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                                 listener.showPreviousHiddenThumbnail();
 
                                 DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
-                                if (dragListener != null) {
+                                if (dragListener != null && screenPosition != null) {
                                     dragListener.onDraggedEnded(draggableView, direction);
                                     dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                                 }
