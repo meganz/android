@@ -57,6 +57,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     lateinit var exoPlayer: SimpleExoPlayer
         private set
     private var playerNotificationManager: PlayerNotificationManager? = null
+    private var notificationDismissed = false
 
     private val _metadata = MutableLiveData<Metadata>()
     val metadata: LiveData<Metadata> = _metadata
@@ -146,6 +147,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
                 viewModel.paused = !playWhenReady
+
+                if (playWhenReady && notificationDismissed) {
+                    playerNotificationManager?.setPlayer(exoPlayer)
+                    notificationDismissed = false
+                }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
@@ -226,6 +232,16 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     } else {
                         // Make notification cancellable.
                         stopForeground(false)
+                    }
+                }
+
+                override fun onNotificationCancelled(
+                    notificationId: Int,
+                    dismissedByUser: Boolean
+                ) {
+                    if (dismissedByUser) {
+                        playerNotificationManager?.setPlayer(null)
+                        notificationDismissed = true
                     }
                 }
             }
