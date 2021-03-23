@@ -491,7 +491,7 @@ class PasscodeLockActivity : BaseActivity() {
         if (isBottomSheetDialogShown(passcodeOptionsBottomSheetDialogFragment)) return
 
         passcodeOptionsBottomSheetDialogFragment =
-            PasscodeOptionsBottomSheetDialogFragment(passcodeType)
+            PasscodeOptionsBottomSheetDialogFragment.newInstance(passcodeType)
         passcodeOptionsBottomSheetDialogFragment?.show(
             supportFragmentManager,
             passcodeOptionsBottomSheetDialogFragment?.tag
