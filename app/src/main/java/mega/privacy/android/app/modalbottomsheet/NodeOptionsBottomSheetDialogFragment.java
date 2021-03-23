@@ -642,10 +642,63 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case MODE5:
+                if (megaApi.isInRubbish(node)) {
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                    } else {
+                        optionInfoText.setText(R.string.general_file_info);
+                    }
+
+                    MegaNode restoreNode = megaApi.getNodeByHandle(node.getRestoreHandle());
+
+                    if (!megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                        counterModify--;
+                        optionRestoreFromRubbish.setVisibility(View.GONE);
+                    } else {
+                        optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                    }
+
+                    nodeIconLayout.setVisibility(View.GONE);
+
+                    optionRemove.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    counterOpen--;
+                    optionOpenWith.setVisibility(View.GONE);
+                    counterModify--;
+                    optionMove.setVisibility(View.GONE);
+                    counterModify--;
+                    optionRename.setVisibility(View.GONE);
+                    counterModify--;
+                    optionCopy.setVisibility(View.GONE);
+                    counterShares--;
+                    optionClearShares.setVisibility(View.GONE);
+                    optionLeaveShares.setVisibility(View.GONE);
+                    optionRubbishBin.setVisibility(View.GONE);
+                    counterShares--;
+                    optionShare.setVisibility(View.GONE);
+                    counterShares--;
+                    optionShareFolder.setVisibility(View.GONE);
+                    counterShares--;
+                    optionLink.setVisibility(View.GONE);
+                    counterShares--;
+                    optionRemoveLink.setVisibility(View.GONE);
+                    counterOpen--;
+                    optionOpenFolder.setVisibility(View.GONE);
+                    counterSave--;
+                    optionDownload.setVisibility(View.GONE);
+                    counterSave--;
+                    optionOffline.setVisibility(View.GONE);
+                    counterShares--;
+                    optionSendChat.setVisibility(View.GONE);
+
+                    break;
+                }
+
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
-
                 } else {
                     optionInfoText.setText(R.string.general_file_info);
                     counterShares--;
