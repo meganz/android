@@ -410,8 +410,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    private fun playing() =
-        exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED
+    fun playing() = exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1

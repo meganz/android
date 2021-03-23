@@ -131,7 +131,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        if (isVideoPlayer()) {
+        if (isVideoPlayer() && playerService?.playing() == true) {
             playerService?.exoPlayer?.playWhenReady = false
             videoPlayerPausedForPlaylist = true
         }
