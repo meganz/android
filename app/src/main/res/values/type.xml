@@ -53,6 +53,10 @@
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey38White38">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
         <item name="android:textSize">18sp</item>
     </style>

@@ -8,15 +8,30 @@
 
     <mega.privacy.android.app.components.twemoji.EmojiEditText
         android:id="@+id/type_text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"
         android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
         app:emojiSize="18sp"
+        app:layout_constraintEnd_toStartOf="@id/extension_text"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="1"
         tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/extension_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey38White38"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="@id/type_text" />
 
     <TextView
         android:id="@+id/error_text"
@@ -28,7 +43,8 @@
         android:textSize="12sp"
         app:drawableEndCompat="@drawable/ic_input_warning"
         app:drawableTint="?attr/colorError"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/type_text"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/type_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
