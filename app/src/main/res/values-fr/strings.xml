@@ -347,7 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Aucune appli n\'est proposée sur votre appareil pour ouvrir cette position</string>
-    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">Il semble qu\'aucune appli n\'est installée qui prenne ce type de fichier en charge</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
@@ -1366,7 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Supprimer de Hors Ligne ?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Définir l\'état</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Thème chromatique</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Fermer</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Non disponible</string>
 
@@ -1473,8 +1473,8 @@
     </plurals>
 
     <plurals name="upload_service_notification_already_uploaded">
-        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
-        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 fichier a été téléversé</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers ont été téléversés</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1621,7 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Les transferts ont été mis en pause</string>
     <string name="attachment_uploading_state_uploading">Téléversement&#8230;</string>
-    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compression&#8230;</string>
     <string name="attachment_uploading_state_error">Erreur. N\'a pas été envoyé.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d fichiers ont déjà été téléchargés.</string>
@@ -2764,8 +2764,8 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Quelque chose a mal tourné</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactez l\'administrateur de votre compte d\'entreprise pour résoudre la situation et activer votre compte.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Augmentera automatiquement, sans frais supplémentaires, pour une utilisation professionnelle justifiée.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]d\'espace de stockage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Quota de transfert[/A] ILLIMITÉ</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] d\'espace de stockage [A]**[/A]</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Quota de transfert [A]illimité[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
@@ -2821,7 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Joindre à partir de&#8230;</string>
 
-    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Conversation crée %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Conversation crée le %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Sélection des messages</string>
 
@@ -3035,11 +3035,11 @@
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Numériser un document</string>
 
-    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s ne se trouve pas dans votre liste de contacts</string>
 
 
     <string name="theme_light" context="Option of color theme, light mode.">Clair</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">Sombre</string>
-    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
-    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Valeur par défaut du système</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Défini par l\'économiseur de pile</string>
 </resources>

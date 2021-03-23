@@ -1366,7 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线中删除？</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">主题颜色</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">主题颜色</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">无法使用</string>
 

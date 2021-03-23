@@ -1366,7 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Você quer eliminar da seção Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Definir status</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Esquema de cores</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Esquema de cores</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Fechar</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Não disponível</string>
 
