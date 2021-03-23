@@ -17,14 +17,14 @@
         android:layout_marginBottom="13dp"
         android:background="@drawable/self_feed_floating_window_background">
         <SurfaceView
-            android:id="@+id/video"
+            android:id="@+id/my_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:visibility="gone"/>
 
         <mega.privacy.android.app.components.RoundedImageView
-            android:id="@+id/avatar_image"
+            android:id="@+id/my_avatar"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true"

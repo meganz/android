@@ -20,7 +20,50 @@
         android:background="@drawable/gradient_shape_callschat"
         app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="meeting" />
+        app:title="meeting">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="36dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/meeting_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:emojiSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/meeting_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/duration_meeting"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption" />
+
+                <Chronometer
+                    android:id="@+id/meeting_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <include
         android:id="@+id/small_camera_parent"

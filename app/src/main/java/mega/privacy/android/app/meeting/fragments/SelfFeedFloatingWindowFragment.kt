@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.CLIENT_ID
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -38,15 +38,15 @@ class SelfFeedFloatingWindowFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         _binding = SelfFeedFloatingWindowFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        logDebug("************** onViewCreated")
         setupClickListeners()
         fragmentTextUpdateObserver()
     }

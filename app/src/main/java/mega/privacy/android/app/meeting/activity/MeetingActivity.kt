@@ -1,6 +1,8 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
@@ -8,12 +10,16 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.IncomingCallNotification
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.VideoCaptureUtils
 
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     companion object{
@@ -40,8 +46,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
+    private var gridViewMenuItem: MenuItem? = null
+    private var speakerViewMenuItem: MenuItem? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        IncomingCallNotification.cancelIncomingCallNotification(this)
+        MegaApplication.setShowPinScreen(true)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
 
@@ -51,6 +63,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
+
+        binding.meetingTitle.setText("Meeting title")
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -67,8 +81,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         }
         val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
         when(intent.getStringExtra(MEETING_TYPE)){
-            MEETING_TYPE_JOIN->navGraph.startDestination = R.id.joinMeetingFragment
-            MEETING_TYPE_CREATE->navGraph.startDestination = R.id.createMeetingFragment
+            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
+            MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
         }
         navController.graph = navGraph
 
@@ -98,6 +112,45 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
 
         updateRole()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_meeting, menu)
+
+        menu?.findItem(R.id.swap_camera)?.isVisible = true
+        speakerViewMenuItem = menu?.findItem(R.id.speaker_view)
+        speakerViewMenuItem?.isVisible = true
+        gridViewMenuItem = menu?.findItem(R.id.grid_view)
+        gridViewMenuItem?.isVisible = true
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            R.id.swap_camera -> {
+                logDebug("Swap camera")
+                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(applicationContext))
+                true
+            }
+            R.id.grid_view -> {
+                logDebug("Change to grid view")
+                gridViewMenuItem?.isVisible = false
+                speakerViewMenuItem?.isVisible = true
+                true
+            }
+            R.id.speaker_view -> {
+                logDebug("Change to speaker view")
+                gridViewMenuItem?.isVisible = true
+                speakerViewMenuItem?.isVisible = false
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onChangeMicState(micOn: Boolean) {

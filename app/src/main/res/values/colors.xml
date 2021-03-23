@@ -372,6 +372,9 @@
     <!-- For disabled borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
 
+    <!-- local camera background-->
+    <color name="black_87_opacity">@color/teal_300_alpha_038</color>
+
     <!-- Label red -->
     <color name="salmon_400_salmon_300">@color/salmon_400</color>
     <!-- Label green -->

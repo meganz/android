@@ -3076,4 +3076,7 @@
     <string name="make_moderator" context="Make the participant as moderator in the meeting">Make moderator</string>
     <string name="remove_participant" context="Remove the participant from meeting">Remove participant</string>
 
+    <string name="duration_meeting" context="Subtitle of the meeting screen ">Duration</string>
+
+
 </resources>
