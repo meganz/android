@@ -373,7 +373,10 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             }
         }
 
-        exoPlayer.playWhenReady = true
+        if (!viewModel.paused) {
+            exoPlayer.playWhenReady = true
+        }
+
         exoPlayer.prepare()
     }
 
