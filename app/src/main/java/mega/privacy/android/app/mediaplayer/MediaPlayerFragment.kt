@@ -96,6 +96,11 @@ class MediaPlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (savedInstanceState != null) {
+            videoPlayerPausedForPlaylist =
+                savedInstanceState.getBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, false)
+        }
+
         val isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
         val playerServiceIntent = Intent(
             requireContext(),
@@ -118,11 +123,6 @@ class MediaPlayerFragment : Fragment() {
             delayHideToolbar()
         }
 
-        if (videoPlayerPausedForPlaylist) {
-            playerService?.exoPlayer?.playWhenReady = true
-            videoPlayerPausedForPlaylist = false
-        }
-
         if (isVideoPlayer()) {
             (requireActivity() as MediaPlayerActivity).setDraggable(true)
         }
@@ -135,6 +135,12 @@ class MediaPlayerFragment : Fragment() {
             playerService?.exoPlayer?.playWhenReady = false
             videoPlayerPausedForPlaylist = true
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
     }
 
     override fun onDestroy() {
@@ -166,7 +172,7 @@ class MediaPlayerFragment : Fragment() {
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
                 if (!it) {
-                    MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    MaterialAlertDialogBuilder(requireContext())
                         .setCancelable(false)
                         .setMessage(
                             StringResourcesUtils.getString(
@@ -175,7 +181,8 @@ class MediaPlayerFragment : Fragment() {
                             )
                         )
                         .setPositiveButton(
-                            StringResourcesUtils.getString(R.string.general_ok).toUpperCase(Locale.ROOT)
+                            StringResourcesUtils.getString(R.string.general_ok)
+                                .toUpperCase(Locale.ROOT)
                         ) { _, _ ->
                             playerService?.stopAudioPlayer()
                             requireActivity().finish()
@@ -215,6 +222,11 @@ class MediaPlayerFragment : Fragment() {
                 (requireActivity() as MediaPlayerActivity).setDraggable(false)
 
                 findNavController().navigate(R.id.action_player_to_playlist)
+            }
+
+            if (videoPlayerPausedForPlaylist) {
+                service.exoPlayer.playWhenReady = true
+                videoPlayerPausedForPlaylist = false
             }
         }
     }
@@ -329,4 +341,8 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
+
+    companion object {
+        private const val KEY_VIDEO_PAUSED_FOR_PLAYLIST = "VIDEO_PAUSED_FOR_PLAYLIST"
+    }
 }
