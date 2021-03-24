@@ -4,6 +4,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import mega.privacy.android.app.BaseActivity
@@ -15,6 +19,7 @@ import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.meeting.fragments.SelfFeedFloatingWindowFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.IncomingCallNotification
@@ -112,6 +117,12 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
 
         updateRole()
+        showSelFeedFloatingWindow()
+    }
+
+    private fun showSelFeedFloatingWindow(){
+        val fragment = SelfFeedFloatingWindowFragment()
+        addFragment(fragment, R.id.small_camera_fragment)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -121,8 +132,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         speakerViewMenuItem = menu?.findItem(R.id.speaker_view)
         speakerViewMenuItem?.isVisible = true
         gridViewMenuItem = menu?.findItem(R.id.grid_view)
-        gridViewMenuItem?.isVisible = true
-
+        gridViewMenuItem?.isVisible = false
         return true
     }
 
@@ -151,6 +161,18 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int){
+        supportFragmentManager.inTransaction { add(frameId, fragment) }
+    }
+
+    private fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int) {
+        supportFragmentManager.inTransaction{replace(frameId, fragment)}
+    }
+
+    inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction) {
+        beginTransaction().func().commit()
     }
 
     override fun onChangeMicState(micOn: Boolean) {
