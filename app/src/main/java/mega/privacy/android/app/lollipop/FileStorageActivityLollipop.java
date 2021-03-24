@@ -4,12 +4,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -32,26 +29,22 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -62,27 +55,32 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.RunOnUIThreadUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SDCardUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener,
+		ActionNodeCallback {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -186,13 +184,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ActionBar aB;
 	
 	private ActionMode actionMode;
-	
-	private AlertDialog newFolderDialog;
+
 	private AlertDialog setDownloadLocationDialog;
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
-
-	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private Handler handler;
 
@@ -209,7 +204,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 return true;
 
             case R.id.cab_menu_create_folder:
-                showNewFolderDialog();
+				showNewFolderDialog(this, this);
                 return true;
 
             case R.id.cab_menu_select_all:
@@ -588,15 +583,41 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 
-		//for below N or above P, open SAF
-		if (intent == null) {
-			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-		}
+        //for below N or above P, open SAF
+        if (intent == null) intent = openSAFIntent();
 
-		logDebug("Request SD card write permission with intent: " + intent);
-		startActivityForResult(intent, REQUEST_CODE_TREE);
-	}
+        logDebug("Request SD card write permission with intent: " + intent);
+
+        try {
+            /*
+                A small number of devices(the device's OS version should be >= N and < Q) cannot handle
+                Intent { act=android.os.storage.action.OPEN_EXTERNAL_DIRECTORY launchParam=MultiScreenLaunchParams { mDisplayId=0 mBaseDisplayId=0 mFlags=0 }}.
+             */
+            startActivityForResult(intent, REQUEST_CODE_TREE);
+        } catch (Exception e) {
+            logError("Start request SD card uri activity error. Current OS version: " + Build.VERSION.SDK_INT, e);
+            if (isBasedOnFileStorage()) {
+                // Try to request SD card uri with SAF.
+				// The toast is showing on SAF.
+                Toast.makeText(this,StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root),Toast.LENGTH_LONG).show();
+                startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+            } else {
+                // Should never happen.
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Get an Intent which access SD card via SAF and grant the uri.
+     *
+     * @return The Intent launches SAF.
+     */
+    private Intent openSAFIntent() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        return intent;
+    }
 
 	/**
 	 * Shows or hides the root view with Internal storage and External storage.
@@ -1019,182 +1040,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	
-	public void showNewFolderDialog(){
-		logDebug("showNewFolderDialog");
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleWidthPx(20, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, getOutMetrics()), 0, scaleWidthPx(17, getOutMetrics()), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileStorageActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileStorageActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.red_600_red_300));
-
-		final TextView textError = new TextView(FileStorageActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, getOutMetrics()), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.red_600_red_300));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileStorageActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-
-
-		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-
-
-			}
-		});
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No action needed
 	}
-	
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		view.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) FileStorageActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
 	}
-	
-	/*
-	 * Create new folder and reload file list
-	 */
-	private void createFolder(String value) {
+
+	@Override
+	public void createFolder(@NotNull String value) {
 		logDebug(value + " Of value");
         SDCardOperator sdCardOperator = null;
         try {
@@ -1226,12 +1083,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         newFolder.setReadable(true, false);
         newFolder.setExecutable(true, false);
     }
-
-	public static boolean matches(String regex, CharSequence input) {
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
-	}
 
 	/**
 	 * Starts the action mode if needed.
@@ -1268,6 +1119,23 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				onCannotWriteOnSDCard();
 				return;
 			}
+
+            /*
+                If a device's OS version is >= N and < Q, the granted SD card uri MUST be root uri,
+                then user can select any location on SD card as donwload location.
+
+                But if the uri is not root(it may happen when user request uri from SAF,
+                because user can select any folder and just grant the uri for the selected folder),
+                need to force the user to select SD card root on SAF.
+             */
+            if (isBasedOnFileStorage() && SDCardUtils.isNotRootUri(treeUri)) {
+				showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root));
+				RunOnUIThreadUtils.INSTANCE.runDelay(1500, () -> {
+                    startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
+                    return Unit.INSTANCE;
+                });
+                return;
+            }
 
             ContentResolver contentResolver = getContentResolver();
 			contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);

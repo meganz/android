@@ -238,4 +238,7 @@
 
     <!-- Contact voice clip progress bar indicator color-->
     <color name="white_018_026">@color/white_alpha_026</color>
+
+    <!-- Error text highlight color (selection background), import to MEGA screen-->
+    <color name="teal_100_teal_500">@color/teal_500</color>
 </resources>

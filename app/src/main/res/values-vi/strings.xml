@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Thông Tin</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Chính Sách Quyền Riêng Tư</string>
     <string name="settings_about_terms_of_service" context="">Điều Khoản Dịch Vụ</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Quy Định Bảo Vệ Dữ Liệu</string>
     <string name="settings_about_app_version" context="App means “Application”">Phiên bản ứng dụng</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Phiên bản MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Phiên bản SDK MEGAchát</string>

@@ -103,7 +103,7 @@ class PsaWebBrowser : Fragment() {
     fun hidePSA() {
         uiHandler.post {
             val currentActivity = activity
-            if (currentActivity is BaseActivity) {
+            if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
                 currentActivity.closeDisplayingPsa()
             }
         }

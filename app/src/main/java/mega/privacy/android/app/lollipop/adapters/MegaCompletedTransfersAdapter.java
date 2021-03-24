@@ -27,9 +27,9 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
@@ -137,7 +137,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
 				params2.setMargins(0, -12, -12, 0);
 				holder.iconDownloadUploadView.setLayoutParams(params2);
-				holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+				holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
 			}
 		}
 

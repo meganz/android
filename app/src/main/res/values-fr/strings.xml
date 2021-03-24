@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">À propos</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Politique de confidentialité</string>
     <string name="settings_about_terms_of_service" context="">Conditions générales d\'utilisation</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Règlement sur la protection des données</string>
     <string name="settings_about_app_version" context="App means “Application”">Version de l\'appli</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Version de la trousse SDK de MEGA</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Version de la trousse SDK de MEGAchat</string>

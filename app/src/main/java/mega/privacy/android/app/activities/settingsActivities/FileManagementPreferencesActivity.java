@@ -155,7 +155,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.settings_file_management_category).toUpperCase());
+        setTitle(R.string.settings_file_management_category);
 
         sttFileManagment = new SettingsFileManagementFragment();
         replaceFragment(sttFileManagment);

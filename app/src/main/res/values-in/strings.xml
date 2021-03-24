@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Tentang</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Kebijakan Privasi</string>
     <string name="settings_about_terms_of_service" context="">Persyaratan Layanan</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versi App</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versi MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versi MEGAchat SDK</string>
