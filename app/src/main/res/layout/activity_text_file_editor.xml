@@ -12,13 +12,27 @@
         android:minHeight="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="textMultiLine"
+        android:textAppearance="@style/TextAppearance.Mega.Body2"
+        android:theme="@style/TransparentEditText.Transparent"
+        app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar"
+        tools:ignore="Autofill,LabelFor" />
+
     <TextView
         android:id="@+id/name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black"
+        android:background="@color/white_087_dark_grey"
         android:gravity="center_horizontal"
         android:padding="14dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey87White87"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Journal01.txt" />
 

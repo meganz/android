@@ -145,6 +145,12 @@
         <item name="android:textColor">@color/white_black</item>
     </style>
 
+    <!-- Medium, normal, 16sp, 0px, grey 87% - white 87% -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
         <item name="android:textSize">18sp</item>

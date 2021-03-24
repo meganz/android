@@ -438,6 +438,10 @@
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>
 
+    <style name="TransparentEditText.Transparent">
+        <item name="android:colorControlActivated">@android:color/transparent</item>
+    </style>
+
     <style name="BottomSheetOption">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>
