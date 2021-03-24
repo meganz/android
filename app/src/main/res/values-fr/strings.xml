@@ -139,7 +139,7 @@
     <string name="alert_no_app" context="Alert text before download">Il n\'y a aucune appli pour ouvrir le fichier %s. Voulez-vous poursuivre le téléchargement ?</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Ne plus afficher</string>
 
-    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Souhaitez-vous vraiment annuler le processus de connexion actuel ?</string>
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Voulez-vous vraiment annuler le processus de connexion actuel ?</string>
 
     <string name="login_text" context="Login button">Connexion</string>
     <string name="email_text" context="email label">Adresse courriel</string>
@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Aucune appli n\'est proposée sur votre appareil pour ouvrir cette position</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">Il semble qu\'aucune appli n\'est installée qui prenne ce type de fichier en charge</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Annuler tous les transferts</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Prendre une photo</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Prendre une photo</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permettre les notifications pour les appels MEGA entrants</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA a besoin de votre autorisation pour autoriser l\'apparition de l\'interface d\'appel.</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Les téléversements de l\'appareil photo sont terminés</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Apparence</string>
     <string name="settings_features" context="settings of the Features section">Fonctions</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
@@ -791,24 +793,23 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">À propos</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Politique de confidentialité</string>
     <string name="settings_about_terms_of_service" context="">Conditions générales d\'utilisation</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Règlement sur la protection des données</string>
     <string name="settings_about_app_version" context="App means “Application”">Version de l\'appli</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Version de la trousse SDK de MEGA</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Version de la trousse SDK de MEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Afficher le code source</string>
 
-    <string name="january">janvier</string>
-    <string name="february">février</string>
-    <string name="march">mars</string>
-    <string name="april">avril</string>
-    <string name="may">mai</string>
-    <string name="june">juin</string>
-    <string name="july">juill.</string>
-    <string name="august">août</string>
-    <string name="september">septembre</string>
-    <string name="october">octobre</string>
-    <string name="november">novembre</string>
-    <string name="december">décembre</string>
+    <string name="january">Janvier</string>
+    <string name="february">Février</string>
+    <string name="march">Mars</string>
+    <string name="april">Avril</string>
+    <string name="may">Mai</string>
+    <string name="june">Juin</string>
+    <string name="july">Juillet</string>
+    <string name="august">Août</string>
+    <string name="september">Septembre</string>
+    <string name="october">Octobre</string>
+    <string name="november">Novembre</string>
+    <string name="december">Décembre</string>
 
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Navigateur de fichiers ZIP</string>
 
@@ -883,7 +884,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte Pro léger</string>
 
-    <string name="backup_title" context="">Sauvegarder votre clé de récupération</string>
+    <string name="backup_title" context="">Sauvegardez votre clé de récupération</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Votre mot de passe déverrouille votre clé de récupération</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Vos données ne sont lisibles qu\'à la suite d\'une chaîne d\'opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
@@ -980,7 +981,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Profitez pleinement de votre compte MEGA en passant à un compte Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Changer la photo de profil</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Prendre une photo</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Prendre une photo</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choisir une photo</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Supprimer la photo</string>
 
@@ -1256,7 +1257,7 @@
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Déconnectez-vous[/A] pour utiliser MEGA avec un autre compte</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Souhaitez-vous vraiment vous déconnecter du compte actuel ?</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Ce message a été supprimé par %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">L\'historique de la conversation a été effacé</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">L\'historique de la conversation a été effacé par %1$s</string>
@@ -1336,6 +1337,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Supprimer de Hors Ligne ?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Définir l\'état</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Thème chromatique</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Fermer</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Non disponible</string>
 
@@ -1438,6 +1440,11 @@
 
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">%1$d fichier a été téléversé</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers ont été téléversés</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 fichier a été téléversé</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers ont été téléversés</item>
     </plurals>
 
@@ -1585,6 +1592,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Les transferts ont été mis en pause</string>
     <string name="attachment_uploading_state_uploading">Téléversement&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compression&#8230;</string>
     <string name="attachment_uploading_state_error">Erreur. N\'a pas été envoyé.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d fichiers ont déjà été téléchargés.</string>
@@ -1623,8 +1631,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Suppression du contact du dossier partagé</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Déplacer vers la corbeille ?</string>
-    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Souhaitez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements de l\'appareil photo sera désactivée.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Souhaitez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements des médias secondaires sera désactivée.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements de l\'appareil photo sera désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements des médias secondaires sera désactivée.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Déplacer vers la corbeille ?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Supprimer de MEGA ?</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Téléversement&#8230;</string>
@@ -1691,6 +1699,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Aucun dossier n\'est partagé</string>
 
     <string name="settings_help" context="Menu item">Aide</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Centre d\'assistance</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer un commentaire</string>
     <string name="setting_feedback_subject" context="mail subject">Rétroaction Android</string>
     <string name="setting_feedback_body" context="mail body">Veuillez rédiger votre commentaire ici :</string>
@@ -2041,7 +2050,7 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">L\'authentification à deux facteurs est activée</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegardez votre clé de récupération</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Le code est invalide</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Vérification de la connexion</string>
@@ -2079,7 +2088,7 @@
     </plurals>
 
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Aperçus d\'URL enrichis</string>
-    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">Vous êtes sur le point de désactiver définitivement les aperçus d\'URL enrichis. Vous pourrez réactiver les aperçus d\'URL enrichis dans vos paramètres. Souhaitez-vous poursuivre ?</string>
+    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">Vous êtes sur le point de désactiver définitivement les aperçus d\'URL enrichis. Vous pourrez réactiver les aperçus d\'URL enrichis dans vos paramètres. Voulez-vous poursuivre ?</string>
 
     <string name="call_missed_messages" context="Message shown when a call ends.">[A]Un appel a été manqué[/A]</string>
     <string name="call_rejected_messages" context="Message shown when a call ends.">[A]L\'appel a été refusé[/A]</string>
@@ -2220,7 +2229,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]sur %2$s sont utilisés[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Changer pour un serveur de test ?</string>
-    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Souhaitez-vous vraiment changer vers un serveur de test ? Votre compte pourrait subir des problèmes irrécupérables.</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Voulez-vous vraiment changer vers un serveur de test ? Votre compte pourrait subir des problèmes irrécupérables.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Ouvrir l\'appareil photo ?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Si vous ouvrez l\'appareil photo, votre transmission vidéo sera mise en pause dans l\'appel actuel.</string>
@@ -2353,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Votre compte actuel est [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sous réserve de votre participation à notre programme d\'objectifs.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Sélectionner un mode de paiement</string>
 
     <string name="billing_period_title" context="title of billing period">Cycle de facturation</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]une fois (mois)[/A] %s</string>
@@ -2604,11 +2612,11 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d de %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Recherche&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Réponse</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Répondre</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorer</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s a mis l\'appel en sourdine</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">En sourdine</string>
-    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Appel en attente</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">L\'appel est en attente</string>
     <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s est en attente</string>
     <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Mettre en attente et répondre</string>
     <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Mettre en attente et me joindre</string>
@@ -2656,7 +2664,7 @@
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Faire glisser pour annuler</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Ce message vocal n\'est pas disponible</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Inviter un ami par</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Inviter un ou une ami par</string>
     <string name="invite_contact_action_button" context="Action button label">Inviter un ami par&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fichier a déjà été téléchargé.&#160;</item>
@@ -2776,6 +2784,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Joindre à partir de&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Conversation crée %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Conversation crée le %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Sélection des messages</string>
 
@@ -2940,7 +2949,7 @@
     <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Le lien et le mot de passe ont été envoyés avec succès.</string>
     <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Passer à un compte Pro</string>
     <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">Les utilisateurs de MEGA Pro ont l\'accès exclusif à des fonctions supplémentaires de sécurité des liens qui rendent votre compte encore plus sûr.</string>
-    <string name="decryption_key_explanation" context="Meaning of links decryption key">Notre système de chiffrement de bout en bout exige une clé unique générée automatiquement pour ce fichier. Un lien qui comprend cette clé est créé par défaut, mais vous pouvez exporter séparément la clé de chiffrement par mesure supplémentaire de sécurité.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Notre système de chiffrement de bout en bout exige une clé unique générée automatiquement pour ce fichier. Un lien qui comprend cette clé est créé par défaut, mais par mesure supplémentaire de sécurité, vous pouvez exporter séparément la clé de chiffrement.</string>
     <string name="reset_password_label" context="Reset password label">Réinitialiser le mot de passe</string>
     <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Partager la clé pour ce lien ?</string>
     <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Partager le mot de passe pour ce lien ?</string>
@@ -2988,4 +2997,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Toujours activés</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Numériser un document</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s ne se trouve pas dans votre liste de contacts</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Clair</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Sombre</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Valeur par défaut du système</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Défini par l\'économiseur de pile</string>
 </resources>

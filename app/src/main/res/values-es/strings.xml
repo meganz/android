@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">La mayoría de los dispositivos no pueden descargar archivos de más de 4 GB. Es probable que la descarga falle</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">No dispones de una aplicación en tu dispositivo para reproducir este archivo</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">No hay aplicaciones disponibles en tu dispositivo para abrir esta ubicación</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">Es posible que no tengas instalada una aplicación que admita este tipo de archivo</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Compartir imagen usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Compartir enlace</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Cancelar todas las transferencias</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Hacer foto</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permitir notificaciones para llamadas entrantes de MEGA</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA necesita tu autorización para permitir que la interfaz de llamada esté visible.</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Subidas de la cámara completadas</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Apariencia</string>
     <string name="settings_features" context="settings of the Features section">Características</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Almacenamiento</string>
@@ -791,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Acerca de</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Política de privacidad</string>
     <string name="settings_about_terms_of_service" context="">Términos de servicio</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Reglamento de protección de datos</string>
     <string name="settings_about_app_version" context="App means “Application”">Versión de la aplicación</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versión del SDK de MEGA</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versión del SDK de MEGAchat</string>
@@ -980,7 +981,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Sácale el máximo provecho a tu cuenta de MEGA con una cuenta Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editar imagen del perfil</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Hacer foto</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Elegir imagen</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Eliminar imagen</string>
 
@@ -1336,6 +1337,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">¿Eliminar desde Sin conexión?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Establecer estado</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Modo</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Descartar</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">No disponible</string>
 
@@ -1439,6 +1441,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">%1$d archivo subido</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d archivos subidos</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 archivo ya subido</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d archivos ya subidos</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1585,6 +1592,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transferencias en pausa</string>
     <string name="attachment_uploading_state_uploading">Subiendo&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Comprimiendo&#8230;</string>
     <string name="attachment_uploading_state_error">No se ha podido enviar</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d archivos descargados anteriormente</string>
@@ -1691,6 +1699,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Ninguna carpeta compartida</string>
 
     <string name="settings_help" context="Menu item">Ayuda</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Centro de ayuda</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Enviar valoración</string>
     <string name="setting_feedback_subject" context="mail subject">Feedback Android</string>
     <string name="setting_feedback_body" context="mail body">Escribe tus comentarios:</string>
@@ -2353,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Tu cuenta es [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sujeto a la participación en nuestro programa de logros.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selecciona el método de pago</string>
 
     <string name="billing_period_title" context="title of billing period">Período de facturación</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Pago único (mes)[/A] %s</string>
@@ -2604,7 +2612,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d de %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Buscar&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Contestar</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Contestar</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorar</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s ha silenciado la llamada</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Silenciada</string>
@@ -2776,6 +2784,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Adjuntar desde&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat creado %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creado el %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleccionar mensajes</string>
 
@@ -2988,4 +2997,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Activas por defecto</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Escanear documento</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s no está en tu lista de contactos</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Claro</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Oscuro</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Predeterminado</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Definido por el modo ahorro</string>
 </resources>

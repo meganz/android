@@ -1,8 +1,10 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Build;
@@ -337,6 +339,25 @@ public class TransfersManagement {
 
             return mBuilder.build();
         }
+    }
+
+    /**
+     * Checks if a service is already running.
+     *
+     * @param serviceClass Service it wants to know if its is already running.
+     * @return True if the service is already running, false otherwise.
+     */
+    public static boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) MegaApplication.getInstance()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
