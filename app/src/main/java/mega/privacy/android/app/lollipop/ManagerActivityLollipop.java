@@ -116,6 +116,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -2002,12 +2003,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		bNV.setTextVisibility(false);
 
 		miniAudioPlayerController = new MiniAudioPlayerController(
-				findViewById(R.id.mini_audio_player), this,
+				findViewById(R.id.mini_audio_player),
 				() -> {
 					// we need update fragmentLayout's layout params when player view is closed.
 					if (bNV.getVisibility() == View.VISIBLE) {
 						showBNVImmediate();
 					}
+
+					return Unit.INSTANCE;
 				});
 
         //Set navigation view
