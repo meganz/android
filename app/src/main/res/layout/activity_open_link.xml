@@ -10,7 +10,7 @@
         android:layout_width="144dp"
         android:layout_height="144dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="182dp"
+        android:layout_marginTop="112dp"
         android:src="@drawable/logo_loading_ic"
         app:tint="@color/red_600_white_087"/>
 
