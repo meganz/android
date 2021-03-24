@@ -44,7 +44,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     private lateinit var binding: ActivityMeetingBinding
-
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
     private val networkReceiver = object : BroadcastReceiver() {
@@ -57,18 +56,18 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var meetType = intent.getStringExtra(MEETING_TYPE)
+
+        val meetType = intent.getStringExtra(MEETING_TYPE)
+
         initReceiver()
         initActionBar(meetType)
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        initNavigation(meetType)
 
         if (savedInstanceState == null) {
 //            val navHostFragment =
@@ -79,14 +78,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 //                .replace(R.id.container, CreateMeetingFragment.newInstance())
 //                .commitNow()
         }
-        val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
-        when(meetType){
-            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
-            MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
-        }
-        // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
-        // Change start destination dynamically
-        navController.graph = navGraph
+
 
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
@@ -127,16 +119,40 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
     }
 
+    /**
+     * Initialize Action Bar and set icon according to param
+     *
+     * @param meetType Create Meeting or Join Meeting
+     */
     private fun initActionBar(meetType: String?) {
         setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         when(meetType) {
-            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+//            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
         }
 
+    }
+
+    /**
+     * Initialize Navigation and set startDestination according to param
+     *
+     * @param meetType Create Meeting or Join Meeting
+     */
+    private fun initNavigation(meetType: String?) {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
+        when(meetType){
+            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
+            MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
+        }
+        // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
+        // Change start destination dynamically
+        navController.graph = navGraph
     }
 
     fun getCurrentFragment(): MeetingBaseFragment? {

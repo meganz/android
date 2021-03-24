@@ -13,20 +13,18 @@ import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListene
 import mega.privacy.android.app.lollipop.controllers.ContactController
 
 class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
-    private var cC: ContactController? = null
+
     private var listener: MeetingBottomSheetDialogActionListener? = null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cC = ContactController(context)
-    }
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
+
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
         contentView = binding.root;
         mainLinearLayout = binding.root.meeting_bottom_sheet
         items_layout = binding.root.meeting_item
+
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)
         dialog.setContentView(contentView)
