@@ -112,7 +112,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_PATH = "filepath";
-	/** Currently for exporting recovery key use. */
+	// Currently for exporting recovery key use.
 	public static final String EXTRA_SD_URI = "sdcarduri";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
@@ -196,7 +196,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private boolean pickingFromSDCard;
 
     /**
-     * Pass to exporting recovery key oepreration.
+     * Pass to exporting recovery key operation.
      */
 	private String sdCardUriString;
 

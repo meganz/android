@@ -4037,9 +4037,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 				else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
 					String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-					String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 
 					if (parentPath != null){
+						String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 						AccountController ac = new AccountController(this);
 						ac.exportMK(parentPath, sdCardUriString);
 					}
@@ -11303,10 +11303,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 
 			if (parentPath != null){
 				String path = parentPath + File.separator + getRecoveryKeyFileName();
+				String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 
 				logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
