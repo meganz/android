@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.textFileEditor
 
+import android.app.ActivityManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -90,6 +91,9 @@ class TextFileEditorActivity : PinActivityLollipop() {
     private fun setUpTextView() {
         if (viewModel.isViewMode()) {
             binding.editText.isEnabled = false
+            val mi = ActivityManager.MemoryInfo()
+            (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+            binding.editText.setText(viewModel.readFile(mi))
         } else {
             binding.editText.isEnabled = true
             binding.editText.requestFocus()
@@ -110,7 +114,7 @@ class TextFileEditorActivity : PinActivityLollipop() {
     }
 
     private fun saveFile() {
-        viewModel.setViewMode()
+        viewModel.saveFile()
         binding.editFab.show()
         updateUIAfterChangeMode()
     }
