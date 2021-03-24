@@ -132,6 +132,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         reloadNodes(orderBy);
     }
 
+    /**
+     * Search the media of camera
+     * @param searchDate the date or date range for searching
+     * @param orderBy The order of sort
+     */
     public void setSearchDate(long[] searchDate, int orderBy) {
         cuSearchDate = searchDate;
         if (mViewModel != null) {
@@ -434,12 +439,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
     }
 
     /**
