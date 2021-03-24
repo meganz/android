@@ -2096,7 +2096,7 @@
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Two-Factor Authentication\nChange password</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Two-Factor Authentication\nCancel account</string>
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Two-Factor Authentication\nChange email</string>
-    <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Disable Two-Factor Authentication</string>
+    <string name="verify_2fa_verification" context="Title of screen verify Two-Factor Authentication">Two-Factor Authentication</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Lost your Authenticator device?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
