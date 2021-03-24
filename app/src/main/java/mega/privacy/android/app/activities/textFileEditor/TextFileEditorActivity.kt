@@ -1,31 +1,25 @@
-package mega.privacy.android.app.activities
+package mega.privacy.android.app.activities.textFileEditor
 
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 
+@AndroidEntryPoint
 class TextFileEditorActivity : PinActivityLollipop() {
 
-    companion object {
-        const val CREATE_MODE = "CREATE_MODE"
-        const val VIEW_AND_EDIT_MODE = "VIEW_AND_EDIT_MODE"
-        const val EDITING_MODE = "EDITING_MODE"
-    }
+    private val viewModel by viewModels<TextFileEditorViewModel>()
 
     private lateinit var binding: ActivityTextFileEditorBinding
-
-    private var fileName: String? = null
-    private var node: MegaNode? = null
-    private var mode = VIEW_AND_EDIT_MODE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +29,10 @@ class TextFileEditorActivity : PinActivityLollipop() {
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        setUpMode()
-
-        val receivedName = intent.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME)
-
-        fileName = if (receivedName != null) receivedName + TXT_EXTENSION else node?.name
+        viewModel.setModeAndName(
+            intent?.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE,
+            intent?.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME)
+        )
 
         setUpTextFileName()
         setUpTextView()
@@ -58,7 +51,7 @@ class TextFileEditorActivity : PinActivityLollipop() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_text_file_editor, menu)
 
-        if (mode == VIEW_AND_EDIT_MODE) {
+        if (viewModel.isViewMode()) {
             val downloadMenuItem = menu?.findItem(R.id.action_download)
             val infoMenuItem = menu?.findItem(R.id.action_properties)
             val shareMenuItem = menu?.findItem(R.id.action_share)
@@ -80,33 +73,22 @@ class TextFileEditorActivity : PinActivityLollipop() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun setUpMode() {
-        node = megaApi.getNodeByHandle(
-            intent?.getLongExtra(
-                Constants.INTENT_EXTRA_KEY_HANDLE,
-                INVALID_HANDLE
-            ) ?: INVALID_HANDLE
-        )
-
-        mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_AND_EDIT_MODE
-    }
-
     private fun setUpTextFileName() {
-        if (mode == VIEW_AND_EDIT_MODE) {
+        if (viewModel.isViewMode()) {
             supportActionBar?.title = null
 
             binding.nameText.apply {
                 isVisible = true
-                text = fileName
+                text = viewModel.getFileName()
             }
         } else {
-            supportActionBar?.title = fileName
+            supportActionBar?.title = viewModel.getFileName()
             binding.nameText.isVisible = false
         }
     }
 
     private fun setUpTextView() {
-        if (mode == VIEW_AND_EDIT_MODE) {
+        if (viewModel.isViewMode()) {
             binding.editText.isEnabled = false
         } else {
             binding.editText.isEnabled = true
@@ -117,10 +99,10 @@ class TextFileEditorActivity : PinActivityLollipop() {
 
     private fun setUpEditFAB() {
         binding.editFab.apply {
-            isVisible = mode == VIEW_AND_EDIT_MODE
+            isVisible = viewModel.isViewMode()
 
             setOnClickListener {
-                mode = EDITING_MODE
+                viewModel.setEditMode()
                 this.hide()
                 updateUIAfterChangeMode()
             }
@@ -128,7 +110,7 @@ class TextFileEditorActivity : PinActivityLollipop() {
     }
 
     private fun saveFile() {
-        mode = VIEW_AND_EDIT_MODE
+        viewModel.setViewMode()
         binding.editFab.show()
         updateUIAfterChangeMode()
     }
