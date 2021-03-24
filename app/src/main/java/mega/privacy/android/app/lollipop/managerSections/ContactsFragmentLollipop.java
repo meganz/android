@@ -903,9 +903,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
                 emptyTextView.setVisibility(View.VISIBLE);
 
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+					emptyImageView.setImageResource(R.drawable.empty_contacts_landscape);
 				}else{
-					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+					emptyImageView.setImageResource(R.drawable.empty_contacts_portrait);
 				}
 
 				String textToShow = String.format(context.getString(R.string.context_empty_contacts)).toUpperCase();
@@ -995,11 +995,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
-				}else{
-					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				}
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    emptyImageView.setImageResource(R.drawable.empty_contacts_landscape);
+                }else{
+                    emptyImageView.setImageResource(R.drawable.empty_contacts_portrait);
+                }
 				String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
 					textToShow = textToShow.replace(
@@ -1199,11 +1199,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
-			}else{
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-			}
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                emptyImageView.setImageResource(R.drawable.empty_contacts_landscape);
+            }else{
+                emptyImageView.setImageResource(R.drawable.empty_contacts_portrait);
+            }
 			String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 			try{
 				textToShow = textToShow.replace(

@@ -118,7 +118,7 @@ public class DecryptAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         mContext = getContext();
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(mContext);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(mContext, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
