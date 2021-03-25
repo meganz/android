@@ -507,9 +507,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void setupOtherViews() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBinding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
+            mBinding.emptyHintImage.setImageResource(R.drawable.empty_cu_landscape);
         } else {
-            mBinding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
+            mBinding.emptyHintImage.setImageResource(R.drawable.empty_cu_portrait);
         }
 
         if (mCamera == TYPE_CAMERA) {

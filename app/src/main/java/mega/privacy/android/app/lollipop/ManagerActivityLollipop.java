@@ -82,6 +82,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -176,13 +177,10 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
-import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
@@ -222,6 +220,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
@@ -437,7 +436,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     MaterialToolbar toolbar;
     AppBarLayout abL;
 
-	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
 
@@ -485,7 +483,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private List<MegaSku> mSkuDetailsList;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -509,9 +507,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case RECENT_CHAT: return "rChat";
 				case NOTIFICATIONS: return "notificFragment";
 				case UPGRADE_ACCOUNT: return "upAFL";
-				case FORTUMO: return "fF";
-				case CENTILI: return "ctF";
-				case CREDIT_CARD: return "ccF";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
@@ -673,9 +668,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
 	private UpgradeAccountFragmentLollipop upAFL;
-	private FortumoFragmentLollipop fFL;
-	private CentiliFragmentLollipop ctFL;
-	private CreditCardFragmentLollipop ccFL;
 	private CameraUploadsFragment cuFragment;
 	private CameraUploadsFragment muFragment;
 	private RecentChatsFragmentLollipop rChatFL;
@@ -912,18 +904,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
 						upAFL.setPricingInfo();
-					}
-
-					//CENTILI_FRAGMENT
-					ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
-					if(ctFL!=null){
-						ctFL.getPaymentId();
-					}
-
-					//FORTUMO_FRAGMENT
-					fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
-					if(fFL!=null){
-						fFL.getPaymentId();
 					}
 				}
 				else if(actionType == UPDATE_ACCOUNT_DETAILS){
@@ -1988,7 +1968,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
-			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -3552,50 +3531,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		int chatStatus = megaChatApi.getOnlineStatus();
 		if (contactStatus != null) {
-			switch (chatStatus) {
-				case MegaChatApi.STATUS_ONLINE: {
-					logDebug("Online");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_online_dark_drawer
-									: R.drawable.ic_online_light));
-					break;
-				}
-				case MegaChatApi.STATUS_AWAY: {
-					logDebug("Away");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_away_dark_drawer
-									: R.drawable.ic_away_light));
-					break;
-				}
-				case MegaChatApi.STATUS_BUSY: {
-					logDebug("Busy");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_busy_dark_drawer
-									: R.drawable.ic_busy_light));
-					break;
-				}
-				case MegaChatApi.STATUS_OFFLINE: {
-					logDebug("Offline");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_offline_dark_drawer
-									: R.drawable.ic_offline_light));
-					break;
-				}
-				case MegaChatApi.STATUS_INVALID: {
-					logWarning("Invalid");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-				default: {
-					logDebug("Default");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-			}
+			ChatUtil.setContactStatus(chatStatus, contactStatus, StatusIconLocation.DRAWER);
 		}
 	}
 
@@ -3711,39 +3647,39 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		setStatusBarColor(this, R.color.teal_500_teal_400);
 	}
 
-	void actionOpenFolder (long handleIntent) {
-		logDebug("Handle Intent: " + handleIntent);
-		int access = -1;
-		if (handleIntent != -1) {
-			MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
-			if (parentIntentN != null) {
-				access = megaApi.getAccess(parentIntentN);
-				switch (access) {
-					case MegaShare.ACCESS_OWNER:
-					case MegaShare.ACCESS_UNKNOWN: {
-						logDebug("The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
-					case MegaShare.ACCESS_READ:
-					case MegaShare.ACCESS_READWRITE:
-					case MegaShare.ACCESS_FULL: {
-						logDebug("The intent set the parentHandleIncoming to " + handleIntent);
-						parentHandleIncoming = handleIntent;
-						drawerItem = DrawerItem.SHARED_ITEMS;
-						deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
-						logDebug("After calculate deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
-						break;
-					}
-					default: {
-						logDebug("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
+	void actionOpenFolder(long handleIntent) {
+		if (handleIntent == INVALID_HANDLE) {
+			logWarning("handleIntent is not valid");
+			return;
+		}
+
+		MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+		if (parentIntentN == null) {
+			logWarning("parentIntentN is null");
+			return;
+		}
+
+		switch (megaApi.getAccess(parentIntentN)) {
+			case MegaShare.ACCESS_READ:
+			case MegaShare.ACCESS_READWRITE:
+			case MegaShare.ACCESS_FULL:
+				parentHandleIncoming = handleIntent;
+				deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
+				drawerItem = DrawerItem.SHARED_ITEMS;
+				break;
+
+			default:
+				if (megaApi.isInRubbish(parentIntentN)) {
+					parentHandleRubbish = handleIntent;
+					drawerItem = DrawerItem.RUBBISH_BIN;
+				} else if (megaApi.isInInbox(parentIntentN)) {
+					parentHandleInbox = handleIntent;
+					drawerItem = DrawerItem.INBOX;
+				} else {
+					parentHandleBrowser = handleIntent;
+					drawerItem = DrawerItem.CLOUD_DRIVE;
 				}
-			}
+				break;
 		}
 	}
 
@@ -5648,9 +5584,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case ACCOUNT: {
 				switch(accountFragment){
-					case CENTILI_FRAGMENT:
-					case FORTUMO_FRAGMENT:
-					case CC_FRAGMENT:
 					case UPGRADE_ACCOUNT_FRAGMENT:
 					case BACKUP_RECOVERY_KEY_FRAGMENT:{
 						fragmentContainer.setVisibility(View.VISIBLE);
@@ -6405,26 +6338,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void showCC(int type, int payMonth, boolean refresh){
-		accountFragment = CC_FRAGMENT;
-
-		ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-		if (ccFL == null) {
-			ccFL = new CreditCardFragmentLollipop();
-			ccFL.setInfo(type, payMonth);
-			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
-		}
-		else if (refresh) {
-			refreshFragment(FragmentTag.CREDIT_CARD.getTag());
-		}
-		else {
-			ccFL.setInfo(type, payMonth);
-			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
-		}
-
-        setTabsVisibility();
-	}
-
 	public void updateInfoNumberOfSubscriptions(){
         if (cancelSubscription != null){
             cancelSubscription.setVisible(false);
@@ -6440,26 +6353,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             }
         }
     }
-
-	public void showFortumo(){
-		fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
-		if (fFL == null){
-			fFL = new FortumoFragmentLollipop();
-		}
-		replaceFragment(fFL, FragmentTag.FORTUMO.getTag());
-		setTabsVisibility();
-	}
-
-	public void showCentili(){
-		accountFragment = CENTILI_FRAGMENT;
-
-		ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
-		if (ctFL == null){
-			ctFL = new CentiliFragmentLollipop();
-		}
-		replaceFragment(ctFL, FragmentTag.CENTILI.getTag());
-		setTabsVisibility();
-	}
 
 	public void showUpAF() {
 		logDebug("showUpAF");
@@ -7110,18 +7003,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						return true;
 		    		}
 					else if (drawerItem == DrawerItem.ACCOUNT){
-						switch (accountFragment) {
-							case UPGRADE_ACCOUNT_FRAGMENT:
-								closeUpgradeAccountFragment();
-								return true;
-
-							case CC_FRAGMENT:
-								ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-								if (ccFL != null) {
-									displayedAccountType = ccFL.getParameterType();
-								}
-								showUpAF();
-								return true;
+						if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
+							closeUpgradeAccountFragment();
+							return true;
 						}
 					} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -7976,14 +7860,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		case UPGRADE_ACCOUNT_FRAGMENT:
 					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");
 					closeUpgradeAccountFragment();
-	    			break;
-	    		case CC_FRAGMENT:
-					ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager()
-							.findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-	    			if (ccFL != null) {
-						displayedAccountType = ccFL.getParameterType();
-	    			}
-					showUpAF();
 	    			break;
 	    		case OVERQUOTA_ALERT:
 				default:
@@ -9107,6 +8983,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				verify2FADialogIsShown = false;
 			}
 		});
+
+        Window window = verify2FADialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
 		verify2FADialog.show();
 		verify2FADialogIsShown = true;
 	}
@@ -14349,14 +14229,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return upAFL;
 	}
 
-	public CentiliFragmentLollipop getCentiliFragment() {
-		return ctFL;
-	}
-
-	public FortumoFragmentLollipop getFortumoFragment() {
-		return fFL;
-	}
-
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
 		this.cFLol = cFLol;
 	}
@@ -14382,9 +14254,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return selectedOfflineNode;
 	}
 
-	public void setSelectedPaymentMethod(int selectedPaymentMethod) {
-		this.selectedPaymentMethod = selectedPaymentMethod;
-	}
 	public void visibilitySearch(boolean visibility){
 		searchByDate.setVisible(visibility);
 	}
@@ -15057,7 +14926,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
 				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
-				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+				drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
 		}

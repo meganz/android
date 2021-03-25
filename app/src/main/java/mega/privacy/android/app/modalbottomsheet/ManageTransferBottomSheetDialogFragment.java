@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Dialog;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -94,6 +95,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         switch (transfer.getState()) {
             case STATE_COMPLETED:
                 location.setText(transfer.getPath());
+                stateIcon.setColorFilter(ContextCompat.getColor(context, R.color.green_500_300), PorterDuff.Mode.SRC_IN);
                 stateIcon.setImageResource(R.drawable.ic_transfers_completed);
                 retryOption.setVisibility(View.GONE);
                 break;
@@ -117,6 +119,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
             default:
                 location.setText(R.string.transfer_unknown);
+                stateIcon.clearColorFilter();
                 stateIcon.setImageResource(R.drawable.ic_queue);
                 break;
         }

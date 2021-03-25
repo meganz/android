@@ -305,7 +305,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.contactMail = contact.getMegaUser().getEmail();
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), holder.contactStateIcon);
+		setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), holder.contactStateIcon, StatusIconLocation.STANDARD);
 		
 		if (multipleSelect && isItemChecked(position)) {
 				holder.itemLayout.setBackgroundResource(R.drawable.background_item_grid_selected);
@@ -364,7 +364,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
 		int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent, StatusIconLocation.STANDARD);
 		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 
 		holder.textViewContactName.setText(contact.getFullName());
@@ -400,7 +400,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
 		int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent, StatusIconLocation.STANDARD);
 		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 
 		holder.textViewContactName.setText(contact.getFullName());
@@ -447,7 +447,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
         int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent, StatusIconLocation.STANDARD);
 		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 		holder.textViewContactName.setText(contact.getFullName());
 

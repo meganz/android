@@ -183,15 +183,12 @@ class MegaNodeDialogUtil {
         ): AlertDialog {
             builder.setView(R.layout.dialog_create_rename_node)
 
-            var typeText: EmojiEditText? = null
-            var errorText: TextView? = null
-
             val dialog = builder.create()
 
             dialog.apply {
                 setOnShowListener {
-                    typeText = findViewById<EmojiEditText>(R.id.type_text)
-                    errorText = findViewById<TextView>(R.id.error_text)
+                    val typeText = findViewById<EmojiEditText>(R.id.type_text)
+                    val errorText = findViewById<TextView>(R.id.error_text)
 
                     typeText?.apply {
                         when (dialogType) {
@@ -236,25 +233,24 @@ class MegaNodeDialogUtil {
                         }
                     }
 
+                    getButton(BUTTON_POSITIVE)
+                        .setOnClickListener {
+                            checkActionDialogValue(
+                                context,
+                                node,
+                                actionNodeCallback,
+                                typeText,
+                                data,
+                                errorText,
+                                dialog,
+                                dialogType
+                            )
+                        }
+
                     quitDialogError(typeText, errorText)
+                    showKeyboardDelayed(typeText)
                 }
             }.show()
-
-            dialog.getButton(BUTTON_POSITIVE)
-                .setOnClickListener {
-                    checkActionDialogValue(
-                        context,
-                        node,
-                        actionNodeCallback,
-                        typeText,
-                        data,
-                        errorText,
-                        dialog,
-                        dialogType
-                    )
-                }
-
-            showKeyboardDelayed(typeText)
 
             return dialog
         }

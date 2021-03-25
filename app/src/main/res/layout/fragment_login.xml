@@ -341,14 +341,13 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
-            android:layout_marginTop="162dp"
+            android:layout_marginTop="112dp"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/login_mega_logo"
                 android:layout_width="144dp"
                 android:layout_height="144dp"
-                android:layout_marginTop="20dp"
                 android:src="@drawable/logo_loading_ic"
                 app:tint="@color/red_600_white_087" />
 
