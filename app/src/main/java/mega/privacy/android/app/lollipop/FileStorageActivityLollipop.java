@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -1041,7 +1042,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		//No action needed
 	}
 

@@ -27,6 +27,8 @@ class OfflineGridFileViewHolder(
     override fun bind(position: Int, node: OfflineNode) {
         super.bind(position, node)
 
+        binding.thumbnail.isVisible = true
+
         val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
 
         if (node.thumbnail != null) {
