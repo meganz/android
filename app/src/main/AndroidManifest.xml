@@ -158,8 +158,9 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing">
 
             <intent-filter>
@@ -335,8 +336,7 @@
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize" />
+            android:label="@string/app_name" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
@@ -384,12 +384,14 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable">
-        </activity>
+            android:name=".mediaplayer.VideoPlayerActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.Dark.FullScreen.Draggable" />
+
+        <activity
+            android:name=".mediaplayer.AudioPlayerActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
@@ -527,10 +529,8 @@
             android:exported="false" >
         </service>
 
-        <service
-            android:name="MegaStreamingService"
-            android:exported="false" >
-        </service>
+        <service android:name=".mediaplayer.service.AudioPlayerService" android:exported="false" />
+        <service android:name=".mediaplayer.service.VideoPlayerService" android:exported="false" />
 
         <service
             android:name=".jobservices.CameraUploadsService"

@@ -219,7 +219,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     logWarning("The selected node is NULL");
                     return;
                 }
-                chatC.prepareForChatDownload(nodeList);
+                ((ChatActivityLollipop) context).downloadNodeList(nodeList);
                 break;
 
             case R.id.option_import_layout:
@@ -227,7 +227,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     logWarning("The selected node is NULL");
                     return;
                 }
-                chatC.importNode(messageId, chatId);
+                chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
                 break;
 
             case R.id.option_save_offline_switch:

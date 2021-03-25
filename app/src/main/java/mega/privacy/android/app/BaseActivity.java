@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
@@ -36,6 +37,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
+import mega.privacy.android.app.interfaces.ActivityLauncher;
+import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -46,6 +51,7 @@ import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,7 +72,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
@@ -162,6 +168,9 @@ public class BaseActivity extends AppCompatActivity {
 
         registerReceiver(resumeTransfersReceiver,
                 new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
+
+        registerReceiver(cookieSettingsReceiver,
+                new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -514,6 +523,23 @@ public class BaseActivity extends AppCompatActivity {
 
             MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
+        }
+    };
+
+    /**
+     * Broadcast to show a snackbar when the Cookie settings has been saved
+     */
+    protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || !isActivityInForeground() || intent == null) {
+                return;
+            }
+
+            View view = getWindow().getDecorView().findViewById(android.R.id.content);
+            if (view != null) {
+                showSnackbar(view, StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved));
+            }
         }
     };
 
@@ -1110,5 +1136,20 @@ public class BaseActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void launchActivity(@NotNull Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void askPermissions(@NotNull String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 }

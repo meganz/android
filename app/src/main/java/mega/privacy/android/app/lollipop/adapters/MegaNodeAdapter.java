@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -53,6 +58,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -70,9 +76,8 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownDialogHandler.*;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, nodeTakenDownDialogListener {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, NodeTakenDownDialogListener, DragThumbnailGetter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -161,6 +166,30 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         TextView transferOverQuotaBannerText;
+    }
+
+    @Override
+    public int getNodePosition(long handle) {
+        for (int i = 0; i < nodes.size(); i++) {
+            MegaNode node = nodes.get(i);
+            if (node != null && node.getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
+    }
+
+    @Nullable
+    @Override
+    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolderBrowserList) {
+            return ((ViewHolderBrowserList) viewHolder).imageView;
+        } else if (viewHolder instanceof ViewHolderBrowserGrid) {
+            return ((ViewHolderBrowserGrid) viewHolder).imageViewThumb;
+        }
+
+        return null;
     }
 
     @Override
@@ -514,7 +543,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return adapterType;
     }
 
-    public MegaNodeAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override
+    public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
         logDebug("onCreateViewHolder");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -625,6 +655,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
+    @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
         logDebug("Position: " + position);
 
@@ -836,6 +867,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
         }
+
+        holder.imageView.setVisibility(View.VISIBLE);
 
         if (node.isFolder()) {
 
@@ -1069,10 +1102,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
                 if (n.isTakenDown() && !isMultipleSelect()) {
-                    takenDownDialog = showTakenDownDialog(n.isFolder(), v, currentPosition, this, context);
+                    takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
                     unHandledItem = currentPosition;
                 } else {
-                    fileClicked(currentPosition, v);
+                    fileClicked(currentPosition);
                 }
                 break;
             }
@@ -1084,42 +1117,28 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         unHandledItem = currentPosition;
     }
 
-    private void fileClicked(int currentPosition, View view) {
-        int[] screenPosition = new int[2];
-        ImageView imageView;
-        if (adapterType == ITEM_VIEW_TYPE_LIST) {
-            imageView = view.findViewById(R.id.file_list_thumbnail);
-        } else {
-            imageView = view.findViewById(R.id.file_grid_thumbnail);
-        }
-        imageView.getLocationOnScreen(screenPosition);
-
-        int[] dimens = new int[4];
-        dimens[0] = screenPosition[0];
-        dimens[1] = screenPosition[1];
-        dimens[2] = imageView.getWidth();
-        dimens[3] = imageView.getHeight();
+    private void fileClicked(int currentPosition) {
         if (type == RUBBISH_BIN_ADAPTER) {
-            ((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
-            ((InboxFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((InboxFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
-            ((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == OUTGOING_SHARES_ADAPTER) {
-            ((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == CONTACT_FILE_ADAPTER) {
-            ((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
-            ((ContactSharedFolderFragment) fragment).itemClick(currentPosition, dimens, imageView);
+            ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
         } else if (type == FOLDER_LINK_ADAPTER) {
-            ((FolderLinkActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
+            ((FolderLinkActivityLollipop) context).itemClick(currentPosition);
         } else if (type == SEARCH_ADAPTER) {
-            ((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((SearchFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == LINKS_ADAPTER) {
-            ((LinksFragment) fragment).itemClick(currentPosition, dimens, imageView);
+            ((LinksFragment) fragment).itemClick(currentPosition);
         } else {
             logDebug("layout FileBrowserFragmentLollipop!");
-            ((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+            ((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
         }
     }
 
@@ -1138,26 +1157,26 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         if (isMultipleSelect()) {
             if (type == RUBBISH_BIN_ADAPTER) {
-                ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition);
             } else if (type == INBOX_ADAPTER) {
-                ((InboxFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((InboxFragmentLollipop)fragment).itemClick(currentPosition);
             } else if (type == INCOMING_SHARES_ADAPTER) {
-                ((IncomingSharesFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((IncomingSharesFragmentLollipop)fragment).itemClick(currentPosition);
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                ((OutgoingSharesFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((OutgoingSharesFragmentLollipop)fragment).itemClick(currentPosition);
             } else if (type == CONTACT_FILE_ADAPTER) {
-                ((ContactFileListFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((ContactFileListFragmentLollipop)fragment).itemClick(currentPosition);
             } else if(type==CONTACT_SHARED_FOLDER_ADAPTER){
-                ((ContactSharedFolderFragment) fragment).itemClick(currentPosition,null,null);
+                ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
             } else if (type == FOLDER_LINK_ADAPTER) {
-                ((FolderLinkActivityLollipop)context).itemClick(currentPosition,null,null);
+                ((FolderLinkActivityLollipop)context).itemClick(currentPosition);
             } else if (type == SEARCH_ADAPTER) {
-                ((SearchFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((SearchFragmentLollipop)fragment).itemClick(currentPosition);
             } else if (type == LINKS_ADAPTER) {
-                ((LinksFragment) fragment).itemClick(currentPosition, null, null);
+                ((LinksFragment) fragment).itemClick(currentPosition);
             } else {
                 logDebug("click layout FileBrowserFragmentLollipop!");
-                ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+                ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition);
             }
         } else {
             if (type == CONTACT_FILE_ADAPTER) {
@@ -1180,37 +1199,37 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         int currentPosition = holder.getAdapterPosition();
         if (type == RUBBISH_BIN_ADAPTER) {
             ((RubbishBinFragmentLollipop)fragment).activateActionMode();
-            ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
             ((InboxFragmentLollipop)fragment).activateActionMode();
-            ((InboxFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((InboxFragmentLollipop)fragment).itemClick(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragmentLollipop)fragment).activateActionMode();
-            ((IncomingSharesFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((IncomingSharesFragmentLollipop)fragment).itemClick(currentPosition);
         } else if(type==CONTACT_SHARED_FOLDER_ADAPTER){
             ((ContactSharedFolderFragment) fragment).activateActionMode();
-            ((ContactSharedFolderFragment) fragment).itemClick(currentPosition, null, null);
+            ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
         } else if (type == OUTGOING_SHARES_ADAPTER) {
             ((OutgoingSharesFragmentLollipop)fragment).activateActionMode();
-            ((OutgoingSharesFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((OutgoingSharesFragmentLollipop)fragment).itemClick(currentPosition);
         } else if (type == CONTACT_FILE_ADAPTER) {
             ((ContactFileListFragmentLollipop)fragment).activateActionMode();
-            ((ContactFileListFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((ContactFileListFragmentLollipop)fragment).itemClick(currentPosition);
         } else if (type == FOLDER_LINK_ADAPTER) {
             logDebug("FOLDER_LINK_ADAPTER");
             ((FolderLinkActivityLollipop)context).activateActionMode();
-            ((FolderLinkActivityLollipop)context).itemClick(currentPosition,null,null);
+            ((FolderLinkActivityLollipop)context).itemClick(currentPosition);
         } else if (type == SEARCH_ADAPTER) {
             ((SearchFragmentLollipop) fragment).activateActionMode();
-            ((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
+            ((SearchFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == LINKS_ADAPTER) {
             logDebug("FOLDER_LINK_ADAPTER");
             ((LinksFragment)fragment).activateActionMode();
-            ((LinksFragment)fragment).itemClick(currentPosition,null,null);
+            ((LinksFragment)fragment).itemClick(currentPosition);
         } else {
             logDebug("click layout FileBrowserFragmentLollipop!");
             ((FileBrowserFragmentLollipop)fragment).activateActionMode();
-            ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition);
         }
 
         return true;
@@ -1326,9 +1345,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     @Override
-    public void onOpenClicked(int currentPosition, View view) {
+    public void onOpenClicked(int currentPosition) {
         unHandledItem = -1;
-        fileClicked(currentPosition, view);
+        fileClicked(currentPosition);
     }
 
     @Override

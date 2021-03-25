@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -10,40 +9,30 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,21 +40,22 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -94,7 +84,9 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends PinActivityLollipop
+		implements MegaGlobalListenerInterface, MegaRequestListenerInterface,
+		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower {
 
 	FrameLayout fragmentContainer;
 
@@ -108,8 +100,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	ContactFileListFragmentLollipop cflF;
 
-	NodeController nC;
-	private AlertDialog downloadConfirmationDialog;
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	CoordinatorLayout coordinatorLayout;
 	Handler handler;
@@ -125,7 +117,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	long parentHandle = -1;
 
 	DatabaseHandler dbH;
-	MegaPreferences prefs;
 
 	MenuItem createFolderMenuItem;
 	MenuItem startConversation;
@@ -134,8 +125,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
 	ProgressDialog statusDialog;
-
-	long lastTimeOnTransferUpdate = -1;
 
 	MegaNode selectedNode = null;
 
@@ -179,6 +168,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(PARENT_HANDLE, parentHandle);
+
+		nodeSaver.saveState(outState);
 	}
 
 	@Override
@@ -253,144 +244,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void showNewFolderDialog() {
-		logDebug("showNewFolderDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ContactFileListActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.red_600_red_300));
-
-		final TextView textError = new TextView(ContactFileListActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.red_600_red_300));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary)
-				, PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(contactPropertiesMainActivity, R.attr.colorSecondary)
-							, PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ColorUtils.getThemeColor(contactPropertiesMainActivity, android.R.attr.textColorSecondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-						return true;
-					}
-					createFolder(value);
-					newFolderDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				} else {
-					createFolder(value);
-					newFolderDialog.dismiss();
-				}
-			}
-		});
+		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
-	private void createFolder(String title) {
+	@Override
+	public void createFolder(@NotNull String title) {
 
 		logDebug("createFolder");
 		if (!isOnline(this)) {
@@ -473,56 +331,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}, 50);
 	}
 
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			int position;
-			int adapterType;
-			int actionType;
-			ImageView imageDrag = null;
-
-			if (intent != null) {
-				position = intent.getIntExtra("position", -1);
-				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-				if (position != -1) {
-					if (adapterType == CONTACT_FILE_ADAPTER) {
-						if (cflF != null && cflF.isAdded()) {
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = cflF.getImageDrag(position);
-								if (cflF.imageDrag != null) {
-									cflF.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null) {
-									cflF.imageDrag = imageDrag;
-									cflF.imageDrag.setVisibility(View.GONE);
-								}
-							} else if (actionType == SCROLL_TO_POSITION) {
-								cflF.updateScrollPosition(position);
-							}
-						}
-					}
-				}
-
-				if (imageDrag != null) {
-					int[] positionDrag = new int[2];
-					int[] screenPosition = new int[4];
-					imageDrag.getLocationOnScreen(positionDrag);
-
-					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
-					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
-					screenPosition[2] = imageDrag.getWidth();
-					screenPosition[3] = imageDrag.getHeight();
-
-					Intent intent1 = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
-					intent1.putExtra("screenPosition", screenPosition);
-					sendBroadcast(intent1);
-				}
-			}
-		}
-	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -532,6 +340,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			this.setParentHandle(-1);
 		} else {
 			this.setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1));
+
+			nodeSaver.restoreState(savedInstanceState);
 		}
 
 		if (megaApi == null) {
@@ -566,7 +376,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity = this;
 
-		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -684,6 +493,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				break;
 			}
 		}
+
+		nodeSaver.handleRequestPermissionsResult(requestCode);
 	}
 
 	@Override
@@ -704,9 +515,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			megaApi.removeRequestListener(this);
 		}
 
-		unregisterReceiver(receiver);
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
+
+		nodeSaver.destroy();
 	}
 
 	@Override
@@ -732,13 +544,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		this.parentHandle = parentHandle;
 	}
 
-	@SuppressLint("NewApi")
-	public void onFileClick(ArrayList<Long> handleList) {
-
-		if (nC == null) {
-			nC = new NodeController(this);
-		}
-		nC.prepareForDownload(handleList, true);
+	public void downloadFile(List<MegaNode> nodes) {
+		nodeSaver.saveNodes(nodes, true, false, false, false);
 	}
 
 	public void moveToTrash(final ArrayList<Long> handleList) {
@@ -772,196 +579,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-	public void showRenameDialog(final MegaNode document, String text) {
-		logDebug("showRenameDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-		input.setSingleLine();
-		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-		input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
-		input.setText(text);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (document.isFolder()) {
-						input.setSelection(0, input.getText().length());
-					} else {
-						String[] s = document.getName().split("\\.");
-						if (s != null) {
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1) {
-								input.setSelection(0, input.getText().length());
-							} else if (numParts > 1) {
-								for (int i = 0; i < (numParts - 1); i++) {
-									lastSelectedPos += s[i].length();
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
-						}
-						showKeyboardDelayed(v);
-					}
-				}
-			}
-		});
-
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ContactFileListActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.red_600_red_300));
-
-		final TextView textError = new TextView(ContactFileListActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ContactFileListActivityLollipop.this, R.color.red_600_red_300));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(contactPropertiesMainActivity, R.attr.colorSecondary),
-							PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					logDebug("actionId is IME_ACTION_DONE");
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					} else {
-						rename(document, value);
-						renameDialog.dismiss();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		builder.setTitle(getString(R.string.context_rename) + " " + new String(document.getName()));
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						rename(document, value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		renameDialog = builder.create();
-		renameDialog.show();
-		renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				} else {
-					rename(document, value);
-					renameDialog.dismiss();
-				}
-			}
-		});
-	}
-
-	private void rename(MegaNode document, String newName) {
-		if (newName.equals(document.getName())) {
-			return;
-		}
-
-		if (!isOnline(this)) {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
-			return;
-		}
-
-		if (isFinishing()) {
-			return;
-		}
-
-		ProgressDialog temp = null;
-		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_renaming));
-			temp.show();
-		} catch (Exception e) {
-			return;
-		}
-		statusDialog = temp;
-
-		logDebug("Renaming " + document.getName() + " to " + newName);
-
-		megaApi.renameNode(document, newName, this);
-	}
-
 	public void showMoveLollipop(ArrayList<Long> handleList) {
 		moveToRubbish = false;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
@@ -971,7 +588,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
 	}
 
 	public void showCopyLollipop(ArrayList<Long> handleList) {
@@ -983,31 +600,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			longArray[i] = handleList.get(i);
 		}
 		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent intent) {
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			if (intent == null) {
-				return;
-			}
-			logDebug("Local folder selected");
-			String parentPath = intent
-					.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			logDebug("URL: " + url + "___SIZE: " + size);
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 
-			Util.storeDownloadLocationIfNeeded(parentPath);
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+            return;
+        }
 
-			if (nC == null) {
-				nC = new NodeController(this);
-			}
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -1052,7 +656,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					}
 				}
 			}
-		} else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -1116,7 +720,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
 					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
-					nC.shareFolder(parent, selectedContacts, item);
+					new NodeController(this).shareFolder(parent, selectedContacts, item);
 				});
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
@@ -1271,8 +875,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			logDebug("Remove request start");
 		} else if (request.getType() == MegaRequest.TYPE_EXPORT) {
 			logDebug("Export request start");
-		} else if (request.getType() == MegaRequest.TYPE_RENAME) {
-			logDebug("Rename request start");
 		} else if (request.getType() == MegaRequest.TYPE_COPY) {
 			logDebug("Copy request start");
 		} else if (request.getType() == MegaRequest.TYPE_SHARE) {
@@ -1343,27 +945,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					cflF.setNodes();
 				}
 			}
-		} else if (request.getType() == MegaRequest.TYPE_RENAME) {
-
-			try {
-				statusDialog.dismiss();
-			} catch (Exception ex) {
-			}
-
-			if (e.getErrorCode() == MegaError.API_OK) {
-				if (cflF != null && cflF.isVisible()) {
-					cflF.clearSelections();
-					cflF.hideMultipleSelect();
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed));
-				}
-			} else {
-				if (cflF != null && cflF.isVisible()) {
-					cflF.clearSelections();
-					cflF.hideMultipleSelect();
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed));
-				}
-			}
-			logDebug("Rename nodes request finished");
 		} else if (request.getType() == MegaRequest.TYPE_COPY) {
 			try {
 				statusDialog.dismiss();
@@ -1522,13 +1103,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		return -1;
 	}
 
-	public void refreshAfterMovingToRubbish() {
-		if (cflF != null && cflF.isVisible()) {
-			cflF.clearSelections();
-			cflF.hideMultipleSelect();
-		}
-	}
-
 	public void openAdvancedDevices(long handleToDownload, boolean highPriority) {
 		logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
 		String externalPath = getExternalCardPath();
@@ -1570,92 +1144,21 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long[] hashes, final boolean highPriority) {
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long[] hashesC = hashes;
-		final long sizeC = size;
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain = new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if (dontShowAgain.isChecked()) {
-							dbH.setAttrAskSizeDownload("false");
-						}
-						if (nC == null) {
-							nC = new NodeController(contactPropertiesMainActivity);
-						}
-						nC.checkInstalledAppBeforeDownload(parentPathC,urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if (dontShowAgain.isChecked()) {
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload(String parentPath, String url, long size, long[] hashes, String nodeToDownload, final boolean highPriority) {
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long[] hashesC = hashes;
-		final long sizeC = size;
+	@Override
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
+		// No update needed
+	}
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain = new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if (dontShowAgain.isChecked()) {
-							dbH.setAttrAskNoAppDownload("false");
-						}
-						if (nC == null) {
-							nC = new NodeController(contactPropertiesMainActivity);
-						}
-						nC.download(parentPathC,urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if (dontShowAgain.isChecked()) {
-					dbH.setAttrAskNoAppDownload("false");
-				}
-			}
-		});
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
+	@Override
+	public void actionConfirmed() {
+		if (cflF != null && cflF.isVisible()) {
+			cflF.clearSelections();
+			cflF.hideMultipleSelect();
+		}
 	}
 }

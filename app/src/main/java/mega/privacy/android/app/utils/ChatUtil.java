@@ -16,7 +16,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.content.ContextCompat;
 
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -53,11 +52,12 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
-import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -72,6 +72,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
@@ -80,7 +81,10 @@ import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.shareFile;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -744,7 +748,8 @@ public class ChatUtil {
      * @param focusType Type of focus.
      * @return The AudioFocusRequest.
      */
-    public static AudioFocusRequest getRequest(AudioFocusListener listener, int focusType) {
+    public static AudioFocusRequest getRequest(AudioManager.OnAudioFocusChangeListener listener,
+                                               int focusType) {
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             AudioAttributes mAudioAttributes =
                     new AudioAttributes.Builder()
@@ -767,8 +772,10 @@ public class ChatUtil {
      *
      * @return True, if it has been successful. False, if not.
      */
-    public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
-        if (mAudioManager == null) {
+    public static boolean getAudioFocus(AudioManager audioManager,
+                                        AudioManager.OnAudioFocusChangeListener listener,
+                                        AudioFocusRequest request, int focusType, int streamType) {
+        if (audioManager == null) {
             logWarning("Audio Manager is NULL");
             return false;
         }
@@ -779,9 +786,9 @@ public class ChatUtil {
                 logWarning("Audio Focus Request is NULL");
                 return false;
             }
-            focusRequest = mAudioManager.requestAudioFocus(request);
+            focusRequest = audioManager.requestAudioFocus(request);
         } else {
-            focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
+            focusRequest = audioManager.requestAudioFocus(listener, streamType, focusType);
         }
 
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
@@ -790,13 +797,14 @@ public class ChatUtil {
     /**
      * Method for leaving the audio focus.
      */
-    public static void abandonAudioFocus(AudioFocusListener listener, AudioManager mAudioManager, AudioFocusRequest request) {
+    public static void abandonAudioFocus(AudioManager.OnAudioFocusChangeListener listener,
+                                         AudioManager audioManager, AudioFocusRequest request) {
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             if(request != null) {
-                mAudioManager.abandonAudioFocusRequest(request);
+                audioManager.abandonAudioFocusRequest(request);
             }
         } else {
-            mAudioManager.abandonAudioFocus(listener);
+            audioManager.abandonAudioFocus(listener);
         }
     }
 
@@ -1061,6 +1069,18 @@ public class ChatUtil {
     }
 
     /**
+     * Method to know if a message is of the geolocation type.
+     *
+     * @param msg The MegaChatMessage.
+     * @return True if it is. False, if not
+     */
+    public static boolean isGeolocation(MegaChatMessage msg) {
+        return (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) &&
+                (msg.getContainsMeta() != null &&
+                        msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION);
+    }
+
+    /**
      * Method for obtaining the contact status bitmap.
      *
      * @param userStatus The contact status.
@@ -1118,6 +1138,23 @@ public class ChatUtil {
         }
 
         return invalidMetaMessage;
+    }
+
+    /**
+     * Method to know if a message is an image.
+     *
+     * @param message The android msg.
+     * @return True, if it's image. False, if not.
+     */
+    public static boolean isMsgImage(AndroidMegaChatMessage message) {
+        if (message != null && message.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+            MegaNodeList list = message.getMessage().getMegaNodeList();
+            if (list.size() == 1) {
+                return MimeTypeList.typeForName(list.get(0).getName()).isImage();
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1464,5 +1501,144 @@ public class ChatUtil {
         String idFound = parts[parts.length - 1];
 
         return Long.parseLong(idFound);
+    }
+
+    /**
+     * Method to share a message from the chat.
+     *
+     * @param context Context of Activity.
+     * @param androidMsg The msg to be shared
+     * @param chatId  The ID of a chat room.
+     */
+    public static void shareMsgFromChat(Context context, AndroidMegaChatMessage androidMsg, long chatId) {
+        MegaChatMessage msg = androidMsg.getMessage();
+        MegaNode node = getNodeFromMessage(msg);
+        if(node == null)
+            return;
+
+        shareNodeFromChat(context, node, chatId, msg.getMsgId());
+    }
+
+    /**
+     * Method to share a node from the chat.
+     *
+     * @param context Context of Activity.
+     * @param node The node to be shared
+     * @param chatId  The ID of a chat room.
+     */
+    public static void shareNodeFromChat(Context context, MegaNode node, long chatId, long msgId){
+        if(!MegaNodeUtil.shouldContinueWithoutError(context, "sharing node", node)){
+            return;
+        }
+
+        String path = getLocalFile(context, node.getName(), node.getSize());
+        if (!isTextEmpty(path)) {
+            logDebug("Node is downloaded, so share the file");
+            shareFile(context, new File(path));
+        } else if (node.isExported()) {
+            logDebug("Node is exported, so share the public link");
+            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
+        } else {
+            if (msgId == MEGACHAT_INVALID_HANDLE) {
+                return;
+            }
+
+            logDebug("Node is not exported, so export Node");
+            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_MSG, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
+        }
+    }
+
+    /**
+     * Method that controls which nodes of messages should be shared directly and which need to be shared via a public link.
+     *
+     * @param context          The Activity context.
+     * @param messagesSelected The ArrayList of selected messages.
+     * @param chatId           The chat ID.
+     */
+    public static void shareNodesFromChat(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, long chatId) {
+        ArrayList<MegaNode> listNodes = new ArrayList<>();
+        for (AndroidMegaChatMessage androidMessage : messagesSelected) {
+            MegaNode node = getNodeFromMessage(androidMessage.getMessage());
+            if (node == null) continue;
+
+            listNodes.add(node);
+        }
+
+        if (!MegaNodeUtil.shouldContinueWithoutError(context, "sharing nodes", listNodes)) {
+            return;
+        }
+
+        if (MegaNodeUtil.areAllNodesDownloaded(context, listNodes)) {
+            return;
+        }
+
+        StringBuilder links = MegaNodeUtil.getExportNodesLink(listNodes);
+        if (areAllNodesExported(listNodes)) {
+            logDebug("All nodes are exported, so share the public links");
+            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
+                    links.toString());
+            return;
+        }
+
+        ArrayList<MegaNode> arrayNodesNotExported = getNotExportedNodes(listNodes);
+        if (!arrayNodesNotExported.isEmpty()) {
+            ExportListener exportListener = new ExportListener(context, ACTION_SHARE_MSG, arrayNodesNotExported.size(), links,
+                    new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
+
+            for (MegaNode nodeNotExported : arrayNodesNotExported) {
+                logDebug("Node is not exported, so export Node");
+                MegaApplication.getInstance().getMegaApi().exportNode(nodeNotExported, exportListener);
+            }
+        }
+    }
+
+    /**
+     * Method to get the node from a message.
+     *
+     * @param message The MegaChatMessage.
+     * @return The MegaNode obtained.
+     */
+    private static MegaNode getNodeFromMessage(MegaChatMessage message) {
+        if (message == null) {
+            return null;
+        }
+
+        MegaNodeList nodeList = message.getMegaNodeList();
+        if (nodeList == null || nodeList.size() == 0) {
+            return null;
+        }
+
+        return nodeList.get(0);
+    }
+
+    /**
+     * Method to find out if all nodes are exported nodes.
+     *
+     * @param listNodes list of nodes to check.
+     * @return True, if all are exported nodes. False, otherwise.
+     */
+    private static boolean areAllNodesExported(ArrayList<MegaNode> listNodes) {
+        for (MegaNode node : listNodes) {
+            if (!node.isExported()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method to get the nodes that are not exported.
+     *
+     * @param listNodes The list of nodes to be checked.
+     * @return The list of nodes that are not exported.
+     */
+    private static ArrayList<MegaNode> getNotExportedNodes(ArrayList<MegaNode> listNodes) {
+        ArrayList<MegaNode> arrayNodesNotExported = new ArrayList<>();
+        for (MegaNode node : listNodes) {
+            if (!node.isExported()) {
+                arrayNodesNotExported.add(node);
+            }
+        }
+        return arrayNodesNotExported;
     }
 }

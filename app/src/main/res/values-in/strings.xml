@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Tentang</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Kebijakan Privasi</string>
     <string name="settings_about_terms_of_service" context="">Persyaratan Layanan</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versi App</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versi MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versi MEGAchat SDK</string>
@@ -863,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Tanggal terlama</string>
     <string name="sort_by_largest_size" context="sort files by largest size">Ukuran terbesar</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Ukuran terkecil</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per bulan</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per tahun</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Masukan detail billing anda:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Alamat 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Alamat 2 (optional)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Kota</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Negara Bagian / Provinsi</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Negara</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Kode pos</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Masukan detail pembayaran anda:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nama depan</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nama belakang</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Nomor Credit Card</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Bulan</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Tahun</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Lanjut</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Akun telah berhasil di upgrade!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operasi gagal. Kartu kredit anda belum dibebankan</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informasi kartu kreditnya tidak benar. Kartu kredit tidak akan dikenakan biaya</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipe Passcode</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
@@ -2391,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Akun anda sekarang adalah [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject pada partisipasi anda dalam achievements program kami</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Pilih metoda pembayaran</string>
 
     <string name="billing_period_title" context="title of billing period">Periode pembayaran</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Satu kali (bulan)[/A] %s</string>
@@ -2403,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (langganan)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Operator Seluler[/A] (satu kali)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Operator Seluler[/A] (satu kali)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">BARU</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Untuk mengupgrade langganan anda saat ini, hubungi tim dukungan kami untuk [A]custom plan[/A].</string>
@@ -2470,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Tautan Obrolan disalin ke papan klip</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Dari[/A] %s / [A]bulan[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Dari[/A] %s per pengguna /[A]bulan[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Panggilan Dimulai</string>
 
@@ -2763,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Meskipun MEGA tidak dapat mengakses data anda, administrator akun bisnis anda memiliki kemampuan untuk mengontrol dan melihat Unggahan Kamera di akun pengguna anda</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ada yang salah</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Hubungi administrator akun bisnis Anda untuk menyelesaikan masalah dan aktifkan akun Anda.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Akan otomatis naik, tanpa biaya tambahan, untuk tujuan usaha yang benar.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Penyimpanan [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Kuota transfer [A]Tanpa Batas[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Saat anda keluar, file dari bagian Offline anda akan dihapus dari perangkat anda.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Saat anda keluar, transfer yang sedang berlangsung akan dibatalkan.</string>

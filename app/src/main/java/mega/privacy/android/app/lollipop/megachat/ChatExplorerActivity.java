@@ -301,6 +301,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         logDebug("onActivityResult " + requestCode + "____" + resultCode);
 
         if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
