@@ -25,7 +25,7 @@
             app:expandedTitleGravity="start|top"
             app:expandedTitleMarginBottom="14dp"
             app:expandedTitleMarginStart="72dp"
-            app:expandedTitleMarginTop="65dp"
+            app:expandedTitleMarginTop="50dp"
             app:expandedTitleTextAppearance="?attr/textAppearanceSubtitle1"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:lineSpacingMultiplier="1.2"

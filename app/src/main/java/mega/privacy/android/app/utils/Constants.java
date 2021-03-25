@@ -115,13 +115,7 @@ public class Constants {
     public static final int MY_ACCOUNT_FRAGMENT = 5000;
     public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
     public static final int OVERQUOTA_ALERT = 5003;
-    public static final int CC_FRAGMENT = 5004;
-    public static final int FORTUMO_FRAGMENT = 5005;
-    public static final int CENTILI_FRAGMENT = 5007;
-    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
-
-    public static final int PAYMENT_CC_MONTH = 111;
-    public static final int PAYMENT_CC_YEAR = 112;
+    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5004;
 
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
@@ -260,6 +254,7 @@ public class Constants {
     public static final String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
     public static final String ACTION_RESTART_SERVICE = "ACTION_RESTART_SERVICE";
+    public static final String ACTION_CHECK_COMPRESSING_MESSAGE = "ACTION_CHECK_COMPRESSING_MESSAGE";
 
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
@@ -302,6 +297,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
     public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
+    public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -581,7 +577,6 @@ public class Constants {
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
     public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
-    public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;

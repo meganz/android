@@ -343,8 +343,20 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
 			chatIcon.setVisible(false);
-
-		}else if (adapterType == ZIP_ADAPTER){
+		} else if (adapterType == RUBBISH_BIN_ADAPTER
+				|| megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG)))){
+			renameIcon.setVisible(false);
+			moveIcon.setVisible(false);
+			copyIcon .setVisible(false);
+			moveToTrashIcon.setVisible(false);
+			removeIcon.setVisible(true);
+			chatIcon.setVisible(false);
+			getlinkIcon.setVisible(false);
+			removelinkIcon.setVisible(false);
+			propertiesIcon.setVisible(true);
+			downloadIcon.setVisible(false);
+			shareIcon.setVisible(false);
+		} else if (adapterType == ZIP_ADAPTER){
 
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -587,18 +599,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 						parent = megaApi.getParentNode(parent);
 					}
 
-					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-
-						moveToTrashIcon.setVisible(true);
-						removeIcon.setVisible(false);
-
-					}else{
-
-						moveToTrashIcon.setVisible(false);
-						removeIcon.setVisible(true);
-						getlinkIcon.setVisible(false);
-						removelinkIcon.setVisible(false);
-					}
+					moveToTrashIcon.setVisible(true);
+					removeIcon.setVisible(false);
 				}
 			}
 		}

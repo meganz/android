@@ -176,14 +176,6 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_about_gdpr"
-			android:title="@string/settings_about_gdpr"
-			android:summary=""
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
 			android:key="settings_about_code_link"
 			android:title="@string/settings_about_code_link_title"
 			app:allowDividerAbove="true"

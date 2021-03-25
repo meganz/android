@@ -1566,7 +1566,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	public void showSnackbar(String s) {
 		if (scrollView != null) {
-			BaseActivity.showSimpleSnackbar(this, outMetrics, scrollView, s);
+			BaseActivity.showSimpleSnackbar(outMetrics, scrollView, s);
 		}
 	}
 

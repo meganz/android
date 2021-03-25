@@ -23,7 +23,6 @@ public class SettingsConstants {
     public static final String KEY_ABOUT_COOKIE_POLICY = "settings_about_cookie_policy";
     public static final String KEY_COOKIE_SETTINGS = "settings_cookie";
     public static final String KEY_ABOUT_TOS = "settings_about_terms_of_service";
-    public static final String KEY_ABOUT_GDPR = "settings_about_gdpr";
     public static final String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
     public static final String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
     public static final String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";

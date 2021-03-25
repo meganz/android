@@ -1038,7 +1038,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
     }
 
     void setOwnerState(long userHandle) {
-        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState);
+        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState, StatusIconLocation.STANDARD);
     }
 
     @Override
@@ -2092,6 +2092,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         logDebug("onActivityResult " + requestCode + "____" + resultCode);
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT) {
