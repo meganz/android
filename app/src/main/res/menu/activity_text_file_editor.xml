@@ -20,19 +20,19 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_properties"
-        android:icon="@drawable/info_ic_white"
+        android:id="@+id/action_get_link"
+        android:icon="@drawable/link_ic_white"
         android:orderInCategory="100"
-        android:title="@string/general_file_info"
+        android:title="@string/context_get_link_menu"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_share"
-        android:icon="@drawable/ic_social_share_white"
+        android:id="@+id/action_remove_link"
+        android:icon="@drawable/ic_remove_link"
         android:orderInCategory="100"
-        android:title="@string/general_share"
+        android:title="@string/context_remove_link_menu"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
@@ -47,19 +47,10 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_get_link"
-        android:icon="@drawable/link_ic_white"
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_social_share_white"
         android:orderInCategory="100"
-        android:title="@string/context_get_link_menu"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_remove_link"
-        android:icon="@drawable/ic_remove_link"
-        android:orderInCategory="100"
-        android:title="@string/context_remove_link_menu"
+        android:title="@string/general_share"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />

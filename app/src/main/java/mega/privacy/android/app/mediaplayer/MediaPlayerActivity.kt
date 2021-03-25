@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
@@ -357,12 +358,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         refreshMenuOptionsVisibility()
 
         return true
-    }
-
-    private fun toggleAllMenuItemsVisibility(menu: Menu, visible: Boolean) {
-        for (i in 0 until menu.size()) {
-            menu.getItem(i).isVisible = visible
-        }
     }
 
     private fun refreshMenuOptionsVisibility() {

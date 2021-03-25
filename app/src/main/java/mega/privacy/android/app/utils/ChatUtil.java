@@ -64,6 +64,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import nz.mega.sdk.AndroidGfxProcessor;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -1640,5 +1641,21 @@ public class ChatUtil {
             }
         }
         return arrayNodesNotExported;
+    }
+
+    public static MegaNode authorizeNodeIfPreview(MegaNode node, MegaChatApiAndroid megaChatApi,
+                                                   MegaApiAndroid megaApi, long chatId) {
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+
+        if (chatRoom != null && chatRoom.isPreview()) {
+            MegaNode nodeAuthorized = megaApi.authorizeChatNode(node, chatRoom.getAuthorizationToken());
+
+            if (nodeAuthorized != null) {
+                logDebug("Authorized");
+                return nodeAuthorized;
+            }
+        }
+
+        return node;
     }
 }

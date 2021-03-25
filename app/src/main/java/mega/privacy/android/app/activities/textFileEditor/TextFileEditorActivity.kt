@@ -10,10 +10,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaShare
 
 @AndroidEntryPoint
 class TextFileEditorActivity : PinActivityLollipop() {
@@ -21,6 +23,8 @@ class TextFileEditorActivity : PinActivityLollipop() {
     private val viewModel by viewModels<TextFileEditorViewModel>()
 
     private lateinit var binding: ActivityTextFileEditorBinding
+
+    private var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +34,7 @@ class TextFileEditorActivity : PinActivityLollipop() {
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.setModeAndName(
-            intent?.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE,
-            intent?.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME)
-        )
-
+        viewModel.setValuesFromIntent(intent)
         setUpTextFileName()
         setUpTextView()
         setUpEditFAB()
@@ -51,27 +51,88 @@ class TextFileEditorActivity : PinActivityLollipop() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_text_file_editor, menu)
+        this.menu = menu
 
-        if (viewModel.isViewMode()) {
-            val downloadMenuItem = menu?.findItem(R.id.action_download)
-            val infoMenuItem = menu?.findItem(R.id.action_properties)
-            val shareMenuItem = menu?.findItem(R.id.action_share)
-            val sendToChatMenuItem = menu?.findItem(R.id.action_send_to_chat)
-            val getLinkMenuItem = menu?.findItem(R.id.action_get_link)
-            val removeLinkMenuItem = menu?.findItem(R.id.action_remove_link)
-            val renameMenuItem = menu?.findItem(R.id.action_rename)
-            val moveMenuItem = menu?.findItem(R.id.action_move)
-            val copyMenuItem = menu?.findItem(R.id.action_copy)
-            val moveToTrashMenuItem = menu?.findItem(R.id.action_move_to_trash)
-            val removeMenuItem = menu?.findItem(R.id.action_remove)
-            val chatImportMenuItem = menu?.findItem(R.id.chat_action_import)
-            val chatOfflineMenuItem = menu?.findItem(R.id.chat_action_save_for_offline)
-            val chatRemoveMenuItem = menu?.findItem(R.id.chat_action_remove)
-        } else {
-            menu?.findItem(R.id.action_save)?.isVisible = true
-        }
+        refreshMenuOptionsVisibility()
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun refreshMenuOptionsVisibility() {
+        val menu = this.menu ?: return
+
+        if (!isOnline(this)) {
+            toggleAllMenuItemsVisibility(menu, false)
+            return
+        }
+
+        if (viewModel.isViewMode()) {
+            if (viewModel.getAdapterType() == OFFLINE_ADAPTER) {
+                toggleAllMenuItemsVisibility(menu, false)
+                menu.findItem(R.id.action_share).isVisible = true
+                return
+            }
+
+            if (viewModel.getNode() == null) {
+                toggleAllMenuItemsVisibility(menu, false)
+                return
+            }
+
+            if (viewModel.getAdapterType() == RUBBISH_BIN_ADAPTER
+                || megaApi.isInRubbish(viewModel.getNode())
+            ) {
+                toggleAllMenuItemsVisibility(menu, false)
+                menu.findItem(R.id.action_remove).isVisible = true
+                return
+            }
+
+            if (viewModel.getAdapterType() == FILE_LINK_ADAPTER || viewModel.getAdapterType() == ZIP_ADAPTER) {
+                toggleAllMenuItemsVisibility(menu, false)
+                return
+            }
+
+            if (viewModel.getAdapterType() == FROM_CHAT) {
+                toggleAllMenuItemsVisibility(menu, false)
+                menu.findItem(R.id.action_download).isVisible = true
+                menu.findItem(R.id.action_share).isVisible = true
+
+                if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
+                    menu.findItem(R.id.chat_action_import).isVisible = true
+                    menu.findItem(R.id.chat_action_save_for_offline).isVisible = true
+                }
+
+                if (viewModel.getMsgChat()?.userHandle == megaChatApi.myUserHandle
+                    && viewModel.getMsgChat()?.isDeletable == true) {
+                    menu.findItem(R.id.chat_action_remove).isVisible = true
+                }
+
+                return
+            }
+
+            toggleAllMenuItemsVisibility(menu, true)
+
+            when(viewModel.getNodeAccess()) {
+                MegaShare.ACCESS_OWNER -> {
+                    if (viewModel.getNode()!!.isExported) {
+                        menu.findItem(R.id.action_get_link).isVisible = false
+                    } else {
+                        menu.findItem(R.id.action_remove_link).isVisible = false
+                    }
+                }
+                MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
+                    menu.findItem(R.id.action_remove).isVisible = false
+                    menu.findItem(R.id.action_move).isVisible = false
+                    menu.findItem(R.id.action_move_to_trash).isVisible = false
+                }
+            }
+
+            menu.findItem(R.id.action_copy).isVisible = viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
+            menu.findItem(R.id.chat_action_import).isVisible = false
+            menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
+            menu.findItem(R.id.chat_action_remove).isVisible = false
+        } else {
+            menu.findItem(R.id.action_save)?.isVisible = true
+        }
     }
 
     private fun setUpTextFileName() {
