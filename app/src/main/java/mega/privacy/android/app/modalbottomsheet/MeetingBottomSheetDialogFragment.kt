@@ -23,7 +23,6 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
         contentView = binding.root;
         mainLinearLayout = binding.root.meeting_bottom_sheet
-        items_layout = binding.root.meeting_item
 
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)

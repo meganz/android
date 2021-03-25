@@ -6,27 +6,14 @@
     android:id="@+id/meeting_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/meeting_title"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:orientation="vertical"/>
+    android:paddingBottom="10dp"
+    android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/meeting_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:layout_centerVertical="true"
-        android:weightSum="2"
-        android:orientation="horizontal">
         <RelativeLayout
             android:id="@+id/rl_start_meeting"
             android:layout_width="0dp"
             android:layout_height="200dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent">
+            android:layout_weight="1" >
 
             <ImageView
                 android:id="@+id/iv_start_meeting"
@@ -36,7 +23,6 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_meeting_start"
                 tools:ignore="ContentDescription" />
-
 
             <TextView
                 android:id="@+id/tv_start_meeting"
@@ -50,7 +36,7 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="@string/new_meeting"
-                android:textAppearance="?attr/textAppearanceSubtitle1" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -82,7 +68,6 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="@string/join_meeting"
-                android:textAppearance="?attr/textAppearanceSubtitle1" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
         </RelativeLayout>
-    </LinearLayout>
 </LinearLayout>

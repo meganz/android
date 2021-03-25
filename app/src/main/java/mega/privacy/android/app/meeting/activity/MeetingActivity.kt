@@ -5,10 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -22,7 +26,9 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 
+@AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
+
     companion object{
         const val MEETING_TYPE = "meetingType"
         const val MEETING_TYPE_JOIN = "join_meeting"
@@ -113,6 +119,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         unregisterReceiver(networkReceiver)
     }
 
+    /**
+     * Register broadcast receiver that needed
+     */
     private fun initReceiver() {
         registerReceiver(
             networkReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
@@ -130,7 +139,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         when(meetType) {
-//            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
         }
 
@@ -155,11 +164,22 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         navController.graph = navGraph
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            android.R.id.home-> onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Get current fragment from navHostFragment
+     */
     fun getCurrentFragment(): MeetingBaseFragment? {
         val navHostFragment: Fragment? =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
         return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
     }
+
     override fun onChangeMicState(micOn: Boolean) {
         Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
     }
@@ -214,5 +234,12 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     override fun onRemoveParticipant() {
 
+    }
+
+    fun setBottomFloatingPanelViewHolder(visible: Boolean) {
+        when(visible) {
+            true-> bottom_floating_panel.visibility = View.VISIBLE;
+            false-> bottom_floating_panel.visibility = View.GONE
+        }
     }
 }
