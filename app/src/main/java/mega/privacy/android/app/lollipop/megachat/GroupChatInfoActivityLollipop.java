@@ -38,6 +38,8 @@ import android.widget.TextView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
@@ -96,7 +99,9 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class GroupChatInfoActivityLollipop extends PasscodeActivity implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
+public class GroupChatInfoActivityLollipop extends PasscodeActivity
+        implements MegaChatRequestListenerInterface, MegaChatListenerInterface,
+        MegaRequestListenerInterface, SnackbarShower {
 
     private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
@@ -1426,5 +1431,10 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity implements M
      */
     public boolean isChatOpen() {
         return isChatOpen;
+    }
+
+    @Override
+    public void showSnackbar(int type, @Nullable String content, long chatId) {
+        showSnackbar(type, containerLayout, content, chatId);
     }
 }

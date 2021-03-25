@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -30,6 +31,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -64,7 +66,7 @@ public class OfflineUtils {
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
+            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
         } else {
             logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
@@ -75,8 +77,14 @@ public class OfflineUtils {
             String path = dlFiles.get(document);
 
             if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + document.getName() + ")", false, activity);
-                continue;
+                RunOnUIThreadUtils.INSTANCE.post(() -> {
+                    Util.showErrorAlertDialog(
+                            getString(R.string.error_not_enough_free_space)
+                                    + " (" + document.getName() + ")",
+                            false, activity);
+                    return Unit.INSTANCE;
+                });
+                return;
             }
 
             String url = null;
@@ -86,32 +94,6 @@ public class OfflineUtils {
             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
-        }
-    }
-
-    /*
-     * Get list of all child files
-     */
-    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder,
-            MegaApiAndroid megaApi) {
-        if (megaApi.getRootNode() == null) {
-            return;
-        }
-
-        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        if (nodeList.size() == 0) {
-            // if this is an empty folder, do nothing
-            return;
-        }
-        folder.mkdir();
-        for (int i = 0; i < nodeList.size(); i++) {
-            MegaNode document = nodeList.get(i);
-            if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subFolder = new File(folder, document.getName());
-                getDlList(dlFiles, document, subFolder, megaApi);
-            } else {
-                dlFiles.put(document, folder.getAbsolutePath());
-            }
         }
     }
 
@@ -245,6 +227,40 @@ public class OfflineUtils {
         }
     }
 
+    /**
+     * Get folder name of an offline node, or `Offline` if it's in root offline folder.
+     *
+     * @param context Android context
+     * @param handle handle of the offline node
+     */
+    public static String getOfflineFolderName(Context context, long handle) {
+        DatabaseHandler dbHandler = DatabaseHandler.getDbHandler(context);
+
+        MegaOffline node = dbHandler.findByHandle(handle);
+        if (node == null) {
+            return "";
+        }
+
+        File file = getOfflineFile(context, node);
+        if (!file.exists()) {
+            return "";
+        }
+
+        File parentFile = file.getParentFile();
+        if (parentFile == null) {
+            return "";
+        }
+
+        File grandParentFile = parentFile.getParentFile();
+        if ((grandParentFile != null && OFFLINE_INBOX_DIR.equals(grandParentFile.getName()
+                + File.separator + parentFile.getName()))
+                || OFFLINE_DIR.equals(parentFile.getName())) {
+            return getString(R.string.section_saved_for_offline_new);
+        } else {
+            return parentFile.getName();
+        }
+    }
+
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
         if (offlineNode.isFolder()) {
@@ -255,9 +271,13 @@ public class OfflineUtils {
     }
 
     public static File getThumbnailFile(Context context, MegaOffline node) {
+        return getThumbnailFile(context, node.getHandle());
+    }
+
+    public static File getThumbnailFile(Context context, String handle) {
         File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
-        String thumbName = Base64.encodeToString(node.getHandle().getBytes(), Base64.DEFAULT);
-        return new File(thumbDir, thumbName + ".jpg");
+        String thumbName = Base64.encodeToString(handle.getBytes(), Base64.DEFAULT);
+        return new File(thumbDir, thumbName + JPG_EXTENSION);
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
@@ -342,7 +362,7 @@ public class OfflineUtils {
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");
-            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
+            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
         } else {
             logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
@@ -676,7 +696,7 @@ public class OfflineUtils {
             path = path.replace(getOfflineFolder(app, OFFLINE_DIR).getPath(), "");
         }
 
-        return app.getString(R.string.section_saved_for_offline_new) + path;
+        return getString(R.string.section_saved_for_offline_new) + path;
     }
 
     /**
@@ -687,7 +707,7 @@ public class OfflineUtils {
      * @return  The path without the "Offline" root parent.
      */
     public static String removeInitialOfflinePath(String path) {
-        return path.replace(MegaApplication.getInstance().getString(R.string.section_saved_for_offline_new), "");
+        return path.replace(getString(R.string.section_saved_for_offline_new), "");
     }
 
     /**

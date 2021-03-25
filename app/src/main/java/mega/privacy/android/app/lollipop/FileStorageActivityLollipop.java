@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -112,6 +113,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_PATH = "filepath";
+	// Currently for exporting recovery key use.
+	public static final String EXTRA_SD_URI = "sdcarduri";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
 
@@ -192,6 +195,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
+
+    /**
+     * Pass to exporting recovery key operation.
+     */
+	private String sdCardUriString;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -920,6 +928,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private void finishPickFolder() {
 		Intent intent = new Intent();
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
+		intent.putExtra(EXTRA_SD_URI, sdCardUriString);
 		intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
 		intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
 		intent.putExtra(EXTRA_URL, url);
@@ -1041,7 +1050,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		//No action needed
 	}
 
@@ -1180,6 +1189,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
                     dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
+                } else if (fromSaveRecoveryKey) {
+                    // For temporary use, don't store the uri to database.
+                    sdCardUriString = uriString;
                 } else {
                     dbH.setSDCardUri(uriString);
                 }
