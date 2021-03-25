@@ -205,20 +205,20 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_hours,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_days,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_weeks,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_months,
                 value
-            ),
-            StringResourcesUtils.getString(R.string.year_cc).toLowerCase(Locale.getDefault())
+            ).toLowerCase(Locale.getDefault()),
+            StringResourcesUtils.getString(R.string.retention_time_picker_year).toLowerCase(Locale.getDefault())
         )
         binding.textPicker.displayedValues = arrayString
     }
