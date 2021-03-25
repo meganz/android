@@ -190,7 +190,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 }
 
                 optionLeaveChat.setVisibility(View.GONE);
-                setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel);
+                setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel, StatusIconLocation.DRAWER);
             }
 
             if (isEnableChatNotifications(chat.getChatId())) {

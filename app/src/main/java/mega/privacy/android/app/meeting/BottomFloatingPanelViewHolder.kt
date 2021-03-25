@@ -145,8 +145,14 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun onBottomFloatingPanelSlide(slideOffset: Float) {
+        val ratio = if (slideOffset < BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD) {
+            slideOffset / BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD
+        } else {
+            1F
+        }
+
         for (updater in propertyUpdaters) {
-            updater(slideOffset)
+            updater(ratio)
         }
     }
 
@@ -226,5 +232,6 @@ class BottomFloatingPanelViewHolder(
 
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F
+        private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F
     }
 }
