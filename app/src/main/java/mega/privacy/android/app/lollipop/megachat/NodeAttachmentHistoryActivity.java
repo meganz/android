@@ -232,6 +232,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
 		emptyImageView = (ImageView) findViewById(R.id.empty_image_view_node_history);
 
+        ColorUtils.setImageViewAlphaIfDark(this, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
 		}else{

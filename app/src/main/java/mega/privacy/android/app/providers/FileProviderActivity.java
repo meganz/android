@@ -1566,7 +1566,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	public void showSnackbar(String s) {
 		if (scrollView != null) {
-			BaseActivity.showSimpleSnackbar(this, outMetrics, scrollView, s);
+			BaseActivity.showSimpleSnackbar(outMetrics, scrollView, s);
 		}
 	}
 

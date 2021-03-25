@@ -347,7 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can’t download files greater than 4GB. Your download will probably fail</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">There isn’t any available app to execute this file on your device</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There are no apps available on your device to open this location</string>
-    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
@@ -656,7 +656,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capture</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
@@ -795,7 +795,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Privacy Policy</string>
     <string name="settings_about_terms_of_service" context="">Terms of Service</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">App version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK Version</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK Version</string>
@@ -1012,7 +1011,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capture</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
@@ -1368,7 +1367,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Remove from Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
 
@@ -2657,7 +2656,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Answer</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
@@ -2768,7 +2767,7 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact because they are part of your Business account.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account has expired</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your Business account has expired</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA can not access to your data, your business account administrator does have the ability to control and view the Camera Uploads in your user account</string>
@@ -2832,7 +2831,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 
-    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select messages</string>
 
@@ -3048,7 +3047,7 @@
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 
-    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
 
 
     <string name="theme_light" context="Option of color theme, light mode.">Light</string>

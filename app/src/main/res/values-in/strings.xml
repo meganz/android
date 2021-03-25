@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">Sebagian besar perangkat tidak bisa mendownload file lebih besar dari 4GB. Unduhan Anda mungkin akan gagal</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Tidak ada app tersedia untuk meng-eksekusi file ini pada perangkat anda.</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Tidak ada aplikasi yang tersedia di perangkat anda untuk membuka lokasi ini</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Bagikan gambar dengan</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Bagikan link</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Batalkan semua transfer</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Ambil foto</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Ambil foto</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Izinkan pemberitahuan untuk panggilan MEGA yang masuk</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA membutuhkan otorisasi anda untuk memungkinkan layar panggilan muncul dari latar belakang.</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Upload kamera selesai</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Penampilan</string>
     <string name="settings_features" context="settings of the Features section">Fitur</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Gudang</string>
@@ -791,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Tentang</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Kebijakan Privasi</string>
     <string name="settings_about_terms_of_service" context="">Persyaratan Layanan</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versi App</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versi MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versi MEGAchat SDK</string>
@@ -1008,7 +1009,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Ambil keuntungan penuh dari akun MEGA anda dengan mengupgrade ke Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Ambil foto</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Ambil foto</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Pilih gambar</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Hapus gambar</string>
 
@@ -1364,6 +1365,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Hapus dari Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Ganti status</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Hilangkan</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Tidak tersedia</string>
 
@@ -1467,6 +1469,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">%1$d file terupload</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files terupload</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1620,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfer dihentikan!</string>
     <string name="attachment_uploading_state_uploading">Mengupload&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">Error. Tidak dikirim.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d file telah didownload.</string>
@@ -1719,6 +1727,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Tidak ada folder dibagikan</string>
 
     <string name="settings_help" context="Menu item">Bantuan</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Pusat Bantuan</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Kirim saran</string>
     <string name="setting_feedback_subject" context="mail subject">Masukan untuk Android</string>
     <string name="setting_feedback_body" context="mail body">Tolong tuliskan masukan anda disini:</string>
@@ -2636,7 +2645,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d dari %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Pencarian&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Jawab</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Jawab</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Abaikan</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s membisukan panggilan ini</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Diam</string>
@@ -2811,6 +2820,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Lampirkan dari &#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Obrolan dibuat pada %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Pilih pesan</string>
 
@@ -3023,4 +3033,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Selalu Aktif</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Pindai dokumen</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Terang</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Gelap</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>

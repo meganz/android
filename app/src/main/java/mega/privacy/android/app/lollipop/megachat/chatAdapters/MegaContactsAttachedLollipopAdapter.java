@@ -222,7 +222,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
 
-		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
+		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon, StatusIconLocation.STANDARD);
 		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		if (!multipleSelect) {
@@ -566,19 +566,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		this.contacts = contacts;
 		positionClicked = -1;
 		notifyDataSetChanged();
-	}
-
-	public void updateContactStatus(int position, long userHandle, int state){
-		logDebug("position: " + position);
-
-		holderList = (ViewHolderContactsList) listFragment.findViewHolderForAdapterPosition(position);
-		if(holderList!=null){
-			setContactStatus(state, holderList.contactStateIcon);
-		}
-		else{
-			logWarning("Holder is NULL");
-			notifyItemChanged(position);
-		}
 	}
 
 	public RecyclerView getListFragment() {
