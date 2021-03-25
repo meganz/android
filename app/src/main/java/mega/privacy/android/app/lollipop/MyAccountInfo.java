@@ -49,9 +49,8 @@ public class MyAccountInfo {
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
-    private boolean businessStatusReceived = false;
-    private boolean shouldShowBusinessAlert = false;
     private boolean isBusinessAlertShown;
+    private boolean wasBusinessAlertAlreadyShown;
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -575,22 +574,6 @@ public class MyAccountInfo {
         return usedStorage;
     }
 
-    public void setBusinessStatusReceived(boolean businessStatusReceived) {
-        this.businessStatusReceived = businessStatusReceived;
-    }
-
-    public boolean isBusinessStatusReceived() {
-        return businessStatusReceived;
-    }
-
-    public void setShouldShowBusinessAlert(boolean shouldShowBusinessAlert) {
-        this.shouldShowBusinessAlert = shouldShowBusinessAlert;
-    }
-
-    public boolean shouldShowBusinessAlert() {
-        return shouldShowBusinessAlert;
-    }
-
     public MegaPurchase getActiveSubscription() {
         return activeSubscription;
     }
@@ -624,5 +607,13 @@ public class MyAccountInfo {
 
     public void setBusinessAlertShown(boolean businessAlertShown) {
         isBusinessAlertShown = businessAlertShown;
+    }
+
+    public boolean wasNotBusinessAlertShownYet() {
+        return !wasBusinessAlertAlreadyShown;
+    }
+
+    public void setBusinessAlertAlreadyShown() {
+        wasBusinessAlertAlreadyShown = true;
     }
 }

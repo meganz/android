@@ -471,7 +471,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
 					}
 
-					sendBroadcastUpdateAccountDetails();
+					sendBroadcastUpdateAccountDetails(false);
 				}
 			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
 				dbH.setTransferQueueStatus(request.getFlag());
@@ -486,10 +486,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		
 	}
 
-	private void sendBroadcastUpdateAccountDetails() {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
-		sendBroadcast(intent);
+	public void sendBroadcastUpdateAccountDetails(boolean isBusinessUpdate) {
+		sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+				.putExtra(ACTION_TYPE, isBusinessUpdate ? UPDATE_BUSINESS : UPDATE_ACCOUNT_DETAILS));
 	}
 
 	private final int interval = 3000;
@@ -1312,16 +1311,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
-	}
-
-	public void updateBusinessStatus() {
-		myAccountInfo.setBusinessStatusReceived(true);
-		int status = megaApi.getBusinessStatus();
-		if (status == BUSINESS_STATUS_EXPIRED
-				|| (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD)){
-			myAccountInfo.setShouldShowBusinessAlert(true);
-		}
-		sendBroadcastUpdateAccountDetails();
 	}
 
 	/**

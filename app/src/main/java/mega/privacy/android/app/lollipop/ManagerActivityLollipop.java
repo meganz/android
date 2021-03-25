@@ -891,39 +891,35 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						upAFL.setPricingInfo();
 					}
 				}
-				else if(actionType == UPDATE_ACCOUNT_DETAILS){
+				else if(actionType == UPDATE_ACCOUNT_DETAILS || actionType == UPDATE_BUSINESS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
-					if(!isFinishing()){
+					if (isFinishing()) {
+						return;
+					}
 
-						updateAccountDetailsVisibleInfo();
+					updateAccountDetailsVisibleInfo();
 
-						//Check if myAccount section is visible
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol!=null){
-							logDebug("Update the account fragment");
-							maFLol.setAccountDetails();
+					//Check if myAccount section is visible
+					if (getMyAccountFragment() != null) {
+						logDebug("Update the account fragment");
+						maFLol.setAccountDetails();
+					}
+
+					if (getMyStorageFragment() != null) {
+						logDebug("Update the account fragment");
+						mStorageFLol.setAccountDetails();
+					}
+
+					if (getUpgradeAccountFragment() != null) {
+						if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
+							closeUpgradeAccountFragment();
+						} else {
+							upAFL.showAvailableAccount();
 						}
+					}
 
-						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-						if(mStorageFLol!=null){
-							logDebug("Update the account fragment");
-							mStorageFLol.setAccountDetails();
-						}
-
-						upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-						if (upAFL != null) {
-							if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
-								closeUpgradeAccountFragment();
-							} else {
-								upAFL.showAvailableAccount();
-							}
-						}
-
-						checkBusinessStatus();
-
-						if (megaApi.isBusinessAccount()) {
-							supportInvalidateOptionsMenu();
-						}
+					if (megaApi.isBusinessAccount()) {
+						supportInvalidateOptionsMenu();
 					}
 				}
 				else if(actionType == UPDATE_CREDIT_CARD_SUBSCRIPTION){
@@ -3026,7 +3022,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * 		and the business warnings and SMS verification have not to be shown.
 	 */
 	private void checkInitialScreens() {
-    	if (checkBusinessStatus()) {
+		if (checkBusinessStatus()) {
 			setBusinessAlertShown(true);
 			return;
 		}
@@ -3061,34 +3057,42 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 *
 	 * @return True if some warning has been shown, false otherwise.
 	 */
-    private boolean checkBusinessStatus() {
-        if (isBusinessGraceAlertShown) {
-            showBusinessGraceAlert();
-            return true;
-        }
-
-        if (isBusinessCUAlertShown) {
-        	showBusinessCUAlert();
-        	return true;
+	private boolean checkBusinessStatus() {
+		if (!megaApi.isBusinessAccount()) {
+			return false;
 		}
 
-        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo == null || myAccountInfo.isBusinessAlertShown()) {
+			return false;
+		}
 
-        if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
-            int status = megaApi.getBusinessStatus();
-            if (status == BUSINESS_STATUS_EXPIRED) {
-                myAccountInfo.setShouldShowBusinessAlert(false);
-                startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
-                return true;
-            } else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
-                myAccountInfo.setShouldShowBusinessAlert(false);
-                showBusinessGraceAlert();
-                return true;
-            }
-        }
+		if (isBusinessGraceAlertShown) {
+			showBusinessGraceAlert();
+			return true;
+		}
 
-        return false;
-    }
+		if (isBusinessCUAlertShown) {
+			showBusinessCUAlert();
+			return true;
+		}
+
+		if (firstLogin && myAccountInfo.wasNotBusinessAlertShownYet()) {
+			int status = megaApi.getBusinessStatus();
+
+			if (status == BUSINESS_STATUS_EXPIRED) {
+				myAccountInfo.setBusinessAlertAlreadyShown();
+				startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
+				return true;
+			} else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
+				myAccountInfo.setBusinessAlertAlreadyShown();
+				showBusinessGraceAlert();
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     private void showBusinessGraceAlert() {
     	logDebug("showBusinessGraceAlert");
@@ -9749,7 +9753,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 
 		if (usedSpaceLayout != null) {
-			if (!info.isBusinessStatusReceived() || megaApi.isBusinessAccount()) {
+			if (megaApi.isBusinessAccount()) {
 				usedSpaceLayout.setVisibility(View.GONE);
 				upgradeAccount.setVisibility(View.GONE);
 				if (settingsSeparator != null) {

@@ -131,6 +131,7 @@ public class Constants {
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
     public static final int UPDATE_CREDIT_CARD_SUBSCRIPTION = 9004;
     public static final int UPDATE_PAYMENT_METHODS = 9005;
+    public static final int UPDATE_BUSINESS = 9005;
 
     public static final int GO_OFFLINE = 9006;
     public static final int GO_ONLINE = 9007;
