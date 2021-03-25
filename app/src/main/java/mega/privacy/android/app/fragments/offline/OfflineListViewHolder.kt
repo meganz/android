@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -26,6 +27,8 @@ class OfflineListViewHolder(
 
     override fun bind(position: Int, node: OfflineNode) {
         super.bind(position, node)
+
+        binding.thumbnail.isVisible = true
 
         if (node.selected) {
             binding.root.setBackgroundColor(

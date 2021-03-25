@@ -3,44 +3,47 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.Util.showSnackbar
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequest.TYPE_RENAME
 
-class RenameListener(context: Context) : BaseListener(context) {
+class RenameListener(
+    private val snackbarShower: SnackbarShower?,
+    context: Context,
+    private val showSnackbar: Boolean = true,
+    private val isMyChatFilesFolder: Boolean = false,
+    private val actionNodeCallback: ActionNodeCallback?
+) : BaseListener(context) {
+    constructor(context: Context) : this(null, context, false, false, null)
 
-    private var isMyChatFilesFolder: Boolean = false
-    private var actionNodeCallback: ActionNodeCallback? = null
-
-    constructor (context: Context, isMyChatFilesFolder: Boolean) : this(context) {
-        this.isMyChatFilesFolder = isMyChatFilesFolder
-    }
-
-    constructor (context: Context, actionNodeCallback: ActionNodeCallback?) : this(context) {
-        this.actionNodeCallback = actionNodeCallback
-    }
+    constructor(context: Context, isMyChatFilesFolder: Boolean) : this(
+        null, context, false, isMyChatFilesFolder, null
+    )
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type != TYPE_RENAME) {
+        if (request.type != MegaRequest.TYPE_RENAME) {
             return
         }
 
-        when {
-            e.errorCode == API_OK -> {
-                showSnackbar(context, getString(R.string.context_correctly_renamed))
-                actionNodeCallback?.finishRenameActionWithSuccess()
-            }
-            isMyChatFilesFolder -> {
-                logWarning("Error renaming \"My chat files\" folder")
-            }
-            else -> {
-                showSnackbar(context, getString(R.string.context_no_renamed))
-            }
+        if (showSnackbar) {
+            snackbarShower?.showSnackbar(
+                getString(
+                    if (e.errorCode == MegaError.API_OK) R.string.context_correctly_renamed
+                    else R.string.context_no_renamed
+                )
+            )
+        }
+
+        if (e.errorCode == MegaError.API_OK) {
+            actionNodeCallback?.finishRenameActionWithSuccess(request.name)
+        }
+
+        if (isMyChatFilesFolder && e.errorCode != MegaError.API_OK) {
+            logWarning("Error renaming \"My chat files\" folder")
         }
     }
 }
