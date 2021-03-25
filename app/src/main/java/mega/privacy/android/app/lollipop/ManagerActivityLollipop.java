@@ -173,13 +173,10 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
-import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
@@ -434,7 +431,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
     MaterialToolbar toolbar;
     AppBarLayout abL;
 
-	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
 
@@ -482,7 +478,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private List<MegaSku> mSkuDetailsList;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -506,9 +502,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				case RECENT_CHAT: return "rChat";
 				case NOTIFICATIONS: return "notificFragment";
 				case UPGRADE_ACCOUNT: return "upAFL";
-				case FORTUMO: return "fF";
-				case CENTILI: return "ctF";
-				case CREDIT_CARD: return "ccF";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
@@ -667,9 +660,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
 	private UpgradeAccountFragmentLollipop upAFL;
-	private FortumoFragmentLollipop fFL;
-	private CentiliFragmentLollipop ctFL;
-	private CreditCardFragmentLollipop ccFL;
 	private CameraUploadsFragment cuFragment;
 	private CameraUploadsFragment muFragment;
 	private RecentChatsFragmentLollipop rChatFL;
@@ -899,18 +889,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
 						upAFL.setPricingInfo();
-					}
-
-					//CENTILI_FRAGMENT
-					ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
-					if(ctFL!=null){
-						ctFL.getPaymentId();
-					}
-
-					//FORTUMO_FRAGMENT
-					fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
-					if(fFL!=null){
-						fFL.getPaymentId();
 					}
 				}
 				else if(actionType == UPDATE_ACCOUNT_DETAILS){
@@ -1711,7 +1689,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
-			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -5388,9 +5365,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 			case ACCOUNT: {
 				switch(accountFragment){
-					case CENTILI_FRAGMENT:
-					case FORTUMO_FRAGMENT:
-					case CC_FRAGMENT:
 					case UPGRADE_ACCOUNT_FRAGMENT:
 					case BACKUP_RECOVERY_KEY_FRAGMENT:{
 						fragmentContainer.setVisibility(View.VISIBLE);
@@ -6178,26 +6152,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void showCC(int type, int payMonth, boolean refresh){
-		accountFragment = CC_FRAGMENT;
-
-		ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-		if (ccFL == null) {
-			ccFL = new CreditCardFragmentLollipop();
-			ccFL.setInfo(type, payMonth);
-			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
-		}
-		else if (refresh) {
-			refreshFragment(FragmentTag.CREDIT_CARD.getTag());
-		}
-		else {
-			ccFL.setInfo(type, payMonth);
-			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
-		}
-
-        setTabsVisibility();
-	}
-
 	public void updateInfoNumberOfSubscriptions(){
         if (cancelSubscription != null){
             cancelSubscription.setVisible(false);
@@ -6213,26 +6167,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
             }
         }
     }
-
-	public void showFortumo(){
-		fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
-		if (fFL == null){
-			fFL = new FortumoFragmentLollipop();
-		}
-		replaceFragment(fFL, FragmentTag.FORTUMO.getTag());
-		setTabsVisibility();
-	}
-
-	public void showCentili(){
-		accountFragment = CENTILI_FRAGMENT;
-
-		ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
-		if (ctFL == null){
-			ctFL = new CentiliFragmentLollipop();
-		}
-		replaceFragment(ctFL, FragmentTag.CENTILI.getTag());
-		setTabsVisibility();
-	}
 
 	public void showUpAF() {
 		logDebug("showUpAF");
@@ -6887,18 +6821,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						return true;
 		    		}
 					else if (drawerItem == DrawerItem.ACCOUNT){
-						switch (accountFragment) {
-							case UPGRADE_ACCOUNT_FRAGMENT:
-								closeUpgradeAccountFragment();
-								return true;
-
-							case CC_FRAGMENT:
-								ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-								if (ccFL != null) {
-									displayedAccountType = ccFL.getParameterType();
-								}
-								showUpAF();
-								return true;
+						if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
+							closeUpgradeAccountFragment();
+							return true;
 						}
 					} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -7724,14 +7649,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	    		case UPGRADE_ACCOUNT_FRAGMENT:
 					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");
 					closeUpgradeAccountFragment();
-	    			break;
-	    		case CC_FRAGMENT:
-					ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager()
-							.findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-	    			if (ccFL != null) {
-						displayedAccountType = ccFL.getParameterType();
-	    			}
-					showUpAF();
 	    			break;
 	    		case OVERQUOTA_ALERT:
 				default:
@@ -14006,14 +13923,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		return upAFL;
 	}
 
-	public CentiliFragmentLollipop getCentiliFragment() {
-		return ctFL;
-	}
-
-	public FortumoFragmentLollipop getFortumoFragment() {
-		return fFL;
-	}
-
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
 		this.cFLol = cFLol;
 	}
@@ -14039,9 +13948,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		return selectedOfflineNode;
 	}
 
-	public void setSelectedPaymentMethod(int selectedPaymentMethod) {
-		this.selectedPaymentMethod = selectedPaymentMethod;
-	}
 	public void visibilitySearch(boolean visibility){
 		searchByDate.setVisible(visibility);
 	}

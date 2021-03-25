@@ -863,34 +863,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">От больших к маленьким</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">От маленьких к большим</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">в месяц</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">в год</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Введите свои платёжные реквизиты:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Адрес 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Адрес 2 (дополнительно)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Город</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Штат/провинция</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Страна</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Почтовый индекс</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Введите свои платёжные данные:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Имя</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Фамилия</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Номер кредитной карты</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Месяц</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Год</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Перейти</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Аккаунт успешно улучшен!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Операция не выполнена. Средства не были списаны с карты</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Неверная информация по карте. Средства не будут списаны</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Тип кода блокировки</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4-значный код</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6-значный код</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Ваш текущий аккаунт — [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">При условии вашего участия в программе достижений.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Выберите способ оплаты</string>
 
     <string name="billing_period_title" context="title of billing period">Расчётный период</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Единоразово (месяц)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (подписка)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (подписка)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Кредитная карта[/A] (подписка)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Мобильный оператор[/A] (разовый)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Мобильный оператор[/A] (разовый)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">НОВЫЕ</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Чтобы улучшить вашу текущую подписку, обратитесь в нашу команду поддержки за [A]индивидуальным планом[/A].</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Ссылка на чат скопирована в буфер обмена</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]От[/A] %s/[A]мес.[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]От[/A] %s за пользователя/[A]месяц[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* подписку можно отменить в любое время до дня продления.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Звонок начался</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Несмотря на то, что у MEGA нет доступа к вашим данным, администратор вашего бизнес-аккаунта может контролировать и просматривать загрузки из камеры в вашем аккаунте.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Что-то пошло не так</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Обратитесь к администратору своего аккаунта, чтобы найти выход и активировать аккаунт.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Для действительно деловых целей будет автоматически увеличиваться без дополнительной оплаты.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] на диске [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Неограниченный[/A] трафик</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">При выходе из системы файлы из раздела «Оффлайн» будут удалены с вашего устройства.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">При выходе из системы текущие передачи будут отменены.</string>
