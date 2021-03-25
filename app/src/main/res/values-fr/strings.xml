@@ -913,7 +913,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte Pro léger</string>
 
-    <string name="backup_title" context="">Sauvegardez votre clé de récupération</string>
+    <string name="backup_title" context="">Sauvegarder votre clé de récupération</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Votre mot de passe déverrouille votre clé de récupération</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Vos données ne sont lisibles qu\'à la suite d\'une chaîne d\'opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
@@ -1473,8 +1473,8 @@
     </plurals>
 
     <plurals name="upload_service_notification_already_uploaded">
-        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 fichier a été téléversé</item>
-        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers ont été téléversés</item>
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 fichier est déjà téléversé</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d fichiers sont déjà téléversés</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -2079,7 +2079,7 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">L\'authentification à deux facteurs est activée</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegardez votre clé de récupération</b></string>
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Le code est invalide</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Vérification de la connexion</string>
