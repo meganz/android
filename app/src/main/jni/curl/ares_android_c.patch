@@ -1,5 +1,5 @@
 diff --git a/ares_android.c b/ares_android.c
-index bf77131..a783cdb 100644
+index bf77131..6f834ce 100644
 --- a/ares_android.c
 +++ b/ares_android.c
 @@ -21,6 +21,8 @@
@@ -39,25 +39,44 @@ index bf77131..a783cdb 100644
    if (android_jvm == NULL || android_connectivity_manager == NULL)
      return;
  
-@@ -271,7 +280,12 @@ char **ares_get_android_server_list(size_t max_servers,
+@@ -234,6 +243,16 @@ void ares_library_cleanup_android(void)
+     (*android_jvm)->DetachCurrentThread(android_jvm);
+ }
+ 
++/*
++  A temp added(by Mega) util method to log crashlytics logs
++  TODO: Remove thie method along with all Crashlytics elements
++*/
++void crashlytics_log(char* msg)
++{
++  if (ccontext == NULL) return;
++  ccontext->log(ccontext, msg);
++}
++
+ char **ares_get_android_server_list(size_t max_servers,
+                                     size_t *num_servers)
+ {
+@@ -270,8 +289,14 @@ char **ares_get_android_server_list(size_t max_servers,
+     res = (*android_jvm)->AttachCurrentThread(android_jvm, &env, NULL);
      need_detatch = 1;
    }
++
    if (res != JNI_OK || env == NULL)
 +  {
 +    char buff[130];
 +    sprintf(buff, "ares_get_android_server_list: failed to get environment. Error: %d Env: %s", res, (env ? "not-null" : "null"));
-+    ccontext->log(ccontext, buff);
++    crashlytics_log(buff);
      goto done;
 +  }
  
    /* JNI below is equivalent to this Java code.
       import android.content.Context;
-@@ -297,24 +311,36 @@ char **ares_get_android_server_list(size_t max_servers,
+@@ -297,24 +322,36 @@ char **ares_get_android_server_list(size_t max_servers,
    active_network = (*env)->CallObjectMethod(env, android_connectivity_manager,
                                              android_cm_active_net_mid);
    if (active_network == NULL)
 +  {
-+    ccontext->log(ccontext, "ares_get_android_server_list: failed to get active_network.");
++   crashlytics_log("ares_get_android_server_list: failed to get active_network.");
      goto done;
 +  }
  
@@ -66,7 +85,7 @@ index bf77131..a783cdb 100644
                                 android_cm_link_props_mid, active_network);
    if (link_properties == NULL)
 +  {
-+    ccontext->log(ccontext, "ares_get_android_server_list: failed to get link_properties"); 
++    crashlytics_log("ares_get_android_server_list: failed to get link_properties"); 
      goto done;
 +  }
  
@@ -74,7 +93,7 @@ index bf77131..a783cdb 100644
                                           android_lp_dns_servers_mid);
    if (server_list == NULL)
 +  {
-+    ccontext->log(ccontext, "ares_get_android_server_list: failed to get server_list");
++    crashlytics_log("ares_get_android_server_list: failed to get server_list");
      goto done;
 +  }
  
@@ -83,7 +102,7 @@ index bf77131..a783cdb 100644
      nserv = (jint)max_servers;
    if (nserv <= 0)
 +  {
-+    ccontext->log(ccontext, "ares_get_android_server_list: failed to get nserv");
++    crashlytics_log("ares_get_android_server_list: failed to get nserv");
      goto done;
 +  }
    *num_servers = (size_t)nserv;

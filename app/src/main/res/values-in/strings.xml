@@ -347,7 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">Sebagian besar perangkat tidak bisa mendownload file lebih besar dari 4GB. Unduhan Anda mungkin akan gagal</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Tidak ada app tersedia untuk meng-eksekusi file ini pada perangkat anda.</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Tidak ada aplikasi yang tersedia di perangkat anda untuk membuka lokasi ini</string>
-    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">Anda mungkin tidak memasang aplikasi apa pun yang mendukung jenis file ini</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Bagikan gambar dengan</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Bagikan link</string>
@@ -654,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Batalkan semua transfer</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Ambil foto</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Tangkap</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Izinkan pemberitahuan untuk panggilan MEGA yang masuk</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA membutuhkan otorisasi anda untuk memungkinkan layar panggilan muncul dari latar belakang.</string>
@@ -917,7 +917,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Recovery Key Anda masuk ke sini</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password tulis disini</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Ini adalah langkah terakhir untuk membatalkan akun anda. Anda akan selamanya kehilangan data yang anda simpan di cloud. Harap masukan password anda di bawah ini.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Ini adalah langkah terakhir untuk menghapus akun Anda. Anda akan kehilangan semua data yang disimpan di cloud secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verifikasi Email</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Harap cek email anda untuk melanjutkan.</string>
@@ -981,7 +981,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Ambil keuntungan penuh dari akun MEGA anda dengan mengupgrade ke Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Ambil foto</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Tangkap</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Pilih gambar</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Hapus gambar</string>
 
@@ -1337,7 +1337,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Hapus dari Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Ganti status</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Tema warna</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Hilangkan</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Tidak tersedia</string>
 
@@ -1444,8 +1444,8 @@
     </plurals>
 
     <plurals name="upload_service_notification_already_uploaded">
-        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
-        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file sudah diunggah</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d file sudah diunggah</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1592,7 +1592,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfer dihentikan!</string>
     <string name="attachment_uploading_state_uploading">Mengupload&#8230;</string>
-    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Mengompres&#8230;</string>
     <string name="attachment_uploading_state_error">Error. Tidak dikirim.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d file telah didownload.</string>
@@ -1896,7 +1896,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Mengupload chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Kualitas media chat</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Kualitas video</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Kualitas video</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Unggah Kamera perlu mengakses foto dan media lain di perangkat Anda. Silakan buka halaman pengaturan dan berikan izin.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2029,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Kontak request baru</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Tidak ada yang aktif[/B][A] Transfer[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Belum selesai[/B][A] Transfer[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]Kosong[/B][A] Folder[/A]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Tulis pesan ke “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Tulis pesan ke %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autentikasi Dua Faktor</string>
@@ -2623,7 +2623,7 @@
     <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">Akhiri dan Jawaban</string>
     <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">Akhiri dan Gabung</string>
 
-    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File sudah diunduh. Disalin ke jalur yang dipilih.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Gabung panggilan</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Untuk bergabung dengan panggilan ini, Anda harus mengakhiri panggilan Anda saat ini.</string>
@@ -2723,7 +2723,7 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Anda tidak dapat menghapus %1$s sebagai kontak karena itu adalah bagian dari akun Bisnis anda.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Ada masalah dengan pembayaran terakhir anda. Silakan akses MEGA menggunakan browser desktop untuk informasi lebih lanjut.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Akun bisnis anda telah kedaluwarsa</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Akun Bisnis anda telah kedaluwarsa</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Terjadi masalah saat memproses pembayaran anda. MEGA terbatas hanya untuk melihat sampai masalah ini telah diperbaiki di browser web desktop.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Akun Anda saat ini [B]ditangguhkan[/B]. Anda hanya dapat menelusuri data Anda.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Meskipun MEGA tidak dapat mengakses data anda, administrator akun bisnis anda memiliki kemampuan untuk mengontrol dan melihat Unggahan Kamera di akun pengguna anda</string>
@@ -2784,7 +2784,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Lampirkan dari &#8230;</string>
 
-    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Obrolan dibuat %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Obrolan dibuat pada %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Pilih pesan</string>
 
@@ -2998,11 +2998,11 @@
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Pindai dokumen</string>
 
-    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s tidak ada dalam daftar kontak anda</string>
 
 
     <string name="theme_light" context="Option of color theme, light mode.">Terang</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">Gelap</string>
-    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
-    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Default sistem</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Diatur oleh Penghemat Baterai</string>
 </resources>
