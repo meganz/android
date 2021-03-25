@@ -5,11 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.FileGalleryInfo
 import mega.privacy.android.app.adapters.viewHolders.FileStorageHolder
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
-import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class FileStorageAdapter (
     var context: Context,
