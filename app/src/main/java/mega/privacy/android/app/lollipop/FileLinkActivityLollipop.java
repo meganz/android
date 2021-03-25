@@ -649,7 +649,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 						if (preview.length() > 0) {
 							Bitmap bitmap = getBitmapForCache(preview, this);
 							previewCache.put(document.getHandle(), bitmap);
+							this.preview = bitmap;
+
 							if (iconView != null) {
+								trySetupCollapsingToolbar();
 								imageView.setImageBitmap(bitmap);
 								buttonPreviewContent.setEnabled(true);
 								imageViewLayout.setVisibility(View.VISIBLE);

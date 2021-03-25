@@ -926,7 +926,7 @@ object MegaNodeUtil {
             return
         }
 
-        val dialogBuilder = AlertDialog.Builder(activity)
+        val dialogBuilder = MaterialAlertDialogBuilder(activity)
 
         dialogBuilder.setTitle(getString(R.string.general_not_available))
             .setMessage(getString(R.string.error_download_takendown_node))
@@ -953,7 +953,7 @@ object MegaNodeUtil {
         listener: NodeTakenDownDialogListener,
         context: Context
     ): AlertDialog {
-        val builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         val inflater = LayoutInflater.from(context)
         val v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null)
 

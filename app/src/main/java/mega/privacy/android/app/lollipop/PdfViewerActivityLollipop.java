@@ -1058,7 +1058,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
 
             shareMenuItem.setVisible(showShareOption(type, isFolderLink, handle));
 
-            if (type == OFFLINE_ADAPTER){
+            if (type == OFFLINE_ADAPTER) {
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
@@ -1072,8 +1072,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-            }
-            else if(type == SEARCH_ADAPTER && !fromIncoming){
+            } else if (type == RUBBISH_BIN_ADAPTER
+                    || megaApi.isInRubbish(megaApi.getNodeByHandle(handle))) {
+                shareMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                propertiesMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(true);
+                chatMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+            } else if (type == SEARCH_ADAPTER && !fromIncoming) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if(node.isExported()){
@@ -1342,17 +1357,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                                 parent = megaApi.getParentNode(parent);
                             }
 
-                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                                moveToTrashMenuItem.setVisible(true);
-                                removeMenuItem.setVisible(false);
-
-                            }
-                            else{
-                                moveToTrashMenuItem.setVisible(false);
-                                removeMenuItem.setVisible(true);
-                                getlinkMenuItem.setVisible(false);
-                                removelinkMenuItem.setVisible(false);
-                            }
+                            moveToTrashMenuItem.setVisible(true);
+                            removeMenuItem.setVisible(false);
                         }
                     }
 

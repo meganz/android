@@ -882,7 +882,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     void setOwnerState(long userHandle) {
-        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState);
+        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState, StatusIconLocation.STANDARD);
     }
 
     @Override

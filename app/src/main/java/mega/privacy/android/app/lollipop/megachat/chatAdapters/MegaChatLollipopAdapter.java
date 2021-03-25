@@ -988,7 +988,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbLand = v.findViewById(R.id.content_own_message_thumb_landscape);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
             holder.contentOwnMessageThumbLand.setBorderWidth(Util.dp2px(1, outMetrics));
-            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.teal_500_teal_400_090));
+            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentOwnMessageThumbLand.setOval(false);
 
             holder.gifIconOwnMessageThumbLand = v.findViewById(R.id.content_own_message_thumb_landscape_gif);
@@ -1011,7 +1011,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbPort = v.findViewById(R.id.content_own_message_thumb_portrait);
             holder.contentOwnMessageThumbPort.setCornerRadius(radius);
             holder.contentOwnMessageThumbPort.setBorderWidth(Util.dp2px(1, outMetrics));
-            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.teal_500_teal_400_090));
+            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentOwnMessageThumbPort.setOval(false);
 
             holder.gifIconOwnMessageThumbPort = v.findViewById(R.id.content_own_message_thumb_portrait_gif);
@@ -1141,7 +1141,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(1);
-            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
+            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentContactMessageThumbLand.setOval(false);
 
             holder.gifIconContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape_gif);
@@ -1185,7 +1185,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
             holder.contentContactMessageThumbPort.setBorderWidth(1);
-            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
+            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.grey_012_white_012));
             holder.contentContactMessageThumbPort.setOval(false);
 
             holder.gifIconContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait_gif);
@@ -8362,13 +8362,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Method for updating reactions if necessary.
      *
      * @param chatId   Chat ID.
-     * @param message  Message ID.
+     * @param message  Message.
      * @param reaction The reaction.
      * @param count    total number of users who have used that reaction in that message.
      */
     public void checkReactionUpdated(long chatId, MegaChatMessage message, String reaction, int count) {
-        if (chatRoom.getChatId() != chatId) {
-            logDebug("Different chat ");
+        if (message == null || chatRoom.getChatId() != chatId) {
+            logDebug("Message is null or is a different chat ");
             return;
         }
 
@@ -8376,6 +8376,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         AndroidMegaChatMessage megaMessage = null;
 
         for (AndroidMegaChatMessage msg : messages) {
+            if (msg == null || msg.getMessage() == null) {
+                logWarning("The message is not valid");
+                continue;
+            }
+
             if (msg.getMessage().getMsgId() == message.getMsgId()) {
                 positionInAdapter = messages.indexOf(msg) + 1;
                 megaMessage = msg;

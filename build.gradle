@@ -3,10 +3,10 @@ buildscript {
     ext.gradleVersion = '4.1.1'
     ext.kotlinVersion = '1.4.10'
     ext.navigationVersion = '2.3.0'
-    ext.googleServicesVersion = '4.3.4'
+    ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.29.1-alpha"
     ext.huaweiServicesVersion = "1.4.1.300"
-    ext.firebaseCrashlyticsVersion = "2.4.1"
+    ext.firebaseCrashlyticsVersion = "2.5.1"
     repositories {
         jcenter()
         google()
@@ -49,8 +49,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.0.2"
-    versionCode = 359
+    appVersion = "4.1.0"
+    versionCode = 362
 
     // Sdk and tools
     compileSdkVersion = 29
@@ -82,5 +82,5 @@ ext {
     playServicesAdsVersion = '19.7.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
-    firebaseBom = '26.4.0'
+    firebaseBom = '26.7.0'
 }

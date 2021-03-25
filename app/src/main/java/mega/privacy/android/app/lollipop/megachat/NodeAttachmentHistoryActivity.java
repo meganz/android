@@ -65,6 +65,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -99,8 +100,10 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>>,
-		SnackbarShower {
+public class NodeAttachmentHistoryActivity extends PinActivityLollipop
+		implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
+		MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
+		StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -235,6 +238,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
 		emptyImageView = (ImageView) findViewById(R.id.empty_image_view_node_history);
+
+        ColorUtils.setImageViewAlphaIfDark(this, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);

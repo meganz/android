@@ -773,15 +773,14 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Method to display a simple Snackbar.
      *
-     * @param context Context of the Activity where the snackbar has to be displayed
      * @param outMetrics DisplayMetrics of the current device
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
      */
-    public static void showSimpleSnackbar(Context context, DisplayMetrics outMetrics, View view, String s) {
+    public static void showSimpleSnackbar(DisplayMetrics outMetrics, View view, String s) {
         Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
+        snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
         params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);

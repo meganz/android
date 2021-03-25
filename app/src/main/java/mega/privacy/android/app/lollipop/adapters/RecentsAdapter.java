@@ -268,11 +268,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             }
 
             if (bucket.isUpdate()) {
-                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
-                        R.drawable.ic_versions_small, R.color.grey_054_white_054));
+                holder.actionIcon.setImageResource(R.drawable.ic_versions_small);
             } else {
-                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
-                        R.drawable.ic_recents_up, R.color.grey_054_white));
+                holder.actionIcon.setImageResource(R.drawable.ic_recents_up);
             }
         }
     }

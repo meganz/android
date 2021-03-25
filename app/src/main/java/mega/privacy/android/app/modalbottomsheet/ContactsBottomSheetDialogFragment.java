@@ -107,7 +107,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         titleNameContactPanel.setText(contact.getFullName());
 
         int contactStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-        setContactStatus(contactStatus, contactStateIcon, titleMailContactPanel);
+        setContactStatus(contactStatus, contactStateIcon, titleMailContactPanel, StatusIconLocation.DRAWER);
         setContactLastGreen(requireContext(), contactStatus, contact.getLastGreen(), titleMailContactPanel);
 
         if (isTextEmpty(titleMailContactPanel.getText().toString())) {

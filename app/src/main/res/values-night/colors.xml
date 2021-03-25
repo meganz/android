@@ -55,6 +55,9 @@
 
     <color name="grey_070_white_070">@color/white_alpha_070</color>
 
+    <!-- Recording voice clip feedback component background -->
+    <color name="grey_087_white_085">@color/white_alpha_085</color>
+
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/grey_alpha_087</color>
 
@@ -95,7 +98,11 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
+    <!-- Same as textColorSecondary on light and textColorPrimary on dark. -->
     <color name="grey_054_white_087">@color/white_alpha_087</color>
+
+    <!-- Transfer completed icon tint -->
+    <color name="green_500_300">@color/green_300</color>
 
     <!-- Notification badge -->
     <color name="white_dark_grey">@color/dark_grey</color>
@@ -201,6 +208,9 @@
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_300</color>
 
+    <!-- Homepage scrim -->
+    <color name="grey_600_085_dark_grey_070">@color/dark_grey_alpha_070</color>
+
     <!--    Mask color for current plan-->
     <color name="white_054_dark_grey_054">@color/dark_grey_alpha_054</color>
 
@@ -214,6 +224,9 @@
 
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/grey_800</color>
+
+    <!-- My QR code fragment background color -->
+    <color name="white_grey_700">@color/grey_700</color>
 
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
@@ -232,6 +245,9 @@
     <color name="grey_012_white_023">@color/white_alpha_023</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/white</color>
+
+    <!-- Contact voice clip progress bar indicator color-->
+    <color name="white_018_026">@color/white_alpha_026</color>
 
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_500</color>

@@ -276,7 +276,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				holder.textViewContactName.setText(getMegaUserNameDB(contact));
 
 				holder.stateIcon.setVisibility(View.VISIBLE);
-				setContactStatus(megaChatApi.getUserOnlineStatus(contact.getHandle()), holder.stateIcon);
+				setContactStatus(megaChatApi.getUserOnlineStatus(contact.getHandle()), holder.stateIcon, StatusIconLocation.STANDARD);
 			}
 			else{
 				holder.textViewContactName.setText(holder.contactMail);
