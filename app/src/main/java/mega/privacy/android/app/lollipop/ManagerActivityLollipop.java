@@ -3062,11 +3062,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			return false;
 		}
 
-		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if (myAccountInfo == null || myAccountInfo.isBusinessAlertShown()) {
-			return false;
-		}
-
 		if (isBusinessGraceAlertShown) {
 			showBusinessGraceAlert();
 			return true;
@@ -3075,6 +3070,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (isBusinessCUAlertShown) {
 			showBusinessCUAlert();
 			return true;
+		}
+
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo == null || myAccountInfo.isBusinessAlertShown()) {
+			return false;
 		}
 
 		if (firstLogin && myAccountInfo.wasNotBusinessAlertShownYet()) {
