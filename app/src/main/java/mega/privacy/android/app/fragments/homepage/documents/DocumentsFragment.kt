@@ -24,12 +24,14 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
@@ -40,7 +42,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 import java.util.*
 import javax.inject.Inject
 
@@ -61,6 +62,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
@@ -89,7 +91,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
-        setupDraggingThumbnailCallback()
         setupAddFabButton()
 
         viewModel.items.observe(viewLifecycleOwner) {
@@ -115,7 +116,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_documents).toUpperCase(Locale.ROOT)
+            StringResourcesUtils.getString(R.string.homepage_empty_hint_documents)
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -126,7 +127,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
                     SNACKBAR_TYPE,
-                    getString(R.string.error_server_connection_problem),
+                    StringResourcesUtils.getString(R.string.error_server_connection_problem),
                     MEGACHAT_INVALID_HANDLE
                 )
             }
@@ -196,7 +197,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
      * Only refresh the list items of uiDirty = true
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<NodeItem>(it)
+        val newList = ArrayList(it)
 
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
@@ -304,8 +305,11 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
                         if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
-                            itemView.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                                R.color.new_multiselect_color))
+                            itemView.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(), R.color.new_multiselect_color
+                                )
+                            )
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
@@ -410,86 +414,49 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         viewModel.loadDocuments()
     }
 
-    /** All below methods are for supporting functions of PdfViewerActivityLollipop */
-
-    private fun getOpeningThumbnailLocationOnScreen(): IntArray? {
-        val position = viewModel.getNodePositionByHandle(openingNodeHandle)
-        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
-        val thumbnailView = viewHolder.itemView.findViewById<ImageView>(R.id.thumbnail)
-        return thumbnailView.getLocationAndDimen()
-    }
-
-    private fun setupDraggingThumbnailCallback() =
-        PdfViewerActivityLollipop.addDraggingThumbnailCallback(
-            DocumentsFragment::class.java, DocumentsDraggingThumbnailCallback(WeakReference(this))
-        )
-
     private fun openDoc(node: MegaNode?, index: Int) {
         if (node == null) {
             return
         }
 
-        var screenPosition: IntArray? = null
         val localPath = FileUtil.getLocalFile(context, node.name, node.size)
-
-        listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(
-            R.id.thumbnail
-        )?.let {
-            screenPosition = it.getLocationAndDimen()
-        }
 
         if (MimeTypeList.typeForName(node.name).isPdf) {
             val intent = Intent(context, PdfViewerActivityLollipop::class.java)
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
             if (viewModel.searchMode) {
-                intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_SEARCH_ADAPTER)
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_SEARCH_ADAPTER)
             } else {
-                intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_BROWSE_ADAPTER)
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_BROWSE_ADAPTER)
             }
-            if (screenPosition != null) {
-                intent.putExtra(Constants.INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+
+            (listView.adapter as? DragThumbnailGetter)?.let {
+                putThumbnailLocation(intent, listView, index, INVALID_VALUE, it)
             }
 
             val paramsSetSuccessfully =
                 if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
+                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
+                        requireActivity() as ManagerActivityLollipop)
                 } else {
-                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
+                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                        requireActivity() as ManagerActivityLollipop)
                 }
 
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
 
             if (paramsSetSuccessfully) {
                 openingNodeHandle = node.handle
-                setupDraggingThumbnailCallback()
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
                 return
             }
         }
-
-        NodeController(activity).prepareForDownload(arrayListOf(node.handle), true)
     }
 
     private fun setupAddFabButton() {
         binding.addFabButton.setOnClickListener {
             (requireActivity() as ManagerActivityLollipop).showUploadPanel(DOCUMENTS_UPLOAD)
-        }
-    }
-
-    companion object {
-        private class DocumentsDraggingThumbnailCallback(
-            private val fragmentRef: WeakReference<DocumentsFragment>
-        ) : DraggingThumbnailCallback {
-
-            override fun setVisibility(visibility: Int) {
-            }
-
-            override fun getLocationOnScreen(location: IntArray) {
-                val fragment = fragmentRef.get() ?: return
-                val result = fragment.getOpeningThumbnailLocationOnScreen() ?: return
-                result.copyInto(location, 0, 0, 2)
-            }
         }
     }
 }

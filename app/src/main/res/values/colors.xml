@@ -218,6 +218,9 @@
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
+    <!-- AudioPlayer playlist position and duration  -->
+    <color name="grey_038_white">@color/grey_alpha_038</color>
+
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
@@ -232,6 +235,11 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- AudioPlayer artist name -->
+    <color name="grey_060_white_060">@color/grey_alpha_060</color>
+
+    <color name="grey_070_white_070">@color/grey_alpha_070</color>
 
     <!-- Recording voice clip feedback component background -->
     <color name="grey_087_white_085">@color/grey_alpha_087</color>
@@ -323,6 +331,8 @@
     <!-- chat status color -->
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
+
+    <color name="grey_200_grey_600">@color/grey_200</color>
 
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_900</color>

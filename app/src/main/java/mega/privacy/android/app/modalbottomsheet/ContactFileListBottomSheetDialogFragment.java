@@ -11,8 +11,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -209,9 +212,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         switch (v.getId()) {
             case R.id.option_download_layout:
                 if (context instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.onFileClick(handleList);
+                    contactFileListActivity.downloadFile(Collections.singletonList(node));
                 } else if (context instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.onFileClick(handleList);
+                    contactInfoActivity.downloadFile(Collections.singletonList(node));
                 }
                 break;
 
@@ -226,15 +229,13 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case R.id.option_leave_layout:
-                showConfirmationLeaveIncomingShare(context, node);
+                showConfirmationLeaveIncomingShare(requireActivity(),
+                        (SnackbarShower) requireActivity(), node);
                 break;
 
             case R.id.option_rename_layout:
-                if (context instanceof ContactFileListActivityLollipop) {
-                    showRenameNodeDialog((ContactFileListActivityLollipop) context, node, (ContactFileListActivityLollipop) context);
-                } else if (context instanceof ContactInfoActivityLollipop) {
-                    showRenameNodeDialog((ContactInfoActivityLollipop) context, node, (ContactInfoActivityLollipop) context);
-                }
+                showRenameNodeDialog(context, node, (SnackbarShower) getActivity(),
+                        (ActionNodeCallback) getActivity());
                 break;
 
             case R.id.option_move_layout:

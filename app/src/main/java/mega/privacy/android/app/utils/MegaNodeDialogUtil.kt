@@ -1,6 +1,8 @@
 package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
@@ -16,19 +18,27 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.listeners.MoveListener
+import mega.privacy.android.app.listeners.RemoveListener
+import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
+import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaNode
 
@@ -48,6 +58,7 @@ class MegaNodeDialogUtil {
          *
          * @param context            Current context.
          * @param node               A valid node.
+         * @param snackbarShower interface to show snackbar.
          * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
          * @return The rename dialog.
          */
@@ -55,6 +66,7 @@ class MegaNodeDialogUtil {
         fun showRenameNodeDialog(
             context: Context,
             node: MegaNode,
+            snackbarShower: SnackbarShower?,
             actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
             val renameDialogBuilder = MaterialAlertDialogBuilder(context)
@@ -65,13 +77,8 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                context,
-                node,
-                actionNodeCallback,
-                null,
-                null,
-                renameDialogBuilder,
-                TYPE_RENAME
+                context, node, actionNodeCallback, snackbarShower,
+                null, null, renameDialogBuilder, TYPE_RENAME
             )
         }
 
@@ -95,13 +102,8 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                context,
-                null,
-                actionNodeCallback,
-                null,
-                null,
-                newFolderDialogBuilder,
-                TYPE_NEW_FOLDER
+                context, null, actionNodeCallback, null,
+                null, null, newFolderDialogBuilder, TYPE_NEW_FOLDER
             )
         }
 
@@ -123,13 +125,8 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                context,
-                parent,
-                null,
-                data,
-                null,
-                newFileDialogBuilder,
-                TYPE_NEW_FILE
+                context, parent, null, null,
+                data, null, newFileDialogBuilder, TYPE_NEW_FILE
             )
         }
 
@@ -157,13 +154,8 @@ class MegaNodeDialogUtil {
                 .setNegativeButton(R.string.general_cancel, null)
 
             return setFinalValuesAndShowDialog(
-                context,
-                parent,
-                null,
-                data,
-                defaultURLName,
-                newURLFileDialogBuilder,
-                TYPE_NEW_URL_FILE
+                context, parent, null, null,
+                data, defaultURLName, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
             )
         }
 
@@ -194,6 +186,7 @@ class MegaNodeDialogUtil {
                 null,
                 null,
                 null,
+                null,
                 newTxtFileDialogBuilder,
                 TYPE_NEW_TXT_FILE
             )
@@ -212,6 +205,7 @@ class MegaNodeDialogUtil {
          * @param context            Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param snackbarShower interface to show snackbar.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
          * @param builder            The AlertDialog.Builder to create and show the final dialog.
@@ -226,6 +220,7 @@ class MegaNodeDialogUtil {
             context: Context,
             node: MegaNode?,
             actionNodeCallback: ActionNodeCallback?,
+            snackbarShower: SnackbarShower?,
             data: String?,
             defaultURLName: String?,
             builder: AlertDialog.Builder,
@@ -298,14 +293,8 @@ class MegaNodeDialogUtil {
                         setOnEditorActionListener { _, actionId, _ ->
                             if (actionId == EditorInfo.IME_ACTION_DONE) {
                                 checkActionDialogValue(
-                                    context,
-                                    node,
-                                    actionNodeCallback,
-                                    typeText,
-                                    data,
-                                    errorText,
-                                    dialog,
-                                    dialogType
+                                    context, node, actionNodeCallback, snackbarShower,
+                                    typeText, data, errorText, dialog, dialogType
                                 )
                             }
 
@@ -313,21 +302,16 @@ class MegaNodeDialogUtil {
                         }
                     }
 
-                    getButton(BUTTON_POSITIVE)
+                    quitDialogError(typeText, errorText)
+
+                    dialog.getButton(BUTTON_POSITIVE)
                         .setOnClickListener {
                             checkActionDialogValue(
-                                context,
-                                node,
-                                actionNodeCallback,
-                                typeText,
-                                data,
-                                errorText,
-                                dialog,
-                                dialogType
+                                context, node, actionNodeCallback, snackbarShower,
+                                typeText, data, errorText, dialog, dialogType
                             )
                         }
 
-                    quitDialogError(typeText, errorText)
                     showKeyboardDelayed(typeText)
                 }
             }.show()
@@ -343,6 +327,7 @@ class MegaNodeDialogUtil {
          * @param context           Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param snackbarShower interface to show snackbar.
          * @param typeText           The input text field.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param errorText          The text field to show the error.
@@ -357,6 +342,7 @@ class MegaNodeDialogUtil {
             context: Context,
             node: MegaNode?,
             actionNodeCallback: ActionNodeCallback?,
+            snackbarShower: SnackbarShower?,
             typeText: EditText?,
             data: String?,
             errorText: TextView?,
@@ -384,10 +370,20 @@ class MegaNodeDialogUtil {
                     when (dialogType) {
                         TYPE_RENAME -> {
                             if (node != null && typedString != node.name) {
-                                NodeController(context).renameNode(
-                                    node,
-                                    typedString,
-                                    actionNodeCallback
+                                if (Util.isOffline(context)) {
+                                    return
+                                }
+
+                                val megaApi = MegaApplication.getInstance().megaApi
+
+                                megaApi.renameNode(
+                                    node, typedString,
+                                    RenameListener(
+                                        snackbarShower, context,
+                                        showSnackbar = true,
+                                        isMyChatFilesFolder = false,
+                                        actionNodeCallback = actionNodeCallback
+                                    )
                                 )
 
                                 actionNodeCallback?.actionConfirmed()
@@ -474,6 +470,78 @@ class MegaNodeDialogUtil {
                 if (typeText != null) {
                     outState.putString(NEW_TEXT_FILE_TEXT, typeText.text.toString())
                 }
+            }
+        }
+
+        /**
+         * Move a node into rubbish bin, or remove it if it's already moved into rubbish bin.
+         *
+         * @param handle handle of the node
+         * @param activity Android activity
+         * @param snackbarShower interface to show snackbar
+         */
+        @JvmStatic
+        @Suppress("DEPRECATION")
+        fun moveToRubbishOrRemove(
+            handle: Long,
+            activity: Activity,
+            snackbarShower: SnackbarShower
+        ) {
+            val megaApi = MegaApplication.getInstance().megaApi
+
+            if (!isOnline(activity)) {
+                snackbarShower.showSnackbar(getString(R.string.error_server_connection_problem))
+                return
+            }
+
+            val node = megaApi.getNodeByHandle(handle) ?: return
+            val rubbishNode = megaApi.rubbishNode
+
+            if (rubbishNode.handle != getRootParentNode(node).handle) {
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    .setMessage(getString(R.string.confirmation_move_to_rubbish))
+                    .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                        val progress = ProgressDialog(activity)
+                        progress.setMessage(getString(R.string.context_move_to_trash))
+
+                        megaApi.moveNode(
+                            node, rubbishNode,
+                            MoveListener {
+                                progress.dismiss()
+
+                                if (it) {
+                                    activity.finish()
+                                } else {
+                                    snackbarShower.showSnackbar(getString(R.string.context_no_moved))
+                                }
+                            })
+
+                        progress.show()
+                    }
+                    .setNegativeButton(getString(R.string.general_cancel), null)
+                    .show()
+            } else {
+                MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                    .setMessage(getString(R.string.confirmation_delete_from_mega))
+                    .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                        val progress = ProgressDialog(activity)
+                        progress.setMessage(getString(R.string.context_delete_from_mega))
+
+                        megaApi.remove(node, RemoveListener {
+                            progress.dismiss()
+
+                            if (it) {
+                                snackbarShower.showSnackbar(getString(R.string.context_correctly_removed))
+                                activity.finish()
+                            } else {
+                                snackbarShower.showSnackbar(getString(R.string.context_no_removed))
+                            }
+                        })
+
+                        progress.show()
+                    }
+                    .setNegativeButton(getString(R.string.general_cancel), null)
+                    .show()
             }
         }
     }

@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +24,8 @@ import android.widget.RelativeLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +33,11 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -53,7 +59,8 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaShare.*;
 
-public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
+public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface,
+		SnackbarShower {
 	private static final String IS_CHECKING_REVERT_VERSION = "IS_CHECKING_REVERT_VERSION";
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 	private static final String SELECTED_POSITION =  "SELECTED_POSITION";
@@ -62,7 +69,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
     MaterialToolbar tB;
-	VersionsFileActivity versionsFileActivity = this;
 
 	MegaNode selectedNode;
 	private long selectedNodeHandle;
@@ -95,9 +101,18 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	private VersionBottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+
 	private int accessLevel;
 
 	private boolean ischeckingRevertVersion;
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, container, content, chatId);
+	}
+
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
 		@Override
@@ -139,10 +154,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 				case R.id.action_download_versions:{
 					if (nodes.size() == 1) {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(0).getHandle());
-						NodeController nC = new NodeController(versionsFileActivity);
-						nC.prepareForDownload(handleList, false);
+						downloadNodes(nodes);
 						clearSelections();
 						actionMode.invalidate();
 					}
@@ -305,6 +317,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			ischeckingRevertVersion = savedInstanceState.getBoolean(IS_CHECKING_REVERT_VERSION, false);
 			selectedNodeHandle = savedInstanceState.getLong(SELECTED_NODE_HANDLE, INVALID_HANDLE);
 			selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
+
+			nodeSaver.restoreState(savedInstanceState);
 		}
 
 	    Bundle extras = getIntent().getExtras();
@@ -367,6 +381,24 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	public void downloadNodes(List<MegaNode> nodes) {
+		nodeSaver.saveNodes(nodes, false, false, false, false);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		nodeSaver.handleActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		nodeSaver.handleRequestPermissionsResult(requestCode);
+	}
+
 	@Override
     protected void onDestroy(){
     	super.onDestroy();
@@ -377,6 +409,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
     		megaApi.removeRequestListener(this);
     	}
     	handler.removeCallbacksAndMessages(null);
+
+    	nodeSaver.destroy();
     }
 	
 	@Override
@@ -874,6 +908,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		outState.putBoolean(IS_CHECKING_REVERT_VERSION, ischeckingRevertVersion);
 		outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle);
 		outState.putInt(SELECTED_POSITION, selectedPosition);
+
+		nodeSaver.saveState(outState);
 	}
 
 	public int getAccessLevel() {

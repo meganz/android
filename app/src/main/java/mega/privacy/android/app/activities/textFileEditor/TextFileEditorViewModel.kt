@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities.textFileEditor
 import android.app.ActivityManager
 import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -15,7 +16,7 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
-class TextFileEditorViewModel @ViewModelInject constructor(private val megaApi: MegaApiAndroid) :
+class TextFileEditorViewModel @ViewModelInject constructor(@MegaApi private val megaApi: MegaApiAndroid) :
     BaseRxViewModel() {
 
     companion object {
