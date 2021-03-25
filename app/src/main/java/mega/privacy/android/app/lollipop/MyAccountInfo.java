@@ -96,59 +96,6 @@ public class MyAccountInfo {
         }
     }
 
-    /**
-     * Clear all MyAccountInfo
-     */
-    public void clear() {
-        usedPerc = -1;
-        usedStorage = -1;
-        accountType = -1;
-        accountInfo = null;
-        paymentBitSet = null;
-        numberOfSubscriptions = -1;
-        subscriptionStatus = -1;
-        subscriptionRenewTime = -1;
-        proExpirationTime = -1;
-        usedFormatted = "";
-        totalFormatted = "";
-        formattedUsedCloud = "";
-        formattedUsedInbox = "";
-        formattedUsedIncoming = "";
-        formattedUsedRubbish = "";
-        formattedAvailableSpace = "";
-        usedTransferFormatted = "";
-        totalTransferFormatted = "";
-        levelInventory = -1;
-        levelAccountDetails = -1;
-
-        inventoryFinished = false;
-        accountDetailsFinished = false;
-        getPaymentMethodsBoolean = false;
-
-        firstNameText = "";
-        lastNameText = "";
-        firstLetter = "";
-        fullName = "";
-
-        lastSessionFormattedDate = "";
-        createSessionTimeStamp = -1;
-
-        if (productAccounts != null) {
-            productAccounts.clear();
-        }
-
-        if (availableSkus != null) {
-            availableSkus.clear();
-        }
-
-        activeSubscription = null;
-
-        pricing = null;
-
-        numVersions = -1;
-        previousVersionsSize = -1;
-    }
-
     public void setAccountDetails(int numDetails){
         logDebug("numDetails: " + numDetails);
 

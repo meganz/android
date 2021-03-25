@@ -1834,6 +1834,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return myAccountInfo;
 	}
 
+	public void resetMyAccountInfo() {
+    	myAccountInfo = new MyAccountInfo();
+	}
+
 	public static boolean getSpeakerStatus(long chatId) {
 		boolean entryExists = hashMapSpeaker.containsKey(chatId);
 		if (entryExists) {
