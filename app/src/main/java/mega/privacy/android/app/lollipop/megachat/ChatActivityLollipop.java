@@ -454,10 +454,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     DatabaseHandler dbH = null;
 
-    FrameLayout fileStorageLayout;
-    private FrameLayout galleryFragment;
-    private ChatFileStorageFragment fileStorageF;
-
     private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
     private ArrayList<AndroidMegaChatMessage> bufferMessages = new ArrayList<>();
     private ArrayList<AndroidMegaChatMessage> bufferSending = new ArrayList<>();
@@ -1113,9 +1109,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         unreadMsgsLayout.setOnClickListener(this);
 
-        fileStorageLayout = findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout.setVisibility(View.GONE);
-
         chatRelativeLayout  = findViewById(R.id.relative_chat_layout);
 
         sendIcon = findViewById(R.id.record_and_send_icon);
@@ -1373,23 +1366,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     private void showLetterKB() {
-        hideFileStorage();
         if(emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown())
             return;
 
         emojiKeyboard.showLetterKeyboard();
-    }
-
-    private void hideFileStorage() {
-        if ((!fileStorageLayout.isShown())) return;
-        showInputText();
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
-                PorterDuff.Mode.SRC_IN);
-        placeRecordButton(RECORD_BUTTON_DEACTIVATED);
-        if (fileStorageF == null) return;
-        fileStorageF.clearSelections();
-        fileStorageF.hideMultipleSelect();
     }
 
     /*
@@ -2554,9 +2534,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 if (emojiKeyboard != null) {
                     emojiKeyboard.hideBothKeyboard(this);
                 }
-                if (fileStorageLayout.isShown()) {
-                    hideFileStorage();
-                }
+
                 if (handlerEmojiKeyboard != null) {
                     handlerEmojiKeyboard.removeCallbacksAndMessages(null);
                 }
@@ -2912,13 +2890,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         logDebug("recordButtonState: " + recordButtonState);
         int marginBottomVoicleLayout;
         recordView.recordButtonTranslation(recordButtonLayout,0,0);
-        if(fileStorageLayout != null && fileStorageLayout.isShown() ||
-                emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
-            marginBottomVoicleLayout = keyboardHeight + marginBottomDeactivated;
-        }
-        else {
-            marginBottomVoicleLayout = marginBottomDeactivated;
-        }
+        marginBottomVoicleLayout = marginBottomDeactivated;
 
         int value = 0;
         int marginBottom = marginBottomVoicleLayout;
@@ -2934,13 +2906,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         else if(recordButtonState == RECORD_BUTTON_ACTIVATED) {
             logDebug("ACTIVATED");
             value = MARGIN_BOTTOM;
-            if(fileStorageLayout != null && fileStorageLayout.isShown() ||
-                    emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
-                marginBottom = keyboardHeight+marginBottomActivated;
-            }
-            else {
-                marginBottom = marginBottomActivated;
-            }
+            marginBottom = marginBottomActivated;
         }
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
         params.height = dp2px(value, getOutMetrics());
@@ -3156,9 +3122,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 break;
             }
             case REQUEST_READ_STORAGE:
-                logDebug("********* Permission Read storage granted");
+                logDebug("Permission Read storage granted");
                 if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).showGallery();
+                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).uploadGallery();
                 }
                 break;
 
@@ -3738,8 +3704,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
-        } else if (fileStorageLayout.isShown()) {
-            hideFileStorage();
         } else {
             if (handlerEmojiKeyboard != null) {
                 handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -3841,7 +3805,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             case R.id.emoji_icon:
                 logDebug("keyboard_icon_chat");
-                hideFileStorage();
                 if(emojiKeyboard==null) break;
                 changeKeyboard(keyboardTwemojiButton);
                 break;
@@ -3862,48 +3825,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:
                 logDebug("file storage icon ");
-                if (fileStorageLayout.isShown()) {
-                    hideFileStorage();
-                    if(emojiKeyboard != null){
-                        emojiKeyboard.changeKeyboardIcon(false);
-                    }
-                } else {
-                    if ((emojiKeyboard != null) && (emojiKeyboard.getLetterKeyboardShown())) {
-                        emojiKeyboard.hideBothKeyboard(this);
-                        handlerEmojiKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                                    if (!hasStoragePermission) {
-                                        ActivityCompat.requestPermissions(chatActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
-                                    } else {
-                                        chatActivity.attachFromFileStorage();
-                                    }
-                                } else {
-                                    chatActivity.attachFromFileStorage();
-                                }
-                            }
-                        }, 250);
-                    } else {
-
-                        if (emojiKeyboard != null) {
-                            emojiKeyboard.hideBothKeyboard(this);
-                        }
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
-
-                            } else {
-                                this.attachFromFileStorage();
-                            }
-                        } else {
-                            this.attachFromFileStorage();
-                        }
-                    }
-                }
                 break;
 
             case R.id.rl_gif_chat:
@@ -4047,27 +3968,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         locationDialog.setCanceledOnTouchOutside(false);
         locationDialog.show();
         isLocationDialogShown = true;
-    }
-
-    private void attachtGalleryFiels(){
-        fileStorageF = ChatFileStorageFragment.newInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
-        hideInputText();
-        fileStorageLayout.setVisibility(View.VISIBLE);
-        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200),
-                PorterDuff.Mode.SRC_IN);
-        placeRecordButton(RECORD_BUTTON_DEACTIVATED);
-    }
-
-    public void attachFromFileStorage(){
-        logDebug("attachFromFileStorage");
-        fileStorageF = ChatFileStorageFragment.newInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
-        hideInputText();
-        fileStorageLayout.setVisibility(View.VISIBLE);
-        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200),
-                PorterDuff.Mode.SRC_IN);
-        placeRecordButton(RECORD_BUTTON_DEACTIVATED);
     }
 
     public void attachFromCloud(){
@@ -9427,7 +9327,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     public void hideKeyboard() {
-        hideFileStorage();
         if (emojiKeyboard == null)
             return;
 
@@ -9887,6 +9786,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
             } else {
                 break;
             }
+        }
+    }
+
+    public void showGallery(ArrayList<FileGalleryItem> files){
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
+            ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).updateFiles(files);
         }
     }
 }

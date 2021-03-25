@@ -4,45 +4,39 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.os.AsyncTask
 import android.os.Build
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.adapters.FileStorageAdapter
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter
+import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
+import mega.privacy.android.app.lollipop.tasks.FetchDeviceGalleryTask
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
-import java.lang.ref.WeakReference
 import java.util.*
 
-class ChatRoomToolbarBottomSheetDialogFragment() : BaseBottomSheetDialogFragment() {
+class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetChatRoomToolbarBinding
     private var downloadLocationDefaultPath: String? = null
-    private var mPhotoUris: ArrayList<String>? = null
-    private var adapter: MegaChatFileStorageAdapter? = null
-    var imagesPath = ArrayList<String>()
-
+    private var mPhotoUris: ArrayList<FileGalleryItem>? = null
+    private lateinit var adapter: FileStorageAdapter
 
     @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
         downloadLocationDefaultPath = FileUtil.getDownloadLocation()
-
 
         binding = BottomSheetChatRoomToolbarBinding.inflate(
             LayoutInflater.from(context),
@@ -51,21 +45,11 @@ class ChatRoomToolbarBottomSheetDialogFragment() : BaseBottomSheetDialogFragment
         )
         val chatActivity = requireActivity() as ChatActivityLollipop
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val hasStoragePermission = ContextCompat.checkSelfPermission(
-                chatActivity,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(
-                    chatActivity,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    Constants.REQUEST_READ_STORAGE
-                )
-            } else {
-                showGallery()
-            }
-        }
+        contentView = binding.root
+        mainLinearLayout = binding.root.linear_layout
+        items_layout = binding.root.linear_layout
+
+        mPhotoUris = ArrayList<FileGalleryItem>()
 
         binding.optionGallery.setOnClickListener{
             chatActivity.sendFromFileSystem()
@@ -88,7 +72,6 @@ class ChatRoomToolbarBottomSheetDialogFragment() : BaseBottomSheetDialogFragment
         }
 
         binding.optionScan.setOnClickListener{
-            //chatActivity.sendFromFileSystem()
             setStateBottomSheetBehaviorHidden()
         }
 
@@ -107,63 +90,62 @@ class ChatRoomToolbarBottomSheetDialogFragment() : BaseBottomSheetDialogFragment
             setStateBottomSheetBehaviorHidden()
         }
 
-        contentView = binding.root
-        mainLinearLayout = binding.root.linear_layout
-        items_layout = binding.root.linear_layout
+        setupListView()
+        setupListAdapter()
 
-
-        binding.recyclerViewGallery.setClipToPadding(false)
-        binding.recyclerViewGallery.setHasFixedSize(true)
-        binding.recyclerViewGallery.setItemAnimator(Util.noChangeRecyclerViewItemAnimator())
-
-        mPhotoUris = ArrayList<String>()
-
-        val mLayoutManager: RecyclerView.LayoutManager =
-            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
-
-        (mLayoutManager as GridLayoutManager).spanSizeLookup = object : SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return adapter!!.getSpanSizeOfPosition(position)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val hasStoragePermission = ContextCompat.checkSelfPermission(
+                chatActivity,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(
+                    chatActivity,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    Constants.REQUEST_READ_STORAGE
+                )
+            } else {
+                uploadGallery()
             }
         }
 
-        if (adapter == null) {
-            adapter =
-                MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages)
-            adapter!!.setHasStableIds(true)
-        } else {
-            adapter!!.setDimensionPhotos(dimImages)
-            setNodes(mPhotoUris!!)
-        }
-
-        adapter!!.isMultipleSelect = false
-        binding.recyclerViewGallery.setLayoutManager(mLayoutManager)
-        binding.recyclerViewGallery.setAdapter(adapter)
-
-        FetchPhotosTask(this).execute()
-        checkAdapterItems(false)
-
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+
+        mBehavior = BottomSheetBehavior.from(mainLinearLayout.parent as View)
+        mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    fun showGallery() {
-//        fileStorageF = ChatFileStorageFragment.newInstance()
-//        getSupportFragmentManager().beginTransaction()
-//            .replace(R.id.fragment_container_file_storage, fileStorageF, "fileStorageF")
-//            .commitNowAllowingStateLoss()
+    private fun setupListView() {
+        val mLayoutManager: RecyclerView.LayoutManager =
+            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
 
+        binding.recyclerViewGallery.clipToPadding = false
+        binding.recyclerViewGallery.setHasFixedSize(true)
+        binding.recyclerViewGallery.setItemAnimator(Util.noChangeRecyclerViewItemAnimator())
+        binding.recyclerViewGallery.setLayoutManager(mLayoutManager)
     }
 
-    fun setNodes(photosUrisReceived: ArrayList<String>) {
+
+    private fun setupListAdapter() {
+        adapter = FileStorageAdapter(context, mPhotoUris)
+        adapter.setHasStableIds(true)
+        binding.recyclerViewGallery.adapter = adapter
+    }
+
+    fun uploadGallery() {
+        setNodes(mPhotoUris!!)
+        FetchDeviceGalleryTask(context).execute()
+        checkAdapterItems(false)
+    }
+
+    fun setNodes(photosUrisReceived: ArrayList<FileGalleryItem>) {
         this.mPhotoUris = photosUrisReceived
-
-        adapter!!.setNodes(mPhotoUris)
+        adapter.setNodes(mPhotoUris)
         checkAdapterItems(true)
     }
 
-    public fun checkAdapterItems(fileLoaded: Boolean) {
-        if (adapter!!.itemCount == 0) {
+    private fun checkAdapterItems(fileLoaded: Boolean) {
+        if (adapter.itemCount == 0) {
             binding.recyclerViewGallery.visibility = View.GONE
             if (fileLoaded) {
                 binding.emptyGallery.setText(R.string.file_storage_empty_folder)
@@ -175,66 +157,14 @@ class ChatRoomToolbarBottomSheetDialogFragment() : BaseBottomSheetDialogFragment
         binding.recyclerViewGallery.visibility = View.VISIBLE
         binding.emptyGallery.visibility = View.GONE
     }
-    fun updatePhotosUris(photoUris: List<String>?){
-        mPhotoUris!!.clear()
-        if (photoUris != null && photoUris.size > 0) {
-            mPhotoUris!!.addAll(photoUris)
+
+    fun updateFiles(files: List<FileGalleryItem>?){
+        if (files!!.isNotEmpty()) {
+            mPhotoUris!!.clear()
+            mPhotoUris!!.addAll(files)
+            adapter.notifyDataSetChanged()
         }
+
+        checkAdapterItems(true)
     }
-
-
-    fun createImagesPath(path: String?) {
-        imagesPath.add(path)
-    }
-
-    class FetchPhotosTask(context: ChatRoomToolbarBottomSheetDialogFragment) : AsyncTask<Void, Void, String>() {
-        private var mContextWeakReference: WeakReference<ChatRoomToolbarBottomSheetDialogFragment>? = WeakReference(
-            context
-        )
-
-        override fun doInBackground(vararg params: Void?): List<String>? {
-            val context: ChatRoomToolbarBottomSheetDialogFragment? = mContextWeakReference!!.get()
-            if (context != null) {
-                //get photos from gallery
-                val projection = arrayOf(
-                    MediaStore.Images.Media.DATA,
-                    MediaStore.Images.Media._ID
-                )
-                val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                val orderBy = MediaStore.Images.Media._ID + " DESC"
-                var cursor: Cursor? = null
-                try {
-                    cursor = context.activity!!
-                        .contentResolver.query(uri, projection, "", null, orderBy)
-                    if (cursor != null) {
-                        val dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA)
-                        val photoUris: MutableList<String> = ArrayList(cursor.count)
-                        while (cursor.moveToNext()) {
-                            photoUris.add("file://" + cursor.getString(dataColumn))
-                            context.createImagesPath(cursor.getString(dataColumn))
-                        }
-                        return photoUris
-                    }
-                } catch (ex: Exception) {
-                    LogUtil.logError("Exception is thrown", ex)
-                } finally {
-                    cursor?.close()
-                }
-            }
-            return null
-        }
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
-
-        override fun onPostExecute(photoUris: List<String>?) {
-            val context: ChatRoomToolbarBottomSheetDialogFragment? = mContextWeakReference!!.get()
-            if (context != null) {
-                context.updatePhotosUris(photoUris)
-                context.checkAdapterItems(true)
-            }
-        }
-    }
-
 }
