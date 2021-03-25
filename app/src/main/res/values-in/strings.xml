@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Tautan ini tidak akan tersedia untuk umum lagi.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Tautan ini tidak akan tersedia untuk umum lagi.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Ubah nama</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Buka link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Bukan</string>
     <string name="context_renaming" context="while renaming a file or folder">Mengubah nama</string>
@@ -1734,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Setel hari</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Tanggal yang dibutuhkan tidak valid</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Karakter tidak diizinkan</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Karakter tidak diizinkan</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">File Audio</string>
 
@@ -2047,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Masukkan kode 6-digit yang dihasilkan oleh aplikasi Otentikasi Anda.</string>
     <string name="general_verify" context="Text button">Verify</string>
     <string name="general_next" context="Text button">Berikut</string>
+    <string name="general_previous" context="Text button">Sebelumnya</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Terjadi kesalahan saat membuat benih atau kode QR, coba lagi.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Otentikasi Dua Faktor Diaktifkan</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Lain kali Anda login ke akun Anda, Anda akan diminta memasukkan kode 6-digit yang disediakan oleh aplikasi Otentikasi Anda.</string>
@@ -2079,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Lihat Konten</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Streaming tidak dapat dijalankan dan file belum diunduh</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Kami tidak dapat membuka file karena tidak ada koneksi jaringan.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File sudah ada di Disimpan untuk Offline</string>
 
@@ -2207,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Pesan</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Kirim ke&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Unggah ke &#8230;</string>
 
@@ -2362,6 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Akun anda sekarang adalah [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject pada partisipasi anda dalam achievements program kami</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Cara pembayaran</string>
 
     <string name="billing_period_title" context="title of billing period">Periode pembayaran</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Satu kali (bulan)[/A] %s</string>
@@ -2916,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">bulan</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">Tahun</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 jam</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d jam</item>
@@ -2972,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Ungu</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Abu</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played on background">Playing on the background</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played on background">Not playing on the background</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now Playing</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+
     <string name="action_more_information" context="Action to get more information">Informasi Lebih Lanjut</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Kebijakan Cookie</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Pengaturan Cookie</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Sebelum anda melanjutkan</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Kami menggunakan penyimpanan lokal dan teknologi serupa (‘Cookies\') untuk memberikan layanan kami kepada anda, meningkatkan pengalaman anda dengan layanan kami dan menyesuaikan iklan yang anda lihat, termasuk melalui pihak ketiga. Terima penggunaan Cookie kami sejak awal kunjungan anda atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes has been saved.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookie Pihak Ketiga</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookie Iklan Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Kategori: Cookie Iklan</string>
@@ -3005,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Gelap</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">Default sistem</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Diatur oleh Penghemat Baterai</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
 </resources>
