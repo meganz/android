@@ -17,9 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            app:subtitle="change email"
             app:subtitleTextAppearance="@style/TextAppearance.Mega.Caption.Secondary"
-            app:title="@string/verify_2fa_verification" />
+            app:title="@string/settings_2fa" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -147,7 +146,8 @@
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/six_pin_verify" />
+                app:layout_constraintTop_toBottomOf="@id/six_pin_verify"
+                android:visibility="gone"/>
 
             <RelativeLayout
                 android:id="@+id/lost_authentication_device"
@@ -175,7 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="81dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/explain_confirm_2fa_verify" />
