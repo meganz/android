@@ -863,34 +863,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Grandezza più grande</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Grandezza più piccola</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">al mese</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">all\'anno</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Inserisci i dettagli di fatturazione:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Indirizzo 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Indirizzo 2 (opzionale)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Città</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stato/Provincia</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Nazione</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Codice postale</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Inserisci i dettagli di pagamento:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nome</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Cognome</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numero Carta di Credito</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Mese</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Anno</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CW</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Procedi</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Upgrade dell\'account effettuato con successo!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'operazione è fallita. Sulla tua carta di credito non è stata accreditata alcuna somma</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Le informazioni della carta di credito non erano corrette. La tua carta di credito non è stata accettata</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipo del codice</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Codice a 4 cifre</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">Codice a 6 cifre</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Il tuo account corrente è [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Soggetto alla tua partecipazione nel nostro programma di obiettivi.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Scegli metodo di pagamento</string>
 
     <string name="billing_period_title" context="title of billing period">Periodo di fatturazione</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Una tantum (mese)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (abbonamento)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (abbonamento)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abbonamento)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NUOVO</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Per aggiornare il tuo abbonamento corrente, per favore contatta il nostro team di supporto per un [A]piano fatto apposta per te[/A].</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Link della chat copiato negli appunti</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Da[/A] %s / [A]mese[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Da[/A] %s per utente/[A]mese[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* L\'abbonamento può essere annullato in qualsiasi momento prima della data di rinnovo.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Chiamata iniziata</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Mentre MEGA non può accedere ai tuoi dati, l\'amministratore della tua organizzazione ha l\'abilità di controllare e vedere i Caricamenti da fotocamera nel tuo account utente</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Qualcosa è andato storto</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contatta l\'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Aumenterà automaticamente, senza costi addizionali, per vere intenzioni di business.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Spazio di archiviazione [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Banda di trasferimento [A]illimitata[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando effettui il logout, i file presenti nella sezione Offline verranno eliminati dal tuo dispositivo.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quando effettui il logout, i trasferimenti in corso verranno annullati.</string>

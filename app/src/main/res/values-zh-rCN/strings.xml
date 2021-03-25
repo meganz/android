@@ -863,34 +863,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">最大尺寸</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小尺寸</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">输入您的账单资料：</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">地址1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">地址2（可选）</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">城市</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">国家/省</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">国家</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">邮编</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">输入您的付款资料：</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">名</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">姓</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">信用卡卡号</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">月</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">年</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">校验码</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">继续</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">账户已成功升级！</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">操作失败。您的信用卡尚未被扣款</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">信用卡信息不正确。您的信用卡尚未被扣款</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">应用锁密码类型</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4位数字密码</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6位数字密码</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您的当前帐户是[A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取决于您所达成的奖励挑战。</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">选择付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]一次性付款(月)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] （订阅）</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A]（订阅）</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]信用卡[/A] （订阅）</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">如需升级您的当前订阅，请联系支持团队了解[A]自定义方案[/A]。</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">聊天链接已复制到剪贴板</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">%s[A]起[/A] 每位用户/[A]月[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*续订日期到期前随时可取消续订服务。</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通话已开始</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA无法访问您的数据，而您的企业帐户管理员有权控制并查看用户帐户中的“相机上传”文件。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**将自动增加，不收取额外费用，并用于真正的商业目的</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A]存储空间[A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]无限[/A]传输流量</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，保存在“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
