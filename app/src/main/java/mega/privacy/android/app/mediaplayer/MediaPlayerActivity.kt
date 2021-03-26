@@ -470,6 +470,18 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     menu.findItem(R.id.copy).isVisible = false
 
                     val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+
+                    val pair = getChatMessage()
+                    val message = pair.second
+
+                    val canRemove = message != null &&
+                            message.userHandle == megaChatApi.myUserHandle && message.isDeletable
+
+                    if (!canRemove) {
+                        moveToTrash.isVisible = false
+                        return
+                    }
+
                     moveToTrash.isVisible = true
                     moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
 

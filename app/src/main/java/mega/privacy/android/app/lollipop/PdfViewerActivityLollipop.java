@@ -1139,7 +1139,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
+                            && msgChat.isDeletable()) {
                         chatRemoveMenuItem.setVisible(true);
                     }
                     else {

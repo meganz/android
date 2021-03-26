@@ -185,7 +185,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
             importIcon.setVisible(false);
             saveForOfflineIcon.setVisible(false);
 
-            if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle()) && messages.get(positionG).isDeletable()) {
+            if (messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
+					&& messages.get(positionG).isDeletable()) {
                 removeIcon.setVisible(true);
             }
             else{

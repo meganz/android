@@ -450,6 +450,7 @@ class MegaNodeDialogUtil {
                 .setMessage(getString(R.string.confirmation_delete_one_attachment))
                 .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
                     ChatController(activity).deleteMessage(message, chatId)
+                    activity.finish()
                 }
                 .setNegativeButton(getString(R.string.general_cancel), null)
                 .show()
