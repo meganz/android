@@ -78,6 +78,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
+    public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
 
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
@@ -338,6 +339,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         final File file = new File(filePath);
         logDebug("File to manage: " + file.getAbsolutePath());
 
+        boolean isTextFile = intent.getBooleanExtra(EXTRA_UPLOAD_TXT, false);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
         String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
         String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
@@ -348,7 +350,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-        if (file.isDirectory()) {
+        if (isTextFile) {
+            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, APP_DATA_TXT_FILE, true, nameInMEGA);
+        } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
             if (nameInMEGA != null) {

@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
@@ -18,7 +19,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 
 @AndroidEntryPoint
-class TextFileEditorActivity : PinActivityLollipop() {
+class TextFileEditorActivity : PinActivityLollipop(), SnackbarShower {
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
 
@@ -184,5 +185,9 @@ class TextFileEditorActivity : PinActivityLollipop() {
         setUpTextFileName()
         setUpTextView()
         invalidateOptionsMenu()
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        showSnackbar(type, binding.textFileEditorContainer, content, chatId)
     }
 }

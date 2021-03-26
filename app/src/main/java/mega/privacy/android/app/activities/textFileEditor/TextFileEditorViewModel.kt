@@ -13,6 +13,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiAndroid
@@ -146,31 +147,40 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         return sb.toString()
     }
 
-    fun saveFile(contentText: String) {
+    fun saveFile(contentText: String): Boolean {
         val app = MegaApplication.getInstance()
         val tempFile = buildTempFile(app, fileName)
-        if (tempFile != null) {
-            val fileWriter = FileWriter(tempFile.absolutePath)
-            val out = BufferedWriter(fileWriter)
-            out.write(contentText)
-            out.close()
+        if (tempFile == null) {
+            logError("Cannot get temporal file.")
+            return false
         }
 
-        if (isFileAvailable(tempFile)) {
-            val uploadIntent = Intent(app, UploadService::class.java)
-                .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
-                .putExtra(UploadService.EXTRA_NAME, fileName)
-                .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
-                .putExtra(
-                    UploadService.EXTRA_PARENT_HASH,
-                    if (mode == CREATE_MODE && node == null) {
-                        megaApi.rootNode.handle
-                    } else {
-                        node?.handle
-                    }
-                )
+        val fileWriter = FileWriter(tempFile.absolutePath)
+        val out = BufferedWriter(fileWriter)
+        out.write(contentText)
+        out.close()
 
-            app.startService(uploadIntent)
+        if (!isFileAvailable(tempFile)) {
+            logError("Cannot manage temporal file.")
+            return false
         }
+
+        val uploadIntent = Intent(app, UploadService::class.java)
+            .putExtra(UploadService.EXTRA_UPLOAD_TXT, true)
+            .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
+            .putExtra(UploadService.EXTRA_NAME, fileName)
+            .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
+            .putExtra(
+                UploadService.EXTRA_PARENT_HASH,
+                if (mode == CREATE_MODE && node == null) {
+                    megaApi.rootNode.handle
+                } else {
+                    node?.handle
+                }
+            )
+
+        app.startService(uploadIntent)
+
+        return true
     }
 }
