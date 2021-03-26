@@ -14,6 +14,7 @@
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_020">#33FFFFFF</color>
     <color name="white_alpha_023">#3BFFFFFF</color>
+    <color name="white_alpha_026">#42FFFFFF</color>
     <color name="white_alpha_030">#4DFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#61FFFFFF</color>
@@ -23,12 +24,14 @@
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_070">#B3FFFFFF</color>
     <color name="white_alpha_080">#CCFFFFFF</color>
+    <color name="white_alpha_085">#D9FFFFFF</color>
     <color name="white_alpha_087">#DEFFFFFF</color>
 
     <color name="black">#000000</color>
     <color name="dark_grey">#121212</color>
     <color name="dark_grey_alpha_050">#80121212</color>
     <color name="dark_grey_alpha_054">#8A121212</color>
+    <color name="dark_grey_alpha_070">#B3121212</color>
 
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
@@ -175,6 +178,9 @@
     <!-- background tint for FAB above images or scrim -->
     <color name="white_teal_200">@color/white</color>
 
+    <!-- Homepage scrim -->
+    <color name="grey_600_085_dark_grey_070">@color/grey_600_alpha_085</color>
+
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
@@ -220,6 +226,9 @@
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
+    <!-- AudioPlayer playlist position and duration  -->
+    <color name="grey_038_white">@color/grey_alpha_038</color>
+
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
@@ -234,6 +243,14 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- AudioPlayer artist name -->
+    <color name="grey_060_white_060">@color/grey_alpha_060</color>
+
+    <color name="grey_070_white_070">@color/grey_alpha_070</color>
+
+    <!-- Recording voice clip feedback component background -->
+    <color name="grey_087_white_085">@color/grey_alpha_087</color>
 
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/white_alpha_087</color>
@@ -250,12 +267,16 @@
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>
 
+    <!-- Same as textColorSecondary on light and textColorPrimary on dark. -->
     <color name="grey_054_white_087">@color/grey_alpha_054</color>
 
     <color name="white_black">@color/white</color>
 
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/white</color>
+
+    <!-- My QR code fragment background color -->
+    <color name="white_grey_700">@color/white</color>
 
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
@@ -312,9 +333,14 @@
 
     <color name="lite_account">#FFA500</color>
 
+    <!-- Transfer completed icon tint -->
+    <color name="green_500_300">@color/green_500</color>
+
     <!-- chat status color -->
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
+
+    <color name="grey_200_grey_600">@color/grey_200</color>
 
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_900</color>
@@ -395,6 +421,9 @@
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
+
+    <!-- Contact voice clip progress bar indicator color-->
+    <color name="white_018_026">@color/white_alpha_018</color>
 
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_100</color>

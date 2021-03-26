@@ -8,7 +8,6 @@ import androidx.appcompat.view.ActionMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -20,13 +19,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 class CuActionModeCallback implements ActionMode.Callback {
-
-    private final MegaApplication app;
 
     private final Context mContext;
     private final CameraUploadsFragment mFragment;
@@ -35,8 +30,6 @@ class CuActionModeCallback implements ActionMode.Callback {
 
     CuActionModeCallback(Context context, CameraUploadsFragment fragment,
             CuViewModel viewModel, MegaApiAndroid megaApi) {
-
-        app = MegaApplication.getInstance();
 
         mContext = context;
         mFragment = fragment;
@@ -55,8 +48,8 @@ class CuActionModeCallback implements ActionMode.Callback {
         switch (item.getItemId()) {
             case R.id.cab_menu_download:
                 mViewModel.clearSelection();
-                new NodeController(mContext)
-                        .prepareForDownload(getDocumentHandles(documents), false);
+                ((ManagerActivityLollipop) mContext)
+                        .saveNodesToDevice(documents, false, false, false, false);
                 break;
             case R.id.cab_menu_copy:
                 mViewModel.clearSelection();
@@ -92,13 +85,8 @@ class CuActionModeCallback implements ActionMode.Callback {
                 break;
             case R.id.cab_menu_send_to_chat:
                 logDebug("Send files to chat");
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning();
-                    break;
-                }
+                ((ManagerActivityLollipop) mContext).attachNodesToChats(documents);
                 mViewModel.clearSelection();
-                new NodeController(mContext).checkIfNodesAreMineAndSelectChatsToSendNodes(
-                        (ArrayList<MegaNode>) documents);
                 break;
             case R.id.cab_menu_trash:
                 mViewModel.clearSelection();

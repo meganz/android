@@ -34,6 +34,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -45,6 +47,8 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -155,7 +159,13 @@ public class AccountController {
         }
     }
 
-    public void exportMK(String path){
+    /**
+     * Export recovery key file to a selected location on file system.
+     *
+     * @param path The selected location.
+     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
+     */
+    public void exportMK(String path, String sdCardUriString){
         logDebug("exportMK");
         if (!isOnline(context)){
             if (context instanceof ManagerActivityLollipop) {
@@ -208,10 +218,30 @@ public class AccountController {
                 return;
             }
 
-            FileWriter fileWriter= new FileWriter(path);
-            out = new BufferedWriter(fileWriter);
-            out.write(key);
-            out.close();
+            // If export the file to SD card.
+            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                // Export to cache folder root first.
+                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
+                FileWriter fileWriter = new FileWriter(temp);
+                out = new BufferedWriter(fileWriter);
+                out.write(key);
+                out.close();
+
+                // Copy to target location on SD card.
+                SDCardOperator sdCardOperator = new SDCardOperator(context);
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+                // If the `sdCardUriString` is null, get SD card root uri from database.
+                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
+
+                // Delete the temp file.
+                temp.delete();
+            } else {
+                FileWriter fileWriter = new FileWriter(path);
+                out = new BufferedWriter(fileWriter);
+                out.write(key);
+                out.close();
+            }
 
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
@@ -221,10 +251,7 @@ public class AccountController {
                 ((TestPasswordActivity) context).passwordReminderSucceeded();
             }
 
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
-            logError("ERROR", e);
-        }catch (IOException e) {
+        } catch (SDCardOperator.SDCardException | IOException e) {
             e.printStackTrace();
             logError("ERROR", e);
         }
@@ -459,6 +486,8 @@ public class AccountController {
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+        MediaPlayerService.stopAudioPlayer(context);
+        MediaPlayerServiceViewModel.clearSettings(context);
 
         PsaManager.INSTANCE.stopChecking();
 

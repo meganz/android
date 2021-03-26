@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">이 위치를 열 수 있는 앱이 기기에 없습니다</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">이 파일 유형을 지원하는 앱을 설치하지 않은 것 같습니다</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">모든 전송 취소</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">사진 찍기</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">캡처</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">수신중인 MEGA 통화의 알림 허용</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA는 백그라운드에서 통화 인터페이스를 띄우기 위해 당신의 허가가 필요합니다.</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">카메라 업로드 완료</string>
+    <string name="settings_appearance" context="settings of the Appearance section">외관</string>
     <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
@@ -791,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK 버전</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK 버전</string>
@@ -861,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">오래된 순</string>
     <string name="sort_by_largest_size" context="sort files by largest size">큰 파일 순</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">작은 파일 순</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">월간</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">연간</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">지불 정보를 입력하세요:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">주소 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">주소 2 (선택적)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">도시</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">주/지방</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">국가</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">우편번호</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">결제 정보를 입력하세요:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">이름</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">성</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">신용카드 번호</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">월</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">연</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">진행</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">계정이 성공적으로 업그레이드 되었습니다!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">작업이 실패하였습니다. 신용 카드가 결제되지 않았습니다</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">신용 카드 정보가 올바르지 않습니다. 신용 카드가 결제되지 않았습니다.</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">암호 유형</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">네 자리 암호</string>
@@ -1008,7 +981,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Pro로 업그레이드하고 MEGA 계정의 모든 혜택을 누리세요.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">프로필 사진 편집</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">사진 찍기</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">캡처</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">사진 선택</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">사진 삭제</string>
 
@@ -1364,6 +1337,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">오프라인에서 제거할까요?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">상태 설정</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">색상 테마</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">해제</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">불가능</string>
 
@@ -1467,6 +1441,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">파일 %1$d개 업로드됨</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">파일 %1$d개 업로드됨</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1개의 파일이 이미 업로드 되었습니다</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d개의 파일이 이미 업로드 되었습니다</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1592,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">전송 일시정지됨!</string>
     <string name="attachment_uploading_state_uploading">업로드 중&#8230;</string>
+    <string name="attachment_uploading_state_compressing">압축중&#8230;</string>
     <string name="attachment_uploading_state_error">오류. 전송되지 않음.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d개의 파일이 이미 다운로드 되었습니다.</string>
@@ -1719,6 +1699,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">공유된 폴더 없음</string>
 
     <string name="settings_help" context="Menu item">도움말</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">도움 센터</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">피드백 보내기</string>
     <string name="setting_feedback_subject" context="mail subject">Android 피드백</string>
     <string name="setting_feedback_body" context="mail body">여기에 의견을 적으세요:</string>
@@ -2048,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">“%s”에게 메시지 쓰는 중&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]활성화된 [A]전송[/A] 없음[/B]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]완료된 [A]전송[/A] 없음[/B]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">“%s”에게 메시지 쓰는 중&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">%s에게 메시지 쓰는 중&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">2단계 인증</string>
@@ -2381,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]1회 (월)[/A] %s</string>
@@ -2393,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (구독)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (구독)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]신용카드[/A] (구독)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 우리의 고객지원 팀에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
@@ -2460,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">클립보드에 대화 링크를 복사하였습니다</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">%s / [A]월[/A]* [A]부터[/A]</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">이용자/[A]개월[/A]당 %s [A]부터[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 정기 구독은 갱신일 이전에 언제든지 취소할 수 있습니다.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">통화 시작</string>
 
@@ -2636,7 +2612,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%2$d 중 %1$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">검색&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">응답</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">응답</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s님이 이 통화를 음소거 하였습니다</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">음소거됨</string>
@@ -2753,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만, 추가 비용 없이, 자동으로 증가됩니다</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]저장소[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">무제한 [A]전송 할당량[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
@@ -2811,6 +2784,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">다음에서 첨부&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">%s 생성된 대화</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%s에 생성된 대화</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">메시지 선택</string>
 
@@ -3023,4 +2997,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">항상 켬</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">문서 스캔</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s님이 당신의 연락처 목록에 없습니다</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">가벼움</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">어두움</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">시스템 기본값</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">배터리 세이버 설정에 따름</string>
 </resources>

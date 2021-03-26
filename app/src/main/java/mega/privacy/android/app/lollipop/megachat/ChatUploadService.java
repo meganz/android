@@ -63,6 +63,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESSAGE_ID;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -301,6 +302,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+			return;
+		} else if (ACTION_CHECK_COMPRESSING_MESSAGE.equals(intent.getAction())) {
+			checkCompressingMessage(intent);
 			return;
 		}
 
@@ -1581,5 +1585,42 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		return videosCompressed;
+	}
+
+	/**
+	 * Checks if a video pending message path is valid and is compressing:
+	 *  - If the path is not valid or the video is already compressing, does nothing.
+	 *  - If not, launches a broadcast to retry the upload.
+	 *
+	 * @param intent Intent containing the pending message with all the needed info.
+	 */
+	private void checkCompressingMessage(Intent intent) {
+		String fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME);
+
+		if (isTextEmpty(fileName)) {
+			logWarning("fileName is not valid, no check is needed.");
+			return;
+		}
+
+		try {
+			fileName = fileName.substring(0, fileName.lastIndexOf("."));
+		} catch (Exception e) {
+			logWarning("Exception getting file name without extension.", e);
+		}
+
+		for (String downSamplingPath: mapVideoDownsampling.keySet()) {
+			if (downSamplingPath.contains(fileName)) {
+				//Video message already compressing
+				return;
+			}
+		}
+
+		//Video message not compressing, need to retry upload
+		long chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+		long pendingMsgId = intent.getLongExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
+
+		sendBroadcast(new Intent(BROADCAST_ACTION_RETRY_PENDING_MESSAGE)
+				.putExtra(INTENT_EXTRA_PENDING_MESSAGE_ID, pendingMsgId)
+				.putExtra(CHAT_ID, chatId));
 	}
 }

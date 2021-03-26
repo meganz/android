@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
@@ -10,7 +11,7 @@ import javax.inject.Inject
  * Use Case to check if Cookie Banner is enabled on SDK
  */
 class CheckCookieBannerEnabledUseCase @Inject constructor(
-    private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
     /**
