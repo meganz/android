@@ -46,10 +46,10 @@ import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.removeNodeFromChat
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -668,7 +668,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     val message = pair.second
 
                     if (message != null) {
-                        removeNodeFromChat(this, pair.first, message)
+                        removeAttachmentMessage(this, pair.first, message)
                     }
                 } else {
                     moveToRubbishOrRemove(playingHandle, this, this)
@@ -754,7 +754,12 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER) {
             val node = getChatMessageNode() ?: return
 
-            handleSelectFolderToImportResult(requestCode, resultCode, data, node, this, this)
+            val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+            if (toHandle == null || toHandle == INVALID_HANDLE) {
+                return
+            }
+
+            handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
         } else {
             viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
         }

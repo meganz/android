@@ -1134,28 +1134,24 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_IMPORT_FOLDER.
      *
-     * @param requestCode requestCode parameter of onActivityResult
      * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
+     * @param toHandle the copy target node handle
      * @param node the node to copy
      * @param snackbarShower interface to show snackbar
      * @param activityLauncher interface to start activity
      */
     @JvmStatic
     fun handleSelectFolderToImportResult(
-        requestCode: Int, resultCode: Int, data: Intent?, node: MegaNode,
+        resultCode: Int, toHandle: Long, node: MegaNode,
         snackbarShower: SnackbarShower, activityLauncher: ActivityLauncher
     ): Boolean {
-        if (requestCode != REQUEST_CODE_SELECT_IMPORT_FOLDER
-            || resultCode != RESULT_OK || data == null
-        ) {
+        if (resultCode != RESULT_OK) {
             return false
         }
 
         val megaApp = MegaApplication.getInstance()
         val megaApi = megaApp.megaApi
 
-        val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
         megaApi.copyNode(
