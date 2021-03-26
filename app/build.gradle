@@ -152,6 +152,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
