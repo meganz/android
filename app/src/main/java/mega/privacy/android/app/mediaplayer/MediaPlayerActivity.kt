@@ -377,11 +377,17 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         val menu = optionsMenu ?: return
         val currentFragment = navController.currentDestination?.id ?: return
 
-        val adapterType = playerService?.viewModel?.currentIntent
+        val service = playerService
+        if (service == null) {
+            toggleAllMenuItemsVisibility(menu, false)
+            return
+        }
+
+        val adapterType = service.viewModel.currentIntent
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
-        val playingHandle = playerService?.viewModel?.playingHandle
-        if (adapterType == null || playingHandle == null) {
+        val playingHandle = service.viewModel.playingHandle
+        if (adapterType == null) {
             toggleAllMenuItemsVisibility(menu, false)
             return
         }
@@ -419,14 +425,42 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     return
                 }
 
-                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                if (adapterType == FROM_CHAT) {
+                    menu.findItem(R.id.properties).isVisible = false
+                    menu.findItem(R.id.rename).isVisible = false
+                    menu.findItem(R.id.move).isVisible = false
+                    menu.findItem(R.id.copy).isVisible = false
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+                    menu.findItem(R.id.chat_import).isVisible = true
+                    menu.findItem(R.id.chat_save_for_offline).isVisible = true
+
+                    menu.findItem(R.id.share).isVisible =
+                        currentFragment == R.id.main_player && showShareOption(
+                            adapterType, adapterType == FOLDER_LINK_ADAPTER, playingHandle
+                        )
+
+                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+
+                    val pair = getChatMessage()
+                    val message = pair.second
+
+                    val canRemove = message != null &&
+                            message.userHandle == megaChatApi.myUserHandle && message.isDeletable
+
+                    if (!canRemove) {
+                        moveToTrash.isVisible = false
+                        return
+                    }
+
+                    moveToTrash.isVisible = true
+                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
+
+                    return
                 }
 
-                val service = playerService
-                if (service == null) {
+                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
                     toggleAllMenuItemsVisibility(menu, false)
-                    return
                 }
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
@@ -448,9 +482,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
                     )
 
-                menu.findItem(R.id.send_to_chat).isVisible = adapterType != FROM_CHAT
+                menu.findItem(R.id.send_to_chat).isVisible = true
 
-                if (adapterType != FROM_CHAT && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
+                if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
                     if (node.isExported) {
                         menu.findItem(R.id.get_link).isVisible = false
                         menu.findItem(R.id.remove_link).isVisible = true
@@ -461,31 +495,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 } else {
                     menu.findItem(R.id.get_link).isVisible = false
                     menu.findItem(R.id.remove_link).isVisible = false
-                }
-
-                if (adapterType == FROM_CHAT) {
-                    menu.findItem(R.id.properties).isVisible = false
-                    menu.findItem(R.id.rename).isVisible = false
-                    menu.findItem(R.id.move).isVisible = false
-                    menu.findItem(R.id.copy).isVisible = false
-
-                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
-
-                    val pair = getChatMessage()
-                    val message = pair.second
-
-                    val canRemove = message != null &&
-                            message.userHandle == megaChatApi.myUserHandle && message.isDeletable
-
-                    if (!canRemove) {
-                        moveToTrash.isVisible = false
-                        return
-                    }
-
-                    moveToTrash.isVisible = true
-                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
-
-                    return
                 }
 
                 menu.findItem(R.id.chat_import).isVisible = false
