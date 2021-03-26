@@ -9347,7 +9347,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     private void createSpeakerAudioManger(){
-        if(rtcAudioManager != null) return;
+        rtcAudioManager = app.getAudioManager();
+        if(rtcAudioManager != null) {
+            activateSpeaker();
+            return;
+        }
+
         speakerWasActivated = true;
         rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
@@ -9371,14 +9376,29 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if(!speakerWasActivated){
             speakerWasActivated = true;
         }
-        if(rtcAudioManager != null){
-            rtcAudioManager.updateSpeakerStatus(true, INVALID_CALL_STATUS);
+
+        if (rtcAudioManager != null) {
+            long chatIdOfCall = getChatCallInProgress();
+            MegaChatCall call = megaChatApi.getChatCall(chatIdOfCall);
+
+            if (call != null && chatIdOfCall != MEGACHAT_INVALID_HANDLE) {
+                if (!MegaApplication.getSpeakerStatus(chatIdOfCall)) {
+                    MegaApplication.setSpeakerStatus(chatIdOfCall, true);
+                    app.updateSpeakerStatus(true, call.getStatus(), chatIdOfCall);
+                }
+            } else {
+                rtcAudioManager.updateSpeakerStatus(true, INVALID_CALL_STATUS);
+            }
         }
     }
 
     public void stopProximitySensor(){
         if(rtcAudioManager == null) return;
-        activateSpeaker();
+
+        if(!participatingInACall()){
+            activateSpeaker();
+        }
+
         rtcAudioManager.unregisterProximitySensor();
         destroySpeakerAudioManger();
     }
