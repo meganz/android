@@ -115,6 +115,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             if (service is MediaPlayerServiceBinder) {
                 playerService = service.service
 
+                refreshMenuOptionsVisibility()
+
                 service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
                     if (service.service.viewModel.playlistSearchQuery != null) {
                         return@observe
@@ -122,8 +124,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                     if (it.first.isEmpty()) {
                         stopPlayer()
-                    } else {
-                        refreshMenuOptionsVisibility()
                     }
                 }
 
