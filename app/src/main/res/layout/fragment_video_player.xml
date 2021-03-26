@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/video_player_control"
+        app:surface_type="surface_view" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="82dp"
+        android:layout_height="82dp"
+        android:layout_gravity="center"
+        android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_large_material" />
+</FrameLayout>

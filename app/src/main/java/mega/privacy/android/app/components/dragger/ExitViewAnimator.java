@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.dragger;
 
-import android.app.Activity;
 import android.graphics.RectF;
 import android.view.SurfaceView;
 import android.view.View;
@@ -14,8 +13,6 @@ import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
@@ -25,7 +22,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
     @Override
     public boolean animateExit(@NonNull final D draggableView, final Direction direction,
-        int duration, final Activity activity, final int[] screenPosition, final View currentView,
+        int duration, final Listener listener, final int[] screenPosition, final View currentView,
         final int[] draggableViewLocationOnScreen) {
         logDebug("animateExit");
         draggableView.setAnimating(true);
@@ -88,21 +85,18 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             @Override
                             public void onAnimationEnd(View view) {
                                 currentView.setVisibility(View.GONE);
-                                if (activity instanceof FullScreenImageViewerLollipop) {
-                                    ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                } else if (activity instanceof AudioVideoPlayerLollipop){
-                                    ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                }
+                                listener.showPreviousHiddenThumbnail();
 
                                 DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
                                 if (dragListener != null) {
-                                    dragListener.onDragCancelled(draggableView);
+                                    dragListener.onDraggedEnded(draggableView, direction);
                                     dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                                 }
 
                                 draggableView.setAnimating(false);
-                                activity.finish();
-                                activity.overridePendingTransition(0, android.R.anim.fade_out);
+                                listener.fadeOutFinish();
+
+                                ViewCompat.animate(draggableView).setListener(null);
                             }
                         });
             }
@@ -128,22 +122,18 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             @Override
                             public void onAnimationEnd(View view) {
                                 currentView.setVisibility(View.GONE);
-                                if (activity instanceof FullScreenImageViewerLollipop) {
-                                    ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                }
-                                else if (activity instanceof AudioVideoPlayerLollipop){
-                                    ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                }
+                                listener.showPreviousHiddenThumbnail();
 
                                 DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
-                                if (dragListener != null) {
-                                    dragListener.onDragCancelled(draggableView);
+                                if (dragListener != null && screenPosition != null) {
+                                    dragListener.onDraggedEnded(draggableView, direction);
                                     dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                                 }
 
                                 draggableView.setAnimating(false);
-                                activity.finish();
-                                activity.overridePendingTransition(0, android.R.anim.fade_out);
+                                listener.fadeOutFinish();
+
+                                ViewCompat.animate(draggableView).setListener(null);
                             }
                         });
             }
@@ -169,21 +159,18 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     .setListener(new ViewPropertyAnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(View view) {
-                            if (activity instanceof FullScreenImageViewerLollipop) {
-                                ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                            } else if (activity instanceof AudioVideoPlayerLollipop) {
-                                ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                            }
+                            listener.showPreviousHiddenThumbnail();
 
                             DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
                             if (dragListener != null) {
-                                dragListener.onDragCancelled(draggableView);
+                                dragListener.onDraggedEnded(draggableView, direction);
                                 dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                             }
 
                             draggableView.setAnimating(false);
-                            activity.finish();
-                            activity.overridePendingTransition(0, android.R.anim.fade_out);
+                            listener.fadeOutFinish();
+
+                            ViewCompat.animate(draggableView).setListener(null);
                         }
                     });
         }

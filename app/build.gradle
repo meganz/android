@@ -117,7 +117,6 @@ android {
                 // This flag must be enabled to see properly-symbolicated native
                 // stack traces in the Crashlytics dashboard.
                 nativeSymbolUploadEnabled true
-                strippedNativeLibsDir 'src/main/libs'
                 unstrippedNativeLibsDir 'src/main/obj/local'
             }
 
@@ -176,9 +175,9 @@ dependencies {
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.8'
-    implementation(name: 'exoplayer-extension-ffmpeg-2.11.8', ext: 'aar')
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
+    implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
@@ -216,6 +215,7 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation files('src/main/libs/libwebrtc.jar')
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
@@ -228,9 +228,8 @@ dependencies {
     gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'
     gmsImplementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
     gmsImplementation platform("com.google.firebase:firebase-bom:$firebaseBom")
-    gmsImplementation 'com.google.firebase:firebase-analytics'
-    gmsImplementation 'com.google.firebase:firebase-crashlytics'
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ndk'
+    gmsImplementation 'com.google.firebase:firebase-analytics-ktx'
     //HMS
     hmsImplementation 'com.huawei.hms:push:4.0.2.300'
     hmsImplementation 'com.huawei.hms:location:4.0.2.300'

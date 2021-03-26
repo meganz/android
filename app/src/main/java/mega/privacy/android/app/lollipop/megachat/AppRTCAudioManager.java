@@ -681,7 +681,7 @@ public class AppRTCAudioManager {
         }
 
         Log.d(TAG, "setDefaultAudioDevice(device=" + defaultAudioDevice + ")");
-//        updateAudioDeviceState();
+        updateAudioDeviceState();
     }
 
     /**

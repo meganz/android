@@ -1,19 +1,22 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
+import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
-class PhotoViewHolder(private val binding: ViewDataBinding) :
+class PhotoViewHolder(val binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
@@ -28,12 +31,16 @@ class PhotoViewHolder(private val binding: ViewDataBinding) :
                     this.actionModeViewModel = actionModeViewModel
                     this.itemOperationViewModel = itemOperationViewModel
                     this.item = item
+
+                    thumbnail.isVisible = true
                 }
                 is ItemNodeListBinding -> {
                     this.itemOperationViewModel = itemOperationViewModel
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi
+
+                    thumbnail.isVisible = true
 
                     // This convoluted logic is a workaround for an UI issue of Fresco placeholder :
                     // The placeholder(If set) image shows up transiently before showing the "tick"

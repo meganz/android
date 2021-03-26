@@ -12,6 +12,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -116,7 +117,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        setContactStatus(getUserStatus(participantHandle), stateIcon);
+        setContactStatus(getUserStatus(participantHandle), stateIcon, StatusIconLocation.DRAWER);
 
         if (participantHandle == megaApi.getMyUser().getHandle()) {
             String myFullName = chatC.getMyFullName();
@@ -234,7 +235,9 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall(((GroupChatInfoActivityLollipop) context), megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
+                startNewCall((GroupChatInfoActivityLollipop) context,
+                        (SnackbarShower) context,
+                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

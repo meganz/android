@@ -69,7 +69,8 @@
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="36dp">
+        android:layout_height="36dp"
+        android:background="?attr/colorPrimary">
 
         <TextView
             android:id="@+id/text_header"

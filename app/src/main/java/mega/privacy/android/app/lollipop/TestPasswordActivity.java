@@ -278,11 +278,13 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
+
             if (parentPath != null){
                 logDebug("parentPath no NULL");
                 parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath);
+                ac.exportMK(parentPath, sdCardUriString);
             }
         }
     }

@@ -16,7 +16,6 @@ import android.os.StatFs;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -26,45 +25,40 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.components.dragger.DraggableView;
-import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.dragger.DragToExitSupport;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -90,19 +84,11 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		SnackbarShower {
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
-	int[] screenPosition;
-	int mLeftDelta;
-	int mTopDelta;
-	float mWidthScale;
-	float mHeightScale;
-	public DraggableView draggableView;
-	public static int screenHeight;
-	int screenWidth;
 	RelativeLayout relativeImageViewerLayout;
-	ImageView ivShadow;
 	private Handler handler;
 
 	private DisplayMetrics outMetrics;
@@ -110,7 +96,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	private boolean aBshown = true;
 
 	ProgressDialog statusDialog;
-	private AlertDialog downloadConfirmationDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -134,7 +119,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
     private MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
-    private ArrayList<String> paths;
 	MegaNode nodeToImport;
 
 	long [] messageIds;
@@ -143,13 +127,19 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	ArrayList<MegaChatMessage> messages;
 
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
-
-	ArrayList<Long> handleListM = new ArrayList<Long>();
 
 	boolean isDeleteDialogShow = false;
 
 	ChatController chatC;
+
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+	private final DragToExitSupport dragToExit = new DragToExitSupport(this, this::onDragActivated, () -> {
+		finish();
+		overridePendingTransition(0, android.R.anim.fade_out);
+
+		return Unit.INSTANCE;
+	});
 
 	@Override
 	public void onDestroy(){
@@ -157,6 +147,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		{
 			megaApi.removeRequestListener(this);
 		}
+
+		nodeSaver.destroy();
 
 		super.onDestroy();
 	}
@@ -232,16 +224,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		switch(requestCode){
-			case REQUEST_WRITE_STORAGE:{
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
-					chatC.prepareForChatDownload(node);
-				}
-				break;
-			}
-		}
+
+		nodeSaver.handleRequestPermissionsResult(requestCode);
 	}
 
 	@Override
@@ -255,19 +239,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			case R.id.chat_full_image_viewer_download: {
 				logDebug("Download option");
-				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-						handleListM.add(node.getHandle());
-						break;
-					}
-				}
-				chatC.prepareForChatDownload(node);
 
+				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+				nodeSaver.saveNode(node, true, false, true, true);
 				break;
 			}
 
@@ -321,8 +295,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
-		screenHeight = outMetrics.heightPixels;
-		screenWidth = outMetrics.widthPixels;
 		float density  = getResources().getDisplayMetrics().density;
 
 		float scaleW = getScaleW(outMetrics, density);
@@ -335,6 +307,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		if (savedInstanceState != null){
 			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+
+			nodeSaver.restoreState(savedInstanceState);
 		}
 		else {
 			isDeleteDialogShow = false;
@@ -380,9 +354,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
-		setContentView(R.layout.activity_chat_full_screen_image_viewer);
-
-		draggableView.setViewAnimator(new ExitViewAnimator<>());
+		setContentView(dragToExit.wrapContentView(R.layout.activity_chat_full_screen_image_viewer));
 
 		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
 		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
@@ -430,7 +402,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		messages = new ArrayList<MegaChatMessage>();
 
 		imageHandles = new ArrayList<Long>();
-		paths = new ArrayList<String>();
 
 		if(messageIds==null){
 			return;
@@ -504,89 +475,23 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			showConfirmationDeleteNode(chatId, messages.get(positionG));
 		}
 
-		if (savedInstanceState == null && adapterMega!= null){
-			ViewTreeObserver observer = viewPager.getViewTreeObserver();
-			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-				@Override
-				public boolean onPreDraw() {
+		if (savedInstanceState == null && adapterMega!= null) {
+			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
+				if (animationStart) {
+					updateViewForAnimation();
+				} else {
+					showActionBar();
 
-					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
-					int[] location = new int[2];
-					viewPager.getLocationOnScreen(location);
-
-					if (screenPosition != null){
-						mLeftDelta = screenPosition[0] - (screenPosition[2]/2) - location[0];
-						mTopDelta = screenPosition[1] - (screenPosition[3]/2) - location[1];
-
-						mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
-						mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
-					}
-					else {
-						mLeftDelta = (screenWidth/2) - location[0];
-						mTopDelta = (screenHeight/2) - location[1];
-
-						mWidthScale = (float) (screenWidth/4) / viewPager.getWidth();
-						mHeightScale = (float) (screenHeight/4) / viewPager.getHeight();
-					}
-
-					runEnterAnimation();
-
-					return true;
+					fragmentContainer.setBackgroundColor(BLACK);
+					relativeImageViewerLayout.setBackgroundColor(BLACK);
+					appBarLayout.setBackgroundColor(BLACK);
 				}
+
+				return null;
 			});
-		}
-		else {
+		} else {
 			fromChatSavedInstance = true;
 		}
-	}
-
-	public void runEnterAnimation() {
-		logDebug("runEnterAnimation");
-		if (aB != null && aB.isShowing()) {
-			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(0)
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								aB.hide();
-							}
-						}).start();
-				bottomLayout.animate().translationY(220).setDuration(0).start();
-			} else {
-				aB.hide();
-			}
-		}
-
-		fragmentContainer.setBackgroundColor(TRANSPARENT);
-		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-		appBarLayout.setBackgroundColor(TRANSPARENT);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			fragmentContainer.setElevation(0);
-			relativeImageViewerLayout.setElevation(0);
-			appBarLayout.setElevation(0);
-
-		}
-
-		viewPager.setPivotX(0);
-		viewPager.setPivotY(0);
-		viewPager.setScaleX(mWidthScale);
-		viewPager.setScaleY(mHeightScale);
-		viewPager.setTranslationX(mLeftDelta);
-		viewPager.setTranslationY(mTopDelta);
-
-		ivShadow.setAlpha(0);
-
-		viewPager.animate().setDuration(ANIMATION_DURATION).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
-			@Override
-			public void run() {
-				showActionBar();
-				fragmentContainer.setBackgroundColor(BLACK);
-				relativeImageViewerLayout.setBackgroundColor(BLACK);
-				appBarLayout.setBackgroundColor(BLACK);
-			}
-		});
-
-		ivShadow.animate().setDuration(ANIMATION_DURATION).alpha(1);
 	}
 
 	@Override
@@ -619,50 +524,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 	}
 
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-		logDebug("Size: " + size);
-
-		final String parentPathC = parentPath;
-		final ArrayList<MegaNode> nodeListC = nodeList;
-		final long sizeC = size;
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						chatC.download(parentPathC, nodeListC);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-	
-
 	public void importNode(MegaNode node){
 		logDebug("Node Handle: " + node.getHandle());
 
@@ -681,6 +542,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
+
+		nodeSaver.saveState(savedInstanceState);
 	}
 	
 	@Override
@@ -798,12 +661,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (intent == null) {
 			return;
 		}
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("Local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			storeDownloadLocationIfNeeded(parentPath);
-			chatC.prepareForDownload(intent, parentPath);
-		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
+
+		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
 			if (!isOnline(this) || megaApi == null) {
@@ -1051,79 +914,58 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
-	@Override
-	public void setContentView(int layoutResID) {
-		super.setContentView(getContainer());
-		View view = LayoutInflater.from(this).inflate(layoutResID, null);
-		draggableView.addView(view);
+	public void setNormalizedScale(float normalizedScale) {
+		dragToExit.setNormalizedScale(normalizedScale);
 	}
 
-	private View getContainer() {
-		RelativeLayout container = new RelativeLayout(this);
-		draggableView = new DraggableView(this);
-		if (getIntent() != null) {
-			screenPosition = getIntent().getIntArrayExtra("screenPosition");
-			draggableView.setScreenPosition(screenPosition);
-		}
-		draggableView.setDraggableListener(this);
-		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-		container.addView(ivShadow, params);
-		container.addView(draggableView);
-		return container;
+	public void setDraggable(boolean draggable) {
+		dragToExit.setDraggable(draggable);
 	}
 
-	@Override
-	public void onViewPositionChanged(float fractionScreen) {
-
-	}
-
-	@Override
-	public void onDragActivated(boolean activated) {
+	private Unit onDragActivated(boolean activated) {
 		logDebug("activated: " + activated);
 
 		if (activated) {
-			if (aB != null && aB.isShowing()) {
-				if(tB != null) {
-					tB.animate().translationY(-220).setDuration(0)
-							.withEndAction(new Runnable() {
-								@Override
-								public void run() {
-									aB.hide();
-								}
-							}).start();
-					bottomLayout.animate().translationY(220).setDuration(0).start();
-				} else {
-					aB.hide();
-				}
-			}
-			fragmentContainer.setBackgroundColor(TRANSPARENT);
-			relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-			appBarLayout.setBackgroundColor(TRANSPARENT);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				fragmentContainer.setElevation(0);
-				relativeImageViewerLayout.setElevation(0);
-				appBarLayout.setElevation(0);
+			updateViewForAnimation();
 
-			}
 			if (fromChatSavedInstance) {
-				draggableView.setCurrentView(null);
+				dragToExit.setCurrentView(null);
+			} else {
+				dragToExit.setCurrentView(adapterMega.getVisibleImage(positionG));
 			}
-			else {
-				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
-			}
-		}
-		else {
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-//					showActionBar();
-					fragmentContainer.setBackgroundColor(BLACK);
-					relativeImageViewerLayout.setBackgroundColor(BLACK);
-					appBarLayout.setBackgroundColor(BLACK);
-				}
+		} else {
+			handler.postDelayed(() -> {
+				fragmentContainer.setBackgroundColor(BLACK);
+				relativeImageViewerLayout.setBackgroundColor(BLACK);
+				appBarLayout.setBackgroundColor(BLACK);
 			}, 300);
 		}
+
+		return null;
+	}
+
+	private void updateViewForAnimation() {
+		if (aB != null && aB.isShowing()) {
+			if(tB != null) {
+				tB.animate().translationY(-220).setDuration(0)
+						.withEndAction(() -> aB.hide()).start();
+				bottomLayout.animate().translationY(220).setDuration(0).start();
+			} else {
+				aB.hide();
+			}
+		}
+
+		fragmentContainer.setBackgroundColor(TRANSPARENT);
+		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+		appBarLayout.setBackgroundColor(TRANSPARENT);
+
+		fragmentContainer.setElevation(0);
+		relativeImageViewerLayout.setElevation(0);
+		appBarLayout.setElevation(0);
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

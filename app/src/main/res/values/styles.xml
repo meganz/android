@@ -171,7 +171,7 @@
 
     <!--- SeekBar teal, chat room contact voice clip -->
     <style name="Widget.Mega.SeekBar.Secondary" parent="Widget.AppCompat.SeekBar">
-        <item name="android:progressBackgroundTint">?attr/colorSecondary</item>
+        <item name="android:progressBackgroundTint">@color/white_018_026</item>
         <item name="android:progressTint">@color/teal_300</item>
         <item name="android:thumbTint">@color/teal_300</item>
         <item name="android:colorControlActivated">@color/teal_300</item>
@@ -236,6 +236,7 @@
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
         <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
+        <item name="android:headerBackground">@color/white_grey_800</item>
     </style>
 
     <style name="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary">
@@ -401,6 +402,12 @@
         <item name="colorSurface">@color/grey_900</item>
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
         <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox.Dark</item>
+    </style>
+
+    <style name="AudioPlayerButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:layout_width">52dp</item>
+        <item name="android:layout_height">52dp</item>
     </style>
 
     <style name="messageForwardIconStyle">
