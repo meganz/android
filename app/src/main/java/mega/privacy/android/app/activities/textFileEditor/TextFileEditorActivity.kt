@@ -175,7 +175,7 @@ class TextFileEditorActivity : PinActivityLollipop() {
     }
 
     private fun saveFile() {
-        viewModel.saveFile()
+        viewModel.saveFile(binding.editText.text.toString())
         binding.editFab.show()
         updateUIAfterChangeMode()
     }

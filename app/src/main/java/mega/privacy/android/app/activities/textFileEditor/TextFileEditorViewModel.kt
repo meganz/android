@@ -3,10 +3,12 @@ package mega.privacy.android.app.activities.textFileEditor
 import android.app.ActivityManager
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -107,8 +109,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         }
 
         megaApi.httpServerSetMaxBufferSize(
-            if (mi.totalMem > Constants.BUFFER_COMP) Constants.MAX_BUFFER_32MB
-            else Constants.MAX_BUFFER_16MB
+            if (mi.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
+            else MAX_BUFFER_16MB
         )
 
         val uri = megaApi.httpServerGetLocalLink(node)
@@ -144,7 +146,31 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         return sb.toString()
     }
 
-    fun saveFile() {
-        mode = VIEW_MODE
+    fun saveFile(contentText: String) {
+        val app = MegaApplication.getInstance()
+        val tempFile = buildTempFile(app, fileName)
+        if (tempFile != null) {
+            val fileWriter = FileWriter(tempFile.absolutePath)
+            val out = BufferedWriter(fileWriter)
+            out.write(contentText)
+            out.close()
+        }
+
+        if (isFileAvailable(tempFile)) {
+            val uploadIntent = Intent(app, UploadService::class.java)
+                .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
+                .putExtra(UploadService.EXTRA_NAME, fileName)
+                .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
+                .putExtra(
+                    UploadService.EXTRA_PARENT_HASH,
+                    if (mode == CREATE_MODE && node == null) {
+                        megaApi.rootNode.handle
+                    } else {
+                        node?.handle
+                    }
+                )
+
+            app.startService(uploadIntent)
+        }
     }
 }
