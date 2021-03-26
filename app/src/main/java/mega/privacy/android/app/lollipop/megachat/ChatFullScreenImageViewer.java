@@ -255,7 +255,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				logDebug("Save for offline option");
 //				showSnackbar("Coming soon...");
 				if (messages.get(positionG) != null){
-					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(), megaChatApi.getChatRoom(chatId));
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(),
+							megaChatApi.getChatRoom(chatId), true, this);
 				}
 				break;
 			}

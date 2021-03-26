@@ -306,6 +306,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
     public static final String INTENT_EXTRA_KEY_COPY_HANDLES = "COPY_HANDLES";
     public static final String INTENT_EXTRA_KEY_COPY_TO = "COPY_TO";
+    public static final String INTENT_EXTRA_KEY_IMPORT_TO = "IMPORT_TO";
     public static final String INTENT_EXTRA_KEY_CONTACT_EMAIL = "contactEmail";
     public static final String INTENT_EXTRA_KEY_LOCATION_FILE_INFO = "locationFileInfo";
     public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
@@ -313,6 +314,8 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
+    public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
+    public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

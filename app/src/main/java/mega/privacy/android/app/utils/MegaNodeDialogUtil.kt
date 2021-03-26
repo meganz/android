@@ -22,6 +22,7 @@ import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
@@ -30,6 +31,7 @@ import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaNode
 
 class MegaNodeDialogUtil {
@@ -433,6 +435,24 @@ class MegaNodeDialogUtil {
                     .setNegativeButton(getString(R.string.general_cancel), null)
                     .show()
             }
+        }
+
+        /**
+         * Remove a chat message node from chat.
+         *
+         * @param activity Android activity
+         * @param chatId chat id
+         * @param message chat message
+         */
+        @JvmStatic
+        fun removeNodeFromChat(activity: Activity, chatId: Long, message: MegaChatMessage) {
+            MaterialAlertDialogBuilder(activity)
+                .setMessage(getString(R.string.confirmation_delete_one_attachment))
+                .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
+                    ChatController(activity).deleteMessage(message, chatId)
+                }
+                .setNegativeButton(getString(R.string.general_cancel), null)
+                .show()
         }
     }
 }

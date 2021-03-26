@@ -1451,7 +1451,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId),
+                            true, this);
                 }
                 break;
             }
