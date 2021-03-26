@@ -9459,6 +9459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (rtcAudioManager != null) {
             long chatIdOfCall = getChatCallInProgress();
             MegaChatCall call = megaChatApi.getChatCall(chatIdOfCall);
+
             if (call != null && chatIdOfCall != MEGACHAT_INVALID_HANDLE) {
                 if (!MegaApplication.getSpeakerStatus(chatIdOfCall)) {
                     MegaApplication.setSpeakerStatus(chatIdOfCall, true);
@@ -9472,9 +9473,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     public void stopProximitySensor(){
         if(rtcAudioManager == null) return;
+
         if(!participatingInACall()){
             activateSpeaker();
         }
+
         rtcAudioManager.unregisterProximitySensor();
         destroySpeakerAudioManger();
     }
