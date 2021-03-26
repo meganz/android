@@ -36,7 +36,7 @@ class FileStorageAdapter (
     }
 
     override fun onClick(v: View?) {
-        val holder = v?.tag as FileStorageHolder
+//        val holder = v?.tag as FileStorageHolder
         //(context as TimeZonePickerActivity).sendTimeZone(holder.timezone)
     }
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.tasks
 
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.provider.MediaStore
@@ -9,7 +10,9 @@ import androidx.annotation.RequiresApi
 import com.facebook.common.util.UriUtil
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import java.util.*
 
 class FetchDeviceGalleryTask(var context: Context?) :
     AsyncTask<Void?, Void?, List<FileGalleryItem>?>() {
@@ -23,60 +26,60 @@ class FetchDeviceGalleryTask(var context: Context?) :
         if (context != null) {
             val files: MutableList<FileGalleryItem> = mutableListOf()
 
-            val uriImagesExternal = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val uriVideosExternal = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            val queryUri: Uri = MediaStore.Files.getContentUri("external")
 
-            val imageProjection = arrayOf(
-                MediaStore.Images.Media.DATE_ADDED,
-                MediaStore.Images.Media._ID
+            val selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+                    + " OR "
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+
+            val projection = arrayOf(
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.TITLE,
+                MediaStore.Files.FileColumns.DURATION
             )
 
-            val videoProjection = arrayOf(
-                MediaStore.Video.Media.DATE_ADDED,
-                MediaStore.Video.Media._ID,
-                MediaStore.Video.Media.DURATION
+            val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC"
+
+            val cursor = context!!.contentResolver.query(
+                queryUri,
+                projection,
+                selection,
+                null,
+                sortOrder
             )
 
-            val imageSortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-            val videoSortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
-
-            val imagesCursor = context!!.contentResolver.query(
-                uriImagesExternal,
-                imageProjection,
-                null,
-                null,
-                imageSortOrder
-            )
-
-            val videosCursor = context!!.contentResolver.query(
-                uriVideosExternal,
-                videoProjection,
-                null,
-                null,
-                videoSortOrder
-            )
-
-            videosCursor.use {
+            cursor.use {
                 it?.let {
-                    val idColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
-                    val dateColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
-                    val durationColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                    val idColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
+                    val mediaTypeColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                    val dateColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)
+                    val durationColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION)
 
                     while (it.moveToNext()) {
                         val id = it.getLong(idColumn)
+                        val mediaType = it.getInt(mediaTypeColumn)
                         val date = it.getString(dateColumn)
-                        val duration = it.getString(durationColumn)
-
                         val contentUri = ContentUris.withAppendedId(
-                            uriVideosExternal,
+                            queryUri,
                             id
                         )
-
                         val path = "file://" + UriUtil.getRealPathFromUri(
                             context!!.contentResolver,
                             contentUri
                         )
-                        val file = FileGalleryItem(false, duration, path, date)
+                        val file: FileGalleryItem =
+                            if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
+                                FileGalleryItem(id, true, 0, path, date)
+                            } else {
+                                val duration = it.getLong(durationColumn)
+                                FileGalleryItem(id, false, duration, path, date)
+                            }
+
                         files.add(file)
                     }
                 } ?: kotlin.run {
@@ -84,35 +87,10 @@ class FetchDeviceGalleryTask(var context: Context?) :
                     return null
                 }
             }
-
-            imagesCursor.use {
-                it?.let {
-                    val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                    val dateColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
-                    while (it.moveToNext()) {
-                        val id = it.getLong(idColumn)
-                        val date = it.getString(dateColumn)
-                        val contentUri = ContentUris.withAppendedId(
-                            uriImagesExternal,
-                            id
-                        )
-
-                        val path = "file://" + UriUtil.getRealPathFromUri(
-                            context!!.contentResolver,
-                            contentUri
-                        )
-                        val file = FileGalleryItem(true, null, path, date)
-                        files.add(file)
-                    }
-                } ?: kotlin.run {
-                    logError("Cursor is null!")
-                    return null
-                }
-            }
-
 
             return files
         }
+
         return null
     }
 }

@@ -3,34 +3,66 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="88dp"
-    android:layout_height="88dp"
-    android:layout_margin="@dimen/photo_grid_margin">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_margin="@dimen/photo_grid_margin">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/file_storage_thumbnail"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:placeholderImage="@drawable/ic_image_thumbnail"
-        tools:src="@drawable/ic_image_thumbnail" />
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/image_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:placeholderImage="@drawable/ic_image_thumbnail" />
 
-    <ImageView
-        android:id="@+id/button_open_gallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:src="@drawable/ic_take_photo"
-        app:tint="@color/white_black"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/video_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:placeholderImage="@drawable/ic_video_thumbnail" />
+
+        <ImageView
+            android:id="@+id/ic_selected"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_marginStart="@dimen/cu_fragment_ic_selected_margin_large"
+            android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/video_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/background_video_duration_message"
+            android:paddingStart="5dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="2dp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="SmallSp" />
+
+        <ImageView
+            android:id="@+id/button_open_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_take_photo"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white_black" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

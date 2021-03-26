@@ -9230,7 +9230,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     58 : 18, getOutMetrics()), 0, 0);
 
             ColorUtils.changeStatusBarColor(this, R.color.white_transparent);
-            writingContainerLayout.setBackgroundColor(Color.TRANSPARENT);
+            writingContainerLayout.setBackgroundResource(android.R.color.transparent);
             inputTextLayout.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
 
