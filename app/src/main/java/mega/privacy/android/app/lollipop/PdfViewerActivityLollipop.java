@@ -711,7 +711,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                         aB.hide();
                     }
                 }
-            } else {
+            } else if (!isFinishing()) {
                 setToolbarVisibilityShow();
             }
 

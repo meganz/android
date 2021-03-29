@@ -82,7 +82,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
-    private var savingInstanceState = false
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -237,8 +236,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
-
-        savingInstanceState = true
     }
 
     private fun stopPlayer() {
@@ -305,7 +302,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     override fun onDestroy() {
         super.onDestroy()
 
-        if (!savingInstanceState) {
+        if (isFinishing) {
             playerService?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
         }
@@ -317,7 +314,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeSaver.destroy()
 
-        if (!savingInstanceState && !isAudioPlayer(intent)) {
+        if (isFinishing && !isAudioPlayer(intent)) {
             MediaPlayerService.resumeAudioPlayer(this)
         }
     }

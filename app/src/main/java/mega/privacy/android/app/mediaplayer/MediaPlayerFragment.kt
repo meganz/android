@@ -308,7 +308,7 @@ class MediaPlayerFragment : Fragment() {
         dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
             if (it) {
                 updateViewForAnimation()
-            } else {
+            } else if (isResumed) {
                 showToolbar()
                 videoPlayerVH?.showController()
 
