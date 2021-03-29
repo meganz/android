@@ -127,6 +127,9 @@ EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
+FLAC_SOURCE_FILE=flac-1.3.2.tar.xz
+FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
+FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 
 function downloadCheckAndUnpack()
 {
@@ -474,6 +477,21 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
     cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
     popd &>> ${LOG_FILE}
+
+    FLAC_EXT_PATH=${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}/extensions/flac/src/main/jni
+    downloadCheckAndUnpack ${FLAC_DOWNLOAD_URL} ${EXOPLAYER}/${FLAC_SOURCE_FILE} ${FLAC_SHA1} ${EXOPLAYER}
+    rm -rf ${FLAC_EXT_PATH}/flac
+    mv ${EXOPLAYER}/flac-1.3.2 ${FLAC_EXT_PATH}/flac
+    echo "* Building FLAC"
+    pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
+    ${NDK_BUILD} APP_ABI=all -j4 &>> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
+    echo "* Building ExoPlayer FLAC extension"
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    ./gradlew :extension-flac:assembleRelease &>> ${LOG_FILE}
+    cp extensions/flac/buildout/outputs/aar/extension-flac-release.aar ../exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
+    popd &>> ${LOG_FILE}
+
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"
