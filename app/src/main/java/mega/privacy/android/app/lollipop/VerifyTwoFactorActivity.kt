@@ -13,9 +13,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_pin_lock.*
-import kotlinx.android.synthetic.main.bottom_sheet_contact_file_list.*
-import kotlinx.android.synthetic.main.content_file_info_activity.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
@@ -147,6 +144,7 @@ class VerifyTwoFactorActivity : PinActivityLollipop() {
             CANCEL_ACCOUNT_2FA -> R.string.verify_2fa_subtitle_cancel_account
             CHANGE_MAIL_2FA -> R.string.verify_2fa_subtitle_change_email
             CHANGE_PASSWORD_2FA -> R.string.verify_2fa_subtitle_change_password
+            DISABLE_2FA -> R.string.verify_2fa_subtitle_diable_2fa
             else -> 0
         }
 
@@ -298,7 +296,7 @@ class VerifyTwoFactorActivity : PinActivityLollipop() {
             return getEditTextPINByIndex(totalCount - 1)
         }
 
-        return binding.sixPinVerify.getChildAt(index)
+        return binding.sixPinVerify.getChildAt(index) as EditTextPIN
     }
 
     /**
@@ -357,7 +355,7 @@ class VerifyTwoFactorActivity : PinActivityLollipop() {
      *
      * @param pin The pin code string.
      */
-    fun verify2FA(pin: String) {
+    private fun verify2FA(pin: String) {
         when (verifyType) {
             CANCEL_ACCOUNT_2FA -> megaApi.multiFactorAuthCancelAccount(pin, listener)
             CHANGE_MAIL_2FA -> megaApi.multiFactorAuthChangeEmail(newEmail, pin, listener)
@@ -501,7 +499,10 @@ class VerifyTwoFactorActivity : PinActivityLollipop() {
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
             logDebug("${request.type}: ${request.requestString} finished.")
 
-            hideKeyboard()
+            if(request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
+                hideKeyboard()
+            }
+
             progressBar.visibility = View.GONE
 
             // PIN code verification error.

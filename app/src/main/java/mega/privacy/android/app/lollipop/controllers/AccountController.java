@@ -98,7 +98,10 @@ public class AccountController {
     public void deleteAccount(){
         logDebug("deleteAccount");
         if (((ManagerActivityLollipop) context).is2FAEnabled()){
-            ((ManagerActivityLollipop) context).showVerifyPin2FA(CANCEL_ACCOUNT_2FA);
+            Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
+            intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CANCEL_ACCOUNT_2FA);
+
+            context.startActivity(intent);
         }
         else {
             megaApi.cancelAccount((ManagerActivityLollipop) context);
