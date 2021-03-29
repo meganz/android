@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CreateMeetingRepository @Inject constructor(
+class AbstractMeetingOnBoardingRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
