@@ -5,7 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <import type="mega.privacy.android.app.MimeTypeList" />
+
+        <import type="mega.privacy.android.app.mediaplayer.playlist.PlaylistItem" />
 
         <variable
             name="item"
@@ -13,6 +17,10 @@
 
         <variable
             name="highlight"
+            type="Boolean" />
+
+        <variable
+            name="paused"
             type="Boolean" />
 
         <variable
@@ -35,6 +43,15 @@
             app:apDefaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
             app:apThumbnail="@{item.thumbnail}"
             app:roundedCornerRadius="4dp" />
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="24dp"
+            android:background="@drawable/media_playlist_paused"
+            android:visibility="@{item.type == PlaylistItem.TYPE_PLAYING &amp;&amp; paused ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
 
         <TextView
             android:layout_width="wrap_content"

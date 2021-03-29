@@ -121,8 +121,16 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
+                adapter.paused = service.viewModel.paused
+
                 adapter.submitList(it.first) {
                     listLayoutManager.scrollToPositionWithOffset(it.second, 0)
+
+                    if (!isVideoPlayer()) {
+                        // Trigger the visibility update of the pause icon of the
+                        // playing (paused) audio.
+                        adapter.notifyItemChanged(it.second + 1)
+                    }
                 }
 
                 (requireActivity() as MediaPlayerActivity).setToolbarTitle(it.third)
