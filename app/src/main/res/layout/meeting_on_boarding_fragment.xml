@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/create_meeting"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    app:behavior_hideable="false"
+    tools:context=".meeting.fragments.CreateMeetingFragment">
+
+    <SurfaceView
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:background="@android:color/transparent" />
+
+    <EditText
+        android:id="@+id/type_meeting_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="?attr/colorSurface"
+        android:gravity="center"
+        android:hint="@string/type_meeting_name"
+        android:inputType="text"
+        android:maxLines="1"
+        android:minWidth="100dp"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textColorHint="#9B9B9B"
+        android:focusedByDefault="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <mega.privacy.android.app.components.RoundedImageView
+        android:id="@+id/meeting_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:scaleType="fitCenter"
+        app:border_width="5dp"
+        app:corner_radius="30dp"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+        app:layout_constraintTop_toBottomOf="@id/type_meeting_edit_text" />
+
+
+    <TextView
+        android:id="@+id/fab_click_tips"
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/meeting_grey_text_bk_corners"
+        android:padding="10dp"
+        android:text="@string/general_mic_mute"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.OnSecondary"
+        app:layout_constraintBottom_toTopOf="@id/on_off_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/meeting_thumbnail" />
+
+
+    <include
+        android:id="@+id/on_off_fab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/meeting_thumbnail"
+        app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+        app:layout_constraintVertical_bias="0.9"
+        layout="@layout/meeting_component_onofffab"/>
+
+    <Button
+        android:id="@+id/btn_start_join_meeting"
+        style="?attr/materialButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/drawer_upgrade_button_background_selector"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/btn_start_meeting"
+        android:textColor="@color/white_dark_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

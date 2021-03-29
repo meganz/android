@@ -16,4 +16,16 @@
         android:label="fragment_join_meeting"
         tools:layout="@layout/join_meeting_fragment">
     </fragment>
+    <fragment
+        android:id="@+id/joinMeetingAsGuestFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment"
+        android:label="fragment_join_meeting_as_guest"
+        tools:layout="@layout/join_meeting_as_guest_fragment">
+    </fragment>
+    <fragment
+        android:id="@+id/inMeeting"
+        android:name="mega.privacy.android.app.meeting.fragments.InMeetingFragment"
+        android:label="fragment_in_meeting"
+        tools:layout="@layout/in_meeting_fragment">
+    </fragment>
 </navigation>

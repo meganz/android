@@ -33,6 +33,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         const val MEETING_TYPE = "meetingType"
         const val MEETING_TYPE_JOIN = "join_meeting"
         const val MEETING_TYPE_CREATE = "create_meeting"
+        const val MEETING_TYPE_GUEST = "join_meeting_as_guest"
+        const val MEETING_TYPE_IN = "in_meeting"
 
         private var isGuest = true
         private var isModerator = false
@@ -57,8 +59,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             if (intent == null) return
 
             when (intent.getIntExtra(BroadcastConstants.ACTION_TYPE, -1)) {
-                Constants.GO_OFFLINE -> getCurrentFragment()?.processOfflineMode()
-                Constants.GO_ONLINE -> getCurrentFragment()?.processOnlineMode()
+                Constants.GO_OFFLINE -> getCurrentFragment()?.processOfflineMode(true)
+                Constants.GO_ONLINE -> getCurrentFragment()?.processOfflineMode(false)
             }
         }
     }
@@ -155,10 +157,15 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
+
         when(meetType){
-            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
+            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
+            MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
+            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeeting
+            else -> navGraph.startDestination = R.id.createMeetingFragment
         }
+
         // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
         // Change start destination dynamically
         navController.graph = navGraph
