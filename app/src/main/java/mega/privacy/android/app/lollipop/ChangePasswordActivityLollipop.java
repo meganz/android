@@ -60,6 +60,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 
+	public static final String KEY_IS_LOGOUT = "logout";
+
 	private ProgressDialog progress;
 	
 	float scaleH, scaleW;
@@ -304,9 +306,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
-		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+		if (getIntent() != null && getIntent().getBooleanExtra(KEY_IS_LOGOUT, false)) {
 			Intent intent = new Intent(this, TestPasswordActivity.class);
-			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
+			intent.putExtra(KEY_IS_LOGOUT, true);
 			startActivity(intent);
 		}
 		super.onBackPressed();
@@ -368,7 +370,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		builder.setView(v);
 
 		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
-		titleDialog.setText(getString(R.string.change_password_verification));
+		titleDialog.setText(getString(R.string.verify_2fa_subtitle_change_password));
 
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
 		pinError.setVisibility(View.GONE);
@@ -1201,7 +1203,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getFlag()){
 					is2FAEnabled = true;
-					showVerifyPin2FA();
+
+                    Intent intent = new Intent(this, VerifyTwoFactorActivity.class);
+                    intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_PASSWORD_2FA);
+                    intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newPassword1.getText().toString());
+                    intent.putExtra(KEY_IS_LOGOUT, getIntent() != null && getIntent().getBooleanExtra(KEY_IS_LOGOUT, false));
+
+                    startActivity(intent);
 				}
 				else {
 					is2FAEnabled = false;
