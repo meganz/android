@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import nz.mega.sdk.*
 import javax.inject.Inject
 
@@ -108,7 +109,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
-                    if (service.service.viewModel.playlistSearchQuery != null) {
+                    if (service.service.viewModel.playlistSearchQuery?.isTextEmpty() == false) {
                         return@observe
                     }
 
