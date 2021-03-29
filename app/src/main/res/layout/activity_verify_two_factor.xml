@@ -58,7 +58,6 @@
                 app:layout_constraintWidth_percent=".6">
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_first_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -71,7 +70,6 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_second_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -84,7 +82,6 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_third_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -97,7 +94,6 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_fouth_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -110,7 +106,6 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_fifth_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -123,7 +118,6 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:id="@+id/pin_sixth_verify"
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal"
