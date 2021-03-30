@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
@@ -34,6 +35,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -221,6 +223,19 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         }
+
+        if (CallUtil.participatingInACall()) {
+            showNotAllowPlayAlert()
+        }
+
+        LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
+            .observe(this) {
+                showNotAllowPlayAlert()
+            }
+    }
+
+    private fun showNotAllowPlayAlert() {
+        showSnackbar(StringResourcesUtils.getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {

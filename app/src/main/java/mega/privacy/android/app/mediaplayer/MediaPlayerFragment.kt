@@ -132,7 +132,7 @@ class MediaPlayerFragment : Fragment() {
         super.onPause()
 
         if (isVideoPlayer() && playerService?.playing() == true) {
-            playerService?.exoPlayer?.playWhenReady = false
+            playerService?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
         }
     }
@@ -225,7 +225,7 @@ class MediaPlayerFragment : Fragment() {
             }
 
             if (videoPlayerPausedForPlaylist) {
-                service.exoPlayer.playWhenReady = true
+                service.setPlayWhenReady(true)
                 videoPlayerPausedForPlaylist = false
             }
         }

@@ -19,6 +19,7 @@ import androidx.lifecycle.*
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
@@ -68,7 +69,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val resumePlayRunnable = {
         if (needPlayWhenReceiveResumeCommand) {
-            exoPlayer.playWhenReady = true
+            setPlayWhenReady(true)
             needPlayWhenReceiveResumeCommand = false
         }
     }
@@ -81,7 +82,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                     if (exoPlayer.playWhenReady) {
-                        exoPlayer.playWhenReady = false
+                        setPlayWhenReady(false)
                         needPlayWhenGoForeground = false
                         needPlayWhenReceiveResumeCommand = false
                     }
@@ -251,7 +252,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             setUseNavigationActionsInCompactView(true)
 
             setPlayer(exoPlayer)
-            setControlDispatcher(CallAwareControlDispatcher(exoPlayer.repeatMode))
+            setControlDispatcher(
+                CallAwareControlDispatcher(exoPlayer.repeatMode, true, this@MediaPlayerService)
+            )
         }
     }
 
@@ -267,7 +270,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             COMMAND_PAUSE -> {
                 if (initialized) {
                     if (playing()) {
-                        exoPlayer.playWhenReady = false
+                        setPlayWhenReady(false)
                         needPlayWhenReceiveResumeCommand = true
                     }
                 } else {
@@ -374,7 +377,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
 
         if (!viewModel.paused) {
-            exoPlayer.playWhenReady = true
+            setPlayWhenReady(true)
         }
 
         exoPlayer.prepare()
@@ -413,10 +416,21 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         stopSelf()
     }
 
+    fun setPlayWhenReady(playWhenReady: Boolean) {
+        if (!playWhenReady) {
+            exoPlayer.playWhenReady = false
+        } else if (CallUtil.participatingInACall()) {
+            LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
+                .post(true)
+        } else {
+            exoPlayer.playWhenReady = true
+        }
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
-            exoPlayer.playWhenReady = true
+            setPlayWhenReady(true)
             needPlayWhenGoForeground = false
         }
     }
@@ -424,7 +438,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
-            exoPlayer.playWhenReady = false
+            setPlayWhenReady(false)
             needPlayWhenGoForeground = true
         }
     }
