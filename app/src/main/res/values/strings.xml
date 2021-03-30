@@ -3071,6 +3071,7 @@
     <string name="general_camera" context="General label for camera">Camera</string>
     <string name="meeting_hold" context="Label for hold meeting">Hold</string>
     <string name="general_speaker" context="General label for speaker">Speaker</string>
+    <string name="general_headphone" context="General label for headphone">Headphone</string>
     <string name="meeting_end" context="Label for end meeting">End</string>
     <string name="invite_participants" context="Invite contacts as participants of the meeting">Invite Participants</string>
     <string name="participants_number" context="The number of participants in the meeting">In the meeting (%d)</string>

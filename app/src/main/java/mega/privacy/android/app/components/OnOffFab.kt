@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import mega.privacy.android.app.R
@@ -19,7 +20,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             updateAppearance()
         }
 
-    private val onIcon: Drawable?
+    private var onIcon: Drawable?
     private val offIcon: Drawable?
 
     @ColorInt
@@ -81,6 +82,11 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 
     fun setOnOffCallback(callback: (Boolean) -> Unit) {
         onOffCallback = callback
+    }
+
+    fun setOnIcon(@DrawableRes icon: Int) {
+        onIcon = ContextCompat.getDrawable(context, icon)
+        updateAppearance()
     }
 
     private fun updateAppearance() {

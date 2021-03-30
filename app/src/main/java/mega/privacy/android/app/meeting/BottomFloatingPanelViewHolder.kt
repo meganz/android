@@ -27,9 +27,22 @@ class BottomFloatingPanelViewHolder(
 
     private val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomFloatingPanel.root)
     private val propertyUpdaters = ArrayList<(Float) -> Unit>()
+
     private var bottomFloatingPanelExpanded = false
+    private var expandedTop = 0
+    private var collapsedTop = 0
 
     private val participantsAdapter = ParticipantsAdapter(listener)
+
+    private val speakerVH = SpeakerButtonViewHolder(
+        binding.bottomFloatingPanel.fabSpeaker,
+        binding.bottomFloatingPanel.fabSpeakerLabel,
+        this::fixBottomSheetPosition
+    ) {
+        updateBottomFloatingPanelIfNeeded()
+
+        listener.onChangeAudioDevice(it)
+    }
 
     init {
         setupBottomSheet()
@@ -43,7 +56,9 @@ class BottomFloatingPanelViewHolder(
             binding.bottomFloatingPanel.guestShareLink.isVisible = false
         }
 
-        binding.bottomFloatingPanel.fabEnd.setImageResource(if (isModerator) R.drawable.ic_end_call else R.drawable.ic_remove)
+        // End meeting for all isn't included in MVP version.
+        // binding.bottomFloatingPanel.fabEnd.setImageResource(if (isModerator) R.drawable.ic_end_call else R.drawable.ic_remove)
+        binding.bottomFloatingPanel.fabEnd.setImageResource(R.drawable.ic_remove)
 
         post {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -60,11 +75,23 @@ class BottomFloatingPanelViewHolder(
         )
     }
 
+    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) =
+        speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
+
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
+
+                when {
+                    newState == BottomSheetBehavior.STATE_EXPANDED && expandedTop == 0 -> {
+                        expandedTop = binding.bottomFloatingPanel.root.top
+                    }
+                    newState == BottomSheetBehavior.STATE_COLLAPSED && collapsedTop == 0 -> {
+                        collapsedTop = binding.bottomFloatingPanel.root.top
+                    }
+                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -107,11 +134,6 @@ class BottomFloatingPanelViewHolder(
 
             listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
         }
-        binding.bottomFloatingPanel.fabSpeaker.setOnOffCallback {
-            updateBottomFloatingPanelIfNeeded()
-
-            listener.onChangeSpeakerState(binding.bottomFloatingPanel.fabSpeaker.isOn)
-        }
         binding.bottomFloatingPanel.fabEnd.setOnClickListener {
             listener.onEndMeeting()
         }
@@ -142,6 +164,30 @@ class BottomFloatingPanelViewHolder(
         if (bottomFloatingPanelExpanded) {
             onBottomFloatingPanelSlide(1F)
         }
+    }
+
+    /**
+     * Update layout could cause bottom sheet have extra top margin, e.g. update text,
+     * change FAB icon, set the top again could fix it.
+     *
+     * TODO: user can still observe visual noise.
+     */
+    private fun fixBottomSheetPosition() {
+        val fixer = {
+            when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_EXPANDED -> {
+                    binding.bottomFloatingPanel.root.top = expandedTop
+                }
+                BottomSheetBehavior.STATE_COLLAPSED -> {
+                    binding.bottomFloatingPanel.root.top = collapsedTop
+                }
+                else -> {
+                }
+            }
+        }
+
+        fixer()
+        post(fixer)
     }
 
     private fun onBottomFloatingPanelSlide(slideOffset: Float) {

@@ -18,6 +18,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -49,6 +50,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
                 isModerator = false
             }
         }
+
+        private var wiredHeadsetConnected = false
+        private var bluetoothConnected = false
     }
 
     private lateinit var binding: ActivityMeetingBinding
@@ -112,6 +116,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
                 Participant("Katayama Fumiki", avatar, false, false, false, true),
             )
         )
+
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
 
         updateRole()
     }
@@ -188,19 +194,25 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onChangeMicState(micOn: Boolean) {
-        Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
+
+        wiredHeadsetConnected = !wiredHeadsetConnected
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
     }
 
     override fun onChangeCamState(camOn: Boolean) {
-        Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
+
+        bluetoothConnected = !bluetoothConnected
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
         Toast.makeText(this, "onChangeHoldState $isHold", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onChangeSpeakerState(speakerOn: Boolean) {
-        Toast.makeText(this, "onChangeSpeakerState $speakerOn", Toast.LENGTH_SHORT).show()
+    override fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice) {
+        Toast.makeText(this, "onChangeAudioDevice $device", Toast.LENGTH_SHORT).show()
     }
 
     override fun onEndMeeting() {
