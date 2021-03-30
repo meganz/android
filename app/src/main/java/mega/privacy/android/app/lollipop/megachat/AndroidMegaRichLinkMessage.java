@@ -143,6 +143,10 @@ public class AndroidMegaRichLinkMessage {
         return matchRegexs(url, CONTACT_LINK_REGEXS);
     }
 
+    public static boolean isMeetingLink(String url) {
+        return matchRegexs(url, MEETING_LINK_REGEXS);
+    }
+
     public boolean isChat() {
         return isChat;
     }

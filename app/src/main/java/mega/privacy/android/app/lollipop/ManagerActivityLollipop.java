@@ -9243,10 +9243,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			int error = nC.importLink(link);
+			int linkType = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
-                switch (error) {
-                    case CHAT_LINK: {
+                switch (linkType) {
+                    case CHAT_LINK:
+					case MEETING_LINK:{
 						logDebug("Open chat link: correct chat link");
                         showChatLink(link);
                         dismissOpenLinkDialog();
@@ -9265,7 +9266,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
                 }
             }
             else {
-                switch (error) {
+                switch (linkType) {
                     case FILE_LINK:
                     case FOLDER_LINK: {
 						logDebug("Do nothing: correct file or folder link");
@@ -9274,9 +9275,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
                     }
                     case CHAT_LINK:
                     case CONTACT_LINK:
+					case MEETING_LINK:
                     case ERROR_LINK: {
 						logWarning("Show error: invalid link or correct chat or contact link");
-                        showOpenLinkError(true, error);
+                        showOpenLinkError(true, linkType);
                         break;
                     }
                 }
@@ -9331,8 +9333,15 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			openLinkText.setHint(R.string.hint_paste_link);
 		}
 		else if (drawerItem == DrawerItem.CHAT) {
-			builder.setTitle(R.string.action_open_chat_link);
-			openLinkText.setHint(R.string.hint_enter_chat_link);
+			Fragment fragment = getSupportFragmentManager()
+					.findFragmentByTag(MeetingBottomSheetDialogFragment.TAG);
+			if (fragment != null) {
+				builder.setTitle(R.string.paste_meeting_link_dialog_title);
+				openLinkText.setHint(R.string.meeting_link);
+			} else {
+				builder.setTitle(R.string.action_open_chat_link);
+				openLinkText.setHint(R.string.hint_enter_chat_link);
+			}
 		}
 
 		openLinkDialog = builder.create();
@@ -9906,8 +9915,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@Override
 	public void onJoinMeeting() {
-		PasteMeetingLinkGuestFragment dialog = new PasteMeetingLinkGuestFragment();
-		dialog.show(getSupportFragmentManager(), PasteMeetingLinkGuestFragment.TAG);
+//		PasteMeetingLinkGuestFragment dialog = new PasteMeetingLinkGuestFragment();
+//		dialog.show(getSupportFragmentManager(), PasteMeetingLinkGuestFragment.TAG);
+		showOpenLinkDialog();
 	}
 
 	@Override
@@ -10289,7 +10299,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	public void showMeetingOptionsPanel(){
 		bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
 	}
 
 	public void showSentRequestOptionsPanel(MegaContactRequest request){

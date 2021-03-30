@@ -937,6 +937,8 @@ public class NodeController {
         }
         else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
             return CONTACT_LINK;
+        } else if (AndroidMegaRichLinkMessage.isMeetingLink(url)) {
+            return MEETING_LINK;
         }
 
         logWarning("wrong url");

@@ -17,7 +17,7 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
         val inflater = requireActivity().layoutInflater;
         val view = inflater.inflate(R.layout.dialog_paste_meeting_link_guest, null)
 
-        builder.setTitle(R.string.invite_to_meeting_dialog_title)
+        builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
             .setView(view)
             .setPositiveButton(R.string.general_ok)
             { _, _ ->

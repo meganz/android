@@ -46,4 +46,8 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
         super.onAttach(context)
         listener = context as MeetingBottomSheetDialogActionListener
     }
+
+    companion object {
+        const val TAG = "MeetingBottomSheetDialog"
+    }
 }

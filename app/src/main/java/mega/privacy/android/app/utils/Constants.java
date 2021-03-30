@@ -522,6 +522,7 @@ public class Constants {
     public static final int FOLDER_LINK = 201;
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
+    public static final int MEETING_LINK = 204;
     public static final int ERROR_LINK = -1;
     public static final int INVALID_CALL_STATUS = -1;
     public static final int MAX_PARTICIPANTS_GRID = 6;
@@ -636,6 +637,11 @@ public class Constants {
     };
 
     public static final String[] CHAT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*chat/.+$",
+            "^https://mega\\.nz/.*chat/.+$"
+    };
+
+    public static final String[] MEETING_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*chat/.+$",
             "^https://mega\\.nz/.*chat/.+$"
     };
