@@ -37,6 +37,10 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant.18">
+        <item name="android:textSize">18sp</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Variant2">
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
@@ -200,6 +204,11 @@
         <item name="android:letterSpacing">0.035714286</item>
         <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Variant.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
 
     <!-- ================== Body1 ====================== -->
 

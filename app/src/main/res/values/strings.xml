@@ -2629,6 +2629,8 @@
     <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="title_tour_five" cotext="Title of fifth tour screen">MEGA encrypted meeting</string>
+    <string name="content_tour_five" cotext="Content of fourth tour screen">End-to-End Encrypted conference at MEGA</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
@@ -3084,4 +3086,7 @@
     <string name="meeting_link" context="The literal meeting link text">Meeting link</string>
     <string name="paste_meeting_link_instruction" context="Tell the user to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
     <string name="invite_to_meeting_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
+
+    <string name="onboarding_no_mega_account" context="The question in on-boarding screen asking if the user don't have a mega account">Don\'t have a MEGA account?</string>
+    <string name="join_meeting_as_guest" context="The question in on-boarding screen asking if the user is going to join meeting as guest">Join meeting as guest?</string>
 </resources>

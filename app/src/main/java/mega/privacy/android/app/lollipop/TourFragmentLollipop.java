@@ -52,6 +52,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private ImageView secondItem;
     private ImageView thirdItem;
     private ImageView fourthItem;
+    private ImageView fifthItem;
     private Button bRegister;
     private Button bLogin;
     private ScrollView baseContainer;
@@ -116,6 +117,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem = (ImageView) v.findViewById(R.id.second_item);
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
         fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
+        fifthItem = (ImageView) v.findViewById(R.id.fifth_item);
 
         baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
 
@@ -133,6 +135,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
 
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
@@ -144,6 +147,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 1:{
@@ -151,6 +155,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 2:{
@@ -158,6 +163,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 3:{
@@ -165,6 +171,15 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        break;
+                    }
+                    case 4:{
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         break;
                     }
                 }
