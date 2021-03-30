@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/paste_meeting_link_instruction"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"/>
+
+    <EditText
+        android:id="@+id/meeting_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_marginTop="30dp"
+        android:singleLine="true"
+        android:textSize="16sp"
+        android:hint="@string/meeting_link"/>
+</LinearLayout>

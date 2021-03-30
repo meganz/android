@@ -215,6 +215,7 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -284,7 +285,6 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -9906,9 +9906,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@Override
 	public void onJoinMeeting() {
-		Intent meetingIntent = new Intent(this, MeetingActivity.class);
-		meetingIntent.putExtra("meetingType", MEETING_TYPE_JOIN);
-		startActivity(meetingIntent);
+		PasteMeetingLinkGuestFragment dialog = new PasteMeetingLinkGuestFragment();
+		dialog.show(getSupportFragmentManager(), PasteMeetingLinkGuestFragment.TAG);
 	}
 
 	@Override
