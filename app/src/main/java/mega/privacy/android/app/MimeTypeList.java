@@ -197,7 +197,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isVideoNotSupported() {
-		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+		return extension.equals("mpg") || extension.equals("avi") || extension.equals("wmv");
 	}
 
 	public boolean isMp4Video() {
