@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting
 import android.content.res.ColorStateList
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -36,8 +35,7 @@ class BottomFloatingPanelViewHolder(
 
     private val speakerVH = SpeakerButtonViewHolder(
         binding.bottomFloatingPanel.fabSpeaker,
-        binding.bottomFloatingPanel.fabSpeakerLabel,
-        this::fixBottomSheetPosition
+        binding.bottomFloatingPanel.fabSpeakerLabel
     ) {
         updateBottomFloatingPanelIfNeeded()
 
@@ -75,8 +73,11 @@ class BottomFloatingPanelViewHolder(
         )
     }
 
-    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) =
+    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) {
         speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
+
+        updateBottomFloatingPanelIfNeeded()
+    }
 
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -116,6 +117,13 @@ class BottomFloatingPanelViewHolder(
 
         setupFabUpdater()
         setupFabLabelUpdater()
+
+        post {
+            val peekHeight =
+                context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
+            bottomSheetBehavior.halfExpandedRatio =
+                peekHeight.toFloat() / binding.root.measuredHeight
+        }
     }
 
     private fun listenButtons() {
@@ -166,30 +174,6 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
-    /**
-     * Update layout could cause bottom sheet have extra top margin, e.g. update text,
-     * change FAB icon, set the top again could fix it.
-     *
-     * TODO: user can still observe visual noise.
-     */
-    private fun fixBottomSheetPosition() {
-        val fixer = {
-            when (bottomSheetBehavior.state) {
-                BottomSheetBehavior.STATE_EXPANDED -> {
-                    binding.bottomFloatingPanel.root.top = expandedTop
-                }
-                BottomSheetBehavior.STATE_COLLAPSED -> {
-                    binding.bottomFloatingPanel.root.top = collapsedTop
-                }
-                else -> {
-                }
-            }
-        }
-
-        fixer()
-        post(fixer)
-    }
-
     private fun onBottomFloatingPanelSlide(slideOffset: Float) {
         val ratio = if (slideOffset < BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD) {
             slideOffset / BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD
@@ -211,17 +195,14 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun setupFabLabelUpdater(label: TextView) {
-        if (Util.isDarkMode(context)) {
-            label.setTextColor(ContextCompat.getColor(context, R.color.white_alpha_087))
-        } else {
-            val fabLabelColorStart = 0xFF
-            val fabLabelColorEnd = 0x21
+        val isDarkMode = Util.isDarkMode(context)
+        val fabLabelColorStart = if (isDarkMode) 0xE2 else 0xFF
+        val fabLabelColorEnd = if (isDarkMode) 0xE2 else 0x21
 
-            propertyUpdaters.add(
-                propertyUpdater(
-                    label, fabLabelColorStart, fabLabelColorEnd
-                ) { view, value -> view.setTextColor(composeColor(value)) })
-        }
+        propertyUpdaters.add(
+            propertyUpdater(
+                label, fabLabelColorStart, fabLabelColorEnd
+            ) { view, value -> view.setTextColor(composeColor(value)) })
     }
 
     private fun setupFabUpdater() {
@@ -232,22 +213,18 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun setupFabBackgroundTintUpdater(fab: OnOffFab) {
-        if (Util.isDarkMode(context)) {
-            fab.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054))
-        } else {
-            val fabBackgroundTintStart = 0x4F
-            val fabBackgroundTintEnd = 0x75
+        val isDarkMode = Util.isDarkMode(context)
+        val fabBackgroundTintStart = if (isDarkMode) 0x6C else 0x4F
+        val fabBackgroundTintEnd = if (isDarkMode) 0x6C else 0x75
 
-            propertyUpdaters.add(
-                propertyUpdater(
-                    fab, fabBackgroundTintStart, fabBackgroundTintEnd
-                ) { view, value ->
-                    if (view.isOn) {
-                        view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
-                    }
-                })
-        }
+        propertyUpdaters.add(
+            propertyUpdater(
+                fab, fabBackgroundTintStart, fabBackgroundTintEnd
+            ) { view, value ->
+                if (view.isOn) {
+                    view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
+                }
+            })
     }
 
     private fun <V : View> propertyUpdater(
@@ -281,3 +258,4 @@ class BottomFloatingPanelViewHolder(
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F
     }
 }
+

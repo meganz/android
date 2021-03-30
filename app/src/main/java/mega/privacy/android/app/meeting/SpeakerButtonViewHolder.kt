@@ -9,7 +9,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 class SpeakerButtonViewHolder(
     private val speakerFab: OnOffFab,
     private val speakerLabel: TextView,
-    private val fixBottomSheetPosition: (() -> Unit)? = null,
     private val switchCallback: (AppRTCAudioManager.AudioDevice) -> Unit
 ) {
     private var currentDevice = AppRTCAudioManager.AudioDevice.EARPIECE
@@ -103,7 +102,5 @@ class SpeakerButtonViewHolder(
                 speakerLabel.text = getString(R.string.general_speaker)
             }
         }
-
-        fixBottomSheetPosition?.invoke()
     }
 }

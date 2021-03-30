@@ -51,6 +51,9 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
 
     override fun meetingButtonClick() {
         viewModel.createMeeting()
+
+        // TODO: test only
+        (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

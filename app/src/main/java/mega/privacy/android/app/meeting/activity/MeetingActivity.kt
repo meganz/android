@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.Menu
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavGraph
@@ -22,24 +22,20 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.fragments.SelfFeedFloatingWindowFragment
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.IncomingCallNotification
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.VideoCaptureUtils
 
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
-    companion object{
+    companion object {
         const val MEETING_TYPE = "meetingType"
         const val MEETING_TYPE_JOIN = "join_meeting"
         const val MEETING_TYPE_CREATE = "create_meeting"
@@ -96,16 +92,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         initActionBar(meetType)
         initNavigation(meetType)
 
-        if (savedInstanceState == null) {
-//            val navHostFragment =
-//                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-//            val navController = navHostFragment.navController
-
-//            supportFragmentManager.beginTransaction()
-//                .replace(R.id.container, CreateMeetingFragment.newInstance())
-//                .commitNow()
-        }
-
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
 
@@ -131,13 +117,16 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             )
         )
 
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
 
         updateRole()
-        showSelFeedFloatingWindow()
+        //showSelFeedFloatingWindow()
     }
 
-    private fun showSelFeedFloatingWindow(){
+    private fun showSelFeedFloatingWindow() {
         val fragment = SelfFeedFloatingWindowFragment()
         addFragment(fragment, R.id.small_camera_fragment)
     }
@@ -180,12 +169,12 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         }
     }
 
-    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int){
+    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int) {
         supportFragmentManager.inTransaction { add(frameId, fragment) }
     }
 
     private fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int) {
-        supportFragmentManager.inTransaction{replace(frameId, fragment)}
+        supportFragmentManager.inTransaction { replace(frameId, fragment) }
     }
 
     inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction) {
@@ -216,7 +205,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        when(meetType) {
+        when (meetType) {
             MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
         }
@@ -232,9 +221,10 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
+        val navGraph: NavGraph =
+            navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
-        when(meetType){
+        when (meetType) {
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
             MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
@@ -319,9 +309,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     fun setBottomFloatingPanelViewHolder(visible: Boolean) {
-        when(visible) {
-            true-> bottom_floating_panel.visibility = View.VISIBLE;
-            false-> bottom_floating_panel.visibility = View.GONE
+        when (visible) {
+            true -> bottom_floating_panel.visibility = View.VISIBLE
+            false -> bottom_floating_panel.visibility = View.GONE
         }
     }
 }
