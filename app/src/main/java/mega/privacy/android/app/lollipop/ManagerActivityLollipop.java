@@ -215,6 +215,7 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -230,6 +231,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
@@ -283,7 +285,6 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -3627,50 +3628,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		int chatStatus = megaChatApi.getOnlineStatus();
 		if (contactStatus != null) {
-			switch (chatStatus) {
-				case MegaChatApi.STATUS_ONLINE: {
-					logDebug("Online");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_online_dark_drawer
-									: R.drawable.ic_online_light));
-					break;
-				}
-				case MegaChatApi.STATUS_AWAY: {
-					logDebug("Away");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_away_dark_drawer
-									: R.drawable.ic_away_light));
-					break;
-				}
-				case MegaChatApi.STATUS_BUSY: {
-					logDebug("Busy");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_busy_dark_drawer
-									: R.drawable.ic_busy_light));
-					break;
-				}
-				case MegaChatApi.STATUS_OFFLINE: {
-					logDebug("Offline");
-					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
-							Util.isDarkMode(this) ? R.drawable.ic_offline_dark_drawer
-									: R.drawable.ic_offline_light));
-					break;
-				}
-				case MegaChatApi.STATUS_INVALID: {
-					logWarning("Invalid");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-				default: {
-					logDebug("Default");
-					contactStatus.setVisibility(View.GONE);
-					break;
-				}
-			}
+			ChatUtil.setContactStatus(chatStatus, contactStatus, StatusIconLocation.DRAWER);
 		}
 	}
 
@@ -3786,39 +3744,39 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		setStatusBarColor(this, R.color.teal_500_teal_400);
 	}
 
-	void actionOpenFolder (long handleIntent) {
-		logDebug("Handle Intent: " + handleIntent);
-		int access = -1;
-		if (handleIntent != -1) {
-			MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
-			if (parentIntentN != null) {
-				access = megaApi.getAccess(parentIntentN);
-				switch (access) {
-					case MegaShare.ACCESS_OWNER:
-					case MegaShare.ACCESS_UNKNOWN: {
-						logDebug("The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
-					case MegaShare.ACCESS_READ:
-					case MegaShare.ACCESS_READWRITE:
-					case MegaShare.ACCESS_FULL: {
-						logDebug("The intent set the parentHandleIncoming to " + handleIntent);
-						parentHandleIncoming = handleIntent;
-						drawerItem = DrawerItem.SHARED_ITEMS;
-						deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
-						logDebug("After calculate deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
-						break;
-					}
-					default: {
-						logDebug("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
-						parentHandleBrowser = handleIntent;
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						break;
-					}
+	void actionOpenFolder(long handleIntent) {
+		if (handleIntent == INVALID_HANDLE) {
+			logWarning("handleIntent is not valid");
+			return;
+		}
+
+		MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+		if (parentIntentN == null) {
+			logWarning("parentIntentN is null");
+			return;
+		}
+
+		switch (megaApi.getAccess(parentIntentN)) {
+			case MegaShare.ACCESS_READ:
+			case MegaShare.ACCESS_READWRITE:
+			case MegaShare.ACCESS_FULL:
+				parentHandleIncoming = handleIntent;
+				deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
+				drawerItem = DrawerItem.SHARED_ITEMS;
+				break;
+
+			default:
+				if (megaApi.isInRubbish(parentIntentN)) {
+					parentHandleRubbish = handleIntent;
+					drawerItem = DrawerItem.RUBBISH_BIN;
+				} else if (megaApi.isInInbox(parentIntentN)) {
+					parentHandleInbox = handleIntent;
+					drawerItem = DrawerItem.INBOX;
+				} else {
+					parentHandleBrowser = handleIntent;
+					drawerItem = DrawerItem.CLOUD_DRIVE;
 				}
-			}
+				break;
 		}
 	}
 
@@ -9162,6 +9120,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				verify2FADialogIsShown = false;
 			}
 		});
+
+        Window window = verify2FADialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
 		verify2FADialog.show();
 		verify2FADialogIsShown = true;
 	}
@@ -9944,9 +9906,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@Override
 	public void onJoinMeeting() {
-		Intent meetingIntent = new Intent(this, MeetingActivity.class);
-		meetingIntent.putExtra("meetingType", MEETING_TYPE_JOIN);
-		startActivity(meetingIntent);
+		PasteMeetingLinkGuestFragment dialog = new PasteMeetingLinkGuestFragment();
+		dialog.show(getSupportFragmentManager(), PasteMeetingLinkGuestFragment.TAG);
 	}
 
 	@Override
@@ -15366,7 +15327,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
 				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
-				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+				drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
 		}

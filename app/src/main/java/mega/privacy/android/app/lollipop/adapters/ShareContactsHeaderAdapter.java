@@ -210,7 +210,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 holder.emailTextView.setText(mail);
 
                 holder.contactStateIcon.setVisibility(View.VISIBLE);
-                setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon);
+                setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon, StatusIconLocation.STANDARD);
 
                 if (contact.getMegaContactAdapter().isSelected()) {
                     holder.avatar.setImageResource(R.drawable.ic_select_folder);
