@@ -16,6 +16,7 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     private val _avatar = MutableLiveData<Bitmap>()
     val result = MutableLiveData<Boolean>()
     val avatar: LiveData<Bitmap> = _avatar
+
     init {
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {

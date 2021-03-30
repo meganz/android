@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.FileUtil
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
-    companion object{
+    companion object {
         const val MEETING_TYPE = "meetingType"
         const val MEETING_TYPE_JOIN = "join_meeting"
         const val MEETING_TYPE_CREATE = "create_meeting"
@@ -117,7 +117,10 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             )
         )
 
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
 
         updateRole()
     }
@@ -146,7 +149,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        when(meetType) {
+        when (meetType) {
             MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
         }
@@ -162,9 +165,10 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        val navGraph: NavGraph = navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
+        val navGraph: NavGraph =
+            navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
-        when(meetType){
+        when (meetType) {
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
             MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
@@ -178,8 +182,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId){
-            android.R.id.home-> onBackPressed()
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -197,14 +201,20 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
 
         wiredHeadsetConnected = !wiredHeadsetConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeCamState(camOn: Boolean) {
         // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
 
         bluetoothConnected = !bluetoothConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
@@ -256,9 +266,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     fun setBottomFloatingPanelViewHolder(visible: Boolean) {
-        when(visible) {
-            true-> bottom_floating_panel.visibility = View.VISIBLE;
-            false-> bottom_floating_panel.visibility = View.GONE
+        when (visible) {
+            true -> bottom_floating_panel.visibility = View.VISIBLE;
+            false -> bottom_floating_panel.visibility = View.GONE
         }
     }
 }
