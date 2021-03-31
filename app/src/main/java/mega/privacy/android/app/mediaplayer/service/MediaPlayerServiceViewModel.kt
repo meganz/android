@@ -81,8 +81,11 @@ class MediaPlayerServiceViewModel(
     private val _playingThumbnail = MutableLiveData<File>()
     val playingThumbnail: LiveData<File> = _playingThumbnail
 
-    private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
-    val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
+    private val _playlist = MutableLiveData<Pair<List<PlaylistItem>, Int>>()
+    val playlist: LiveData<Pair<List<PlaylistItem>, Int>> = _playlist
+
+    private val _playlistTitle = MutableLiveData<String>()
+    val playlistTitle: LiveData<String> = _playlistTitle
 
     private val _retry = MutableLiveData<Boolean>()
     val retry: LiveData<Boolean> = _retry
@@ -92,7 +95,6 @@ class MediaPlayerServiceViewModel(
 
     var currentIntent: Intent? = null
         private set
-    var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
     private val playlistItemsMap = HashMap<String, PlaylistItem>()
@@ -235,17 +237,19 @@ class MediaPlayerServiceViewModel(
                     .fromCallable(Callable {
                         when (type) {
                             OFFLINE_ADAPTER -> {
-                                playlistTitle = getOfflineFolderName(context, firstPlayHandle)
+                                _playlistTitle.postValue(
+                                    getOfflineFolderName(context, firstPlayHandle)
+                                )
 
                                 buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                             }
                             AUDIO_BROWSE_ADAPTER -> {
-                                playlistTitle = getString(R.string.upload_to_audio)
+                                _playlistTitle.postValue(getString(R.string.upload_to_audio))
 
                                 buildPlaylistForAudio(intent, firstPlayHandle)
                             }
                             VIDEO_BROWSE_ADAPTER -> {
-                                playlistTitle = getString(R.string.sortby_type_video_first)
+                                _playlistTitle.postValue(getString(R.string.sortby_type_video_first))
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
                             }
@@ -267,7 +271,7 @@ class MediaPlayerServiceViewModel(
                                 )
 
                                 if (isInRootLinksLevel(type, parentHandle)) {
-                                    playlistTitle = getString(R.string.tab_links_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_links_shares))
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getPublicLinks(order), firstPlayHandle
@@ -276,7 +280,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = getString(R.string.tab_incoming_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_incoming_shares))
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getInShares(order), firstPlayHandle
@@ -285,7 +289,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = getString(R.string.tab_outgoing_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_outgoing_shares))
 
                                     val nodes = ArrayList<MegaNode>()
                                     var lastHandle = INVALID_HANDLE
@@ -307,9 +311,10 @@ class MediaPlayerServiceViewModel(
                                     val contact = megaApi.getContact(email) ?: return@Callable
                                     val nodes = megaApi.getInShares(contact)
 
-                                    playlistTitle =
-                                        getString(R.string.title_incoming_shares_with_explorer) +
+                                    val title =
+                                        getString(R.string.title_incoming_shares_with_explorer) + " " +
                                                 getMegaUserNameDB(contact)
+                                    _playlistTitle.postValue(title)
 
                                     buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
                                     return@Callable
@@ -325,7 +330,7 @@ class MediaPlayerServiceViewModel(
                                     megaApi.getNodeByHandle(parentHandle)
                                 }) ?: return@Callable
 
-                                playlistTitle = if (parentHandle == INVALID_HANDLE) {
+                                val title = if (parentHandle == INVALID_HANDLE) {
                                     getString(
                                         when (type) {
                                             RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
@@ -337,10 +342,12 @@ class MediaPlayerServiceViewModel(
                                     parent.name
                                 }
 
+                                _playlistTitle.postValue(title)
+
                                 buildPlaylistFromParent(parent, intent, firstPlayHandle)
                             }
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
-                                playlistTitle = getString(R.string.section_recents)
+                                _playlistTitle.postValue(getString(R.string.section_recents))
 
                                 val handles =
                                     intent.getLongArrayExtra(NODE_HANDLES) ?: return@Callable
@@ -362,7 +369,7 @@ class MediaPlayerServiceViewModel(
                                     megaApiFolder.getNodeByHandle(parentHandle)
                                 }) ?: return@Callable
 
-                                playlistTitle = parent.name
+                                _playlistTitle.postValue(parent.name)
 
                                 buildPlaylistFromNodes(
                                     getApi(type), megaApiFolder.getChildren(parent, order),
@@ -374,7 +381,7 @@ class MediaPlayerServiceViewModel(
                                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
                                         ?: return@Callable
 
-                                playlistTitle = File(zipPath).parentFile?.name ?: ""
+                                _playlistTitle.postValue(File(zipPath).parentFile?.name ?: "")
 
                                 val files = File(zipPath).parentFile?.listFiles() ?: return@Callable
                                 buildPlaylistFromFiles(files.asList(), firstPlayHandle)
@@ -816,7 +823,7 @@ class MediaPlayerServiceViewModel(
         }
 
         logDebug("doPostPlaylistItems post ${items.size} items")
-        _playlist.postValue(Triple(items, scrollPosition, playlistTitle))
+        _playlist.postValue(Pair(items, scrollPosition))
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
@@ -828,7 +835,7 @@ class MediaPlayerServiceViewModel(
             }
         }
 
-        _playlist.postValue(Triple(filteredItems, 0, playlistTitle))
+        _playlist.postValue(Pair(filteredItems, 0))
     }
 
     fun getPlaylistItem(handle: String?): PlaylistItem? {
@@ -844,7 +851,7 @@ class MediaPlayerServiceViewModel(
                 playlistItems.removeAt(index)
                 _mediaItemToRemove.value = index
                 if (playlistItems.isEmpty()) {
-                    _playlist.value = Triple(emptyList(), 0, playlistTitle)
+                    _playlist.value = Pair(emptyList(), 0)
                 } else {
                     postPlaylistItems()
                 }

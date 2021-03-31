@@ -132,8 +132,10 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
                         adapter.notifyItemChanged(it.second + 1)
                     }
                 }
+            }
 
-                (requireActivity() as MediaPlayerActivity).setToolbarTitle(it.third)
+            service.viewModel.playlistTitle.observe(viewLifecycleOwner) {
+                (requireActivity() as MediaPlayerActivity).setToolbarTitle(it)
             }
         }
     }
