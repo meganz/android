@@ -63,9 +63,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     private lateinit var binding: ActivityMeetingBinding
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
-    private var gridViewMenuItem: MenuItem? = null
-    private var speakerViewMenuItem: MenuItem? = null
-
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
@@ -123,7 +120,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
 
         updateRole()
-        //showSelFeedFloatingWindow()
     }
 
     private fun showSelFeedFloatingWindow() {
@@ -131,45 +127,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         addFragment(fragment, R.id.small_camera_fragment)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_meeting, menu)
-
-        menu?.findItem(R.id.swap_camera)?.isVisible = true
-        speakerViewMenuItem = menu?.findItem(R.id.speaker_view)
-        speakerViewMenuItem?.isVisible = true
-        gridViewMenuItem = menu?.findItem(R.id.grid_view)
-        gridViewMenuItem?.isVisible = false
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                true
-            }
-            R.id.swap_camera -> {
-                logDebug("Swap camera")
-                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(applicationContext))
-                true
-            }
-            R.id.grid_view -> {
-                logDebug("Change to grid view")
-                gridViewMenuItem?.isVisible = false
-                speakerViewMenuItem?.isVisible = true
-                true
-            }
-            R.id.speaker_view -> {
-                logDebug("Change to speaker view")
-                gridViewMenuItem?.isVisible = true
-                speakerViewMenuItem?.isVisible = false
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int) {
+    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int){
         supportFragmentManager.inTransaction { add(frameId, fragment) }
     }
 
@@ -228,7 +186,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
             MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
-            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeeting
+            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeetingFragment
             else -> navGraph.startDestination = R.id.createMeetingFragment
         }
 

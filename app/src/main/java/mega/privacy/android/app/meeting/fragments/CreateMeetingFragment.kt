@@ -6,12 +6,12 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.view.*
+import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -52,8 +52,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
     override fun meetingButtonClick() {
         viewModel.createMeeting()
 
-        // TODO: test only
-        (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
+        // TODO delete test code: to InMeetingFragment
+        findNavController().navigate(R.id.inMeetingFragment)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
             }
         }
         abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner){
-            (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
+            (meetingActivity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
         }
 
         btn_start_join_meeting.setOnClickListener{
@@ -73,7 +73,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
             meetingButtonClick()
         }
         // It is valid when setting isClickable after setOnClickListener
-        btn_start_join_meeting.isClickable = false
+        // TODO delete test code: Uncomment
+//        btn_start_join_meeting.isClickable = false
 
         type_meeting_edit_text.addTextChangedListener(textWatcher)
         showKeyboardDelayed(type_meeting_edit_text)

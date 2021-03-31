@@ -23,7 +23,7 @@
         tools:layout="@layout/join_meeting_as_guest_fragment">
     </fragment>
     <fragment
-        android:id="@+id/inMeeting"
+        android:id="@+id/inMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.InMeetingFragment"
         android:label="fragment_in_meeting"
         tools:layout="@layout/in_meeting_fragment">

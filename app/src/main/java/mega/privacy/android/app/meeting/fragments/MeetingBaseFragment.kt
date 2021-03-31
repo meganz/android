@@ -1,7 +1,9 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
 /**
@@ -10,6 +12,8 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
  * create an instance of this fragment.
  */
 open class MeetingBaseFragment : BaseFragment() {
+
+    lateinit var meetingActivity : MeetingActivity
 
     companion object {
         /**
@@ -21,6 +25,11 @@ open class MeetingBaseFragment : BaseFragment() {
         @JvmStatic
         fun newInstance() =
             MeetingBaseFragment()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        meetingActivity = requireActivity() as MeetingActivity
     }
 
     /**
