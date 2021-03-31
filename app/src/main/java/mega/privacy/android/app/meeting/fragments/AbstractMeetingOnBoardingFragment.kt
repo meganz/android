@@ -32,7 +32,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         const val KEY_MEETING_SPEAKER_STATE = "meeting_speaker"
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

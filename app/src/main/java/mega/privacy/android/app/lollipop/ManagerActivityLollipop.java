@@ -284,7 +284,9 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -842,6 +844,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
+	private static final int LINK_DIALOG_MEETING = 1;
+	private static final int LINK_DIALOG_CHAT = 2;
+	private int chatLinkDialogType = LINK_DIALOG_CHAT;
 
 	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
@@ -9173,7 +9178,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 	}
 
-	private void showOpenLinkError(boolean show, int error) {
+	private void showOpenLinkError(boolean show, int linkType) {
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
@@ -9184,7 +9189,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						openLinkErrorText.setText(R.string.invalid_file_folder_link_empty);
 						return;
 					}
-                    switch (error) {
+                    switch (linkType) {
                         case CHAT_LINK: {
 							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
@@ -9192,6 +9197,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
+						case MEETING_LINK: {
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
+									android.R.attr.textColorPrimary));
+							openLinkErrorText.setText(R.string.valid_meeting_link);
+							openLinkOpenButton.setText(R.string.action_open_meeting_link);
+							break;
+						}
                         case CONTACT_LINK: {
 							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
@@ -9207,10 +9219,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
                 }
                 else if (drawerItem == DrawerItem.CHAT) {
 					if (openLinkText.getText().toString().isEmpty()) {
-						openLinkErrorText.setText(R.string.invalid_chat_link_empty);
+						openLinkErrorText.setText(chatLinkDialogType == LINK_DIALOG_CHAT ?
+								R.string.invalid_chat_link_empty : R.string.invalid_meeting_link_empty);
 						return;
 					}
-                    openLinkErrorText.setText(R.string.invalid_chat_link_args);
+                    openLinkErrorText.setText(chatLinkDialogType == LINK_DIALOG_CHAT ?
+							R.string.invalid_chat_link_args : R.string.invalid_meeting_link_args);
                 }
 			}
 			else {
@@ -9338,9 +9352,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			if (fragment != null) {
 				builder.setTitle(R.string.paste_meeting_link_dialog_title);
 				openLinkText.setHint(R.string.meeting_link);
+				chatLinkDialogType = LINK_DIALOG_MEETING;
 			} else {
 				builder.setTitle(R.string.action_open_chat_link);
 				openLinkText.setHint(R.string.hint_enter_chat_link);
+				chatLinkDialogType = LINK_DIALOG_CHAT;
 			}
 		}
 
@@ -9366,17 +9382,24 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	public void showChatLink(String link) {
 		logDebug("Link: " + link);
-		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+//		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+//
+//		if (joiningToChatLink) {
+//			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
+//			resetJoiningChatLink();
+//		} else {
+//			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
+//		}
+//
+//		openChatLinkIntent.setData(Uri.parse(link));
+//		startActivity(openChatLinkIntent);
 
-		if (joiningToChatLink) {
-			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-			resetJoiningChatLink();
-		} else {
-			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-		}
+		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
+		joinMeetingLinkIntent.setAction(ACTION_JOIN_MEETING);
+		joinMeetingLinkIntent.setData(Uri.parse(link));
+		joinMeetingLinkIntent.putExtra(MEETING_TYPE, MEETING_TYPE_JOIN);
+		startActivity(joinMeetingLinkIntent);
 
-		openChatLinkIntent.setData(Uri.parse(link));
-		startActivity(openChatLinkIntent);
 		drawerItem = DrawerItem.CHAT;
 		selectDrawerItemLollipop(drawerItem);
 	}
@@ -12679,6 +12702,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 			}
 		}
+		// TODO: Meeting project, Join meeting from here
+//		else if (request.getType() == MegaChatRequest.TYPE_JOIN_MEETING) {
+//showChatLink(request.getLink());
+//				dismissOpenLinkDialog();
+//		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: " + request.getFlag());

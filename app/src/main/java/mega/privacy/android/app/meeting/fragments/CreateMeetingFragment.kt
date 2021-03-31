@@ -42,7 +42,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
 
     companion object {
         private const val KEY_MEETING_NAME = "meetingName"
-        fun newInstance() = CreateMeetingFragment()
     }
 
     override fun onSubCreateView(view: View) {

@@ -2681,9 +2681,12 @@
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
     <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
     <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
+    <string name="invalid_meeting_link_empty" context="Error shown when it tries to open an invalid meeting link and the text view is empty">Please enter a valid meeting link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
+    <string name="valid_meeting_link" context="Error shown when it tries to open a meeting link from the Cloud Drive section">You have pasted a meeting link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="action_open_meeting_link" context="Menu item">Open meeting link</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">New chat link</string>
@@ -3066,6 +3069,7 @@
     <string name="new_meeting" context="Label that create a meeting">New meeting</string>
     <string name="join_meeting" context="Label that join a meeting">Join meeting</string>
     <string name="btn_start_meeting" context="Button that create a meeting">Start meeting</string>
+    <string name="btn_join_meeting" context="Button that join a meeting">Join meeting</string>
     <string name="type_meeting_name" context="Hint shown to guide user on meeting name">Joanna\'s meeting</string>
 
     <string name="general_mic" context="General label for microphone">Mic</string>
@@ -3091,4 +3095,7 @@
     <string name="paste_meeting_link_dialog_title">Please paste your meeting link to join </string>
     <string name="paste_meeting_link_guest_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
     <string name="paste_meeting_link_guest_instruction" context="Tell the guest to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
+
+    <string name="invalid_meeting_link" context="error message shown when a meeting link is invalid">This meeting has ended</string>
+    <string name="invalid_meeting_link_args" context="error message shown when a meeting link is not well formed">Invalid meeting link</string>
 </resources>

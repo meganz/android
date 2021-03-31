@@ -1,13 +1,16 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.view.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_LINK
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -22,7 +25,8 @@ private const val ARG_PARAM2 = "param2"
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     private lateinit var viewModel: JoinMeetingViewModel
     override fun onSubCreateView(view: View) {
-
+        view.btn_start_join_meeting.setText(R.string.btn_join_meeting)
+        Log.i("Alex", "${arguments?.get(MEETING_LINK)}")
     }
 
     override fun meetingButtonClick() {
@@ -40,16 +44,5 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(JoinMeetingViewModel::class.java)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @return A new instance of fragment MeetingFragment.
-         */
-        @JvmStatic
-        fun newInstance() = CreateMeetingFragment()
     }
 }
