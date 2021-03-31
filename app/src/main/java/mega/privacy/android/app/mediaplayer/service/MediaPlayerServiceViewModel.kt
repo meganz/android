@@ -534,7 +534,8 @@ class MediaPlayerServiceViewModel(
         doBuildPlaylist(
             megaApi, nodes, firstPlayHandle,
             {
-                isFileAvailable(getOfflineFile(context, it)) && filterByNodeName(it.name)
+                val file = getOfflineFile(context, it)
+                isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
             },
             {
                 mediaItemFromFile(getOfflineFile(context, it), it.handle)
@@ -616,7 +617,7 @@ class MediaPlayerServiceViewModel(
         doBuildPlaylist(
             api, nodes, firstPlayHandle,
             {
-                filterByNodeName(it.name)
+                it.isFile && filterByNodeName(it.name)
             },
             {
                 val localPath = getLocalFile(context, it.name, it.size)

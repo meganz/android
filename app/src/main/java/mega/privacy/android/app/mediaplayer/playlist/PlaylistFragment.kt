@@ -105,6 +105,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        playlistObserved = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 

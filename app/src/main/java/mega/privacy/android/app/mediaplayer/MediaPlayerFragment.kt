@@ -143,6 +143,12 @@ class MediaPlayerFragment : Fragment() {
         outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        playlistObserved = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
