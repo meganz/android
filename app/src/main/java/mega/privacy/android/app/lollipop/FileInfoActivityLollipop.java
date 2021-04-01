@@ -902,9 +902,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat);
 
-        if (pendingToSetIconsColorFilter) {
-            setIconsColorFilter();
-        }
+        setIconsColorFilter();
 
         MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
