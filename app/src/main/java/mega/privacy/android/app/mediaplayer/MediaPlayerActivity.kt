@@ -523,12 +523,13 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                     if (adapterType == OFFLINE_ADAPTER) {
                         intent = Intent(this, OfflineFileInfoActivity::class.java)
+                        intent.putExtra(HANDLE, playingHandle.toString())
                     } else {
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
                         intent.putExtra(NAME, nodeName)
+                        intent.putExtra(HANDLE, playingHandle)
                     }
 
-                    intent.putExtra(HANDLE, playingHandle)
                     startActivity(intent)
                 }
                 return true
