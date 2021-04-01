@@ -313,6 +313,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
+    public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

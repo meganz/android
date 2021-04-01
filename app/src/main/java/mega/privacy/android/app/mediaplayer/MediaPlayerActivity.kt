@@ -38,6 +38,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -440,8 +441,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 menu.findItem(R.id.save_to_device).isVisible = true
 
-                menu.findItem(R.id.properties).isVisible =
-                    currentFragment == R.id.main_player
+                menu.findItem(R.id.properties).isVisible = currentFragment == R.id.main_player
 
                 menu.findItem(R.id.share).isVisible =
                     currentFragment == R.id.main_player && showShareOption(
@@ -515,10 +515,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         )
                     )
                 } else {
-                    val nodeName =
-                        service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
-                            ?: return false
-
                     val intent: Intent
 
                     if (adapterType == OFFLINE_ADAPTER) {
@@ -526,8 +522,31 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         intent.putExtra(HANDLE, playingHandle.toString())
                     } else {
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
-                        intent.putExtra(NAME, nodeName)
                         intent.putExtra(HANDLE, playingHandle)
+
+                        val nodeName =
+                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
+                                ?: return false
+                        intent.putExtra(NAME, nodeName)
+
+                        val fromIncoming =
+                            if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
+                                val node = megaApi.getNodeByHandle(playingHandle) ?: return false
+
+                                NodeController(this).nodeComesFromIncoming(node)
+                            } else {
+                                false
+                            }
+
+                        when {
+                            adapterType == INCOMING_SHARES_ADAPTER || fromIncoming -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INCOMING_SHARES)
+                                intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
+                            }
+                            adapterType == INBOX_ADAPTER -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INBOX)
+                            }
+                        }
                     }
 
                     startActivity(intent)
