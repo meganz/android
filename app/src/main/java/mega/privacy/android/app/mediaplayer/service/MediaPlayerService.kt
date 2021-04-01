@@ -19,6 +19,7 @@ import androidx.lifecycle.*
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.util.EventLogger
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
@@ -32,6 +33,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -168,6 +170,16 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             override fun onPlayerError(error: ExoPlaybackException) {
                 viewModel.onPlayerError()
+            }
+        })
+
+        exoPlayer.addAnalyticsListener(object : EventLogger(trackSelector, "MediaPlayer") {
+            override fun logd(msg: String) {
+                logDebug(msg)
+            }
+
+            override fun loge(msg: String) {
+                logError(msg)
             }
         })
 
