@@ -253,6 +253,12 @@ class BottomFloatingPanelViewHolder(
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
+    fun collpase() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomFloatingPanelExpanded = false
+        onBottomFloatingPanelSlide(0F)
+    }
+
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F

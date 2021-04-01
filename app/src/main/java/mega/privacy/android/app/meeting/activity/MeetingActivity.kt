@@ -5,16 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
@@ -22,15 +19,16 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.meeting.fragments.SelfFeedFloatingWindowFragment
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.IncomingCallNotification
 
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
@@ -92,27 +90,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
 
-        val megaApi = MegaApplication.getInstance().megaApi
-        val avatar =
-            CacheFolderManager.buildAvatarFile(this, megaApi.myEmail + FileUtil.JPG_EXTENSION)
 
-        bottomFloatingPanelViewHolder.setParticipants(
-            listOf(
-                Participant("Joanna Zhao", avatar, false, true, false, false),
-                Participant("Yeray Rosales", avatar, true, false, true, false),
-                Participant("Harmen Porter", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-            )
-        )
+
+        bottomFloatingPanelViewHolder.setParticipants(TestTool.getTestParticipants(this))
 
         bottomFloatingPanelViewHolder.onHeadphoneConnected(
             wiredHeadsetConnected,
@@ -120,23 +100,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         )
 
         updateRole()
-    }
-
-    private fun showSelFeedFloatingWindow() {
-        val fragment = SelfFeedFloatingWindowFragment()
-        addFragment(fragment, R.id.small_camera_fragment)
-    }
-
-    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int){
-        supportFragmentManager.inTransaction { add(frameId, fragment) }
-    }
-
-    private fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int) {
-        supportFragmentManager.inTransaction { replace(frameId, fragment) }
-    }
-
-    inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction) {
-        beginTransaction().func().commit()
     }
 
     override fun onDestroy() {
@@ -271,5 +234,25 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             true -> bottom_floating_panel.visibility = View.VISIBLE
             false -> bottom_floating_panel.visibility = View.GONE
         }
+    }
+
+    fun BottomFloatingPanelInOut() {
+        if(bottom_floating_panel.visibility == View.VISIBLE) {
+            bottom_floating_panel.animate().translationY(300f).setDuration(500).withEndAction {
+                bottom_floating_panel.visibility = View.GONE
+            }.start()
+        } else {
+            bottom_floating_panel.animate().translationY(0f).setDuration(300).withEndAction {
+                bottom_floating_panel.visibility = View.VISIBLE
+            }.start()
+        }
+    }
+
+    fun collpaseFloatingPanel() {
+        bottomFloatingPanelViewHolder.collpase()
+    }
+
+    fun hideActionBar() {
+        binding.toolbar.visibility = View.GONE
     }
 }

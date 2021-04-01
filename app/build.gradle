@@ -219,8 +219,6 @@ dependencies {
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
-    implementation 'com.github.shivthepro:stickydragview:0.0.1'
-
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
     gmsImplementation 'com.google.firebase:firebase-messaging:21.0.1'

@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".meeting.fragments.InMeetingFragment">
+    android:background="@color/dark_grey"
+    android:fitsSystemWindows="true">
 
-    <TextView
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/in_meeting_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_shape_callschat"
+        android:elevation="1dp"
+        android:fitsSystemWindows="true"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
+        app:subtitle="Calling..."
+        app:subtitleTextAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
+        app:subtitleTextColor="@color/white"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Joanna's meeting"
+        app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+        app:titleTextColor="@color/white" />
+
+    <FrameLayout
+        android:id="@+id/meeting_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        android:elevation="-1dp" />
 
-</FrameLayout>
+    <FrameLayout
+        android:id="@+id/self_feed_floating_window_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

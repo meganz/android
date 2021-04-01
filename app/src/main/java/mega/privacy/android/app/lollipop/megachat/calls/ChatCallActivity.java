@@ -844,7 +844,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         paramsSmall.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         paramsSmall.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
         smallFragmentContainer.setLayoutParams(paramsSmall);
-//        smallFragmentContainer.setOnTouchListener(new OnDragTouchListener(smallFragmentContainer, smallCameraLayout));
+        smallFragmentContainer.setOnTouchListener(new OnDragTouchListener(smallFragmentContainer, smallCameraLayout));
         smallCameraLayout.setVisibility(View.GONE);
         smallFragmentContainer.setVisibility(View.GONE);
 

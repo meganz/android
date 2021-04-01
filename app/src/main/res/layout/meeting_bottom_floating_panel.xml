@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:behavior_expandedOffset="12dp"
+    app:behavior_expandedOffset="26dp"
     app:behavior_fitToContents="false"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/meeting_bottom_floating_panel_peek_height"

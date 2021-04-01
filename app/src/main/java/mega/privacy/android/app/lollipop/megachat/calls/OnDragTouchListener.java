@@ -89,6 +89,14 @@ public class OnDragTouchListener implements View.OnTouchListener {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
+                    // Sticky
+                    float x;
+                    if(bounds[0] > (float)(mParent.getWidth() / 2)) {
+                        x = mParent.getWidth() - mView.getWidth();
+                    } else {
+                        x = 0;
+                    }
+                    mView.animate().x(x).y(bounds[1]).setDuration(0).start();
                     onDragFinish();
                     break;
                 case MotionEvent.ACTION_MOVE:
