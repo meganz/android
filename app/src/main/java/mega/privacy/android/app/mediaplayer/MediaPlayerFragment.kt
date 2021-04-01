@@ -168,10 +168,6 @@ class MediaPlayerFragment : Fragment() {
             service.viewModel.playlist.observe(viewLifecycleOwner) {
                 logDebug("MediaPlayerService observed playlist ${it.first.size} items")
 
-                if (service.viewModel.playlistSearchQuery != null) {
-                    return@observe
-                }
-
                 audioPlayerVH?.togglePlaylistEnabled(it.first)
                 videoPlayerVH?.togglePlaylistEnabled(it.first)
             }

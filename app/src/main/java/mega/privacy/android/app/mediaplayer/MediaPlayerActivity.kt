@@ -59,7 +59,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import nz.mega.sdk.*
 import javax.inject.Inject
 
@@ -110,15 +109,11 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
-                    if (service.service.viewModel.playlistSearchQuery?.isTextEmpty() == false) {
+                    if (service.service.viewModel.isInSearchMode()) {
                         return@observe
                     }
 
-                    if (it.first.isEmpty()) {
-                        stopPlayer()
-                    } else {
-                        refreshMenuOptionsVisibility()
-                    }
+                    refreshMenuOptionsVisibility()
                 }
 
                 service.service.metadata.observe(this@MediaPlayerActivity) {
@@ -739,6 +734,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         when (code) {
             MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
             MegaError.API_EBLOCKED -> showTakenDownAlert(this)
+            MegaError.API_ENOENT -> stopPlayer()
         }
     }
 

@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
@@ -440,6 +441,8 @@ class MediaPlayerServiceViewModel(
         playerRetry++
         _retry.value = playerRetry <= MAX_RETRY
     }
+
+    fun isInSearchMode() = playlistSearchQuery?.isTextEmpty() == false
 
     /**
      * Check if the new intent would create the same playlist as current one.
@@ -853,6 +856,7 @@ class MediaPlayerServiceViewModel(
                 _mediaItemToRemove.value = index
                 if (playlistItems.isEmpty()) {
                     _playlist.value = Pair(emptyList(), 0)
+                    _error.value = MegaError.API_ENOENT
                 } else {
                     postPlaylistItems()
                 }

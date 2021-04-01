@@ -132,7 +132,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
                 adapter.submitList(it.first) {
                     listLayoutManager.scrollToPositionWithOffset(it.second, 0)
 
-                    if (!isVideoPlayer()) {
+                    if (!isVideoPlayer() && it.first.isNotEmpty()) {
                         // Trigger the visibility update of the pause icon of the
                         // playing (paused) audio.
                         adapter.notifyItemChanged(it.second + 1)
