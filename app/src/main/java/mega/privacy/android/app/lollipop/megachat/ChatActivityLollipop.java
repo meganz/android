@@ -9348,19 +9348,21 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private void createSpeakerAudioManger(){
         rtcAudioManager = app.getAudioManager();
-        if(rtcAudioManager != null) {
+
+        if(rtcAudioManager == null){
+            speakerWasActivated = true;
+            rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
+        }else{
             activateSpeaker();
-            return;
         }
 
-        speakerWasActivated = true;
-        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
                 if(!speakerWasActivated && !isNear){
                     adapter.pausePlaybackInProgress();
                 }else if(speakerWasActivated && isNear){
+                    adapter.refreshVoiceClipPlayback();
                     speakerWasActivated = false;
                 }
             }
@@ -9393,12 +9395,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void stopProximitySensor(){
-        if(rtcAudioManager == null) return;
+        if(rtcAudioManager == null || participatingInACall()) return;
 
-        if(!participatingInACall()){
-            activateSpeaker();
-        }
-
+        activateSpeaker();
         rtcAudioManager.unregisterProximitySensor();
         destroySpeakerAudioManger();
     }
