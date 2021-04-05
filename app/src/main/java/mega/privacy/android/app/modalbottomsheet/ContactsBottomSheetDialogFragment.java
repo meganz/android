@@ -2,7 +2,6 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +15,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -107,7 +107,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         titleNameContactPanel.setText(contact.getFullName());
 
         int contactStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-        setContactStatus(contactStatus, contactStateIcon, titleMailContactPanel);
+        setContactStatus(contactStatus, contactStateIcon, titleMailContactPanel, StatusIconLocation.DRAWER);
         setContactLastGreen(requireContext(), contactStatus, contact.getLastGreen(), titleMailContactPanel);
 
         if (isTextEmpty(titleMailContactPanel.getText().toString())) {
@@ -152,7 +152,8 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall(((ManagerActivityLollipop) context), contact.getMegaUser());
+                startNewCall((ManagerActivityLollipop) context, (SnackbarShower) context,
+                        contact.getMegaUser());
                 break;
 
             case R.id.contact_list_option_send_file_layout:

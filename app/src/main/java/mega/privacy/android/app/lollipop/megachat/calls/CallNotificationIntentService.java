@@ -164,7 +164,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Incoming call answered.");
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra(CHAT_ID, chatIdIncomingCall);
                 i.setAction(SECOND_CALL);

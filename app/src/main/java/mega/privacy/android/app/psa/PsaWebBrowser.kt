@@ -39,9 +39,6 @@ class PsaWebBrowser : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val megaApi = MegaApplication.getInstance().megaApi
-        val myUserHandle = megaApi.myUserHandle ?: return
-
         val url = arguments?.getString(ARGS_URL_KEY) ?: return
         psaId = arguments?.getInt(ARGS_ID_KEY) ?: return
 
@@ -60,6 +57,15 @@ class PsaWebBrowser : Fragment() {
         }
 
         binding.webView.addJavascriptInterface(this, JS_INTERFACE)
+
+        loadUrl(url)
+    }
+
+    fun loadUrl(url: String) {
+        binding.webView.visibility = View.INVISIBLE
+
+        val megaApi = MegaApplication.getInstance().megaApi
+        val myUserHandle = megaApi.myUserHandle ?: return
 
         // This is the same way SDK getting device id:
         // https://github.com/meganz/sdk/blob/develop/src/posix/fs.cpp#L1575
@@ -103,7 +109,7 @@ class PsaWebBrowser : Fragment() {
     fun hidePSA() {
         uiHandler.post {
             val currentActivity = activity
-            if (currentActivity is BaseActivity) {
+            if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
                 currentActivity.closeDisplayingPsa()
             }
         }

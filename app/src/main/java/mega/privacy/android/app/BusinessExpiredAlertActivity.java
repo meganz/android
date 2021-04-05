@@ -12,14 +12,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class BusinessExpiredAlertActivity extends PinActivityLollipop implements View.OnClickListener {
+public class BusinessExpiredAlertActivity extends PasscodeActivity implements View.OnClickListener {
 
     private static final int IMAGE_HEIGHT_PORTRAIT = 284;
     private static final int IMAGE_HEIGHT_LANDSCAPE = 136;

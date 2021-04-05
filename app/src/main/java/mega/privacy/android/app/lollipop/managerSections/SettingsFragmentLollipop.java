@@ -54,13 +54,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private ListPreference colorThemeListPreference;
     private PreferenceCategory securityCategory;
     private Preference recoveryKey;
-    private Preference pinLockPreference;
+    private Preference passcodeLockPreference;
     private Preference changePass;
     private SwitchPreferenceCompat twoFASwitch;
     private SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
     private Preference advancedPreference;
     private RecyclerView listView;
-    private boolean pinLock = false;
+    private boolean passcodeLock = false;
     private boolean setAutoaccept = false;
     private boolean autoAccept = true;
     private Preference cameraUploadsPreference;
@@ -73,7 +73,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory aboutCategory;
     private Preference aboutPrivacy;
     private Preference aboutTOS;
-    private Preference aboutGDPR;
     private Preference codeLink;
     private Preference aboutSDK;
     private Preference aboutKarere;
@@ -101,8 +100,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         securityCategory = findPreference(CATEGORY_SECURITY);
         recoveryKey = findPreference(KEY_RECOVERY_KEY);
         recoveryKey.setOnPreferenceClickListener(this);
-        pinLockPreference = findPreference(KEY_PIN_LOCK);
-        pinLockPreference.setOnPreferenceClickListener(this);
+        passcodeLockPreference = findPreference(KEY_PASSCODE_LOCK);
+        passcodeLockPreference.setOnPreferenceClickListener(this);
         changePass = findPreference(KEY_CHANGE_PASSWORD);
         changePass.setOnPreferenceClickListener(this);
         twoFASwitch = findPreference(KEY_2FA);
@@ -122,8 +121,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         aboutPrivacy.setOnPreferenceClickListener(this);
         aboutTOS = findPreference(KEY_ABOUT_TOS);
         aboutTOS.setOnPreferenceClickListener(this);
-        aboutGDPR = findPreference(KEY_ABOUT_GDPR);
-        aboutGDPR.setOnPreferenceClickListener(this);
         codeLink = findPreference(KEY_ABOUT_CODE_LINK);
         codeLink.setOnPreferenceClickListener(this);
         aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
@@ -159,17 +156,17 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Method for update the Passcode lock section.
      */
     private void updatePasscodeLock() {
-        if (prefs == null || prefs.getPinLockEnabled() == null) {
-            pinLock = false;
-            dbH.setPinLockEnabled(false);
+        if (prefs == null || prefs.getPasscodeLockEnabled() == null) {
+            passcodeLock = false;
+            dbH.setPasscodeLockEnabled(false);
         } else {
-            pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+            passcodeLock = Boolean.parseBoolean(prefs.getPasscodeLockEnabled());
         }
         updatePasscodeLockSubtitle();
     }
 
     public void updatePasscodeLockSubtitle() {
-        pinLockPreference.setSummary(pinLock ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off);
+        passcodeLockPreference.setSummary(passcodeLock ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off);
     }
 
     /**
@@ -262,7 +259,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 ((ManagerActivityLollipop) context).showMKLayout();
                 break;
 
-            case KEY_PIN_LOCK:
+            case KEY_PASSCODE_LOCK:
                 startActivity(new Intent(context, PasscodePreferencesActivity.class));
                 break;
 
@@ -310,12 +307,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_TOS:
                 viewIntent = new Intent(Intent.ACTION_VIEW);
                 viewIntent.setData(Uri.parse("https://mega.nz/terms"));
-                startActivity(viewIntent);
-                break;
-
-            case KEY_ABOUT_GDPR:
-                viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
                 startActivity(viewIntent);
                 break;
 

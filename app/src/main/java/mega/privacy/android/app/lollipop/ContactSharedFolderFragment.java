@@ -26,6 +26,8 @@ import java.util.Stack;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -181,7 +183,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         listView.invalidate();
     }
     
-    public void itemClick(int position,int[] screenPosition,ImageView imageView) {
+    public void itemClick(int position) {
         
         if (adapter.isMultipleSelect()) {
             logDebug("Multiselect ON");
@@ -260,12 +262,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             switch (item.getItemId()) {
                 case R.id.cab_menu_download: {
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
-                    }
-                    
-                    ((ContactInfoActivityLollipop)context).onFileClick(handleList);
+                    ((ContactInfoActivityLollipop)context).downloadFile(documents);
                     break;
                 }
                 case R.id.cab_menu_copy: {
@@ -291,7 +288,8 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                         handleList.add(documents.get(i).getHandle());
                     }
                     
-                    showConfirmationLeaveIncomingShares(context, handleList);
+                    showConfirmationLeaveIncomingShares(requireActivity(),
+                            (SnackbarShower) requireActivity(), handleList);
                     break;
                 }
                 case R.id.cab_menu_trash: {
@@ -303,8 +301,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     break;
                 }
                 case R.id.cab_menu_rename: {
-                    MegaNode aux = documents.get(0);
-                    showRenameNodeDialog(context, aux, (ContactInfoActivityLollipop) getActivity());
+                    MegaNode node = documents.get(0);
+                    showRenameNodeDialog(context, node, (SnackbarShower) getActivity(),
+                            (ActionNodeCallback) getActivity());
                     break;
                 }
             }

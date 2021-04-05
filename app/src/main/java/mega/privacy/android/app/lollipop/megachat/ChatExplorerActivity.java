@@ -24,7 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
@@ -47,7 +47,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatExplorerActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class ChatExplorerActivity extends PasscodeActivity implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     Toolbar tB;
     ActionBar aB;
@@ -301,6 +301,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         logDebug("onActivityResult " + requestCode + "____" + resultCode);
 
         if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {

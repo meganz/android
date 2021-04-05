@@ -133,7 +133,7 @@
                 android:layout_below="@+id/account_type_icon"
                 android:layout_alignStart="@+id/account_type_icon"
                 android:layout_marginBottom="10dp"
-                android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.White87White"
                 tools:text="Renews on" />
 
             <TextView
@@ -209,7 +209,7 @@
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="10dp"
                     android:layout_toEndOf="@+id/add_phone_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60"
                     tools:text="@string/sms_add_phone_number_dialog_msg_non_achievement_user" />
 
                 <include layout="@layout/view_relative_layout_separator_72" />
@@ -251,7 +251,7 @@
                     android:layout_marginBottom="10dp"
                     android:layout_toEndOf="@+id/backup_recovery_key_image"
                     android:text="@string/backup_recovery_key_subtitle"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60" />
 
                 <include layout="@layout/view_relative_layout_separator_72" />
 
@@ -290,7 +290,7 @@
                     android:layout_marginStart="72dp"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
                     tools:text="132 connections" />
 
                 <include layout="@layout/view_relative_layout_separator_72" />
@@ -333,7 +333,7 @@
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
                     android:text="@string/achievements_subtitle"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14" />
 
                 <include layout="@layout/view_relative_layout_separator_72" />
 
@@ -373,7 +373,7 @@
                     android:layout_marginStart="72dp"
                     android:layout_marginEnd="18dp"
                     android:layout_marginBottom="14dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3.14"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
                     tools:text="Today 14:53" />
 
             </RelativeLayout>

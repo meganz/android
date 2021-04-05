@@ -128,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp" />
+                    android:layout_marginRight="8dp"
+                    app:tint="@color/grey_054_white_054"/>
 
                 <TextView
                     android:id="@+id/time_text"

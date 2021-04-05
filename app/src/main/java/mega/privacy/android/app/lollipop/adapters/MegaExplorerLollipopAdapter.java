@@ -245,7 +245,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
         if (node.isFolder()){
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
 
             holder.itemView.setOnLongClickListener(null);
 

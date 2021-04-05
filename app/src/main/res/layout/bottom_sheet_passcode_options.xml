@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/OnlyTextBottomSheetHeaderStyle"
+            android:text="@string/settings_passcode_option" />
+
+        <TextView
+            android:id="@+id/four_digits_option"
+            style="@style/OnlyTextBottomSheetOptionStyle"
+            android:text="@string/four_pin_lock" />
+
+        <View style="@style/SeparatorBottomSheetStyle" />
+
+        <TextView
+            android:id="@+id/six_digits_option"
+            style="@style/OnlyTextBottomSheetOptionStyle"
+            android:text="@string/six_pin_lock" />
+
+        <View style="@style/SeparatorBottomSheetStyle" />
+
+        <TextView
+            android:id="@+id/alphanumeric_option"
+            style="@style/OnlyTextBottomSheetOptionStyle"
+            android:text="@string/AN_pin_lock" />
+
+    </LinearLayout>
+
+</ScrollView>

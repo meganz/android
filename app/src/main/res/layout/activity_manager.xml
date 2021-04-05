@@ -15,7 +15,7 @@
             android:id="@+id/fragment_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="56dp"
+            android:layout_marginBottom="@dimen/bottom_navigation_view_height"
             android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -111,7 +111,7 @@
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:layout_above="@id/psa_layout"
+                android:layout_above="@id/mini_audio_player"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
@@ -119,6 +119,18 @@
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white" />
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/mini_audio_player"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/audio_player_mini_controller_height"
+                android:layout_above="@id/psa_layout"
+                android:visibility="gone"
+                android:background="?attr/colorPrimary"
+                app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+                app:player_layout_id="@layout/audio_player_view_controller_only"
+                app:surface_type="none"
+                tools:visibility="visible" />
 
             <include
                 android:id="@+id/psa_layout"
@@ -134,7 +146,7 @@
                 style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
                 android:background="@color/grey_020_dark_grey"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/bottom_navigation_view_height"
                 android:layout_alignParentBottom="true"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"
                 app:menu="@menu/bottom_navigation_items" />

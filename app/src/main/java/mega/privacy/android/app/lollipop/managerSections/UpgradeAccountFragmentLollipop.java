@@ -29,7 +29,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.fragments.BaseFragment;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -52,7 +51,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	private TextView textMyAccount;
 
 	private int parameterType = -1;
-	private int paymentMethod = -1;
 
 	//PRO LITE elements:
 	protected RelativeLayout proLiteLayout;
@@ -82,12 +80,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	protected TextView bandwidthSectionPro3;
 	private RelativeLayout pro3TransparentLayout;
 
-	//Business elements
-	protected RelativeLayout businessLayout;
-	protected TextView monthSectionBusiness;
-	protected TextView storageSectionBusiness;
-	protected TextView bandwidthSectionBusiness;
-
 	private TextView labelCustomPlan;
 
 	//Payment layout
@@ -98,14 +90,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	private TextView selectPaymentMethod;
 
 	private RelativeLayout googlePlayLayout;
-	private RelativeLayout creditCardLayout;
-	private RelativeLayout fortumoLayout;
-	private RelativeLayout centiliLayout;
 
 	private RelativeLayout googlePlayLayer;
-	private RelativeLayout creditCardLayer;
-	private RelativeLayout fortumoLayer;
-	private RelativeLayout centiliLayer;
 
 	private LinearLayout optionsBilling;
 	private RadioGroup billingPeriod;
@@ -126,13 +112,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 		scrollView = v.findViewById(R.id.scroll_view_upgrade);
 
-		new ListenScrollChangesHelper().addViewToListen(scrollView, (v1, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-			if (scrollView.canScrollVertically(-1)) {
-				((ManagerActivityLollipop) context).changeAppBarElevation(true);
-			} else {
-				((ManagerActivityLollipop) context).changeAppBarElevation(false);
-			}
-		});
+		new ListenScrollChangesHelper().addViewToListen(scrollView, (v1, scrollX, scrollY, oldScrollX, oldScrollY) ->
+				((ManagerActivityLollipop) context).changeAppBarElevation(scrollView.canScrollVertically(-1)));
 
 		textMyAccount = v.findViewById(R.id.text_of_my_account);
 		semitransparentLayer = v.findViewById(R.id.semitransparent_layer);
@@ -192,14 +173,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		labelCustomPlan.setText(resultB);
 		//END -- PRO III ACCOUNT
 
-		//BUSINESS ACCOUNT
-		businessLayout = v.findViewById(R.id.upgrade_business_layout);
-		businessLayout.setOnClickListener(this);
-		monthSectionBusiness = v.findViewById(R.id.month_business);
-		storageSectionBusiness = v.findViewById(R.id.storage_business);
-		bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
-		//END -- BUSINESS ACCOUNT
-
 		refreshAccountInfo();
 
 		setPricingInfo();
@@ -223,7 +196,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	}
 
 	/**
-	 * Sets pricing info of PRO and Business plans.
+	 * Sets pricing info of PRO plans.
 	 */
 	public void setPricingInfo() {
 		if (myAccountInfo == null) {
@@ -270,25 +243,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						monthSectionLite.setText(textToShow);
 						storageSectionLite.setText(textStorage);
 						bandwidthSectionLite.setText(textTransfer);
-						break;
-
-					case BUSINESS:
-						// The initial amount of storage space for business account is 15TB
-						String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
-						String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
-
-						try {
-							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
-							businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
-							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
-							businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
-						} catch (Exception e) {
-							logError("Exception formatting string", e);
-						}
-
-						monthSectionBusiness.setText(textToShow);
-						storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
-						bandwidthSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
 						break;
 				}
 			}
@@ -340,13 +294,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case PRO_LITE:
 					color = String.valueOf(ContextCompat.getColor(context,R.color.orange_400_orange_300));
 					break;
-				case BUSINESS:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.dark_blue_500_200));
-					break;
 			}
 
-			stringPrice = getString(product.getLevel() == BUSINESS ?
-					R.string.type_business_month : R.string.type_month, stringPrice);
+			stringPrice = getString(R.string.type_month, stringPrice);
 		} else {
 			stringPrice = getString(product.getMonths() == 12 ?
 					R.string.billed_yearly_text : R.string.billed_monthly_text, stringPrice);
@@ -384,6 +334,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		logDebug("account: " + account);
 		RelativeLayout selectPaymentMethodClicked;
 
+		parameterType = account;
+
 		switch (account) {
 			case PRO_LITE:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
@@ -397,10 +349,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			case PRO_III:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro3;
 				break;
-			case BUSINESS:
-				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
-				return;
 			default:
+				parameterType = 0;
 				return;
 		}
 
@@ -445,9 +395,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
             String textGoogleWallet = getString(BillingManagerImpl.PAY_METHOD_RES_ID);
             try{
-                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'"
+                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color='"
 						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
+						+ "'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -455,66 +405,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
             googleWalletText.setText(HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY));
             selectPaymentMethodClicked.<ImageView>findViewById(R.id.payment_method_google_wallet_icon).setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID);
-
-
-			creditCardLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
-			creditCardLayout.setOnClickListener(this);
-
-			creditCardLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_layer);
-			creditCardLayer.setVisibility(View.GONE);
-
-			TextView creditCardText = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
-			String textCreditCardText = getString(R.string.payment_method_credit_card);
-			try{
-				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
-				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
-			} catch (Exception e) {
-				logError("Exception formatting string", e);
-			}
-
-			creditCardText.setText(HtmlCompat.fromHtml(textCreditCardText, HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-			fortumoLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
-			fortumoLayout.setOnClickListener(this);
-
-			fortumoLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_layer);
-			fortumoLayer.setVisibility(View.GONE);
-
-			TextView fortumoText = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_text);
-
-			String textFortumoText = getString(R.string.payment_method_fortumo);
-			try{
-				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
-				textFortumoText = textFortumoText.replace("[/A]", "</font>");
-			} catch (Exception e) {
-				logError("Exception formatting string", e);
-			}
-
-			fortumoText.setText(HtmlCompat.fromHtml(textFortumoText, HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-			centiliLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
-			centiliLayout.setOnClickListener(this);
-
-			centiliLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_layer);
-			centiliLayer.setVisibility(View.GONE);
-
-			TextView centiliText = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_text);
-
-			String textCentiliText = getString(R.string.payment_method_centili);
-			try{
-				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-						+ "\'>");
-				textCentiliText = textCentiliText.replace("[/A]", "</font>");
-			} catch (Exception e) {
-				logError("Exception formatting string", e);
-			}
-
-			centiliText.setText(HtmlCompat.fromHtml(textCentiliText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options);
 
@@ -534,10 +424,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.grey_700_026_grey_300_026)));
 
 			googlePlayLayout.setVisibility(View.GONE);
-			creditCardLayout.setVisibility(View.GONE);
-			fortumoLayout.setVisibility(View.GONE);
-			centiliLayout.setVisibility(View.GONE);
-            layoutButtons.setVisibility(View.GONE);
+			layoutButtons.setVisibility(View.GONE);
 			optionsBilling.setVisibility(View.GONE);
 
 			showPaymentMethods(account);
@@ -564,6 +451,11 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					new Handler().post(() -> scrollView.smoothScrollTo(0, pro3Layout.getBottom()));
 					break;
 			}
+
+			logDebug("parameterType: " + parameterType);
+
+			((ManagerActivityLollipop) context).setSelectedAccountType(parameterType);
+			showmyF(parameterType);
 		} else {
 			logWarning("PaymentBitSet Null");
 		}
@@ -594,9 +486,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String textToShow = "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType);
 
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'"
+			textToShow = textToShow.replace("[A]", "<font color='"
 					+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-					+ "\'>");
+					+ "'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (Exception e) {
 			logError("Exception formatting string", e);
@@ -616,28 +508,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		}
 	}
 
-	private void showNextPaymentFragment(int paymentM) {
-		logDebug("paymentM: " + paymentM);
-
-		if (selectPaymentMethodLayoutLite.getVisibility() == View.VISIBLE) {
-			parameterType = PRO_LITE;
-		} else if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
-			parameterType = PRO_I;
-		} else if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
-			parameterType = PRO_II;
-		} else if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
-			parameterType = PRO_III;
-		} else {
-			parameterType = 0;
-		}
-		paymentMethod = paymentM;
-		logDebug("parameterType: " + parameterType);
-
-		((ManagerActivityLollipop) context).setSelectedAccountType(parameterType);
-		((ManagerActivityLollipop) context).setSelectedPaymentMethod(paymentMethod);
-		showmyF(paymentM, parameterType);
-	}
-
 	private void contactForCustomPlan() {
 		logDebug("Send Feedback");
         ((ManagerActivityLollipop) context).askForCustomizedPlan();
@@ -645,235 +515,87 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 	@Override
 	public void onClick(View v) {
-		logDebug("onClick");
+		((ManagerActivityLollipop) context).setDisplayedAccountType(-1);
 
-		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
-		switch (v.getId()){
-			case R.id.lbl_custom_plan: {
-                contactForCustomPlan();
-				break;
+		if (v.getId() == R.id.lbl_custom_plan) {
+			logDebug("Custom plan pressed");
+			contactForCustomPlan();
+		} else if (v.getId() == R.id.button_continue) {
+			logDebug("Button continue pressed");
+			switch (parameterType) {
+				case PRO_I:
+					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_I_MONTH : SKU_PRO_I_YEAR);
+					break;
+				case PRO_II:
+					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_II_MONTH : SKU_PRO_II_YEAR);
+					break;
+				case PRO_III:
+					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_III_MONTH : SKU_PRO_III_YEAR);
+					break;
+				case PRO_LITE:
+					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_LITE_MONTH : SKU_PRO_LITE_YEAR);
+					break;
 			}
-            case R.id.button_continue:{
-				logDebug("Button button_continue pressed");
-				if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-					//MONTHLY SUBSCRIPTION
-					switch (parameterType) {
-						case PRO_I: {
-							//PRO I
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_MONTH, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_MONTH);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_II: {
-							//PRO II
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_MONTH, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_MONTH);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_III: {
-							//PRO III
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_MONTH, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_MONTH);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_LITE: {
-							//LITE
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_MONTH, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_MONTH);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
-									((ManagerActivityLollipop) context).showFortumo();
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
-									((ManagerActivityLollipop) context).showCentili();
-									break;
-								}
-							}
-							break;
-						}
-					}
-				} else {
-					//YEARLY SUBSCRIPTION
-					switch (parameterType) {
-						case PRO_I: {
-							//PRO I
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_YEAR, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_I_YEAR);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_II: {
-							//PRO II
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_YEAR, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_II_YEAR);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_III: {
-							//PRO III
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_YEAR, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_YEAR);
-									break;
-								}
-							}
-							break;
-						}
-						case PRO_LITE: {
-							//LITE
-							switch (paymentMethod) {
-								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, PAYMENT_CC_YEAR, true);
-									break;
-								}
-								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_YEAR);
-									break;
-								}
-							}
-							break;
-						}
-					}
-				}
-
-                break;
-            }
-			case R.id.button_cancel:{
-				logDebug("button_cancel");
-				semitransparentLayer.setVisibility(View.GONE);
+		} else if (v.getId() == R.id.button_cancel || v.getId() == R.id.semitransparent_layer) {
+			logDebug("Button cancel pressed");
+			semitransparentLayer.setVisibility(View.GONE);
+			selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+			selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+			selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+			selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+		} else if (v.getId() == R.id.upgrade_prolite_layout) {
+			logDebug("Pro Lite selected");
+			if (selectPaymentMethodLayoutLite.getVisibility() == View.VISIBLE) {
 				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
+			} else {
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-				break;
+				onUpgradeClick(PRO_LITE);
 			}
-			case R.id.semitransparent_layer:{
-				logDebug("semitransparent_layer");
-				semitransparentLayer.setVisibility(View.GONE);
-				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+		} else if (v.getId() == R.id.upgrade_pro_i_layout) {
+			logDebug("Pro I selected");
+			if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+			} else {
+				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-				break;
+				onUpgradeClick(PRO_I);
 			}
-			case R.id.upgrade_prolite_layout:{
-				if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
-					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-					semitransparentLayer.setVisibility(View.GONE);
-				}else{
-					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-					onUpgradeClick(PRO_LITE);
-				}
-				break;
+		} else if (v.getId() == R.id.upgrade_pro_ii_layout) {
+			logDebug("Pro II selected");
+			if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
+				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+			} else {
+				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+				onUpgradeClick(PRO_II);
 			}
-			case R.id.upgrade_pro_i_layout:{
-				if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
-					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-				} else {
-					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-					semitransparentLayer.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-					onUpgradeClick(PRO_I);
-				}
-				break;
-			}
-			case R.id.upgrade_pro_ii_layout:{
-				if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
-					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-				} else {
-					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-					semitransparentLayer.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-					onUpgradeClick(PRO_II);
-				}
-				break;
-			}
-			case R.id.upgrade_pro_iii_layout:{
-				if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
-					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-				} else {
-					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-					semitransparentLayer.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-					onUpgradeClick(PRO_III);
-				}
-				break;
-			}
-			case R.id.payment_method_google_wallet:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
-				break;
-			}
-			case R.id.payment_method_credit_card:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD);
-				break;
-			}
-			case R.id.payment_method_fortumo:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
-				break;
-			}
-			case R.id.payment_method_centili:{
-				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CENTILI);
-				break;
-			}
-			case R.id.upgrade_business_layout:{
-				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
-				break;
+		} else if (v.getId() == R.id.upgrade_pro_iii_layout) {
+			logDebug("Pro III selected");
+			if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
+				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+			} else {
+				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+				onUpgradeClick(PRO_III);
 			}
 		}
+	}
+
+	/**
+	 * Method to check if monthly billing period has been selected
+	 * @return TRUE if monthly billing period has been selected or FALSE otherwise.
+	 */
+	private boolean isMonthlyBillingPeriodSelected() {
+		return billingPeriod.getCheckedRadioButtonId() == R.id.billed_monthly;
 	}
 
 	private void showPaymentMethods(int parameterType){
@@ -887,150 +609,33 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			return;
 		}
 
-		switch(parameterType){
-			case PRO_I:{
-				if (myAccountInfo.getPaymentBitSet() != null){
-					if (!myAccountInfo.isInventoryFinished()){
-						logDebug("if (!myAccountInfo.isInventoryFinished())");
-						googlePlayLayout.setVisibility(View.GONE);
-					}
-					else{
-                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
-                            googlePlayLayout.setVisibility(View.VISIBLE);
-                            layoutButtons.setVisibility(View.VISIBLE);
-                        }
-					}
+		if (myAccountInfo.getPaymentBitSet() == null) {
+			logWarning("Not payment bit set received!!!");
+			selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
+			googlePlayLayout.setVisibility(View.GONE);
+			return;
+		}
 
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-						creditCardLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
-
-					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
-						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-					}
-					else{
-						selectPaymentMethod.setText(getString(R.string.select_payment_method));
-					}
-				}
-				else{
-					logWarning("Not payment bit set received!!!");
-					selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-					googlePlayLayout.setVisibility(View.GONE);
-					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
-				}
-
-				break;
-			}
-			case PRO_II:{
-
-				if (myAccountInfo.getPaymentBitSet() != null){
-					if (!myAccountInfo.isInventoryFinished()){
-						logDebug("if (!myAccountInfo.isInventoryFinished())");
-						googlePlayLayout.setVisibility(View.GONE);
-					}
-					else{
-                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
-                            googlePlayLayout.setVisibility(View.VISIBLE);
-                            layoutButtons.setVisibility(View.VISIBLE);
-                        }
-					}
-
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-						creditCardLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
-
-					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
-						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-					}
-					else{
-						selectPaymentMethod.setText(getString(R.string.select_payment_method));
-					}
-				}
-				else{
-					logWarning("Not payment bit set received!!!");
-				}
-
-				break;
-			}
-			case PRO_III:{
-
-				if (myAccountInfo.getPaymentBitSet() != null){
-					if (!myAccountInfo.isInventoryFinished()){
-						logDebug("if (!myAccountInfo.isInventoryFinished())");
-						googlePlayLayout.setVisibility(View.GONE);
-					}
-					else{
-                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
-                            googlePlayLayout.setVisibility(View.VISIBLE);
-                            layoutButtons.setVisibility(View.VISIBLE);
-                        }
-					}
-
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-						creditCardLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					fortumoLayout.setVisibility(View.GONE);
-					centiliLayout.setVisibility(View.GONE);
-
-					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
-						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-					}
-					else{
-						selectPaymentMethod.setText(getString(R.string.select_payment_method));
-					}
-				}
-
-				break;
-			}
-			case PRO_LITE:{
-
-				if (myAccountInfo.getPaymentBitSet() != null){
-					if (!myAccountInfo.isInventoryFinished()){
-						logDebug("if (!myAccountInfo.isInventoryFinished())");
-						googlePlayLayout.setVisibility(View.GONE);
-					}
-					else {
-                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
-                            googlePlayLayout.setVisibility(View.VISIBLE);
-                            layoutButtons.setVisibility(View.VISIBLE);
-                        }
-					}
-
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-						creditCardLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-						fortumoLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-						centiliLayout.setVisibility(View.VISIBLE);
-                        layoutButtons.setVisibility(View.VISIBLE);
-
-                    }
-
-					if(!isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
-						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-					}
-					else{
-						selectPaymentMethod.setText(getString(R.string.select_payment_method));
-					}
-				}
-				break;
+		if (!myAccountInfo.isInventoryFinished()) {
+			logDebug("if (!myAccountInfo.isInventoryFinished())");
+			googlePlayLayout.setVisibility(View.GONE);
+		} else {
+			if (isPaymentMethodAvailable(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+				googlePlayLayout.setVisibility(View.VISIBLE);
+				layoutButtons.setVisibility(View.VISIBLE);
+				optionsBilling.setVisibility(View.VISIBLE);
+				buttonContinue.setEnabled(true);
+				buttonContinue.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+				billedMonthly.setVisibility(View.VISIBLE);
+				billedYearly.setVisibility(View.VISIBLE);
+				selectPaymentMethod.setText(getString(R.string.payment_method));
+			} else {
+				googlePlayLayout.setVisibility(View.GONE);
+				layoutButtons.setVisibility(View.GONE);
+				optionsBilling.setVisibility(View.GONE);
+				billedMonthly.setVisibility(View.GONE);
+				billedYearly.setVisibility(View.GONE);
+				selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
 			}
 		}
 	}
@@ -1085,8 +690,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		}
 	}
 
-	private void showmyF(int paymentMethod, int parameterType){
-		logDebug("paymentMethod " + paymentMethod + ", type " + parameterType);
+	private void showmyF(int parameterType){
+		logDebug("type " + parameterType);
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
@@ -1113,296 +718,69 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		switch (parameterType) {
 			case PRO_I:
 				logDebug("case PRO I");
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
+					if (isMonthlyBillingPeriodSelected()) {
+						billedYearly.setChecked(true);
+					}
+					billedMonthly.setVisibility(View.GONE);
+				}
 
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro I - PAYMENT_METHOD_FORTUMO");
-						creditCardLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
+					if (!isMonthlyBillingPeriodSelected()) {
+						billedMonthly.setChecked(true);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro I - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						logDebug("Pro I - PAYMENT_METHOD_CREDIT_CARD");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
-						}
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
-					}
+					billedYearly.setVisibility(View.GONE);
 				}
 
 				break;
 
 			case PRO_II:
 				logDebug(" case PRO II");
-
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro II - PAYMENT_METHOD_FORTUMO");
-						creditCardLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
+					if (isMonthlyBillingPeriodSelected()) {
+						billedYearly.setChecked(true);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro II - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						logDebug("Pro II - PAYMENT_METHOD_CREDIT_CARD");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
-						}
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
-					}
+					billedMonthly.setVisibility(View.GONE);
 				}
 
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
+					if (!isMonthlyBillingPeriodSelected()) {
+						billedMonthly.setChecked(true);
+					}
+					billedYearly.setVisibility(View.GONE);
+				}
 				break;
 
 			case PRO_III:
 				logDebug("case PRO III");
-
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Pro III - PAYMENT_METHOD_FORTUMO");
-						creditCardLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
+					if (isMonthlyBillingPeriodSelected()) {
+						billedYearly.setChecked(true);
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Pro III - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						logDebug("Pro III - PAYMENT_METHOD_CREDIT_CARD");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
-						}
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
-					}
+					billedMonthly.setVisibility(View.GONE);
 				}
 
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
+					if (!isMonthlyBillingPeriodSelected()) {
+						billedMonthly.setChecked(true);
+					}
+					billedYearly.setVisibility(View.GONE);
+				}
 				break;
 
 			case PRO_LITE:
 				logDebug("case LITE");
-				switch (paymentMethod){
-					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-						logDebug("Lite - PAYMENT_METHOD_FORTUMO");
-						creditCardLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						fortumoLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedMonthly.setChecked(true);
-						billedYearly.setVisibility(View.GONE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-						logDebug("Lite - PAYMENT_METHOD_CENTILI");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedMonthly.setChecked(true);
-						billedYearly.setVisibility(View.GONE);
-						break;
-					}
-					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-						logDebug("Lite - PAYMENT_METHOD_CREDIT_CARD");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
+					if (isMonthlyBillingPeriodSelected()) {
 						billedYearly.setChecked(true);
-						break;
 					}
-					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-						logDebug("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
-						fortumoLayer.setVisibility(View.VISIBLE);
-						creditCardLayer.setVisibility(View.VISIBLE);
-						centiliLayer.setVisibility(View.VISIBLE);
-						googlePlayLayer.setVisibility(View.GONE);
-						optionsBilling.setVisibility(View.VISIBLE);
-						buttonContinue.setEnabled(true);
-						buttonContinue.setTextColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
-						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.VISIBLE);
-
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
-								billedYearly.setChecked(true);
-							}
-							billedMonthly.setVisibility(View.GONE);
-						}
-						if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
-							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
-								billedMonthly.setChecked(true);
-							}
-							billedYearly.setVisibility(View.GONE);
-						}
-						break;
+					billedMonthly.setVisibility(View.GONE);
+				}
+				if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
+					if (!isMonthlyBillingPeriodSelected()) {
+						billedMonthly.setChecked(true);
 					}
+					billedYearly.setVisibility(View.GONE);
 				}
 				break;
 		}

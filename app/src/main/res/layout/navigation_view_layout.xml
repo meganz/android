@@ -98,7 +98,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/navigation_drawer_account_information"
-                    android:background="#ffffff"
                     android:visibility="gone">
 
                     <ProgressBar
