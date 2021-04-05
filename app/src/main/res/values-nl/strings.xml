@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Kenmerken</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Opslag</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Toegangscode Slot</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Toegangscode Slot</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video\'s groter zijn dan %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Indien ingeschakeld, uploadt u informatie over waar uw foto\'s zijn gemaakt, dus wees voorzichtig wanneer u ze deelt.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\'s en video\'s</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Niet ingesteld</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Toegangscode Slot</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Toegangscode Slot</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Wijzig Toegangscode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>

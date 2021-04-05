@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">各種機能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ストレージ</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">パスコードロック</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">パスコードロック</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は多くの電力を消費します。 MEGAはあなたに、圧縮する動画が%sより大きい場合、あなたの端末を積極的に充電することを求めます。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">有効にすると、あなたの写真が撮影された場所に関する情報をアップロードするため、それらを共有する際にご注意ください。</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">フォトと動画</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">パスコードロック</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">パスコードロック</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">パスコードの変更</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">入力</string>

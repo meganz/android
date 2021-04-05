@@ -119,7 +119,7 @@
     <dimen name="divider_width">72dp</dimen>
 
     <!-- My account page button padding -->
-    <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
+    <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
 </resources>

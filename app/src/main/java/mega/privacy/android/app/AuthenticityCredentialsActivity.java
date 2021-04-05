@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.VerifyCredentialsListener;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
@@ -31,7 +31,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class AuthenticityCredentialsActivity extends PinActivityLollipop {
+public class AuthenticityCredentialsActivity extends PasscodeActivity {
 
     private static final String CONTACT_CREDENTIALS = "CONTACT_CREDENTIALS";
     private static final int LENGTH_CREDENTIALS_LIST = 10;

@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">ฟีเจอร์</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ที่เก็บข้อมูล</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">การบีบอัดวิดีโอใช้พลังงานมาก MEGA จะต้องให้คุณชาร์จอุปกรณ์ของคุณด้วย หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า %s</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">หากเปิดใช้งาน คุณจะอัปโหลดข้อมูลเกี่ยวกับตำแหน่งที่ถ่ายภาพของคุณ ดังนั้นโปรดระมัดระวังถ้าคุณจะแชร์ตำแหน่งที่ตั้งนี้</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">รูปถ่ายและวิดีโอ</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">ยังไม่ได้กำหนดค่า</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">เปลี่ยนรหัสผ่าน</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">ตกลง</string>
