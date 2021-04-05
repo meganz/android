@@ -1204,9 +1204,15 @@ public class ChatController {
                                           long idChat, int typeImport) {
         CopyListener listener;
         if (typeImport == IMPORT_TO_SHARE_OPTION) {
-            listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
-                    messagesSelected, messagesToImport.size(), context, snackbarShower, this,
-                    idChat, exportListener);
+            if(exportListener == null){
+                listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
+                        messagesSelected, messagesToImport.size(), context, snackbarShower, this, idChat);
+            }else{
+                listener = new CopyListener(CopyListener.MULTIPLE_IMPORT_CONTACT_MESSAGES,
+                        messagesSelected, messagesToImport.size(), context, snackbarShower, this,
+                        idChat, exportListener);
+            }
+
         } else {
             listener = new CopyListener(CopyListener.MULTIPLE_FORWARD_MESSAGES, messagesSelected,
                     messagesToImport.size(), context, snackbarShower, this, idChat);
