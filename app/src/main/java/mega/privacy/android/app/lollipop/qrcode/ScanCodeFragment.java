@@ -297,42 +297,43 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
      * @param printEmail Flag to indicate if the dialog message includes contact email or not.
      */
     public void showAlertDialog (int title, int text, final boolean success, final boolean printEmail) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_invite, null);
-        builder.setView(v);
+        if(requestedAlertDialog == null) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View v = inflater.inflate(R.layout.dialog_invite, null);
+            builder.setView(v);
 
-        dialogTitle = v.findViewById(R.id.dialog_invite_title);
-        dialogText = v.findViewById(R.id.dialog_invite_text);
-        dialogButton = v.findViewById(R.id.dialog_invite_button);
-        dialogButton.setOnClickListener(this);
+            requestedAlertDialog = builder.create();
+            requestedAlertDialog.setOnDismissListener(dialog -> {
+                if (success) {
+                    dialogshown = false;
+                    codeScanner.releaseResources();
+                    getActivity().finish();
+                } else {
+                    codeScanner.startPreview();
+                }
+            });
+
+            dialogTitle = v.findViewById(R.id.dialog_invite_title);
+            dialogText = v.findViewById(R.id.dialog_invite_text);
+            dialogButton = v.findViewById(R.id.dialog_invite_button);
+            dialogButton.setOnClickListener(this);
+        }
         this.success = success;
         this.printEmail = printEmail;
 
-        if (dialogTitleContent == -1){
+        if (dialogTitleContent == -1) {
             dialogTitleContent = title;
         }
         if (dialogTextContent == -1) {
             dialogTextContent = text;
         }
         dialogTitle.setText(StringResourcesUtils.getString(dialogTitleContent));
-        if (printEmail){
+        if (printEmail) {
             dialogText.setText(StringResourcesUtils.getString(dialogTextContent, myEmail));
         } else {
             dialogText.setText(StringResourcesUtils.getString(dialogTextContent));
         }
-
-        requestedAlertDialog = builder.create();
-        requestedAlertDialog.setOnDismissListener(dialog -> {
-            if (success){
-                dialogshown = false;
-                codeScanner.releaseResources();
-                getActivity().finish();
-            }
-            else {
-                codeScanner.startPreview();
-            }
-        });
         dialogshown = true;
         requestedAlertDialog.show();
     }

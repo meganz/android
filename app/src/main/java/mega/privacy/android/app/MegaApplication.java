@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
@@ -129,6 +130,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
 	@MegaApi
@@ -169,8 +171,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
-
-	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
 
@@ -751,6 +751,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
 		//Logout transfers resumption
@@ -1014,14 +1015,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
 		MegaApplication.showInfoChatMessages = showInfoChatMessages;
-	}
-
-	public static boolean isShowPinScreen() {
-		return showPinScreen;
-	}
-
-	public static void setShowPinScreen(boolean showPinScreen) {
-		MegaApplication.showPinScreen = showPinScreen;
 	}
 
 	public static String getUrlConfirmationLink() {
@@ -1607,6 +1600,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.remove(chatId);
 	}
 
+	public AppRTCAudioManager getAudioManager(){
+		return rtcAudioManager;
+	}
+
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
@@ -1769,7 +1766,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
 		openCallService(call.getChatid());
-		MegaApplication.setShowPinScreen(false);
+		passcodeManagement.setShowPasscodeScreen(false);
 		int callStatus = call.getStatus();
 
 		Intent i = new Intent(this, ChatCallActivity.class);
@@ -1972,6 +1969,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public static PasscodeManagement getPasscodeManagement() {
+		return passcodeManagement;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {

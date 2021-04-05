@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Opzioni</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Archivio</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Codice di accesso</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Codice di accesso</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compressione dei video consuma molta energia; MEGA ti chiederà di caricare il tuo dispositivo se i video da convertire sono più grandi di %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Se attiva, caricherai informazioni riguardo la posizione dove le tue foto sono state scattate, quindi sii attento quando le condividi.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto e video</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Non impostato</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Codice di accesso</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Codice di accesso</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Cambia codice</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Entra</string>
@@ -2029,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nuova richiesta di contatto</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Nessun[/B] [A]trasferimento attivo[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Nessun[/B] [A]trasferimento completato[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Cartella[/A] [B]vuota[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrivi messaggio a %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autenticazione a due fattori</string>
