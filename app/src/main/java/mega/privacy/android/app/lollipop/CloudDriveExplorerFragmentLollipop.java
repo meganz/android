@@ -38,7 +38,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
@@ -297,7 +296,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		cancelButton.setText(R.string.general_cancel);
 		fabSelect = v.findViewById(R.id.fab_select);
 		fabSelect.setOnClickListener(this);
 
@@ -352,7 +351,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		switch (modeCloud) {
 			case FileExplorerActivityLollipop.MOVE:
-				optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
+				optionButton.setText(R.string.context_move);
 
 				MegaNode parentMove= ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
@@ -362,18 +361,22 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.COPY:
-				optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
+				optionButton.setText(R.string.context_copy);
 
 				MegaNode parentCopy = ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentCopy == null || parentCopy.getHandle() != parentHandle);
 				break;
 
 			case FileExplorerActivityLollipop.UPLOAD:
-				optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+				optionButton.setText(R.string.context_upload);
 				break;
 
 			case FileExplorerActivityLollipop.IMPORT:
-				optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+				optionButton.setText(R.string.add_to_cloud);
+				break;
+
+			case FileExplorerActivityLollipop.SAVE:
+				optionButton.setText(R.string.save_action);
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
@@ -382,7 +385,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				//No break; needed: the text should be set with SELECT mode
 
 			default:
-				optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+				optionButton.setText(R.string.general_select);
 				break;
 		}
 

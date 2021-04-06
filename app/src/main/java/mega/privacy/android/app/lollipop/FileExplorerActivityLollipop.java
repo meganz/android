@@ -138,6 +138,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
 	public static String ACTION_UPLOAD_TO_CHAT = "ACTION_UPLOAD_TO_CHAT";
+	public static String ACTION_SAVE_TO_CLOUD = "ACTION_SAVE_TO_CLOUD";
 
 	public static final int UPLOAD = 0;
 	public static final int MOVE = 1;
@@ -147,6 +148,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	public static final int SELECT = 5;
 	public static final int SELECT_CAMERA_FOLDER = 7;
 	public static final int SHARE_LINK = 8;
+	public static final int SAVE = 9;
 
 	private static final int NO_TABS = -1;
 	private static final int CLOUD_TAB = 0;
@@ -675,6 +677,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 				selectFile = false;
 
 				aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
+				setView(CLOUD_TAB, false, -1);
+				tabShown=NO_TABS;
+			}
+			else if ((intent.getAction().equals(ACTION_SAVE_TO_CLOUD))){
+				logDebug("action = SAVE to Cloud Drive");
+				mode = SAVE;
+				selectFile = false;
+
+				aB.setTitle(R.string.section_cloud_drive);
+				aB.setSubtitle(R.string.cloud_drive_select_destination);
 				setView(CLOUD_TAB, false, -1);
 				tabShown=NO_TABS;
 			}
@@ -1237,6 +1249,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 		else if(mode == UPLOAD && !importFileF){
 			aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 		}
+		else if(mode == SAVE){
+			aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+		}
 		else if (mode == UPLOAD && importFileF) {
 			if (importFragmentSelected == -1) {
 				return;
@@ -1268,7 +1283,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 		cDriveExplorer = getCloudExplorerFragment();
 		iSharesExplorer = getIncomingExplorerFragment();
 
-		aB.setSubtitle(null);
+		if (mode == SAVE) {
+			aB.setSubtitle(R.string.cloud_drive_select_destination);
+		} else {
+			aB.setSubtitle(null);
+		}
 
 		if(tabShown==NO_TABS){
 			if (importFileF) {
@@ -1796,7 +1815,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 			logDebug("finish!");
 			finishActivity();
 		}
-		else if (mode == UPLOAD){
+		else if (mode == UPLOAD || mode == SAVE){
 
 			logDebug("mode UPLOAD");
 

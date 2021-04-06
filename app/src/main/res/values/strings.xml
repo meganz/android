@@ -3040,4 +3040,6 @@
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
+
+    <string name="cloud_drive_select_destination" context="Cloud Drive screen subtitle indicating a destination is required to be selected">Select destination</string>
 </resources>
