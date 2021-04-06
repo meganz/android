@@ -2,16 +2,16 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.os.Bundle
 import android.view.*
-import android.widget.RelativeLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
+import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.VideoCaptureUtils
 
@@ -19,7 +19,6 @@ class InMeetingFragment : MeetingBaseFragment() {
 
     private lateinit var gridViewMenuItem: MenuItem
     private lateinit var speakerViewMenuItem: MenuItem
-    private lateinit var root: View
 
     companion object {
         fun newInstance() = InMeetingFragment()
@@ -41,15 +40,25 @@ class InMeetingFragment : MeetingBaseFragment() {
 
     var lastTouch: Long = 0
 
+    fun onPageClick() {
+        if (System.currentTimeMillis() - lastTouch > 500) {
+            in_meeting_toolbar.fadeInOut(toTop = true)
+            meetingActivity.bottomFloatingPanelInOut()
+
+            if(in_meeting_toolbar.visibility == View.VISIBLE) {
+                meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            } else {
+                meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
+
+            lastTouch = System.currentTimeMillis()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        root = view
         view.setOnClickListener {
-            if (System.currentTimeMillis() - lastTouch > 500) {
-                root.in_meeting_toolbar.flick(-220f)
-                meetingActivity.BottomFloatingPanelInOut()
-                lastTouch = System.currentTimeMillis()
-            }
+            onPageClick()
         }
 
         self_feed_floating_window_container.setOnTouchListener(
@@ -61,14 +70,14 @@ class InMeetingFragment : MeetingBaseFragment() {
 
         loadChildFragment(
             R.id.meeting_container,
-            GridViewCallFragment.newInstance(),
-            "sdas"
+            IndividualCallFragment.newInstance(),
+            IndividualCallFragment.TAG
         )
 
         loadChildFragment(
             R.id.self_feed_floating_window_container,
             SelfFeedFloatingWindowFragment.newInstance(1, 2),
-            "sdas"
+            SelfFeedFloatingWindowFragment.TAG
         )
 
         meetingActivity.setSupportActionBar(view.in_meeting_toolbar)
@@ -82,21 +91,6 @@ class InMeetingFragment : MeetingBaseFragment() {
 
         view.setOnApplyWindowInsetsListener { _, insets ->
             insets
-        }
-    }
-
-    private fun View.flick(to: Float) {
-        if (visibility == View.VISIBLE) {
-            animate().translationY(to).setDuration(500).withEndAction {
-                visibility = View.GONE
-            }.withStartAction {
-                meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }.start()
-        } else {
-            animate().translationY(0f).setDuration(500).withStartAction {
-                visibility = View.VISIBLE
-                meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }.start()
         }
     }
 
@@ -137,7 +131,7 @@ class InMeetingFragment : MeetingBaseFragment() {
                 loadChildFragment(
                     R.id.meeting_container,
                     GridViewCallFragment.newInstance(),
-                    "sdas"
+                    GridViewCallFragment.TAG
                 )
                 true
             }
@@ -148,8 +142,9 @@ class InMeetingFragment : MeetingBaseFragment() {
 
                 loadChildFragment(
                     R.id.meeting_container,
+                    // TODO replace with speaker mode fragment.
                     IndividualCallFragment.newInstance(),
-                    "sdas"
+                    IndividualCallFragment.TAG
                 )
                 true
             }

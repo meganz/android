@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.CLIENT_ID
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatRoom
 
 
@@ -37,7 +36,7 @@ class SelfFeedFloatingWindowFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate the layout for this fragment
         _binding = SelfFeedFloatingWindowFragmentBinding.inflate(inflater, container, false)
@@ -74,6 +73,9 @@ class SelfFeedFloatingWindowFragment : BaseFragment() {
 //    }
 
     companion object {
+
+        const val TAG = "SelfFeedFloatingWindowFragment"
+
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.

@@ -2,11 +2,14 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class CustomizedGridCallRecyclerView extends RecyclerView {
 
@@ -14,6 +17,13 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
     public int columnWidth = -1;
     private boolean isWrapContent = false;
     private int widthTotal = 0;
+
+    private OnTouchCallback onTouchCallback;
+
+    public interface OnTouchCallback {
+
+        void onTouch();
+    }
 
     public CustomizedGridCallRecyclerView(Context context) {
         super(context);
@@ -44,18 +54,22 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         setLayoutManager(manager);
     }
 
+    public void setOnTouchCallback(OnTouchCallback onTouchCallback) {
+        this.onTouchCallback = onTouchCallback;
+    }
+
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         logDebug("onMeasure-> widthSpec: " + widthSpec + ", heightSpec: " + heightSpec);
         super.onMeasure(widthSpec, heightSpec);
-        if(!isWrapContent){
+        if (!isWrapContent) {
             logDebug("columnWidth :" + columnWidth);
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
                 logDebug("spanCount: " + spanCount);
                 manager.setSpanCount(spanCount);
             }
-        }else{
+        } else {
 
             ViewGroup.LayoutParams params = getLayoutParams();
             logDebug("columnWidth :" + columnWidth);
@@ -69,7 +83,7 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         }
     }
 
-    public void setWrapContent(){
+    public void setWrapContent() {
         isWrapContent = true;
 //		widthTotal = getMeasuredWidth();
 //		ViewGroup.LayoutParams params = getLayoutParams();
@@ -89,8 +103,34 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
     public int getColumnWidth() {
         return columnWidth;
     }
+
     public void setColumnWidth(int columnWidth) {
         this.columnWidth = columnWidth;
+    }
+
+    class SingleTapDetector extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (onTouchCallback != null) {
+                onTouchCallback.onTouch();
+            }
+            return false;
+        }
+    }
+
+    private final GestureDetector detector = new GestureDetector(getContext(), new SingleTapDetector());
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        detector.onTouchEvent(e);
+        performClick();
+        return super.onTouchEvent(e);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     @Override

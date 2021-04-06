@@ -7,12 +7,10 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
-import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
@@ -21,15 +19,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.MEETING_LINK
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.IncomingCallNotification
 
 @AndroidEntryPoint
@@ -258,16 +254,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         }
     }
 
-    fun BottomFloatingPanelInOut() {
-        if(bottom_floating_panel.visibility == View.VISIBLE) {
-            bottom_floating_panel.animate().translationY(300f).setDuration(500).withEndAction {
-                bottom_floating_panel.visibility = View.GONE
-            }.start()
-        } else {
-            bottom_floating_panel.animate().translationY(0f).setDuration(300).withEndAction {
-                bottom_floating_panel.visibility = View.VISIBLE
-            }.start()
-        }
+    fun bottomFloatingPanelInOut() {
+        bottom_floating_panel.fadeInOut()
     }
 
     fun collpaseFloatingPanel() {

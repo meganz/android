@@ -17,6 +17,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     companion object {
 
+        const val TAG = "SpeakerViewCallFragment"
+
         @JvmStatic
         fun newInstance() = SpeakerViewCallFragment()
     }

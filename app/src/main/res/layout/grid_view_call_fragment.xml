@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
         android:id="@+id/recycler_view_cameras"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical|center|center_horizontal"
         android:clipToPadding="true"
         android:horizontalSpacing="0dp"
         android:nestedScrollingEnabled="false"
         android:numColumns="auto_fit"
         android:scrollbars="horizontal"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="0dp" />
+        android:verticalSpacing="0dp"
+        android:elevation="-2dp"
+        android:background="#ffffff"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

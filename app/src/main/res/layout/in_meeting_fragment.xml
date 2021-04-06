@@ -30,6 +30,8 @@
 
     <FrameLayout
         android:id="@+id/self_feed_floating_window_container"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="110dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

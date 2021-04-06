@@ -17,6 +17,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     companion object {
 
+        const val TAG = "IndividualCallFragment"
+
         @JvmStatic
         fun newInstance() = IndividualCallFragment()
     }
