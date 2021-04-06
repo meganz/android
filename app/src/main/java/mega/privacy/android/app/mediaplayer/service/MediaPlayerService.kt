@@ -265,7 +265,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             setPlayer(exoPlayer)
             setControlDispatcher(
-                CallAwareControlDispatcher(exoPlayer.repeatMode, true, this@MediaPlayerService)
+                CallAwareControlDispatcher(exoPlayer.repeatMode)
             )
         }
     }
