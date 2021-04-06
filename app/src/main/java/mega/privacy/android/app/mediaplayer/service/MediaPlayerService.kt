@@ -69,11 +69,17 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     private var needPlayWhenReceiveResumeCommand = false
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val resumePlayRunnable = {
-        if (needPlayWhenReceiveResumeCommand) {
-            setPlayWhenReady(true)
-            needPlayWhenReceiveResumeCommand = false
+
+    // We need keep it as Runnable here, because we need remove it from handler later,
+    // using lambda doesn't work when remove it from handler.
+    private val resumePlayRunnable = object : Runnable {
+        override fun run() {
+            if (needPlayWhenReceiveResumeCommand) {
+                setPlayWhenReady(true)
+                needPlayWhenReceiveResumeCommand = false
+            }
         }
+
     }
 
     private var audioManager: AudioManager? = null

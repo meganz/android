@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -129,7 +128,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         }
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
