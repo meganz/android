@@ -33,6 +33,8 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.aes_decrypt;
 import static mega.privacy.android.app.utils.Util.aes_encrypt;
@@ -40,7 +42,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 60;
+	private static final int DATABASE_VERSION = 61;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -89,9 +91,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_SHOW_INVITE_BANNER = "showinvitebanner";
     private static final String KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover";
-    private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
-    private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
-    private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
+    private static final String KEY_PASSCODE_LOCK_ENABLED = "pinlockenabled";
+    private static final String KEY_PASSCODE_LOCK_TYPE = "pinlocktype";
+    private static final String KEY_PASSCODE_LOCK_CODE = "pinlockcode";
+	private static final String KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
     private static final String KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder";
@@ -333,52 +336,53 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
 
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY,"                  	//0
-                + KEY_FIRST_LOGIN + " BOOLEAN, "                    	//1
-                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               	//2
-                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   	//3
-                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               	//4
-                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  	//5
-                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              	//6
-                + KEY_PIN_LOCK_ENABLED + " TEXT, "                  	//7
-                + KEY_PIN_LOCK_CODE + " TEXT, "                     	//8
-                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                	//9
-                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         	//10
-                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                	//11
-                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              	//12
-                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                	//13
-                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          	//14
-                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                	//15
-                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             	//16
-                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 	//17
-                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                	//18
-                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                	//19
-                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       	//20
-                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            	//21
-                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     	//22
-                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              	//23
-                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 	//24
-                + KEY_PIN_LOCK_TYPE + " TEXT, "                     	//25
-                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              	//26
-                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           	//27
-                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              	//28
-                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               	//29
-                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               	//30
-                + KEY_AUTO_PLAY + " BOOLEAN,"                       	//31
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               	//32
-                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          	//33
-                + KEY_CHARGING_ON_SIZE + " TEXT,"                   	//34
-                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       	//35
-                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//36
-                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//37
-                + KEY_REMOVE_GPS + " TEXT,"                         	//38
-                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 	//39
-                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       	//40
-				+ KEY_SD_CARD_URI + " TEXT,"                        	//41
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"					//42
-				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"			//43
-				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"				//44
-				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN" + ")";	//45
+                + KEY_ID + " INTEGER PRIMARY KEY,"                  															//0
+                + KEY_FIRST_LOGIN + " BOOLEAN, "                    															//1
+                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               															//2
+                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   															//3
+                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               															//4
+                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  															//5
+                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              															//6
+                + KEY_PASSCODE_LOCK_ENABLED + " TEXT, "               														    //7
+                + KEY_PASSCODE_LOCK_CODE + " TEXT, "                   														    //8
+                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                															//9
+                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         															//10
+                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                															//11
+                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              															//12
+                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                															//13
+                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          															//14
+                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                															//15
+                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             															//16
+                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 															//17
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                															//18
+                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                															//19
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       															//20
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            															//21
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     															//22
+                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              															//23
+                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 															//24
+                + KEY_PASSCODE_LOCK_TYPE + " TEXT, "                  														    //25
+                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              															//26
+                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           															//27
+                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              															//28
+                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//29
+                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               															//30
+                + KEY_AUTO_PLAY + " BOOLEAN,"                       															//31
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               															//32
+                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//33
+                + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//34
+                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//35
+                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//36
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//37
+                + KEY_REMOVE_GPS + " TEXT,"                         															//38
+                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 															//39
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       															//40
+				+ KEY_SD_CARD_URI + " TEXT,"                        															//41
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"																			//42
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//43
+				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//44
+				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//45
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	//46
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -631,15 +635,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if(oldVersion <= 19){
 
-			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PIN_LOCK_TYPE + " TEXT;");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_TYPE + " TEXT;");
 
-			if(this.isPinLockEnabled(db)){
+			if(isPasscodeLockEnabled(db)){
                 logDebug("PIN enabled!");
-				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt(PIN_4) + "';");
+				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_TYPE + " = '" + encrypt(PIN_4) + "';");
 			}
 			else{
                 logDebug("PIN NOT enabled!");
-				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt("") + "';");
+				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_TYPE + " = '" + encrypt("") + "';");
 			}
 		}
 
@@ -913,6 +917,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (oldVersion <= 59) {
             db.execSQL(CREATE_BACKUP_TABLE);
         }
+
+		if (oldVersion <= 60) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
+					+ " = '" + encrypt("" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
+		}
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1547,8 +1557,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_CAM_SYNC_HANDLE, encrypt(prefs.getCamSyncHandle()));
         values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(prefs.getCamSyncLocalPath()));
         values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(prefs.getCamSyncFileUpload()));
-        values.put(KEY_PIN_LOCK_ENABLED, encrypt(prefs.getPinLockEnabled()));
-        values.put(KEY_PIN_LOCK_CODE, encrypt(prefs.getPinLockCode()));
+        values.put(KEY_PASSCODE_LOCK_ENABLED, encrypt(prefs.getPasscodeLockEnabled()));
+        values.put(KEY_PASSCODE_LOCK_CODE, encrypt(prefs.getPasscodeLockCode()));
         values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()));
         values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
         values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()));
@@ -1565,7 +1575,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(prefs.getPreferredViewListCameraUploads()));
         values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()));
         values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getCameraFolderExternalSDCard()));
-        values.put(KEY_PIN_LOCK_TYPE, encrypt(prefs.getPinLockType()));
+        values.put(KEY_PASSCODE_LOCK_TYPE, encrypt(prefs.getPasscodeLockType()));
 		values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()));
 		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
 		values.put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(prefs.getPreferredSortCameraUpload()));
@@ -1573,6 +1583,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
+		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
+
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 
@@ -1593,6 +1605,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("getPreferences");
 		MegaPreferences prefs = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				int id = Integer.parseInt(cursor.getString(0));
@@ -1637,16 +1650,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String closeInviteBanner = decrypt(cursor.getString(39));
 				String preferredSortCameraUpload = decrypt(cursor.getString(40));
 				String sdCardUri = decrypt(cursor.getString(41));
+				String passcodeLockRequireTime = decrypt(cursor.getString(46));
 
 				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri);
+						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri, passcodeLockRequireTime);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
+
 		return prefs;
 	}
 
@@ -2015,7 +2030,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 
-	public boolean isPinLockEnabled(SQLiteDatabase db){
+	public boolean isPasscodeLockEnabled(SQLiteDatabase db){
         logDebug("getPinLockEnabled");
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		String pinLockEnabled = null;
@@ -3094,22 +3109,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return getBooleanValue(TABLE_PREFERENCES, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, false);
 	}
 
-	public void setPinLockType (String pinLockType){
-        logDebug("setPinLockType");
+	public void setPasscodeLockType(String passcodeLockType){
+        logDebug("setPasscodeLockType");
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
+
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + "= '" + encrypt(pinLockType) + "' WHERE " + KEY_ID + " = '1'";
+				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_TYPE + "= '" + encrypt(passcodeLockType) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
 			} else {
-				values.put(KEY_PIN_LOCK_TYPE, encrypt(pinLockType));
+				values.put(KEY_PASSCODE_LOCK_TYPE, encrypt(passcodeLockType));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
+	}
+
+	public String getPasscodeLockType() {
+		return getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_TYPE, "");
 	}
 
 	public void setSecondaryFolderPath (String localPath){
@@ -3414,16 +3433,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return defaultValue;
 	}
 
-	public void setPinLockEnabled (boolean pinLockEnabled){
+	public void setPasscodeLockEnabled(boolean passcodeLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
+
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_ENABLED + "= '" + encrypt(pinLockEnabled + "") + "' WHERE " + KEY_ID + " = '1'";
+				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_ENABLED + "= '" + encrypt(passcodeLockEnabled + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
 			} else {
-				values.put(KEY_PIN_LOCK_ENABLED, encrypt(pinLockEnabled + ""));
+				values.put(KEY_PASSCODE_LOCK_ENABLED, encrypt(passcodeLockEnabled + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 		} catch (Exception e) {
@@ -3431,21 +3450,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 	}
 
-	public void setPinLockCode (String pinLockCode){
+	public boolean isPasscodeLockEnabled() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_ENABLED, false);
+	}
+
+	public void setPasscodeLockCode(String passcodeLockCode){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
+
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_CODE + "= '" + encrypt(pinLockCode + "") + "' WHERE " + KEY_ID + " = '1'";
+				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_CODE + "= '" + encrypt(passcodeLockCode + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
 			} else {
-				values.put(KEY_PIN_LOCK_CODE, encrypt(pinLockCode + ""));
+				values.put(KEY_PASSCODE_LOCK_CODE, encrypt(passcodeLockCode + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
+	}
+
+	public String getPasscodeLockCode() {
+		return getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_CODE, "");
+	}
+
+	/**
+	 * Sets the time required before ask for the passcode.
+	 *
+	 * @param requiredTime The time required before ask for the passcode.
+	 */
+	public void setPasscodeRequiredTime(int requiredTime) {
+		setStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, requiredTime + "");
+	}
+
+	/**
+	 * Gets the time required before ask for the passcode.
+	 *
+	 * @return The time required before ask for the passcode.
+	 */
+	public int getPasscodeRequiredTime() {
+		String string = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + "");
+		return !isTextEmpty(string) ? Integer.parseInt(string) : REQUIRE_PASSCODE_INVALID;
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {

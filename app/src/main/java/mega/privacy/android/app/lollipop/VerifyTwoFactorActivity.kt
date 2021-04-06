@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
@@ -30,7 +31,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.*
 
 @AndroidEntryPoint
-class VerifyTwoFactorActivity : PinActivityLollipop() {
+class VerifyTwoFactorActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityVerifyTwoFactorBinding
 

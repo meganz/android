@@ -5,7 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
@@ -17,9 +19,20 @@ class PhotosBrowseAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel
 ) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
-    SectionTitleProvider {
+    SectionTitleProvider, DragThumbnailGetter {
 
     private var itemDimen = 0
+
+    override fun getNodePosition(handle: Long) =
+        currentList.indexOfFirst { it.node?.handle == handle }
+
+    override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? {
+        if (viewHolder is PhotoViewHolder && viewHolder.binding is ItemPhotoBrowseBinding) {
+            return viewHolder.binding.thumbnail
+        }
+
+        return null
+    }
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type

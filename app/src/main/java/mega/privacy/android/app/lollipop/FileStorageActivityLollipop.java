@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -61,6 +62,7 @@ import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
@@ -78,8 +80,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDia
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener,
+public class FileStorageActivityLollipop extends PasscodeActivity implements OnClickListener,
 		ActionNodeCallback {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
@@ -112,6 +113,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_PATH = "filepath";
+	// Currently for exporting recovery key use.
+	public static final String EXTRA_SD_URI = "sdcarduri";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
 
@@ -192,6 +195,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
+
+    /**
+     * Pass to exporting recovery key operation.
+     */
+	private String sdCardUriString;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -920,6 +928,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void finishPickFolder() {
 		Intent intent = new Intent();
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
+		intent.putExtra(EXTRA_SD_URI, sdCardUriString);
 		intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
 		intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
 		intent.putExtra(EXTRA_URL, url);
@@ -1041,7 +1050,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess() {
+	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		//No action needed
 	}
 
@@ -1180,6 +1189,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
                     dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
+                } else if (fromSaveRecoveryKey) {
+                    // For temporary use, don't store the uri to database.
+                    sdCardUriString = uriString;
                 } else {
                     dbH.setSDCardUri(uriString);
                 }

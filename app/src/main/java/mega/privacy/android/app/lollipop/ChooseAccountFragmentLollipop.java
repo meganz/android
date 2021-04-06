@@ -21,11 +21,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.utils.ColorUtils;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaPricing;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -124,14 +120,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         bandwidthSectionPro3 = v.findViewById(R.id.bandwidth_pro_iii);
         //END -- PRO III ACCOUNT
 
-        //BUSINESS
-        businessLayout = v.findViewById(R.id.choose_account_business_layout);
-        businessLayout.setOnClickListener(this);
-        monthSectionBusiness = v.findViewById(R.id.month_business);
-        storageSectionBusiness = v.findViewById(R.id.storage_business);
-        bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
-        //END -- BUSINESS
-
         setPricingInfo();
         return v;
     }
@@ -165,10 +153,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
                 intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
                 intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
                 break;
-            case R.id.choose_account_business_layout:
-                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-                intent.putExtra(EXTRA_ACCOUNT_TYPE, BUSINESS);
-                break;
         }
 
         startActivity(intent);
@@ -191,9 +175,9 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
-            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'"
+            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color='"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                    + "\'>");
+                    + "'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
@@ -202,9 +186,9 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
         String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
-            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'"
+            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color='"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                    + "\'>");
+                    + "'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);

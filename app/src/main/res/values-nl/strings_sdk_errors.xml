@@ -30,7 +30,7 @@
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Niet genoeg tegoed</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">2-Factor Authenticatie vereist.</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Toegang geweigerd voor niet-admin-gebruikers</string>
-    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Uw zakelijke account is verlopen</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Uw Zakelijke account is verlopen</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit kaart geweigerd</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Facturering mislukt</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Afgewezen door fraudebescherming</string>

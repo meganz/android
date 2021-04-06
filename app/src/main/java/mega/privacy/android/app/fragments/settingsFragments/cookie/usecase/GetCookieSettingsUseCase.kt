@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -12,7 +13,7 @@ import javax.inject.Inject
  * Use Case to get cookie settings from SDK
  */
 class GetCookieSettingsUseCase @Inject constructor(
-    private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
     /**

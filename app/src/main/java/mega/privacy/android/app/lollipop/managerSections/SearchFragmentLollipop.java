@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,6 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -73,21 +73,19 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class SearchFragmentLollipop extends RotatableFragment{
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
-
-	public static ImageView imageDrag;
 
 	private Context context;
 	private RecyclerView recyclerView;
@@ -147,38 +145,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		adapter.filClicked(position);
 	}
 
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				mLayoutManager.scrollToPosition(position);
-			}
-			else if (gridLayoutManager != null) {
-				gridLayoutManager.scrollToPosition(position);
-			}
-		}
-	}
-
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				View v = mLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-				}
-			}
-			else if (gridLayoutManager != null){
-				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Disables select mode by clearing selections and resetting selected items.
 	 */
@@ -196,13 +162,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, false);
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							documents, false, false, false, false);
 					closeSelectMode();
 					break;
 				}
@@ -271,13 +232,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
-					if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-						showOverDiskQuotaPaywallWarning();
-						break;
-					}
-					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
-					NodeController nC = new NodeController(context);
-					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
+					((ManagerActivityLollipop) context).attachNodesToChats(adapter.getArrayListSelectedNodes());
 					closeSelectMode();
 					break;
 				}
@@ -674,6 +629,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			newSearchNodesTask();
 			((ManagerActivityLollipop) context).showFabButton();
 		}
+
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_SEARCH);
 	}
 
 	public void newSearchNodesTask() {
@@ -715,7 +672,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		intent.putExtra(ARRAY_SEARCH, serialized);
 	}
 	
-    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+    public void itemClick(int position) {
 		logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
@@ -775,11 +732,13 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					intent.putExtra("screenPosition", screenPosition);
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
+
 					manageNodes(intent);
 					startActivity(intent);
 					getActivity().overridePendingTransition(0,0);
-					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -800,7 +759,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					else {
 						internalIntent = true;
-						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
+						mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);
@@ -813,12 +773,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					mediaIntent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					manageNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					imageDrag = imageView;
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
 
 					if (localPath != null){
@@ -835,6 +794,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else {
 						if (megaApi.httpServerIsRunning() == 0) {
 							megaApi.httpServerStart();
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -866,10 +826,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						else {
 							((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(nodes.get(position).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList, true);
+							((ManagerActivityLollipop) context).saveNodesToDevice(
+									Collections.singletonList(nodes.get(position)),
+									true, false, false, false);
 						}
 					}
 			  		((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -899,6 +858,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else {
 						if (megaApi.httpServerIsRunning() == 0) {
 							megaApi.httpServerStart();
+							pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -918,18 +878,16 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
+					putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						context.startActivity(pdfIntent);
 					}
 					else{
 						Toast.makeText(context, context.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -976,10 +934,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 									if (isIntentAvailable(context, intent)) {
 										startActivity(intent);
 									} else {
-										ArrayList<Long> handleList = new ArrayList<Long>();
-										handleList.add(nodes.get(position).getHandle());
-										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList, true);
+										((ManagerActivityLollipop) context).saveNodesToDevice(
+												Collections.singletonList(nodes.get(position)),
+												true, false, false, false);
 									}
 								}
 							}
@@ -996,10 +953,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 							if (isIntentAvailable(context, intent)) {
 								startActivity(intent);
 							} else {
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(nodes.get(position).getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList, true);
+								((ManagerActivityLollipop) context).saveNodesToDevice(
+										Collections.singletonList(nodes.get(position)),
+										true, false, false, false);
 							}
 
 						} finally {
@@ -1011,17 +967,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 							}
 						}
 					} else {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
 				} else{
 					adapter.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(nodes.get(position).getHandle());
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, true);
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							Collections.singletonList(nodes.get(position)),
+							true, false, false, false);
 				}
 			}
 		}

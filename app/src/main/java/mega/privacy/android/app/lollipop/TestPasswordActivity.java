@@ -27,6 +27,7 @@ import android.widget.TextView;
 import java.io.File;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -41,7 +42,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
+public class TestPasswordActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
 
     private LinearLayout passwordReminderLayout;
     private ImageView passwordReminderCloseButton;
@@ -278,11 +279,13 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
+
             if (parentPath != null){
                 logDebug("parentPath no NULL");
                 parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath);
+                ac.exportMK(parentPath, sdCardUriString);
             }
         }
     }

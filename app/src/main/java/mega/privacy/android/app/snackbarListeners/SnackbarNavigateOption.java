@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -17,7 +16,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
 import static mega.privacy.android.app.utils.Constants.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class SnackbarNavigateOption implements View.OnClickListener {
 
@@ -87,8 +85,6 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             ((FullScreenImageViewerLollipop) context).finish();
         } else if (context instanceof PdfViewerActivityLollipop) {
             ((PdfViewerActivityLollipop) context).finish();
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop) context).finish();
         } else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).finish();
         } else if (context instanceof ContactFileListActivityLollipop) {

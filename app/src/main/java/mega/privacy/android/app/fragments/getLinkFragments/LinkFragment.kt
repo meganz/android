@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.getLinkFragments
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.Bitmap
 import android.graphics.PorterDuff
@@ -330,6 +331,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun showDatePicker() {
         val calendar =
             if (node.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()

@@ -446,7 +446,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 
                 int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
-                setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent);
+                setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
