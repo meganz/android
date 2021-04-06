@@ -39,23 +39,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         const val MEETING_TYPE_IN = "in_meeting"
 
         const val MEETING_LINK = "meeting_link"
-
-        private var isGuest = true
-        private var isModerator = false
-
-        private fun updateRole() {
-            if (isGuest) {
-                isGuest = false
-            } else if (!isModerator) {
-                isModerator = true
-            } else {
-                isGuest = true
-                isModerator = false
-            }
-        }
-
-        private var wiredHeadsetConnected = false
-        private var bluetoothConnected = false
     }
 
     private lateinit var binding: ActivityMeetingBinding
@@ -87,19 +70,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         initActionBar(meetType)
         initNavigation(meetType)
 
-        bottomFloatingPanelViewHolder =
-            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
+        // TODO: pass real role here
+        bottomFloatingPanelViewHolder = BottomFloatingPanelViewHolder(binding, this, false, true)
 
+        // TODO: pass real headphone state here
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(false, false)
 
-
+        // TODO: load real participants and set it
         bottomFloatingPanelViewHolder.setParticipants(TestTool.getTestParticipants(this))
-
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
-
-        updateRole()
     }
 
     override fun onDestroy() {
@@ -180,23 +158,11 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onChangeMicState(micOn: Boolean) {
-        // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
-
-        wiredHeadsetConnected = !wiredHeadsetConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+        Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
     }
 
     override fun onChangeCamState(camOn: Boolean) {
-        // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
-
-        bluetoothConnected = !bluetoothConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+        Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
