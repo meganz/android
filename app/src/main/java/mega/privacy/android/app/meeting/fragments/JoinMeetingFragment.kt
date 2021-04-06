@@ -24,10 +24,6 @@ private const val ARG_PARAM2 = "param2"
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     private lateinit var viewModel: JoinMeetingViewModel
-    override fun onSubCreateView(view: View) {
-        view.btn_start_join_meeting.setText(R.string.btn_join_meeting)
-        Log.i("Alex", "${arguments?.get(MEETING_LINK)}")
-    }
 
     override fun meetingButtonClick() {
 

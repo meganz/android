@@ -1,89 +1,110 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
-import kotlinx.android.synthetic.main.meeting_component_onofffab.view.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util
+
 
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
-
-    companion object {
-        const val KEY_MEETING_MIC_STATE = "meeting_mic"
-        const val KEY_MEETING_CAMERA_STATE = "meeting_camera"
-        const val KEY_MEETING_SPEAKER_STATE = "meeting_speaker"
-    }
-
+    private lateinit var binding: MeetingOnBoardingFragmentBinding
+    var meetingName: String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.meeting_on_boarding_fragment, container, false)
-        initOnOffFab(savedInstanceState, view)
-        onSubCreateView(view)
-        return view
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_MEETING_MIC_STATE, fab_mic.isOn)
-        outState.putBoolean(KEY_MEETING_CAMERA_STATE, fab_cam.isOn)
-        outState.putBoolean(KEY_MEETING_SPEAKER_STATE, fab_speaker.isOn)
+        initBinding()
+        initViewModel()
+        return binding.root
     }
 
     /**
-     * Initialize OnOffFabs : Mic, Speaker, Camera...
+     * Bind layout views to viewmodel
      */
-    private fun initOnOffFab(savedInstanceState: Bundle?, view: View) {
-        savedInstanceState?.let {
-            view.fab_mic.isOn = it.getBoolean(KEY_MEETING_MIC_STATE, false)
-            view.fab_cam.isOn = it.getBoolean(KEY_MEETING_CAMERA_STATE, false)
-            view.fab_speaker.isOn = it.getBoolean(KEY_MEETING_SPEAKER_STATE, false)
-        }
+    private fun initBinding() {
+        binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
+        binding.viewmodel = abstractMeetingOnBoardingViewModel
+        binding.lifecycleOwner = this
+        binding.btnStartJoinMeeting.setOnClickListener { onMeetingButtonClick() }
+    }
 
-        view.fab_mic.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_mic.isOn)
-            }
+    /**
+     * Initialize viewmodel
+     * Use ViewModel to manage UI-related data
+     */
+    private fun initViewModel() {
+        abstractMeetingOnBoardingViewModel.micLiveData.observe(viewLifecycleOwner) {
+            switchMic(it)
         }
-
-        view.fab_cam.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_cam.isOn)
-            }
+        abstractMeetingOnBoardingViewModel.cameraLiveData.observe(viewLifecycleOwner) {
+            switchCamera(it)
         }
-
-        view.fab_speaker.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_speaker.isOn)
-            }
+        abstractMeetingOnBoardingViewModel.speakerLiveData.observe(viewLifecycleOwner) {
+            switchSpeaker(it)
         }
     }
 
     /**
-     * Called by onCreateView(), for inherit subclasses to initialize UI
+     * Response to meeting button's 'onClick' event
+     * Dispatch to current sub fragment
+     */
+    private fun onMeetingButtonClick() {
+        meetingName = abstractMeetingOnBoardingViewModel.getMeetingName()
+        meetingName?.let {
+            Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+            meetingButtonClick()
+        }
+    }
+
+    /**
+     * Show tip when switching fabs, such as mic, camera, and speaker
      *
-     * @param view The root View of the inflated hierarchy
+     * @param v Get location of tip
+     * @param message The text to show
+     * @param duration How long to display the message.
      */
-    abstract fun onSubCreateView(view: View)
+    fun showToast(v: View, message: String, duration: Int) {
+        var xOffset = 0
+        var yOffset = 0
+        val gvr = Rect()
+        if (v.getGlobalVisibleRect(gvr)) {
+            val root = v.rootView
+            val halfWidth = root.right / 2
+            val halfHeight = root.bottom / 2
+            val parentCenterX: Int = (gvr.right - gvr.left) / 2 + gvr.left
+            val parentCenterY: Int = (gvr.bottom - gvr.top) / 2 + gvr.top
+            yOffset = if (parentCenterY <= halfHeight) {
+                -(halfHeight - parentCenterY)
+            } else {
+                parentCenterY - halfHeight
+            }
+            if (parentCenterX < halfWidth) {
+                xOffset = -(halfWidth - parentCenterX)
+            }
+            if (parentCenterX >= halfWidth) {
+                xOffset = parentCenterX - halfWidth
+            }
+        }
+        val toast = Toast.makeText(requireContext(), message, duration)
+        toast.setGravity(Gravity.CENTER, xOffset, yOffset)
+        toast.show()
+    }
 
     /**
      * Used by inherit subclasses
@@ -92,58 +113,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     abstract fun meetingButtonClick()
 
     /**
-     * Pop key board
-     */
-    fun showKeyboardDelayed(view: EditText) {
-        GlobalScope.async {
-            delay(50)
-            view.isFocusable = true;
-            view.isFocusableInTouchMode = true;
-            view.requestFocus();
-            val imm =
-                view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
-
-    /**
-     * Hide key board immediately
-     */
-    fun hideKeyboard(view: View) {
-        logDebug("hideKeyboard() ")
-        view.clearFocus()
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.let {
-            imm.hideSoftInputFromWindow(view.windowToken, 0, null)
-        }
-    }
-
-    /**
-     * Get Avatar
+     * Get Avatar and display
      */
     fun setProfileAvatar() {
         logDebug("setProfileAvatar")
         abstractMeetingOnBoardingViewModel.avatar.observe(viewLifecycleOwner) {
             meeting_thumbnail.setImageBitmap(it)
-        }
-    }
-
-    /**
-     * Control OnOffFabs such as mic, camera and speaker
-     *
-     * @param bOn true: open camera preview; false: close camera preview
-     */
-    fun switchOnOffFab(id: View, bOn: Boolean) {
-        when {
-            // Mic
-            id == fab_mic && bOn -> if (checkPermissionsAudio()) activateMic()
-            id == fab_mic && !bOn -> deactivateMic()
-            // Camera
-            id == fab_cam && bOn -> if (checkPermissionsCamera()) activateCamera()
-            id == fab_cam && !bOn -> deactivateCamera()
-            // Speaker
-            id == fab_speaker && bOn -> if (checkPermissionsAudio()) activateSpeaker()
-            id == fab_speaker && !bOn -> deactivateSpeaker()
         }
     }
 
@@ -159,7 +134,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             Constants.REQUEST_CAMERA, Constants.REQUEST_RECORD_AUDIO -> {
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO")
                 if (checkPermissionsCamera()) {
-                    activateCamera()
+                    switchCamera(true)
                 }
             }
         }
@@ -215,52 +190,29 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Activate Camera
+     * Switch Camera
+     *
+     * @param bOn true: turn on; off: turn off
      */
-    fun activateCamera() {
-        logDebug("Activate Camera")
-        fab_cam.isOn = !fab_cam.isOn
-        camera_preview.visibility = View.VISIBLE
+    fun switchCamera(bOn: Boolean) {
+        fab_cam.isOn = bOn
     }
 
     /**
-     * Deactivate Camera
+     * Switch Speaker / Headphone
+     *
+     * @param bOn true: switch to speaker; false: switch to headphone
      */
-    fun deactivateCamera() {
-        logDebug("Deactivate Camera")
-        fab_cam.isOn = !fab_cam.isOn
-        camera_preview.visibility = View.GONE
+    private fun switchSpeaker(bOn: Boolean) {
+        fab_speaker.isOn = bOn
     }
 
     /**
-     * Deactivate Speaker
+     * Turn On / Off Mic
+     *
+     * @param bOn true: turn on; off: turn off
      */
-    private fun deactivateSpeaker() {
-        fab_speaker.isOn = !fab_speaker.isOn
-        logDebug("Deactivate Speaker")
-    }
-
-    /**
-     * Activate Speaker
-     */
-    private fun activateSpeaker() {
-        fab_speaker.isOn = !fab_speaker.isOn
-        logDebug("Activate Speaker")
-    }
-
-    /**
-     * Deactivate Mic
-     */
-    private fun deactivateMic() {
-        logDebug("Deactivate Mic")
-        fab_mic.isOn = !fab_mic.isOn
-    }
-
-    /**
-     * Activate Mic
-     */
-    private fun activateMic() {
-        logDebug("Activate Mic")
-        fab_mic.isOn = !fab_mic.isOn
+    private fun switchMic(bOn: Boolean) {
+        fab_mic.isOn = bOn
     }
 }
