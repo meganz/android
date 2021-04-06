@@ -798,7 +798,7 @@ class MediaPlayerServiceViewModel(
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
-            items[index] = item.finalizeThumbnailAndType(type)
+            items[index] = item.finalizeItem(index, type)
         }
 
         val hasPrevious = playingIndex > 0
@@ -833,9 +833,11 @@ class MediaPlayerServiceViewModel(
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
         val filteredItems = ArrayList<PlaylistItem>()
 
-        for (item in items) {
+        for ((index, item) in items.withIndex()) {
             if (item.nodeName.toLowerCase(Locale.ROOT).contains(filter)) {
-                filteredItems.add(item.finalizeThumbnailAndType(PlaylistItem.TYPE_PREVIOUS))
+                // Filter only affects displayed playlist, it doesn't affect what
+                // ExoPlayer is playing, so we still need use the index before filter.
+                filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))
             }
         }
 
