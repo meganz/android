@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.textFileEditor
+package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
 import android.os.Bundle
@@ -89,6 +89,8 @@ class TextFileEditorActivity : PinActivityLollipop(), SnackbarShower {
 
             if (viewModel.getAdapterType() == FILE_LINK_ADAPTER || viewModel.getAdapterType() == ZIP_ADAPTER) {
                 toggleAllMenuItemsVisibility(menu, false)
+                menu.findItem(R.id.action_download).isVisible = true
+                menu.findItem(R.id.action_share).isVisible = true
                 return
             }
 

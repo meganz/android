@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.textFileEditor
+package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
 import android.content.Intent
@@ -13,7 +13,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiAndroid
@@ -61,10 +60,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     fun setValuesFromIntent(intent: Intent) {
-        val name = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
-        mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_MODE
-        fileName = if (name != null) name + FileUtil.TXT_EXTENSION else node?.name!!
-
         adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         if (adapterType == FROM_CHAT) {
@@ -91,6 +86,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
             node = megaApi.getNodeByHandle(handle)
         }
+
+        val name = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
+        mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_MODE
+        fileName = if (name != null) name + FileUtil.TXT_EXTENSION else node?.name!!
     }
 
     fun readFile(mi: ActivityManager.MemoryInfo): String {

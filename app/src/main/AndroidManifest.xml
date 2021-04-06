@@ -500,7 +500,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.textFileEditor.TextFileEditorActivity"
+            android:name="mega.privacy.android.app.textFileEditor.TextFileEditorActivity"
             android:launchMode="singleTop">
         </activity>
 

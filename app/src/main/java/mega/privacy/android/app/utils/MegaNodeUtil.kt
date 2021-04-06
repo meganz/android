@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -1425,5 +1426,12 @@ object MegaNodeUtil {
         } else {
             snackbarShower.showSnackbar(getString(R.string.intent_not_available))
         }
+    }
+
+    @JvmStatic
+    fun manageTextFileIntent(context: Context, node: MegaNode) {
+        val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
+        textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        context.startActivity(textFileIntent)
     }
 }

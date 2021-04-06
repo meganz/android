@@ -255,4 +255,8 @@ public class MimeTypeList {
 	public boolean isGIF () {
 		return extension.equals("gif") || extension.equals("webp");
 	}
+
+	public boolean isTextFile() {
+		return type.startsWith("text/plain") || extension.equals("txt");
+	}
 }
