@@ -15,7 +15,6 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
-import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants.*
@@ -28,7 +27,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 import java.util.*
 
-class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
+class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     companion object {
         private const val OPTION_HOURS = 0
         private const val OPTION_DAYS = 1
@@ -205,20 +204,20 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_hours,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_days,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_weeks,
                 value
-            ),
+            ).toLowerCase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_months,
                 value
-            ),
-            StringResourcesUtils.getString(R.string.year_cc).toLowerCase(Locale.getDefault())
+            ).toLowerCase(Locale.getDefault()),
+            StringResourcesUtils.getString(R.string.retention_time_picker_year).toLowerCase(Locale.getDefault())
         )
         binding.textPicker.displayedValues = arrayString
     }

@@ -26,7 +26,6 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-
 import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
@@ -45,7 +44,6 @@ import java.util.HashMap;
 
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -72,7 +70,6 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -101,11 +98,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_TARGET_URI = "target_uri";
 	public static final String EXTRA_PATH = "SAVE_PATH";
 	public static final String EXTRA_FOLDER_LINK = "FOLDER_LINK";
+	public static final String EXTRA_FROM_MV = "fromMV";
 	public static final String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
-	public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
 	private static int errorEBloqued = 0;
 	private int errorCount = 0;
@@ -340,7 +337,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
         boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
-        boolean fromMV = intent.getBooleanExtra("fromMV", false);
+        boolean fromMV = intent.getBooleanExtra(EXTRA_FROM_MV, false);
 		logDebug("fromMV: " + fromMV);
 
 		megaApi = app.getMegaApi();
@@ -813,13 +810,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								}
 							} else {
 								internalIntent = true;
-								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+								mediaIntent = getMediaIntent(this, currentFile.getName());
 							}
 
-							mediaIntent.putExtra(IS_PLAYLIST, false);
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
-                            mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {

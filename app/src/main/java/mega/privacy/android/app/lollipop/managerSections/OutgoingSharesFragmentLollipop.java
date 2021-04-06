@@ -47,6 +47,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 	}
 
+	@Override
+	protected int viewerFrom() {
+		return VIEWER_FROM_OUTGOING_SHARES;
+	}
+
 	private class ActionBarCallBack extends BaseActionBarCallBack {
 
 		public ActionBarCallBack(int currentTab) {
@@ -225,7 +230,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 		if (adapter.isMultipleSelect()) {
 			logDebug("multiselect ON");
 
@@ -270,7 +275,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.showFabButton();
 		} else {
 			//Is file
-			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
+			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position);
 		}
 	}
 

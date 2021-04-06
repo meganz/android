@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -174,7 +175,7 @@ public class CallUtil {
         for(Long chatIdCall:currentCalls){
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
             if(call != null){
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());
@@ -198,7 +199,7 @@ public class CallUtil {
         for(Long chatIdCall:currentCalls){
             if(chatIdCall == chatId){
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());
@@ -910,9 +911,11 @@ public class CallUtil {
      * Method to control when a call should be started, whether the chat room should be created or is already created.
      *
      * @param activity The Activity.
+     * @param snackbarShower The interface to show snackbar.
      * @param user    The mega User.
      */
-    public static void startNewCall(Activity activity, MegaUser user) {
+    public static void startNewCall(Activity activity, SnackbarShower snackbarShower,
+                                    MegaUser user) {
         if(user == null)
             return;
 
@@ -924,7 +927,9 @@ public class CallUtil {
             ArrayList<MegaChatRoom> chats = new ArrayList<>();
             ArrayList<MegaUser> usersNoChat = new ArrayList<>();
             usersNoChat.add(user);
-            CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, activity, CreateChatListener.START_AUDIO_CALL);
+            CreateChatListener listener = new CreateChatListener(
+                    CreateChatListener.START_AUDIO_CALL, chats, usersNoChat, activity,
+                    snackbarShower);
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, listener);
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {

@@ -39,6 +39,8 @@ import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
@@ -72,6 +74,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
@@ -126,10 +129,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
+	@MegaApi
 	@Inject
 	MegaApiAndroid megaApi;
+	@MegaApiFolder
+	@Inject
+	MegaApiAndroid megaApiFolder;
 	@Inject
 	MegaChatApiAndroid megaChatApi;
 	@Inject
@@ -137,7 +145,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Inject
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
-	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
 	final static public String APP_KEY = "6tioyn8ka5l6hty";
@@ -161,8 +168,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
-
-	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
 
@@ -736,13 +741,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		checkAppUpgrade();
 
 		setupMegaApi();
+		setupMegaApiFolder();
 		setupMegaChatApi();
 
-		megaApiFolder = getMegaApiFolder();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
 		//Logout transfers resumption
@@ -896,31 +902,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public MegaApiAndroid getMegaApiFolder(){
-		if (megaApiFolder == null){
-			PackageManager m = getPackageManager();
-			String s = getPackageName();
-			PackageInfo p;
-			String path = null;
-			try
-			{
-				p = m.getPackageInfo(s, 0);
-				path = p.applicationInfo.dataDir + "/";
-			}
-			catch (NameNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			
-			Log.d(TAG, "Database path: " + path);
-			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					BuildConfig.USER_AGENT, path);
-
-			megaApiFolder.retrySSLerrors(true);
-
-			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-		}
-		
 		return megaApiFolder;
 	}
 
@@ -957,6 +938,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+	}
+
+	/**
+	 * Setup the MegaApiAndroid instance for folder link.
+	 */
+	private void setupMegaApiFolder() {
+		megaApiFolder.retrySSLerrors(true);
+
+		megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+		megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 	}
 
 	private void setupMegaChatApi() {
@@ -1021,14 +1012,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
 		MegaApplication.showInfoChatMessages = showInfoChatMessages;
-	}
-
-	public static boolean isShowPinScreen() {
-		return showPinScreen;
-	}
-
-	public static void setShowPinScreen(boolean showPinScreen) {
-		MegaApplication.showPinScreen = showPinScreen;
 	}
 
 	public static String getUrlConfirmationLink() {
@@ -1612,6 +1595,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.remove(chatId);
 	}
 
+	public AppRTCAudioManager getAudioManager(){
+		return rtcAudioManager;
+	}
+
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
@@ -1774,7 +1761,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
 		openCallService(call.getChatid());
-		MegaApplication.setShowPinScreen(false);
+		passcodeManagement.setShowPasscodeScreen(false);
 		int callStatus = call.getStatus();
 
 		Intent i = new Intent(this, ChatCallActivity.class);
@@ -1977,6 +1964,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public static PasscodeManagement getPasscodeManagement() {
+		return passcodeManagement;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {

@@ -1,6 +1,6 @@
 [submodule "app/src/main/jni/mega/sdk"]
 	path = app/src/main/jni/mega/sdk
-	url = https://github.com/meganz/sdk.git
+	url = https://code.developers.mega.co.nz/sdk/sdk.git
 [submodule "app/src/main/jni/megachat/sdk"]
 	path = app/src/main/jni/megachat/sdk
-	url = https://github.com/meganz/MEGAchat.git
+	url = https://code.developers.mega.co.nz/megachat/MEGAchat.git

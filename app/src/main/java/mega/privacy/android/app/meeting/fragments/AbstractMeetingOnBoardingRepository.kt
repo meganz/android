@@ -6,6 +6,7 @@ import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
@@ -19,7 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AbstractMeetingOnBoardingRepository @Inject constructor(
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {

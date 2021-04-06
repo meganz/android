@@ -134,10 +134,10 @@ public class TouchImageView extends ImageView {
         normalizedScale = 1;
 
         if (getContext() instanceof FullScreenImageViewerLollipop){
-            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
         }
         else if (getContext() instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
         }
 
         mScaleType = ScaleType.FIT_CENTER;
@@ -287,19 +287,19 @@ public class TouchImageView extends ImageView {
 
             if (getContext() instanceof FullScreenImageViewerLollipop) {
                 if (normalizedScale == 1) {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(true);
                 } else {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(false);
                 }
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
             }
             else if (getContext() instanceof ChatFullScreenImageViewer) {
                 if (normalizedScale == 1) {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(true);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(true);
                 } else {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(false);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(false);
                 }
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
             }
 
             m = bundle.getFloatArray("matrix");
@@ -371,10 +371,10 @@ public class TouchImageView extends ImageView {
         normalizedScale = 1;
 
         if (getContext() instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
         }
         else if (getContext() instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
         }
 
         fitImageToView();
@@ -645,10 +645,10 @@ public class TouchImageView extends ImageView {
             normalizedScale = 1;
 
             if (getContext() instanceof FullScreenImageViewerLollipop) {
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
             }
             else if (getContext() instanceof ChatFullScreenImageViewer) {
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
             }
 
         } else {
@@ -938,19 +938,19 @@ public class TouchImageView extends ImageView {
 
         if (getContext() instanceof FullScreenImageViewerLollipop) {
             if (normalizedScale == 1) {
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+                ((FullScreenImageViewerLollipop) getContext()).setDraggable(true);
             } else {
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+                ((FullScreenImageViewerLollipop) getContext()).setDraggable(false);
             }
-            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
         }
         else if (getContext() instanceof ChatFullScreenImageViewer) {
             if (normalizedScale == 1) {
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(true);
+                ((ChatFullScreenImageViewer) getContext()).setDraggable(true);
             } else {
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(false);
+                ((ChatFullScreenImageViewer) getContext()).setDraggable(false);
             }
-            ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
         }
 
         if (normalizedScale > upperScale) {
@@ -958,19 +958,19 @@ public class TouchImageView extends ImageView {
 
             if (getContext() instanceof FullScreenImageViewerLollipop) {
                 if (normalizedScale == 1) {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(true);
                 } else {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(false);
                 }
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
             }
             else if (getContext() instanceof ChatFullScreenImageViewer) {
                 if (normalizedScale == 1) {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(true);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(true);
                 } else {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(false);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(false);
                 }
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
             }
 
             deltaScale = upperScale / origScale;
@@ -979,19 +979,19 @@ public class TouchImageView extends ImageView {
 
             if (getContext() instanceof FullScreenImageViewerLollipop) {
                 if (normalizedScale == 1) {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(true);
                 } else {
-                    ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+                    ((FullScreenImageViewerLollipop) getContext()).setDraggable(false);
                 }
-                ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
             }
             else if (getContext() instanceof ChatFullScreenImageViewer) {
                 if (normalizedScale == 1) {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(true);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(true);
                 } else {
-                    ((ChatFullScreenImageViewer) getContext()).draggableView.setDraggable(false);
+                    ((ChatFullScreenImageViewer) getContext()).setDraggable(false);
                 }
-                ((ChatFullScreenImageViewer) getContext()).draggableView.setNormalizedScale(normalizedScale);
+                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
             }
 
             deltaScale = lowerScale / origScale;

@@ -15,8 +15,8 @@ public class Constants {
     public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET = 1000;
-    public static final int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-    public static final int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
+    public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
+    public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_GET_LOCAL = 1003;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
@@ -102,11 +102,8 @@ public class Constants {
 
     public static final int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
     public static final int MULTIPLE_CHAT_IMPORT = 10;
-    public static final int MULTIPLE_FORWARD_MESSAGES = 11;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
-    public static final int MULTIPLE_IMPORT_CONTACT_MESSAGES = 13;
-
-    public static final int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES + 1;
+    public static final int MULTIPLE_RESTORED_FROM_RUBBISH = 13;
 
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;
@@ -115,13 +112,7 @@ public class Constants {
     public static final int MY_ACCOUNT_FRAGMENT = 5000;
     public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
     public static final int OVERQUOTA_ALERT = 5003;
-    public static final int CC_FRAGMENT = 5004;
-    public static final int FORTUMO_FRAGMENT = 5005;
-    public static final int CENTILI_FRAGMENT = 5007;
-    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
-
-    public static final int PAYMENT_CC_MONTH = 111;
-    public static final int PAYMENT_CC_YEAR = 112;
+    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5004;
 
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
@@ -294,17 +285,35 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
+    public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
+    public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+    public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
-    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
+    public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
     public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
     public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
+    public static final String INTENT_EXTRA_KEY_IS_PLAYLIST = "IS_PLAYLIST";
+    public static final String INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST";
+    public static final String INTENT_EXTRA_KEY_FROM = "from";
+    public static final String INTENT_EXTRA_KEY_COPY_FROM = "COPY_FROM";
+    public static final String INTENT_EXTRA_KEY_MOVE_FROM = "MOVE_FROM";
+    public static final String INTENT_EXTRA_KEY_MOVE_HANDLES = "MOVE_HANDLES";
+    public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
+    public static final String INTENT_EXTRA_KEY_COPY_HANDLES = "COPY_HANDLES";
+    public static final String INTENT_EXTRA_KEY_COPY_TO = "COPY_TO";
+    public static final String INTENT_EXTRA_KEY_CONTACT_EMAIL = "contactEmail";
+    public static final String INTENT_EXTRA_KEY_LOCATION_FILE_INFO = "locationFileInfo";
+    public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
+    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "PARENT_HANDLE";
+    public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
+    public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -341,6 +350,23 @@ public class Constants {
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
 
+    public static final int VIEWER_FROM_PHOTOS = 1;
+    public static final int VIEWER_FROM_INCOMING_SHARES = 2;
+    public static final int VIEWER_FROM_OUTGOING_SHARES = 3;
+    public static final int VIEWER_FROM_LINKS = 4;
+    public static final int VIEWER_FROM_DOCUMENTS = 5;
+    public static final int VIEWER_FROM_VIDEOS = 6;
+    public static final int VIEWER_FROM_OFFLINE = 7;
+    public static final int VIEWER_FROM_RECETS_BUCKET = 8;
+    public static final int VIEWER_FROM_CUMU = 9;
+    public static final int VIEWER_FROM_RECETS = 10;
+    public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
+    public static final int VIEWER_FROM_FOLDER_LINK = 12;
+    public static final int VIEWER_FROM_ZIP_BROWSER = 13;
+    public static final int VIEWER_FROM_FILE_BROWSER = 14;
+    public static final int VIEWER_FROM_INBOX = 15;
+    public static final int VIEWER_FROM_RUBBISH_BIN = 16;
+    public static final int VIEWER_FROM_SEARCH = 17;
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
     public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
@@ -427,6 +453,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
+    public static final String NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID = "AudioPlayerNotification";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
     public static final String TYPE_TEXT_PLAIN = "text/plain";
@@ -585,7 +612,6 @@ public class Constants {
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
     public static final String ACTION_CHAT_OPEN = "ACTION_CHAT_OPEN";
-    public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
@@ -746,6 +772,8 @@ public class Constants {
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
+    public static final int LOCATION_INDEX_WIDTH = 2;
+    public static final int LOCATION_INDEX_HEIGHT = 3;
 
     public static final String OFFLINE_ROOT = "/";
 
@@ -761,6 +789,11 @@ public class Constants {
 
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
+
+    public static final long AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS = 3000;
+    public static final long AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS = 200;
+    public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
+    public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
 
     public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
 
@@ -779,7 +812,10 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
-    public static final String EVENT_PSA_VISIBILITY = "psa_visibility";
+
+    public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
+    public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
+    public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";

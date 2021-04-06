@@ -30,6 +30,7 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import kotlin.Pair;
@@ -43,12 +44,10 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.Scrollable;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -57,16 +56,16 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
-
-    public static ImageView imageDrag;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -111,12 +110,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         super.onStop();
 
         ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentClosed(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        imageDrag = null;
     }
 
     @Override
@@ -194,6 +187,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         super.onViewCreated(view, savedInstanceState);
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
+
+        observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_RECETS);
     }
 
     @Override
@@ -335,38 +330,19 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         return nodeHandles;
     }
 
-    public ImageView getImageDrag(long handle) {
-        return adapter.getThumbnailView(listView, handle);
-    }
-
-    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail) {
-        imageDrag = thumbnail;
-
-        int[] screenPosition = null;
-        if (thumbnail != null) {
-            screenPosition = new int[4];
-
-            int[] loc = new int[2];
-            thumbnail.getLocationOnScreen(loc);
-
-            screenPosition[0] = loc[0];
-            screenPosition[1] = loc[1];
-            screenPosition[2] = thumbnail.getWidth();
-            screenPosition[3] = thumbnail.getHeight();
-        }
-
+    public void openFile(int index, MegaNode node, boolean isMedia) {
         Intent intent = null;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-            }
             intent.putExtra(HANDLE, node.getHandle());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
             }
+
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -378,64 +354,50 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
-                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                intent = getMediaIntent(context, node.getName());
             } else {
                 intent = new Intent(Intent.ACTION_VIEW);
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-                int[] screenPositionForSwipeDismiss = new int[]{
-                        screenPosition[0] + screenPosition[2] / 2,
-                        screenPosition[1] + screenPosition[3] / 2,
-                        screenPosition[2],
-                        screenPosition[3]
-                };
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS, screenPositionForSwipeDismiss);
-
-            }
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
-                intent.putExtra(IS_PLAYLIST, true);
+                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true);
             } else {
-                intent.putExtra(IS_PLAYLIST, false);
+                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
             }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                        (ManagerActivityLollipop) requireActivity());
             }
 
-            if (paramsSetSuccessfully) {
-                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-                if (isOpusFile(node)) {
-                    intent.setDataAndType(intent.getData(), "audio/*");
-                }
+            if (paramsSetSuccessfully && isOpusFile(node)) {
+                intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             intent = new Intent(Intent.ACTION_VIEW);
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath);
+                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath,
+                        (ManagerActivityLollipop) requireActivity());
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            if (screenPosition != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-            }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                        false, (ManagerActivityLollipop) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                        (ManagerActivityLollipop) requireActivity());
             }
-
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         }
 
         if (intent != null && !isIntentAvailable(context, intent)) {
@@ -444,15 +406,16 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         }
 
         if (paramsSetSuccessfully) {
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
+
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
         }
 
-        ArrayList<Long> handleList = new ArrayList<Long>();
-        handleList.add(node.getHandle());
-        NodeController nC = new NodeController(context);
-        nC.prepareForDownload(handleList, true);
+        ((ManagerActivityLollipop) context).saveNodesToDevice(Collections.singletonList(node),
+                true, false, false, false);
     }
 
     public void setBucketSelected(MegaRecentActionBucket bucketSelected) {

@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu trữ</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Hình ảnh và video</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Chưa chỉnh</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Đổi Mã Số</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Nhập</string>
@@ -862,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Ngày cũ nhất</string>
     <string name="sort_by_largest_size" context="sort files by largest size">Kích thước lớn nhất</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Kích thước nhỏ nhất</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">hàng tháng</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">hàng năm</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Xin nhập thông tin thanh toán:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Địa chỉ 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Địa chỉ 2 (nếu muốn)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Thành phố</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Bang / Tỉnh</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Quốc gia</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Mã bưu chính</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Xin nhập phương thức giao dịch:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Tên</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Họ</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Số Thẻ Tín Dụng</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Tháng</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Năm</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">Mã CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Tiến hành</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Tài khoản đã được nâng cấp thành công!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Quá trình giao dịch thất bại. Thẻ tín dụng của quý khách chưa bị tính phí</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Thông tin thẻ không đúng, vì vậy chưa có quá trình tính phí đã được thực hiện</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Dạng Mã Số</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Mã 4 số</string>
@@ -2057,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]Trống[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Viết tin nhắn cho %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Xác Minh 2-Bước</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Hạng của tài khoản bây giờ là [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Tùy thuộc vào việc tham gia của người sử dụng dịch vụ khi thực hiện các nhiệm vụ phần thưởng thành tích.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Chọn phương thức thanh toán</string>
 
     <string name="billing_period_title" context="title of billing period">Chu kỳ thanh toán</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Một lần duy nhất (tháng)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (đình kỳ)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (đình kỳ)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Thẻ Ngân Hàng[/A] (đình kỳ)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mạng Di Động[/A] (một lần duy nhất)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mạng Di Động[/A] (một lần duy nhất)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">MỚI</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Để nâng cấp thuê bao hiện tại, quý khách xin liên hệ bộ trợ giúp để đặt [A]thuê bao theo nhu cầu[/A].</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Đường liên kết tới chát đã được ghi vào bộ nhớ</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Giá từ[/A] %s nhân viên /[A]tháng[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Các gói thuê bao tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Cuộc Gọi Đã Bắt Đầu</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Mặc dù MEGA không có quyền truy cập vào dữ liệu của bạn, nhưng người quản trị tài khoản doanh nghiệp sẽ có khả năng xem nội dung Camera Uploads có trong tài khoản nhân viên của bạn</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Có vấn đề xảy ra</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Liên hệ với ban tổng quản lý tài khoản doanh nghiệp để giải quyết và khôi phục tài khoản của bạn.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Sẽ được tự động mở rộng thêm, không hề tính thêm phí, khi dùng cho mục đích doanh nghiệp chân chính.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Không gian lưu trữ[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Không Giới Hạn[/A] Băng thông</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Khi đăng xuất, các tệp tin trong phần Ngoại Tuyến sẽ bị xóa khỏi thiết bị.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Khi đăng xuất, tất cả các phiên truyền tải chưa xong sẽ bị hủy.</string>
