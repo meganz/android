@@ -38,7 +38,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
@@ -48,7 +47,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.getMediaIntent
-import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
@@ -524,32 +522,6 @@ object MegaNodeUtil {
         }
 
         return true
-    }
-
-    /**
-     * Checks if the Toolbar option "share" should be visible or not when media is opened from chat.
-     *
-     * @param chatId chat room id
-     * @param messageId chat message id
-     * @return True if the option "share" should be visible, false otherwise
-     */
-    @JvmStatic
-    fun showShareOptionFromChat(chatId: Long, messageId: Long): Boolean {
-        val app = MegaApplication.getInstance()
-        val megaChatApi = app.megaChatApi
-
-        val chatRoom = megaChatApi.getChatRoom(chatId) ?: return false
-        val messageType = megaChatApi.getMessage(chatId, messageId)?.type ?: return false
-
-        if (((chatRoom.ownPrivilege == MegaChatRoom.PRIV_RM
-                    || chatRoom.ownPrivilege == MegaChatRoom.PRIV_RO)
-                    && !chatRoom.isPreview)
-        ) {
-            return false
-        }
-
-        return messageType == MegaChatMessage.TYPE_NODE_ATTACHMENT && isOnline(app)
-                && !ChatController(app).isInAnonymousMode
     }
 
     /**

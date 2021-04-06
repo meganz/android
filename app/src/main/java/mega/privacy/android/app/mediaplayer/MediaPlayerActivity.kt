@@ -432,12 +432,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     menu.findItem(R.id.chat_import).isVisible = true
                     menu.findItem(R.id.chat_save_for_offline).isVisible = true
 
-                    // TODO: we should call showShareOptionFromChat(chatId, msgId)
-                    // when the share action is implemented.
-                    menu.findItem(R.id.share).isVisible =
-                        currentFragment == R.id.main_player && showShareOption(
-                            adapterType, adapterType == FOLDER_LINK_ADAPTER, playingHandle
-                        )
+                    // TODO: share option will be added in AND-12831
+                    menu.findItem(R.id.share).isVisible = false
 
                     val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
 
@@ -610,9 +606,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     }
                     FILE_LINK_ADAPTER -> {
                         shareLink(this, launchIntent.getStringExtra(URL_FILE_LINK))
-                    }
-                    FROM_CHAT -> {
-                        // TODO: revamp the implementation in ChatActivityLollipop, and reuse it here
                     }
                     else -> {
                         shareNode(this, megaApi.getNodeByHandle(service.viewModel.playingHandle))
