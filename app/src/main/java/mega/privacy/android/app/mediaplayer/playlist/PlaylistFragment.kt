@@ -164,7 +164,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
 
     override fun onItemClick(item: PlaylistItem) {
         if (!CallUtil.participatingInACall()) {
-            playerService?.exoPlayer?.seekTo(item.index, 0)
+            playerService?.seekTo(item.index)
         }
         (requireActivity() as MediaPlayerActivity).closeSearch()
 

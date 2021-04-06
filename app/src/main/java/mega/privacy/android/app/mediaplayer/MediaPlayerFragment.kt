@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
@@ -66,6 +67,8 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private var toolbarVisible = true
+
+    private var retryFailedDialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -173,23 +176,29 @@ class MediaPlayerFragment : Fragment() {
             }
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
-                if (!it) {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setCancelable(false)
-                        .setMessage(
-                            StringResourcesUtils.getString(
-                                if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                else R.string.error_fail_to_open_file_no_network
+                when {
+                    !it && retryFailedDialog == null -> {
+                        retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                            .setCancelable(false)
+                            .setMessage(
+                                StringResourcesUtils.getString(
+                                    if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                    else R.string.error_fail_to_open_file_no_network
+                                )
                             )
-                        )
-                        .setPositiveButton(
-                            StringResourcesUtils.getString(R.string.general_ok)
-                                .toUpperCase(Locale.ROOT)
-                        ) { _, _ ->
-                            playerService?.stopAudioPlayer()
-                            requireActivity().finish()
-                        }
-                        .show()
+                            .setPositiveButton(
+                                StringResourcesUtils.getString(R.string.general_ok)
+                                    .toUpperCase(Locale.ROOT)
+                            ) { _, _ ->
+                                playerService?.stopAudioPlayer()
+                                requireActivity().finish()
+                            }
+                            .show()
+                    }
+                    it -> {
+                        retryFailedDialog?.dismiss()
+                        retryFailedDialog = null
+                    }
                 }
             }
         }

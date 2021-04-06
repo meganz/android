@@ -860,11 +860,18 @@ class MediaPlayerServiceViewModel(
                     _playlist.value = Pair(emptyList(), 0)
                     _error.value = MegaError.API_ENOENT
                 } else {
+                    resetRetryState()
+
                     postPlaylistItems()
                 }
                 return
             }
         }
+    }
+
+    fun resetRetryState() {
+        playerRetry = 0
+        _retry.value = true
     }
 
     fun updateItemName(handle: Long, newName: String) {

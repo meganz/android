@@ -341,7 +341,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         })
 
         viewModel.retry.observe(this, Observer {
-            if (it) {
+            if (it && exoPlayer.playbackState == Player.STATE_IDLE) {
                 exoPlayer.prepare()
             }
         })
@@ -437,6 +437,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         } else {
             exoPlayer.playWhenReady = true
         }
+    }
+
+    fun seekTo(index: Int) {
+        exoPlayer.seekTo(index, 0)
+        viewModel.resetRetryState()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
