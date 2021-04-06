@@ -23,6 +23,11 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
+    /**
+     * Retrieve the color determined for an avatar.
+     *
+     * @return The default avatar color.
+     */
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
         AvatarUtil.getDefaultAvatar(
             getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
@@ -47,5 +52,17 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
             listener
         )
+    }
+
+    fun switchMic(bOn: Boolean): Boolean {
+        return true
+    }
+
+    fun switchCamera(bOn: Boolean): Boolean {
+        return true
+    }
+
+    fun switchSpeaker(bOn: Boolean): Boolean {
+        return true
     }
 }

@@ -6,85 +6,49 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.view.*
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import nz.mega.sdk.*
 
 @AndroidEntryPoint
-class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestListenerInterface {
-    private var meetingName: String = ""
+class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestListenerInterface,
+    MegaChatRequestListenerInterface {
     private val viewModel: CreateMeetingViewModel by viewModels()
 
-    private val textWatcher: TextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            if (s != null) {
-                btn_start_join_meeting.isClickable = s.isNotEmpty()
-            }
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-
-        }
-
-    }
-
-    companion object {
-        private const val KEY_MEETING_NAME = "meetingName"
-    }
-
-    override fun onSubCreateView(view: View) {
-
-    }
-
     override fun meetingButtonClick() {
-        viewModel.createMeeting()
+        logDebug("Meeting Name: $meetingName")
+        // will replaced
+        val peers = MegaChatPeerList.createInstance()
+        viewModel.createMeeting(false, peers, this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedInstanceState?.let {
-            meetingName = it.getString(KEY_MEETING_NAME, "").toString()
-            if (!TextUtils.isEmpty(meetingName)) {
-                type_meeting_edit_text.setText(meetingName)
-            }
-        }
-        abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner) {
-            (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
-        }
 
-        btn_start_join_meeting.setOnClickListener {
-            hideKeyboard(type_meeting_edit_text)
-            meetingButtonClick()
-        }
-        // It is valid when setting isClickable after setOnClickListener
-        btn_start_join_meeting.isClickable = false
-
-        type_meeting_edit_text.addTextChangedListener(textWatcher)
         showKeyboardDelayed(type_meeting_edit_text)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        initViewModel()
         setProfileAvatar()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        if (!TextUtils.isEmpty(meetingName)) {
-            outState.putString(KEY_MEETING_NAME, meetingName)
+    /**
+     * Initialize viewmodel
+     */
+    private fun initViewModel(){
+        abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner) {
+            (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
+        }
+        abstractMeetingOnBoardingViewModel.tips.observe(viewLifecycleOwner) {
+            showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
         }
     }
 
@@ -102,5 +66,29 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
 
     override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
         Toast.makeText(requireContext(), "onRequestTemporaryError", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+    }
+
+    override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+    }
+
+    override fun onRequestFinish(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+        logDebug("onRequestFinish: " + request!!.requestString + " " + request!!.type)
+    }
+
+    override fun onRequestTemporaryError(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+
     }
 }
