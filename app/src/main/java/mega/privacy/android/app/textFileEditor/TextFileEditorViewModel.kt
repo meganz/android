@@ -3,6 +3,12 @@ package mega.privacy.android.app.textFileEditor
 import android.app.ActivityManager
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -39,7 +45,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private var fileName = ""
     private var node: MegaNode? = null
     private var mode = VIEW_MODE
-    private var contentText = ""
     private var adapterType: Int = INVALID_VALUE
     private var msgChat: MegaChatMessage? = null
 
@@ -57,6 +62,13 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun setEditMode() {
         mode = EDIT_MODE
+    }
+
+    private val contentText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    fun onContentTextRead(): LiveData<String> = contentText
+
+    fun readFileContent(mi: ActivityManager.MemoryInfo) {
+        viewModelScope.launch { readFile(mi) }
     }
 
     fun setValuesFromIntent(intent: Intent) {
@@ -92,58 +104,59 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         fileName = if (name != null) name + FileUtil.TXT_EXTENSION else node?.name!!
     }
 
-    fun readFile(mi: ActivityManager.MemoryInfo): String {
-        val localFileUri = getLocalFile(null, node?.name, node?.size!!)
+    private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
+        withContext(Dispatchers.IO) {
+            val localFileUri = getLocalFile(null, node?.name, node?.size!!)
 
-        if (!isTextEmpty(localFileUri)) {
-            val localFile = File(localFileUri)
+            if (!isTextEmpty(localFileUri)) {
+                val localFile = File(localFileUri)
 
-            if (isFileAvailable(localFile)) {
-                contentText = readFile(BufferedReader(FileReader(localFile)))
-                return contentText
+                if (isFileAvailable(localFile)) {
+                    readFile(BufferedReader(FileReader(localFile)))
+                    return@withContext
+                }
             }
+
+            if (megaApi.httpServerIsRunning() == 0) {
+                megaApi.httpServerStart()
+            }
+
+            megaApi.httpServerSetMaxBufferSize(
+                if (mi.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
+                else MAX_BUFFER_16MB
+            )
+
+            val uri = megaApi.httpServerGetLocalLink(node)
+            if (uri == null) {
+                logError("Error getting the file uri.")
+                contentText.value = ""
+            }
+
+            val url = URL(uri)
+            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            readFile(BufferedReader(InputStreamReader(connection.inputStream)))
         }
-
-        if (megaApi.httpServerIsRunning() == 0) {
-            megaApi.httpServerStart()
-        }
-
-        megaApi.httpServerSetMaxBufferSize(
-            if (mi.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
-            else MAX_BUFFER_16MB
-        )
-
-        val uri = megaApi.httpServerGetLocalLink(node)
-        if (uri == null) {
-            logError("Error getting the file uri.")
-            return contentText
-        }
-
-        val url = URL(uri)
-        val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
-        val inputS = connection.inputStream
-        contentText = readFile(BufferedReader(InputStreamReader(inputS)))
-        return contentText
     }
 
-    private fun readFile(br: BufferedReader): String {
-        val sb = StringBuilder()
+    private suspend fun readFile(br: BufferedReader) {
+        withContext(Dispatchers.IO) {
+            val sb = StringBuilder()
 
-        try {
-            var line: String?
+            try {
+                var line: String?
 
-            while (br.readLine().also { line = it } != null) {
-                sb.append(line)
-                sb.append('\n')
+                while (br.readLine().also { line = it } != null) {
+                    sb.append(line)
+                    sb.append('\n')
+                }
+
+                br.close()
+            } catch (e: IOException) {
+                logError("Exception while reading text file.", e)
             }
 
-            br.close()
-            return sb.toString()
-        } catch (e: IOException) {
-            logError("Exception while reading text file.", e)
+            contentText.postValue(sb.toString())
         }
-
-        return sb.toString()
     }
 
     fun saveFile(contentText: String): Boolean {

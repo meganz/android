@@ -131,10 +131,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             menu.findItem(R.id.action_copy).isVisible = viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
             menu.findItem(R.id.chat_action_import).isVisible = false
+            menu.findItem(R.id.action_remove).isVisible = false
             menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
             menu.findItem(R.id.chat_action_remove).isVisible = false
+            menu.findItem(R.id.action_save).isVisible = false
         } else {
-            menu.findItem(R.id.action_save)?.isVisible = true
+            menu.findItem(R.id.action_save).isVisible = true
         }
     }
 
@@ -157,7 +159,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             binding.editText.isEnabled = false
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
-            binding.editText.setText(viewModel.readFile(mi))
+
+            viewModel.onContentTextRead().observe(this, { contentRead ->
+                binding.editText.setText(contentRead)
+            })
+
+            viewModel.readFileContent(mi)
         } else {
             binding.editText.isEnabled = true
             binding.editText.requestFocus()

@@ -57,35 +57,35 @@
 
     <item
         android:id="@+id/action_rename"
-        android:orderInCategory="90"
+        android:orderInCategory="110"
         android:title="@string/context_rename"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_move"
-        android:orderInCategory="90"
+        android:orderInCategory="110"
         android:title="@string/context_move"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_copy"
-        android:orderInCategory="90"
+        android:orderInCategory="110"
         android:title="@string/context_copy"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_move_to_trash"
-        android:orderInCategory="80"
+        android:orderInCategory="120"
         android:title="@string/context_move_to_trash"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_remove"
-        android:orderInCategory="80"
+        android:orderInCategory="120"
         android:title="@string/context_remove"
         android:visible="false"
         app:showAsAction="never" />
@@ -108,7 +108,7 @@
 
     <item
         android:id="@+id/chat_action_remove"
-        android:orderInCategory="80"
+        android:orderInCategory="110"
         android:title="@string/context_remove"
         android:visible="false"
         app:showAsAction="never" />
