@@ -463,6 +463,11 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
                     toggleAllMenuItemsVisibility(menu, false)
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+                    menu.findItem(R.id.share).isVisible = true
+
+                    return
                 }
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
@@ -534,6 +539,15 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             R.id.save_to_device -> {
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
+                    ZIP_ADAPTER -> {
+                        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
+                            ?: return false
+                        val playlistItem =
+                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)
+                                ?: return false
+
+                        nodeSaver.saveUri(uri, playlistItem.nodeName, playlistItem.size, true)
+                    }
                     FROM_CHAT -> {
                         val node = getChatMessageNode() ?: return true
 

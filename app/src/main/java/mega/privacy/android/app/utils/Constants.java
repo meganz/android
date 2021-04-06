@@ -766,6 +766,9 @@ public class Constants {
 
     public static final int INVALID_VALUE = -1;
 
+    public static final long INVALID_SIZE = -1;
+    public static final int COPY_FILE_BUFFER_SIZE = 32 * 1024; // 32 KB
+
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
     public static final int LOCATION_INDEX_WIDTH = 2;
