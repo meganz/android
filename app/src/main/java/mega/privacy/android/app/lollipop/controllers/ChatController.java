@@ -1,13 +1,9 @@
 package mega.privacy.android.app.lollipop.controllers;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.StatFs;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -66,6 +62,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -257,7 +254,7 @@ public class ChatController {
 
         if (messageToDelete == null) {
             logDebug("The message cannot be deleted");
-        }else{
+        } else if (context instanceof ChatActivityLollipop) {
             logDebug("The message has been deleted");
             ((ChatActivityLollipop) context).updatingRemovedMessage(message);
         }
@@ -956,44 +953,28 @@ public class ChatController {
         }
     }
 
-    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chatRoom){
+    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages,
+                                           MegaChatRoom chatRoom,
+                                           SnackbarShower snackbarShower) {
         logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
-            saveForOffline(messages.get(i).getMegaNodeList(), chatRoom);
+            saveForOffline(messages.get(i).getMegaNodeList(), chatRoom, false, snackbarShower);
         }
     }
 
-    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chatRoom){
+    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages,
+                                                  MegaChatRoom chatRoom,
+                                                  SnackbarShower snackbarShower) {
         logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
-            saveForOffline(messages.get(i).getMessage().getMegaNodeList(), chatRoom);
+            saveForOffline(messages.get(i).getMessage().getMegaNodeList(), chatRoom, false,
+                    snackbarShower);
         }
     }
 
-    public void saveForOffline(MegaNodeList nodeList, MegaChatRoom chatRoom){
-
+    public void saveForOffline(MegaNodeList nodeList, MegaChatRoom chatRoom,
+                               boolean fromMediaViewer, SnackbarShower snackbarShower) {
         File destination = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                if (context instanceof ChatActivityLollipop) {
-                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof ChatFullScreenImageViewer){
-                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                }
-            }
-        }
 
         if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
@@ -1015,7 +996,8 @@ public class ChatController {
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         logWarning("File already exists!");
-                        showSnackbar(context, context.getString(R.string.file_already_exists));
+                        snackbarShower.showSnackbar(SNACKBAR_TYPE,
+                                getString(R.string.file_already_exists), MEGACHAT_INVALID_HANDLE);
                     }
                     else{
                         dlFiles.put(document, destination.getAbsolutePath());
@@ -1038,8 +1020,12 @@ public class ChatController {
 
             String path = dlFiles.get(document);
 
-            if(availableFreeSpace <document.getSize()){
-                showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((ChatActivityLollipop) context));
+            if (availableFreeSpace <document.getSize()) {
+                showErrorAlertDialog(
+                        getString(R.string.location_label,
+                                getString(R.string.error_not_enough_free_space),
+                                document.getName()),
+                        false, ((Activity) context));
                 continue;
             }
 
@@ -1049,7 +1035,7 @@ public class ChatController {
             logDebug("serializeString: " + serializeString);
             service.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
-            if (context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+            if (fromMediaViewer) {
                 service.putExtra("fromMV", true);
             }
             context.startService(service);

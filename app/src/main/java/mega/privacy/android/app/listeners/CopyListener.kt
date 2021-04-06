@@ -52,7 +52,7 @@ class CopyListener(
         snackbarShower: SnackbarShower,
         chatController: ChatController,
         chatId: Long,
-        exportListener: ExportListener
+        exportListener: ExportListener?
     ) : this(action, snackbarShower, null, context) {
         initFields(messagesSelected, counter, chatController, chatId, exportListener)
     }
