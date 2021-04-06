@@ -536,6 +536,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     if (adapterType == OFFLINE_ADAPTER) {
                         intent = Intent(this, OfflineFileInfoActivity::class.java)
                         intent.putExtra(HANDLE, playingHandle.toString())
+
+                        logDebug("onOptionsItemSelected properties offline handle $playingHandle")
                     } else {
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
                         intent.putExtra(HANDLE, playingHandle)
