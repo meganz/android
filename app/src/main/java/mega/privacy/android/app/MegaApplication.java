@@ -349,8 +349,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
-					//Login transfers resumption
-					TransfersManagement.enableTransfersResumption();
+					//Login check resumed pending transfers
+					TransfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -751,8 +751,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
         passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
-		//Logout transfers resumption
-		TransfersManagement.enableTransfersResumption();
+		//Logout check resumed pending transfers
+		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = false;
 		if (dbH != null) {

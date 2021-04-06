@@ -248,21 +248,19 @@ public class TransfersManagement {
     }
 
     /**
-     * Enables transfers resumption.
+     * Check if there are resumed pending transfers.
      * Before start to check if there are pending transfers, it has to wait a time
      * WAIT_TIME_TO_RESTART_SERVICES. This time is for the transfer resumption to be enabled
      * since there is no possibility to listen any response of the request to know when it finishes.
      *
      */
-    public static void enableTransfersResumption() {
+    public static void checkResumedPendingTransfers() {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
 
         if (megaApi.getRootNode() != null) {
             checkSDCardCompletedTransfers();
         }
-
-        megaApi.enableTransferResumption();
 
         if (app.getDbH().getTransferQueueStatus()) {
             //Queue of transfers should be paused.
