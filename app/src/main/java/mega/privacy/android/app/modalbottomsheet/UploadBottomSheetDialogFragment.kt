@@ -15,6 +15,7 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         private const val UPLOAD_TYPE = "UPLOAD_TYPE"
         const val GENERAL_UPLOAD = 1
         const val DOCUMENTS_UPLOAD = 2
+        const val HOMEPAGE_UPLOAD = 3
 
         @JvmStatic
         fun newInstance(uploadType: Int): UploadBottomSheetDialogFragment {
@@ -43,9 +44,14 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         mainLinearLayout = binding.uploadBottomSheet
         items_layout = binding.itemsLayout
 
-        if (arguments?.getInt(UPLOAD_TYPE) == DOCUMENTS_UPLOAD) {
-            binding.takePictureOption.isVisible = false
-            binding.newFolderOption.isVisible = false
+        when (arguments?.getInt(UPLOAD_TYPE)) {
+            DOCUMENTS_UPLOAD -> {
+                binding.takePictureOption.isVisible = false
+                binding.newFolderOption.isVisible = false
+            }
+            HOMEPAGE_UPLOAD -> {
+                binding.newFolderOption.isVisible = false
+            }
         }
 
         binding.uploadFromDeviceOption.setOnClickListener(this)
