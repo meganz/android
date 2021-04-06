@@ -426,10 +426,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 }
 
                 if (adapterType == FROM_CHAT) {
-                    menu.findItem(R.id.properties).isVisible = false
-                    menu.findItem(R.id.rename).isVisible = false
-                    menu.findItem(R.id.move).isVisible = false
-                    menu.findItem(R.id.copy).isVisible = false
+                    toggleAllMenuItemsVisibility(menu, false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true
                     menu.findItem(R.id.chat_import).isVisible = true
