@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -375,14 +376,25 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     }
 
     private fun refreshMenuOptionsVisibility() {
-        val menu = optionsMenu ?: return
-        val currentFragment = navController.currentDestination?.id ?: return
+        val menu = optionsMenu
+        if (menu == null) {
+            logDebug("refreshMenuOptionsVisibility menu is null")
+            return
+        }
+
+        val currentFragment = navController.currentDestination?.id
+        if (currentFragment == null) {
+            logDebug("refreshMenuOptionsVisibility currentFragment is null")
+            return
+        }
 
         val adapterType = playerService?.viewModel?.currentIntent
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         val playingHandle = playerService?.viewModel?.playingHandle
         if (adapterType == null || playingHandle == null) {
+            logDebug("refreshMenuOptionsVisibility null adapterType ($adapterType) or playingHandle ($playingHandle)")
+
             toggleAllMenuItemsVisibility(menu, false)
             return
         }
@@ -426,12 +438,16 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 val service = playerService
                 if (service == null) {
+                    logDebug("refreshMenuOptionsVisibility service is null")
+
                     toggleAllMenuItemsVisibility(menu, false)
                     return
                 }
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
                 if (node == null) {
+                    logDebug("refreshMenuOptionsVisibility node is null")
+
                     toggleAllMenuItemsVisibility(menu, false)
                     return
                 }
