@@ -19,6 +19,7 @@ import nz.mega.sdk.*
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestListenerInterface,
     MegaChatRequestListenerInterface {
+
     private val viewModel: CreateMeetingViewModel by viewModels()
 
     override fun meetingButtonClick() {

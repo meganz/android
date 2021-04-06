@@ -204,7 +204,6 @@ object CuSyncManager {
             backupName,
             state,
             subState,
-            extraData,
             SyncListener(SetBackupCallback(), megaApplication)
         )
     }
@@ -408,9 +407,9 @@ object CuSyncManager {
             BACKUP_TYPE_INVALID,
             targetNode,
             localFolder,
+            INVALID_NON_NULL_VALUE,
             state,
             MegaError.API_OK,
-            INVALID_NON_NULL_VALUE,
             SyncListener(UpdateBackupCallback(), megaApplication)
         )
     }

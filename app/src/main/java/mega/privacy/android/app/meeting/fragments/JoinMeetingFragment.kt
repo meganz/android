@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.view.*
@@ -23,22 +24,14 @@ private const val ARG_PARAM2 = "param2"
  */
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
-    private lateinit var viewModel: JoinMeetingViewModel
+
+    private val viewModel: JoinMeetingViewModel by viewModels()
 
     override fun meetingButtonClick() {
-
     }
 
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.join_meeting_fragment, container, false)
-//    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(JoinMeetingViewModel::class.java)
     }
 }
