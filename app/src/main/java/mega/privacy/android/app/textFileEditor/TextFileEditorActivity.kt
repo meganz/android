@@ -8,9 +8,9 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isOnline
@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 
 @AndroidEntryPoint
-class TextFileEditorActivity : PinActivityLollipop(), SnackbarShower {
+class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
 
