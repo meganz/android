@@ -923,20 +923,19 @@ public class NodeController {
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
             return FILE_LINK;
-        }
-        else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
+        } else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             context.startActivity(openFolderIntent);
             return FOLDER_LINK;
-        }
-        else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
+        } else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
             return CHAT_LINK;
-        }
-        else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
+        } else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
             return CONTACT_LINK;
+        } else if (AndroidMegaRichLinkMessage.isMeetingLink(url)) {
+            return MEETING_LINK;
         }
 
         logWarning("wrong url");

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -27,6 +28,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.MEETING_LINK
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.IncomingCallNotification
 
@@ -39,6 +41,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         const val MEETING_TYPE_CREATE = "create_meeting"
         const val MEETING_TYPE_GUEST = "join_meeting_as_guest"
         const val MEETING_TYPE_IN = "in_meeting"
+
+        const val MEETING_LINK = "meeting_link"
 
         private var isGuest = true
         private var isModerator = false
@@ -145,9 +149,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val navGraph: NavGraph =
             navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
+        val bundle = Bundle()
+
         when (meetType) {
             MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
-            MEETING_TYPE_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
+            MEETING_TYPE_JOIN -> {
+                bundle.putString(MEETING_LINK, intent.dataString)
+                navGraph.startDestination = R.id.joinMeetingFragment
+            }
             MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
             MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeetingFragment
             else -> navGraph.startDestination = R.id.createMeetingFragment
@@ -155,7 +164,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
         // Change start destination dynamically
-        navController.graph = navGraph
+        navController.setGraph(navGraph, bundle)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -171,14 +187,20 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
 
         wiredHeadsetConnected = !wiredHeadsetConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeCamState(camOn: Boolean) {
         // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
 
         bluetoothConnected = !bluetoothConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(wiredHeadsetConnected, bluetoothConnected)
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
@@ -231,7 +253,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     fun setBottomFloatingPanelViewHolder(visible: Boolean) {
         when (visible) {
-            true -> bottom_floating_panel.visibility = View.VISIBLE
+            true -> bottom_floating_panel.visibility = View.VISIBLE;
             false -> bottom_floating_panel.visibility = View.GONE
         }
     }

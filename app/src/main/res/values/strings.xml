@@ -2629,6 +2629,8 @@
     <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="title_tour_five" cotext="Title of fifth tour screen">MEGA encrypted meeting</string>
+    <string name="content_tour_five" cotext="Content of fourth tour screen">End-to-End Encrypted conference at MEGA</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
@@ -2679,9 +2681,12 @@
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
     <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
     <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
+    <string name="invalid_meeting_link_empty" context="Error shown when it tries to open an invalid meeting link and the text view is empty">Please enter a valid meeting link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
+    <string name="valid_meeting_link" context="Error shown when it tries to open a meeting link from the Cloud Drive section">You have pasted a meeting link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="action_open_meeting_link" context="Menu item">Open meeting link</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">New chat link</string>
@@ -3064,6 +3069,7 @@
     <string name="new_meeting" context="Label that create a meeting">New meeting</string>
     <string name="join_meeting" context="Label that join a meeting">Join meeting</string>
     <string name="btn_start_meeting" context="Button that create a meeting">Start meeting</string>
+    <string name="btn_join_meeting" context="Button that join a meeting">Join meeting</string>
     <string name="type_meeting_name" context="Hint shown to guide user on meeting name">Joanna\'s meeting</string>
 
     <string name="general_mic" context="General label for microphone">Mic</string>
@@ -3078,13 +3084,19 @@
     <string name="ping_to_speaker" context="Ping the participant to speaker view in the meeting">Pin to Speaker View</string>
     <string name="make_moderator" context="Make the participant as moderator in the meeting">Make moderator</string>
     <string name="remove_participant" context="Remove the participant from meeting">Remove participant</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="meeting_link" context="The literal meeting link text">Meeting link</string>
     <string name="paste_meeting_link_instruction" context="Tell the user to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
     <string name="invite_to_meeting_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
     <string name="duration_meeting" context="Subtitle of the meeting screen ">Duration</string>
 
+    <string name="onboarding_no_mega_account" context="The question in on-boarding screen asking if the user don't have a mega account">Don\'t have a MEGA account?</string>
+    <string name="join_meeting_as_guest" context="The question in on-boarding screen asking if the user is going to join meeting as guest">Join meeting as guest?</string>
 
+    <string name="paste_meeting_link_dialog_title">Please paste your meeting link to join </string>
+    <string name="paste_meeting_link_guest_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
+    <string name="paste_meeting_link_guest_instruction" context="Tell the guest to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
+
+    <string name="invalid_meeting_link" context="error message shown when a meeting link is invalid">This meeting has ended</string>
+    <string name="invalid_meeting_link_args" context="error message shown when a meeting link is not well formed">Invalid meeting link</string>
 </resources>

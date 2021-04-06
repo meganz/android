@@ -21,9 +21,9 @@ import nz.mega.sdk.MegaRequestListenerInterface
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestListenerInterface {
     private var meetingName: String = ""
-    private val viewModel: CreateMeetingViewModel  by viewModels()
+    private val viewModel: CreateMeetingViewModel by viewModels()
 
-    private val textWatcher: TextWatcher = object: TextWatcher{
+    private val textWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
         }
@@ -42,7 +42,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
 
     companion object {
         private const val KEY_MEETING_NAME = "meetingName"
-        fun newInstance() = CreateMeetingFragment()
     }
 
     override fun onSubCreateView(view: View) {
@@ -60,15 +59,15 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
         super.onViewCreated(view, savedInstanceState)
         savedInstanceState?.let {
             meetingName = it.getString(KEY_MEETING_NAME, "").toString()
-            if (!TextUtils.isEmpty(meetingName)){
+            if (!TextUtils.isEmpty(meetingName)) {
                 type_meeting_edit_text.setText(meetingName)
             }
         }
-        abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner){
-            (meetingActivity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
+        abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner) {
+            (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
         }
 
-        btn_start_join_meeting.setOnClickListener{
+        btn_start_join_meeting.setOnClickListener {
             hideKeyboard(type_meeting_edit_text)
             meetingButtonClick()
         }
@@ -78,13 +77,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
 
         type_meeting_edit_text.addTextChangedListener(textWatcher)
         showKeyboardDelayed(type_meeting_edit_text)
-
-        fab_cam.setOnClickListener{
-            run {
-                fab_cam.isOn = !fab_cam.isOn
-                showBackgroundCameraPreview(fab_cam.isOn)
-            }
-        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

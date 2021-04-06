@@ -185,6 +185,7 @@ import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_IN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -2562,8 +2563,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
                 if(chatRoom.isGroup()){
-//                    showMeetingOptionsPanel();
-                    onCreateMeeting();
+                    // In a group, directly enter meeting room
+                    onCreateMeeting(MEETING_TYPE_IN);
                     break;
                 }
                 startVideo = true;
@@ -2629,12 +2630,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    private void onCreateMeeting() {
+    private void onCreateMeeting(String meetingType) {
         Intent meetingIntent = new Intent(this, MeetingActivity.class);
-        meetingIntent.putExtra("meetingType", MEETING_TYPE_CREATE);
+        meetingIntent.putExtra("meetingType", meetingType);
         startActivity(meetingIntent);
     }
-
     /*
      *Prepare recording
      */
