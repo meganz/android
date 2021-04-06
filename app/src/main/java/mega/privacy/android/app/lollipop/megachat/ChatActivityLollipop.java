@@ -4611,7 +4611,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                         boolean allNodeImages = true;
                         boolean isRemoved = false;
                         boolean allNodeNonContacts = true;
-                        boolean allNodeContacts = true;
 
                         menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
@@ -4669,23 +4668,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                     }
                                 }
                             }
-
-                            if (allNodeContacts) {
-                                if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                                    allNodeContacts = false;
-                                } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
-
-                                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                        long userHandle = selected.get(i).getMessage().getUserHandle(i);
-                                        if (!chatRoom.isGroup() && userHandle == chatRoom.getPeerHandle(0)) {
-                                            allNodeContacts = false;
-                                        }
-                                    } else {
-                                        allNodeContacts = false;
-                                    }
-                                }
-                            }
                     }
 
                         if (isUploading || isRemoved) {
@@ -4696,7 +4678,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             importIcon.setVisible(false);
                         }
                         else {
@@ -4725,8 +4706,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible((isOnline(chatActivity) &&
                                     !chatC.isInAnonymousMode()) && showForward);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(allNodeNonContacts &&
-                                    isOnline(chatActivity) && !chatC.isInAnonymousMode());
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(allNodeContacts &&
                                     isOnline(chatActivity) && !chatC.isInAnonymousMode());
                         }
                     }
