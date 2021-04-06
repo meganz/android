@@ -211,8 +211,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param psa the psa to display
      */
     private void launchPsaWebBrowser(Psa psa) {
-        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        // If there is a PsaWebBrowser launched, we should use it to load the new url.
         if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            psaWebBrowser.loadUrl(psa.getUrl());
             return;
         }
 

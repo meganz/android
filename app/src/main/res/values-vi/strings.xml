@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu trữ</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Hình ảnh và video</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Chưa chỉnh</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Đổi Mã Số</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Nhập</string>
@@ -2029,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]Trống[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Viết tin nhắn cho %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Xác Minh 2-Bước</string>

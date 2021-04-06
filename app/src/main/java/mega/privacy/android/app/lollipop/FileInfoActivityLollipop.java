@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -128,9 +129,9 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener,
-        MegaRequestListenerInterface, MegaGlobalListenerInterface,
-        ActionNodeCallback, SnackbarShower {
+public class FileInfoActivityLollipop extends PasscodeActivity implements OnClickListener,
+        MegaRequestListenerInterface, MegaGlobalListenerInterface, ActionNodeCallback,
+        SnackbarShower {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;

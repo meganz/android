@@ -25,6 +25,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -62,7 +63,7 @@ import nz.mega.sdk.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
+abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, ActivityLauncher {
 
     @MegaApi
     @Inject

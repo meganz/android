@@ -4669,8 +4669,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				aB.setSubtitle(null);
 				if(isSearchEnabled){
 					setFirstNavigationLevel(false);
-				}
-				else{
+				} else {
 					setFirstNavigationLevel(true);
 					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
@@ -5650,9 +5649,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
-
-				setToolbarTitle();
-    			supportInvalidateOptionsMenu();
+				if (isSearchEnabled && searchDate != null) {
+					cuFragment.setSearchDate(searchDate, orderCamera);
+					invalidateOptionsMenu();
+					setToolbarTitle();
+				} else {
+					setToolbarTitle();
+					supportInvalidateOptionsMenu();
+				}
 				showFabButton();
 				showHideBottomNavigationView(false);
 				if (!comesFromNotifications) {
@@ -7850,8 +7854,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
-				drawerItem = DrawerItem.CAMERA_UPLOADS;
-				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				// if pre fragment is the same one, do nothing.
+				if(oldDrawerItem != DrawerItem.CAMERA_UPLOADS) {
+					drawerItem = DrawerItem.CAMERA_UPLOADS;
+					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_shared_items: {
