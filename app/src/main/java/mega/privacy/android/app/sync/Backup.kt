@@ -35,7 +35,7 @@ data class Backup(
      * @see MegaError
      */
     var subState: Int = MegaError.API_OK,
-    var extraData: String = INVALID_NON_NULL_VALUE,
+    var extraData: String? = INVALID_NON_NULL_VALUE,
     @ClientOnly var startTimestamp: Long = 0L,
     @ClientOnly var lastFinishTimestamp: Long = 0L,
     @ClientOnly var targetFolderPath: String = INVALID_NON_NULL_VALUE,
