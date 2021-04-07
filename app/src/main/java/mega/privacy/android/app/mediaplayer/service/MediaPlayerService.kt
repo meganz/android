@@ -271,7 +271,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             setPlayer(exoPlayer)
             setControlDispatcher(
-                CallAwareControlDispatcher(exoPlayer.repeatMode, true)
+                CallAwareControlDispatcher(exoPlayer.repeatMode)
             )
         }
     }
@@ -399,10 +399,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
 
         exoPlayer.prepare()
-
-        if (!viewModel.audioPlayer) {
-            playingVideo = true
-        }
     }
 
     override fun onDestroy() {
@@ -413,10 +409,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         if (initialized) {
             if (audioManager != null) {
                 abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
-            }
-
-            if (!viewModel.audioPlayer) {
-                playingVideo = false
             }
 
             viewModel.clear()
@@ -488,8 +480,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         private const val RESUME_DELAY_MS = 500L
 
         const val SINGLE_PLAYLIST_SIZE = 2
-
-        var playingVideo = false
 
         /**
          * Pause the audio player when play video, play/record audio clip, start/receive call.
