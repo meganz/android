@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -20,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
@@ -34,10 +34,12 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -49,6 +51,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDevi
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
@@ -89,7 +93,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
-    private var savingInstanceState = false
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -117,16 +120,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 refreshMenuOptionsVisibility()
 
-                service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
-                    if (service.service.viewModel.playlistSearchQuery != null) {
-                        return@observe
-                    }
-
-                    if (it.first.isEmpty()) {
-                        stopPlayer()
-                    }
-                }
-
                 service.service.metadata.observe(this@MediaPlayerActivity) {
                     dragToExit.nodeChanged(service.service.viewModel.playingHandle)
                 }
@@ -138,7 +131,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         }
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -229,6 +221,19 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         }
+
+        if (CallUtil.participatingInACall()) {
+            showNotAllowPlayAlert()
+        }
+
+        LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
+            .observe(this) {
+                showNotAllowPlayAlert()
+            }
+    }
+
+    private fun showNotAllowPlayAlert() {
+        showSnackbar(StringResourcesUtils.getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {
@@ -244,8 +249,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
-
-        savingInstanceState = true
     }
 
     private fun stopPlayer() {
@@ -312,7 +315,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     override fun onDestroy() {
         super.onDestroy()
 
-        if (!savingInstanceState) {
+        if (isFinishing) {
             playerService?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
         }
@@ -324,7 +327,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeSaver.destroy()
 
-        if (!savingInstanceState && !isAudioPlayer(intent)) {
+        if (isFinishing && !isAudioPlayer(intent)) {
             MediaPlayerService.resumeAudioPlayer(this)
         }
     }
@@ -374,11 +377,22 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     }
 
     private fun refreshMenuOptionsVisibility() {
-        val menu = optionsMenu ?: return
-        val currentFragment = navController.currentDestination?.id ?: return
+        val menu = optionsMenu
+        if (menu == null) {
+            logDebug("refreshMenuOptionsVisibility menu is null")
+            return
+        }
+
+        val currentFragment = navController.currentDestination?.id
+        if (currentFragment == null) {
+            logDebug("refreshMenuOptionsVisibility currentFragment is null")
+            return
+        }
 
         val service = playerService
         if (service == null) {
+            logDebug("refreshMenuOptionsVisibility null service")
+
             toggleAllMenuItemsVisibility(menu, false)
             return
         }
@@ -386,8 +400,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         val adapterType = service.viewModel.currentIntent
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
-        val playingHandle = service.viewModel.playingHandle
         if (adapterType == null) {
+            logDebug("refreshMenuOptionsVisibility null adapterType")
+
             toggleAllMenuItemsVisibility(menu, false)
             return
         }
@@ -411,7 +426,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 }
 
                 if (adapterType == RUBBISH_BIN_ADAPTER
-                    || megaApi.isInRubbish(megaApi.getNodeByHandle(playingHandle))
+                    || megaApi.isInRubbish(megaApi.getNodeByHandle(service.viewModel.playingHandle))
                 ) {
                     toggleAllMenuItemsVisibility(menu, false)
 
@@ -465,6 +480,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
                 if (node == null) {
+                    logDebug("refreshMenuOptionsVisibility node is null")
+
                     toggleAllMenuItemsVisibility(menu, false)
                     return
                 }
@@ -474,8 +491,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
                 menu.findItem(R.id.save_to_device).isVisible = true
 
-                menu.findItem(R.id.properties).isVisible =
-                    currentFragment == R.id.main_player
+                menu.findItem(R.id.properties).isVisible = currentFragment == R.id.main_player
 
                 menu.findItem(R.id.share).isVisible =
                     currentFragment == R.id.main_player && showShareOption(
@@ -569,20 +585,44 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         )
                     )
                 } else {
-                    val nodeName =
-                        service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
-                            ?: return false
-
                     val intent: Intent
 
                     if (adapterType == OFFLINE_ADAPTER) {
                         intent = Intent(this, OfflineFileInfoActivity::class.java)
+                        intent.putExtra(HANDLE, playingHandle.toString())
+
+                        logDebug("onOptionsItemSelected properties offline handle $playingHandle")
                     } else {
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
-                        intent.putExtra(NAME, nodeName)
+                        intent.putExtra(HANDLE, playingHandle)
+
+                        val node = megaApi.getNodeByHandle(playingHandle)
+                        if (node == null) {
+                            logError("onOptionsItemSelected properties non-offline null node")
+
+                            return false
+                        }
+
+                        intent.putExtra(NAME, node.name)
+
+                        val fromIncoming =
+                            if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
+                                NodeController(this).nodeComesFromIncoming(node)
+                            } else {
+                                false
+                            }
+
+                        when {
+                            adapterType == INCOMING_SHARES_ADAPTER || fromIncoming -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INCOMING_SHARES)
+                                intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
+                            }
+                            adapterType == INBOX_ADAPTER -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INBOX)
+                            }
+                        }
                     }
 
-                    intent.putExtra(HANDLE, playingHandle)
                     startActivity(intent)
                 }
                 return true
@@ -862,6 +902,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         when (code) {
             MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
             MegaError.API_EBLOCKED -> showTakenDownAlert(this)
+            MegaError.API_ENOENT -> stopPlayer()
         }
     }
 

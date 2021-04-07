@@ -314,6 +314,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
+    public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
 
@@ -811,6 +812,7 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+    public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";

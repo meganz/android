@@ -8,7 +8,7 @@ import mega.privacy.android.app.databinding.ItemVideoPlaylistHeaderBinding
  */
 class VideoPlaylistHeaderHolder(private val binding: ItemVideoPlaylistHeaderBinding) :
     PlaylistViewHolder(binding) {
-    override fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation) {
+    override fun bind(paused: Boolean, item: PlaylistItem, itemOperation: PlaylistItemOperation) {
         binding.highlight = item.type == PlaylistItem.TYPE_NEXT_HEADER
         binding.name = item.nodeName
     }

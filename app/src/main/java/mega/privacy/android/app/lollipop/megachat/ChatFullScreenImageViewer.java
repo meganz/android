@@ -481,7 +481,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
 				if (animationStart) {
 					updateViewForAnimation();
-				} else {
+				} else if (!isFinishing()) {
 					showActionBar();
 
 					fragmentContainer.setBackgroundColor(BLACK);

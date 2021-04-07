@@ -311,7 +311,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private int currentColorFilter;
-    private boolean pendingToSetIconsColorFilter;
 
     private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
@@ -902,9 +901,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat);
 
-        if (pendingToSetIconsColorFilter) {
-            setIconsColorFilter();
-        }
+        setIconsColorFilter();
 
         MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
@@ -993,11 +990,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (removeLinkMenuItem == null || getLinkMenuItem == null || downloadMenuItem == null
                 || shareMenuItem == null || leaveMenuItem == null || copyMenuItem == null
                 || sendToChatMenuItem == null) {
-            pendingToSetIconsColorFilter = true;
             return;
         }
 
-        pendingToSetIconsColorFilter = false;
 
         drawableRemoveLink.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN);
         removeLinkMenuItem.setIcon(drawableRemoveLink);

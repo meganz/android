@@ -26,12 +26,14 @@ data class PlaylistItem(
     val size: Long,
 ) {
     /**
-     * Create a new instance with the specified item type, and nullify thumbnail if it's not exist.
+     * Create a new instance with the specified index and item type,
+     * and nullify thumbnail if it's not exist.
      *
+     * @param index new index
      * @param type item type
      * @return the new instance
      */
-    fun finalizeThumbnailAndType(type: Int): PlaylistItem {
+    fun finalizeItem(index: Int, type: Int): PlaylistItem {
         return PlaylistItem(
             nodeHandle, nodeName,
             if (thumbnail?.exists() == true) thumbnail else null,
