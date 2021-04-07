@@ -501,7 +501,7 @@
         <activity android:name=".meeting.activity.MeetingActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize|stateVisible"/>
+            android:windowSoftInputMode="adjustResize"/>
 
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"

@@ -32,6 +32,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        type_meeting_edit_text.visibility = View.VISIBLE
         showKeyboardDelayed(type_meeting_edit_text)
     }
 

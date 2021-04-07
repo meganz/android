@@ -7,8 +7,7 @@
     <fragment
         android:id="@+id/createMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
-        android:label="fragment_create_meeting"
-        tools:layout="@layout/create_meeting_fragment">
+        android:label="fragment_create_meeting">
     </fragment>
     <fragment
         android:id="@+id/joinMeetingFragment"

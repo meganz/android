@@ -10,11 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
@@ -37,7 +39,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setProfileAvatar()
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            title = arguments?.getString(MeetingActivity.MEETING_NAME)
+            subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
+        }
     }
 
     /**

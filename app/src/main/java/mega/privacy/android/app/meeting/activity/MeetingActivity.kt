@@ -38,6 +38,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         const val MEETING_TYPE_GUEST = "join_meeting_as_guest"
         const val MEETING_TYPE_IN = "in_meeting"
 
+        const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
 
         private var isGuest = true
