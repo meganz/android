@@ -5,7 +5,6 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.R
@@ -19,6 +18,9 @@ class InMeetingFragment : MeetingBaseFragment() {
 
     private lateinit var gridViewMenuItem: MenuItem
     private lateinit var speakerViewMenuItem: MenuItem
+
+    private lateinit var individualCallFragment: IndividualCallFragment
+    private lateinit var floatingWindowFragment: IndividualCallFragment
 
     companion object {
         fun newInstance() = InMeetingFragment()
@@ -45,7 +47,7 @@ class InMeetingFragment : MeetingBaseFragment() {
             in_meeting_toolbar.fadeInOut(toTop = true)
             meetingActivity.bottomFloatingPanelInOut()
 
-            if(in_meeting_toolbar.visibility == View.VISIBLE) {
+            if (in_meeting_toolbar.visibility == View.VISIBLE) {
                 meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
                 meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -68,16 +70,18 @@ class InMeetingFragment : MeetingBaseFragment() {
             )
         )
 
+        individualCallFragment = IndividualCallFragment.newInstance(1, 2, false)
         loadChildFragment(
             R.id.meeting_container,
-            IndividualCallFragment.newInstance(),
+            individualCallFragment,
             IndividualCallFragment.TAG
         )
 
+        floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
         loadChildFragment(
             R.id.self_feed_floating_window_container,
-            SelfFeedFloatingWindowFragment.newInstance(1, 2),
-            SelfFeedFloatingWindowFragment.TAG
+            floatingWindowFragment,
+            IndividualCallFragment.TAG
         )
 
         meetingActivity.setSupportActionBar(view.in_meeting_toolbar)
@@ -143,7 +147,7 @@ class InMeetingFragment : MeetingBaseFragment() {
                 loadChildFragment(
                     R.id.meeting_container,
                     // TODO replace with speaker mode fragment.
-                    IndividualCallFragment.newInstance(),
+                    IndividualCallFragment.newInstance(1, 2, false),
                     IndividualCallFragment.TAG
                 )
                 true

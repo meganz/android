@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:background="#bebcd111" />
+        android:background="@android:color/transparent" />
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar_image"
@@ -18,7 +18,7 @@
         android:layout_height="128dp"
         android:layout_centerInParent="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_chat"
+        android:src="@drawable/ic_import_to_cloud_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,6 @@
         android:layout_centerInParent="true"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_call_hold_big"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
