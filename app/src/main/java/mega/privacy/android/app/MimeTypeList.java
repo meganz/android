@@ -256,7 +256,33 @@ public class MimeTypeList {
 		return extension.equals("gif") || extension.equals("webp");
 	}
 
-	public boolean isTextFile() {
-		return type.startsWith("text/plain") || extension.equals("txt");
+	/**
+	 * Checks if a file is openable in Text editor.
+	 *
+	 * All the contemplated extension are supported by Web client, so mobile clients should try
+	 * to support them too.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	public boolean isOpenableTextFile() {
+				//Text
+		return type.startsWith("text/plain") || extension.equals("txt") || extension.equals("ans")
+				|| extension.equals("ascii") || extension.equals("log") || extension.equals("wpd")
+				|| extension.equals("json") || extension.equals("md")
+
+				//Web data
+				|| extension.equals("html") || extension.equals("xml") || extension.equals("shtml")
+				|| extension.equals("dhtml") || extension.equals("js") || extension.equals("css")
+				|| extension.equals("jar") || extension.equals("java") || extension.equals("class")
+
+				//Web lang
+				|| extension.equals("php") || extension.equals("php3") || extension.equals("php4")
+				|| extension.equals("php5") || extension.equals("phtml") || extension.equals("inc")
+				|| extension.equals("asp") || extension.equals("pl") || extension.equals("cgi")
+				|| extension.equals("py") || extension.equals("sql") || extension.equals("accdb")
+				|| extension.equals("db") || extension.equals("dbf") || extension.equals("mdb")
+				|| extension.equals("pdb") || extension.equals("c") || extension.equals("cpp")
+				|| extension.equals("h") || extension.equals("cs") || extension.equals("sh")
+				|| extension.equals("vb") || extension.equals("swift");
 	}
 }
