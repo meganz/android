@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -106,6 +105,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -348,6 +348,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					//Ask for MU and CU folder when App in init state
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+
+					// Init CU sync data after login successfully
+					initCuSync();
 
 					//Login check resumed pending transfers
 					TransfersManagement.checkResumedPendingTransfers();
