@@ -272,7 +272,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
-import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -5634,7 +5633,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				showGlobalAlertDialogsIfNeeded();
-				initCuSync();
 				break;
 			}
     		case CAMERA_UPLOADS: {
