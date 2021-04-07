@@ -22,14 +22,14 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/explain_confirm_2fa_verify"
@@ -62,7 +62,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -74,7 +74,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -86,7 +86,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -98,7 +98,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -110,7 +110,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -121,7 +121,7 @@
                     android:layout_width="36sp"
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?android:attr/textColorPrimary"
@@ -174,5 +174,5 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/explain_confirm_2fa_verify" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
