@@ -5,14 +5,15 @@ import com.google.android.exoplayer2.Player
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.LogUtil.logWarning
 
 /**
  * A DefaultControlDispatcher which only dispatch control if there is no ongoing call.
  */
 class CallAwareControlDispatcher(
-    private var currentRepeatMode: Int
-) :
-    DefaultControlDispatcher(0, 0) {
+    private var currentRepeatMode: Int,
+    private val isInNotification: Boolean = false
+) : DefaultControlDispatcher(0, 0) {
     override fun dispatchSeekTo(player: Player, windowIndex: Int, positionMs: Long): Boolean {
         if (CallUtil.participatingInACall()) {
             return false
@@ -28,6 +29,11 @@ class CallAwareControlDispatcher(
             return false
         }
 
+        if (isInNotification && MediaPlayerService.playingVideo) {
+            logWarning("abort dispatchNext: video is playing")
+            return false
+        }
+
         return super.dispatchNext(player)
     }
 
@@ -38,6 +44,11 @@ class CallAwareControlDispatcher(
             return false
         }
 
+        if (isInNotification && MediaPlayerService.playingVideo) {
+            logWarning("abort dispatchPrevious: video is playing")
+            return false
+        }
+
         return super.dispatchPrevious(player)
     }
 
@@ -45,6 +56,11 @@ class CallAwareControlDispatcher(
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
 
+            return false
+        }
+
+        if (isInNotification && MediaPlayerService.playingVideo) {
+            logWarning("abort dispatchSetPlayWhenReady: video is playing")
             return false
         }
 
