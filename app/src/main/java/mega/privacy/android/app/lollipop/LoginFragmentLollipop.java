@@ -84,7 +84,6 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1986,7 +1985,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return;
                     }
                 }
-                initCuSync();
+
                 readyToManager();
             } else {
                 if(confirmLogoutDialog != null) {
