@@ -3055,6 +3055,7 @@
     <string name="join_meeting" context="Label that join a meeting">Join meeting</string>
     <string name="btn_start_meeting" context="Button that create a meeting">Start meeting</string>
     <string name="btn_join_meeting" context="Button that join a meeting">Join meeting</string>
+    <string name="btn_join_meeting_as_guest" context="Button that join a meeting as guest">Join as a guest</string>
     <string name="type_meeting_name" context="Hint shown to guide user on meeting name">Joanna\'s meeting</string>
 
     <string name="general_mic" context="General label for microphone">Mic</string>

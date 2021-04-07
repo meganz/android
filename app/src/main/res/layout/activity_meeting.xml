@@ -17,8 +17,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/gradient_shape_callschat"
             app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="meeting" />
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"

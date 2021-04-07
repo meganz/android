@@ -152,6 +152,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.setTitle("")
+
         when (meetType) {
             MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)

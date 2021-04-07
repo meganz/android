@@ -38,7 +38,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initViewModel()
-        setProfileAvatar()
     }
 
     /**

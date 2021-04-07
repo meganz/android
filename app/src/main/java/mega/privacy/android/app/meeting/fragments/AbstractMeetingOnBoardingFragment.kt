@@ -22,9 +22,10 @@ import mega.privacy.android.app.utils.Util
 
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
-    val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
-    private lateinit var binding: MeetingOnBoardingFragmentBinding
+    protected val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
+    protected lateinit var binding: MeetingOnBoardingFragmentBinding
     var meetingName: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,6 +33,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         initBinding()
         initViewModel()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setProfileAvatar()
     }
 
     /**
@@ -115,7 +121,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Get Avatar and display
      */
-    fun setProfileAvatar() {
+    private fun setProfileAvatar() {
         logDebug("setProfileAvatar")
         abstractMeetingOnBoardingViewModel.avatar.observe(viewLifecycleOwner) {
             meeting_thumbnail.setImageBitmap(it)
