@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text_file_editor_container"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_file_editor_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,7 +16,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
 
         <EditText
@@ -27,6 +28,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:inputType="textMultiLine"
+            android:paddingBottom="100dp"
             android:textAppearance="@style/TextAppearance.Mega.Body2"
             android:theme="@style/TransparentEditText.Transparent"
             tools:ignore="Autofill,LabelFor" />
