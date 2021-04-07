@@ -418,7 +418,8 @@ class MediaPlayerServiceViewModel(
             }
 
             val playlistItem = PlaylistItem(
-                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING
+                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING,
+                node?.size ?: INVALID_SIZE
             )
             playlistItems.add(playlistItem)
             playlistItemsMap[firstPlayHandle.toString()] = playlistItem
@@ -551,6 +552,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 getThumbnailFile(context, it)
+            },
+            {
+                it.getSize(context)
             }
         )
     }
@@ -607,6 +611,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 null
+            },
+            {
+                it.length()
             }
         )
     }
@@ -652,6 +659,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 File(getThumbFolder(context), it.base64Handle.plus(JPG_EXTENSION))
+            },
+            {
+                it.size
             }
         )
     }
@@ -665,6 +675,7 @@ class MediaPlayerServiceViewModel(
         handleGetter: (T) -> Long,
         nameGetter: (T) -> String,
         thumbnailGetter: (T) -> File?,
+        sizeGetter: (T) -> Long,
     ) {
         playlistItems.clear()
         playlistItemsMap.clear()
@@ -691,7 +702,10 @@ class MediaPlayerServiceViewModel(
             }
 
             val playlistItem =
-                PlaylistItem(handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT)
+                PlaylistItem(
+                    handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT,
+                    sizeGetter(node)
+                )
             playlistItems.add(playlistItem)
             playlistItemsMap[handle.toString()] = playlistItem
 

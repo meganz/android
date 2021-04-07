@@ -23,6 +23,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -44,9 +45,6 @@ public class SDCardOperator {
     private DocumentFile sdCardRootDocument;
 
     private boolean isSDCardDownload;
-
-    //32kb
-    private static final int BUFFER_SIZE = 32 * 1024;
 
     public static class SDCardException extends Exception {
 
@@ -204,13 +202,8 @@ public class SDCardOperator {
             }
 
             is = new FileInputStream(file);
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int length;
 
-            while ((length = is.read(buffer)) != -1) {
-                os.write(buffer, 0, length);
-                os.flush();
-            }
+            copyStream(is, os);
         } finally {
             if (is != null) {
                 is.close();
@@ -219,6 +212,58 @@ public class SDCardOperator {
             if (os != null) {
                 os.close();
             }
+        }
+    }
+
+    /**
+     * Copy an Uri to targetPath.
+     *
+     * @param targetPath Path where the file has to be moved.
+     * @param source Uri to copy.
+     * @param name File name of the Uri.
+     *
+     * @throws IOException If some error happens opening output stream.
+     */
+    public void copyUri(String targetPath, Uri source, String name) throws IOException {
+        DocumentFile parent = getDocumentFileByPath(targetPath);
+        DocumentFile df = parent.findFile(name);
+
+        if (df != null) {
+            logDebug("delete former file.");
+            df.delete();
+        }
+
+        Uri uri = parent.createFile(null, name).getUri();
+        OutputStream os = null;
+        InputStream is = null;
+
+        try {
+            os = context.getContentResolver().openOutputStream(uri, "rwt");
+            if (os == null) {
+                throw new IOException("Open output stream exception!");
+            }
+
+            is = context.getContentResolver().openInputStream(source);
+
+            copyStream(is, os);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+
+            if (os != null) {
+                os.close();
+            }
+        }
+    }
+
+    private void copyStream(InputStream is, OutputStream os) throws IOException {
+        byte[] buffer = new byte[COPY_FILE_BUFFER_SIZE];
+        int length;
+
+        while ((length = is.read(buffer)) != -1) {
+            os.write(buffer, 0, length);
+            os.flush();
         }
     }
 

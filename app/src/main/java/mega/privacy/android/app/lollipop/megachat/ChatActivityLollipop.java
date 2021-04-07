@@ -4372,7 +4372,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                 case R.id.chat_cab_menu_offline:
                     finishMultiselectionMode();
-                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
+                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
+                            ChatActivityLollipop.this);
                     break;
             }
             return false;
