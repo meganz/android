@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
@@ -595,15 +596,17 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
                         intent.putExtra(HANDLE, playingHandle)
 
-                        val nodeName =
-                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
-                                ?: return false
-                        intent.putExtra(NAME, nodeName)
+                        val node = megaApi.getNodeByHandle(playingHandle)
+                        if (node == null) {
+                            logError("onOptionsItemSelected properties non-offline null node")
+
+                            return false
+                        }
+
+                        intent.putExtra(NAME, node.name)
 
                         val fromIncoming =
                             if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
-                                val node = megaApi.getNodeByHandle(playingHandle) ?: return false
-
                                 NodeController(this).nodeComesFromIncoming(node)
                             } else {
                                 false
