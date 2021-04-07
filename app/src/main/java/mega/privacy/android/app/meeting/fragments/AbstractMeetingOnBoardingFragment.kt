@@ -65,7 +65,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Dispatch to current sub fragment
      */
     private fun onMeetingButtonClick() {
-        meetingName = abstractMeetingOnBoardingViewModel.getMeetingName()
+        meetingName = abstractMeetingOnBoardingViewModel.meetingName.value
         meetingName?.let {
             Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
             meetingButtonClick()

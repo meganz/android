@@ -83,10 +83,6 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getMeetingName(): String? {
-        return meetingName.value
-    }
-
     /**
      * Response of clicking mic fab
      *
