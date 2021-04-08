@@ -16,7 +16,7 @@
         android:icon="@drawable/ic_grid_view"
         android:orderInCategory="110"
         android:title="Grid view"
-        android:visible="true"
+        android:visible="false"
         app:iconTint="@color/white"
         app:showAsAction="ifRoom" />
     <item
@@ -25,7 +25,7 @@
         android:icon="@drawable/ic_speaker_view"
         android:orderInCategory="120"
         android:title="Speaker view"
-        android:visible="false"
+        android:visible="true"
         app:iconTint="@color/white"
         app:showAsAction="ifRoom" />
 </menu>

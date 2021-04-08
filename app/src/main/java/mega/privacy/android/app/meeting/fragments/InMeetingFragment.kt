@@ -8,11 +8,9 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.R
-import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.VideoCaptureUtils
 
 class InMeetingFragment : MeetingBaseFragment() {
 
@@ -21,6 +19,7 @@ class InMeetingFragment : MeetingBaseFragment() {
 
     private lateinit var individualCallFragment: IndividualCallFragment
     private lateinit var floatingWindowFragment: IndividualCallFragment
+    private lateinit var gridViewCallFragment: GridViewCallFragment
 
     companion object {
         fun newInstance() = InMeetingFragment()
@@ -70,11 +69,11 @@ class InMeetingFragment : MeetingBaseFragment() {
             )
         )
 
-        individualCallFragment = IndividualCallFragment.newInstance(1, 2, false)
+        gridViewCallFragment = GridViewCallFragment.newInstance()
         loadChildFragment(
             R.id.meeting_container,
-            individualCallFragment,
-            IndividualCallFragment.TAG
+            gridViewCallFragment,
+            GridViewCallFragment.TAG
         )
 
         floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
@@ -90,8 +89,6 @@ class InMeetingFragment : MeetingBaseFragment() {
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         setHasOptionsMenu(true)
-
-//        meetingActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
         view.setOnApplyWindowInsetsListener { _, insets ->
             insets
@@ -124,8 +121,10 @@ class InMeetingFragment : MeetingBaseFragment() {
                 true
             }
             R.id.swap_camera -> {
-                logDebug("Swap camera.")
-                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
+                //TODO test code
+                addParticipant()
+//                logDebug("Swap camera.")
+//                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
                 true
             }
             R.id.grid_view -> {
@@ -141,18 +140,30 @@ class InMeetingFragment : MeetingBaseFragment() {
             }
             R.id.speaker_view -> {
                 logDebug("Change to speaker view.")
-                gridViewMenuItem.isVisible = true
-                speakerViewMenuItem.isVisible = false
-
-                loadChildFragment(
-                    R.id.meeting_container,
-                    // TODO replace with speaker mode fragment.
-                    IndividualCallFragment.newInstance(1, 2, false),
-                    IndividualCallFragment.TAG
-                )
+                //TODO test code
+                removeParticipant()
+//                gridViewMenuItem.isVisible = true
+//                speakerViewMenuItem.isVisible = false
+//
+//                loadChildFragment(
+//                    R.id.meeting_container,
+//                    // TODO replace with speaker mode fragment.
+//                    IndividualCallFragment.newInstance(1, 2, false),
+//                    IndividualCallFragment.TAG
+//                )
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    // TODO test code
+    fun addParticipant() {
+       gridViewCallFragment.loadParticipants(true)
+    }
+
+    fun removeParticipant() {
+        gridViewCallFragment.loadParticipants(false)
+    }
+    // TODO test code
 }

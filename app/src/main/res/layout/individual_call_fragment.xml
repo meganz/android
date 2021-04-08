@@ -13,7 +13,7 @@
         android:background="@android:color/transparent" />
 
     <mega.privacy.android.app.components.RoundedImageView
-        android:id="@+id/avatar_image"
+        android:id="@+id/avatar"
         android:layout_width="128dp"
         android:layout_height="128dp"
         android:layout_centerInParent="true"
@@ -28,7 +28,7 @@
         rounded:corner_radius="60dp" />
 
     <ImageView
-        android:id="@+id/avatar_image_on_hold"
+        android:id="@+id/on_hold_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
