@@ -107,6 +107,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private CuViewModel mViewModel;
 
     private static final String AD_SLOT = "and3";
+    private static long[] cuSearchDate = null;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -126,8 +127,16 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         reloadNodes(orderBy);
     }
 
+    /**
+     * Search the media of camera
+     * @param searchDate the date or date range for searching
+     * @param orderBy The order of sort
+     */
     public void setSearchDate(long[] searchDate, int orderBy) {
-        mViewModel.setSearchDate(searchDate, orderBy);
+        cuSearchDate = searchDate;
+        if (mViewModel != null) {
+            mViewModel.setSearchDate(searchDate, orderBy);
+        }
     }
 
     public void reloadNodes(int orderBy) {
@@ -160,7 +169,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(mManagerActivity.orderCamera);
+            // When press back, reload all files.
+            setSearchDate(null, mManagerActivity.orderCamera);
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
@@ -315,17 +325,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mManagerActivity = (ManagerActivityLollipop) context;
 
+        CuViewModelFactory viewModelFactory =
+                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
+        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+
         initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-
-        CuViewModelFactory viewModelFactory =
-                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
-        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
             return createCameraUploadsViewForFirstLogin(inflater, container);

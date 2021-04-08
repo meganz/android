@@ -28,6 +28,7 @@ import java.util.Date;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -42,7 +43,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SearchByDateActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class SearchByDateActivityLollipop extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     float scaleH, scaleW;
     float density;

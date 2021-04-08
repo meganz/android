@@ -24,10 +24,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -43,7 +43,7 @@ import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
-public class AchievementsActivity extends PinActivityLollipop {
+public class AchievementsActivity extends PasscodeActivity {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
     static final int INVALID_TYPE = -1;
 

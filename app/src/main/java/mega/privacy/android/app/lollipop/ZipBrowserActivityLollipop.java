@@ -43,6 +43,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -57,8 +58,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
+public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
-public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP ="HANDLE_ZIP";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
