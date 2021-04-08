@@ -1515,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">Lihat kontak</string>
 
-    <string name="import_success_message" context="Menu option">Berhasil ditambahkan ke Cloud drive</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Berhasil ditambahkan ke Cloud drive</string>
     <string name="import_success_error" context="Menu option">Error. Tidak ditambahkan ke Cloud drive</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Menghubungkan&#8230;</string>
@@ -1736,7 +1736,7 @@
     <string name="label_set_day" context="title of a Search by date tag">Setel hari</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Tanggal yang dibutuhkan tidak valid</string>
 
-    <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Karakter tidak diizinkan</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
@@ -2988,10 +2988,10 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Ungu</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Abu</string>
 
-    <string name="background_play_hint" context="Text that indicates the audio will still be played on background">Playing on the background</string>
-    <string name="not_background_play_hint" context="Text that indicates the audio will not be played on background">Not playing on the background</string>
-    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now Playing</string>
-    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Will play in the background</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Will not play in the background</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now playing</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now playing (paused)</string>
     <string name="audio_track_info" context="Title of the song info screen">Track info</string>
 
     <string name="action_more_information" context="Action to get more information">Informasi Lebih Lanjut</string>
@@ -3000,7 +3000,7 @@
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Sebelum anda melanjutkan</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Kami menggunakan penyimpanan lokal dan teknologi serupa (‘Cookies\') untuk memberikan layanan kami kepada anda, meningkatkan pengalaman anda dengan layanan kami dan menyesuaikan iklan yang anda lihat, termasuk melalui pihak ketiga. Terima penggunaan Cookie kami sejak awal kunjungan anda atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
     <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes has been saved.</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookie Pihak Ketiga</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookie Iklan Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Kategori: Cookie Iklan</string>

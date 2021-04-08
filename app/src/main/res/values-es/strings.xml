@@ -367,7 +367,7 @@
     </plurals>
 
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
-    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Renombrar %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Abrir enlace</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
     <string name="context_renaming" context="while renaming a file or folder">Renombrando</string>
@@ -1515,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">Ver contactos</string>
 
-    <string name="import_success_message" context="Menu option">Añadido a Mi nube</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Añadido a Mi nube</string>
     <string name="import_success_error" context="Menu option">No se ha podido añadir a Mi nube</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Conectando&#8230;</string>
@@ -1736,14 +1736,14 @@
     <string name="label_set_day" context="title of a Search by date tag">Elegir día</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">La fecha solicitada no es válida</string>
 
-    <string name="empty_name" context="Error shown when the user left a name empty">Incorrect name</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Nombre inválido</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Corrige los nombres de archivo antes de continuar</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Caracteres no permitidos</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Los siguientes caracteres no están permitidos: ” * / : < >? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Nombra tu archivo antes de continuar</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Nombra tus archivos antes de continuar</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Archivo de audio</string>
@@ -2090,7 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Vista previa del contenido</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">No se puede hacer streaming y el archivo no se ha descargado</string>
-    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">No se ha podido abrir el archivo.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">No se ha podido abrir el archivo debido a la falta de conexión de red.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">El archivo ya está en la sección Sin conexión</string>
 
@@ -2219,7 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Mensaje</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Vídeo</string>
 
-    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Enviar enlace a&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Enviar a&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Subir a&#8230;</string>
 
@@ -2302,7 +2302,7 @@
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Esta conversación ya no está disponible.</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Enlace de chat invalido</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Enlace de chat inválido</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotación de la clave de cifrado</string>
     <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
@@ -2988,19 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Púrpura</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Gris</string>
 
-    <string name="background_play_hint" context="Text that indicates the audio will still be played on background">Playing on the background</string>
-    <string name="not_background_play_hint" context="Text that indicates the audio will not be played on background">Not playing on the background</string>
-    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now Playing</string>
-    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
-    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Se reproducirá en segundo plano</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">No se reproducirá en segundo plano</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Reproduciendo</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Reproduciendo (en pausa)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Info</string>
 
     <string name="action_more_information" context="Action to get more information">Más información</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Política de Cookies</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Ajustes de Cookies</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Antes de continuar</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Utilizamos el almacenamiento local y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios, mejorar tu experiencia al usarlos y personalizar los anuncios que ves, incluso a través de terceros. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes has been saved.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Ajustes de Cookies no guardados</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Los cambios en los Ajustes de Cookies han sido guardados.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookies de terceros</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookies publicitarias de Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Categoría: Cookies publicitarias</string>
@@ -3030,5 +3030,5 @@
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">Predeterminado</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Definido por el modo ahorro</string>
 
-    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Selecciona la raíz de la tarjeta SD.</string>
 </resources>
