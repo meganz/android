@@ -14,6 +14,8 @@ import java.util.HashMap;
  * Mime type for files
  */
 public class MimeTypeList {
+	//20MB
+	private static final long MAX_SIZE_OPENABLE_TEXT_FILE = 20971520;
 	
 	// Icon resource mapping for different file type extensions
 	private static HashMap<String, Integer> resourcesCache;
@@ -287,5 +289,15 @@ public class MimeTypeList {
 
 				//Files without extension
 				|| type.startsWith("application/octet-stream");
+	}
+
+	/**
+	 * Checks if a file is openable in Text editor.
+	 * It's openable if its size is not bigger than MAX_SIZE_OPENABLE_TEXT_FILE.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	public boolean isOpenableTextFile(long fileSize) {
+		return  isOpenableTextFile() && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE;
 	}
 }

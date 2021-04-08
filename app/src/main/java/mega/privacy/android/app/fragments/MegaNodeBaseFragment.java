@@ -75,6 +75,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -664,6 +665,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     return;
                 }
             }
+        } else if (mimeType.isOpenableTextFile(node.getSize())) {
+            manageTextFileIntent(requireContext(), node, fragmentAdapter);
+            return;
         }
 
         if (intent != null) {

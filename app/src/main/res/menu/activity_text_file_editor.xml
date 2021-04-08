@@ -101,9 +101,11 @@
 
     <item
         android:id="@+id/chat_action_save_for_offline"
+        android:icon="@drawable/ic_save_offline"
         android:orderInCategory="100"
         android:title="@string/save_for_offline"
         android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item

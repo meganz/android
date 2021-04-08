@@ -5211,6 +5211,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                                             openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
+                                    } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                                        manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
                                     } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
                                         openWith(this, node);

@@ -469,7 +469,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			startActivity(pdfIntent);
 			overridePendingTransition(0,0);
-		} else if (MimeTypeList.typeForName(currentFile.getName()).isOpenableTextFile()) {
+		} else if (MimeTypeList.typeForName(currentFile.getName()).isOpenableTextFile(currentFile.length())) {
 			startActivity(new Intent(this, TextFileEditorActivity.class)
 					.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName())
 					.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)

@@ -885,7 +885,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						true, false, false, false);
 			}
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
-		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile()) {
+		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
 			manageTextFileIntent(context, node, FILE_BROWSER_ADAPTER);
 		} else {
 			logDebug("itemClick:isFile:otherOption");

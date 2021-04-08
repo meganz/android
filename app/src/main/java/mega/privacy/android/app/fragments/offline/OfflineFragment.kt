@@ -634,7 +634,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 logDebug("Is URL file")
                 viewModel.processUrlFile(file)
             }
-            mime.isOpenableTextFile -> {
+            mime.isOpenableTextFile(file.length()) -> {
                 startActivity(
                     Intent(requireContext(), TextFileEditorActivity::class.java)
                         .putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.name)

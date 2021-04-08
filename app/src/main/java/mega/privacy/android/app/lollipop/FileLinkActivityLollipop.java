@@ -896,7 +896,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			else{
 				logWarning("No Available Intent");
 			}
-		}else{
+		} else if (MimeTypeList.typeForName(document.getName()).isOpenableTextFile(document.getSize())) {
+			manageTextFileIntent(this, document, FILE_LINK_ADAPTER);
+		} else{
 			logWarning("none");
 		}
 	}

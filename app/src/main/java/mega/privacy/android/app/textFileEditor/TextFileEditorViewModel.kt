@@ -83,10 +83,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             && adapterType != FROM_CHAT
             && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
 
-    fun readFileContent(mi: ActivityManager.MemoryInfo) {
-        viewModelScope.launch { readFile(mi) }
-    }
-
     fun setValuesFromIntent(intent: Intent, savedInstanceState: Bundle?) {
         adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
@@ -129,6 +125,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         }
 
         fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: node?.name!!
+    }
+
+    fun readFileContent(mi: ActivityManager.MemoryInfo) {
+        viewModelScope.launch { readFile(mi) }
     }
 
     private suspend fun readFile(mi: ActivityManager.MemoryInfo) {

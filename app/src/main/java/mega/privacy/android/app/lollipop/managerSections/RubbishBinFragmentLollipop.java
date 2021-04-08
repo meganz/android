@@ -73,6 +73,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class RubbishBinFragmentLollipop extends Fragment{
@@ -922,7 +923,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								Collections.singletonList(nodes.get(position)),
 								true, false, false, false);
 					}
-				} else{
+				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
+				} else {
 					adapter.notifyDataSetChanged();
 					((ManagerActivityLollipop) context).saveNodesToDevice(
 							Collections.singletonList(nodes.get(position)),
