@@ -11,6 +11,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CONTENT_TEXT
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isOnline
@@ -21,11 +23,18 @@ import nz.mega.sdk.MegaShare
 @AndroidEntryPoint
 class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
+    companion object {
+        const val MODIFIED_TEXT = "MODIFIED_TEXT"
+        const val CURSOR_POSITION = "CURSOR_POSITION"
+    }
+
     private val viewModel by viewModels<TextFileEditorViewModel>()
 
     private lateinit var binding: ActivityTextFileEditorBinding
 
     private var menu: Menu? = null
+
+    private var readingContent = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +44,18 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.setValuesFromIntent(intent)
+        viewModel.setValuesFromIntent(intent, savedInstanceState)
         setUpTextFileName()
-        setUpTextView()
+        setUpTextView(savedInstanceState)
         setUpEditFAB()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(MODE, viewModel.getMode())
+        outState.putString(CONTENT_TEXT, viewModel.getContentText())
+        outState.putString(MODIFIED_TEXT, binding.editText.text.toString())
+        outState.putInt(CURSOR_POSITION, binding.editText.selectionStart)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -105,7 +122,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 }
 
                 if (viewModel.getMsgChat()?.userHandle == megaChatApi.myUserHandle
-                    && viewModel.getMsgChat()?.isDeletable == true) {
+                    && viewModel.getMsgChat()?.isDeletable == true
+                ) {
                     menu.findItem(R.id.chat_action_remove).isVisible = true
                 }
 
@@ -114,7 +132,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             toggleAllMenuItemsVisibility(menu, true)
 
-            when(viewModel.getNodeAccess()) {
+            when (viewModel.getNodeAccess()) {
                 MegaShare.ACCESS_OWNER -> {
                     if (viewModel.getNode()!!.isExported) {
                         menu.findItem(R.id.action_get_link).isVisible = false
@@ -129,13 +147,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
 
-            menu.findItem(R.id.action_copy).isVisible = viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
+            menu.findItem(R.id.action_copy).isVisible =
+                viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
             menu.findItem(R.id.chat_action_import).isVisible = false
             menu.findItem(R.id.action_remove).isVisible = false
             menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
             menu.findItem(R.id.chat_action_remove).isVisible = false
             menu.findItem(R.id.action_save).isVisible = false
         } else {
+            toggleAllMenuItemsVisibility(menu, false)
             menu.findItem(R.id.action_save).isVisible = true
         }
     }
@@ -154,27 +174,49 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
-    private fun setUpTextView() {
+    private fun setUpTextView(savedInstanceState: Bundle?) {
         if (viewModel.isViewMode()) {
-            binding.editText.isEnabled = false
+            binding.editText.apply {
+                isEnabled = false
+
+                if (savedInstanceState != null && viewModel.getContentText() != null) {
+                    setText(viewModel.getContentText())
+                    return
+                }
+            }
+
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
 
             viewModel.onContentTextRead().observe(this, { contentRead ->
+                readingContent = false
+                binding.fileEditorScrollView.isVisible = true
+                binding.progressBar.isVisible = false
+                binding.editFab.isVisible = true
                 binding.editText.setText(contentRead)
             })
 
+            readingContent = true
+            binding.fileEditorScrollView.isVisible = false
+            binding.progressBar.isVisible = true
             viewModel.readFileContent(mi)
         } else {
-            binding.editText.isEnabled = true
-            binding.editText.requestFocus()
-            showKeyboardDelayed(binding.editText)
+            binding.editText.apply {
+                isEnabled = true
+
+                if (savedInstanceState != null) {
+                    setText(savedInstanceState.getString(MODIFIED_TEXT))
+                    setSelection(savedInstanceState.getInt(CURSOR_POSITION))
+                }
+
+                showKeyboardDelayed(this)
+            }
         }
     }
 
     private fun setUpEditFAB() {
         binding.editFab.apply {
-            isVisible = viewModel.isViewMode()
+            isVisible = viewModel.isViewMode() && viewModel.isEditableAdapter() && !readingContent
 
             setOnClickListener {
                 viewModel.setEditMode()
@@ -185,15 +227,30 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun saveFile() {
-        viewModel.saveFile(binding.editText.text.toString())
+        if (viewModel.getContentText() == binding.editText.text.toString()) {
+            setViewMode()
+        } else {
+            viewModel.saveFile(binding.editText.text.toString())
+        }
+    }
+
+    private fun setViewMode() {
+        viewModel.setViewMode()
         binding.editFab.show()
         updateUIAfterChangeMode()
     }
 
     private fun updateUIAfterChangeMode() {
+        refreshMenuOptionsVisibility()
         setUpTextFileName()
-        setUpTextView()
-        invalidateOptionsMenu()
+
+        binding.editText.apply {
+            isEnabled = !viewModel.isViewMode()
+
+            if (!viewModel.isViewMode()) {
+                showKeyboardDelayed(this)
+            }
+        }
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

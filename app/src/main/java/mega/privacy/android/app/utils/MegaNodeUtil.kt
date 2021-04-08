@@ -1429,9 +1429,10 @@ object MegaNodeUtil {
     }
 
     @JvmStatic
-    fun manageTextFileIntent(context: Context, node: MegaNode) {
+    fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
         val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
         textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
         context.startActivity(textFileIntent)
     }
 }

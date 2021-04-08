@@ -2,6 +2,7 @@ package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
 import android.content.Intent
+import android.os.Bundle
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,12 +22,9 @@ import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatMessage
-import nz.mega.sdk.MegaNode
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -37,9 +35,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 ) : BaseRxViewModel() {
 
     companion object {
+        const val MODE = "MODE"
         const val CREATE_MODE = "CREATE_MODE"
         const val VIEW_MODE = "VIEW_MODE"
         const val EDIT_MODE = "EDIT_MODE"
+
+        const val CONTENT_TEXT = "CONTENT_TEXT"
     }
 
     private var fileName = ""
@@ -48,7 +49,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private var adapterType: Int = INVALID_VALUE
     private var msgChat: MegaChatMessage? = null
 
+    private val contentText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    fun onContentTextRead(): LiveData<String> = contentText
+
+    fun getContentText(): String? = contentText.value
+
+    fun getMode(): String = mode
+
     fun isViewMode(): Boolean = mode == VIEW_MODE
+
+    fun setViewMode() {
+        mode = VIEW_MODE
+    }
 
     fun getFileName(): String = fileName
 
@@ -64,14 +76,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode = EDIT_MODE
     }
 
-    private val contentText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
-    fun onContentTextRead(): LiveData<String> = contentText
+    fun isEditableAdapter(): Boolean = adapterType != OFFLINE_ADAPTER
+            && adapterType != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(node)
+            && adapterType != FILE_LINK_ADAPTER
+            && adapterType != ZIP_ADAPTER
+            && adapterType != FROM_CHAT
+            && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
 
     fun readFileContent(mi: ActivityManager.MemoryInfo) {
         viewModelScope.launch { readFile(mi) }
     }
 
-    fun setValuesFromIntent(intent: Intent) {
+    fun setValuesFromIntent(intent: Intent, savedInstanceState: Bundle?) {
         adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         if (adapterType == FROM_CHAT) {
@@ -100,7 +116,14 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         }
 
         val name = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
-        mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_MODE
+
+        if (savedInstanceState != null) {
+            mode = savedInstanceState.getString(MODE) ?: VIEW_MODE
+            contentText.value = savedInstanceState.getString(CONTENT_TEXT)
+        } else {
+            mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_MODE
+        }
+
         fileName = if (name != null) name + FileUtil.TXT_EXTENSION else node?.name!!
     }
 
@@ -186,8 +209,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 UploadService.EXTRA_PARENT_HASH,
                 if (mode == CREATE_MODE && node == null) {
                     megaApi.rootNode.handle
-                } else {
+                } else if (mode == CREATE_MODE && node != null) {
                     node?.handle
+                } else {
+                    node?.parentHandle
                 }
             )
 

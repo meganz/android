@@ -15,6 +15,7 @@
         app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
     <ScrollView
+        android:id="@+id/file_editor_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
@@ -34,6 +35,17 @@
             tools:ignore="Autofill,LabelFor" />
 
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/file_editor_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/name_text"
