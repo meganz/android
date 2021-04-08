@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Możliwości</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Pojemności</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Blokada PIN</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Blokada PIN</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Kompresja wideo zużywa dużo energii; MEGA będzie wymagać aktywnego ładowania urządzenia, jeśli filmy do skompresowania są większe niż %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Jeśli ta opcja jest włączona, prześlesz informacje o tym, gdzie zostały zrobione Twoje zdjęcia, więc zachowaj ostrożność, udostępniając je.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Zdjęcia i filmy</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nie ustawiono</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blokada PIN</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blokada PIN</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Zmień kod</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Dalej</string>
@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">O Nas</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Polityka Prywatności</string>
     <string name="settings_about_terms_of_service" context="">Regulamin serwisu</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Wersja aplikacji</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Wersja MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Wersja MEGAchat SDK</string>
@@ -863,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Najstarsza data</string>
     <string name="sort_by_largest_size" context="sort files by largest size">Największy rozmiar</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Najmniejszy rozmiar</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">miesięcznie</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">rocznie</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Wprowadź dane do płatności:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adres</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adres 2 (opcjonalnie)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Miasto</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stan / prowincja</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Kraj</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Kod pocztowy</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Wprowadź dane do płatności:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Imię</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nazwisko</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numer karty kredytowej</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Miesiąc</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Rok</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Kontynuuj</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Konto zostało aktywowane!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operacja nie powiodła się. Twoja karta nie została obciążona.</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Wprowadzone dane karty kredytowej są nieprawidłowe. Twoja karta nie zostanie obciążona.</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Rodzaj kodu</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 cyfrowy PIN</string>
@@ -2391,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Twoje aktualne konto [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Podlega zasadom opisanym w programie osiągnięć.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Wybierz formę płatności</string>
 
     <string name="billing_period_title" context="title of billing period">Okres rozliczeniowy</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Jednorazowo (miesiąc)[/A] %s</string>
@@ -2403,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subskrypcja)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subskrypcja)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Karta kredytowa[/A] (subskrypcja)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (jednorazowe)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (jednorazowe)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOWY</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Aby uaktualnić bieżącą subskrypcję, prosimy o kontakt z naszym zespołem pomocy technicznej w celu uzyskania [A]planu niestandardowego[/A].</string>
@@ -2470,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Czat Link skopiowany do schowka</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Od[/A] %s / [A]miesiąc[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Od[/A] %s na użytkownika/[A]miesiąc[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Subskrypcja cykliczna może zostać anulowana w dowolnym momencie przed datą odnowienia.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Połączenie rozpoczęte</string>
 
@@ -2763,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Chociaż MEGA nie ma dostępu do twoich danych, administrator twojego konta biznesowego ma możliwość kontrolowania i przeglądania przesłanych z aparatu na twoim koncie użytkownika</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Wystąpiły problemy</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Skontaktuj się z administratorem konta biznesowego, aby rozwiązać problem i aktywować konto.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Zwiększy się automatycznie, bez dodatkowych opłat, w prawdziwych celach biznesowych.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Pojemność [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Nieograniczona[/A] wielkość transferu</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Kiedy się wylogujesz, pliki z sekcji Offline zostaną usunięte z Twojego urządzenia.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Po wylogowaniu trwające przelewy zostaną anulowane.</string>

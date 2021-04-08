@@ -420,8 +420,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
                     android:layout_marginTop="16dp"
-                    android:paddingLeft="@dimen/btn_padding_horizontal_my_account"
-                    android:paddingRight="@dimen/btn_padding_horizontal_my_account"
+                    android:paddingLeft="@dimen/btn_21_padding_horizontal"
+                    android:paddingRight="@dimen/btn_21_padding_horizontal"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:text="@string/action_export_master_key" />
 

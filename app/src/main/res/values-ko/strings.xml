@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">암호 잠금</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">암호 잠금</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">암호 잠금</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">암호 잠금</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">암호 변경</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">입력</string>
@@ -793,7 +793,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK 버전</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK 버전</string>
@@ -863,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">오래된 순</string>
     <string name="sort_by_largest_size" context="sort files by largest size">큰 파일 순</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">작은 파일 순</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">월간</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">연간</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">지불 정보를 입력하세요:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">주소 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">주소 2 (선택적)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">도시</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">주/지방</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">국가</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">우편번호</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">결제 정보를 입력하세요:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">이름</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">성</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">신용카드 번호</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">월</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">연</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">진행</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">계정이 성공적으로 업그레이드 되었습니다!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">작업이 실패하였습니다. 신용 카드가 결제되지 않았습니다</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">신용 카드 정보가 올바르지 않습니다. 신용 카드가 결제되지 않았습니다.</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">암호 유형</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">네 자리 암호</string>
@@ -2391,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]1회 (월)[/A] %s</string>
@@ -2403,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (구독)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (구독)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]신용카드[/A] (구독)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 우리의 고객지원 팀에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
@@ -2470,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">클립보드에 대화 링크를 복사하였습니다</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">%s / [A]월[/A]* [A]부터[/A]</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">이용자/[A]개월[/A]당 %s [A]부터[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 정기 구독은 갱신일 이전에 언제든지 취소할 수 있습니다.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">통화 시작</string>
 
@@ -2763,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만, 추가 비용 없이, 자동으로 증가됩니다</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] 저장소 [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]무제한[/A] 전송 할당량</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">로그아웃하면, 진행중인 전송은 취소됩니다.</string>

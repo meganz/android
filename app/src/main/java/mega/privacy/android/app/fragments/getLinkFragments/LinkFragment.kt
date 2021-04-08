@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.getLinkFragments
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.Bitmap
 import android.graphics.PorterDuff
@@ -22,6 +23,7 @@ import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -41,7 +43,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         private const val ALPHA_VIEW_DISABLED = 0.3f
         private const val ALPHA_VIEW_ENABLED = 1.0f
         private const val INVALID_EXPIRATION_TIME = -1L
-        private const val THUMBNAIL_CORNER = 4F
         private const val LAST_MINUTE = "2359"
     }
 
@@ -188,7 +189,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
                 getRoundedBitmap(
                     context,
                     thumb,
-                    dp2px(THUMBNAIL_CORNER, outMetrics)
+                    dp2px(THUMB_CORNER_RADIUS_DP)
                 )
             )
         } else {
@@ -330,6 +331,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun showDatePicker() {
         val calendar =
             if (node.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()

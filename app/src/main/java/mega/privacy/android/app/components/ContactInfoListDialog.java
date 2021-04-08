@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.telephony.PhoneNumberUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import java.util.Set;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -164,8 +166,28 @@ public class ContactInfoListDialog {
         private List<String> added;
 
         private ContactInfoAdapter(List<String> contents, List<String> added) {
-            this.contents = contents;
+            this.contents = removeDuplicateNumber(contents);
             this.added = added;
+        }
+
+        /**
+         * Format phone numbers by stripping separators like "-", "_" or " ".
+         * After this remove the duplicate phone number.
+         * For example:
+         * after stripping separators,
+         * 12-345-678, 12 345 678 should be 12345678, and considered as one phone number.
+         *
+         * @param contents A list contains a contact's email and/or phone numbers.
+         * @return Phone number list without duplicate phone numbers.
+         */
+        private List<String> removeDuplicateNumber(List<String> contents) {
+            Set<String> set = new HashSet<>();
+            for(String content : contents) {
+                // Stripping separators only for phone numbers.
+                set.add(TextUtil.isEmail(content) ? content : PhoneNumberUtils.stripSeparators(content));
+            }
+
+            return  new ArrayList<>(set);
         }
 
         @NonNull

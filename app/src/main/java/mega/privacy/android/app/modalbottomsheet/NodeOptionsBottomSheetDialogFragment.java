@@ -18,10 +18,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -32,7 +34,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -44,7 +45,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
@@ -969,7 +969,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (v.getId()) {
             case R.id.option_download_layout:
-                nC.prepareForDownload(handleList, false);
+                ((ManagerActivityLollipop) context).saveNodesToDevice(
+                        Collections.singletonList(node), false, false, false, false);
                 break;
 
             case R.id.option_favourite_layout:
@@ -1052,20 +1053,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                showConfirmationLeaveIncomingShare(context, node);
+                showConfirmationLeaveIncomingShare(requireActivity(),
+                        (SnackbarShower) requireActivity(), node);
                 break;
 
             case R.id.option_send_chat_layout:
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning();
-                    break;
-                }
-                nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
+                ((ManagerActivityLollipop) context).attachNodeToChats(node);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.option_rename_layout:
-                ((ManagerActivityLollipop) context).showRenameDialog(node, node.getName());
+                ((ManagerActivityLollipop) context).showRenameDialog(node);
 
                 break;
 

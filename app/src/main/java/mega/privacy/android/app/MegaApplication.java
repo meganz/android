@@ -28,18 +28,18 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
@@ -73,6 +73,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
@@ -104,6 +105,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -127,10 +129,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
+	@MegaApi
 	@Inject
 	MegaApiAndroid megaApi;
+	@MegaApiFolder
+	@Inject
+	MegaApiAndroid megaApiFolder;
 	@Inject
 	MegaChatApiAndroid megaChatApi;
 	@Inject
@@ -138,7 +145,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Inject
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
-	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
 	final static public String APP_KEY = "6tioyn8ka5l6hty";
@@ -161,11 +167,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 
-	private static final boolean USE_BUNDLED_EMOJI = false;
-
 	private static boolean showInfoChatMessages = false;
-
-	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
 
@@ -200,7 +202,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
-	private static boolean isCookieBannerEnabled = false;
 	private static boolean arePreferenceCookiesEnabled = false;
 	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
@@ -348,8 +349,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
-					//Login transfers resumption
-					TransfersManagement.enableTransfersResumption();
+					// Init CU sync data after login successfully
+					initCuSync();
+
+					//Login check resumed pending transfers
+					TransfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -740,17 +744,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		checkAppUpgrade();
 
 		setupMegaApi();
+		setupMegaApiFolder();
 		setupMegaChatApi();
 
-		megaApiFolder = getMegaApiFolder();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
-		//Logout transfers resumption
-		TransfersManagement.enableTransfersResumption();
+		//Logout check resumed pending transfers
+		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -800,37 +805,32 @@ public class MegaApplication extends MultiDexApplication implements Application.
         };
 
 		registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
-		EmojiManager.install(new TwitterEmojiProvider());
 
+		EmojiManager.install(new TwitterEmojiProvider());
 		EmojiManagerShortcodes.initEmojiData(getApplicationContext());
 		EmojiManager.install(new TwitterEmojiProvider());
 		final EmojiCompat.Config config;
-		if (USE_BUNDLED_EMOJI) {
-			logDebug("Use Bundle emoji");
-			// Use the bundled font for EmojiCompat
-			config = new BundledEmojiCompatConfig(getApplicationContext());
-		} else {
-			logDebug("Use downloadable font for EmojiCompat");
-			// Use a downloadable font for EmojiCompat
-			final FontRequest fontRequest = new FontRequest(
-					"com.google.android.gms.fonts",
-					"com.google.android.gms",
-					"Noto Color Emoji Compat",
-					R.array.com_google_android_gms_fonts_certs);
-			config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
-					.setReplaceAll(false)
-					.registerInitCallback(new EmojiCompat.InitCallback() {
-						@Override
-						public void onInitialized() {
-							logDebug("EmojiCompat initialized");
-						}
-						@Override
-						public void onFailed(@Nullable Throwable throwable) {
-							logWarning("EmojiCompat initialization failed");
-						}
-					});
-		}
+		logDebug("Use downloadable font for EmojiCompat");
+		// Use a downloadable font for EmojiCompat
+		final FontRequest fontRequest = new FontRequest(
+				"com.google.android.gms.fonts",
+				"com.google.android.gms",
+				"Noto Color Emoji Compat",
+				R.array.com_google_android_gms_fonts_certs);
+		config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
+				.setReplaceAll(false)
+				.registerInitCallback(new EmojiCompat.InitCallback() {
+					@Override
+					public void onInitialized() {
+						logDebug("EmojiCompat initialized");
+					}
+					@Override
+					public void onFailed(@Nullable Throwable throwable) {
+						logWarning("EmojiCompat initialization failed");
+					}
+				});
 		EmojiCompat.init(config);
+
 		// clear the cache files stored in the external cache folder.
         clearPublicCache(this);
 
@@ -905,31 +905,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public MegaApiAndroid getMegaApiFolder(){
-		if (megaApiFolder == null){
-			PackageManager m = getPackageManager();
-			String s = getPackageName();
-			PackageInfo p;
-			String path = null;
-			try
-			{
-				p = m.getPackageInfo(s, 0);
-				path = p.applicationInfo.dataDir + "/";
-			}
-			catch (NameNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			
-			Log.d(TAG, "Database path: " + path);
-			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					BuildConfig.USER_AGENT, path);
-
-			megaApiFolder.retrySSLerrors(true);
-
-			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-		}
-		
 		return megaApiFolder;
 	}
 
@@ -966,6 +941,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+	}
+
+	/**
+	 * Setup the MegaApiAndroid instance for folder link.
+	 */
+	private void setupMegaApiFolder() {
+		megaApiFolder.retrySSLerrors(true);
+
+		megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+		megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 	}
 
 	private void setupMegaChatApi() {
@@ -1030,14 +1015,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
 		MegaApplication.showInfoChatMessages = showInfoChatMessages;
-	}
-
-	public static boolean isShowPinScreen() {
-		return showPinScreen;
-	}
-
-	public static void setShowPinScreen(boolean showPinScreen) {
-		MegaApplication.showPinScreen = showPinScreen;
 	}
 
 	public static String getUrlConfirmationLink() {
@@ -1621,6 +1598,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.remove(chatId);
 	}
 
+	public AppRTCAudioManager getAudioManager(){
+		return rtcAudioManager;
+	}
+
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
@@ -1783,7 +1764,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
 		openCallService(call.getChatid());
-		MegaApplication.setShowPinScreen(false);
+		passcodeManagement.setShowPasscodeScreen(false);
 		int callStatus = call.getStatus();
 
 		Intent i = new Intent(this, ChatCallActivity.class);
@@ -1988,12 +1969,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaApplication.userWaitingForCall = userWaitingForCall;
 	}
 
-	public void setCookieBannerEnabled(boolean enabled) {
-		isCookieBannerEnabled = enabled;
-	}
-
-	public static boolean isCookieBannerEnabled() {
-		return isCookieBannerEnabled;
+	public static PasscodeManagement getPasscodeManagement() {
+		return passcodeManagement;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {

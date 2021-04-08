@@ -1,8 +1,10 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Build;
@@ -246,21 +248,19 @@ public class TransfersManagement {
     }
 
     /**
-     * Enables transfers resumption.
+     * Check if there are resumed pending transfers.
      * Before start to check if there are pending transfers, it has to wait a time
      * WAIT_TIME_TO_RESTART_SERVICES. This time is for the transfer resumption to be enabled
      * since there is no possibility to listen any response of the request to know when it finishes.
      *
      */
-    public static void enableTransfersResumption() {
+    public static void checkResumedPendingTransfers() {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
 
         if (megaApi.getRootNode() != null) {
             checkSDCardCompletedTransfers();
         }
-
-        megaApi.enableTransferResumption();
 
         if (app.getDbH().getTransferQueueStatus()) {
             //Queue of transfers should be paused.
@@ -337,6 +337,25 @@ public class TransfersManagement {
 
             return mBuilder.build();
         }
+    }
+
+    /**
+     * Checks if a service is already running.
+     *
+     * @param serviceClass Service it wants to know if its is already running.
+     * @return True if the service is already running, false otherwise.
+     */
+    public static boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) MegaApplication.getInstance()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
