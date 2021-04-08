@@ -283,6 +283,9 @@ public class MimeTypeList {
 				|| extension.equals("db") || extension.equals("dbf") || extension.equals("mdb")
 				|| extension.equals("pdb") || extension.equals("c") || extension.equals("cpp")
 				|| extension.equals("h") || extension.equals("cs") || extension.equals("sh")
-				|| extension.equals("vb") || extension.equals("swift");
+				|| extension.equals("vb") || extension.equals("swift")
+
+				//Files without extension
+				|| type.startsWith("application/octet-stream");
 	}
 }

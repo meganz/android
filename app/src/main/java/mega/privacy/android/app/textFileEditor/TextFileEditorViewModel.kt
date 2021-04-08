@@ -17,7 +17,6 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -45,6 +44,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     private var fileName = ""
     private var node: MegaNode? = null
+    private var filePath: String? = null
     private var mode = VIEW_MODE
     private var adapterType: Int = INVALID_VALUE
     private var msgChat: MegaChatMessage? = null
@@ -90,46 +90,52 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun setValuesFromIntent(intent: Intent, savedInstanceState: Bundle?) {
         adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
-        if (adapterType == FROM_CHAT) {
-            val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
-            val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+        when (adapterType) {
+            FROM_CHAT -> {
+                val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
-            if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
-                msgChat = megaChatApi.getMessage(chatId, msgId)
+                if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
+                    msgChat = megaChatApi.getMessage(chatId, msgId)
 
-                if (msgChat == null) {
-                    msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId)
-                }
+                    if (msgChat == null) {
+                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId)
+                    }
 
-                if (msgChat != null) {
-                    node = authorizeNodeIfPreview(
-                        msgChat!!.megaNodeList.get(0),
-                        megaChatApi,
-                        megaApi,
-                        chatId
-                    )
+                    if (msgChat != null) {
+                        node = authorizeNodeIfPreview(
+                            msgChat!!.megaNodeList.get(0),
+                            megaChatApi,
+                            megaApi,
+                            chatId
+                        )
+                    }
                 }
             }
-        } else {
-            val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-            node = megaApi.getNodeByHandle(handle)
+            OFFLINE_ADAPTER, ZIP_ADAPTER -> {
+                filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
+            }
+            else -> {
+                val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+                node = megaApi.getNodeByHandle(handle)
+            }
         }
-
-        val name = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
 
         if (savedInstanceState != null) {
             mode = savedInstanceState.getString(MODE) ?: VIEW_MODE
             contentText.value = savedInstanceState.getString(CONTENT_TEXT)
         } else {
-            mode = if (node == null || node?.isFolder == true) CREATE_MODE else VIEW_MODE
+            mode = intent.getStringExtra(MODE) ?: VIEW_MODE
         }
 
-        fileName = if (name != null) name + FileUtil.TXT_EXTENSION else node?.name!!
+        fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: node?.name!!
     }
 
     private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
         withContext(Dispatchers.IO) {
-            val localFileUri = getLocalFile(null, node?.name, node?.size!!)
+            val localFileUri =
+                if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER) filePath
+                else getLocalFile(null, node?.name, node?.size!!)
 
             if (!isTextEmpty(localFileUri)) {
                 val localFile = File(localFileUri)

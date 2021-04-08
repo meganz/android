@@ -192,7 +192,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 readingContent = false
                 binding.fileEditorScrollView.isVisible = true
                 binding.progressBar.isVisible = false
-                binding.editFab.isVisible = true
+                binding.editFab.isVisible = viewModel.isEditableAdapter()
                 binding.editText.setText(contentRead)
             })
 
