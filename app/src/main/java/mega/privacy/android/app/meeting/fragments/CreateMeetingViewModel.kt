@@ -9,10 +9,10 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 class CreateMeetingViewModel @ViewModelInject constructor(
     private val repository: CreateMeetingRepository
 ) : ViewModel() {
-    private val _avatar = MutableLiveData<Bitmap>()
+//    private val _avatar = MutableLiveData<Bitmap>()
     val result = MutableLiveData<Boolean>()
-    val avatar: LiveData<Bitmap> = _avatar
-
+//    val avatar: LiveData<Bitmap> = _avatar
+    var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
     /**
      * Create Meeting

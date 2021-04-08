@@ -26,22 +26,6 @@ class CreateMeetingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
-//    suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
-//        AvatarUtil.getDefaultAvatar(
-//            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
-//        )
-//    }
-//
-//    /**
-//     * Get the actual avatar from the server and save it to the cache folder
-//     */
-//    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
-//        megaApi.getUserAvatar(
-//            megaApi.myUser,
-//            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
-//            listener
-//        )
-//    }
 
     fun createMeeting(
         group: Boolean,

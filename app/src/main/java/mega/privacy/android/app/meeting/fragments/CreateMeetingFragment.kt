@@ -6,6 +6,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -21,35 +22,40 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
     MegaChatRequestListenerInterface {
 
     private val viewModel: CreateMeetingViewModel by viewModels()
+    private var meetingName: String? = null
 
     override fun meetingButtonClick() {
+        meetingName = viewModel.meetingName.value
         logDebug("Meeting Name: $meetingName")
-        // will replaced
-        val peers = MegaChatPeerList.createInstance()
-        viewModel.createMeeting(false, peers, this)
+        meetingName?.let {
+            Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+            // will replaced
+            val peers = MegaChatPeerList.createInstance()
+            viewModel.createMeeting(false, peers, this)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         type_meeting_edit_text.visibility = View.VISIBLE
-        showKeyboardDelayed(type_meeting_edit_text)
+        initViewModel()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        initViewModel()
+
     }
 
     /**
-     * Initialize viewmodel
+     * Initialize ViewModel
      */
-    private fun initViewModel(){
-        abstractMeetingOnBoardingViewModel.result.observe(viewLifecycleOwner) {
-            (activity as MeetingActivity).setBottomFloatingPanelViewHolder(true)
-        }
-        abstractMeetingOnBoardingViewModel.tips.observe(viewLifecycleOwner) {
-            showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
+    private fun initViewModel() {
+        binding?.let {
+            it.createviewmodel = viewModel
+            if (it.typeMeetingEditText.isVisible) {
+                showKeyboardDelayed(type_meeting_edit_text)
+            }
         }
     }
 

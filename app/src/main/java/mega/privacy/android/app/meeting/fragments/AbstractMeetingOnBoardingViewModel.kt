@@ -18,13 +18,14 @@ import nz.mega.sdk.MegaRequest
 class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository
 ) : ViewModel() {
+    // Avatar
     private val _avatar = MutableLiveData<Bitmap>()
-    val result = MutableLiveData<Boolean>()
     val avatar: LiveData<Bitmap> = _avatar
 
     var tips: MutableLiveData<String> = MutableLiveData<String>()
-    var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
+
+    // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>().apply { value = false }
     private val _cameraLiveData: MutableLiveData<Boolean> =
@@ -35,6 +36,18 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     val micLiveData: LiveData<Boolean> = _micLiveData
     val cameraLiveData: LiveData<Boolean> = _cameraLiveData
     val speakerLiveData: LiveData<Boolean> = _speakerLiveData
+
+    // Permissions
+    private var cameraGranted: Boolean = false
+    private val _cameraPermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    val cameraPermissionCheck: LiveData<Boolean> = _cameraPermissionCheck
+    private var recordAudioGranted: Boolean = false
+    private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
+        MutableLiveData<Boolean>(false)
+    val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
+    private var storageGranted: Boolean = false
+    private val _storagePermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    val storagePermissionCheck: LiveData<Boolean> = _storagePermissionCheck
 
     init {
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
@@ -89,6 +102,10 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; off: turn off
      */
     fun clickMic(bOn: Boolean) {
+        if (!recordAudioGranted) {
+            _recordAudioPermissionCheck.value = true
+            return
+        }
         if (abstractMeetingOnBoardingRepository.switchMic(bOn)) {
             _micLiveData.value = bOn
             when (bOn) {
@@ -110,6 +127,10 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; off: turn off
      */
     fun clickCamera(bOn: Boolean) {
+        if (!cameraGranted) {
+            _cameraPermissionCheck.value = true
+            return
+        }
         if (abstractMeetingOnBoardingRepository.switchCamera(bOn)) {
             _cameraLiveData.value = bOn
             when (bOn) {
@@ -144,5 +165,32 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
                 )
             }
         }
+    }
+
+    /**
+     * Set camera permission
+     *
+     * @param cameraPermission true: the permission is granted
+     */
+    fun setCameraPermission(cameraPermission: Boolean) {
+        cameraGranted = cameraPermission
+    }
+
+    /**
+     * Set record & audio permission
+     *
+     * @param recordAudioPermission true: the permission is granted
+     */
+    fun setRecordAudioPermission(recordAudioPermission: Boolean) {
+        recordAudioGranted = recordAudioPermission
+    }
+
+    /**
+     * Set storage permission
+     *
+     * @param storagePermission true: the permission is granted
+     */
+    fun setStoragePermission(storagePermission: Boolean) {
+        storageGranted = storagePermission
     }
 }

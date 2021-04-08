@@ -6,6 +6,9 @@
 
     <data>
         <variable
+            name="createviewmodel"
+            type="mega.privacy.android.app.meeting.fragments.CreateMeetingViewModel" />
+        <variable
             name="viewmodel"
             type="mega.privacy.android.app.meeting.fragments.AbstractMeetingOnBoardingViewModel" />
     </data>
@@ -32,7 +35,7 @@
             android:minWidth="100dp"
             android:singleLine="true"
             android:textAlignment="center"
-            android:text="@={viewmodel.meetingName}"
+            android:text="@={createviewmodel.meetingName}"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textColorHint="#9B9B9B"

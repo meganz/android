@@ -3086,4 +3086,9 @@
 
     <string name="invalid_meeting_link" context="error message shown when a meeting link is invalid">This meeting has ended</string>
     <string name="invalid_meeting_link_args" context="error message shown when a meeting link is not well formed">Invalid meeting link</string>
+    <!-- meeting permission-->
+    <string name="meeting_permission_info" context="Warning show to the user when the app needs permissions to start a meeting.">Please allow MEGA access permission</string>
+    <string name="meeting_permission_info_message" context="Message of a dialog to show user the permissions that needed">For the best meeting experience, MEGA may ask to access to your microphone, camera, and storage.</string>
+    <string name="button_permission_info" context="Button to confirm the action of restarting one transfer">Got it</string>
+    <string name="meeting_required_permissions_warning" context="Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.">MEGA needs your permission in order to get the best meeting experience.</string>
 </resources>
