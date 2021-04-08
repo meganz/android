@@ -352,8 +352,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					// Init CU sync data after login successfully
 					initCuSync();
 
-					//Login transfers resumption
-					TransfersManagement.enableTransfersResumption();
+					//Login check resumed pending transfers
+					TransfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -754,8 +754,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
         passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
-		//Logout transfers resumption
-		TransfersManagement.enableTransfersResumption();
+		//Logout check resumed pending transfers
+		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = false;
 		if (dbH != null) {
