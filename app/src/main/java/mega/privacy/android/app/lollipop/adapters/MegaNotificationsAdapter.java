@@ -19,11 +19,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetUserEmailListener;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -32,11 +36,13 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.TextUtil.replaceFormatText;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
+public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener, GetUserEmailListener.OnUserEmailUpdateCallback {
 
 	public static int MAX_WIDTH_FIRST_LINE_NEW_LAND =306;
 	public static int MAX_WIDTH_FIRST_LINE_SEEN_LAND =336;
@@ -91,7 +97,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
     	TextView dateText;
 
     	LinearLayout separator;
-    }
+	}
 
 	ViewHolderNotifications holder = null;
 
@@ -125,6 +131,165 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		return holder;
 	}
 
+	boolean isHolderNull(int pos, MegaNotificationsAdapter.ViewHolderNotifications holder) {
+		if (holder ==  null) {
+			holder = (MegaNotificationsAdapter.ViewHolderNotifications) listFragment.findViewHolderForAdapterPosition(pos);
+			if (holder == null) {
+				notifyItemChanged(pos);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Method for getting a user's email from MegaUserAlert.
+	 *
+	 * @param pos    position in adapter
+	 * @param holder ViewHolderNotifications
+	 * @param alert  MegaUserAlert
+	 * @return The email
+	 */
+	private String getEmail(int pos, ViewHolderNotifications holder, MegaUserAlert alert) {
+		String email = alert.getEmail();
+		if (email != null) {
+			return email;
+		}
+
+		NonContactInfo nonContact = MegaApplication.getInstance().getDbH().findNonContactByHandle(alert.getUserHandle() + "");
+		if (nonContact != null && nonContact.getEmail() != null) {
+			return nonContact.getEmail();
+		}
+
+		if (isHolderNull(pos, holder)) {
+			return null;
+		}
+
+		megaApi.getUserEmail(alert.getUserHandle(), new GetUserEmailListener(context, this, pos));
+		return context.getString(R.string.unknown_name_label);
+	}
+
+	/**
+	 * Method to correctly show the title or description text of a notification when the user's email needs to be displayed.
+	 *
+	 * @param position position in adapter
+	 * @param holder   ViewHolderNotifications
+	 * @param alert    MegaUserAlert
+	 * @param email    Email of a user
+	 */
+	private void setTitleOrDescriptionTextWithEmail(int position, ViewHolderNotifications holder, MegaUserAlert alert, String email) {
+		if (isHolderNull(position, holder)) {
+			return;
+		}
+
+		String textToShow;
+		switch (alert.getType()) {
+			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:
+				textToShow = String.format(getString(R.string.notification_new_contact_request), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:
+				textToShow = String.format(getString(R.string.subtitle_contact_request_notification_cancelled), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
+				textToShow = String.format(getString(R.string.notification_new_contact), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
+				textToShow = String.format(getString(R.string.subtitle_account_notification_deleted), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
+				textToShow = String.format(getString(R.string.notification_reminder_contact_request), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
+				textToShow = String.format(getString(R.string.subtitle_contact_notification_deleted), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:
+				textToShow = String.format(getString(R.string.subtitle_contact_notification_blocked), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:
+				textToShow = String.format(getString(R.string.subtitle_outgoing_contact_request_accepted), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:
+				textToShow = String.format(getString(R.string.subtitle_outgoing_contact_request_denied), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:
+				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_ignored), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
+				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_accepted), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:
+				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_denied), getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_NEWSHARE:
+				textToShow = String.format(getString(R.string.notification_new_shared_folder), getNicknameForNotificationsSection(context, email));
+				holder.titleText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_DELETEDSHARE:
+				if (alert.getNumber(0) == 0) {
+					MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
+					if (node != null) {
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), getNicknameForNotificationsSection(context, email), node.getName());
+					} else {
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), getNicknameForNotificationsSection(context, email));
+					}
+				} else {
+					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), getNicknameForNotificationsSection(context, email));
+				}
+
+				holder.titleText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_NEWSHAREDNODES:
+				int numFiles = (int) alert.getNumber(1);
+				int numFolders = (int) alert.getNumber(0);
+				if (numFolders > 0 && numFiles > 0) {
+					String numFilesString = context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
+					String numFoldersString = context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
+					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, getNicknameForNotificationsSection(context, email), numFoldersString, numFilesString);
+				} else if (numFolders > 0) {
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, getNicknameForNotificationsSection(context, email), numFolders);
+				} else {
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, getNicknameForNotificationsSection(context, email), numFiles);
+				}
+
+				holder.titleText.setText(replaceFormatText(context, textToShow));
+				break;
+
+			case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
+				int itemCount = (int) alert.getNumber(0);
+				textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount,
+						getNicknameForNotificationsSection(context, email), itemCount);
+				holder.titleText.setText(replaceFormatText(context, textToShow));
+				break;
+		}
+	}
+
 	@Override
 	public void onBindViewHolder(ViewHolderNotifications holder, int position) {
 		logDebug("Position: " + position);
@@ -152,27 +317,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.notification_new_contact_request), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -215,27 +361,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification_cancelled));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_request_notification_cancelled), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -278,27 +405,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.notification_new_contact), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -341,27 +449,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_account_notification_deleted));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_account_notification_deleted), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -404,27 +493,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.notification_reminder_contact_request), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -466,28 +536,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_notification_deleted));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_deleted), getNicknameForNotificationsSection(context, email));
-
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -530,27 +580,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_notification_blocked));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_blocked), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -593,27 +624,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_accepted), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -655,27 +667,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_denied), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -717,27 +710,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_ignored), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -779,27 +753,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_accepted), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -841,27 +796,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_denied), getNicknameForNotificationsSection(context, email));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.descriptionText.setText(result);
 				holder.descriptionText.setVisibility(View.VISIBLE);
 
 				//Description set to max, adjust title
@@ -903,28 +839,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = String.format(context.getString(R.string.notification_new_shared_folder), getNicknameForNotificationsSection(context, email));
-
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
 				//Description not shown, adjust title
@@ -968,46 +884,16 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				String email = alert.getEmail();
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = "";
-				Spanned result = null;
 				//TYPE_DELETEDSHARE (0: value 1 if access for this user was removed by the share owner, otherwise
 				//value 0 if someone left the folder)
 
-				if(alert.getNumber(0)==0){
+				if (alert.getNumber(0) == 0) {
 					MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
-					if(node!=null){
-						holder.itemLayout.setOnClickListener(this);
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), getNicknameForNotificationsSection(context, email), node.getName());
-					}
-					else{
-						holder.itemLayout.setOnClickListener(null);
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), getNicknameForNotificationsSection(context, email));
-					}
-				}
-				else{
-					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), getNicknameForNotificationsSection(context, email));
-				}
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
+					holder.itemLayout.setOnClickListener(node != null ? this : null);
 				}
 
-				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
 				//Description not shown, adjust title
@@ -1046,45 +932,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				String email = alert.getEmail();
-				int numFiles = (int) alert.getNumber(1);
-				int numFolders = (int) alert.getNumber(0);
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = "";
-
-				if(numFolders>0 && numFiles>0){
-
-					String numFilesString = context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
-					String numFoldersString = context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
-
-					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, getNicknameForNotificationsSection(context, email), numFoldersString, numFilesString);
-				}
-				else if(numFolders>0){
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, getNicknameForNotificationsSection(context, email), numFolders);
-				}
-				else{
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, getNicknameForNotificationsSection(context, email), numFiles);
-				}
-
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-
-				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
 				//Description not shown, adjust title
@@ -1128,30 +977,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				String email = alert.getEmail();
-				int itemCount = (int) alert.getNumber(0);
+				setTitleOrDescriptionTextWithEmail(position, holder, alert, getEmail(position, holder, alert));
 
-				String textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount, getNicknameForNotificationsSection(context, email), itemCount);
-
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-							+ "\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-							+ "\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-
-				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
 				//Description not shown, adjust title
@@ -1564,5 +1391,17 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	public void setListFragment(RecyclerView listFragment) {
 		this.listFragment = listFragment;
+	}
+
+	@Override
+	public void onUserEmailUpdate(@Nullable String email, long handleUser, int position) {
+		MegaNotificationsAdapter.ViewHolderNotifications view = (MegaNotificationsAdapter.ViewHolderNotifications) listFragment.findViewHolderForLayoutPosition(position);
+		if (view != null) {
+			MegaUserAlert alert = (MegaUserAlert) getItem(position);
+			if (handleUser != alert.getUserHandle()) {
+				return;
+			}
+			setTitleOrDescriptionTextWithEmail(position, view, alert, email);
+		}
 	}
 }
