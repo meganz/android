@@ -1739,7 +1739,7 @@
     <string name="empty_name" context="Error shown when the user left a name empty">文件名无效</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">请更改您的文件名</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">无效的字符</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允许使用这些字符：” * / : < >? \ |</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
         <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">请为您的文件命名</item>

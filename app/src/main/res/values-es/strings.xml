@@ -1739,7 +1739,7 @@
     <string name="empty_name" context="Error shown when the user left a name empty">Nombre inválido</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Corrige los nombres de archivo antes de continuar</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Caracteres no permitidos</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Los siguientes caracteres no están permitidos: ” * / : < >? \ |</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Los siguientes caracteres no están permitidos: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
         <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Nombra tu archivo antes de continuar</item>

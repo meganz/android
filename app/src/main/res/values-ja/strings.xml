@@ -1739,7 +1739,7 @@
     <string name="empty_name" context="Error shown when the user left a name empty">名前が無効です</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">先に進む前にファイル名を修正してください</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">無効な文字です</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">次の文字は許可されていません： ” * / : < >? \ |</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
         <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">先に進む前にファイルに名前を付けてください</item>

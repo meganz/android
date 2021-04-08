@@ -1739,7 +1739,7 @@
     <string name="empty_name" context="Error shown when the user left a name empty">잘못된 이름</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">진행하기 전에 파일 이름을 고치세요</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">잘못된 글자</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">다음의 글자는 허용되지 않습니다: ” * / : < >? \ |</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
         <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">진행하기 전에 파일에 이름을 지으세요</item>
