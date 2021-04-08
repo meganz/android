@@ -169,15 +169,13 @@ object CuSyncManager {
      * @param state state Should be MegaApiJava.CU_SYNC_STATE_ACTIVE when create.
      * @param subState subState Valid value definitions
      * @see MegaError
-     * @param extraData extraData
      */
     private fun setBackup(
         backupType: Int,
         targetNode: Long?,
         localFolder: String?,
         state: Int = State.CU_SYNC_STATE_ACTIVE,
-        subState: Int = MegaError.API_OK,
-        extraData: String = INVALID_NON_NULL_VALUE
+        subState: Int = MegaError.API_OK
     ) {
         if (isInvalid(targetNode?.toString())) {
             logWarning("Target handle is invalid, value: $targetNode")
@@ -237,6 +235,7 @@ object CuSyncManager {
                 cuSync.backupId,
                 newTargetNode,
                 null,
+                StringResourcesUtils.getString(R.string.section_photo_sync),
                 INVALID_VALUE
             )
         }
@@ -271,6 +270,7 @@ object CuSyncManager {
                 muSync.backupId,
                 newTargetNode,
                 null,
+                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
                 INVALID_VALUE,
             )
         }
@@ -301,6 +301,7 @@ object CuSyncManager {
                 cuSync.backupId,
                 INVALID_HANDLE,
                 newLocalFolder!!,
+                StringResourcesUtils.getString(R.string.section_photo_sync),
                 INVALID_VALUE
             )
         }
@@ -331,6 +332,53 @@ object CuSyncManager {
                 muSync.backupId,
                 INVALID_HANDLE,
                 newLocalFolder!!,
+                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                INVALID_VALUE
+            )
+        }
+    }
+
+    /**
+     * Update CU backup's name.
+     *
+     * @see MegaApiJava
+     */
+    fun updatePrimaryBackupName() {
+        if (!CameraUploadUtil.isPrimaryEnabled()) {
+            logDebug("CU is not enabled, no need to update.")
+            return
+        }
+
+        val cuSync = databaseHandler.cuBackup
+        if (cuSync != null) {
+            updateBackup(
+                cuSync.backupId,
+                INVALID_HANDLE,
+                null,
+                StringResourcesUtils.getString(R.string.section_photo_sync),
+                INVALID_VALUE
+            )
+        }
+    }
+
+    /**
+     * Update MU backup's name.
+     *
+     * @see MegaApiJava
+     */
+    fun updateSecondaryBackupName() {
+        if (!CameraUploadUtil.isSecondaryEnabled()) {
+            logDebug("MU is not enabled, no need to update.")
+            return
+        }
+
+        val muSync = databaseHandler.muBackup
+        if (muSync != null) {
+            updateBackup(
+                muSync.backupId,
+                INVALID_HANDLE,
+                null,
+                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
                 INVALID_VALUE
             )
         }
@@ -353,13 +401,14 @@ object CuSyncManager {
                 cuSync.backupId,
                 INVALID_HANDLE,
                 null,
+                StringResourcesUtils.getString(R.string.section_photo_sync),
                 newState
             )
         }
     }
 
     /**
-     * Update CU backup's state.
+     * Update MU backup's state.
      *
      * @see MegaApiJava
      */
@@ -375,6 +424,7 @@ object CuSyncManager {
                 muSync.backupId,
                 INVALID_HANDLE,
                 null,
+                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
                 newState
             )
         }
@@ -386,15 +436,16 @@ object CuSyncManager {
      * @see MegaApiJava.updateBackup
      *
      * @param backupId ID of the backup which is to be updated.
-     * should be MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD or MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
      * @param targetNode Handle of the MegaNode where the backup targets to.
      * @param localFolder Path of the local folder where the backup uploads from.
+     * @param backupName Name of the backup. Should be "Camera Uploads" for CU and "Media Uploads" for MU.
      * @param state state Current state of the backup.
      */
     private fun updateBackup(
         backupId: Long,
         targetNode: Long,
         localFolder: String?,
+        backupName: String,
         state: Int
     ) {
         if (isInvalid(backupId.toString())) {
@@ -407,7 +458,7 @@ object CuSyncManager {
             BACKUP_TYPE_INVALID,
             targetNode,
             localFolder,
-            INVALID_NON_NULL_VALUE,
+            backupName,
             state,
             MegaError.API_OK,
             SyncListener(UpdateBackupCallback(), megaApplication)

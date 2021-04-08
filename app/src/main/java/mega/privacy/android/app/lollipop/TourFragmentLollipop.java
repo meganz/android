@@ -31,6 +31,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestFragment;
 import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
@@ -126,6 +127,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         bLogin.setOnClickListener(this);
         bRegister.setOnClickListener(this);
+        v.findViewById(R.id.join_meeting_as_guest).setOnClickListener(this);
 
         adapter = new TourImageAdapter((LoginActivityLollipop)context);
         viewPager.setAdapter(adapter);
@@ -285,6 +287,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
             case R.id.button_login_tour:
                 logDebug("onLoginClick");
                 ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
+                break;
+            case R.id.join_meeting_as_guest:
+                logDebug("onJoinMeetingAsGuestClick");
+                new PasteMeetingLinkGuestFragment().show(getChildFragmentManager(),
+                        PasteMeetingLinkGuestFragment.TAG);
                 break;
         }
     }
