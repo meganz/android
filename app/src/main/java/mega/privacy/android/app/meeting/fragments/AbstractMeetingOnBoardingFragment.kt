@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
@@ -25,11 +23,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 
 
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
+    private var bRefreshPermission: Boolean = false
     protected val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     private var requestCode = 0
@@ -63,6 +61,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         checkMeetingPermissions(permissions, true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshPermissions(permissions)
     }
 
     /**
@@ -196,7 +199,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         dialogShow: Boolean,
         sysSettingShow: Boolean = false
     ) {
-
         val mPermissionList: MutableList<String> = ArrayList()
         requestCode = 0
         for (i in permissions.indices) {
@@ -207,14 +209,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                     permissions[i]
                 )
             if (!bPermission && sysSettingShow) {
-                val showRequestPermission =
-                    PermissionUtils.shouldShowRequestPermissionRationale(
-                        requireActivity(),
-                        permissions[i]
-                    )
                 if (!showRequestPermission) {
                     // The user ticket 'Don't ask again' and deny a permission request.
                     logDebug("the user ticket 'Don't ask again' and deny a permission request.")
+                    bRefreshPermission = true
                     val warningText =
                         StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
                     (activity as BaseActivity).showSnackbar(
@@ -326,12 +324,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                         requireActivity(),
                         permissions[i]
                     )
-                if (showRequestPermission) {
-                    // Don't show permission dialog again when user select "DENY", Recheck it when using
-                    //@Suppress("UNCHECKED_CAST")
-                    //checkMeetingPermissions(permissions as Array<String>, false)
-                    return
-                } else {
+                // Don't show permission dialog again when user select "DENY", Recheck it when using
+                if (!showRequestPermission) {
                     // The user ticket 'Don't ask again' and deny a permission request.
                     logDebug("the user ticket 'Don't ask again' and deny a permission request.")
                 }
@@ -341,26 +335,29 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Determine whether you have been granted a particular permission
+     * Update the permission state of ViewModel,
      *
-     * @param permission The name of the permission being checked.
-     * @param requestCode Application specific request code to match with a result
-     *    reported to {@link #onRequestPermissionsResult(int, String[], int[])}.
+     * @param permission One or more permission strings.
+     *
      */
-    fun checkPermissions(permission: String, requestCode: Int): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
+    private fun refreshPermissions(permission: Array<String>) {
+        if(bRefreshPermission) {
+            bRefreshPermission = false
+            for (i in permission.indices) {
+                val bPermission = PermissionUtils.hasPermissions(requireContext(), permission[i])
+                when (permission[i]) {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        abstractMeetingOnBoardingViewModel.setStoragePermission(bPermission)
+                    }
+                    Manifest.permission.CAMERA -> {
+                        abstractMeetingOnBoardingViewModel.setCameraPermission(bPermission)
+                    }
+                    Manifest.permission.RECORD_AUDIO -> {
+                        abstractMeetingOnBoardingViewModel.setRecordAudioPermission(bPermission)
+                    }
+                }
+            }
         }
-        val hasPermission =
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-        if (!hasPermission) {
-            requestPermissions(arrayOf(permission), requestCode)
-            return false
-        }
-        return true
     }
 
     /**
