@@ -6,7 +6,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -14,13 +13,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -29,19 +25,18 @@ import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
-import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaNode
 
 class MegaNodeDialogUtil {
@@ -193,7 +188,7 @@ class MegaNodeDialogUtil {
                 TYPE_NEW_TXT_FILE
             )
 
-            if (!isTextEmpty(typedName)) {
+            if (typedName != null && typedName != TXT_EXTENSION) {
                 dialog.findViewById<EmojiEditText>(R.id.type_text)?.setText(typedName)
             }
 
@@ -235,7 +230,6 @@ class MegaNodeDialogUtil {
             dialog.apply {
                 setOnShowListener {
                     val typeText = findViewById<EmojiEditText>(R.id.type_text)
-                    val extensionText = findViewById<TextView>(R.id.extension_text)
                     val errorText = findViewById<TextView>(R.id.error_text)
 
                     typeText?.apply {
@@ -261,35 +255,13 @@ class MegaNodeDialogUtil {
                             }
                             TYPE_NEW_TXT_FILE -> {
                                 setHint(R.string.context_new_file_name)
-                                extensionText?.apply {
-                                    isVisible = true
-                                    text = TXT_EXTENSION
-                                }
+                                setText(TXT_EXTENSION)
+                                runDelay(SHOW_IM_DELAY.toLong()) { setSelection(0) }
                             }
                         }
 
                         doAfterTextChanged {
                             quitDialogError(typeText, errorText)
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                extensionText?.setTextAppearance(
-                                    if (isTextEmpty(typeText.text.toString()))
-                                        R.style.TextAppearance_Mega_Subtitle1_Grey38White38
-                                    else R.style.TextAppearance_Mega_Subtitle1
-                                )
-                            } else {
-                                extensionText?.setTextColor(
-                                    if (isTextEmpty(typeText.text.toString())) ContextCompat.getColor(
-                                        context,
-                                        R.color.grey_038_white_038
-                                    ) else getThemeColor(
-                                        context,
-                                        R.attr.colorPrimary
-                                    )
-                                )
-                            }
-
-
                         }
 
                         setOnEditorActionListener { _, actionId, _ ->
