@@ -9,13 +9,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
@@ -29,7 +28,6 @@ import static nz.mega.sdk.MegaShare.*;
 public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node = null;
-    private NodeController nC;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +39,6 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         } else if (context instanceof VersionsFileActivity) {
             node = ((VersionsFileActivity) context).getSelectedNode();
         }
-
-        nC = new NodeController(context);
     }
 
     @SuppressLint("RestrictedApi")
@@ -125,12 +121,9 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
             return;
         }
 
-        ArrayList<Long> handleList = new ArrayList<>();
-        handleList.add(node.getHandle());
-
         switch (v.getId()) {
             case R.id.option_download_layout:
-                nC.prepareForDownload(handleList, false);
+                ((VersionsFileActivity) context).downloadNodes(Collections.singletonList(node));
                 break;
 
             case R.id.option_revert_layout:

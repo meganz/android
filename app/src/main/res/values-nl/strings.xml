@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4GB. Uw download zal waarschijnlijk mislukken</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Er is geen applicatie beschikbaar om dit bestand te openen op uw apparaat</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Er zijn geen applicaties beschikbaar op uw apparaat om deze locatie te openen</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">U heeft geen enkele applicaties geïnstalleerd die deze bestandstype ondersteunen.</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Deel afbeelding door middel van</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Deel koppeling</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Annuleer alle overdrachten</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Maak een foto</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Vastleggen</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Meldingen van inkomende MEGA-oproepen toestaan</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA heeft uw toestemming nodig om de oproepinterface op de achtergrond te laten verschijnen.</string>
@@ -676,10 +677,11 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads voltooid</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Verschijning</string>
     <string name="settings_features" context="settings of the Features section">Kenmerken</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Opslag</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Toegangscode Slot</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Toegangscode Slot</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video\'s groter zijn dan %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Indien ingeschakeld, uploadt u informatie over waar uw foto\'s zijn gemaakt, dus wees voorzichtig wanneer u ze deelt.</string>
 
@@ -771,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\'s en video\'s</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Niet ingesteld</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Toegangscode Slot</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Toegangscode Slot</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Wijzig Toegangscode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
@@ -861,34 +863,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Grootste maat</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Kleinste maat</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per maand</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per jaar</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Vul uw factuurgegevens:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adres 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adres 2 (optioneel)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Stad</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Staat/Provincie</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Land</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postcode</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Vul uw betalingsgegevens:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Voornaam</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Achternaam</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Creditcard nummer</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Maand</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Jaar</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV-Code</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Verder gaan</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account met succes opgewaardeerd!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">De handeling is mislukt. Uw credit kaart was niet opgeladen</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">De credit kaart informatie was niet juist. De credit kaart wordt niet gebruikt</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Toegangscode Type</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 cijferige Toegangscode</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6 cijferige Toegangscode</string>
@@ -957,7 +931,7 @@
 
     <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Ongeldige invoer</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Ongeldig e-mailadres</string>
-    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Controleer aub het e-mail adres en probeer opnieuw.</string>
+    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Controleer het e-mail adres en probeer opnieuw.</string>
     <!--
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
     -->
@@ -1007,7 +981,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Maak optimaal gebruik van uw MEGA-account door te upgraden naar PRO.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Profielfoto bewerken</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Maak een foto</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Vastleggen</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Kies afbeelding</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Verwijder afbeelding</string>
 
@@ -1363,6 +1337,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Verwijderen van Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Status instellen</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Kleur thema</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Sluiten</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Niet beschikbaar</string>
 
@@ -1466,6 +1441,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">Bestand %1$d geupload</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">Bestanden %1$d geupload</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 bestand al geüpload</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d bestanden al geüpload</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1612,6 +1592,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Overdrachten gepauzeerd</string>
     <string name="attachment_uploading_state_uploading">Uploaden&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Comprimeren&#8230;</string>
     <string name="attachment_uploading_state_error">Fout. Niet verzonden.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d bestanden al gedownload.</string>
@@ -1718,6 +1699,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Geen mappen gedeeld</string>
 
     <string name="settings_help" context="Menu item">Help</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Help Centrum</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Feedback versturen</string>
     <string name="setting_feedback_subject" context="mail subject">Android terugkoppeling</string>
     <string name="setting_feedback_body" context="mail body">Schrijf hier uw feedback:</string>
@@ -1872,7 +1854,7 @@
     <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list’s header">Bij MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">Telefoon contacten</string>
 
-    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Uw account is geschorst door meerdere misbruiken van MEGA\'s Algemene Voorwaarden. Controleer uw Email Postbak.</string>
+    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Uw account is geschorst door meerdere misbruiken van MEGA\'s Algemene Voorwaarden. Controleer uw email postbak.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Uw account was beëindigd door een schending van MEGA\'s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
 
     <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Bestanden laden</string>
@@ -2047,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nieuw contact verzoek</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Geen actieve[/B][A] Overdrachten[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Geen voltooide [/B][A] Overdrachten[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]Leegmaken[/B][A]Map[/A]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Schrijf bericht naar “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Schrijf bericht naar %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Twee-Stap Authenticatie</string>
@@ -2380,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Uw huidige account is [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Afhankelijk van uw deelname in ons beloningsprogramma.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selecteer betalingsmethode</string>
 
     <string name="billing_period_title" context="title of billing period">Betaal periode</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Eenmalige (maand)[/A] %s</string>
@@ -2392,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonnement)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay [/A] (abonnement)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abonnement)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile provider[/A] (éénmalig)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile provider[/A] (éénmalig)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NIEUW</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Als u uw huidige abonnement wilt upgraden, neem dan contact op met ons ondersteuningsteam voor een [A]aangepast plan [/A].</string>
@@ -2459,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Gesprekskoppeling gekopieerd naar het klembord</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Van[/A] %s / [A]maand[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Van[/A] %s per gebruiker/[A]maand[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*Periodieke abonnement kan op elk moment gestopt worden voor de herhaaldatum.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Oproep Gestart</string>
 
@@ -2635,7 +2612,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d van %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Zoeken&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Antwoord</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Antwoord</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Negeren</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s heeft deze oproep gedempt</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Gedempt</string>
@@ -2739,22 +2716,19 @@
     <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">Betaling verplicht</string>
     <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">Betaling over tijd</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">Gebruikers beheer is alleen beschikbaar vanuit een desktop web browser.</string>
-    <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Gebruik</string>
+    <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Verbruik</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Opslag verbruik details</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Totaal gebruik</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Overdracht</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">U kunt %1$s niet verwijderen als contact omdat deze deel uitmaakt van uw zakelijke account.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Er is een probleem opgetreden met uw laatste betaling. Ga naar MEGA via een desktopbrowser voor meer informatie.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Uw zakelijke account is verlopen</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Uw Zakelijke account is verlopen</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Er is een probleem opgetreden bij het verwerken van uw betaling. MEGA kan alleen worden bekeken totdat dit probleem is opgelost in een desktop webbrowser.</string>
-    <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Uw account is momenteel [B]geschorst[/B]/ U kunt alleen door uw gegevens bladeren.</string>
+    <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Hoewel MEGA geen toegang heeft tot uw gegevens, heeft uw zakelijke accountbeheerder de mogelijkheid om de camera-uploads in uw gebruikersaccount te beheren en te bekijken</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Er is iets fout gegaan</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**Wordt automatisch verhoogd, zonder koste, voor echte zakelijke doelen.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Opslag[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Ongelimiteerde [A]Overdracht tegoed[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
@@ -2810,6 +2784,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Bijvoegen vanaf &#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Gesprek gecreëerd %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat gecreëerd op %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selecteer berichten</string>
 
@@ -3022,4 +2997,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Altijd aan</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Document scannen</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is niet in uw contact lijst</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Licht</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Donker</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">Systeem standaard</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Ingesteld door batterijbesparing</string>
 </resources>

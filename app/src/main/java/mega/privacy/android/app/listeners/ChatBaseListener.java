@@ -2,6 +2,8 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -16,22 +18,22 @@ public class ChatBaseListener implements MegaChatRequestListenerInterface {
     }
 
     @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+    public void onRequestStart(@NonNull MegaChatApiJava api, @NonNull MegaChatRequest request) {
 
     }
 
     @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+    public void onRequestUpdate(@NonNull MegaChatApiJava api, @NonNull MegaChatRequest request) {
 
     }
 
     @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    public void onRequestFinish(@NonNull MegaChatApiJava api, @NonNull MegaChatRequest request, @NonNull MegaChatError e) {
 
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    public void onRequestTemporaryError(@NonNull MegaChatApiJava api, @NonNull MegaChatRequest request, @NonNull MegaChatError e) {
 
     }
 }

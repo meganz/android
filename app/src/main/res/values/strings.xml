@@ -347,7 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can’t download files greater than 4GB. Your download will probably fail</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">There isn’t any available app to execute this file on your device</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There are no apps available on your device to open this location</string>
-    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have a proper app to view this file</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
@@ -656,7 +656,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capture</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
@@ -683,7 +683,8 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
@@ -775,21 +776,29 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change passcode</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Require passcode</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Immediately</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 failed passcode attempt</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">You will be logged out and your offline files will be deleted after 10 further failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Wrong Passcode, please try again. You have 1 attempt left</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong Passcode, please try again. You have %2d attempts left</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your Passcode</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your Passcode</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new Passcode</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new Passcode</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match. Try again.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your passcode</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your passcode</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new passcode</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new passcode</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>
@@ -865,38 +874,10 @@
     <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">City</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State/Province</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First name</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last name</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Credit Card Number</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Month</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Year</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation failed. Your credit card has not been charged</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information was not correct. The credit card will not be charged</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric Passcode</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 Digits</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 Digits</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
@@ -1011,7 +992,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capture</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
@@ -1367,7 +1348,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Remove from Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
 
@@ -2085,6 +2066,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the 6-digit code generated by your Authenticator App.</string>
     <string name="general_verify" context="Text button">Verify</string>
     <string name="general_next" context="Text button">Next</string>
+    <string name="general_previous" context="Text button">Previous</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR code, please try again.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Two-Factor Authentication Enabled</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Next time you login to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
@@ -2117,6 +2099,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Preview Content</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">The streaming can not be executed and the file has not been downloaded</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to no network connection.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File already exists in Saved for Offline</string>
 
@@ -2401,7 +2384,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievements program.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Payment method</string>
 
     <string name="billing_period_title" context="title of billing period">Billing period</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
@@ -2413,9 +2396,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade your current subscription, please contact our support team for a [A]custom plan[/A].</string>
@@ -2480,7 +2460,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user/[A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
@@ -2656,7 +2635,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Answer</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
@@ -2767,15 +2746,12 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact because they are part of your Business account.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account has expired</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your Business account has expired</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA can not access to your data, your business account administrator does have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Will automatically increase, at no additional charge, for genuine business purposes.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Storage [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Unlimited[/A] Transfer quota</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you log out, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you log out, ongoing transfers will be cancelled.</string>
@@ -2831,7 +2807,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 
-    <string name="inactive_chat_title_2" context="Title of an inactive chat. Placeholder is to show the creation date. e.g. Chat created today">Chat created %s</string>
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select messages</string>
 
@@ -2963,6 +2939,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">year</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
@@ -3019,6 +2997,12 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played on background">Playing on the background</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played on background">Not playing on the background</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now Playing</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+
     <string name="action_more_information" context="Action to get more information">More Information</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
@@ -3047,7 +3031,7 @@
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
 
-    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
 
 
     <string name="theme_light" context="Option of color theme, light mode.">Light</string>

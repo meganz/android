@@ -47,6 +47,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 	}
 
+	@Override
+	protected int viewerFrom() {
+		return VIEWER_FROM_OUTGOING_SHARES;
+	}
+
 	private class ActionBarCallBack extends BaseActionBarCallBack {
 
 		public ActionBarCallBack(int currentTab) {
@@ -225,7 +230,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 		if (adapter.isMultipleSelect()) {
 			logDebug("multiselect ON");
 
@@ -270,7 +275,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.showFabButton();
 		} else {
 			//Is file
-			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
+			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position);
 		}
 	}
 
@@ -382,9 +387,9 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
 				|| managerActivity.getParentHandleOutgoing() == -1) {
 			if (isScreenInPortrait(context)) {
-				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait);
 			} else {
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape);
 			}
 			textToShow = context.getString(R.string.context_empty_outgoing);
 		}

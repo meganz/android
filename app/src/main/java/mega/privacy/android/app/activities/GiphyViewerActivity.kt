@@ -3,16 +3,17 @@ package mega.privacy.android.app.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
-import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.GiphyUtil.Companion.getOriginalGiphySrc
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
-class GiphyViewerActivity : PinActivityLollipop() {
+class GiphyViewerActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityGiphyViewerBinding
 
@@ -22,6 +23,10 @@ class GiphyViewerActivity : PinActivityLollipop() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window?.statusBarColor = ContextCompat.getColor(this,R.color.black)
+        window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
+
         binding = ActivityGiphyViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
