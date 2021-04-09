@@ -1,6 +1,10 @@
 package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,14 +13,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TEXT_FILE_UPLOADED
+import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CONTENT_TEXT
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatApi
@@ -41,8 +50,39 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     private var discardChangesDialog: AlertDialog? = null
 
+    private val completedEditionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null || BROADCAST_ACTION_TEXT_FILE_UPLOADED != intent.action) return
+
+            val completedTransferId = intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong())
+            if (completedTransferId == INVALID_ID.toLong()) {
+                logWarning("Invalid completedTransferId")
+                return
+            }
+
+            val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
+            if (completedTransfer == null) {
+                logWarning("Invalid completedTransfer")
+                return
+            }
+
+            if (!viewModel.isSameNode(completedTransfer)) {
+                logWarning("Not the same file, no update needed.")
+                return
+            }
+
+            finishCompletedEdition(completedTransfer)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        registerReceiver(
+            completedEditionReceiver,
+            IntentFilter(BROADCAST_ACTION_TEXT_FILE_UPLOADED)
+        )
+
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -76,6 +116,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
         }
+
+        unregisterReceiver(completedEditionReceiver)
 
         super.onDestroy()
     }
@@ -287,14 +329,16 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private fun saveFile() {
         if (isFileEdited()) {
             viewModel.saveFile(binding.editText.text.toString())
+            setViewMode(false)
+            binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
         } else {
-            setViewMode()
+            setViewMode(true)
         }
     }
 
-    private fun setViewMode() {
+    private fun setViewMode(fabVisible: Boolean) {
         viewModel.setViewMode()
-        binding.editFab.show()
+        if (fabVisible) binding.editFab.show()
         updateUIAfterChangeMode()
     }
 
@@ -309,6 +353,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 showKeyboardDelayed(this)
             }
         }
+    }
+
+    private fun finishCompletedEdition(completedTransfer: AndroidCompletedTransfer) {
+
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

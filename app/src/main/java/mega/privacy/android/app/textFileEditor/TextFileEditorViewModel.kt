@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -258,5 +259,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         if (needStopHttpServer) {
             api.httpServerStop()
         }
+    }
+
+    fun isSameNode(completedTransfer: AndroidCompletedTransfer): Boolean {
+        val transferParentNode = megaApi.getNodeByHandle(completedTransfer.parentHandle)
+        val fileParentNode = when {
+            node == null -> megaApi.rootNode
+            node!!.isFolder -> node
+            else -> megaApi.getNodeByHandle(
+                node!!.parentHandle
+            )
+        }
+
+        return completedTransfer.fileName == fileName && transferParentNode == fileParentNode
     }
 }

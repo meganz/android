@@ -285,7 +285,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                         if (transfer.isFolderTransfer()) {
                             mapProgressFolderTransfers.put(transfer.getTag(), transfer);
-                        } else {
+                        } else if (transfer.getAppData() == null){
                             mapProgressFileTransfers.put(transfer.getTag(), transfer);
                         }
                     }
@@ -795,7 +795,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 		    if (!transfer.isFolderTransfer()) {
-                addCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
+		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
+                addCompletedTransfer(completedTransfer);
+
+                if (APP_DATA_TXT_FILE.equals(transfer.getAppData())) {
+                    sendBroadcast(new Intent(BROADCAST_ACTION_TEXT_FILE_UPLOADED)
+                            .putExtra(COMPLETED_TRANSFER, completedTransfer.getId()));
+                }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
                     MegaApplication.getTransfersManagement().setFailedTransfers(true);
@@ -816,7 +822,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
 
             String appData = transfer.getAppData();
-            if(appData!=null){
+            if (appData != null) {
                 return;
             }
 
