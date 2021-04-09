@@ -7,9 +7,10 @@ import mega.privacy.android.app.databinding.ItemAudioPlaylistBinding
  */
 class AudioPlaylistItemHolder(private val binding: ItemAudioPlaylistBinding) :
     PlaylistViewHolder(binding) {
-    override fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation) {
+    override fun bind(paused: Boolean, item: PlaylistItem, itemOperation: PlaylistItemOperation) {
         binding.item = item
         binding.highlight = item.type == PlaylistItem.TYPE_NEXT
+        binding.paused = paused
         binding.itemOperation = itemOperation
     }
 }

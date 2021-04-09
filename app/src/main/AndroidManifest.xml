@@ -391,6 +391,7 @@
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity

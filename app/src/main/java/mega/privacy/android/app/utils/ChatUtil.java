@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -1643,7 +1644,7 @@ public class ChatUtil {
         }
         return arrayNodesNotExported;
     }
-
+    
     public static MegaNode authorizeNodeIfPreview(MegaNode node, MegaChatApiAndroid megaChatApi,
                                                    MegaApiAndroid megaApi, long chatId) {
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
@@ -1658,6 +1659,24 @@ public class ChatUtil {
         }
 
         return node;
+    }
+
+    /**
+     * Remove an attachment message from chat.
+     *
+     * @param activity Android activity
+     * @param chatId chat id
+     * @param message chat message
+     */
+    public static void removeAttachmentMessage(Activity activity, long chatId,
+                                               MegaChatMessage message) {
+        new MaterialAlertDialogBuilder(activity)
+                .setMessage(getString(R.string.confirmation_delete_one_attachment))
+                .setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+                    new ChatController(activity).deleteMessage(message, chatId);
+                    activity.finish();
+                })
+                .setNegativeButton(getString(R.string.general_cancel), null)
     }
 
     public static void manageTextFileIntent(Context context, long msgId, long chatId) {

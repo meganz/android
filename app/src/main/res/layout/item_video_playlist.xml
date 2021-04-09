@@ -5,7 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <import type="mega.privacy.android.app.MimeTypeList" />
+
+        <import type="mega.privacy.android.app.mediaplayer.playlist.PlaylistItem" />
 
         <variable
             name="item"
@@ -65,6 +69,7 @@
             android:layout_height="1dp"
             android:layout_gravity="bottom"
             android:layout_marginStart="72dp"
-            android:background="@color/white_alpha_012" />
+            android:background="@color/white_alpha_012"
+            android:visibility="@{item.type == PlaylistItem.TYPE_PLAYING ? View.GONE : View.VISIBLE}" />
     </FrameLayout>
 </layout>

@@ -13,9 +13,10 @@ import mega.privacy.android.app.databinding.ItemVideoPlaylistHeaderBinding
  */
 class PlaylistAdapter(
     private val itemOperation: PlaylistItemOperation,
-    private val isAudioPlayer: Boolean
-) :
-    ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
+    private val isAudioPlayer: Boolean,
+    var paused: Boolean = false
+) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
+
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
     }
@@ -58,6 +59,6 @@ class PlaylistAdapter(
     }
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
-        holder.bind(getItem(position), itemOperation)
+        holder.bind(paused, getItem(position), itemOperation)
     }
 }

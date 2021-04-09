@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
@@ -476,7 +475,7 @@ class MegaNodeDialogUtil {
                 MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setMessage(getString(R.string.confirmation_move_to_rubbish))
                     .setPositiveButton(getString(R.string.general_move)) { _, _ ->
-                        val progress = ProgressDialog(activity)
+                        val progress = android.app.ProgressDialog(activity)
                         progress.setMessage(getString(R.string.context_move_to_trash))
 
                         megaApi.moveNode(
@@ -499,7 +498,7 @@ class MegaNodeDialogUtil {
                 MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setMessage(getString(R.string.confirmation_delete_from_mega))
                     .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
-                        val progress = ProgressDialog(activity)
+                        val progress = android.app.ProgressDialog(activity)
                         progress.setMessage(getString(R.string.context_delete_from_mega))
 
                         megaApi.remove(node, RemoveListener {

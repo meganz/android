@@ -712,7 +712,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         aB.hide();
                     }
                 }
-            } else {
+            } else if (!isFinishing()) {
                 setToolbarVisibilityShow();
             }
 
@@ -1140,7 +1140,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
+                            && msgChat.isDeletable()) {
                         chatRemoveMenuItem.setVisible(true);
                     }
                     else {
@@ -1452,7 +1453,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId),
+                            true, this);
                 }
                 break;
             }

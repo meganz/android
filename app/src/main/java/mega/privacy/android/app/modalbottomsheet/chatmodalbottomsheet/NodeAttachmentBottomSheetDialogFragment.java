@@ -18,6 +18,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -240,10 +241,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 if (availableOffline(context, node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeOffline(mOffDelete, dbH, context);
-                } else {
+                } else if (context instanceof SnackbarShower) {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
-                    chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOfflineWithAndroidMessages(messages,
+                            megaChatApi.getChatRoom(chatId), (SnackbarShower) context);
                 }
                 break;
         }
