@@ -57,9 +57,12 @@
         android:layout_width="0dp"
         android:layout_height="26dp"
         android:layout_marginBottom="70dp"
+        app:buffered_color="@color/grey_300"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:played_color="@color/teal_300_teal_200"
+        app:unplayed_color="@color/grey_200_grey_600" />
 
     <TextView
         android:id="@id/exo_position"

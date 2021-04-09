@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">此連結將不再是公開狀態。</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">這些連結將不再是公開狀態。</item>
     </plurals>
-    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
+
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重新命名</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">重新命名%1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">打開連接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開啟</string>
     <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
@@ -454,8 +456,8 @@
     <string name="context_send_no_permission" context="message when trying to send a file without full access">您沒有發送此檔案的權限</string>
     <string name="context_folder_created" context="success message when creating a folder">資料夾已創建</string>
     <string name="context_folder_no_created" context="error message when creating a folder">發生錯誤。未創建資料夾。</string>
-    <string name="context_correctly_renamed" context="success message when renaming a node">重命名成功</string>
-    <string name="context_no_renamed" context="error message">錯誤。未重命名</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">重新命名成功</string>
+    <string name="context_no_renamed" context="error message">錯誤。未重新命名</string>
     <string name="context_correctly_copied" context="success message when copying a node">複製成功</string>
     <!--
     <string name="context_correctly_sent" context="success message when sending a file">File sent</string>
@@ -997,7 +999,7 @@
     <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user’s profile">要刪除您的個人照片嗎？</string>
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user’s account">編輯</string>
 
-    <string name="title_set_expiry_date" context="Alert Dialog to get link">設定到期日</string>
+    <string name="title_set_expiry_date" context="Alert Dialog to get link">設定有效日期</string>
     <string name="title_set_password_protection" context="Title of the dialog to get link with password">密碼保護設定</string>
     <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(PRO專業版限定)</string>
     <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">設定密碼</string>
@@ -1513,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">查看聯絡人</string>
 
-    <string name="import_success_message" context="Menu option">已成功新增至雲端硬碟中</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已成功新增至雲端硬碟中</string>
     <string name="import_success_error" context="Menu option">發生錯誤，無法新增至雲端硬碟中。</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">正在連線中&#8230;</string>
@@ -1734,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">設定日期</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">所選日期無效</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">字符無法使用</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">無效的名稱</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">在繼續操作前，請更正您的檔案名稱</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">無效字元</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允許使用以下字元：” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">在繼續操作之前，請命名您的檔案名稱</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">在繼續操作之前，請命名您的檔案名稱</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">音檔</string>
 
@@ -2047,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <string name="general_verify" context="Text button">確認</string>
     <string name="general_next" context="Text button">下一步</string>
+    <string name="general_previous" context="Text button">先前的</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成種子或QR碼時出錯，請再試一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">已啟用雙重驗證</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
@@ -2079,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">預覽內容</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">無法執行串流式傳輸，也未下載檔案</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">無法開啟檔案。</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">由於沒有網路連線，我們無法開啟檔案。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">檔案已存在於離線存取裡</string>
 
@@ -2207,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">訊息</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">影片</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">發送連結到&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">寄給&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">上傳至&#8230;</string>
 
@@ -2362,6 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您現在的帳戶是[A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取決於您所達成的獎勵挑戰。</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">繳費週期</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]一次性(月)[/A] %s</string>
@@ -2916,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">個月</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">年</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1小時</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d小時</item>
@@ -2949,7 +2965,7 @@
     <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">連結和密碼已成功發送。</string>
     <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">升級至專業版</string>
     <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA專業版用戶可以獨享額外的連結安全功能，讓您的帳戶更加安全。</string>
-    <string name="decryption_key_explanation" context="Meaning of links decryption key">我們的點對點加密系統需要有為此檔案自動生成的唯一密鑰。預設情況下會自動產生帶有此密鑰的連結，但為了更加安全考量，您可以將解密密鑰單獨匯出。</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">我們的點對點加密系統需要有為此檔案自動生成的唯一密鑰才能開啟。預設情況下會自動產生帶有此密鑰的連結，但為了更加安全考量，您可以將解密密鑰單獨匯出。</string>
     <string name="reset_password_label" context="Reset password label">重設密碼</string>
     <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">分享此連結的密鑰？</string>
     <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">分享此連結的密碼？</string>
@@ -2972,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">蘭紫</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">銀灰</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">在背景中播放</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">不在背景中播放</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">正在播放</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">正在播放(暫停)</string>
+    <string name="audio_track_info" context="Title of the song info screen">歌曲資訊</string>
+
     <string name="action_more_information" context="Action to get more information">更多資訊</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie政策</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie設定</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">在繼續之前</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">我們使用本機儲存及類似技術（Cookies）來為您提供我們的服務，提升您使用我們服務的體驗並自訂您看到的，包括來自第三方的廣告，從到訪網站開始接受我們所使用的Cookie，或在Cookie設定中自訂Cookie選項。在我們的[A]Cookie政策[/A]了解更多信息。</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie設定未儲存</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie設定變更已儲存。</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">第三方Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google廣告Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">類別：廣告Cookies</string>
@@ -3005,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">系統預設</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">由省電模式設定</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">請選擇SD卡根目錄</string>
 </resources>
