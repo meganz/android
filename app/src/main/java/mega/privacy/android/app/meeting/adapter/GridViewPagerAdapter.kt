@@ -31,7 +31,6 @@ class GridViewPagerAdapter(
                 when (data.size) {
                     2 -> maxWidth
                     3 -> (maxWidth * 0.8).toInt()
-                    4, 5, 6 -> maxWidth / 2
                     else -> maxWidth / 2
                 }
             )
@@ -39,7 +38,7 @@ class GridViewPagerAdapter(
             gridView.setColumnWidth(maxWidth / 2)
         }
 
-        val adapter = ParticipantVideoAdapter(gridView, maxWidth, maxHeight, position)
+        val adapter = VideoGridViewAdapter(gridView, maxWidth, maxHeight, position)
         adapter.submitList(data)
 
         gridView.adapter = adapter

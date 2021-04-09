@@ -6,20 +6,20 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
 
-class ParticipantVideoAdapter(
+class VideoGridViewAdapter(
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val pagePosition: Int
-) : ListAdapter<Participant, ParticipantVideoViewHolder>(ParticipantDiffCallback()) {
+) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
 
-    override fun onBindViewHolder(holder: ParticipantVideoViewHolder, position: Int) {
-        holder.bind(getItem(position), itemCount, pagePosition == 0)
+    override fun onBindViewHolder(holderGrid: VideoGridViewHolder, position: Int) {
+        holderGrid.bind(getItem(position), itemCount, pagePosition == 0)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantVideoViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoGridViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ParticipantVideoViewHolder(
+        return VideoGridViewHolder(
             ItemCameraGroupCallBinding.inflate(inflater, parent, false),
             gridView,
             screenWidth,

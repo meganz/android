@@ -6,25 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import ash.TL
-import com.zhpan.bannerview.BannerViewPager
 import com.zhpan.bannerview.constants.IndicatorGravity
-import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
-import kotlinx.android.synthetic.main.grid_view_call_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.adapter.ParticipantVideoAdapter
+import mega.privacy.android.app.meeting.adapter.VideoGridViewAdapter
 import mega.privacy.android.app.utils.Util
-import java.util.*
 import kotlin.random.Random
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
-    lateinit var adapter: ParticipantVideoAdapter
+    lateinit var gridViewAdapter: VideoGridViewAdapter
 
     lateinit var viewDataBinding: GridViewCallFragmentBinding
 

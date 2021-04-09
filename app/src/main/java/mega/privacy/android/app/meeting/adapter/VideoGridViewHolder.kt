@@ -13,7 +13,7 @@ import javax.inject.Inject
  * When use DataBinding here, when user fling the RecyclerView, the bottom sheet will have
  * extra top offset. Not use DataBinding could avoid this bug.
  */
-class ParticipantVideoViewHolder(
+class VideoGridViewHolder(
     private val binding: ItemCameraGroupCallBinding,
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,

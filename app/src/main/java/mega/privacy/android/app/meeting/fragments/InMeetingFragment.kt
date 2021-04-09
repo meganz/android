@@ -20,6 +20,7 @@ class InMeetingFragment : MeetingBaseFragment() {
     private lateinit var individualCallFragment: IndividualCallFragment
     private lateinit var floatingWindowFragment: IndividualCallFragment
     private lateinit var gridViewCallFragment: GridViewCallFragment
+    private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
     companion object {
         fun newInstance() = InMeetingFragment()
@@ -70,10 +71,17 @@ class InMeetingFragment : MeetingBaseFragment() {
         )
 
         gridViewCallFragment = GridViewCallFragment.newInstance()
+//        loadChildFragment(
+//            R.id.meeting_container,
+//            gridViewCallFragment,
+//            GridViewCallFragment.TAG
+//        )
+
+        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
         loadChildFragment(
             R.id.meeting_container,
-            gridViewCallFragment,
-            GridViewCallFragment.TAG
+            speakerViewCallFragment,
+            SpeakerViewCallFragment.TAG
         )
 
         floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
@@ -122,7 +130,7 @@ class InMeetingFragment : MeetingBaseFragment() {
             }
             R.id.swap_camera -> {
                 //TODO test code
-                addParticipant()
+                gridViewCallFragment.loadParticipants(true)
 //                logDebug("Swap camera.")
 //                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
                 true
@@ -131,39 +139,27 @@ class InMeetingFragment : MeetingBaseFragment() {
                 logDebug("Change to grid view.")
                 gridViewMenuItem.isVisible = false
                 speakerViewMenuItem.isVisible = true
+
                 loadChildFragment(
                     R.id.meeting_container,
-                    GridViewCallFragment.newInstance(),
+                    gridViewCallFragment,
                     GridViewCallFragment.TAG
                 )
                 true
             }
             R.id.speaker_view -> {
                 logDebug("Change to speaker view.")
-                //TODO test code
-                removeParticipant()
-//                gridViewMenuItem.isVisible = true
-//                speakerViewMenuItem.isVisible = false
-//
-//                loadChildFragment(
-//                    R.id.meeting_container,
-//                    // TODO replace with speaker mode fragment.
-//                    IndividualCallFragment.newInstance(1, 2, false),
-//                    IndividualCallFragment.TAG
-//                )
+                gridViewMenuItem.isVisible = true
+                speakerViewMenuItem.isVisible = false
+
+                loadChildFragment(
+                    R.id.meeting_container,
+                    speakerViewCallFragment,
+                    SpeakerViewCallFragment.TAG
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    // TODO test code
-    fun addParticipant() {
-       gridViewCallFragment.loadParticipants(true)
-    }
-
-    fun removeParticipant() {
-        gridViewCallFragment.loadParticipants(false)
-    }
-    // TODO test code
 }

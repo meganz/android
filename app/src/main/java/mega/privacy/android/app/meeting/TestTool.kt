@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting
 import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.adapter.ParticipantVideoAdapter
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 
