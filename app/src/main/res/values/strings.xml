@@ -3035,11 +3035,14 @@
 
     <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
 
-
     <string name="theme_light" context="Option of color theme, light mode.">Light</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">Dark</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
+
+
+    <string name="discard_changes_warning" context="Warning which alerts the user before discard changes">Discard changes?</string>
+    <string name="discard_action" context="Action discard">Discard</string>
 </resources>

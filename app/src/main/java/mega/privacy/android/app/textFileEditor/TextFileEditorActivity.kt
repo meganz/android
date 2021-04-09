@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -26,6 +28,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     companion object {
         const val MODIFIED_TEXT = "MODIFIED_TEXT"
         const val CURSOR_POSITION = "CURSOR_POSITION"
+        const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -35,6 +38,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var menu: Menu? = null
 
     private var readingContent = false
+
+    private var discardChangesDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +53,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         setUpTextFileName()
         setUpTextView(savedInstanceState)
         setUpEditFAB()
+
+        if (savedInstanceState != null
+            && savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)
+        ) {
+            showDiscardChangesConfirmationDialog()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -55,12 +66,26 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putString(CONTENT_TEXT, viewModel.getContentText())
         outState.putString(MODIFIED_TEXT, binding.editText.text.toString())
         outState.putInt(CURSOR_POSITION, binding.editText.selectionStart)
+        outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         viewModel.checkIfNeedsStopHttpServer()
+
+        if (isDiscardChangesConfirmationDialogShown()) {
+            discardChangesDialog?.dismiss()
+        }
+
         super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        if (isFileEdited()) {
+            showDiscardChangesConfirmationDialog()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -236,11 +261,34 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    private fun isFileEdited(): Boolean =
+        viewModel.getContentText() != binding.editText.text.toString()
+
+    private fun showDiscardChangesConfirmationDialog() {
+        val builder =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+
+        builder.setTitle(R.string.discard_changes_warning)
+            .setCancelable(false)
+            .setPositiveButton(R.string.discard_action) { _, _ ->
+                finish()
+            }
+            .setNegativeButton(R.string.button_cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        discardChangesDialog = builder.create()
+        discardChangesDialog!!.show()
+    }
+
+    private fun isDiscardChangesConfirmationDialogShown(): Boolean =
+        discardChangesDialog?.isShowing ?: false
+
     private fun saveFile() {
-        if (viewModel.getContentText() == binding.editText.text.toString()) {
-            setViewMode()
-        } else {
+        if (isFileEdited()) {
             viewModel.saveFile(binding.editText.text.toString())
+        } else {
+            setViewMode()
         }
     }
 
