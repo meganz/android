@@ -18,12 +18,16 @@ class VideoListViewHolder(
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    fun bind(participant: Participant) {
+    fun bind(participant: Participant, itemClickViewModel: ItemClickViewModel) {
         val layoutParams = binding.general.layoutParams
         layoutParams.width = Util.dp2px(110f)
         layoutParams.height = Util.dp2px(110f)
 
         binding.general.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+
+        binding.general.setOnClickListener {
+            itemClickViewModel.onItemClick(participant)
+        }
     }
 
 }

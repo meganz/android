@@ -5,10 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
 
-class VideoListViewAdapter() : ListAdapter<Participant, VideoListViewHolder>(ParticipantDiffCallback()) {
+class VideoListViewAdapter(
+    private val itemClickViewModel: ItemClickViewModel
+) : ListAdapter<Participant, VideoListViewHolder>(ParticipantDiffCallback()) {
 
     override fun onBindViewHolder(holderList: VideoListViewHolder, position: Int) {
-        holderList.bind(getItem(position))
+        holderList.bind(getItem(position), itemClickViewModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoListViewHolder {
