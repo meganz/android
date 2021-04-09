@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mega.privacy.android.app.components.CustomizedGridCallRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/grid_view"
+<com.zhpan.bannerview.BannerViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grid_view_pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/dark_grey"
-    android:clipToPadding="true"
-    android:horizontalSpacing="0dp"
-    android:nestedScrollingEnabled="false"
-    android:numColumns="auto_fit"
-    android:scrollbars="horizontal"
-    android:stretchMode="columnWidth"
-    android:padding="0dp"
-    android:verticalSpacing="0dp" />
+    android:layout_height="match_parent" />

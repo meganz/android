@@ -9,11 +9,12 @@ import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
 class ParticipantVideoAdapter(
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
-    private val screenHeight: Int
+    private val screenHeight: Int,
+    private val pagePosition: Int
 ) : ListAdapter<Participant, ParticipantVideoViewHolder>(ParticipantDiffCallback()) {
 
     override fun onBindViewHolder(holder: ParticipantVideoViewHolder, position: Int) {
-        holder.bind(getItem(position), itemCount)
+        holder.bind(getItem(position), itemCount, pagePosition == 0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantVideoViewHolder {

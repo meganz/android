@@ -54,10 +54,6 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         setLayoutManager(manager);
     }
 
-    public void setOnTouchCallback(OnTouchCallback onTouchCallback) {
-        this.onTouchCallback = onTouchCallback;
-    }
-
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         logDebug("onMeasure-> widthSpec: " + widthSpec + ", heightSpec: " + heightSpec);

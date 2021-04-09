@@ -5,29 +5,43 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.core.content.ContextCompat
+import ash.TL
+import com.zhpan.bannerview.BannerViewPager
+import com.zhpan.bannerview.constants.IndicatorGravity
+import com.zhpan.bannerview.utils.BannerUtils
+import com.zhpan.indicator.enums.IndicatorStyle
 import kotlinx.android.synthetic.main.grid_view_call_fragment.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.TestTool
+import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantVideoAdapter
+import mega.privacy.android.app.utils.Util
+import java.util.*
+import kotlin.random.Random
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
     lateinit var adapter: ParticipantVideoAdapter
+
+    lateinit var viewDataBinding: GridViewCallFragmentBinding
 
     var maxWidth = 0
 
     var maxHeight = 0
 
     // TODO test code
-    val data: MutableList<Participant> = mutableListOf(Participant("Katayama Fumiki", null, "#1223ff", false, false, false, true))
+    val data: MutableList<Participant> =
+        mutableListOf(Participant("Katayama Fumiki", null, "#1223ff", false, false, false, true))
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.grid_view_call_fragment, container, false)
+    ): View {
+        viewDataBinding = GridViewCallFragmentBinding.inflate(inflater, container, false)
+        return viewDataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,50 +53,64 @@ class GridViewCallFragment : MeetingBaseFragment() {
         maxWidth = outMetrics.widthPixels
         maxHeight = outMetrics.heightPixels
 
-        adapter = ParticipantVideoAdapter(grid_view, maxWidth, maxHeight)
-        adapter.submitList(data)
-
-        grid_view.setOnTouchCallback {
-            (parentFragment as InMeetingFragment).onPageClick()
-        }
-        grid_view.itemAnimator = DefaultItemAnimator()
-
-        grid_view.adapter = adapter
-    }
-
-    private fun refreshUI() {
-        grid_view.setColumnWidth(
-            when (data.size) {
-                2 -> maxWidth
-                3 -> (maxWidth * 0.8).toInt()
-                4, 5, 6 -> maxWidth / 2
-                else -> maxWidth / 2
+        viewDataBinding.gridViewPager
+            .setScrollDuration(800)
+            .setAutoPlay(false)
+            .setIndicatorStyle(IndicatorStyle.CIRCLE)
+            .setIndicatorSliderGap(Util.dp2px(6f))
+            .setIndicatorSliderRadius(
+                Util.dp2px(3f),
+                Util.dp2px(3f)
+            )
+            .setIndicatorMargin(0, 0, 0, 200)
+            .setIndicatorGravity(IndicatorGravity.CENTER)
+            .setIndicatorSliderColor(
+                ContextCompat.getColor(requireContext(), R.color.grey_300_grey_600),
+                ContextCompat.getColor(requireContext(), R.color.white)
+            )
+            .setOnPageClickListener { _, _ ->
+                (parentFragment as InMeetingFragment).onPageClick()
             }
-        )
-
-        adapter.notifyDataSetChanged()
+            .setAdapter(GridViewPagerAdapter(maxWidth, maxHeight))
+            .create()
     }
 
 
     // TODO test code
-    fun loadParticipants(add : Boolean) {
-        if(add) {
+    fun loadParticipants(add: Boolean) {
+        if (add) {
             // Random.nextInt(TestTool.testData().size)
-            if (data.size < 6) {
-                data.add(TestTool.testData()[data.size])
-            } else {
-                data.removeAll(data.subList(2, data.size))
-            }
+//            if (data.size < 6) {
+//            } else {
+//                data.removeAll(data.subList(2, data.size))
+//            }
+            data.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])
         } else {
-            if(data.size > 2) {
+            if (data.size > 2) {
                 // Random.nextInt(data.size)
                 data.removeAt(data.size - 1)
             }
         }
 
-        refreshUI()
+        viewDataBinding.gridViewPager.refreshData(sliceBy6())
     }
     // TODO test code
+
+    private fun sliceBy6(): MutableList<List<Participant>> {
+        val result = mutableListOf<List<Participant>>()
+        val sliceCount = if (data.size % 6 == 0) data.size / 6 else data.size / 6 + 1
+
+        for (i in 0 until sliceCount) {
+            var to = i * 6 + 5
+            if (to >= data.size) {
+                to = data.size - 1
+            }
+
+            result.add(i, data.slice(IntRange(i * 6, to)))
+        }
+
+        return result
+    }
 
     companion object {
 

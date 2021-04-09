@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.grid_view_call_fragment.*
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
 import nz.mega.sdk.MegaApiAndroid
@@ -24,43 +23,78 @@ class ParticipantVideoViewHolder(
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    fun bind(participant: Participant, itemCount: Int) {
+    fun bind(participant: Participant, itemCount: Int, isFirstPage: Boolean) {
+        layout(isFirstPage, itemCount)
+
+        binding.general.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+    }
+
+    private fun layout(isFirstPage: Boolean, itemCount: Int) {
         var w = 0
         var h = 0
 
-        val lp: GridLayoutManager.LayoutParams =
+        val layoutParams: GridLayoutManager.LayoutParams =
             binding.general.layoutParams as GridLayoutManager.LayoutParams
 
-        when (itemCount) {
-            2 -> {
-                w = screenWidth
-                h = screenHeight / 2
-                lp.setMargins(0, 0, 0, 0)
-            }
-            3 -> {
-                w = (screenWidth * 0.8).toInt()
-                h = screenHeight / 3
-                lp.setMargins((screenWidth - w) / 2, 0, (screenWidth - w) / 2, 0)
-            }
-            5 -> {
-                w = screenWidth / 2
-                h = screenHeight / 3
-                if(adapterPosition == 4) {
-                    lp.setMargins((screenWidth - w) / 2, 0, (screenWidth - w) / 2, 0)
-                } else {
-                    lp.setMargins(0, 0, 0, 0)
+        val veriticalMargin = ((screenHeight - screenWidth / 2 * 3) / 2)
+
+        if (isFirstPage) {
+            when (itemCount) {
+                2 -> {
+                    w = screenWidth
+                    h = screenHeight / 2
+                    layoutParams.setMargins(0, 0, 0, 0)
+                }
+                3 -> {
+                    w = (screenWidth * 0.8).toInt()
+                    h = screenHeight / 3
+                    layoutParams.setMargins((screenWidth - w) / 2, 0, (screenWidth - w) / 2, 0)
+                }
+                5 -> {
+                    w = screenWidth / 2
+                    h = w
+
+                    when (adapterPosition) {
+                        0, 1 -> {
+                            layoutParams.setMargins(0, veriticalMargin, 0, 0)
+                        }
+                        4 -> {
+                            layoutParams.setMargins((screenWidth - w) / 2, 0, (screenWidth - w) / 2, 0)
+                        }
+                        else -> {
+                            layoutParams.setMargins(0, 0, 0, 0)
+                        }
+                    }
+                }
+                4, 6 -> {
+                    val pair = layout46(layoutParams, veriticalMargin)
+                    h = pair.first
+                    w = pair.second
                 }
             }
-            4, 6 -> {
-                w = screenWidth / 2
-                h = screenHeight / 3
-                lp.setMargins(0, 0, 0, 0)
-            }
+        } else {
+            val pair = layout46(layoutParams, veriticalMargin)
+            h = pair.first
+            w = pair.second
         }
 
-        lp.width = w
-        lp.height = h
+        layoutParams.width = w
+        layoutParams.height = h
+    }
 
-        binding.general.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+    private fun layout46(
+        layoutParams: GridLayoutManager.LayoutParams,
+        veriticalMargin: Int
+    ): Pair<Int, Int> {
+        val w = screenWidth / 2
+        when (adapterPosition) {
+            0, 1 -> {
+                layoutParams.setMargins(0, veriticalMargin, 0, 0)
+            }
+            else -> {
+                layoutParams.setMargins(0, 0, 0, 0)
+            }
+        }
+        return Pair(w, w)
     }
 }
