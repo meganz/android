@@ -62,16 +62,14 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 Util.dp2px(3f),
                 Util.dp2px(3f)
             )
-            .setIndicatorMargin(0, 0, 0, 200)
+            .setIndicatorMargin(0, 0, 0, 170)
             .setIndicatorGravity(IndicatorGravity.CENTER)
             .setIndicatorSliderColor(
                 ContextCompat.getColor(requireContext(), R.color.grey_300_grey_600),
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
-            .setOnPageClickListener { _, _ ->
-                (parentFragment as InMeetingFragment).onPageClick()
-            }
-            .setAdapter(GridViewPagerAdapter(maxWidth, maxHeight))
+            .setOnPageClickListener(null)
+            .setAdapter(GridViewPagerAdapter(parentFragment, maxWidth, maxHeight))
             .create()
     }
 

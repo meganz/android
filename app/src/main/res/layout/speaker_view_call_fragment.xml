@@ -5,38 +5,5 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SurfaceView
-        android:id="@+id/video"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:background="#bebcd111" />
 
-    <mega.privacy.android.app.components.RoundedImageView
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/avatar_image"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:scaleType="fitCenter"
-        android:layout_centerInParent="true"
-        rounded:border_color="@color/white_alpha_030"
-        android:src="@drawable/ic_chat"
-        rounded:border_width="3dp"
-        rounded:corner_radius="60dp" />
-
-    <ImageView
-        android:id="@+id/avatar_image_on_hold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_call_hold_big"
-        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.individual_call_fragment, container, false)
+        return inflater.inflate(R.layout.speaker_view_call_fragment, container, false)
     }
 
     companion object {

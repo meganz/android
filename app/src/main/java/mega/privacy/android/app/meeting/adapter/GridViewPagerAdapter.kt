@@ -6,8 +6,10 @@ import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 
 class GridViewPagerAdapter(
+    private val fragment: Fragment?,
     private val maxWidth: Int,
     private val maxHeight: Int,
 ) : BaseBannerAdapter<List<Participant>>() {
@@ -20,6 +22,9 @@ class GridViewPagerAdapter(
     ) {
         val gridView = holder.findViewById<CustomizedGridCallRecyclerView>(R.id.grid_view)
         gridView.itemAnimator = DefaultItemAnimator()
+        gridView.setOnTouchCallback {
+            (fragment as? InMeetingFragment)?.onPageClick()
+        }
 
         if(position == 0) {
             gridView.setColumnWidth(

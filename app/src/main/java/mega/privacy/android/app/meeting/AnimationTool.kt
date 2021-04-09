@@ -21,7 +21,7 @@ object AnimationTool {
             0f)
 
         animation.duration = duration
-        animation.fillAfter = true
+        animation.fillAfter = false
         startAnimation(animation)
         visibility = if (isVisible) View.GONE else View.VISIBLE
     }
