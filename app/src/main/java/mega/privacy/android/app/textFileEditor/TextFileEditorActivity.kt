@@ -58,6 +58,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onDestroy() {
+        viewModel.checkIfNeedsStopHttpServer()
+        super.onDestroy()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
@@ -96,64 +101,69 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 return
             }
 
-            if (viewModel.getAdapterType() == RUBBISH_BIN_ADAPTER
-                || megaApi.isInRubbish(viewModel.getNode())
-            ) {
-                toggleAllMenuItemsVisibility(menu, false)
-                menu.findItem(R.id.action_remove).isVisible = true
-                return
-            }
-
-            if (viewModel.getAdapterType() == FILE_LINK_ADAPTER || viewModel.getAdapterType() == ZIP_ADAPTER) {
-                toggleAllMenuItemsVisibility(menu, false)
-                menu.findItem(R.id.action_download).isVisible = true
-                menu.findItem(R.id.action_share).isVisible = true
-                return
-            }
-
-            if (viewModel.getAdapterType() == FROM_CHAT) {
-                toggleAllMenuItemsVisibility(menu, false)
-                menu.findItem(R.id.action_download).isVisible = true
-                menu.findItem(R.id.action_share).isVisible = true
-
-                if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
-                    menu.findItem(R.id.chat_action_import).isVisible = true
-                    menu.findItem(R.id.chat_action_save_for_offline).isVisible = true
+            when (viewModel.getAdapterType()) {
+                RUBBISH_BIN_ADAPTER -> {
+                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.findItem(R.id.action_remove).isVisible = true
                 }
-
-                if (viewModel.getMsgChat()?.userHandle == megaChatApi.myUserHandle
-                    && viewModel.getMsgChat()?.isDeletable == true
-                ) {
-                    menu.findItem(R.id.chat_action_remove).isVisible = true
+                FILE_LINK_ADAPTER, ZIP_ADAPTER -> {
+                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.findItem(R.id.action_download).isVisible = true
+                    menu.findItem(R.id.action_share).isVisible = true
                 }
+                FOLDER_LINK_ADAPTER -> {
+                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.findItem(R.id.action_download).isVisible = true
+                }
+                FROM_CHAT -> {
+                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.findItem(R.id.action_download).isVisible = true
+                    menu.findItem(R.id.action_share).isVisible = true
 
-                return
-            }
+                    if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
+                        menu.findItem(R.id.chat_action_import).isVisible = true
+                        menu.findItem(R.id.chat_action_save_for_offline).isVisible = true
+                    }
 
-            toggleAllMenuItemsVisibility(menu, true)
-
-            when (viewModel.getNodeAccess()) {
-                MegaShare.ACCESS_OWNER -> {
-                    if (viewModel.getNode()!!.isExported) {
-                        menu.findItem(R.id.action_get_link).isVisible = false
-                    } else {
-                        menu.findItem(R.id.action_remove_link).isVisible = false
+                    if (viewModel.getMsgChat()?.userHandle == megaChatApi.myUserHandle
+                        && viewModel.getMsgChat()?.isDeletable == true
+                    ) {
+                        menu.findItem(R.id.chat_action_remove).isVisible = true
                     }
                 }
-                MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
+                else -> {
+                    if (megaApi.isInRubbish(viewModel.getNode())) {
+                        toggleAllMenuItemsVisibility(menu, false)
+                        menu.findItem(R.id.action_remove).isVisible = true
+                        return
+                    }
+
+                    toggleAllMenuItemsVisibility(menu, true)
+
+                    when (viewModel.getNodeAccess()) {
+                        MegaShare.ACCESS_OWNER -> {
+                            if (viewModel.getNode()!!.isExported) {
+                                menu.findItem(R.id.action_get_link).isVisible = false
+                            } else {
+                                menu.findItem(R.id.action_remove_link).isVisible = false
+                            }
+                        }
+                        MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
+                            menu.findItem(R.id.action_remove).isVisible = false
+                            menu.findItem(R.id.action_move).isVisible = false
+                            menu.findItem(R.id.action_move_to_trash).isVisible = false
+                        }
+                    }
+
+                    menu.findItem(R.id.action_copy).isVisible =
+                        viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
+                    menu.findItem(R.id.chat_action_import).isVisible = false
                     menu.findItem(R.id.action_remove).isVisible = false
-                    menu.findItem(R.id.action_move).isVisible = false
-                    menu.findItem(R.id.action_move_to_trash).isVisible = false
+                    menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
+                    menu.findItem(R.id.chat_action_remove).isVisible = false
+                    menu.findItem(R.id.action_save).isVisible = false
                 }
             }
-
-            menu.findItem(R.id.action_copy).isVisible =
-                viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
-            menu.findItem(R.id.chat_action_import).isVisible = false
-            menu.findItem(R.id.action_remove).isVisible = false
-            menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
-            menu.findItem(R.id.chat_action_remove).isVisible = false
-            menu.findItem(R.id.action_save).isVisible = false
         } else {
             toggleAllMenuItemsVisibility(menu, false)
             menu.findItem(R.id.action_save).isVisible = true

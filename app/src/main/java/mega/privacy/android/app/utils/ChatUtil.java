@@ -1644,7 +1644,7 @@ public class ChatUtil {
         }
         return arrayNodesNotExported;
     }
-    
+
     public static MegaNode authorizeNodeIfPreview(MegaNode node, MegaChatApiAndroid megaChatApi,
                                                    MegaApiAndroid megaApi, long chatId) {
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
@@ -1676,7 +1676,7 @@ public class ChatUtil {
                     new ChatController(activity).deleteMessage(message, chatId);
                     activity.finish();
                 })
-                .setNegativeButton(getString(R.string.general_cancel), null)
+                .setNegativeButton(getString(R.string.general_cancel), null);
     }
 
     public static void manageTextFileIntent(Context context, long msgId, long chatId) {

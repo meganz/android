@@ -14,6 +14,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
@@ -30,6 +31,7 @@ import java.net.URL
 
 class TextFileEditorViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
 ) : BaseRxViewModel() {
 
@@ -42,6 +44,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         const val CONTENT_TEXT = "CONTENT_TEXT"
     }
 
+    private lateinit var api: MegaApiAndroid
+
     private var fileName = ""
     private var node: MegaNode? = null
     private var filePath: String? = null
@@ -49,10 +53,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private var adapterType: Int = INVALID_VALUE
     private var msgChat: MegaChatMessage? = null
 
+    private var needStopHttpServer = false
+
     private val contentText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     fun onContentTextRead(): LiveData<String> = contentText
 
     fun getContentText(): String? = contentText.value
+
+    fun getFileName(): String = fileName
+
+    fun getNode(): MegaNode? = node
+
+    fun getNodeAccess(): Int = megaApi.getAccess(node)
 
     fun getMode(): String = mode
 
@@ -62,23 +74,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode = VIEW_MODE
     }
 
-    fun getFileName(): String = fileName
-
-    fun getNode(): MegaNode? = node
-
-    fun getNodeAccess(): Int = megaApi.getAccess(node)
+    fun setEditMode() {
+        mode = EDIT_MODE
+    }
 
     fun getAdapterType(): Int = adapterType
 
     fun getMsgChat(): MegaChatMessage? = msgChat
 
-    fun setEditMode() {
-        mode = EDIT_MODE
-    }
-
     fun isEditableAdapter(): Boolean = adapterType != OFFLINE_ADAPTER
             && adapterType != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(node)
             && adapterType != FILE_LINK_ADAPTER
+            && adapterType != FOLDER_LINK_ADAPTER
             && adapterType != ZIP_ADAPTER
             && adapterType != FROM_CHAT
             && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
@@ -111,11 +118,30 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                 filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
             }
+            FILE_LINK_ADAPTER -> {
+                node = MegaNode.unserialize(intent.getStringExtra(EXTRA_SERIALIZE_STRING))
+            }
+            FOLDER_LINK_ADAPTER -> {
+                node = megaApiFolder.getNodeByHandle(
+                    intent.getLongExtra(
+                        INTENT_EXTRA_KEY_HANDLE,
+                        INVALID_HANDLE
+                    )
+                )
+
+                node = megaApiFolder.authorizeNode(node)
+            }
             else -> {
-                val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-                node = megaApi.getNodeByHandle(handle)
+                node = megaApi.getNodeByHandle(
+                    intent.getLongExtra(
+                        INTENT_EXTRA_KEY_HANDLE,
+                        INVALID_HANDLE
+                    )
+                )
             }
         }
+
+        api = if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi
 
         if (savedInstanceState != null) {
             mode = savedInstanceState.getString(MODE) ?: VIEW_MODE
@@ -146,16 +172,17 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 }
             }
 
-            if (megaApi.httpServerIsRunning() == 0) {
-                megaApi.httpServerStart()
+            if (api.httpServerIsRunning() == 0) {
+                api.httpServerStart()
+                needStopHttpServer = true
             }
 
-            megaApi.httpServerSetMaxBufferSize(
+            api.httpServerSetMaxBufferSize(
                 if (mi.totalMem > BUFFER_COMP) MAX_BUFFER_32MB
                 else MAX_BUFFER_16MB
             )
 
-            val uri = megaApi.httpServerGetLocalLink(node)
+            val uri = api.httpServerGetLocalLink(node)
             if (uri == null) {
                 logError("Error getting the file uri.")
                 contentText.value = ""
@@ -225,5 +252,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         app.startService(uploadIntent)
 
         return true
+    }
+
+    fun checkIfNeedsStopHttpServer() {
+        if (needStopHttpServer) {
+            api.httpServerStop()
+        }
     }
 }

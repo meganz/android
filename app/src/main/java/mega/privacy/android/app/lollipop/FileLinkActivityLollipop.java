@@ -549,7 +549,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
 							buttonPreviewContent.setVisibility(View.VISIBLE);
 						}else{
-							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() || MimeTypeList.typeForName(document.getName()).isPdf()){
+							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible()
+									|| MimeTypeList.typeForName(document.getName()).isAudio()
+									|| MimeTypeList.typeForName(document.getName()).isPdf()
+									||  MimeTypeList.typeForName(document.getName()).isOpenableTextFile(document.getSize())){
 								imageViewLayout.setVisibility(View.GONE);
 								iconViewLayout.setVisibility(View.VISIBLE);
 
