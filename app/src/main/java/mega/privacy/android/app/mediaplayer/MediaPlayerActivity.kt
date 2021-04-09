@@ -478,6 +478,14 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     return
                 }
 
+                if (adapterType == FOLDER_LINK_ADAPTER) {
+                    toggleAllMenuItemsVisibility(menu, false)
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+
+                    return
+                }
+
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
                 if (node == null) {
                     logDebug("refreshMenuOptionsVisibility node is null")
