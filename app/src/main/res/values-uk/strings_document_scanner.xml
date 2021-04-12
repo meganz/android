@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<resources>
+    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Обрізати</string>
+    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Зберегти скан</string>
+    <string name="scan_action_add" context="button">Додати</string>
+    <string name="scan_action_save" context="Action of a button to save something">Зберегти</string>
+    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Переробити</string>
+    <string name="scan_file_name" context="Document scanner file name">Ім’я файлу</string>
+    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Тип файлу</string>
+    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Якість</string>
+    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Розміщення</string>
+    <string name="scan_quality_high" context="Document scanner high quality option">Висока</string>
+    <string name="scan_quality_medium" context="Document scanner medium quality option">Середня</string>
+    <string name="scan_quality_low" context="Document scanner low quality option">Низька</string>
+    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Скасувати сканування?</string>
+    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Поточне сканування буде втрачене</string>
+    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Скасувати всі сканування?</string>
+    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Поточний документ буде втрачений</string>
+    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Не зберігати</string>
+    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Видалити поточне сканування?</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Щоб сканувати документи, потрібен доступ до камери</string>
+    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Неправильний ввід</string>
+</resources>
