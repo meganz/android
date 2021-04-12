@@ -5595,7 +5595,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
 				if (isSearchEnabled && searchDate != null) {
-					cuFragment.setSearchDate(searchDate, orderCamera);
+					cuFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
 					invalidateOptionsMenu();
 					setToolbarTitle();
 				} else {

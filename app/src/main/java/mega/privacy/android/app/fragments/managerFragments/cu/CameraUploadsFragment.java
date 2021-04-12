@@ -180,7 +180,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             reloadNodes(sortOrderManagement.getOrderCamera());
 
             // When press back, reload all files.
-            setSearchDate(null, mManagerActivity.orderCamera);
+            setSearchDate(null, sortOrderManagement.getOrderCamera());
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
