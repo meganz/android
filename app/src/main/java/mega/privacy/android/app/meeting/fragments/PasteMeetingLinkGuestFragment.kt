@@ -140,22 +140,13 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                         showSnackbar(
                             requireContext(),
                             Constants.SNACKBAR_TYPE,
-                            getString(R.string.error_chat_link_init_error),
+                            getString(R.string.error_meeting_link_init_error),
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                         return
                     }
 
-                    val joinMeetingLinkIntent =
-                        Intent(requireContext(), MeetingActivity::class.java)
-                    joinMeetingLinkIntent.action = Constants.ACTION_JOIN_MEETING
-                    joinMeetingLinkIntent.data = Uri.parse(request.link)
-                    joinMeetingLinkIntent.putExtra(
-                        MeetingActivity.MEETING_TYPE,
-                        MeetingActivity.MEETING_TYPE_JOIN
-                    )
-                    startActivity(joinMeetingLinkIntent)
-
+                    startJoinMeeting(request.link)
                     dismiss()
                 } else if (e.errorCode == MegaChatError.ERROR_NOENT) {
                     Util.showAlert(
@@ -168,6 +159,18 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                 }
             }
         })
+
+    private fun startJoinMeeting(meetingLink: String) {
+        val joinMeetingLinkIntent = Intent(requireContext(), MeetingActivity::class.java)
+        joinMeetingLinkIntent.action = Constants.ACTION_JOIN_MEETING
+        joinMeetingLinkIntent.data = Uri.parse(meetingLink)
+        joinMeetingLinkIntent.putExtra(
+            MeetingActivity.MEETING_TYPE,
+            MeetingActivity.MEETING_TYPE_JOIN
+        )
+
+        startActivity(joinMeetingLinkIntent)
+    }
 
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)

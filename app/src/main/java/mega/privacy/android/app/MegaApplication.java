@@ -78,6 +78,7 @@ import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -839,6 +840,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		Fresco.initialize(this);
 
 		AdsLibInitializer.INSTANCE.init(this);
+
+		Util.writeAppLaunchedTime(this);
 	}
 
 	public void askForFullAccountInfo(){

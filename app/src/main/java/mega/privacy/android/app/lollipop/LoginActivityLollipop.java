@@ -2,21 +2,25 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -24,10 +28,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.jetbrains.annotations.NotNull;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -35,10 +40,18 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
-import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.listeners.ChatBaseListener;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -93,24 +106,25 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     static boolean isBackFromLoginPage;
     static boolean isFetchingNodes;
 
+    private static boolean clipboardRead;
+
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
             int actionType;
 
-            if (intent != null){
+            if (intent != null) {
                 actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
-                if(actionType == UPDATE_GET_PRICING){
+                if (actionType == UPDATE_GET_PRICING) {
                     logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
                     //UPGRADE_ACCOUNT_FRAGMENT
 
-                    if(chooseAccountFragment!=null && chooseAccountFragment.isAdded()){
+                    if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
                         chooseAccountFragment.setPricingInfo();
                     }
-                }
-                else if(actionType == UPDATE_PAYMENT_METHODS){
+                } else if (actionType == UPDATE_PAYMENT_METHODS) {
                     logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
@@ -191,11 +205,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
         intentReceived = getIntent();
-        if(savedInstanceState!=null) {
+        if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
             visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-        }
-        else{
+        } else {
             if (intentReceived != null) {
                 visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 logDebug("There is an intent! VisibleFragment: " + visibleFragment);
@@ -226,12 +239,81 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
+
+//        if (Util.readAppLaunchedTime(this) <= 1) {
+            checkClipboardMeetingLink();
+//        }
+    }
+
+    private void checkClipboardMeetingLink() {
+        ViewTreeObserver observer = getWindow().getDecorView().findViewById(android.R.id.content)
+                .getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(() -> {
+            if (clipboardRead) return;
+            clipboardRead = true;
+
+            String meetingLink = extractMeetingLink();
+            if (TextUtil.isTextEmpty(meetingLink) || !initMegaChat()) return;
+
+            megaChatApi.connect(new ChatBaseListener(LoginActivityLollipop.this) {
+                @Override
+                public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api,
+                                            @NonNull @NotNull MegaChatRequest request,
+                                            @NonNull @NotNull MegaChatError e) {
+                    if (request.getType() != MegaChatRequest.TYPE_CONNECT
+                            || e.getErrorCode() != MegaChatError.ERROR_OK) return;
+
+                    megaChatApi.checkChatLink(meetingLink, new ChatBaseListener(
+                            LoginActivityLollipop.this) {
+                        @Override
+                        public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api, @NonNull @NotNull MegaChatRequest request, @NonNull @NotNull MegaChatError e) {
+                            if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
+                                    && !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
+                                startJoinMeeting(request.getLink());
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    private String extractMeetingLink() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = clipboard.getPrimaryClip();
+
+        if (clipData == null) return "";
+        String content = clipData.getItemAt(0).getText().toString();
+
+        return AndroidMegaRichLinkMessage.isMeetingLink(content) ? content : "";
+    }
+
+    private boolean initMegaChat() {
+        int initResult = megaChatApi.getInitState();
+
+        if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
+            initResult = megaChatApi.initAnonymous();
+        }
+
+        return initResult != MegaChatApi.INIT_ERROR;
+    }
+
+    private void startJoinMeeting(String meetingLink) {
+        Intent joinMeetingLinkIntent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
+        joinMeetingLinkIntent.setAction(Constants.ACTION_JOIN_MEETING);
+        joinMeetingLinkIntent.setData(Uri.parse(meetingLink));
+        joinMeetingLinkIntent.putExtra(
+                MeetingActivity.MEETING_TYPE,
+                MeetingActivity.MEETING_TYPE_JOIN
+        );
+
+        startActivity(joinMeetingLinkIntent);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home: {
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
@@ -346,7 +428,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         }
 
-        if( ((MegaApplication) getApplication()).isEsid()){
+        if (((MegaApplication) getApplication()).isEsid()) {
             showAlertLoggedOut();
         }
     }
@@ -383,7 +465,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void showAlertLoggedOut() {
         logDebug("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
-        if(!isFinishing()){
+        if (!isFinishing()) {
             final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
@@ -531,11 +613,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     } catch (Exception ex) {
                         logError("Exception", ex);
                     }
-                }
-                else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)) {
+                } else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
-                }
-                else if (intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)) {
+                } else if (intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)) {
                     showGeneralTransferOverQuotaWarning();
                 }
                 intent.setAction(null);
@@ -623,15 +703,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
-        if(request.getType() == MegaRequest.TYPE_LOGOUT){
+        if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 
-            if(accountBlocked!=null){
+            if (accountBlocked != null) {
                 showSnackbar(accountBlocked);
             }
-            accountBlocked=null;
+            accountBlocked = null;
 
-        }
-        else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
+        } else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT) {
             try {
                 if (request.getParamType() == 1) {
                     if (e.getErrorCode() == MegaError.API_OK) {
@@ -643,14 +722,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                         cancelConfirmationAccount();
                     }
                 }
-            }
-            catch (Exception exc){
+            } catch (Exception exc) {
                 logError("Exception", exc);
             }
         }
     }
 
-    public void cancelConfirmationAccount(){
+    public void cancelConfirmationAccount() {
         logDebug("cancelConfirmationAccount");
         dbH.clearEphemeral();
         dbH.clearCredentials();
@@ -682,7 +760,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         super.onPause();
     }
 
-    public void showAB(Toolbar tB){
+    public void showAB(Toolbar tB) {
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.show();
@@ -724,8 +802,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         });
     }
 
-    public void hideAB(){
-        if (aB != null){
+    public void hideAB() {
+        if (aB != null) {
             aB.hide();
         }
     }
