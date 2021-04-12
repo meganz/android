@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotografii și videoclipuri</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
@@ -862,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Cele mai vechi date</string>
     <string name="sort_by_largest_size" context="sort files by largest size">Cele mai mari dimensiuni</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Cele mai mici dimensiuni</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per lună</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per an</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Introdu detaliile de facturare:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adresa 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adresa 2 (opțional)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Oraș</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Județ/Provincie</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Țară</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Cod poștal</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Introdu detaliile de plată:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Prenume</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nume</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numărul cardului de credit</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Lună</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">An</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Continuă</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Cont upgradat cu succes!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operația a eșuat. Nu ți s-a retras nicio sumă de pe cardul de credit</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informațiile cardului de credit nu au fost corecte. Nu ți se va retrage nicio sumă de pe cardul de credit.</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipul codului de acces</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Cod de acces din 4 cifre</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Contul tău actual este [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Obiectul participării tale în programul nostru de realizări</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selectează metoda de plată</string>
 
     <string name="billing_period_title" context="title of billing period">Perioadă de facturare</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Unică (o lună)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonament)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Card de credit[/A] (abonament)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Operator mobil[/A] (plată unică)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Operator mobil[/A] (plată unică)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOU</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Pentru a upgrada abonamentul actual, te rugăm să contactezi echipa noastră de asistență pentru un [A]plan personalizat[/A].</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Linkul chatului copiat în clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]De la[/A] %s / [A]lună[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]De la[/A] %s per utilizator/[A]lună[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Abonarea recurentă poate fi anulată în orice moment înainte de data de reînnoire.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Apel început</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Deși MEGA nu îți poate accesa datele, administratorul contului tău business poate controla și vedea încărcările cameră din contul tău de utilizator</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ceva a mers prost</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactează administratorul contului business pentru a rezolva problema și a-ți activa contul.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Va crește automat, fără costuri suplimentare, pentru scopurile de afaceri autentice.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Stocare[/A] %s **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Cotă de transfer[/A] nelimitată **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Când te deconectezi, transferurile în curs vor fi anulate.</string>

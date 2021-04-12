@@ -6,14 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TypedFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid
 ) {
     /** Live Data to notify the query result*/
     var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()

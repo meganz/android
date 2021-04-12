@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:text="@string/general_mic"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_mic"
         app:layout_constraintStart_toStartOf="@id/fab_mic"
         app:layout_constraintTop_toBottomOf="@id/fab_mic" />
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:text="@string/general_camera"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_cam"
         app:layout_constraintStart_toStartOf="@id/fab_cam"
         app:layout_constraintTop_toBottomOf="@id/fab_cam" />
@@ -123,7 +123,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:text="@string/meeting_hold"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_hold"
         app:layout_constraintStart_toStartOf="@id/fab_hold"
         app:layout_constraintTop_toBottomOf="@id/fab_hold" />
@@ -155,7 +155,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:text="@string/general_speaker"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_speaker"
         app:layout_constraintStart_toStartOf="@id/fab_speaker"
         app:layout_constraintTop_toBottomOf="@id/fab_speaker" />
@@ -182,7 +182,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:text="@string/meeting_end"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_end"
         app:layout_constraintStart_toStartOf="@id/fab_end"
         app:layout_constraintTop_toBottomOf="@id/fab_end" />

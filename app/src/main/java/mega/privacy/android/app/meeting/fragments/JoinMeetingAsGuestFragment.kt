@@ -1,31 +1,27 @@
 package mega.privacy.android.app.meeting.fragments
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.Util
 
 class JoinMeetingAsGuestFragment : Fragment() {
+
+    private val viewModel: JoinMeetingAsGuestViewModel by viewModels()
 
     companion object {
         fun newInstance() = JoinMeetingAsGuestFragment()
     }
 
-    private lateinit var viewModel: JoinMeetingAsGuestViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.join_meeting_as_guest_fragment, container, false)
+        edit_first_name.visibility = View.VISIBLE
+        edit_last_name.visibility = View.VISIBLE
+        btn_start_join_meeting.setText(R.string.btn_join_meeting_as_guest)
+        Util.showKeyboardDelayed(edit_first_name)
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(JoinMeetingAsGuestViewModel::class.java)
-    }
-
 }

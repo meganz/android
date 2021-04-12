@@ -53,6 +53,10 @@
         <item name="android:textColor">@color/grey_087_grey_070</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant5">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
@@ -145,6 +149,16 @@
         <item name="android:textColor">@color/white_black</item>
     </style>
 
+    <!-- Medium, normal, 20sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
         <item name="android:textSize">18sp</item>
@@ -183,6 +197,14 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Variant">
+        <item name="android:textColor">@color/grey_060_white_060</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Variant2">
+        <item name="android:textColor">@color/grey_070_white_070</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey">
         <item name="android:textColor">@color/grey_054_white_087</item>
     </style>
@@ -209,6 +231,10 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Variant2">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
 
     <!-- ================== Body1 ====================== -->
 
@@ -378,8 +404,18 @@
         <item name="android:textColor">@color/grey_054_white</item>
     </style>
 
-    <!-- Regular, 10sp, 0px, white -->
+    <!-- Regular, 12sp, 0px, AudioPlayer main player position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant3">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
+    <style name="TextAppearance.Mega.Caption.Variant4">
+        <item name="android:textColor">@color/grey_038_white</item>
+    </style>
+
+    <!-- Regular, 10sp, 0px, white -->
+    <style name="TextAppearance.Mega.Caption.Variant5">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">10sp</item>
     </style>

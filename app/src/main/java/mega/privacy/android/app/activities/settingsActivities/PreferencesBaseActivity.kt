@@ -6,13 +6,13 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
-import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.StringResourcesUtils
 import java.util.*
 
-open class PreferencesBaseActivity : PinActivityLollipop() {
+open class PreferencesBaseActivity : PasscodeActivity() {
 
     protected lateinit var binding: ActivitySettingsBinding
 

@@ -38,6 +38,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         const val MEETING_TYPE_GUEST = "join_meeting_as_guest"
         const val MEETING_TYPE_IN = "in_meeting"
 
+        const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
     }
 
@@ -59,7 +60,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         super.onCreate(savedInstanceState)
 
         IncomingCallNotification.cancelIncomingCallNotification(this)
-        MegaApplication.setShowPinScreen(true)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -104,6 +104,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.setTitle("")
+
         when (meetType) {
             MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)

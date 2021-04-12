@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
@@ -50,7 +49,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("MissingPermission")
-public class MapsActivity extends PinActivityLollipop implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
+public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
 
     public static final int REQUEST_INTERVAL = 3000;
     public static final int ICONS_ALPHA = 143;

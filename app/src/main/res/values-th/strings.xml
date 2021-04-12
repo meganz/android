@@ -681,7 +681,7 @@
     <string name="settings_features" context="settings of the Features section">ฟีเจอร์</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ที่เก็บข้อมูล</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">การบีบอัดวิดีโอใช้พลังงานมาก MEGA จะต้องให้คุณชาร์จอุปกรณ์ของคุณด้วย หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า %s</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">หากเปิดใช้งาน คุณจะอัปโหลดข้อมูลเกี่ยวกับตำแหน่งที่ถ่ายภาพของคุณ ดังนั้นโปรดระมัดระวังถ้าคุณจะแชร์ตำแหน่งที่ตั้งนี้</string>
 
@@ -773,7 +773,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">รูปถ่ายและวิดีโอ</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">ยังไม่ได้กำหนดค่า</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">เปลี่ยนรหัสผ่าน</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">ตกลง</string>
@@ -862,34 +862,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">วันที่เก่าที่สุด</string>
     <string name="sort_by_largest_size" context="sort files by largest size">ขนาดใหญ่ที่สุด</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">ขนาดเล็กที่สุด</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">ต่อเดือน</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">ต่อปี</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">กรอกรายละเอียดการเรียกเก็บเงินของคุณ:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">ที่อยู่ 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">ที่อยู่ 2 (ตัวเลือก)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">เมือง/อำเภอ</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">รัฐ/จังหวัด</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">รหัสไปรษณีย์</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">กรอกรายละเอียดการชำระเงิน:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">ชื่อ</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">นามสกุล</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">หมายเลขบัตรเครดิต</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">เดือน</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">ปี</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">ดำเนินการ</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">อัปเกรดบัญชีเรียบร้อยแล้ว</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">การดำเนินการล้มเหลว บัตรเครดิตของคุณจะไม่ถูกเรียกเก็บเงิน</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">ข้อมูลบัตรเครดิตไม่ถูกต้อง บัตรเครดิตจะไม่ถูกเรียกเก็บเงิน</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">ประเภทรหัสผ่าน</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">รหัสผ่าน 4 หลัก</string>
@@ -2057,12 +2029,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">คำขอติดต่อใหม่</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">เขียนข้อความถึง "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">เขียนข้อความถึง “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[A]ไม่มีการถ่ายโอน[/A][B]ที่ใช้งานอยู่[/B]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[A]ไม่มีการถ่ายโอน[/A]ที่[B]เสร็จสมบูรณ์[/B]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]โฟลเดอร์[/B][A]ว่าง[/A]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">เขียนข้อความถึง "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">เขียนข้อความถึง “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">เขียนข้อความถึง %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">การรับรองความถูกต้องด้วยสองปัจจัย (2FA)</string>
@@ -2390,7 +2362,6 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">บัญชีปัจจุบันของคุณคือ [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">ขึ้นอยู่กับการมีส่วนร่วมในโครงการความสำเร็จของเรา</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">เลือกวิธีการชำระเงิน</string>
 
     <string name="billing_period_title" context="title of billing period">ระยะเวลาการเรียกเก็บเงิน</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]ครั้งเดียว (เดือน)[/A] %s</string>
@@ -2402,9 +2373,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (การสมัครใช้งาน)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (การสมัครใช้งาน)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]บัตรเครดิต[/A] (การสมัครใช้งาน)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]ผู้ให้บริการโทรศัพท์เคลื่อนที่[/A] (ครั้งเดียว)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]ผู้ให้บริการโทรศัพท์เคลื่อนที่[/A] (ครั้งเดียว)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">ใหม่</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">หากต้องการอัปเกรดการสมัครสมาชิกปัจจุบันของคุณ กรุณาติดต่อฝ่ายสนับสนุนของเราเพื่อเลือก[A]แผนกำหนดเอง[/A]</string>
@@ -2469,7 +2437,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">คัดลอกลิงก์แชทไปยังคลิปบอร์ดแล้ว</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]จาก[/A] %s / [A]เดือน[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]เริ่มต้น[/A] %s ต่อผู้ใช้งาน/[A]เดือน[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* การสมัครสมาชิกแบบจ่ายเป็นประจำสามารถยกเลิกได้ทุกเมื่อก่อนวันที่ต่ออายุจะมาถึง</string>
     <string name="call_started_messages" context="Message shown when a call starts.">เริ่มการโทร</string>
 
@@ -2762,9 +2729,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">แม้ว่า MEGA จะไม่สามารถเข้าถึงข้อมูลของคุณได้ แต่ผู้ดูแลระบบบัญชีธุรกิจของคุณก็มีความสามารถในการควบคุมและดูการอัปโหลดจากกล้องในบัญชีผู้ใช้ของคุณได้</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">มีบางอย่างผิดพลาด</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">ติดต่อผู้ดูแลระบบบัญชีธุรกิจของคุณเพื่อแก้ไขปัญหาและเปิดใช้งานบัญชีของคุณ</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** จะเพิ่มให้โดยอัตโนมัติและไม่มีการคิดค่าธรรมเนียมเพิ่มเติม เพื่อให้ตรงตามวัตถุประสงค์ทางธุรกิจที่แท้จริง</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]พื้นที่เก็บข้อมูล[/A] %s **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">ไม่จำกัด[A]โควต้าการถ่ายโอน[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิก</string>

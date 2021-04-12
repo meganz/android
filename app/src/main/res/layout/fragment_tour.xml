@@ -109,7 +109,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="22dp"
+            android:layout_marginBottom="14dp"
             android:text="@string/onboarding_no_mega_account"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant.18" />
 
@@ -118,7 +118,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="8dp"
             android:layout_below="@id/no_account"
             android:text="@string/join_meeting_as_guest"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AccentColor" />

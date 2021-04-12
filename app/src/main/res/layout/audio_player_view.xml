@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_020_grey_800">
+
+    <!-- the artwork's size & position will be adjusted in code -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/artwork_container"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="invisible"
+        app:cardCornerRadius="8dp"
+        tools:layout_marginTop="60dp"
+        tools:visibility="visible">
+
+        <!-- ExoPlayer will set exo_artwork invisible until it get metadata -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_default_audio_cover" />
+
+        <ImageView
+            android:id="@id/exo_artwork"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:visibility="invisible" />
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@id/exo_controller_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

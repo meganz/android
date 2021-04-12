@@ -7,20 +7,17 @@
     <fragment
         android:id="@+id/createMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
-        android:label="fragment_create_meeting"
-        tools:layout="@layout/create_meeting_fragment">
+        android:label="fragment_create_meeting">
     </fragment>
     <fragment
         android:id="@+id/joinMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingFragment"
-        android:label="fragment_join_meeting"
-        tools:layout="@layout/join_meeting_fragment">
+        android:label="fragment_join_meeting">
     </fragment>
     <fragment
         android:id="@+id/joinMeetingAsGuestFragment"
         android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment"
-        android:label="fragment_join_meeting_as_guest"
-        tools:layout="@layout/join_meeting_as_guest_fragment">
+        android:label="fragment_join_meeting_as_guest">
     </fragment>
     <fragment
         android:id="@+id/inMeetingFragment"

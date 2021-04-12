@@ -32,6 +32,9 @@
     <!-- Drawer item disabled text color  -->
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 
+    <!-- AudioPlayer playlist position and duration  -->
+    <color name="grey_038_white">@color/white</color>
+
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/white_alpha_016</color>
 
@@ -46,6 +49,11 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/white_alpha_087</color>
+
+    <!-- AudioPlayer artist name -->
+    <color name="grey_060_white_060">@color/white_alpha_060</color>
+
+    <color name="grey_070_white_070">@color/white_alpha_070</color>
 
     <!-- Recording voice clip feedback component background -->
     <color name="grey_087_white_085">@color/white_alpha_085</color>
@@ -143,6 +151,8 @@
     <color name="homepage_background">@color/dark_grey</color>
 
     <color name="grey_700_grey_300">@color/grey_300</color>
+
+    <color name="grey_200_grey_600">@color/grey_600</color>
 
     <color name="grey_700_grey_600">@color/grey_600</color>
 
