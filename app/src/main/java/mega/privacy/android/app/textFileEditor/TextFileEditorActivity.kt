@@ -54,24 +54,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null || BROADCAST_ACTION_TEXT_FILE_UPLOADED != intent.action) return
 
-            val completedTransferId = intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong())
-            if (completedTransferId == INVALID_ID.toLong()) {
-                logWarning("Invalid completedTransferId")
-                return
-            }
-
-            val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
-            if (completedTransfer == null) {
-                logWarning("Invalid completedTransfer")
-                return
-            }
-
-            if (!viewModel.isSameNode(completedTransfer)) {
-                logWarning("Not the same file, no update needed.")
-                return
-            }
-
-            finishCompletedEdition(completedTransfer)
+            finishCompletedEdition(intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong()))
         }
     }
 
@@ -355,8 +338,26 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
-    private fun finishCompletedEdition(completedTransfer: AndroidCompletedTransfer) {
+    private fun finishCompletedEdition(completedTransferId: Long) {
+        if (completedTransferId == INVALID_ID.toLong()) {
+            logWarning("Invalid completedTransferId")
+            return
+        }
 
+        val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
+        if (completedTransfer == null) {
+            logWarning("Invalid completedTransfer")
+            return
+        }
+
+        if (!viewModel.isSameNode(completedTransfer)) {
+            logWarning("Not the same file, no update needed.")
+            return
+        }
+
+        viewModel.setContentText(binding.editText.text.toString())
+        binding.nameText.text = viewModel.getFileName()
+        binding.editFab.show()
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

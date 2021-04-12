@@ -61,6 +61,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getContentText(): String? = contentText.value
 
+    fun setContentText(editedContentText: String) {
+        contentText.value = editedContentText
+    }
+
     fun getFileName(): String = fileName
 
     fun getNode(): MegaNode? = node
@@ -262,15 +266,13 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     fun isSameNode(completedTransfer: AndroidCompletedTransfer): Boolean {
-        val transferParentNode = megaApi.getNodeByHandle(completedTransfer.parentHandle)
-        val fileParentNode = when {
-            node == null -> megaApi.rootNode
-            node!!.isFolder -> node
-            else -> megaApi.getNodeByHandle(
-                node!!.parentHandle
-            )
+        val fileParentHandle = when {
+            node == null -> megaApi.rootNode.handle
+            node!!.isFolder -> node!!.handle
+            else -> node!!.parentHandle
         }
 
-        return completedTransfer.fileName == fileName && transferParentNode == fileParentNode
+        return completedTransfer.fileName == fileName
+                && completedTransfer.parentHandle == fileParentHandle
     }
 }
