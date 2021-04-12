@@ -19,17 +19,16 @@ import kotlin.random.Random
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
-    lateinit var gridViewAdapter: VideoGridViewAdapter
-
     lateinit var viewDataBinding: GridViewCallFragmentBinding
 
     var maxWidth = 0
 
     var maxHeight = 0
 
-    // TODO test code
+    // TODO test code start
     val data: MutableList<Participant> =
         mutableListOf(Participant("Katayama Fumiki", null, "#1223ff", false, false, false, true))
+    // TODO test code end
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +68,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
 
-    // TODO test code
+    // TODO test code start
     fun loadParticipants(add: Boolean) {
         if (add) {
             // Random.nextInt(TestTool.testData().size)
@@ -87,7 +86,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         viewDataBinding.gridViewPager.refreshData(sliceBy6())
     }
-    // TODO test code
+    // TODO test code end
 
     private fun sliceBy6(): MutableList<List<Participant>> {
         val result = mutableListOf<List<Participant>>()

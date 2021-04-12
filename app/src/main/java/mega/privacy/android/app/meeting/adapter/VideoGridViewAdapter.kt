@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
+import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 
 class VideoGridViewAdapter(
     private val gridView: CustomizedGridCallRecyclerView,
@@ -20,7 +20,7 @@ class VideoGridViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoGridViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return VideoGridViewHolder(
-            ItemCameraGroupCallBinding.inflate(inflater, parent, false),
+            ItemParticipantVideoBinding.inflate(inflater, parent, false),
             gridView,
             screenWidth,
             screenHeight

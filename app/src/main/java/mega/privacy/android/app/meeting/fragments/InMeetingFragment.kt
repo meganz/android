@@ -71,18 +71,18 @@ class InMeetingFragment : MeetingBaseFragment() {
         )
 
         gridViewCallFragment = GridViewCallFragment.newInstance()
-//        loadChildFragment(
-//            R.id.meeting_container,
-//            gridViewCallFragment,
-//            GridViewCallFragment.TAG
-//        )
-
-        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
         loadChildFragment(
             R.id.meeting_container,
-            speakerViewCallFragment,
-            SpeakerViewCallFragment.TAG
+            gridViewCallFragment,
+            GridViewCallFragment.TAG
         )
+
+        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
+//        loadChildFragment(
+//            R.id.meeting_container,
+//            speakerViewCallFragment,
+//            SpeakerViewCallFragment.TAG
+//        )
 
         floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
         loadChildFragment(
@@ -97,6 +97,9 @@ class InMeetingFragment : MeetingBaseFragment() {
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         setHasOptionsMenu(true)
+
+        // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        meetingActivity.window.decorView.systemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         view.setOnApplyWindowInsetsListener { _, insets ->
             insets
@@ -129,10 +132,11 @@ class InMeetingFragment : MeetingBaseFragment() {
                 true
             }
             R.id.swap_camera -> {
-                //TODO test code
+                //TODO test code start: add participants
                 gridViewCallFragment.loadParticipants(true)
 //                logDebug("Swap camera.")
 //                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
+                //TODO test code end: add participants
                 true
             }
             R.id.grid_view -> {

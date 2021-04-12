@@ -2,31 +2,31 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-import mega.privacy.android.app.databinding.ItemCameraGroupCallBinding
+import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
+import mega.privacy.android.app.meeting.TestTool.showHide
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 class VideoListViewHolder(
-    private val binding: ItemCameraGroupCallBinding,
+    private val binding: ItemParticipantVideoBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
     fun bind(participant: Participant, itemClickViewModel: ItemClickViewModel) {
-        val layoutParams = binding.general.layoutParams
+        val layoutParams = binding.root.layoutParams
         layoutParams.width = Util.dp2px(110f)
         layoutParams.height = Util.dp2px(110f)
 
-        binding.general.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+        binding.video.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+        binding.name.text = participant.name
 
-        binding.general.setOnClickListener {
+        binding.root.setOnClickListener {
             itemClickViewModel.onItemClick(participant)
+            binding.selectedForeground.showHide()
         }
     }
 
