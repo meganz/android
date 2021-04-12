@@ -35,6 +35,10 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), MegaRequestLi
             val peers = MegaChatPeerList.createInstance()
             viewModel.createMeeting(false, peers, this)
         }
+
+        // TODO delete test code start: to InMeetingFragment
+        findNavController().navigate(R.id.inMeetingFragment)
+        // TODO delete test code end: to InMeetingFragment
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
