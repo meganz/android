@@ -3,87 +3,168 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.core.content.ContextCompat
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
-import kotlinx.android.synthetic.main.meeting_component_onofffab.view.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.PermissionUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+
 
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
-    val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
+    private var bRefreshPermission: Boolean = false
+    protected val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
+    protected lateinit var binding: MeetingOnBoardingFragmentBinding
+    private var requestCode = 0
 
-    companion object {
-        const val KEY_MEETING_MIC_STATE = "meeting_mic"
-        const val KEY_MEETING_CAMERA_STATE = "meeting_camera"
-        const val KEY_MEETING_SPEAKER_STATE = "meeting_speaker"
-    }
+    // Default permission array for meeting
+    val permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA,
+        Manifest.permission.RECORD_AUDIO
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.meeting_on_boarding_fragment, container, false)
-        initOnOffFab(savedInstanceState, view)
-        onSubCreateView(view)
-        return view
+        initBinding()
+        initViewModel()
+        return binding.root
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_MEETING_MIC_STATE, fab_mic.isOn)
-        outState.putBoolean(KEY_MEETING_CAMERA_STATE, fab_cam.isOn)
-        outState.putBoolean(KEY_MEETING_SPEAKER_STATE, fab_speaker.isOn)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setProfileAvatar()
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            title = arguments?.getString(MeetingActivity.MEETING_NAME)
+            subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
+        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        checkMeetingPermissions(permissions, true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshPermissions(permissions)
     }
 
     /**
-     * Initialize OnOffFabs : Mic, Speaker, Camera...
+     * Bind layout views to ViewModel
      */
-    private fun initOnOffFab(savedInstanceState: Bundle?, view: View) {
-        savedInstanceState?.let {
-            view.fab_mic.isOn = it.getBoolean(KEY_MEETING_MIC_STATE, false)
-            view.fab_cam.isOn = it.getBoolean(KEY_MEETING_CAMERA_STATE, false)
-            view.fab_speaker.isOn = it.getBoolean(KEY_MEETING_SPEAKER_STATE, false)
-        }
+    private fun initBinding() {
+        binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
+        binding.viewmodel = abstractMeetingOnBoardingViewModel
+        binding.lifecycleOwner = this
+        binding.btnStartJoinMeeting.setOnClickListener { onMeetingButtonClick() }
+    }
 
-        view.fab_mic.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_mic.isOn)
+    /**
+     * Initialize ViewModel
+     * Use ViewModel to manage UI-related data
+     */
+    private fun initViewModel() {
+        abstractMeetingOnBoardingViewModel.micLiveData.observe(viewLifecycleOwner) {
+            switchMic(it)
+        }
+        abstractMeetingOnBoardingViewModel.cameraLiveData.observe(viewLifecycleOwner) {
+            switchCamera(it)
+        }
+        abstractMeetingOnBoardingViewModel.speakerLiveData.observe(viewLifecycleOwner) {
+            switchSpeaker(it)
+        }
+        abstractMeetingOnBoardingViewModel.tips.observe(viewLifecycleOwner) {
+            showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
+        }
+        abstractMeetingOnBoardingViewModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
+            if (it) {
+                checkMeetingPermissions(
+                    arrayOf(Manifest.permission.CAMERA),
+                    dialogShow = false,
+                    sysSettingShow = true
+                )
             }
         }
-
-        view.fab_cam.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_cam.isOn)
+        abstractMeetingOnBoardingViewModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
+            if (it) {
+                checkMeetingPermissions(
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    dialogShow = false,
+                    sysSettingShow = true
+                )
             }
         }
-
-        view.fab_speaker.setOnClickListener {
-            run {
-                switchOnOffFab(it, !fab_speaker.isOn)
+        abstractMeetingOnBoardingViewModel.storagePermissionCheck.observe(viewLifecycleOwner) {
+            if (it) {
+                checkMeetingPermissions(
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    dialogShow = false,
+                    sysSettingShow = true
+                )
             }
         }
     }
 
     /**
-     * Called by onCreateView(), for inherit subclasses to initialize UI
+     * Response to meeting button's 'onClick' event
+     * Dispatch to current sub fragment
+     */
+    private fun onMeetingButtonClick() {
+        meetingButtonClick()
+    }
+
+    /**
+     * Show tip when switching fabs, such as mic, camera, and speaker
      *
-     * @param view The root View of the inflated hierarchy
+     * @param v Get location of tip
+     * @param message The text to show
+     * @param duration How long to display the message.
      */
-    abstract fun onSubCreateView(view: View)
+    private fun showToast(v: View, message: String, duration: Int) {
+        var xOffset = 0
+        var yOffset = 0
+        val gvr = Rect()
+        if (v.getGlobalVisibleRect(gvr)) {
+            val root = v.rootView
+            val halfWidth = root.right / 2
+            val halfHeight = root.bottom / 2
+            val parentCenterX: Int = (gvr.right - gvr.left) / 2 + gvr.left
+            val parentCenterY: Int = (gvr.bottom - gvr.top) / 2 + gvr.top
+            yOffset = if (parentCenterY <= halfHeight) {
+                -(halfHeight - parentCenterY)
+            } else {
+                parentCenterY - halfHeight
+            }
+            if (parentCenterX < halfWidth) {
+                xOffset = -(halfWidth - parentCenterX)
+            }
+            if (parentCenterX >= halfWidth) {
+                xOffset = parentCenterX - halfWidth
+            }
+        }
+        val toast = Toast.makeText(requireContext(), message, duration)
+        toast.setGravity(Gravity.CENTER, xOffset, yOffset)
+        toast.show()
+    }
 
     /**
      * Used by inherit subclasses
@@ -92,34 +173,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     abstract fun meetingButtonClick()
 
     /**
-     * Pop key board
-     */
-    fun showKeyboardDelayed(view: EditText) {
-        GlobalScope.async {
-            delay(50)
-            view.isFocusable = true;
-            view.isFocusableInTouchMode = true;
-            view.requestFocus();
-            val imm =
-                view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
-
-    /**
-     * Hide key board immediately
-     */
-    fun hideKeyboard(view: View) {
-        logDebug("hideKeyboard() ")
-        view.clearFocus()
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.let {
-            imm.hideSoftInputFromWindow(view.windowToken, 0, null)
-        }
-    }
-
-    /**
-     * Get Avatar
+     * Get Avatar and display
      */
     fun setProfileAvatar() {
         logDebug("setProfileAvatar")
@@ -129,22 +183,116 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Control OnOffFabs such as mic, camera and speaker
+     * Check all the permissions for meeting
+     * 1. Check whether permission is granted
+     * 2. Request permission
+     * 3. Callback after requesting permission
+     * 4. Determine whether the user denies permission is to check the don't ask again option, if checked, the client needs to manually open the permission
      *
-     * @param bOn true: open camera preview; false: close camera preview
+     * @param permissions Array of permissions
+     * @param dialogShow true: show the permission education dialog; false: don't show the permission education dialog
+     * @param sysSettingShow Check if the user ticket 'Don't ask again' and deny a permission request, if so, direct to system setting of MEGA.
+     *
      */
-    fun switchOnOffFab(id: View, bOn: Boolean) {
-        when {
-            // Mic
-            id == fab_mic && bOn -> if (checkPermissionsAudio()) activateMic()
-            id == fab_mic && !bOn -> deactivateMic()
-            // Camera
-            id == fab_cam && bOn -> if (checkPermissionsCamera()) activateCamera()
-            id == fab_cam && !bOn -> deactivateCamera()
-            // Speaker
-            id == fab_speaker && bOn -> if (checkPermissionsAudio()) activateSpeaker()
-            id == fab_speaker && !bOn -> deactivateSpeaker()
+    private fun checkMeetingPermissions(
+        permissions: Array<String>,
+        dialogShow: Boolean,
+        sysSettingShow: Boolean = false
+    ) {
+        val mPermissionList: MutableList<String> = ArrayList()
+        requestCode = 0
+        for (i in permissions.indices) {
+            val bPermission = PermissionUtils.hasPermissions(requireContext(), permissions[i])
+            val showRequestPermission =
+                PermissionUtils.shouldShowRequestPermissionRationale(
+                    requireActivity(),
+                    permissions[i]
+                )
+            if (!bPermission && sysSettingShow) {
+                if (!showRequestPermission) {
+                    // The user ticket 'Don't ask again' and deny a permission request.
+                    logDebug("the user ticket 'Don't ask again' and deny a permission request.")
+                    bRefreshPermission = true
+                    val warningText =
+                        StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
+                    (activity as BaseActivity).showSnackbar(
+                        Constants.PERMISSIONS_TYPE,
+                        binding.root,
+                        warningText
+                    )
+                    return
+                }
+            }
+            when (permissions[i]) {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                    abstractMeetingOnBoardingViewModel.setStoragePermission(bPermission)
+                    if (!bPermission) {
+                        requestCode += Constants.REQUEST_READ_WRITE_STORAGE
+                    }
+                }
+                Manifest.permission.CAMERA -> {
+                    abstractMeetingOnBoardingViewModel.setCameraPermission(bPermission)
+                    if (!bPermission) {
+                        requestCode += Constants.REQUEST_CAMERA
+                    }
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    abstractMeetingOnBoardingViewModel.setRecordAudioPermission(bPermission)
+                    if (!bPermission) {
+                        requestCode += Constants.REQUEST_RECORD_AUDIO
+                    }
+                }
+            }
+            if (!bPermission) {
+                // If 'Don't ask again' is not selected, show the permission request dialog
+                if (showRequestPermission) {
+                    mPermissionList.add(permissions[i])
+                }
+            }
         }
+        if (mPermissionList.isNotEmpty()) {
+            if (dialogShow) {
+                showPermissionsEducation(requireActivity())
+            } else {
+                // Some permissions are not granted
+                val permissionsArr = mPermissionList.toTypedArray()
+                requestPermissions(
+                    permissionsArr,
+                    requestCode
+                )
+            }
+        }
+
+    }
+
+    /**
+     * Shows a permission education.
+     * It will be displayed at the beginning of meeting activity.
+     *
+     * @param context current Context.
+     */
+    private fun showPermissionsEducation(context: Context) {
+
+        val permissionsWarningDialogBuilder =
+            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+
+        permissionsWarningDialogBuilder.setTitle(StringResourcesUtils.getString(R.string.meeting_permission_info))
+            .setMessage(StringResourcesUtils.getString(R.string.meeting_permission_info_message))
+            .setCancelable(false)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel)) { dialog, _ ->
+                run {
+                    dialog.dismiss()
+                    requireActivity().finish()
+                }
+            }
+            .setPositiveButton(StringResourcesUtils.getString(R.string.button_permission_info)) { dialog, _ ->
+                run {
+                    dialog.dismiss()
+                    checkMeetingPermissions(permissions, false)
+                }
+            }
+
+        permissionsWarningDialogBuilder.show()
     }
 
     override fun onRequestPermissionsResult(
@@ -154,113 +302,88 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     ) {
         logDebug("onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) return
-        when (requestCode) {
-            Constants.REQUEST_CAMERA, Constants.REQUEST_RECORD_AUDIO -> {
-                logDebug("REQUEST_CAMERA || RECORD_AUDIO")
-                if (checkPermissionsCamera()) {
-                    activateCamera()
+
+        var i = 0
+        while (i < grantResults.size) {
+            val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
+            when (permissions[i]) {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                    abstractMeetingOnBoardingViewModel.setStoragePermission(bPermission)
+                }
+                Manifest.permission.CAMERA -> {
+                    abstractMeetingOnBoardingViewModel.setCameraPermission(bPermission)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    abstractMeetingOnBoardingViewModel.setRecordAudioPermission(bPermission)
+                }
+            }
+            if (!bPermission) {
+                // Check if the user ticket 'Don't ask again' and deny a permission request.
+                val showRequestPermission =
+                    PermissionUtils.shouldShowRequestPermissionRationale(
+                        requireActivity(),
+                        permissions[i]
+                    )
+                // Don't show permission dialog again when user select "DENY", Recheck it when using
+                if (!showRequestPermission) {
+                    // The user ticket 'Don't ask again' and deny a permission request.
+                    logDebug("the user ticket 'Don't ask again' and deny a permission request.")
+                }
+            }
+            i++
+        }
+    }
+
+    /**
+     * Update the permission state of ViewModel,
+     *
+     * @param permission One or more permission strings.
+     *
+     */
+    private fun refreshPermissions(permission: Array<String>) {
+        if(bRefreshPermission) {
+            bRefreshPermission = false
+            for (i in permission.indices) {
+                val bPermission = PermissionUtils.hasPermissions(requireContext(), permission[i])
+                when (permission[i]) {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        abstractMeetingOnBoardingViewModel.setStoragePermission(bPermission)
+                    }
+                    Manifest.permission.CAMERA -> {
+                        abstractMeetingOnBoardingViewModel.setCameraPermission(bPermission)
+                    }
+                    Manifest.permission.RECORD_AUDIO -> {
+                        abstractMeetingOnBoardingViewModel.setRecordAudioPermission(bPermission)
+                    }
                 }
             }
         }
     }
 
     /**
-     * Determine whether you have been granted a particular permission
+     * Switch Camera
      *
-     * @param permission The name of the permission being checked.
-     * @param requestCode Application specific request code to match with a result
-     *    reported to {@link #onRequestPermissionsResult(int, String[], int[])}.
+     * @param bOn true: turn on; off: turn off
      */
-    fun checkPermissions(permission: String, requestCode: Int): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
-        }
-        val hasPermission =
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-        if (!hasPermission) {
-            requestPermissions(arrayOf(permission), requestCode)
-            return false
-        }
-        return true
+    fun switchCamera(bOn: Boolean) {
+        fab_cam.isOn = bOn
     }
 
     /**
-     * Check Permissions of Camera
+     * Switch Speaker / Headphone
      *
-     * @return whether you have been granted a particular permission
+     * @param bOn true: switch to speaker; false: switch to headphone
      */
-    fun checkPermissionsCamera(): Boolean {
-        logDebug("checkPermissionsCamera")
-        return (checkPermissions(
-            Manifest.permission.CAMERA,
-            Constants.REQUEST_CAMERA
-        ))
+    private fun switchSpeaker(bOn: Boolean) {
+        fab_speaker.isOn = bOn
     }
 
     /**
-     * Check Permissions of Audio
+     * Turn On / Off Mic
      *
-     * @return whether you have been granted a particular permission
+     * @param bOn true: turn on; off: turn off
      */
-    fun checkPermissionsAudio(): Boolean {
-        logDebug("checkPermissionsCall")
-        return (checkPermissions(
-            Manifest.permission.RECORD_AUDIO,
-            Constants.REQUEST_RECORD_AUDIO
-        ))
-    }
-
-    /**
-     * Activate Camera
-     */
-    fun activateCamera() {
-        logDebug("Activate Camera")
-        fab_cam.isOn = !fab_cam.isOn
-        camera_preview.visibility = View.VISIBLE
-    }
-
-    /**
-     * Deactivate Camera
-     */
-    fun deactivateCamera() {
-        logDebug("Deactivate Camera")
-        fab_cam.isOn = !fab_cam.isOn
-        camera_preview.visibility = View.GONE
-    }
-
-    /**
-     * Deactivate Speaker
-     */
-    private fun deactivateSpeaker() {
-        fab_speaker.isOn = !fab_speaker.isOn
-        logDebug("Deactivate Speaker")
-    }
-
-    /**
-     * Activate Speaker
-     */
-    private fun activateSpeaker() {
-        fab_speaker.isOn = !fab_speaker.isOn
-        logDebug("Activate Speaker")
-    }
-
-    /**
-     * Deactivate Mic
-     */
-    private fun deactivateMic() {
-        logDebug("Deactivate Mic")
-        fab_mic.isOn = !fab_mic.isOn
-    }
-
-    /**
-     * Activate Mic
-     */
-    private fun activateMic() {
-        logDebug("Activate Mic")
-        fab_mic.isOn = !fab_mic.isOn
+    private fun switchMic(bOn: Boolean) {
+        fab_mic.isOn = bOn
     }
 }
