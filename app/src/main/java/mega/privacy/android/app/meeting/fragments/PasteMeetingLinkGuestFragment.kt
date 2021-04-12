@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_paste_meeting_link_guest.*
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
@@ -76,11 +77,18 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
             meetingLink = linkEdit.text.toString()
 
             if (validateLink(meetingLink)) {
-                initMegaChat { checkMeetingLink() }
+//                initMegaChat { checkMeetingLink() }
+                startOpenLinkActivity()
             }
         }
 
         return dialog
+    }
+
+    private fun startOpenLinkActivity() {
+        val intent = Intent(requireContext(), OpenLinkActivity::class.java)
+        intent.data = Uri.parse(meetingLink)
+        startActivity(intent)
     }
 
     private fun validateLink(link: String): Boolean {

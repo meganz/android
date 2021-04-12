@@ -38,6 +38,7 @@ import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import mega.privacy.android.app.listeners.ChatBaseListener;
@@ -253,29 +254,40 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             clipboardRead = true;
 
             String meetingLink = extractMeetingLink();
-            if (TextUtil.isTextEmpty(meetingLink) || !initMegaChat()) return;
+            if (TextUtil.isTextEmpty(meetingLink)) return;
 
-            megaChatApi.connect(new ChatBaseListener(LoginActivityLollipop.this) {
-                @Override
-                public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api,
-                                            @NonNull @NotNull MegaChatRequest request,
-                                            @NonNull @NotNull MegaChatError e) {
-                    if (request.getType() != MegaChatRequest.TYPE_CONNECT
-                            || e.getErrorCode() != MegaChatError.ERROR_OK) return;
-
-                    megaChatApi.checkChatLink(meetingLink, new ChatBaseListener(
-                            LoginActivityLollipop.this) {
-                        @Override
-                        public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api, @NonNull @NotNull MegaChatRequest request, @NonNull @NotNull MegaChatError e) {
-                            if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
-                                    && !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
-                                startJoinMeeting(request.getLink());
-                            }
-                        }
-                    });
-                }
-            });
+            // TODO: Either make use of OpenLinkActivity or own code to process the meeting link
+            // Should talk to UI designer
+            startOpenLinkActivity(meetingLink);
+//            if (TextUtil.isTextEmpty(meetingLink) || !initMegaChat()) return;
+//
+//            megaChatApi.connect(new ChatBaseListener(LoginActivityLollipop.this) {
+//                @Override
+//                public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api,
+//                                            @NonNull @NotNull MegaChatRequest request,
+//                                            @NonNull @NotNull MegaChatError e) {
+//                    if (request.getType() != MegaChatRequest.TYPE_CONNECT
+//                            || e.getErrorCode() != MegaChatError.ERROR_OK) return;
+//
+//                    megaChatApi.checkChatLink(meetingLink, new ChatBaseListener(
+//                            LoginActivityLollipop.this) {
+//                        @Override
+//                        public void onRequestFinish(@NonNull @NotNull MegaChatApiJava api, @NonNull @NotNull MegaChatRequest request, @NonNull @NotNull MegaChatError e) {
+//                            if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
+//                                    && !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
+//                                startJoinMeeting(request.getLink());
+//                            }
+//                        }
+//                    });
+//                }
+//            });
         });
+    }
+
+    private void startOpenLinkActivity(String meetingLink) {
+        Intent intent = new Intent(this, OpenLinkActivity.class);
+        intent.setData(Uri.parse(meetingLink));
+        startActivity(intent);
     }
 
     private String extractMeetingLink() {
