@@ -44,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -52,6 +55,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -80,10 +84,15 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveI
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
+@AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
 
     private static final String AD_SLOT = "and4";
+
+    @Inject
+    protected
+    SortOrderManagement sortOrderManagement;
 
     protected ManagerActivityLollipop managerActivity;
 
@@ -690,16 +699,17 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
-                return getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel());
+                return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
+                        managerActivity.isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
                 if (managerActivity.isFirstNavigationLevel()) {
-                    return managerActivity.getOrderOthers();
+                    return sortOrderManagement.getOrderOthers();
                 }
 
             default:
-                return managerActivity.orderCloud;
+                return sortOrderManagement.getOrderCloud();
         }
     }
 

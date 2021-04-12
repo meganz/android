@@ -92,6 +92,10 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
     <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant">
         <item name="android:letterSpacing">0</item>
@@ -307,6 +311,10 @@
     <!-- Accent -->
     <style name="TextAppearance.Mega.Body2.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
     </style>
 
     <!-- Medium, Accent -->
