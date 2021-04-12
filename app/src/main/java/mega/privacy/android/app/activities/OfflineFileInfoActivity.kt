@@ -1,15 +1,15 @@
 package mega.privacy.android.app.activities
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragmentArgs
 import mega.privacy.android.app.utils.Constants.HANDLE
 
 @AndroidEntryPoint
-class OfflineFileInfoActivity : AppCompatActivity() {
+class OfflineFileInfoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_offline_file_info)

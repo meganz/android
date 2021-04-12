@@ -9,7 +9,6 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,13 +36,14 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.providers.FileProviderActivity.CLOUD_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
@@ -65,10 +64,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 
 	ImageView emptyImageView;
-	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-
-	TextView contentText;
 
 	Stack<Integer> lastPositionStack;
 
@@ -95,7 +91,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
-			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -188,7 +183,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
-			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
@@ -233,13 +227,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
-		
-		contentText = (TextView) v.findViewById(R.id.provider_content_text);
-		contentText.setVisibility(View.GONE);
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
 
 		if (context instanceof FileProviderActivity){
@@ -249,17 +239,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	
 		if (parentHandle == -1)
 		{
-			//QA Report #6608 - do not remember last folder
-			//Find in the database the last parentHandle
-//			prefs = dbH.getPreferences();
-//			if (prefs != null) {
-//				String lastFolder = prefs.getLastFolderCloud();
-//				if(lastFolder != null) {
-//					if (lastFolder.compareTo("") != 0){
-//						parentHandle = Long.parseLong(lastFolder);
-//					}
-//				}
-//			}
 			parentHandle = megaApi.getRootNode().getHandle();
 		}			
 		
@@ -288,7 +267,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		}
 
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, CLOUD_DRIVE_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, CLOUD_DRIVE_PROVIDER_ADAPTER);
 		}
 
 		listView.setAdapter(adapter);
@@ -412,7 +391,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+            emptyTextViewFirst.setVisibility(View.GONE);
 			
 			nodes = megaApi.getChildren(parentNode);
 			setNodes(nodes);
@@ -464,7 +443,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+                emptyTextViewFirst.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
@@ -473,10 +452,15 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -491,16 +475,21 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 //					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 //					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -515,7 +504,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+                emptyTextViewFirst.setVisibility(View.GONE);
 			}
 		}
 	}

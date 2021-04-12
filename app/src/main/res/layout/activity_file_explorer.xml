@@ -1,11 +1,8 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/white"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/fragment_container_file_explorer"
@@ -21,24 +18,19 @@
                 android:id="@+id/app_bar_layout_explorer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/Theme.Megaactionbar">
+                app:elevation="0dp">
 
-                <androidx.appcompat.widget.Toolbar
+                <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar_explorer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"
-                    tools:context=".FileProviderActivityLollipop"
-                    app:popupTheme="@style/Theme.Megaactionbar"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    app:theme="@style/Theme.Megaactionbar"/>
+                    android:background="@android:color/transparent"
+                    android:layout_height="?attr/actionBarSize"/>
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_file_explorer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/MyCustomTabLayout"/>
+                    style="@style/Widget.Mega.TabLayout"/>
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -62,14 +54,15 @@
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
+            android:layout_marginTop="112dp"
             android:visibility="gone" >
 
             <ImageView
                 android:id="@+id/file_login_mega_logo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/logo_loading_ic" />
+                android:layout_width="144dp"
+                android:layout_height="144dp"
+                android:src="@drawable/logo_loading_ic"
+                app:tint="@color/red_600_white_087" />
 
             <TextView
                 android:id="@+id/file_login_query_signup_link_text"

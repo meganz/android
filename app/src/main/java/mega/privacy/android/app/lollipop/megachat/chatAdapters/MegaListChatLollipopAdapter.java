@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
@@ -55,6 +54,7 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -64,7 +64,6 @@ import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -86,9 +85,8 @@ import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
-	public static final int ITEM_VIEW_TYPE_NORMAL_SELECTED = 0;
-	public static final int ITEM_VIEW_TYPE_NORMAL_UNSELECTED = 1;
-	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 2;
+	public static final int ITEM_VIEW_TYPE_NORMAL_CHATS = 0;
+	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
@@ -104,7 +102,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	boolean multipleSelect = false;
-	private SparseBooleanArray selectedItems;
+	private SparseBooleanArray selectedItems = new SparseBooleanArray();
 	Object fragment;
 
 	DisplayMetrics outMetrics;
@@ -135,7 +133,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		cC = new ChatController(context);
 		
 		if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
-			selectedItems = new SparseBooleanArray();
 			multipleSelect = true;
 		}
 	}
@@ -203,10 +200,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		final int itemType = getItemViewType(position);
 		logDebug("position: " + position + ", itemType: " + itemType);
 
-		holder.itemView.setVisibility(View.VISIBLE);
-
-		if(itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED || itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
-			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
+		if(itemType == ITEM_VIEW_TYPE_NORMAL_CHATS) {
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
 			setTitle(position, holder);
@@ -220,11 +214,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+				if (isItemChecked(position)) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.itemLayout.setBackground(null);
 					setUserAvatar(holder, userHandleEncoded);
 				}
 
@@ -237,9 +231,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					outMetrics = new DisplayMetrics ();
 					display.getMetrics(outMetrics);
 				}
-
-				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(scaleWidthPx(6,outMetrics));
-				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxHeight(scaleHeightPx(6,outMetrics));
 
 				setStatus(position, holder);
 			}
@@ -254,11 +245,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+				if (isItemChecked(position)) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.itemLayout.setBackground(null);
 					createGroupChatAvatar(holder, getTitleChat(chat));
 				}
 			}
@@ -282,9 +273,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					((ViewHolderNormalChatList)holder).circlePendingMessages.setAlpha(.4f);
 
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+					int textColor = ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary);
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(textColor);
+					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(textColor);
+					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(textColor);
 				}
 				else{
 					((ViewHolderNormalChatList)holder).imageView.setAlpha(1.0f);
@@ -296,9 +288,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					((ViewHolderNormalChatList)holder).circlePendingMessages.setAlpha(1.0f);
 
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
+					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
+					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.black));
 				}
 			}
 			else{
@@ -468,7 +460,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		dbH = DatabaseHandler.getDbHandler(context);
 		View v = null;
 
-		if(viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
+		if(viewType == ITEM_VIEW_TYPE_NORMAL_CHATS) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
 			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
@@ -562,19 +554,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				break;
 			}
 			case 1:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_1);
 				break;
 			}
 			case 2:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_2);
 				break;
 			}
 			case 3:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_3);
 				break;
 			}
 			default:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_4);
 				break;
 			}
 		}
@@ -607,10 +599,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public int getItemViewType(int position) {
 		if (position >= chats.size()) {
 			return ITEM_VIEW_TYPE_ARCHIVED_CHATS;
-		} else if (multipleSelect && isItemChecked(position)) {
-			return ITEM_VIEW_TYPE_NORMAL_SELECTED;
 		} else {
-			return ITEM_VIEW_TYPE_NORMAL_UNSELECTED;
+			return ITEM_VIEW_TYPE_NORMAL_CHATS;
 		}
 	}
 
@@ -621,9 +611,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setMultipleSelect(boolean multipleSelect) {
 		logDebug("setMultipleSelect");
-		if (!this.multipleSelect && multipleSelect) {
-			selectedItems = new SparseBooleanArray();
-		}
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
@@ -658,11 +645,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-						}
-					}
+					hideMultipleSelect();
 					notifyItemChanged(positionToflip);
 				}
 
@@ -682,15 +665,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void toggleSelection(int pos) {
 		logDebug("position: " + pos);
 
+		final boolean delete;
 		if (selectedItems.get(pos, false)) {
 			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
+			delete = true;
 		}
 		else {
 			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
+			delete = false;
 		}
-		notifyItemChanged(pos);
 
 		if (!(listFragment.findViewHolderForLayoutPosition(pos) instanceof ViewHolderNormalChatList)) {
 			return;
@@ -703,31 +688,34 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(Animation animation) {
-
+					if (!delete) {
+						notifyItemChanged(pos);
+					}
 				}
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-						}
+					hideMultipleSelect();
+					if (delete) {
+						notifyItemChanged(pos);
 					}
 				}
 
 				@Override
 				public void onAnimationRepeat(Animation animation) {
-
 				}
 			});
 			view.imageView.startAnimation(flipAnimation);
+		} else {
+			hideMultipleSelect();
+			notifyItemChanged(pos);
 		}
-		else {
-			if (selectedItems.size() <= 0){
-				if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-					((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-				}
-			}
+	}
+
+	private void hideMultipleSelect() {
+		if (selectedItems.size() <= 0
+				&& (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity)) {
+			((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
 		}
 	}
 
@@ -919,7 +907,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			setContactStatus(getUserStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon);
+			setContactStatus(getUserStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon, StatusIconLocation.STANDARD);
 		}
 		else{
 			logWarning("Holder is NULL: " + position);
@@ -931,7 +919,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void updateContactStatus(int position, long userHandle, int state) {
 		holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
 		if (holder != null) {
-			setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ((ViewHolderNormalChatList) holder).contactStateIcon);
+			setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ((ViewHolderNormalChatList) holder).contactStateIcon, StatusIconLocation.STANDARD);
 		} else {
 			logWarning("Holder is NULL");
 			notifyItemChanged(position);
@@ -992,7 +980,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("ChatRoom ID: " + chat.getChatId());
 				logDebug("Chat timestamp: " + chat.getLastTimestamp());
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
-				String dateFS = formatDate(context,chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT);
+				String dateFS = formatDate(chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT);
 				logDebug("Date timestamp: " + date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;
@@ -1050,7 +1038,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if (call != null && isStatusConnected(context, chat.getChatId())) {
 				int callStatus = call.getStatus();
 				((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 				((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
 
 				switch (callStatus) {
@@ -1085,7 +1073,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 
-		((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+		((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 		((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
 		((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);
 		((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
@@ -1109,13 +1097,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				logDebug("Message Type -> INVALID");
 				((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.no_conversation_history));
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 				((ViewHolderNormalChatList)holder).textViewDate.setVisibility(View.GONE);
 			}
 			else if(messageType==255){
 				logDebug("Message Type -> LOADING");
 				((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.general_loading));
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 				((ViewHolderNormalChatList)holder).textViewDate.setVisibility(View.GONE);
 			}
 			else if(messageType==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
@@ -1395,7 +1383,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 				}
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_PRIV_CHANGE){
 				logDebug("PRIVILEGE CHANGE message");
@@ -1588,7 +1576,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_TRUNCATE){
 				logDebug("Message type TRUNCATE");
@@ -1645,7 +1633,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			} else if (messageType == MegaChatMessage.TYPE_SET_RETENTION_TIME) {
 				String text;
 				String fullName;
@@ -1684,7 +1672,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				Spanned result = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
 				((ViewHolderNormalChatList) holder).textViewContent.setText(result);
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.grey_600_white_087));
 			}
 			else if(messageType==MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE) {
 				logDebug("Message type TYPE_PUBLIC_HANDLE_CREATE");
@@ -1709,7 +1697,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE) {
 				logDebug("Message type TYPE_PUBLIC_HANDLE_DELETE");
@@ -1734,7 +1722,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_SET_PRIVATE_MODE) {
 				logDebug("Message type TYPE_SET_PRIVATE_MODE");
@@ -1761,7 +1749,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CHAT_TITLE) {
 				logDebug("Message type TYPE_CHAT_TITLE");
@@ -1790,7 +1778,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 
 			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
 				logDebug("Message type TYPE_CALL_STARTED");
@@ -1927,7 +1915,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CONTAINS_META){
 				logDebug("Message type TYPE_CONTAINS_META");
@@ -1948,7 +1936,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.black));
 					((ViewHolderNormalChatList)holder).textViewContent.setText("");
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
@@ -2019,13 +2007,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						if(lastMessageString!=null) {
 							Spannable myMessage = new SpannableString(lastMessageString);
-							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(me, myMessage);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 						}
 					}
@@ -2062,14 +2050,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
 								Spannable myMessage = new SpannableString(lastMessageString);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
 							else{
 								logDebug("Message NOt read");
 								Spannable myMessage = new SpannableString(lastMessageString);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
@@ -2077,11 +2065,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						else{
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 							}
 							else{
 								logDebug("Message NOT read");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
@@ -2103,18 +2091,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 					}
 
-					int contentColor = chat.getUnreadCount() == 0 ? R.color.file_list_second_row : R.color.accentColor;
+					int contentColor = chat.getUnreadCount() == 0 ? R.color.grey_054_white_054 : R.color.teal_300_teal_200;
 					CharSequence giphyTextContent = null;
 
 					if (lastMsgSender == megaChatApi.getMyUserHandle()) {
 						Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						Spannable myMessage = new SpannableString(giphyTitle);
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						giphyTextContent = TextUtils.concat(me, myMessage);
-						contentColor = R.color.file_list_second_row;
+						contentColor = R.color.grey_054_white_054;
 					} else if (chat.isGroup()) {
 						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
@@ -2154,12 +2142,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						Spannable myMessage = new SpannableString(invalidMetaMessage);
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
-						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 					}
 					else{
@@ -2195,14 +2183,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
 								Spannable myMessage = new SpannableString(invalidMetaMessage);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
 							else{
 								logDebug("Message NOT read");
 								Spannable myMessage = new SpannableString(invalidMetaMessage);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
@@ -2210,11 +2198,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						else{
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 							}
 							else{
 								logDebug("Message NOT read");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(invalidMetaMessage);
@@ -2228,11 +2216,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
 					Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
-					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-					myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					CharSequence indexedText = TextUtils.concat(me, myMessage);
-					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 					((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
 				} else if (chat.isGroup()) {
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
@@ -2259,17 +2247,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if (chat.getUnreadCount() == 0) {
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					} else {
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					}
 
 					((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(name, myMessage));
 				} else {
 					if (chat.getUnreadCount() == 0) {
-						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 					} else {
-						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 					}
 
 					((ViewHolderNormalChatList) holder).textViewContent.setText(contactAttachmentMessage);
@@ -2302,15 +2290,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					logDebug("The last message is mine: " + lastMsgSender);
 					Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 
-						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 					}
 				}
@@ -2350,14 +2338,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						boolean isRead;
 						if(chat.getUnreadCount()==0){
 							logDebug("Message READ");
-							contactMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+							contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 							isRead = true;
 						}
 						else{
 							logDebug("Message NOT read");
-							contactMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							isRead = false;
 						}
 						CharSequence indexedText = TextUtils.concat(name, contactMessage);
@@ -2368,12 +2356,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						if(chat.getUnreadCount()==0){
 							logDebug("Message READ");
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 						}
 						else{
 							logDebug("Message NOT read");
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 
@@ -2390,12 +2378,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	private void setVoiceClipOrLocationLayout(ImageView image, TextView text, int resource, boolean isRead) {
 		if (isRead) {
-			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.ic_mic_read_message));
-			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
+			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.grey_300_grey_600));
+			text.setTextColor(ContextCompat.getColor(context, R.color.grey_300_grey_600));
 		}
 		else {
-			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.ic_mic_unread_message));
-			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_unread_message));
+			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.teal_300_teal_200));
+			text.setTextColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
 		}
 	}
 

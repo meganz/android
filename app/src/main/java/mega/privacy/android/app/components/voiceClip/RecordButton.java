@@ -6,7 +6,6 @@ import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.R;
@@ -57,24 +56,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             this.setOnTouchListener(this);
         } else {
             this.setOnTouchListener(null);
-        }
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        setClip(this);
-    }
-
-    public void setClip(View v) {
-        if (v.getParent() == null) return;
-
-        if (v instanceof ViewGroup) {
-            ((ViewGroup) v).setClipChildren(false);
-            ((ViewGroup) v).setClipToPadding(false);
-        }
-        if (v.getParent() instanceof View) {
-            setClip((View) v.getParent());
         }
     }
 

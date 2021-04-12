@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black_white">@color/white</color>
+
+    <!--  Same as colorOnSecondary  -->
+    <color name="white_087_dark_grey">@color/dark_grey</color>
+
+    <!-- Same as colorError -->
+    <color name="red_900_red_400">@color/red_400</color>
+
+    <!-- chat room message loading image tint  -->
+    <color name="grey_005_white_008">@color/white_alpha_008</color>
+
+    <!-- chat reaction add/own emoji background fill -->
+    <color name="grey_003_white_018">@color/white_alpha_018</color>
+
+    <!-- chat reaction add/own emoji background border -->
+    <color name="grey_012_white_015">@color/white_alpha_015</color>
+
+    <!-- chat reaction contact emoji background fill -->
+    <color name="teal_300_006_teal_400_050">@color/teal_400_alpha_050</color>
+
+    <!-- chat reaction contact emoji background border -->
+    <color name="teal_300_teal_600">@color/teal_600</color>
+
+    <!-- chat unread message background -->
+    <color name="grey_020_grey_700">@color/grey_700</color>
+
+    <!-- chat room voice clip SeekBar progressBackgroundTint -->
+    <color name="white_018_white_038">@color/white_alpha_038</color>
+
+    <!-- Drawer item disabled text color  -->
+    <color name="grey_038_white_038">@color/white_alpha_038</color>
+
+    <!-- Bottom navigation menu disabled tint color  -->
+    <color name="grey_016_white_016">@color/white_alpha_016</color>
+
+    <!-- Record voice clip audio level indicator -->
+    <color name="white_045_grey_045">@color/grey_alpha_045</color>
+
+    <!-- Chat observer layout background -->
+    <color name="grey_050_white_050">@color/white_alpha_050</color>
+
+    <!-- Chat sending location overlay -->
+    <color name="white_050_grey_050">@color/grey_alpha_050</color>
+
+    <!-- Same to textColorPrimary -->
+    <color name="grey_087_white_087">@color/white_alpha_087</color>
+
+    <!-- Recording voice clip feedback component background -->
+    <color name="grey_087_white_085">@color/white_alpha_085</color>
+
+    <!-- call in progress text color -->
+    <color name="white_087_grey_087">@color/grey_alpha_087</color>
+
+    <!-- Turn on notification title text color -->
+    <color name="white_grey_087">@color/grey_alpha_087</color>
+
+    <!-- Turn on notification subtitle text color -->
+    <color name="grey_087_grey_070">@color/grey_alpha_070</color>
+
+    <!-- Turn on notification bullet text color -->
+    <color name="grey_900_grey_700">@color/grey_700</color>
+
+    <color name="white_black">@color/black</color>
+
+    <!-- Emoji keyboard background -->
+    <color name="grey_010_grey_800">@color/grey_800</color>
+
+    <!-- Giphy loading placeholder -->
+    <color name="grey_050_grey_800">@color/grey_800</color>
+
+    <!-- Chat message unselected icon tint -->
+    <color name="grey_600_white_087">@color/white_alpha_087</color>
+
+    <!-- Chat message forward icon tint -->
+    <color name="grey_200_grey_500">@color/grey_500</color>
+
+    <!-- Chat management message name, e.g. Tom created a chat link, "Tom" is the name -->
+    <color name="grey_900_grey_100">@color/grey_100</color>
+
+    <!-- Chat management message text, e.g. Tom created a chat link, "created a chat link" is the text -->
+    <color name="grey_500_grey_400">@color/grey_400</color>
+
+    <!-- Same to textColorSecondary -->
+    <color name="grey_054_white_054">@color/white_alpha_054</color>
+
+    <!-- The underline color of TextInputLayout when unfocused -->
+    <color name="grey_012_white_012">@color/white_alpha_012</color>
+    <!-- The "eye" icon -->
+    <color name="grey_012_white_038">@color/white_alpha_038</color>
+
+    <!-- Same as textColorSecondary on light and textColorPrimary on dark. -->
+    <color name="grey_054_white_087">@color/white_alpha_087</color>
+
+    <!-- Transfer completed icon tint -->
+    <color name="green_500_300">@color/green_300</color>
+
+    <!-- Notification badge -->
+    <color name="white_dark_grey">@color/dark_grey</color>
+
+    <!-- password strength -->
+    <color name="yellow_600_yellow_300">@color/yellow_300</color>
+    <color name="green_500_green_400">@color/green_400</color>
+    <color name="lime_green_500_200">@color/lime_green_200</color>
+    <color name="dark_blue_500_200">@color/dark_blue_200</color>
+
+    <!-- Colors for empty content hint text. Use non-alpha colors, for
+     <font color=""> doesn't support alpha -->
+    <color name="grey_300_grey_600">@color/grey_600</color>
+
+    <!-- Turn on camera uploads -->
+    <color name="teal_300_dark_grey">@color/dark_grey</color>
+
+    <!-- icon tint for FAB above images or scrim -->
+    <color name="teal_300_black">@color/black</color>
+    <!-- background tint for FAB above images or scrim -->
+    <color name="white_teal_200">@color/teal_200</color>
+
+    <!-- Primary red -->
+    <color name="red_600_red_300">@color/red_300</color>
+
+    <!-- Tint color for login page MEGA LOGO -->
+    <color name="red_600_white_087">@color/white_alpha_087</color>
+
+    <color name="red_600_red_400">@color/red_400</color>
+
+    <color name="red_500_red_300">@color/red_300</color>
+
+    <color name="red_900_080_red_400_080">@color/red_400_alpha_080</color>
+
+    <!-- Solid color. e.g. Grid item background -->
+    <color name="white_white_005">@color/white_alpha_005</color>
+
+    <color name="new_multiselect_color">@android:color/transparent</color>
+
+    <color name="grey_010_white_087">@color/white_alpha_087</color>
+    <color name="teal_300_grey_087">@color/grey_alpha_087</color>
+
+    <!-- transfer over quota progress -->
+    <color name="amber_700_amber_300">@color/amber_300</color>
+
+    <color name="homepage_background">@color/dark_grey</color>
+
+    <color name="grey_700_grey_300">@color/grey_300</color>
+
+    <!-- homepage upload FAB tint -->
+    <color name="grey_900_grey_050">@color/grey_050</color>
+
+    <!-- Available offline disabled text color -->
+    <color name="grey_700_026_grey_300_026">@color/grey_300_alpha_026</color>
+
+    <color name="salmon_700_salmon_300">@color/salmon_300</color>
+    <color name="orange_400_orange_300">@color/orange_300</color>
+    <color name="lime_green_500_300">@color/lime_green_300</color>
+
+    <!-- Chat contact text message text color -->
+    <color name="grey_087_white">@color/white</color>
+
+    <!-- Chat contact file info color -->
+    <color name="grey_054_white">@color/white</color>
+
+    <!-- Chat contact reaction emoji count text color -->
+    <color name="teal_300_white">@color/white</color>
+
+    <!-- Chat reaction add icon tint color -->
+    <color name="grey_026_white_038">@color/white_alpha_038</color>
+
+    <!-- chat own text message background -->
+    <color name="teal_500_teal_400_090">@color/teal_400_alpha_090</color>
+    <!-- chat own text message background, sending -->
+    <color name="teal_500_040_teal_400_036">@color/teal_400_alpha_036</color>
+
+    <!-- chat contact text message background -->
+    <color name="grey_100_060_white_023">@color/white_alpha_023</color>
+
+    <!-- Business account management container-->
+    <color name="grey_020_white_012">@color/white_alpha_012</color>
+
+    <!-- Background color of Achievements screen -->
+    <color name="grey_020_dark_grey">@color/dark_grey</color>
+
+    <!--Info Achievements title background -->
+    <color name="white_transparent">@android:color/transparent</color>
+
+    <!-- SMSVerificationActivity background and status bar -->
+    <color name="blue_400_blue_200">@color/dark_blue_200</color>
+
+    <!-- Same to colorSecondary -->
+    <color name="teal_300_teal_200">@color/teal_200</color>
+
+    <!-- Error text highlight color (selection background) -->
+    <color name="teal_100_teal_050">@color/teal_050</color>
+
+    <!-- Turn on notification screen background -->
+    <color name="teal_500_teal_400">@color/teal_400</color>
+
+    <!-- "Contact" title in Notifications Screen -->
+    <color name="jade_600_jade_300">@color/jade_300</color>
+
+    <!-- Homepage scrim -->
+    <color name="grey_600_085_dark_grey_070">@color/dark_grey_alpha_070</color>
+
+    <!--    Mask color for current plan-->
+    <color name="white_054_dark_grey_054">@color/dark_grey_alpha_054</color>
+
+    <color name="white_050_dark_grey_050">@color/dark_grey_alpha_050</color>
+
+    <!--  Upgrade account mask color  -->
+    <color name="grey_020_white_020">@color/white_alpha_020</color>
+
+    <!-- Two factor authentication credentials background -->
+    <color name="grey_020_grey_800">@color/grey_800</color>
+
+    <!-- Date picker background color -->
+    <color name="white_grey_800">@color/grey_800</color>
+
+    <!-- My QR code fragment background color -->
+    <color name="white_grey_700">@color/grey_700</color>
+
+    <!--    For disabled alert dialog borderless button-->
+    <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
+
+    <!-- Label red -->
+    <color name="salmon_400_salmon_300">@color/salmon_300</color>
+    <!-- Label green -->
+    <color name="green_400_green_300">@color/green_300</color>
+    <!-- Label blue -->
+    <color name="blue_300_blue_200">@color/blue_200</color>
+    <!-- Label purple -->
+    <color name="purple_300_purple_200">@color/purple_200</color>
+    <!-- Storage progress bar warning -->
+    <color name="amber_600_amber_300">@color/amber_300</color>
+    <!-- Same as progress bar trackColor -->
+    <color name="grey_012_white_023">@color/white_alpha_023</color>
+    <!-- For drawing QR code -->
+    <color name="dark_grey_white">@color/white</color>
+
+    <!-- Contact voice clip progress bar indicator color-->
+    <color name="white_018_026">@color/white_alpha_026</color>
+</resources>

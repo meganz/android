@@ -17,6 +17,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -32,8 +33,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -51,12 +54,14 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
-import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -73,6 +78,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
     public final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
 
+    /** Avatar's border width */
+    public final static int BORDER_WIDTH = 3;
+
     MegaUser myUser;
     String myEmail;
     MegaApiAndroid megaApi;
@@ -83,11 +91,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     String contactLink = null;
 
     private ActionBar aB;
+    private AppBarLayout abL;
 
     private RelativeLayout relativeContainerQRCode;
     private ImageView qrcode;
     private TextView qrcode_link;
     private Button qrcode_copy_link;
+    private ScrollView scrollView;
     private View v;
 
     private Context context;
@@ -186,6 +196,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             aB.setDisplayHomeAsUpEnabled(true);
         }
 
+        abL = requireActivity().findViewById(R.id.app_bar_layout);
+        scrollView = v.findViewById(R.id.my_code_scrollview);
         relativeContainerQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_container);
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
@@ -200,6 +212,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             qrcode_link.setText(contactLink);
             qrcode_copy_link.setEnabled(true);
         }
+
+        new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> checkScroll());
 
         Configuration configuration = getResources().getConfiguration();
         int width = getDP(RELATIVE_WIDTH);
@@ -222,6 +236,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         return v;
     }
 
+    public void checkScroll() {
+        if (scrollView != null) {
+            boolean withElevation = scrollView.canScrollVertically(-1);
+            abL.setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
+            ColorUtils.changeStatusBarColorForElevation(requireActivity(), withElevation);
+        }
+    }
+
     int getDP(int value){
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
@@ -231,17 +253,17 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
         int width = AVATAR_WIDTH;
+        float offset = (float)(width / 2);
+
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(WHITE);
+        // Avatar border's color
+        paint.setColor(ContextCompat.getColor(context, R.color.white_dark_grey));
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
-        c.drawBitmap(qr, 0f, 0f, null);
-        c.drawRect(AVATAR_LEFT,
-                AVATAR_LEFT,
-                AVATAR_RIGHT,
-                AVATAR_RIGHT, paint);
+        c.drawBitmap(qr, 0f, 0f, null); // Util.dp2px(3)
+        c.drawCircle(AVATAR_LEFT + offset, AVATAR_LEFT + offset, offset + Util.dp2px(BORDER_WIDTH),paint);
         c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
@@ -261,20 +283,20 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
-        int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
+        int color = ContextCompat.getColor(context, R.color.dark_grey);
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(WHITE);
+        paint.setColor(ContextCompat.getColor(context, R.color.white_grey_700));
         c.drawRect(0, 0, WIDTH, WIDTH, paint);
         paint.setColor(color);
 
         for (int y = 0; y < h; y++) {
             int offset = y * w;
             for (int x = 0; x < w; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ? color : WHITE;
+                pixels[offset + x] = bitMatrix.get(x, y) ? color : ContextCompat.getColor(context, R.color.white_grey_700);
             }
         }
 

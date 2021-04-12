@@ -2,11 +2,11 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.PorterDuff;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +23,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -142,18 +143,19 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 		holder.iconDownloadUploadView.setImageResource(transfer.getType() == TYPE_DOWNLOAD ? R.drawable.ic_download_transfers : R.drawable.ic_upload_transfers);
 
-		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+		holder.textViewCompleted.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
         params1.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:
 				holder.textViewCompleted.setText(transfer.getPath());
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
+				holder.imageViewCompleted.setColorFilter(ContextCompat.getColor(context, R.color.green_500_300), PorterDuff.Mode.SRC_IN);
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed);
 				break;
 
 			case STATE_FAILED:
-				holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.error_color));
+				holder.textViewCompleted.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
 				holder.textViewCompleted.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
                 params1.rightMargin = 0;
 				holder.imageViewCompleted.setImageBitmap(null);
@@ -167,13 +169,12 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 			default:
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
+				holder.imageViewCompleted.clearColorFilter();
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
 		}
 
         holder.imageViewCompleted.setLayoutParams(params1);
-
-		holder.itemLayout.setBackgroundColor(Color.WHITE);
 	}
 
 	@Override

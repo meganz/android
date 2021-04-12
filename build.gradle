@@ -3,10 +3,10 @@ buildscript {
     ext.gradleVersion = '4.1.1'
     ext.kotlinVersion = '1.4.10'
     ext.navigationVersion = '2.3.0'
-    ext.googleServicesVersion = '4.3.4'
+    ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.29.1-alpha"
     ext.huaweiServicesVersion = "1.4.1.300"
-
+    ext.firebaseCrashlyticsVersion = "2.5.1"
     repositories {
         jcenter()
         google()
@@ -19,6 +19,7 @@ buildscript {
         classpath "com.google.gms:google-services:$googleServicesVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "com.huawei.agconnect:agcp:$huaweiServicesVersion"
+        classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -48,8 +49,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.0.2"
-    versionCode = 359
+    appVersion = "4.1.0"
+    versionCode = 365
 
     // Sdk and tools
     compileSdkVersion = 29
@@ -67,7 +68,7 @@ ext {
     gsonVersion = '2.8.5'
     ktxVersion = '1.3.2'
     lifecycleVersion = '2.2.0'
-    materialVersion = '1.2.1'
+    materialVersion = '1.3.0'
     recyclerViewVersion = '1.1.0'
     roomVersion = '2.2.5'
     viewPagerVersion = '1.0.0'
@@ -81,4 +82,5 @@ ext {
     playServicesAdsVersion = '19.7.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
+    firebaseBom = '26.7.0'
 }

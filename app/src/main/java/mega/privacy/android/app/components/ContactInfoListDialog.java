@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.Set;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class ContactInfoListDialog {
@@ -54,7 +58,7 @@ public class ContactInfoListDialog {
     /**
      * proportion of screen height under portrait mode
      */
-    private static final float HEIGHT_P = 0.5f;
+    private static final float HEIGHT_P = 0.7f;
     /**
      * proportion of screen width under landscape mode
      */
@@ -65,23 +69,17 @@ public class ContactInfoListDialog {
     private static final float HEIGHT_L = 0.9f;
     private static final float CHECKBOX_ALPHA = 0.3f;
 
-    public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, final OnMultipleSelectedListener listener) {
+    private OnMultipleSelectedListener listener;
+
+    public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, OnMultipleSelectedListener listener) {
         this.context = context;
         this.current = contact;
+        this.listener = listener;
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         contentView = inflater.inflate(R.layout.dialog_contact_info_list, null);
         listView = contentView.findViewById(R.id.info_list_view);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        contentView.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
-            dialog.dismiss();
-            listener.cancel();
-
-        });
-        contentView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
-            dialog.dismiss();
-            listener.onSelect(selected, unSelected);
-        });
     }
 
     /**
@@ -100,12 +98,21 @@ public class ContactInfoListDialog {
         }
 
         listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
-        dialog = new AlertDialog.Builder(context)
+        dialog = new MaterialAlertDialogBuilder(context)
                 .setTitle(current.getName())
                 .setView(contentView)
                 .setCancelable(false)
+                .setPositiveButton(getString(R.string.general_ok), (dialog, which) -> {
+                    dialog.dismiss();
+                    listener.onSelect(selected, unSelected);
+                })
+                .setNegativeButton(getString(R.string.button_cancel), (dialog, which) -> {
+                    dialog.dismiss();
+                    listener.cancel();
+                })
                 .create();
         dialog.show();
+
         // get current device's screen size in pixel
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);

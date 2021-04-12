@@ -112,25 +112,6 @@ public class SDCardOperator {
         return path.matches(SD_PATH_REGEX);
     }
 
-    public boolean canWriteWithFile(String target) {
-        boolean canWrite = new File(target).canWrite();
-        if (!canWrite) {
-            return false;
-        }
-        // test if really can write on this path.
-        File test = new File(target, TEST);
-        try {
-            canWrite = test.createNewFile();
-        } catch (IOException e) {
-            return false;
-        }
-        if (!canWrite) {
-            return false;
-        } else {
-            return test.delete();
-        }
-    }
-
     public void buildFileStructure(Map<Long, String> dlList, String parent, MegaApiJava api, MegaNode node) {
         if (node.isFolder()) {
             createFolder(parent, node.getName());
@@ -297,6 +278,7 @@ public class SDCardOperator {
                 return null;
             }
         }
+
         if (sdCardOperator != null && isSDCardPath) {
             //user has installed another sd card.
             if (sdCardOperator.isNewSDCardPath(downloadPath)) {
@@ -305,16 +287,15 @@ public class SDCardOperator {
                 return null;
             }
 
-            if (!sdCardOperator.canWriteWithFile(downloadPath)) {
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                    return null;
-                }
+            try {
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
+                return null;
             }
         }
+
         return sdCardOperator;
     }
 
@@ -361,8 +342,7 @@ public class SDCardOperator {
 
         MegaApplication app = MegaApplication.getInstance();
         try {
-            initDocumentFileRoot(uri != null ? uri
-                    : app.getDbH().getSDCardUri());
+            initDocumentFileRoot(uri != null ? uri : app.getDbH().getSDCardUri());
 
             moveFile(targetPath, downloadedFile);
 

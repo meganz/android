@@ -101,18 +101,23 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void getOrder() {
-        MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
-
-        if (prefs != null && prefs.getPreferredSortCloud() !=  null) {
-            orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
+        if (isSearchF()) {
+            orderCloud = managerA.orderCloud;
+            orderOthers = managerA.orderOthers;
         } else {
-            orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
-        }
+            MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
 
-        if (prefs != null && prefs.getPreferredSortOthers() != null) {
-            orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
-        } else {
-            orderOthers = MegaApiAndroid.ORDER_DEFAULT_ASC;
+            if (prefs != null && prefs.getPreferredSortCloud() != null) {
+                orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
+            } else {
+                orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
+            }
+
+            if (prefs != null && prefs.getPreferredSortOthers() != null) {
+                orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
+            } else {
+                orderOthers = MegaApiAndroid.ORDER_DEFAULT_ASC;
+            }
         }
     }
 
@@ -218,7 +223,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
             }
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderOthers);
+            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderCloud);
         }
     }
 
@@ -248,7 +253,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
             }
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnOutShares(query, megaCancelToken, orderOthers);
+            nodes = megaApi.searchOnOutShares(query, megaCancelToken, orderCloud);
         }
     }
 

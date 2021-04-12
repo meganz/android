@@ -3346,6 +3346,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param value      Value to set.
 	 */
 	private void setStringValue(String tableName, String columnName, String value) {
+		if(isTextEmpty(value)) {
+			logWarning("Set " + columnName + " with empty value!");
+		}
+
 		String selectQuery = "SELECT * FROM " + tableName;
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
@@ -3928,39 +3932,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	//New management of pending messages
-	public long addPendingMessage(String idChat, String timestamp, String filePath, String fingerprint, String name){
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(idChat));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(timestamp));
-		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(filePath));
-		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(fingerprint));
-		values.put(KEY_PENDING_MSG_NAME, encrypt(name));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
-
-		return db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
+	/**
+	 * Adds a pending message.
+	 *
+	 * @param message Pending message to add.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessage(PendingMessageSingle message) {
+		return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING);
 	}
 
-	public long addPendingMessage(PendingMessageSingle message){
+	/**
+	 * Adds a pending message from File Explorer.
+	 *
+	 * @param message Pending message to add.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessageFromExplorer(PendingMessageSingle message) {
+		return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER);
+	}
+
+	/**
+	 * Adds a pending message.
+	 *
+	 * @param message Pending message to add.
+	 * @param state	  State of the pending message.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessage(PendingMessageSingle message, int state) {
 		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
+		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId() + ""));
+		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp() + ""));
 		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
 		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
 		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
-
-		return db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
-	}
-
-	public long addPendingMessageFromExplorer(PendingMessageSingle message){
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
-		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
-		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
-		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER);
+		values.put(KEY_PENDING_MSG_TRANSFER_TAG, INVALID_ID);
+		values.put(KEY_PENDING_MSG_STATE, state);
 
 		return db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
 	}
@@ -4003,26 +4010,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return pendMsg;
 	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage   Identifier of the pending message.
+	 * @param transferTag Identifier of the transfer.
+	 */
 	public void updatePendingMessageOnTransferStart(long idMessage, int transferTag) {
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag);
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_UPLOADING);
-		String where = KEY_ID + "=" +idMessage;
-
-		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-        logDebug("Rows updated: " + rows);
+		updatePendingMessage(idMessage, transferTag, INVALID_OPTION, PendingMessageSingle.STATE_UPLOADING);
 	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage  Identifier of the pending message.
+	 * @param nodeHandle Handle of the node already uploaded.
+	 * @param state      State of the pending message.
+	 */
 	public void updatePendingMessageOnTransferFinish(long idMessage, String nodeHandle, int state) {
+		updatePendingMessage(idMessage, INVALID_ID, nodeHandle, state);
+	}
 
+	/**
+	 * Updates a pending message.
+	 *
+	 * @param idMessage   Identifier of the pending message.
+	 * @param transferTag Identifier of the transfer.
+	 * @param nodeHandle  Handle of the node already uploaded.
+	 * @param state       State of the pending message.
+	 */
+	public void updatePendingMessage(long idMessage, int transferTag, String nodeHandle, int state) {
 		ContentValues values = new ContentValues();
+
+		if (transferTag != INVALID_ID) {
+			values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag);
+		}
+
 		values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle));
 		values.put(KEY_PENDING_MSG_STATE, state);
-		String where = KEY_ID + "=" +idMessage;
+		String where = KEY_ID + "=" + idMessage;
 
-		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
-        logDebug("Rows updated: " + rows);
+		db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
 	}
 
 	public void updatePendingMessageOnAttach(long idMessage, String temporalId, int state) {

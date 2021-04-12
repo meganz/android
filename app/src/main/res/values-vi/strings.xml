@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">Đa số các thiết bị di động không đủ khả năng đăng tải dữ liệu lớn hơn 4GB. Phiên tải xuống này có thể sẽ thất bại</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Điện thoại của bạn không có ứng dụng nào có thể mở được tệp này</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Không có ứng dụng nào trong điện thoại của bạn để mở định vị này</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">You may not have any apps installed which support this file type</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Gửi hình ảnh này bằng</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Chia sẻ đường dẫn liên kết</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Hủy tất cả các truyền tải</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Chụp ảnh</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Chụp ảnh</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Cho phếp hiện thông báo cho các cuộc gọi MEGA</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA cần sự cấp phép của bạn để giao diện cuộc gọi được bật lên màn hình khi đang hoạt động nền.</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads đã đăng tải xong</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Giao Diện</string>
     <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu trữ</string>
@@ -944,7 +946,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Chỗ điền Mã Khóa Phục Hồi ở đây</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">điền mật khẩu ở đây</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Đây là bước cuối cùng để hoàn tất việc hủy bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu ở dưới đây.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Đây là bước cuối cùng để hoàn tất việc xóa bỏ tài khoản. Bạn sẽ mất hoàn toàn tất cả dữ liệu bạn đã lưu trên ổ mây. Để tiến hành, xin nhập mật khẩu vào dưới đây.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Xác thực email</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Xin kiểm tra hộp thư email để thục hiện bước kế tiếp.</string>
@@ -1008,7 +1010,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Nhận toàn bộ sức mạnh và các tính năng cho tài khoản MEGA của bạn khi lên hạng Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Đổi ảnh đại diện</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Chụp ảnh</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Chụp ảnh</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Chọn ảnh đại diện mới</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Xóa ảnh đại diện</string>
 
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Xóa khỏi Lưu Ngoại Tuyến?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Chọn trạng thái hoạt động online</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Đã đọc</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Chưa có</string>
 
@@ -1467,6 +1470,11 @@
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">Đã tải lên %1$d tệp</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">Đã tải lên %1$d tệp</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">1 file already uploaded</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">%1$d files already uploaded</item>
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Phiên truyền tải bị dừng!</string>
     <string name="attachment_uploading_state_uploading">Đang tải lên&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
     <string name="attachment_uploading_state_error">Lỗi. Không gửi được.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d tệp tin đã được tải về rồi.</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Không có thư mục chia sẻ nào</string>
 
     <string name="settings_help" context="Menu item">Thắc Mắc Cần Trợ Giúp</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">Thư Viện Hướng Dẫn</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Gửi Phản Hồi</string>
     <string name="setting_feedback_subject" context="mail subject">Phản hồi từ thiết bị Android</string>
     <string name="setting_feedback_body" context="mail body">Xin viết lời phản hồi ở đây:</string>
@@ -1915,7 +1925,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Đăng tải lên chát</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chất lượng video tải lên cuộc chát</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chất lượng video</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Chất Lượng Video</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads cần quyền truy cập vào hình ảnh và các nội dung đa phương tiện khác trên thiết bị. Xin đi vào phần cài đặt và cấp quyền truy cập cho MEGA.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2048,12 +2058,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]Trống[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Viết tin nhắn cho %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Xác Minh 2-Bước</string>
@@ -2636,7 +2646,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">Bước %1$d trong tổng %2$d bước</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Tìm kiếm&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Trả lời</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">Trả lời</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Bỏ Qua</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s đã tắt tiếng cuộc gọi này</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Đã tắt tiếng</string>
@@ -2755,7 +2765,7 @@
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Liên hệ với ban tổng quản lý tài khoản doanh nghiệp để giải quyết và khôi phục tài khoản của bạn.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Sẽ được tự động mở rộng thêm, không hề tính thêm phí, khi dùng cho mục đích doanh nghiệp chân chính.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Không gian lưu trữ[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">KHÔNG GIỚI HẠN [A]Băng thông[/A]</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Không Giới Hạn[/A] Băng thông</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Khi đăng xuất, các tệp tin trong phần Ngoại Tuyến sẽ bị xóa khỏi thiết bị.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Khi đăng xuất, tất cả các phiên truyền tải chưa xong sẽ bị hủy.</string>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Đính kèm từ&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">Chat created %s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chát tạo vào ngày %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Chọn tin nhắn</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Luôn Bật</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">Nhẹ</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">Tối</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 </resources>

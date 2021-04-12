@@ -1,11 +1,16 @@
 package mega.privacy.android.app.service.map;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
+import android.os.Looper;
 import android.view.View;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,17 +41,22 @@ import mega.privacy.android.app.lollipop.megachat.MapsActivity;
 import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.REQUEST_INTERVAL;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
+@SuppressLint("MissingPermission")
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
 
     private GoogleMap mMap;
 
     private MapView mapView;
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private final FusedLocationProviderClient fusedLocationProviderClient;
+    private final LocationRequest locationRequest;
+    private final LocationCallback locationCallback;
+
+    private Location lastLocation;
 
     private Marker fullScreenMarker;
 
@@ -58,7 +68,30 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(REQUEST_INTERVAL);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null || locationResult.getLastLocation() == null) {
+                    logWarning("locationResult is null");
+                    return;
+                }
+
+                lastLocation = locationResult.getLastLocation();
+                onGetLastLocation(lastLocation.getLatitude(), lastLocation.getLongitude());
+
+                if (!activity.isFullScreenEnabled()) {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                            DEFAULT_ZOOM));
+                }
+            }
+        };
     }
 
     /**
@@ -74,6 +107,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         double distanceFromCenterToCorner = radius * Math.sqrt(2);
         LatLng southwestCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 225.0);
         LatLng northeastCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 45.0);
+
         return new LatLngBounds(southwestCorner, northeastCorner);
     }
 
@@ -103,6 +137,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             setAddress(fullScreenAddress);
             return true;
         }
+
         return false;
     }
 
@@ -139,13 +174,16 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         logDebug("onMapReady");
+
         mMap = googleMap;
         enableLocationUpdates();
+
         if (!isGPSEnabled()) {
             askForGPS();
         } else {
             initMap();
         }
+
         setCurrentLocationVisibility();
     }
 
@@ -201,8 +239,10 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void initMap() {
         if (mMap == null) {
+            logWarning("mMap is null");
             return;
         }
+
         dismissProgress();
         mMap.setMyLocationEnabled(getInitResult());
 
@@ -219,23 +259,28 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     }
 
     @Override
+    public void disableCurrentLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    @Override
+    public void enableCurrentLocationUpdates() {
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,
+                Looper.getMainLooper());
+    }
+
+    @Override
     public void setMyLocation(boolean animateCamera) {
-        if (mMap == null) {
+        if (mMap == null || lastLocation == null) {
+            logWarning("mMap or lastLocation is null");
             return;
         }
 
-        fusedLocationProviderClient.getLastLocation().addOnFailureListener(e -> {
-            logError("getLastLocation() onFailure: " + e.getMessage());
-            showError();
-        }).addOnSuccessListener(location -> {
-            if (location != null) {
-                logDebug("getLastLocation() onSuccess");
-                onGetLastLocation(location.getLatitude(), location.getLongitude());
-                if (animateCamera) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-                }
-            }
-        });
+        if (animateCamera) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                    DEFAULT_ZOOM));
+        }
     }
 
     @Override
@@ -246,6 +291,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             logError(e.getMessage(), e);
             e.printStackTrace();
         }
+
         fullScreenMarker = null;
     }
 
@@ -256,6 +302,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void getMarkerInfo() {
         if (mMap == null) {
+            logWarning("mMap is null");
             return;
         }
 
@@ -268,25 +315,31 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         if (addresses != null && addresses.size() > 0) {
             String address = addresses.get(0).getAddressLine(0);
             fullScreenAddress = new MapAddress(new MegaLatLng(latLng.latitude, latLng.longitude), null, address);
+
             if (fullScreenMarker == null) {
                 fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet(address).icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
             } else {
                 fullScreenMarker.setPosition(latLng);
                 fullScreenMarker.setSnippet(address);
             }
+
             showIconShadow();
+
             if (!fullScreenMarker.isVisible()) {
                 showMarker();
             }
+
             fullScreenMarker.showInfoWindow();
         } else {
             fullScreenAddress = new MapAddress(new MegaLatLng(latLng.latitude, latLng.longitude), null, null);
+
             if (fullScreenMarker == null) {
                 fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet("").icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
             } else {
                 fullScreenMarker.setPosition(latLng);
                 fullScreenMarker.setSnippet("");
             }
+
             showIconShadow();
             setAnimatingMarker(0);
         }
@@ -304,6 +357,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             fullScreenMarker.setVisible(false);
             return true;
         }
+
         return false;
     }
 }

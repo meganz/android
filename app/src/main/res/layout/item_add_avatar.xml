@@ -9,8 +9,8 @@
     android:layout_marginRight="8dp">
     <RelativeLayout
         android:id="@+id/chip_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginLeft="11dp"
         android:layout_marginRight="11dp"
         android:layout_centerHorizontal="true"
@@ -20,32 +20,28 @@
             android:id="@+id/add_rounded_avatar"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            rounded:corner_radius="20dp"/>
+            rounded:corner_radius="20dp" />
         <ImageView
             android:id="@+id/add_icon_chip"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignEnd="@+id/add_rounded_avatar"
-            android:layout_alignBottom="@+id/add_rounded_avatar"
-            android:layout_marginEnd="-3dp"
-            android:layout_marginBottom="-3dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:contentDescription="@null"
-            android:paddingStart="24dp"
-            android:paddingTop="24dp"
-            android:src="@drawable/ic_add_avatar"/>
+            android:src="@drawable/ic_add_avatar" />
     </RelativeLayout>
 
     <TextView
         android:id="@+id/name_chip"
-        style="@style/TransparentBlackTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/chip_layout"
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
-        android:fontFamily="roboto"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
         android:gravity="center"
         android:maxWidth="60dp"
         android:singleLine="true"
-        android:textSize="12sp"
         android:visibility="gone"/>
 
     <TextView
@@ -54,9 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/chip_layout"
         android:layout_gravity="center_horizontal"
-        android:fontFamily="sans-serif-medium"
         android:text="@string/invite_more"
-        android:textColor="@color/accentColor"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
         android:visibility="gone"/>
 </RelativeLayout>

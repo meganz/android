@@ -83,9 +83,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					control.removeShare().setVisible(true);
 				}
 			} else {
-				menu.findItem(R.id.cab_menu_remove_share)
-						.setIcon(mutateIconSecondary(context, R.drawable.ic_remove_share,
-								R.color.white));
 				control.removeShare().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
@@ -95,10 +92,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
@@ -389,9 +382,9 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
 				|| managerActivity.getParentHandleOutgoing() == -1) {
 			if (isScreenInPortrait(context)) {
-				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait);
 			} else {
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape);
 			}
 			textToShow = context.getString(R.string.context_empty_outgoing);
 		}

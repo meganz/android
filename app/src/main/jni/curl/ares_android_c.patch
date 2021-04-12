@@ -1,0 +1,110 @@
+diff --git a/ares_android.c b/ares_android.c
+index bf77131..6f834ce 100644
+--- a/ares_android.c
++++ b/ares_android.c
+@@ -21,6 +21,8 @@
+ #include "ares_android.h"
+ #include "ares_private.h"
+ 
++#include "../../mega/sdk/third_party/crashlyticsC.h"
++
+ static JavaVM *android_jvm = NULL;
+ static jobject android_connectivity_manager = NULL;
+ 
+@@ -39,6 +41,9 @@ static jmethodID android_list_get_mid = NULL;
+ /* InetAddress.getHostAddress */
+ static jmethodID android_ia_host_addr_mid = NULL;
+ 
++static crashlytics_context_t* ccontext = NULL;
++
++
+ static jclass jni_get_class(JNIEnv *env, const char *path)
+ {
+   jclass cls = NULL;
+@@ -88,6 +93,8 @@ int ares_library_init_android(jobject connectivity_manager)
+   int ret = ARES_ENOTINITIALIZED;
+   jclass obj_cls = NULL;
+ 
++  ccontext = crashlytics_init();
++
+   if (android_jvm == NULL)
+     goto cleanup;
+ 
+@@ -206,6 +213,8 @@ void ares_library_cleanup_android(void)
+   int need_detatch = 0;
+   int res;
+ 
++  crashlytics_free(&ccontext);
++
+   if (android_jvm == NULL || android_connectivity_manager == NULL)
+     return;
+ 
+@@ -234,6 +243,16 @@ void ares_library_cleanup_android(void)
+     (*android_jvm)->DetachCurrentThread(android_jvm);
+ }
+ 
++/*
++  A temp added(by Mega) util method to log crashlytics logs
++  TODO: Remove thie method along with all Crashlytics elements
++*/
++void crashlytics_log(char* msg)
++{
++  if (ccontext == NULL) return;
++  ccontext->log(ccontext, msg);
++}
++
+ char **ares_get_android_server_list(size_t max_servers,
+                                     size_t *num_servers)
+ {
+@@ -270,8 +289,14 @@ char **ares_get_android_server_list(size_t max_servers,
+     res = (*android_jvm)->AttachCurrentThread(android_jvm, &env, NULL);
+     need_detatch = 1;
+   }
++
+   if (res != JNI_OK || env == NULL)
++  {
++    char buff[130];
++    sprintf(buff, "ares_get_android_server_list: failed to get environment. Error: %d Env: %s", res, (env ? "not-null" : "null"));
++    crashlytics_log(buff);
+     goto done;
++  }
+ 
+   /* JNI below is equivalent to this Java code.
+      import android.content.Context;
+@@ -297,24 +322,36 @@ char **ares_get_android_server_list(size_t max_servers,
+   active_network = (*env)->CallObjectMethod(env, android_connectivity_manager,
+                                             android_cm_active_net_mid);
+   if (active_network == NULL)
++  {
++   crashlytics_log("ares_get_android_server_list: failed to get active_network.");
+     goto done;
++  }
+ 
+   link_properties =
+       (*env)->CallObjectMethod(env, android_connectivity_manager,
+                                android_cm_link_props_mid, active_network);
+   if (link_properties == NULL)
++  {
++    crashlytics_log("ares_get_android_server_list: failed to get link_properties"); 
+     goto done;
++  }
+ 
+   server_list = (*env)->CallObjectMethod(env, link_properties,
+                                          android_lp_dns_servers_mid);
+   if (server_list == NULL)
++  {
++    crashlytics_log("ares_get_android_server_list: failed to get server_list");
+     goto done;
++  }
+ 
+   nserv = (*env)->CallIntMethod(env, server_list, android_list_size_mid);
+   if (nserv > (jint)max_servers)
+     nserv = (jint)max_servers;
+   if (nserv <= 0)
++  {
++    crashlytics_log("ares_get_android_server_list: failed to get nserv");
+     goto done;
++  }
+   *num_servers = (size_t)nserv;
+ 
+   dns_list = ares_malloc(sizeof(*dns_list)*(*num_servers));

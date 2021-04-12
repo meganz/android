@@ -347,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">大多数设备无法下载超过4GB 的文件。您的下载可能会失败。</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">您的设备上没有可用的应用程序执行此文件</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">您的设备上没有可用应用程序打开此位置</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">您似乎未安装任何支持此文件类型的应用程序</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
@@ -653,7 +654,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">取消所有传输</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">拍摄</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">允许接收MEGA来电通知</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA需要您的授权才能允许呼叫界面从后台弹出。</string>
@@ -676,6 +677,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">相机上传完成</string>
+    <string name="settings_appearance" context="settings of the Appearance section">外观</string>
     <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
@@ -1008,7 +1010,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">升级至Pro帐户，尊享MEGA会员服务。</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">编辑个人照片</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">拍摄</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">选择照片</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">删除照片</string>
 
@@ -1364,6 +1366,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线中删除？</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">主题颜色</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">无法使用</string>
 
@@ -1466,6 +1469,11 @@
 
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">已上传%1$d个文件</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">已上传%1$d个文件</item>
+    </plurals>
+
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">已上传1个文件</item>
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">已上传%1$d个文件</item>
     </plurals>
 
@@ -1613,6 +1621,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">传输已暂停！</string>
     <string name="attachment_uploading_state_uploading">正在上传&#8230;</string>
+    <string name="attachment_uploading_state_compressing">正在压缩&#8230;</string>
     <string name="attachment_uploading_state_error">错误！未发送</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">已下载%d的文件。</string>
@@ -1719,6 +1728,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">没有分享的文件夹</string>
 
     <string name="settings_help" context="Menu item">帮助</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">帮助中心</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">发送反馈</string>
     <string name="setting_feedback_subject" context="mail subject">安卓反馈</string>
     <string name="setting_feedback_body" context="mail body">请在这里写下您的反馈：</string>
@@ -2048,12 +2058,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">新的联系人请求</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无[/B][A]正在传输[/A]的文件</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无已完成的[/B][A]传输[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]文件夹[/A]当前为[B]空[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">写信息给 "%s"&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">双重验证</string>
@@ -2636,7 +2646,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%2$d的%1$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">搜索&#8230;&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">应答</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">应答</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽略</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s 该通话已静音</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">已静音</string>
@@ -2754,8 +2764,8 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**将自动增加，不收取额外费用，并用于真正的商业目的</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]存储空间[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">无限[A]传输流量[/A]</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A]存储空间[A]**[/A]</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]无限[/A]传输流量</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，保存在“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
@@ -2811,6 +2821,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">聊天创建于%s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">聊天创建于%s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">选择消息</string>
 
@@ -3023,4 +3034,12 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">始终开启</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">扫描文件</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s不在您的联系人列表中</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">轻度</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">跟随系统</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">跟随省电模式设置</string>
 </resources>

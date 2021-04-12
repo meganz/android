@@ -1,33 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".InboxListFragment" >
-  
-    <RelativeLayout
-        android:id="@+id/inbox_list_content_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:background="@color/content_text_background">
-
-			<TextView
-				android:id="@+id/inbox_list_content_text"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:textColor="@color/secondary_text"
-				android:layout_centerVertical="true"
-				android:layout_marginLeft="72dp"
-				android:textSize="14sp" />
-
-    </RelativeLayout>
+    android:layout_height="match_parent" >
        
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/inbox_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/inbox_list_content_text_layout"/>
+        android:choiceMode="multipleChoice"/>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -48,15 +27,11 @@
 			android:orientation="horizontal"
 			android:layout_below="@id/inbox_list_empty_image"
 			android:layout_centerHorizontal="true">
-
 			<TextView
 				android:id="@+id/inbox_list_empty_text_first"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:fontFamily="sans-serif"
-				android:textAllCaps="true"
-				android:textColor="@color/text_secondary"
-				android:textSize="14sp" />
+				android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
 		</LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

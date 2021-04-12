@@ -38,8 +38,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -60,6 +62,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -76,6 +79,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -96,6 +100,33 @@ public class ChatUtil {
     private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
     private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
     private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
+
+    /**
+     * Where is the status icon placed, according to the design,
+     * according to the design,
+     * on dark mode the status icon image is different based on the place where it's placed.
+     */
+    public enum StatusIconLocation {
+
+        /**
+         * On chat list
+         * Contact list
+         * Contact info
+         * Flat app bar no chat room
+         */
+        STANDARD,
+
+        /**
+         * Raised app bar on chat room
+         */
+        APPBAR,
+
+        /**
+         * On nav drawer
+         * Bottom sheets
+         */
+        DRAWER
+    }
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -143,7 +174,7 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
 
         if (context instanceof GroupChatInfoActivityLollipop) {
@@ -503,35 +534,127 @@ public class ChatUtil {
      *
      * @param userStatus         contact's status
      * @param contactStateIcon  view in which the status icon has to be set
+     * @param where Where the icon is placed.
      */
-    public static void setContactStatus(int userStatus, ImageView contactStateIcon) {
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, StatusIconLocation where) {
         if (contactStateIcon == null) {
             return;
         }
 
+        Context context = contactStateIcon.getContext();
         contactStateIcon.setVisibility(View.VISIBLE);
+
+        int statusImageResId = getIconResourceIdByLocation(context, userStatus, where);
+
+        // Hide the icon ImageView.
+        if(statusImageResId == 0) {
+            contactStateIcon.setVisibility(View.GONE);
+        } else {
+            contactStateIcon.setImageResource(statusImageResId);
+        }
+    }
+
+    /**
+     * Get status icon image resource id by display mode and where the icon is placed.
+     *
+     * @param context Context object.
+     * @param userStatus User online status.
+     * @param where Where the icon is placed.
+     * @return Image resource id based on where the icon is placed.
+     * NOTE: when the user has an invalid online status, returns 0.
+     * Caller should verify the return value, 0 is an invalid value for resource id.
+     *
+     */
+    public static int getIconResourceIdByLocation(Context context,int userStatus, StatusIconLocation where) {
+        int statusImageResId = 0;
 
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_online_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_online_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_online_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_online_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_away_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_away_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_away_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_away_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_busy_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_busy_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_busy_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_busy_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                if (Util.isDarkMode(context)) {
+                    switch (where) {
+                        case STANDARD:
+                            statusImageResId = R.drawable.ic_offline_dark_standard;
+                            break;
+
+                        case DRAWER:
+                            statusImageResId = R.drawable.ic_offline_dark_drawer;
+                            break;
+
+                        case APPBAR:
+                            statusImageResId = R.drawable.ic_offline_dark_appbar;
+                            break;
+                    }
+                } else {
+                    statusImageResId = R.drawable.ic_offline_light;
+                }
                 break;
 
             case MegaChatApi.STATUS_INVALID:
             default:
-                contactStateIcon.setVisibility(View.GONE);
+                // Do nothing, let statusImageResId be 0.
         }
+
+        return statusImageResId;
     }
 
     /**
@@ -540,10 +663,11 @@ public class ChatUtil {
      * @param userStatus         contact's status
      * @param contactStateIcon  view in which the status icon has to be set
      * @param contactStateText  view in which the status text has to be set
+     * @param where The status icon image resource is different based on the place where it's placed.
      */
-    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText) {
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText, StatusIconLocation where) {
         MegaApplication app = MegaApplication.getInstance();
-        setContactStatus(userStatus, contactStateIcon);
+        setContactStatus(userStatus, contactStateIcon, where);
 
         if (contactStateText == null) {
             return;
@@ -687,8 +811,11 @@ public class ChatUtil {
             return chat.getTitle();
         }
 
-        MegaApplication app = MegaApplication.getInstance();
-        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
+        String date = formatDate(chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT);
+
+        return isTodayOrYesterday(chat.getCreationTs())
+                ? getString(R.string.inactive_chat_title_2, date.toLowerCase(Locale.getDefault()))
+                : getString(R.string.inactive_chat_title, date);
     }
 
     /**
@@ -757,7 +884,7 @@ public class ChatUtil {
     public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
         final AlertDialog muteDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
         if (chats == null) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);
@@ -940,19 +1067,25 @@ public class ChatUtil {
      * @return The final bitmap.
      */
     public static Bitmap getStatusBitmap(int userStatus) {
+        Resources resources = MegaApplication.getInstance().getBaseContext().getResources();
+        boolean isDarkMode = Util.isDarkMode(MegaApplication.getInstance());
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_online_dark_standard
+                                : R.drawable.ic_online_light);
             case MegaChatApi.STATUS_AWAY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_away_dark_standard
+                                : R.drawable.ic_away_light);
             case MegaChatApi.STATUS_BUSY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_busy_dark_standard
+                                : R.drawable.ic_busy_light);
             case MegaChatApi.STATUS_OFFLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_offline_dark_standard
+                                : R.drawable.ic_offline_light);
             case MegaChatApi.STATUS_INVALID:
             default:
                 return null;
@@ -993,7 +1126,7 @@ public class ChatUtil {
      * @param chat The MegaChatRoom.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.ResumeTransfersWarning);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         String message = context.getString(R.string.confirmation_clear_chat_history);
 
         builder.setTitle(R.string.title_properties_chat_clear)
@@ -1015,7 +1148,7 @@ public class ChatUtil {
             return;
 
         final AlertDialog historyRetentionDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
 
         View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
         TextView title = view.findViewById(R.id.title);
@@ -1239,7 +1372,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
@@ -1249,7 +1382,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
@@ -1284,5 +1417,52 @@ public class ChatUtil {
         return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
                 ((chatRoom.isGroup() && chatRoom.isActive()) ||
                         (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
+    }
+
+    /**
+     * Creates a pending message representing an attachment message.
+     *
+     * @param idChat       Identifier of the chat where the message has to be sent.
+     * @param filePath     Path of the file which will be attached to the chat.
+     * @param fileName     Name of the file which will be attached to the chat.
+     * @param fromExplorer True if the file comes from File Explorer, false otherwise.
+     * @return The pending message after add it to the DB.
+     */
+    public static PendingMessageSingle createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
+        long idPendingMessage;
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+
+        PendingMessageSingle pendingMsg = new PendingMessageSingle();
+        pendingMsg.setChatId(idChat);
+        pendingMsg.setUploadTimestamp(System.currentTimeMillis() / 1000);
+        pendingMsg.setFilePath(filePath);
+        pendingMsg.setName(fileName);
+        pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
+
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments()) {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
+            pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
+        } else if (fromExplorer) {
+            idPendingMessage = dbH.addPendingMessageFromExplorer(pendingMsg);
+        } else {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg);
+        }
+
+        pendingMsg.setId(idPendingMessage);
+
+        return pendingMsg;
+    }
+
+    /**
+     * Gets the identifier of a pending message from the appData of its transfer.
+     *
+     * @param appData AppData of the transfer in question.
+     * @return The identifier of the pending message.
+     */
+    public static long getPendingMessageIdFromAppData(String appData) {
+        String[] parts = appData.split(APP_DATA_INDICATOR);
+        String idFound = parts[parts.length - 1];
+
+        return Long.parseLong(idFound);
     }
 }

@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +61,8 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -88,17 +89,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	MegaNodeAdapter adapter;
     public NewHeaderItemDecoration headerItemDecoration;
     private int placeholderCount;
-	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode;
 	
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
@@ -324,7 +321,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             checkScroll();
 			return true;
 		}
@@ -334,7 +330,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             checkScroll();
 		}
 
@@ -348,8 +343,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
@@ -478,10 +471,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void checkScroll () {
 		if (recyclerView != null) {
 			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -527,7 +520,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -539,8 +532,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -581,19 +572,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
 
-//			emptyImageView.setImageResource(R.drawable.inbox_empty);
-
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
-
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
-//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setListFragment(recyclerView);
-//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
@@ -603,7 +587,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			setContentText();
 
-			return v;	
+			return v;
 		}
 	}
 	
@@ -1095,7 +1079,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
 
 			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleInbox()||((ManagerActivityLollipop)context).getParentHandleInbox()==-1) {
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -1104,12 +1087,17 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
 
-				String textToShow = String.format(context.getString(R.string.context_empty_inbox));
+				String textToShow = StringResourcesUtils.getString(R.string.context_empty_inbox);
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -1124,16 +1112,21 @@ public class InboxFragmentLollipop extends RotatableFragment{
 //				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 //				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 				}else{
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 				}
 				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -1150,18 +1143,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.GONE);
-
-			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).getParentHandleInbox()||((ManagerActivityLollipop) context).getParentHandleInbox()==-1) {
-
-				contentText.setText(getMegaNodeFolderInfo(inboxNode));
-			} else {
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
-
-				if(parentNode!=null){
-					contentText.setText(getMegaNodeFolderInfo(parentNode));
-				}
-			}
 		}
 	}
 
