@@ -1,8 +1,11 @@
 package mega.privacy.android.app.textFileEditor
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,12 +19,17 @@ import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -49,10 +57,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     private var fileName = ""
     private var node: MegaNode? = null
-    private var filePath: String? = null
+    private var fileUri: Uri? = null
+    private var fileSize: Long? = null
     private var mode = VIEW_MODE
     private var adapterType: Int = INVALID_VALUE
     private var msgChat: MegaChatMessage? = null
+    private var chatRoom: MegaChatRoom? = null
 
     private var needStopHttpServer = false
 
@@ -61,6 +71,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getContentText(): String? = contentText.value
 
+
     fun setContentText(editedContentText: String) {
         contentText.value = editedContentText
     }
@@ -68,6 +79,14 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun getFileName(): String = fileName
 
     fun getNode(): MegaNode? = node
+
+    fun updateNode(handle: Long) {
+        node = megaApi.getNodeByHandle(handle)
+    }
+
+    fun getFileUri(): Uri = fileUri!!
+
+    fun getFileSize(): Long = fileSize!!
 
     fun getNodeAccess(): Int = megaApi.getAccess(node)
 
@@ -87,6 +106,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getMsgChat(): MegaChatMessage? = msgChat
 
+    fun getChatRoom(): MegaChatRoom? = chatRoom
+
     fun isEditableAdapter(): Boolean = adapterType != OFFLINE_ADAPTER
             && adapterType != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(node)
             && adapterType != FILE_LINK_ADAPTER
@@ -104,6 +125,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
                 if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
+                    chatRoom = megaChatApi.getChatRoom(chatId)
                     msgChat = megaChatApi.getMessage(chatId, msgId)
 
                     if (msgChat == null) {
@@ -121,7 +143,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 }
             }
             OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
+                val filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
+                fileUri = filePath!!.toUri()
+                fileSize = File(filePath).length()
             }
             FILE_LINK_ADAPTER -> {
                 node = MegaNode.unserialize(intent.getStringExtra(EXTRA_SERIALIZE_STRING))
@@ -165,7 +189,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
         withContext(Dispatchers.IO) {
             val localFileUri =
-                if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER) filePath
+                if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER) fileUri.toString()
                 else getLocalFile(null, node?.name, node?.size!!)
 
             if (!isTextEmpty(localFileUri)) {
@@ -274,5 +298,56 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         return completedTransfer.fileName == fileName
                 && completedTransfer.parentHandle == fileParentHandle
+    }
+
+    /**
+     * Handle activity result.
+     *
+     * @param requestCode      RequestCode of onActivityResult
+     * @param resultCode       ResultCode of onActivityResult
+     * @param data             Intent of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
+     */
+    fun handleActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
+        activityLauncher: ActivityLauncher
+    ) {
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return
+        }
+
+        when (requestCode) {
+            REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
+                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                if (toHandle == INVALID_HANDLE) {
+                    return
+                }
+
+                handleSelectFolderToImportResult(
+                    resultCode,
+                    toHandle,
+                    node!!,
+                    snackbarShower,
+                    activityLauncher
+                )
+            }
+            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> handleSelectFolderToMoveResult(
+                requestCode,
+                resultCode,
+                data,
+                snackbarShower
+            )
+            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> handleSelectFolderToCopyResult(
+                requestCode,
+                resultCode,
+                data,
+                snackbarShower,
+                activityLauncher
+            )
+        }
     }
 }

@@ -13,17 +13,34 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TEXT_FILE_UPLOADED
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
+import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CONTENT_TEXT
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.shareUri
+import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
+import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
+import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
+import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
+import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -38,6 +55,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         const val MODIFIED_TEXT = "MODIFIED_TEXT"
         const val CURSOR_POSITION = "CURSOR_POSITION"
         const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
+        const val RENAME_SHOWN = "RENAME_SHOWN"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -49,6 +67,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var readingContent = false
 
     private var discardChangesDialog: AlertDialog? = null
+    private var renameDialog: AlertDialog? = null
+
+    private val nodeAttacher by lazy { MegaAttacher(this) }
+
+    private val nodeSaver by lazy {
+        NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
+    }
 
     private val completedEditionReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -77,10 +102,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         setUpTextView(savedInstanceState)
         setUpEditFAB()
 
-        if (savedInstanceState != null
-            && savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)
-        ) {
-            showDiscardChangesConfirmationDialog()
+        if (savedInstanceState != null) {
+            nodeAttacher.restoreState(savedInstanceState)
+            nodeSaver.restoreState(savedInstanceState)
+
+            if (savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)) {
+                showDiscardChangesConfirmationDialog()
+            }
+
+            if (savedInstanceState.getBoolean(RENAME_SHOWN, false)) {
+                renameNode()
+            }
         }
     }
 
@@ -90,6 +122,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putString(MODIFIED_TEXT, binding.editText.text.toString())
         outState.putInt(CURSOR_POSITION, binding.editText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
+        outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
+
+        nodeAttacher.saveState(outState)
+        nodeSaver.saveState(outState)
+
         super.onSaveInstanceState(outState)
     }
 
@@ -98,6 +135,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
+        }
+
+        if (isRenameDialogShown()) {
+            renameDialog?.dismiss()
         }
 
         unregisterReceiver(completedEditionReceiver)
@@ -117,9 +158,47 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.action_save -> saveFile()
+            R.id.action_download -> downloadFile(nodeSaver)
+            R.id.action_get_link, R.id.action_remove_link -> manageLink()
+            R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
+            R.id.action_share -> share()
+            R.id.action_rename -> renameNode()
+            R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
+            R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+            R.id.action_move_to_trash, R.id.action_remove -> moveToRubbishOrRemove(
+                viewModel.getNode()!!.handle,
+                this,
+                this
+            )
+            R.id.chat_action_import -> importNode()
+            R.id.chat_action_save_for_offline -> ChatController(this).saveForOffline(
+                viewModel.getMsgChat()!!.megaNodeList,
+                viewModel.getChatRoom(),
+                true,
+                this
+            )
+            R.id.chat_action_remove -> ChatUtil.removeAttachmentMessage(
+                this,
+                viewModel.getChatRoom()!!.chatId,
+                viewModel.getMsgChat()
+            )
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
+            return
+        }
+
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)) {
+            return
+        }
+
+        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -168,7 +247,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 FROM_CHAT -> {
                     toggleAllMenuItemsVisibility(menu, false)
                     menu.findItem(R.id.action_download).isVisible = true
-                    menu.findItem(R.id.action_share).isVisible = true
 
                     if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
                         menu.findItem(R.id.chat_action_import).isVisible = true
@@ -319,6 +397,72 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    private fun downloadFile(nodeSaver: NodeSaver) {
+        when (viewModel.getAdapterType()) {
+            OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(viewModel.getNode()!!.handle, true)
+            ZIP_ADAPTER -> nodeSaver.saveUri(
+                viewModel.getFileUri(),
+                viewModel.getFileName(),
+                viewModel.getFileSize(),
+                true
+            )
+            FROM_CHAT -> nodeSaver.saveNode(
+                viewModel.getNode()!!,
+                highPriority = true,
+                isFolderLink = true,
+                fromMediaViewer = true
+            )
+            else -> nodeSaver.saveHandle(
+                viewModel.getNode()!!.handle,
+                isFolderLink = viewModel.getAdapterType() == FOLDER_LINK_ADAPTER,
+                fromMediaViewer = true
+            )
+        }
+    }
+
+    private fun manageLink() {
+        if (showTakenDownNodeActionNotAvailableDialog(viewModel.getNode(), this)) {
+            return
+        }
+
+        if (viewModel.getNode()?.isExported == true) {
+            showConfirmRemoveLinkDialog(this) {
+                megaApi.disableExport(viewModel.getNode(), ExportListener(this, ACTION_REMOVE_LINK))
+            }
+        } else {
+            showGetLinkActivity(this, viewModel.getNode()!!.handle)
+        }
+    }
+
+    private fun share() {
+        when (viewModel.getAdapterType()) {
+            OFFLINE_ADAPTER, ZIP_ADAPTER -> shareUri(
+                this,
+                viewModel.getFileName(),
+                viewModel.getFileUri()
+            )
+            FILE_LINK_ADAPTER -> shareLink(this, intent.getStringExtra(URL_FILE_LINK))
+            else -> shareNode(this, viewModel.getNode()!!)
+        }
+    }
+
+    private fun renameNode() {
+        renameDialog =
+            showRenameNodeDialog(this, viewModel.getNode()!!, this, object : ActionNodeCallback {
+                override fun finishRenameActionWithSuccess(newName: String) {
+                    binding.nameText.text = newName
+                }
+            })
+    }
+
+    private fun isRenameDialogShown(): Boolean = renameDialog?.isShowing ?: false
+
+    private fun importNode() {
+        val intent = Intent(this, FileExplorerActivityLollipop::class.java)
+        intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
+        startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
+    }
+
     private fun setViewMode(fabVisible: Boolean) {
         viewModel.setViewMode()
         if (fabVisible) binding.editFab.show()
@@ -356,6 +500,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
 
         viewModel.setContentText(binding.editText.text.toString())
+        viewModel.updateNode(completedTransfer.nodeHandle.toLong())
         binding.nameText.text = viewModel.getFileName()
         binding.editFab.show()
     }

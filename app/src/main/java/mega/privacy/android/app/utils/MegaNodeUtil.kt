@@ -1460,10 +1460,21 @@ object MegaNodeUtil {
 
     @JvmStatic
     fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
+        manageTextFileIntent(context, node, adapterType, null)
+    }
+
+    @JvmStatic
+    fun manageTextFileIntent(
+        context: Context,
+        node: MegaNode,
+        adapterType: Int,
+        urlFileLink: String?
+    ) {
         val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
 
         if (adapterType == FILE_LINK_ADAPTER) {
             textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
+            textFileIntent.putExtra(URL_FILE_LINK, urlFileLink)
         } else {
             textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         }
