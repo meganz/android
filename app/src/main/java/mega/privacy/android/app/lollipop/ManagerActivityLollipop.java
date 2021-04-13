@@ -141,6 +141,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -8941,25 +8942,27 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	public void showChatLink(String link) {
 		logDebug("Link: " + link);
-//		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-//
-//		if (joiningToChatLink) {
-//			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-//			resetJoiningChatLink();
-//		} else {
-//			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-//		}
-//
-//		openChatLinkIntent.setData(Uri.parse(link));
-//		startActivity(openChatLinkIntent);
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
 
+		if (joiningToChatLink) {
+			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
+			resetJoiningChatLink();
+		} else {
+			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
+		}
+
+		openChatLinkIntent.setData(Uri.parse(link));
+		startActivity(openChatLinkIntent);
+
+		drawerItem = DrawerItem.CHAT;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	private void goToJoinMeeting(String link) {
 		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
 		joinMeetingLinkIntent.setData(Uri.parse(link));
 		joinMeetingLinkIntent.setAction(MEETING_ACTION_JOIN);
 		startActivity(joinMeetingLinkIntent);
-
-		drawerItem = DrawerItem.CHAT;
-		selectDrawerItemLollipop(drawerItem);
 	}
 
 	/**
@@ -12201,7 +12204,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					logError("ERROR WHEN ARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_archive_chat, chatTitle), -1);
 				}
-				else{ACTION_OPEN_CHAT_LINK
+				else{
 					logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
 				}
@@ -12215,7 +12218,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					return;
 				}
 
-				showChatLink(request.getLink());
+				String link = request.getLink();
+				if (AndroidMegaRichLinkMessage.isMeetingLink(link)) {
+					goToJoinMeeting(link);
+				} else {
+					showChatLink(link);
+				}
+
 				dismissOpenLinkDialog();
 			}
 			else {

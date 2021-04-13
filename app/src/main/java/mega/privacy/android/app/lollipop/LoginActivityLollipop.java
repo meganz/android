@@ -234,9 +234,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
 
-        if (Util.readAppLaunchedTime(this) <= 1) {
+//        if (Util.readAppLaunchedTime(this) <= 1) {
             checkClipboardMeetingLink();
-        }
+//        }
     }
 
     private void checkClipboardMeetingLink() {

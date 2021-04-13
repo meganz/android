@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
 
-class JoinMeetingAsGuestFragment : Fragment() {
+@AndroidEntryPoint
+class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
     private val viewModel: JoinMeetingAsGuestViewModel by viewModels()
 
-    companion object {
-        fun newInstance() = JoinMeetingAsGuestFragment()
+    override fun meetingButtonClick() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

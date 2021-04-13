@@ -27,7 +27,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -410,10 +412,10 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		boolean isChatLink = matchRegexs(url, CHAT_LINK_REGEXS);
-		Intent intent = new Intent(this, isChatLink
-				? ChatActivityLollipop.class : MeetingActivity.class);
-		intent.setAction(isChatLink ? ACTION_OPEN_CHAT_LINK : MEETING_ACTION_GUEST);
+		boolean isMeetingLink = matchRegexs(url, MEETING_LINK_REGEXS);
+		Intent intent = new Intent(this, isMeetingLink ? MeetingActivity.class :
+				ChatActivityLollipop.class);
+		intent.setAction(isMeetingLink ? MEETING_ACTION_GUEST : ACTION_OPEN_CHAT_LINK);
 		intent.setData(Uri.parse(url));
 		startActivity(intent);
 		finish();

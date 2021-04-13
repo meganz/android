@@ -78,11 +78,11 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val meetAction = intent.action
+        val meetingAction = intent.action
 
         initReceiver()
-        initActionBar(meetAction)
-        initNavigation(meetAction)
+        initActionBar(meetingAction)
+        initNavigation(meetingAction)
 
         if (savedInstanceState == null) {
 //            val navHostFragment =
@@ -155,8 +155,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         actionBar.title = ""
 
         when (meetAction) {
-            MEETING_ACTION_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
-            MEETING_ACTION_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            MEETING_ACTION_JOIN, MEETING_ACTION_CREATE, MEETING_ACTION_GUEST
+                -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
     }
 
@@ -174,12 +175,13 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         val bundle = Bundle()
 
+        if (meetAction == MEETING_ACTION_GUEST || meetAction == MEETING_ACTION_JOIN) {
+            bundle.putString(MEETING_LINK, intent.dataString)
+        }
+
         when (meetAction) {
             MEETING_ACTION_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
-            MEETING_ACTION_JOIN -> {
-                bundle.putString(MEETING_LINK, intent.dataString)
-                navGraph.startDestination = R.id.joinMeetingFragment
-            }
+            MEETING_ACTION_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
             MEETING_ACTION_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
             MEETING_ACTION_IN -> navGraph.startDestination = R.id.inMeeting
             else -> navGraph.startDestination = R.id.createMeetingFragment
