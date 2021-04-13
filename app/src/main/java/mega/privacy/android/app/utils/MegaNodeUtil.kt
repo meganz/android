@@ -151,14 +151,31 @@ object MegaNodeUtil {
     /**
      *
      * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
      *
-     * @param context   current Context.
-     * @param node      node to share.
+     * @param context Current Context.
+     * @param node    Node to share.
      */
     @JvmStatic
     fun shareNode(context: Context, node: MegaNode) {
+        shareNode(context, node, null)
+    }
+
+    /**
+     *
+     * Shares a node.
+     * If the node is a folder creates and/or shares the folder link.
+     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
+     *
+     * @param context                  Current Context.
+     * @param node                     Node to share.
+     * @param onExportFinishedListener Listener to manage the result of export request.
+     */
+    @JvmStatic
+    fun shareNode(
+        context: Context,
+        node: MegaNode,
+        onExportFinishedListener: ExportListener.OnExportFinishedListener?
+    ) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             val path = getLocalFile(context, node.name, node.size)
 
@@ -168,7 +185,8 @@ object MegaNodeUtil {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
                 MegaApplication.getInstance().megaApi.exportNode(
-                    node, ExportListener(context, ACTION_SHARE_NODE, Intent(Intent.ACTION_SEND))
+                    node,
+                    ExportListener(context, Intent(Intent.ACTION_SEND), onExportFinishedListener)
                 )
             }
         }
@@ -256,9 +274,8 @@ object MegaNodeUtil {
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
-        val exportListener = ExportListener(
-            context, ACTION_SHARE_NODE, notExportedNodes, links, Intent(Intent.ACTION_SEND)
-        )
+        val exportListener =
+            ExportListener(context, notExportedNodes, links, Intent(Intent.ACTION_SEND))
 
         for (node in nodes) {
             if (!node.isExported) {

@@ -80,6 +80,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getNode(): MegaNode? = node
 
+    fun updateNode() {
+        if (node == null) return
+
+        node = megaApi.getNodeByHandle(node!!.handle)
+    }
+
     fun updateNode(handle: Long) {
         node = megaApi.getNodeByHandle(handle)
     }

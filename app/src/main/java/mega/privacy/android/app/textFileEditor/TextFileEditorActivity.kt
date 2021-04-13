@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
@@ -128,6 +129,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         nodeSaver.saveState(outState)
 
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.updateNode()
+        refreshMenuOptionsVisibility()
     }
 
     override fun onDestroy() {
@@ -427,7 +435,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (viewModel.getNode()?.isExported == true) {
             showConfirmRemoveLinkDialog(this) {
-                megaApi.disableExport(viewModel.getNode(), ExportListener(this, ACTION_REMOVE_LINK))
+                megaApi.disableExport(
+                    viewModel.getNode(),
+                    ExportListener(this) { runDelay(100L) { finishExportAction() } })
             }
         } else {
             showGetLinkActivity(this, viewModel.getNode()!!.handle)
@@ -442,8 +452,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.getFileUri()
             )
             FILE_LINK_ADAPTER -> shareLink(this, intent.getStringExtra(URL_FILE_LINK))
-            else -> shareNode(this, viewModel.getNode()!!)
+            else -> shareNode(this, viewModel.getNode()!!) { finishExportAction() }
         }
+    }
+
+    private fun finishExportAction() {
+        viewModel.updateNode()
+        refreshMenuOptionsVisibility()
     }
 
     private fun renameNode() {
