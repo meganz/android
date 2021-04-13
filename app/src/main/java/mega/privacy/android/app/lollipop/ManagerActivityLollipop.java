@@ -9106,7 +9106,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void showNewTxtFileDialog(String typedName) {
 		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName);
+				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+				drawerItem == DrawerItem.HOMEPAGE);
 	}
 
 	public long getParentHandleBrowser() {

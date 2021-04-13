@@ -254,7 +254,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void showNewTxtFileDialog(String typedName) {
-		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, megaApi.getNodeByHandle(parentHandle), typedName);
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
+				megaApi.getNodeByHandle(parentHandle), typedName, false);
 	}
 
 	@Override

@@ -22,10 +22,12 @@ import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CONTENT_TEXT
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
@@ -57,6 +59,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         const val CURSOR_POSITION = "CURSOR_POSITION"
         const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         const val RENAME_SHOWN = "RENAME_SHOWN"
+        const val SAVING_MODE = "SAVING_MODE"
+        const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -66,6 +70,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var menu: Menu? = null
 
     private var readingContent = false
+    private var savingMode: String? = null
 
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
@@ -106,6 +111,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
             nodeSaver.restoreState(savedInstanceState)
+            savingMode = savedInstanceState.getString(SAVING_MODE)
 
             if (savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)) {
                 showDiscardChangesConfirmationDialog()
@@ -124,6 +130,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putInt(CURSOR_POSITION, binding.editText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
+        outState.putString(SAVING_MODE, savingMode)
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
@@ -399,6 +406,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     private fun saveFile() {
         if (isFileEdited()) {
+            savingMode = viewModel.getMode()
             viewModel.saveFile(binding.editText.text.toString())
             setViewMode(false)
             binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
@@ -520,6 +528,25 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.updateNode(completedTransfer.nodeHandle.toLong())
         binding.nameText.text = viewModel.getFileName()
         binding.editFab.show()
+
+        showSnackbar(
+            when {
+                savingMode == EDIT_MODE -> {
+                    StringResourcesUtils.getString(R.string.file_updated)
+                }
+                intent.getBooleanExtra(FROM_HOME_PAGE, false) -> {
+                    StringResourcesUtils.getString(
+                        R.string.file_saved_to,
+                        StringResourcesUtils.getString(R.string.section_cloud_drive)
+                    )
+                }
+                else -> {
+                    StringResourcesUtils.getString(R.string.file_created)
+                }
+            }
+        )
+
+        savingMode = null
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

@@ -25,6 +25,7 @@ import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity.Companion.FROM_HOME_PAGE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
@@ -74,7 +75,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, node, actionNodeCallback, snackbarShower,
-                null, null, renameDialogBuilder, TYPE_RENAME
+                null, null, false, renameDialogBuilder, TYPE_RENAME
             )
         }
 
@@ -99,7 +100,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, null, actionNodeCallback, null,
-                null, null, newFolderDialogBuilder, TYPE_NEW_FOLDER
+                null, null, false, newFolderDialogBuilder, TYPE_NEW_FOLDER
             )
         }
 
@@ -122,7 +123,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, parent, null, null,
-                data, null, newFileDialogBuilder, TYPE_NEW_FILE
+                data, null, false, newFileDialogBuilder, TYPE_NEW_FILE
             )
         }
 
@@ -151,7 +152,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, parent, null, null,
-                data, defaultURLName, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
+                data, defaultURLName, false, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
             )
         }
 
@@ -161,13 +162,15 @@ class MegaNodeDialogUtil {
          * @param context   Current context.
          * @param parent    A valid node. Specifically the parent in which the file will be created.
          * @param typedName The previous typed text.
+         * @param fromHome  True if the text file will be created from Homepage, false otherwise.
          * @return The create new text file dialog.
          */
         @JvmStatic
         fun showNewTxtFileDialog(
             context: Context,
             parent: MegaNode,
-            typedName: String?
+            typedName: String?,
+            fromHome: Boolean
         ): AlertDialog {
             val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -183,6 +186,7 @@ class MegaNodeDialogUtil {
                 null,
                 null,
                 null,
+                fromHome,
                 newTxtFileDialogBuilder,
                 TYPE_NEW_TXT_FILE
             )
@@ -204,6 +208,7 @@ class MegaNodeDialogUtil {
          * @param snackbarShower interface to show snackbar.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
+         * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param builder            The AlertDialog.Builder to create and show the final dialog.
          * @param dialogType         Indicates the type of dialog. It can be:
          *                            - TYPE_RENAME:       Rename action.
@@ -219,6 +224,7 @@ class MegaNodeDialogUtil {
             snackbarShower: SnackbarShower?,
             data: String?,
             defaultURLName: String?,
+            fromHome: Boolean,
             builder: AlertDialog.Builder,
             dialogType: Int
         ): AlertDialog {
@@ -267,7 +273,7 @@ class MegaNodeDialogUtil {
                             if (actionId == EditorInfo.IME_ACTION_DONE) {
                                 checkActionDialogValue(
                                     context, node, actionNodeCallback, snackbarShower,
-                                    typeText, data, errorText, dialog, dialogType
+                                    typeText, data, errorText, fromHome, dialog, dialogType
                                 )
                             }
 
@@ -281,7 +287,7 @@ class MegaNodeDialogUtil {
                         .setOnClickListener {
                             checkActionDialogValue(
                                 context, node, actionNodeCallback, snackbarShower,
-                                typeText, data, errorText, dialog, dialogType
+                                typeText, data, errorText, fromHome, dialog, dialogType
                             )
                         }
 
@@ -304,6 +310,7 @@ class MegaNodeDialogUtil {
          * @param typeText           The input text field.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param errorText          The text field to show the error.
+         * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param dialog             The AlertDialog to check.
          * @param dialogType         Indicates the type of dialog. It can be:
          *                           - TYPE_RENAME:       Rename action.
@@ -319,6 +326,7 @@ class MegaNodeDialogUtil {
             typeText: EditText?,
             data: String?,
             errorText: TextView?,
+            fromHome: Boolean,
             dialog: AlertDialog,
             dialogType: Int
         ) {
@@ -380,6 +388,7 @@ class MegaNodeDialogUtil {
                                 .putExtra(MODE, CREATE_MODE)
                                 .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
                                 .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
+                                .putExtra(FROM_HOME_PAGE, fromHome)
 
                             context.startActivity(textFileEditor)
                         }
