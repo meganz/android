@@ -1645,8 +1645,17 @@ public class ChatUtil {
         return arrayNodesNotExported;
     }
 
+    /**
+     * Authorizes the node if the chat is on preview mode.
+     *
+     * @param node        Node to authorize.
+     * @param megaChatApi MegaChatApiAndroid instance.
+     * @param megaApi     MegaApiAndroid instance.
+     * @param chatId      Chat identifier to check.
+     * @return The authorized node if preview, same node otherwise.
+     */
     public static MegaNode authorizeNodeIfPreview(MegaNode node, MegaChatApiAndroid megaChatApi,
-                                                   MegaApiAndroid megaApi, long chatId) {
+                                                  MegaApiAndroid megaApi, long chatId) {
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 
         if (chatRoom != null && chatRoom.isPreview()) {
@@ -1679,6 +1688,13 @@ public class ChatUtil {
                 .setNegativeButton(getString(R.string.general_cancel), null);
     }
 
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context Current context.
+     * @param msgId   Message identifier.
+     * @param chatId  Chat identifier.
+     */
     public static void manageTextFileIntent(Context context, long msgId, long chatId) {
         context.startActivity(new Intent(context, TextFileEditorActivity.class)
                 .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)

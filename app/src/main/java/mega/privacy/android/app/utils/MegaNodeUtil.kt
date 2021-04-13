@@ -1475,11 +1475,26 @@ object MegaNodeUtil {
         }
     }
 
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     */
     @JvmStatic
     fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
         manageTextFileIntent(context, node, adapterType, null)
     }
 
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     * @param urlFileLink Link of the file if the adapter is FILE_LINK_ADAPTER.
+     */
     @JvmStatic
     fun manageTextFileIntent(
         context: Context,

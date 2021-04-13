@@ -87,7 +87,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     fun updateNode(handle: Long) {
-        val handle = node!!.handle
         node = megaApi.getNodeByHandle(handle)
     }
 
@@ -115,6 +114,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getChatRoom(): MegaChatRoom? = chatRoom
 
+    /**
+     * Checks if the file can be editable depending on the current adapter.
+     *
+     * @return True if the file can be editable, false otherwise.
+     */
     fun isEditableAdapter(): Boolean = adapterType != OFFLINE_ADAPTER
             && adapterType != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(node)
             && adapterType != FILE_LINK_ADAPTER
@@ -123,6 +127,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             && adapterType != FROM_CHAT
             && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
 
+    /**
+     * Gets all necessary values from intent and savedInstanceState if available.
+     *
+     * @param intent             Received intent.
+     * @param savedInstanceState Saved state.
+     */
     fun setValuesFromIntent(intent: Intent, savedInstanceState: Bundle?) {
         adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
@@ -189,10 +199,21 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: node?.name!!
     }
 
+    /**
+     * Starts the read action to get the content of the file.
+     *
+     * @param mi Current phone memory info in case is needed to read the file on streaming.
+     */
     fun readFileContent(mi: ActivityManager.MemoryInfo) {
         viewModelScope.launch { readFile(mi) }
     }
 
+    /**
+     * Continues the read action to get the content of the file.
+     * Checks if the file is available to read locally. If not, it's read by streaming.
+     *
+     * @param mi Current phone memory info in case is needed to read the file on streaming.
+     */
     private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
         withContext(Dispatchers.IO) {
             val localFileUri =
@@ -230,6 +251,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Finishes the read action after get all necessary params to do it.
+     *
+     * @param br Necessary BufferReader to read the file.
+     */
     private suspend fun readFile(br: BufferedReader) {
         withContext(Dispatchers.IO) {
             val sb = StringBuilder()
@@ -251,6 +277,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Starts the save file content action by creating a temp file, setting the new or modified text,
+     * and then uploading it to the Cloud.
+     *
+     * @param contentText The new or modified content text.
+     */
     fun saveFile(contentText: String): Boolean {
         val app = MegaApplication.getInstance()
         val tempFile = buildTempFile(app, fileName)
@@ -290,12 +322,21 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         return true
     }
 
+    /**
+     * Stops the http server if it has been started before.
+     */
     fun checkIfNeedsStopHttpServer() {
         if (needStopHttpServer) {
             api.httpServerStop()
         }
     }
 
+    /**
+     * Checks if the completed transfer refers to the same node of current view.
+     *
+     * @param completedTransfer Completed transfer to check.
+     * @return True if the completed transfer refers to the same node, false otherwise.
+     */
     fun isSameNode(completedTransfer: AndroidCompletedTransfer): Boolean {
         val fileParentHandle = when {
             node == null -> megaApi.rootNode.handle
