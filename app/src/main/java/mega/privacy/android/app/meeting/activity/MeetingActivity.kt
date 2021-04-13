@@ -19,14 +19,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.MEETING_LINK
-import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.IncomingCallNotification
 
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
@@ -40,23 +40,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
-
-        private var isGuest = true
-        private var isModerator = false
-
-        private fun updateRole() {
-            if (isGuest) {
-                isGuest = false
-            } else if (!isModerator) {
-                isModerator = true
-            } else {
-                isGuest = true
-                isModerator = false
-            }
-        }
-
-        private var wiredHeadsetConnected = false
-        private var bluetoothConnected = false
     }
 
     private lateinit var binding: ActivityMeetingBinding
@@ -76,6 +59,8 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        IncomingCallNotification.cancelIncomingCallNotification(this)
+
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -85,48 +70,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         initActionBar(meetType)
         initNavigation(meetType)
 
-        if (savedInstanceState == null) {
-//            val navHostFragment =
-//                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-//            val navController = navHostFragment.navController
+        // TODO: pass real role here
+        bottomFloatingPanelViewHolder = BottomFloatingPanelViewHolder(binding, this, false, true)
 
-//            supportFragmentManager.beginTransaction()
-//                .replace(R.id.container, CreateMeetingFragment.newInstance())
-//                .commitNow()
-        }
+        // TODO: pass real headphone state here
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(false, false)
 
-
-        bottomFloatingPanelViewHolder =
-            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
-
-        val megaApi = MegaApplication.getInstance().megaApi
-        val avatar =
-            CacheFolderManager.buildAvatarFile(this, megaApi.myEmail + FileUtil.JPG_EXTENSION)
-
-        bottomFloatingPanelViewHolder.setParticipants(
-            listOf(
-                Participant("Joanna Zhao", avatar, false, true, false, false),
-                Participant("Yeray Rosales", avatar, true, false, true, false),
-                Participant("Harmen Porter", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-                Participant("Katayama Fumiki", avatar, false, false, false, true),
-            )
-        )
-
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
-
-        updateRole()
+        // TODO: load real participants and set it
+        bottomFloatingPanelViewHolder.setParticipants(TestTool.getTestParticipants(this))
     }
 
     override fun onDestroy() {
@@ -183,7 +134,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
                 navGraph.startDestination = R.id.joinMeetingFragment
             }
             MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
-            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeeting
+            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeetingFragment
             else -> navGraph.startDestination = R.id.createMeetingFragment
         }
 
@@ -209,23 +160,11 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onChangeMicState(micOn: Boolean) {
-        // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
-
-        wiredHeadsetConnected = !wiredHeadsetConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+        Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
     }
 
     override fun onChangeCamState(camOn: Boolean) {
-        // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
-
-        bluetoothConnected = !bluetoothConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+        Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
@@ -281,5 +220,17 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
             true -> bottom_floating_panel.visibility = View.VISIBLE;
             false -> bottom_floating_panel.visibility = View.GONE
         }
+    }
+
+    fun bottomFloatingPanelInOut() {
+        bottom_floating_panel.fadeInOut()
+    }
+
+    fun collpaseFloatingPanel() {
+        bottomFloatingPanelViewHolder.collpase()
+    }
+
+    fun hideActionBar() {
+        binding.toolbar.visibility = View.GONE
     }
 }
