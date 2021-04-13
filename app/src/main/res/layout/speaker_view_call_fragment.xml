@@ -46,6 +46,15 @@
         app:layout_constraintBottom_toBottomOf="@id/speaker_video"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <ImageView
+        android:id="@+id/quality_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_bad_connection"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/speaker_video"
+        app:layout_constraintStart_toEndOf="@id/speaker_mute_icon" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/participants_horizontal_list"
         android:layout_width="match_parent"

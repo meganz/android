@@ -18,8 +18,8 @@ class VideoListViewHolder(
 
     fun bind(participant: Participant, itemClickViewModel: ItemClickViewModel) {
         val layoutParams = binding.root.layoutParams
-        layoutParams.width = Util.dp2px(110f)
-        layoutParams.height = Util.dp2px(110f)
+        layoutParams.width = Util.dp2px(90f)
+        layoutParams.height = Util.dp2px(90f)
 
         binding.video.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
         binding.name.text = participant.name
