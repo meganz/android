@@ -154,6 +154,8 @@
 
     <color name="grey_200_grey_600">@color/grey_600</color>
 
+    <color name="grey_700_grey_600">@color/grey_600</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_050</color>
 

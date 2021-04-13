@@ -121,6 +121,8 @@
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
 
     <dimen name="meeting_bottom_floating_panel_fab_size">48dp</dimen>
+    <dimen name="meeting_bottom_floating_panel_peek_height">100dp</dimen>
+
     <dimen name="bottom_sheet_item_height">56dp</dimen>
     <dimen name="bottom_sheet_item_padding_horizontal">18dp</dimen>
     <dimen name="bottom_sheet_item_drawable_padding">32dp</dimen>
