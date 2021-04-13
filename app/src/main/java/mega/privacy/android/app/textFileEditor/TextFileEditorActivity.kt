@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 
 @AndroidEntryPoint
 class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
@@ -407,9 +408,14 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private fun saveFile() {
         if (isFileEdited()) {
             savingMode = viewModel.getMode()
-            viewModel.saveFile(binding.editText.text.toString())
-            setViewMode(false)
-            binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
+
+            if(viewModel.saveFile(binding.editText.text.toString())) {
+                setViewMode(false)
+                binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
+            } else {
+                creationOrEditActionFailed()
+                savingMode = null
+            }
         } else {
             setViewMode(true)
         }
@@ -524,6 +530,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
+        if (completedTransfer.state != STATE_COMPLETED) {
+            creationOrEditActionFailed()
+            return
+        }
+
         viewModel.setContentText(binding.editText.text.toString())
         viewModel.updateNode(completedTransfer.nodeHandle.toLong())
         binding.nameText.text = viewModel.getFileName()
@@ -531,22 +542,35 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         showSnackbar(
             when {
-                savingMode == EDIT_MODE -> {
-                    StringResourcesUtils.getString(R.string.file_updated)
-                }
-                intent.getBooleanExtra(FROM_HOME_PAGE, false) -> {
-                    StringResourcesUtils.getString(
-                        R.string.file_saved_to,
-                        StringResourcesUtils.getString(R.string.section_cloud_drive)
-                    )
-                }
-                else -> {
-                    StringResourcesUtils.getString(R.string.file_created)
-                }
+                savingMode == EDIT_MODE -> StringResourcesUtils.getString(R.string.file_updated)
+                intent.getBooleanExtra(
+                    FROM_HOME_PAGE,
+                    false
+                ) -> StringResourcesUtils.getString(
+                    R.string.file_saved_to,
+                    StringResourcesUtils.getString(R.string.section_cloud_drive)
+                )
+                else -> StringResourcesUtils.getString(R.string.file_created)
             }
         )
 
         savingMode = null
+    }
+
+    private fun creationOrEditActionFailed() {
+        viewModel.setEditMode()
+        updateUIAfterChangeMode()
+
+        showSnackbar(
+            when {
+                savingMode == EDIT_MODE -> StringResourcesUtils.getString(R.string.file_update_failed)
+                intent.getBooleanExtra(
+                    FROM_HOME_PAGE,
+                    false
+                ) -> StringResourcesUtils.getString(R.string.file_saved_to_failed)
+                else -> StringResourcesUtils.getString(R.string.file_creation_failed)
+            }
+        )
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

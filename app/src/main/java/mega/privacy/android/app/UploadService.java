@@ -396,10 +396,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		return null;
 	}
 
-	/*
-	 * No more intents in the queue
+	/**
+	 * No more intents in the queue, reset and finish service.
+     *
+     * @param showSnackbar True if should show finish snackbar, false otherwise.
 	 */
-	private void onQueueComplete() {
+	private void onQueueComplete(boolean showSnackbar) {
 		logDebug("onQueueComplete");
         releaseLocks();
         if (isOverquota != NOT_OVERQUOTA_STATE) {
@@ -417,7 +419,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 showFolderUploadCompleteNotification();
             }
 
-            sendUploadFinishBroadcast();
+            if (showSnackbar) {
+                sendUploadFinishBroadcast();
+            }
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
@@ -821,8 +825,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 return;
             }
 
-            String appData = transfer.getAppData();
-            if (appData != null) {
+            if (transfer.getAppData() != null) {
+                if (megaApi.getNumPendingUploads() == 0) {
+                    onQueueComplete(false);
+                }
+
                 return;
             }
 
@@ -1032,7 +1039,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                         && (totalFileUploadsCompleted + totalFolderUploadsCompleted) == currentUpload
                         && (totalFileUploadsCompleted + totalFolderUploadsCompleted) >= uploadCount
                 ) {
-                    onQueueComplete();
+                    onQueueComplete(true);
                 } else {
                     updateProgressNotification(transfer.isFolderTransfer());
                 }

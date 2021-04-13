@@ -87,6 +87,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     fun updateNode(handle: Long) {
+        val handle = node!!.handle
         node = megaApi.getNodeByHandle(handle)
     }
 
