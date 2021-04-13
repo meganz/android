@@ -230,7 +230,6 @@ public class Constants {
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
-    public static final String ACTION_JOIN_MEETING = "JOIN_MEETING";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
     public static final String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
@@ -590,7 +589,6 @@ public class Constants {
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
     public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
-    public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
@@ -636,6 +634,10 @@ public class Constants {
     public static final int THUMB_MARGIN_DP = 16;
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
+
+    public static final int AUDIO_MANAGER_CALL_RINGING = 0;
+    public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 1;
+    public static final int AUDIO_MANAGER_CALL_OUTGOING = 2;
 
     public static final String SEPARATOR = File.separator;
 

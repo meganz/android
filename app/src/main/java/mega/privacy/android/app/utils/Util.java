@@ -50,6 +50,7 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -152,6 +153,9 @@ public class Util {
 
 	// 150ms, a smaller value may cause the keyboard to fail to open
 	private final static int SHOW_IM_DELAY = 150;
+
+	// How many times the app has been launched till now
+	private final static String KEY_LAUNCHED_TIME = "launched_time";
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
@@ -1608,4 +1612,24 @@ public class Util {
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
+
+	/**
+	 * Note down how many times the app has been launched till now
+	 * @param context
+	 */
+	public static void writeAppLaunchedTime(Context context) {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		int time = sharedPreferences.getInt(KEY_LAUNCHED_TIME, 0);
+		sharedPreferences.edit().putInt(KEY_LAUNCHED_TIME, time + 1).apply();
+	}
+
+	/**
+	 * Return how many times the app has been launched till now
+	 * @param context
+	 * @return the number of time the app has been launched
+	 */
+	public static int readAppLaunchedTime(Context context) {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		return sharedPreferences.getInt(KEY_LAUNCHED_TIME, 0);
+	}
 }

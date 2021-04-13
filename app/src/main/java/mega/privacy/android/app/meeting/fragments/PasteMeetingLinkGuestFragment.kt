@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_paste_meeting_link_guest.*
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
@@ -76,11 +77,19 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
             meetingLink = linkEdit.text.toString()
 
             if (validateLink(meetingLink)) {
-                initMegaChat { checkMeetingLink() }
+                // TODO: +Meeting, use open link activity or self logic to process the link?
+//                initMegaChat { checkMeetingLink() }
+                startOpenLinkActivity()
             }
         }
 
         return dialog
+    }
+
+    private fun startOpenLinkActivity() {
+        val intent = Intent(requireContext(), OpenLinkActivity::class.java)
+        intent.data = Uri.parse(meetingLink)
+        startActivity(intent)
     }
 
     private fun validateLink(link: String): Boolean {
@@ -140,22 +149,13 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                         showSnackbar(
                             requireContext(),
                             Constants.SNACKBAR_TYPE,
-                            getString(R.string.error_chat_link_init_error),
+                            getString(R.string.error_meeting_link_init_error),
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                         return
                     }
 
-                    val joinMeetingLinkIntent =
-                        Intent(requireContext(), MeetingActivity::class.java)
-                    joinMeetingLinkIntent.action = Constants.ACTION_JOIN_MEETING
-                    joinMeetingLinkIntent.data = Uri.parse(request.link)
-                    joinMeetingLinkIntent.putExtra(
-                        MeetingActivity.MEETING_TYPE,
-                        MeetingActivity.MEETING_TYPE_JOIN
-                    )
-                    startActivity(joinMeetingLinkIntent)
-
+                    startJoinMeeting(request.link)
                     dismiss()
                 } else if (e.errorCode == MegaChatError.ERROR_NOENT) {
                     Util.showAlert(
@@ -168,6 +168,14 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                 }
             }
         })
+
+    private fun startJoinMeeting(meetingLink: String) {
+        val intent = Intent(requireContext(), MeetingActivity::class.java)
+        intent.data = Uri.parse(meetingLink)
+        intent.action = MeetingActivity.MEETING_ACTION_GUEST
+
+        startActivity(intent)
+    }
 
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)

@@ -188,7 +188,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             if (isItMe(chatId, peerid, clientid)) {
                 megaChatApi.addChatLocalVideoListener(chatId, listener);
             } else {
-                megaChatApi.addChatRemoteVideoListener(chatId, peerid, clientid, listener);
+                megaChatApi.addChatRemoteVideoListener(chatId, clientid, false, listener);
             }
         } else {
             listener.setHeight(0);
@@ -233,9 +233,9 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
 
         logDebug("Removing remote video listener");
         if (isItMe(chatId, peerid, clientid)) {
-            megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
+            megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener);
         } else {
-            megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
+            megaChatApi.removeChatVideoListener(chatId, clientid, false, listener);
         }
         listener = null;
     }
@@ -366,7 +366,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
      */
     public void changeUser(long newChatId, long callId, long newPeerId, long newClientId) {
 
-        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getId() != callId) {
+        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getCallId() != callId) {
             logError("Error changing the user");
             return;
         }

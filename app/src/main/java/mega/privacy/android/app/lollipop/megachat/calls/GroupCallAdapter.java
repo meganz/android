@@ -313,7 +313,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
                 megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
             } else {
-                megaChatApi.addChatRemoteVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
+                megaChatApi.addChatRemoteVideoListener(chatId, peer.getClientId(), false, peer.getListener());
             }
 
             if (peers.size() <= MAX_PARTICIPANTS_GRID) {
@@ -442,9 +442,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holder.videoLayout.setVisibility(View.GONE);
         if (peer.getListener() != null) {
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, peer.getListener());
+                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, peer.getListener());
             } else {
-                megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
+                megaChatApi.removeChatVideoListener(chatId, peer.getClientId(), false, peer.getListener());
             }
 
             if (holder.parentSurfaceView.getChildCount() > 0) {
@@ -820,9 +820,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder = getHolder(position);
             if (holder != null && peer.getListener() != null) {
                 if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-                    megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, peer.getListener());
+                    megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, peer.getListener());
                 } else {
-                    megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
+                    megaChatApi.removeChatVideoListener(chatId, peer.getClientId(), false, peer.getListener());
                 }
                 if (holder.parentSurfaceView.getChildCount() != 0) {
                     holder.parentSurfaceView.removeAllViews();

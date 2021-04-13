@@ -26,6 +26,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
@@ -118,11 +119,12 @@ public class ContactController {
             MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
-                if (megaChatApi.getChatCall(chatId) != null) {
+                MegaChatCall call = megaChatApi.getChatCall(chatId);
+                if (call != null) {
                     if (context instanceof ManagerActivityLollipop) {
-                        megaChatApi.hangChatCall(chatId, (ManagerActivityLollipop) context);
+                        megaChatApi.hangChatCall(call.getCallId(), (ManagerActivityLollipop) context);
                     } else if (context instanceof ContactInfoActivityLollipop) {
-                        megaChatApi.hangChatCall(chatId, (ContactInfoActivityLollipop) context);
+                        megaChatApi.hangChatCall(call.getCallId(), (ContactInfoActivityLollipop) context);
                     }
                 }
             }
