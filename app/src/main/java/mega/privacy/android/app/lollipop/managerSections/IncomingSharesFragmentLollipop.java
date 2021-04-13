@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -159,7 +160,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 
-			nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -185,7 +186,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			findNodes();
 		} else {
 			parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
-			nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -229,7 +230,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.supportInvalidateOptionsMenu();
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(nodes.get(position), managerActivity.orderCloud);
+			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 
 			adapter.setNodes(nodes);
@@ -246,7 +247,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void findNodes() {
 		nodes = megaApi.getInShares();
 
-		if (managerActivity.orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByMailDescending(nodes);
 		}
 		addSectionTitle(nodes, adapter.getAdapterType());
@@ -323,7 +324,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					managerActivity.supportInvalidateOptionsMenu();
 					managerActivity.setToolbarTitle();
 
-					nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+					nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 					addSectionTitle(nodes, adapter.getAdapterType());
 
 					adapter.setNodes(nodes);

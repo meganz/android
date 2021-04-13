@@ -148,7 +148,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 

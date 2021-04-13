@@ -683,7 +683,7 @@
     <string name="settings_features" context="settings of the Features section">Características</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Almacenamiento</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Bloqueo con código de acceso</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Bloqueo con código de acceso</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que dejes tu dispositivo cargando si los videos a comprimir son superiores a %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si activas está opción, se subirá información sobre dónde se tomaron tus fotos, así que ten cuidado al compartirlas.</string>
 
@@ -775,7 +775,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos y vídeos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">No configurado</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Bloqueo con código de acceso</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Bloqueo con código de acceso</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Cambiar código de acceso</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Entrar</string>

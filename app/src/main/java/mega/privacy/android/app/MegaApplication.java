@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -45,6 +44,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -74,6 +74,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
@@ -105,6 +106,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -128,6 +130,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
 	@MegaApi
@@ -142,6 +145,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	DatabaseHandler dbH;
 	@Inject
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -166,8 +171,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
-
-	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
 
@@ -315,7 +318,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("END logout sdk request - wait chat logout");
@@ -349,8 +352,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
-					//Login transfers resumption
-					TransfersManagement.enableTransfersResumption();
+					// Init CU sync data after login successfully
+					initCuSync();
+
+					//Login check resumed pending transfers
+					TransfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -748,10 +754,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
-		//Logout transfers resumption
-		TransfersManagement.enableTransfersResumption();
+		//Logout check resumed pending transfers
+		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1013,14 +1020,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaApplication.showInfoChatMessages = showInfoChatMessages;
 	}
 
-	public static boolean isShowPinScreen() {
-		return showPinScreen;
-	}
-
-	public static void setShowPinScreen(boolean showPinScreen) {
-		MegaApplication.showPinScreen = showPinScreen;
-	}
-
 	public static String getUrlConfirmationLink() {
 		return urlConfirmationLink;
 	}
@@ -1217,6 +1216,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+
+			sortOrderManagement.resetDefaults();
 
 			try{
 				if (megaChatApi != null){
@@ -1602,6 +1603,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.remove(chatId);
 	}
 
+	public AppRTCAudioManager getAudioManager(){
+		return rtcAudioManager;
+	}
+
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
@@ -1764,7 +1769,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
 		openCallService(call.getChatid());
-		MegaApplication.setShowPinScreen(false);
+		passcodeManagement.setShowPasscodeScreen(false);
 		int callStatus = call.getStatus();
 
 		Intent i = new Intent(this, ChatCallActivity.class);
@@ -1967,6 +1972,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public static PasscodeManagement getPasscodeManagement() {
+		return passcodeManagement;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {
