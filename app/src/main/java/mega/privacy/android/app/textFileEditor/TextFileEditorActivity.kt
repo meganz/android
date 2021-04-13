@@ -409,11 +409,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (isFileEdited()) {
             savingMode = viewModel.getMode()
 
-            if(viewModel.saveFile(binding.editText.text.toString())) {
+            if (viewModel.saveFile(binding.editText.text.toString())) {
                 setViewMode(false)
                 binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
             } else {
-                creationOrEditActionFailed()
+                createOrEditActionFailed()
                 savingMode = null
             }
         } else {
@@ -531,14 +531,18 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
 
         if (completedTransfer.state != STATE_COMPLETED) {
-            creationOrEditActionFailed()
+            createOrEditActionFailed()
             return
         }
 
         viewModel.setContentText(binding.editText.text.toString())
         viewModel.updateNode(completedTransfer.nodeHandle.toLong())
         binding.nameText.text = viewModel.getFileName()
-        binding.editFab.show()
+        binding.editFab.apply {
+            //Necessary to call hide first to avoid not being shown because the view doesn't exist yet
+            hide()
+            show()
+        }
 
         showSnackbar(
             when {
@@ -557,7 +561,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         savingMode = null
     }
 
-    private fun creationOrEditActionFailed() {
+    private fun createOrEditActionFailed() {
         viewModel.setEditMode()
         updateUIAfterChangeMode()
 
