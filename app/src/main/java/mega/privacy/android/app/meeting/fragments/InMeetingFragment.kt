@@ -5,11 +5,13 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
+import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class InMeetingFragment : MeetingBaseFragment() {
@@ -42,6 +44,8 @@ class InMeetingFragment : MeetingBaseFragment() {
 
     var lastTouch: Long = 0
 
+    var previousY = -1f
+
     fun onPageClick() {
         if (System.currentTimeMillis() - lastTouch > 500) {
             in_meeting_toolbar.fadeInOut(toTop = true)
@@ -53,36 +57,91 @@ class InMeetingFragment : MeetingBaseFragment() {
                 meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
 
+            placeFloatingWindow()
+
             lastTouch = System.currentTimeMillis()
         }
     }
 
+    private fun placeFloatingWindow() {
+        checkRelativePositionWithToolbar()
+        checkRelativePositionWithBottomSheet()
+    }
+
+    private fun checkRelativePositionWithToolbar() {
+        val isIntersect = (in_meeting_toolbar.bottom - self_feed_floating_window_container.y) > 0
+        if (in_meeting_toolbar.visibility == View.VISIBLE && isIntersect) {
+            self_feed_floating_window_container.moveY(in_meeting_toolbar.bottom.toFloat())
+        }
+
+        val isIntersectPreviously = (in_meeting_toolbar.bottom - previousY) > 0
+        if (in_meeting_toolbar.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
+            self_feed_floating_window_container.moveY(previousY)
+        }
+    }
+
+    private fun checkRelativePositionWithBottomSheet() {
+        val bottom =
+            self_feed_floating_window_container.y + self_feed_floating_window_container.height
+        val top = meetingActivity.bottom_floating_panel.top
+        val margin1 = bottom - top
+
+        val isIntersect = margin1 > 0
+        if (meetingActivity.bottom_floating_panel.visibility == View.VISIBLE && isIntersect) {
+            self_feed_floating_window_container.moveY(self_feed_floating_window_container.y - margin1)
+        }
+
+        val margin2 =
+            previousY + self_feed_floating_window_container.height - meetingActivity.bottom_floating_panel.top
+        val isIntersectPreviously = margin2 > 0
+        if (meetingActivity.bottom_floating_panel.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
+            self_feed_floating_window_container.moveY(previousY)
+        }
+    }
+
+    private lateinit var dragTouchListener : OnDragTouchListener
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         view.setOnClickListener {
             onPageClick()
         }
 
-        self_feed_floating_window_container.setOnTouchListener(
-            OnDragTouchListener(
-                view.self_feed_floating_window_container,
-                view
-            )
-        )
+        dragTouchListener = OnDragTouchListener(
+            view.self_feed_floating_window_container,
+            view,
+            object : OnDragTouchListener.OnDragActionListener {
 
+                override fun onDragStart(view: View?) {
+                    if(in_meeting_toolbar.visibility == View.VISIBLE) {
+                        dragTouchListener.setToolbarHeight(in_meeting_toolbar.bottom)
+                        dragTouchListener.setBottomSheetHeight(meetingActivity.bottom_floating_panel.top)
+                    } else {
+                        dragTouchListener.setToolbarHeight(0)
+                        dragTouchListener.setBottomSheetHeight(0)
+                    }
+                }
+
+                override fun onDragEnd(view: View) {
+                    // Record the last Y of the floating window after dragging ended.
+                    previousY = view.y
+                }
+
+            }
+        )
+        self_feed_floating_window_container.setOnTouchListener(dragTouchListener)
+
+        individualCallFragment = IndividualCallFragment.newInstance(1, 2, false)
         gridViewCallFragment = GridViewCallFragment.newInstance()
+        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
+
+        //TODO test code start
         loadChildFragment(
             R.id.meeting_container,
-            gridViewCallFragment,
-            GridViewCallFragment.TAG
+            individualCallFragment,
+            IndividualCallFragment.TAG
         )
-
-        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
-//        loadChildFragment(
-//            R.id.meeting_container,
-//            speakerViewCallFragment,
-//            SpeakerViewCallFragment.TAG
-//        )
 
         floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
         loadChildFragment(
@@ -90,6 +149,7 @@ class InMeetingFragment : MeetingBaseFragment() {
             floatingWindowFragment,
             IndividualCallFragment.TAG
         )
+        //TODO test code end
 
         meetingActivity.setSupportActionBar(view.in_meeting_toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
@@ -99,7 +159,8 @@ class InMeetingFragment : MeetingBaseFragment() {
         setHasOptionsMenu(true)
 
         // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        meetingActivity.window.decorView.systemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
+        meetingActivity.window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         view.setOnApplyWindowInsetsListener { _, insets ->
             insets

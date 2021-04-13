@@ -23,6 +23,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private lateinit var surfaceHolder: SurfaceHolder
 
+    var videoAlpha = 255
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -31,6 +33,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW)
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,8 +51,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         if (isFloatingWindow) {
             handleFloatingWindow()
-        }
 
+            meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
+                view.alpha = 1 - it
+            }
+
+            meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
+                videoAlpha = ((1 - it) * 255).toInt()
+            }
+        }
     }
 
     private fun handleFloatingWindow() {
@@ -61,25 +71,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
         surfaceHolder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(holder: SurfaceHolder?) {
-                if (isFloatingWindow) {
-                    val w = video.width.toFloat()
-                    val h = video.height.toFloat()
-                    val rectF = RectF(0f, 0f, w, h)
-
-                    val canvas = surfaceHolder.lockCanvas()
-                    val paint = Paint()
-                    paint.color = Color.parseColor("#ABCDEF")
-                    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
-
-                    canvas.drawRoundRect(
-                        rectF,
-                        Util.dp2px(16f, outMetrics).toFloat(),
-                        Util.dp2px(16f, outMetrics).toFloat(),
-                        paint
-                    )
-
-                    surfaceHolder.unlockCanvasAndPost(canvas)
-                }
+                Thread{
+                    while (true) {
+                        Thread.sleep(100)
+                        drawFrame()
+                    }
+                }.start()
             }
 
             override fun surfaceChanged(
@@ -95,6 +92,32 @@ class IndividualCallFragment : MeetingBaseFragment() {
         })
         // TODO test code end
     }
+
+    // TODO test start
+    private fun drawFrame() {
+        val w = video.width.toFloat()
+        val h = video.height.toFloat()
+        val rectF = RectF(0f, 0f, w, h)
+
+        val canvas = surfaceHolder.lockCanvas()
+
+        canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        val paint = Paint()
+        paint.apply {
+            color = Color.parseColor("#ABCDEF")
+            alpha = videoAlpha
+        }
+
+        canvas?.drawRoundRect(
+            rectF,
+            Util.dp2px(16f, outMetrics).toFloat(),
+            Util.dp2px(16f, outMetrics).toFloat(),
+            paint
+        )
+
+        surfaceHolder.unlockCanvasAndPost(canvas)
+    }
+    // TODO test code end
 
     companion object {
 

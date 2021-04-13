@@ -7,7 +7,6 @@ public class OnDragTouchListener implements View.OnTouchListener {
     private View mView;
     private View mParent;
     private boolean isDragging;
-    private boolean isInitialized = false;
     private int width;
     private float maxLeft;
     private float maxRight;
@@ -17,6 +16,9 @@ public class OnDragTouchListener implements View.OnTouchListener {
     private float maxBottom;
     private float dY;
     private OnDragActionListener mOnDragActionListener;
+
+    private int toolbarHeight;
+    private int bottomSheetHeight;
 
     public OnDragTouchListener(View view, View parent) {
         this(view, parent, null);
@@ -35,13 +37,11 @@ public class OnDragTouchListener implements View.OnTouchListener {
         mView = view;
         mParent = parent;
         isDragging = false;
-        isInitialized = false;
     }
 
     public void updateBounds() {
         updateViewBounds();
         updateParentBounds();
-        isInitialized = true;
     }
 
     public void updateViewBounds() {
@@ -55,8 +55,16 @@ public class OnDragTouchListener implements View.OnTouchListener {
         maxLeft = 0;
         maxRight = maxLeft + mParent.getWidth();
 
-        maxTop = 0;
-        maxBottom = maxTop + mParent.getHeight();
+        maxTop = 0 + toolbarHeight;
+        maxBottom = (bottomSheetHeight > 0) ? bottomSheetHeight : mParent.getHeight();
+    }
+
+    public void setToolbarHeight(int toolbarHeight) {
+        this.toolbarHeight = toolbarHeight;
+    }
+
+    public void setBottomSheetHeight(int bottomSheetHeight) {
+        this.bottomSheetHeight = bottomSheetHeight;
     }
 
     @Override
@@ -108,15 +116,13 @@ public class OnDragTouchListener implements View.OnTouchListener {
         } else {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    isDragging = true;
-                    if (!isInitialized) {
-                        updateBounds();
-                    }
-                    dX = v.getX() - event.getRawX();
-                    dY = v.getY() - event.getRawY();
                     if (mOnDragActionListener != null) {
                         mOnDragActionListener.onDragStart(mView);
                     }
+                    isDragging = true;
+                    updateBounds();
+                    dX = v.getX() - event.getRawX();
+                    dY = v.getY() - event.getRawY();
                     return true;
             }
         }

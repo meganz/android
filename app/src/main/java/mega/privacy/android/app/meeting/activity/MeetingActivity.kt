@@ -14,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
@@ -43,7 +42,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     private lateinit var binding: ActivityMeetingBinding
-    private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
+    lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -227,7 +226,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     fun collpaseFloatingPanel() {
-        bottomFloatingPanelViewHolder.collpase()
+        bottomFloatingPanelViewHolder.collapse()
     }
 
     fun hideActionBar() {
