@@ -72,6 +72,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -692,8 +693,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				mode = SAVE;
 				selectFile = false;
 
-				aB.setTitle(R.string.section_cloud_drive);
-				aB.setSubtitle(R.string.cloud_drive_select_destination);
+				aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
+				aB.setSubtitle(StringResourcesUtils.getString(R.string.cloud_drive_select_destination));
 				setView(CLOUD_TAB, false, -1);
 				tabShown=NO_TABS;
 			}
@@ -1257,7 +1258,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 		}
 		else if(mode == SAVE){
-			aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+			aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive).toUpperCase());
 		}
 		else if (mode == UPLOAD && importFileF) {
 			if (importFragmentSelected == -1) {
@@ -1291,7 +1292,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		iSharesExplorer = getIncomingExplorerFragment();
 
 		if (mode == SAVE) {
-			aB.setSubtitle(R.string.cloud_drive_select_destination);
+			aB.setSubtitle(StringResourcesUtils.getString(R.string.cloud_drive_select_destination));
 		} else {
 			aB.setSubtitle(null);
 		}

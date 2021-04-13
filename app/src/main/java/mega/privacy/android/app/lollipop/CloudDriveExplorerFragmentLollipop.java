@@ -304,7 +304,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
-		cancelButton.setText(R.string.general_cancel);
+		cancelButton.setText(StringResourcesUtils.getString(R.string.general_cancel));
 		fabSelect = v.findViewById(R.id.fab_select);
 		fabSelect.setOnClickListener(this);
 
@@ -359,7 +359,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		switch (modeCloud) {
 			case FileExplorerActivityLollipop.MOVE:
-				optionButton.setText(R.string.context_move);
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_move));
 
 				MegaNode parentMove= ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
@@ -369,22 +369,22 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.COPY:
-				optionButton.setText(R.string.context_copy);
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_copy));
 
 				MegaNode parentCopy = ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentCopy == null || parentCopy.getHandle() != parentHandle);
 				break;
 
 			case FileExplorerActivityLollipop.UPLOAD:
-				optionButton.setText(R.string.context_upload);
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_upload));
 				break;
 
 			case FileExplorerActivityLollipop.IMPORT:
-				optionButton.setText(R.string.add_to_cloud);
+				optionButton.setText(StringResourcesUtils.getString(R.string.add_to_cloud));
 				break;
 
 			case FileExplorerActivityLollipop.SAVE:
-				optionButton.setText(R.string.save_action);
+				optionButton.setText(StringResourcesUtils.getString(R.string.save_action));
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
@@ -393,7 +393,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				//No break; needed: the text should be set with SELECT mode
 
 			default:
-				optionButton.setText(R.string.general_select);
+				optionButton.setText(StringResourcesUtils.getString(R.string.general_select));
 				break;
 		}
 
