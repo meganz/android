@@ -337,14 +337,16 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             viewModel.onContentTextRead().observe(this, { contentRead ->
                 readingContent = false
                 binding.fileEditorScrollView.isVisible = true
-                binding.progressBar.isVisible = false
+                binding.loadingImage.isVisible = false
+                binding.loadingProgressBar.isVisible = false
                 binding.editFab.isVisible = viewModel.isEditableAdapter()
                 binding.editText.setText(contentRead)
             })
 
             readingContent = true
             binding.fileEditorScrollView.isVisible = false
-            binding.progressBar.isVisible = true
+            binding.loadingImage.isVisible = true
+            binding.loadingProgressBar.isVisible = true
             viewModel.readFileContent(mi)
         } else {
             binding.editText.apply {
