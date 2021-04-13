@@ -86,7 +86,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null || BROADCAST_ACTION_TEXT_FILE_UPLOADED != intent.action) return
 
-            finishCompletedEdition(intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong()))
+            finishCompletedCreationOrEdition(intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong()))
         }
     }
 
@@ -106,7 +106,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         viewModel.setValuesFromIntent(intent, savedInstanceState)
         setUpTextFileName()
-        setUpTextView(savedInstanceState)
+        setUpContentTextView(savedInstanceState)
         setUpEditFAB()
 
         if (savedInstanceState != null) {
@@ -127,8 +127,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(MODE, viewModel.getMode())
         outState.putString(CONTENT_TEXT, viewModel.getContentText())
-        outState.putString(MODIFIED_TEXT, binding.editText.text.toString())
-        outState.putInt(CURSOR_POSITION, binding.editText.selectionStart)
+        outState.putString(MODIFIED_TEXT, binding.contentText.text.toString())
+        outState.putInt(CURSOR_POSITION, binding.contentText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
         outState.putString(SAVING_MODE, savingMode)
@@ -174,7 +174,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.action_save -> saveFile()
-            R.id.action_download -> downloadFile(nodeSaver)
+            R.id.action_download -> downloadFile()
             R.id.action_get_link, R.id.action_remove_link -> manageLink()
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
             R.id.action_share -> share()
@@ -226,6 +226,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         return super.onCreateOptionsMenu(menu)
     }
 
+    /**
+     * Sets the right Toolbar options depending on current situation.
+     */
     private fun refreshMenuOptionsVisibility() {
         val menu = this.menu ?: return
 
@@ -314,6 +317,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Sets the name of the file in the corresponding view:
+     *  - On footer if is on VIEW_MODE
+     *  - On Toolbar if is on CREATE_MODE or EDIT_MODE
+     */
     private fun setUpTextFileName() {
         if (viewModel.isViewMode()) {
             supportActionBar?.title = null
@@ -328,9 +336,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
-    private fun setUpTextView(savedInstanceState: Bundle?) {
+    /**
+     * Sets the initial state of content text view.
+     * Asks for the content text and sets it when read.
+     *
+     * @param savedInstanceState Uses it to set the content text if available.
+     */
+    private fun setUpContentTextView(savedInstanceState: Bundle?) {
         if (viewModel.isViewMode()) {
-            binding.editText.apply {
+            binding.contentText.apply {
                 isEnabled = false
 
                 if (savedInstanceState != null && viewModel.getContentText() != null) {
@@ -348,7 +362,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 binding.loadingImage.isVisible = false
                 binding.loadingProgressBar.isVisible = false
                 binding.editFab.isVisible = viewModel.isEditableAdapter()
-                binding.editText.setText(contentRead)
+                binding.contentText.setText(contentRead)
             })
 
             readingContent = true
@@ -357,7 +371,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             binding.loadingProgressBar.isVisible = true
             viewModel.readFileContent(mi)
         } else {
-            binding.editText.apply {
+            binding.contentText.apply {
                 isEnabled = true
 
                 if (savedInstanceState != null) {
@@ -370,6 +384,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Sets the initial state of edit fab button.
+     */
     private fun setUpEditFAB() {
         binding.editFab.apply {
             isVisible = viewModel.isViewMode() && viewModel.isEditableAdapter() && !readingContent
@@ -382,9 +399,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Checks if the content of the file has been modified.
+     *
+     * @return True if the content has been modified, false otherwise.
+     */
     private fun isFileEdited(): Boolean =
-        viewModel.getContentText() != binding.editText.text.toString()
+        viewModel.getContentText() != binding.contentText.text.toString()
 
+    /**
+     * Shows a confirmation dialog before discard text changes.
+     */
     private fun showDiscardChangesConfirmationDialog() {
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
@@ -402,14 +427,22 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         discardChangesDialog!!.show()
     }
 
+    /**
+     * Checks if the confirmation dialog to discard text changes is shown.
+     *
+     * @return True if the dialog is shown, false otherwise.
+     */
     private fun isDiscardChangesConfirmationDialogShown(): Boolean =
         discardChangesDialog?.isShowing ?: false
 
+    /**
+     * Starts the save process and updates the UI to show the saving state.
+     */
     private fun saveFile() {
         if (isFileEdited()) {
             savingMode = viewModel.getMode()
 
-            if (viewModel.saveFile(binding.editText.text.toString())) {
+            if (viewModel.saveFile(binding.contentText.text.toString())) {
                 setViewMode(false)
                 binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
             } else {
@@ -421,7 +454,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
-    private fun downloadFile(nodeSaver: NodeSaver) {
+    /**
+     * Manages the download action.
+     */
+    private fun downloadFile() {
         when (viewModel.getAdapterType()) {
             OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(viewModel.getNode()!!.handle, true)
             ZIP_ADAPTER -> nodeSaver.saveUri(
@@ -444,6 +480,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Manages the get or remove link action depending on if the node is already exported or not.
+     */
     private fun manageLink() {
         if (showTakenDownNodeActionNotAvailableDialog(viewModel.getNode(), this)) {
             return
@@ -460,6 +499,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Manages the share action.
+     */
     private fun share() {
         when (viewModel.getAdapterType()) {
             OFFLINE_ADAPTER, ZIP_ADAPTER -> shareUri(
@@ -472,11 +514,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
+    /**
+     * Updates the UI after finish the export action (get or remove link).
+     */
     private fun finishExportAction() {
         viewModel.updateNode()
         refreshMenuOptionsVisibility()
     }
 
+    /**
+     * Manages the rename action.
+     */
     private fun renameNode() {
         renameDialog =
             showRenameNodeDialog(this, viewModel.getNode()!!, this, object : ActionNodeCallback {
@@ -486,25 +534,41 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             })
     }
 
+    /**
+     * Checks if the rename dialog is shown.
+     *
+     * @return True if the dialog is shown, false otherwise.
+     */
     private fun isRenameDialogShown(): Boolean = renameDialog?.isShowing ?: false
 
+    /**
+     * Manages the import node action.
+     */
     private fun importNode() {
         val intent = Intent(this, FileExplorerActivityLollipop::class.java)
         intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
     }
 
+    /**
+     * Sets the view mode.
+     *
+     * @param fabVisible True if the edit fab should be visible, false otherwise.
+     */
     private fun setViewMode(fabVisible: Boolean) {
         viewModel.setViewMode()
         if (fabVisible) binding.editFab.show()
         updateUIAfterChangeMode()
     }
 
+    /**
+     * Updates the UI after change from one mode to another new one.
+     */
     private fun updateUIAfterChangeMode() {
         refreshMenuOptionsVisibility()
         setUpTextFileName()
 
-        binding.editText.apply {
+        binding.contentText.apply {
             isEnabled = !viewModel.isViewMode()
 
             if (!viewModel.isViewMode()) {
@@ -513,7 +577,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         }
     }
 
-    private fun finishCompletedEdition(completedTransferId: Long) {
+    /**
+     * Updates the UI after creation or edition finishes.
+     *
+     * @param completedTransferId The completed transfer identifier on DB.
+     */
+    private fun finishCompletedCreationOrEdition(completedTransferId: Long) {
         if (completedTransferId == INVALID_ID.toLong()) {
             logWarning("Invalid completedTransferId")
             return
@@ -535,7 +604,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.setContentText(binding.editText.text.toString())
+        viewModel.setContentText(binding.contentText.text.toString())
         viewModel.updateNode(completedTransfer.nodeHandle.toLong())
         binding.nameText.text = viewModel.getFileName()
         binding.editFab.apply {
@@ -561,6 +630,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         savingMode = null
     }
 
+    /**
+     * Updates the UI and warns about a failure on creation or edition of the file.
+     */
     private fun createOrEditActionFailed() {
         viewModel.setEditMode()
         updateUIAfterChangeMode()

@@ -22,7 +22,7 @@
         app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
 
         <EditText
-            android:id="@+id/edit_text"
+            android:id="@+id/content_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
