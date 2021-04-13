@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA خمسين غيغابايت (GB 50) كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I  برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -> تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-> التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -> إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -> تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android\n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA خمسين غيغابايت (GB 50) كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I  برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -&gt; تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-&gt; التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -&gt; إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -&gt; تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android\n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA هو تخزين سحابي مزود بخصوصية دائمة قوية</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">برو لايت</string>
@@ -367,7 +367,7 @@
     </plurals>
 
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">تغيير الاسم</string>
-    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">أعادة التسمية %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">فتح الرابط</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">فتح</string>
     <string name="context_renaming" context="while renaming a file or folder">جاري اعادة التسمية</string>
@@ -1736,14 +1736,14 @@
     <string name="label_set_day" context="title of a Search by date tag">حدد يوم</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">التاريخ المختار غير متوفر</string>
 
-    <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">عناصر غير مسموحة</string>
-    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">اسم غير صالح</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">صحح أسماء الملفات قبل المتابعة</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">عناصر غير صالحة</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">قم بتسمية ملفك قبل المتابعة</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">قم بتسمية ملفاتك قبل المتابعة</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">ملف صوتي</string>
@@ -2090,7 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">استعراض المحتوى</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">الملف غير محمل و لا يمكن القيام بعرض الملف</string>
-    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">غير قادر على فتح ملف.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">لم نتمكن من فتح الملف بسبب عدم وجود اتصال بالشبكة.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">الملف موجود ضمن الملفات المخزنة دون الاتصال بالإنترنت</string>
 
@@ -2219,7 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">رسالة</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">فيديو</string>
 
-    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">إرسال الرابط إلى&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">ارسل الى&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">ترفيع الى&#8230;</string>
 
@@ -2988,19 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">بنفسجي</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">رصاصي</string>
 
-    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Will play in the background</string>
-    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Will not play in the background</string>
-    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now playing</string>
-    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now playing (paused)</string>
-    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">سيتم التشغيل في خلفية التطبيق</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">لن يتم التشغيل في خلفية التطبيق</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">التشغيل الحالي</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">التشغيل الآن (متوقف مؤقتاً)</string>
+    <string name="audio_track_info" context="Title of the song info screen">معلومات التسجيل الموسيقي</string>
 
     <string name="action_more_information" context="Action to get more information">معلومات اكثر</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">سياسة ملفات تعريف الارتباط Cookie</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">إعدادات ملفات تعريف الارتباط Cookie</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">قبل أن تقوم بالمتابعة</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">نستخدم التخزين المحلي والتقنيات المماثلة (”ملفات تعريف الارتباط”) لتقديم خدماتنا لك، وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط في إعدادات ملفات تعريف الارتباط. اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط الخاصة بنا[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">إعدادات ملفات تعريف الارتباط Cookie غير محفوظة</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">تم حفظ تغييرات إعدادات ملفات تعريف الارتباط Cookie.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">ملفات تعريف الارتباط Cookie لطرف ثالث</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">ملفات تعريف ارتباط Cookies إعلانات غوغل Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">التصنيف: ملفات تعريف الارتباط Cookies الإعلانية</string>
@@ -3030,5 +3030,5 @@
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">افتراضي النظام</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">اضبط حسب موفر البطارية</string>
 
-    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">الرجاء تحديد جذر بطاقة الذاكرة SD.</string>
 </resources>
