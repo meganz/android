@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -32,8 +31,6 @@ import android.widget.RelativeLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.jetbrains.annotations.NotNull;
-
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -41,18 +38,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
-import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -60,6 +52,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -241,9 +234,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
 
-//        if (Util.readAppLaunchedTime(this) <= 1) {
+        if (Util.readAppLaunchedTime(this) <= 1) {
             checkClipboardMeetingLink();
-//        }
+        }
     }
 
     private void checkClipboardMeetingLink() {
@@ -256,7 +249,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             String meetingLink = extractMeetingLink();
             if (TextUtil.isTextEmpty(meetingLink)) return;
 
-            // TODO: Either make use of OpenLinkActivity or own code to process the meeting link
+            // TODO: +Meeting, Either make use of OpenLinkActivity or own code to process the meeting link
             // Should talk to UI designer
             startOpenLinkActivity(meetingLink);
 //            if (TextUtil.isTextEmpty(meetingLink) || !initMegaChat()) return;
@@ -311,15 +304,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     }
 
     private void startJoinMeeting(String meetingLink) {
-        Intent joinMeetingLinkIntent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
-        joinMeetingLinkIntent.setAction(Constants.ACTION_JOIN_MEETING);
-        joinMeetingLinkIntent.setData(Uri.parse(meetingLink));
-        joinMeetingLinkIntent.putExtra(
-                MeetingActivity.MEETING_TYPE,
-                MeetingActivity.MEETING_TYPE_JOIN
-        );
+        Intent intent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
+        intent.setData(Uri.parse(meetingLink));
+        intent.setAction(MEETING_ACTION_GUEST);
 
-        startActivity(joinMeetingLinkIntent);
+        startActivity(intent);
     }
 
     @Override

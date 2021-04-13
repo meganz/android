@@ -208,7 +208,6 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
-import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -277,9 +276,8 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -8956,9 +8954,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 //		startActivity(openChatLinkIntent);
 
 		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
-		joinMeetingLinkIntent.setAction(ACTION_JOIN_MEETING);
 		joinMeetingLinkIntent.setData(Uri.parse(link));
-		joinMeetingLinkIntent.putExtra(MEETING_TYPE, MEETING_TYPE_JOIN);
+		joinMeetingLinkIntent.setAction(MEETING_ACTION_JOIN);
 		startActivity(joinMeetingLinkIntent);
 
 		drawerItem = DrawerItem.CHAT;
@@ -9506,7 +9503,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	@Override
 	public void onCreateMeeting() {
 		Intent meetingIntent = new Intent(this, MeetingActivity.class);
-		meetingIntent.putExtra("meetingType", MEETING_TYPE_CREATE);
+		meetingIntent.setAction(MEETING_ACTION_CREATE);
 		startActivity(meetingIntent);
 	}
 
@@ -12204,7 +12201,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					logError("ERROR WHEN ARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_archive_chat, chatTitle), -1);
 				}
-				else{
+				else{ACTION_OPEN_CHAT_LINK
 					logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
 				}
@@ -12231,11 +12228,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 			}
 		}
-		// TODO: Meeting project, Join meeting from here
-//		else if (request.getType() == MegaChatRequest.TYPE_JOIN_MEETING) {
-//showChatLink(request.getLink());
-//				dismissOpenLinkDialog();
-//		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: " + request.getFlag());

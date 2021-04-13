@@ -230,7 +230,6 @@ public class Constants {
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
-    public static final String ACTION_JOIN_MEETING = "JOIN_MEETING";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
     public static final String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";

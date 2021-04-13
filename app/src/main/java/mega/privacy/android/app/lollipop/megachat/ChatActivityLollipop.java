@@ -188,8 +188,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -2571,7 +2570,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
                 if(chatRoom.isGroup()){
                     // In a group, directly enter meeting room
-                    onCreateMeeting(MEETING_TYPE_IN);
+                    onCreateMeeting(MEETING_ACTION_IN);
                     break;
                 }
                 startVideo = true;
@@ -2639,7 +2638,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private void onCreateMeeting(String meetingType) {
         Intent meetingIntent = new Intent(this, MeetingActivity.class);
-        meetingIntent.putExtra("meetingType", meetingType);
+        meetingIntent.setAction(meetingType);
         startActivity(meetingIntent);
     }
     /*

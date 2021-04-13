@@ -77,6 +77,7 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
             meetingLink = linkEdit.text.toString()
 
             if (validateLink(meetingLink)) {
+                // TODO: +Meeting, use open link activity or self logic to process the link?
 //                initMegaChat { checkMeetingLink() }
                 startOpenLinkActivity()
             }
@@ -169,15 +170,11 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
         })
 
     private fun startJoinMeeting(meetingLink: String) {
-        val joinMeetingLinkIntent = Intent(requireContext(), MeetingActivity::class.java)
-        joinMeetingLinkIntent.action = Constants.ACTION_JOIN_MEETING
-        joinMeetingLinkIntent.data = Uri.parse(meetingLink)
-        joinMeetingLinkIntent.putExtra(
-            MeetingActivity.MEETING_TYPE,
-            MeetingActivity.MEETING_TYPE_JOIN
-        )
+        val intent = Intent(requireContext(), MeetingActivity::class.java)
+        intent.data = Uri.parse(meetingLink)
+        intent.action = MeetingActivity.MEETING_ACTION_GUEST
 
-        startActivity(joinMeetingLinkIntent)
+        startActivity(intent)
     }
 
     private fun showError(errorStringId: Int) {

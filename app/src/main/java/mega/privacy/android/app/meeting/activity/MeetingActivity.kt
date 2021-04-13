@@ -25,18 +25,17 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.MEETING_LINK
 import mega.privacy.android.app.utils.FileUtil
 
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     companion object {
-        const val MEETING_TYPE = "meetingType"
-        const val MEETING_TYPE_JOIN = "join_meeting"
-        const val MEETING_TYPE_CREATE = "create_meeting"
-        const val MEETING_TYPE_GUEST = "join_meeting_as_guest"
-        const val MEETING_TYPE_IN = "in_meeting"
+//        const val MEETING_TYPE = "meetingType"
+        const val MEETING_ACTION_JOIN = "join_meeting"
+        const val MEETING_ACTION_CREATE = "create_meeting"
+        const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
+        const val MEETING_ACTION_IN = "in_meeting"
 
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
@@ -79,11 +78,11 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val meetType = intent.getStringExtra(MEETING_TYPE)
+        val meetAction = intent.action
 
         initReceiver()
-        initActionBar(meetType)
-        initNavigation(meetType)
+        initActionBar(meetAction)
+        initNavigation(meetAction)
 
         if (savedInstanceState == null) {
 //            val navHostFragment =
@@ -146,28 +145,27 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     /**
      * Initialize Action Bar and set icon according to param
      *
-     * @param meetType Create Meeting or Join Meeting
+     * @param meetAction Create Meeting or Join Meeting
      */
-    private fun initActionBar(meetType: String?) {
+    private fun initActionBar(meetAction: String?) {
         setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setTitle("")
+        actionBar.title = ""
 
-        when (meetType) {
-            MEETING_TYPE_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
-            MEETING_TYPE_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+        when (meetAction) {
+            MEETING_ACTION_JOIN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            MEETING_ACTION_CREATE -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
         }
-
     }
 
     /**
      * Initialize Navigation and set startDestination according to param
      *
-     * @param meetType Create Meeting or Join Meeting
+     * @param meetAction Create Meeting or Join Meeting
      */
-    private fun initNavigation(meetType: String?) {
+    private fun initNavigation(meetAction: String?) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
@@ -176,14 +174,14 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         val bundle = Bundle()
 
-        when (meetType) {
-            MEETING_TYPE_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
-            MEETING_TYPE_JOIN -> {
+        when (meetAction) {
+            MEETING_ACTION_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
+            MEETING_ACTION_JOIN -> {
                 bundle.putString(MEETING_LINK, intent.dataString)
                 navGraph.startDestination = R.id.joinMeetingFragment
             }
-            MEETING_TYPE_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
-            MEETING_TYPE_IN -> navGraph.startDestination = R.id.inMeeting
+            MEETING_ACTION_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
+            MEETING_ACTION_IN -> navGraph.startDestination = R.id.inMeeting
             else -> navGraph.startDestination = R.id.createMeetingFragment
         }
 
