@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -45,6 +44,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -106,6 +106,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -144,6 +145,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	DatabaseHandler dbH;
 	@Inject
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -315,7 +318,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("END logout sdk request - wait chat logout");
@@ -349,8 +352,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
-					//Login transfers resumption
-					TransfersManagement.enableTransfersResumption();
+					// Init CU sync data after login successfully
+					initCuSync();
+
+					//Login check resumed pending transfers
+					TransfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -751,8 +757,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
         passcodeManagement = new PasscodeManagement(null, 0, true);
         chatManagement = new ChatManagement();
 
-		//Logout transfers resumption
-		TransfersManagement.enableTransfersResumption();
+		//Logout check resumed pending transfers
+		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1210,6 +1216,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+
+			sortOrderManagement.resetDefaults();
 
 			try{
 				if (megaChatApi != null){

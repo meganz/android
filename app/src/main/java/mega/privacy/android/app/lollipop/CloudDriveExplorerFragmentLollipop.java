@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -50,6 +53,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
@@ -67,8 +71,12 @@ import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
 		OnClickListener, CheckScrollInterface {
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -871,11 +879,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context,
-				this,
-				s,
-				-1,
-				nodes);
+		searchNodesTask = new SearchNodesTask(context, this, s, INVALID_HANDLE, nodes, sortOrderManagement);
 		searchNodesTask.execute();
 	}
 

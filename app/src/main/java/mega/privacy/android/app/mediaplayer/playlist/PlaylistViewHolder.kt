@@ -8,5 +8,5 @@ import androidx.recyclerview.widget.RecyclerView
  */
 abstract class PlaylistViewHolder(binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    abstract fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation)
+    abstract fun bind(paused: Boolean, item: PlaylistItem, itemOperation: PlaylistItemOperation)
 }
