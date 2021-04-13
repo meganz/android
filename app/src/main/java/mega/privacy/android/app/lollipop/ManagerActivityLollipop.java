@@ -1103,11 +1103,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_RECONNECTING:
-					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 						updateVisibleCallElements(chatIdReceived);

@@ -79,7 +79,7 @@ public class IncomingCallNotification {
         Intent intent = new Intent(context, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(CHAT_ID, callToLaunch.getChatid());
-        intent.putExtra(CALL_ID, callToLaunch.getId());
+        intent.putExtra(CALL_ID, callToLaunch.getCallId());
         @NoMeaning int i = 0;
         PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);

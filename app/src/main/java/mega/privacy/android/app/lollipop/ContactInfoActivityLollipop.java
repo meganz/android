@@ -315,15 +315,10 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_RECONNECTING:
-					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						if (MegaApplication.getCallLayoutStatus(chatIdReceived)) {
-							checkScreenRotationToShowCall();
-						}
+						checkScreenRotationToShowCall();
 						break;
 				}
 			}
@@ -2145,7 +2140,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		addChecksForACall(chatRoom.getChatId(), startVideo);
-		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true,this);
 		MegaApplication.setIsWaitingForCall(false);
 	}
 
