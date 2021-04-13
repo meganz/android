@@ -6637,7 +6637,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		} else if (!searchExpand) {
 			if (isOnline(this)) {
 				if (fullscreenOfflineFragment.getItemCount() > 0
-						&& !fullscreenOfflineFragment.searchMode()) {
+						&& !fullscreenOfflineFragment.searchMode() && searchMenuItem != null) {
 					searchMenuItem.setVisible(true);
 				}
 			} else {
