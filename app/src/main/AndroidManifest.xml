@@ -499,6 +499,11 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.contacts.ContactsActivity"
+            android:label="@string/section_contacts"
+            android:launchMode="singleTop" />
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
