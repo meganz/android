@@ -11,6 +11,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -26,16 +27,13 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CONTENT_TEXT
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -50,17 +48,14 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 
 @AndroidEntryPoint
 class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
-        const val MODIFIED_TEXT = "MODIFIED_TEXT"
         const val CURSOR_POSITION = "CURSOR_POSITION"
         const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         const val RENAME_SHOWN = "RENAME_SHOWN"
-        const val SAVING_MODE = "SAVING_MODE"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
     }
 
@@ -71,7 +66,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var menu: Menu? = null
 
     private var readingContent = false
-    private var savingMode: String? = null
 
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
@@ -86,7 +80,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null || BROADCAST_ACTION_TEXT_FILE_UPLOADED != intent.action) return
 
-            finishCompletedCreationOrEdition(intent.getLongExtra(COMPLETED_TRANSFER, INVALID_ID.toLong()))
+            viewModel.finishCreationOrEdition(
+                intent.getLongExtra(
+                    COMPLETED_TRANSFER,
+                    INVALID_ID.toLong()
+                )
+            )
         }
     }
 
@@ -104,15 +103,16 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.setValuesFromIntent(intent, savedInstanceState)
-        setUpTextFileName()
-        setUpContentTextView(savedInstanceState)
-        setUpEditFAB()
+        if (savedInstanceState == null) {
+            viewModel.setValuesFromIntent(intent)
+        }
+
+        setUpObservers()
+        setUpView(savedInstanceState)
 
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
             nodeSaver.restoreState(savedInstanceState)
-            savingMode = savedInstanceState.getString(SAVING_MODE)
 
             if (savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)) {
                 showDiscardChangesConfirmationDialog()
@@ -125,13 +125,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(MODE, viewModel.getMode())
-        outState.putString(CONTENT_TEXT, viewModel.getContentText())
-        outState.putString(MODIFIED_TEXT, binding.contentText.text.toString())
         outState.putInt(CURSOR_POSITION, binding.contentText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
-        outState.putString(SAVING_MODE, savingMode)
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
@@ -163,7 +159,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onBackPressed() {
-        if (isFileEdited()) {
+        if (viewModel.isFileEdited()) {
             showDiscardChangesConfirmationDialog()
         } else {
             super.onBackPressed()
@@ -173,7 +169,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
-            R.id.action_save -> saveFile()
+            R.id.action_save -> {
+                viewModel.onCreationOrEditionFinished().observe(this, ::showCreationOrEditionResult)
+                viewModel.saveFile(this)
+            }
             R.id.action_download -> downloadFile()
             R.id.action_get_link, R.id.action_remove_link -> manageLink()
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
@@ -318,94 +317,163 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Sets the name of the file in the corresponding view:
-     *  - On footer if is on VIEW_MODE
-     *  - On Toolbar if is on CREATE_MODE or EDIT_MODE
+     * Sets the initial state of view and asks for the content text.
+     *
+     * @param savedInstanceState Saved state if available.
      */
-    private fun setUpTextFileName() {
-        if (viewModel.isViewMode()) {
-            supportActionBar?.title = null
-
-            binding.nameText.apply {
-                isVisible = true
-                text = viewModel.getFileName()
+    private fun setUpView(savedInstanceState: Bundle?) {
+        binding.contentText.apply {
+            doAfterTextChanged { editable ->
+                viewModel.setEditedText(editable?.toString())
             }
-        } else {
-            supportActionBar?.title = viewModel.getFileName()
-            binding.nameText.isVisible = false
+
+            if (savedInstanceState != null) {
+                setText(viewModel.getEditedText())
+                setSelection(savedInstanceState.getInt(CURSOR_POSITION))
+            }
+        }
+
+        binding.editFab.setOnClickListener {
+            viewModel.setEditMode()
         }
     }
 
-    /**
-     * Sets the initial state of content text view.
-     * Asks for the content text and sets it when read.
-     *
-     * @param savedInstanceState Uses it to set the content text if available.
-     */
-    private fun setUpContentTextView(savedInstanceState: Bundle?) {
-        if (viewModel.isViewMode()) {
-            binding.contentText.apply {
-                isEnabled = false
+    private fun setUpObservers() {
+        viewModel.isEditableAdapter().observe(this, ::showEditable)
+        viewModel.getFileName().observe(this, ::showFileName)
+        viewModel.getMode().observe(this, ::showMode)
+        viewModel.onSavingMode().observe(this, ::showSavingMode)
+        viewModel.onContentTextRead().observe(this, ::showContentRead)
+    }
 
-                if (savedInstanceState != null && viewModel.getContentText() != null) {
-                    setText(viewModel.getContentText())
-                    return
-                }
+    /**
+     * Updates the UI depending on the current mode.
+     *
+     * @param mode Current mode.
+     */
+    private fun showMode(mode: String) {
+        refreshMenuOptionsVisibility()
+
+        if (mode == VIEW_MODE) {
+            if (binding.contentText.text.isEmpty()) {
+                val mi = ActivityManager.MemoryInfo()
+                (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+                readingContent = true
+                viewModel.readFileContent(mi)
+                binding.fileEditorScrollView.isVisible = false
+                binding.loadingImage.isVisible = true
+                binding.loadingProgressBar.isVisible = true
             }
 
-            val mi = ActivityManager.MemoryInfo()
-            (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+            supportActionBar?.title = null
+            binding.nameText.isVisible = true
+            binding.contentText.isEnabled = false
 
-            viewModel.onContentTextRead().observe(this, { contentRead ->
-                readingContent = false
-                binding.fileEditorScrollView.isVisible = true
-                binding.loadingImage.isVisible = false
-                binding.loadingProgressBar.isVisible = false
-                binding.editFab.isVisible = viewModel.isEditableAdapter()
-                binding.contentText.setText(contentRead)
-            })
-
-            readingContent = true
-            binding.fileEditorScrollView.isVisible = false
-            binding.loadingImage.isVisible = true
-            binding.loadingProgressBar.isVisible = true
-            viewModel.readFileContent(mi)
+            if (!readingContent && !viewModel.isSavingMode()) {
+                binding.editFab.show()
+            }
         } else {
+            supportActionBar?.title = viewModel.getNameOfFile()
+            binding.nameText.isVisible = false
+
             binding.contentText.apply {
                 isEnabled = true
-
-                if (savedInstanceState != null) {
-                    setText(savedInstanceState.getString(MODIFIED_TEXT))
-                    setSelection(savedInstanceState.getInt(CURSOR_POSITION))
-                }
-
                 showKeyboardDelayed(this)
             }
+
+            binding.editFab.hide()
         }
     }
 
     /**
-     * Sets the initial state of edit fab button.
+     * Updates the UI by setting the saving mode.
+     *
+     * @param savingMode The pre-saving mode.
      */
-    private fun setUpEditFAB() {
-        binding.editFab.apply {
-            isVisible = viewModel.isViewMode() && viewModel.isEditableAdapter() && !readingContent
+    private fun showSavingMode(savingMode: String?) {
+        if (savingMode != null) {
+            binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
+        }
+    }
 
-            setOnClickListener {
-                viewModel.setEditMode()
-                this.hide()
-                updateUIAfterChangeMode()
+    /**
+     * Shows the file name.
+     *
+     * @param name File name.
+     */
+    private fun showFileName(name: String) {
+        supportActionBar?.title = name
+        binding.nameText.text = name
+    }
+
+    /**
+     * Updates the UI and shows the read content.
+     *
+     * @param contentRead Read content.
+     */
+    private fun showContentRead(contentRead: String) {
+        readingContent = false
+        binding.fileEditorScrollView.isVisible = true
+        binding.loadingImage.isVisible = false
+        binding.loadingProgressBar.isVisible = false
+        binding.contentText.setText(contentRead)
+
+        if (viewModel.isViewMode()) {
+            binding.editFab.show()
+        }
+    }
+
+    /**
+     * Sets the fab visibility depending on current adapter.
+     *
+     * @param editableAdapter True if is an editable adapter, false otherwise.
+     */
+    private fun showEditable(editableAdapter: Boolean) {
+        binding.editFab.apply {
+            if (editableAdapter && !readingContent && viewModel.isViewMode()) {
+                show()
+            } else {
+                hide()
             }
         }
     }
 
     /**
-     * Checks if the content of the file has been modified.
+     * Shows the result of a create or edit action.
      *
-     * @return True if the content has been modified, false otherwise.
+     * @param success True if the action finished with success, false otherwise.
      */
-    private fun isFileEdited(): Boolean =
-        viewModel.getContentText() != binding.contentText.text.toString()
+    private fun showCreationOrEditionResult(success: Boolean) {
+        if (success) {
+            binding.nameText.apply {
+                isVisible = true
+                text = viewModel.getNameOfFile()
+            }
+
+            binding.editFab.apply {
+                //Necessary to call hide first to avoid not being shown because the view doesn't exist yet
+                hide()
+                show()
+            }
+        }
+
+        showSnackbar(
+            when {
+                viewModel.isSavingModeEdit() -> StringResourcesUtils.getString(if (success) R.string.file_updated else R.string.file_update_failed)
+                intent.getBooleanExtra(
+                    FROM_HOME_PAGE,
+                    false
+                ) -> StringResourcesUtils.getString(
+                    if (success) R.string.file_saved_to else R.string.file_saved_to_failed,
+                    StringResourcesUtils.getString(R.string.section_cloud_drive)
+                )
+                else -> StringResourcesUtils.getString(if (success) R.string.file_created else R.string.file_creation_failed)
+            }
+        )
+
+        viewModel.resetSavingMode()
+        viewModel.removeCreationOrEditionSuccessObservers(this)
+    }
 
     /**
      * Shows a confirmation dialog before discard text changes.
@@ -436,34 +504,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         discardChangesDialog?.isShowing ?: false
 
     /**
-     * Starts the save process and updates the UI to show the saving state.
-     */
-    private fun saveFile() {
-        if (isFileEdited()) {
-            savingMode = viewModel.getMode()
-
-            if (viewModel.saveFile(this, binding.contentText.text.toString())) {
-                setViewMode(false)
-                binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
-            } else {
-                createOrEditActionFailed()
-                savingMode = null
-            }
-        } else {
-            setViewMode(true)
-        }
-    }
-
-    /**
      * Manages the download action.
      */
     private fun downloadFile() {
         when (viewModel.getAdapterType()) {
             OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(viewModel.getNode()!!.handle, true)
             ZIP_ADAPTER -> nodeSaver.saveUri(
-                viewModel.getFileUri(),
-                viewModel.getFileName(),
-                viewModel.getFileSize(),
+                viewModel.getFileUri()!!,
+                viewModel.getNameOfFile(),
+                viewModel.getFileSize()!!,
                 true
             )
             FROM_CHAT -> nodeSaver.saveNode(
@@ -506,7 +555,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         when (viewModel.getAdapterType()) {
             OFFLINE_ADAPTER, ZIP_ADAPTER -> shareUri(
                 this,
-                viewModel.getFileName(),
+                viewModel.getNameOfFile(),
                 viewModel.getFileUri()
             )
             FILE_LINK_ADAPTER -> shareLink(this, intent.getStringExtra(URL_FILE_LINK))
@@ -548,108 +597,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         val intent = Intent(this, FileExplorerActivityLollipop::class.java)
         intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
-    }
-
-    /**
-     * Sets the view mode.
-     *
-     * @param fabVisible True if the edit fab should be visible, false otherwise.
-     */
-    private fun setViewMode(fabVisible: Boolean) {
-        viewModel.setViewMode()
-        if (fabVisible) binding.editFab.show()
-        updateUIAfterChangeMode()
-    }
-
-    /**
-     * Updates the UI after change from one mode to another new one.
-     */
-    private fun updateUIAfterChangeMode() {
-        refreshMenuOptionsVisibility()
-        setUpTextFileName()
-
-        binding.contentText.apply {
-            isEnabled = !viewModel.isViewMode()
-
-            if (!viewModel.isViewMode()) {
-                showKeyboardDelayed(this)
-            }
-        }
-    }
-
-    /**
-     * Updates the UI after creation or edition finishes.
-     *
-     * @param completedTransferId The completed transfer identifier on DB.
-     */
-    private fun finishCompletedCreationOrEdition(completedTransferId: Long) {
-        if (completedTransferId == INVALID_ID.toLong()) {
-            logWarning("Invalid completedTransferId")
-            return
-        }
-
-        val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
-        if (completedTransfer == null) {
-            logWarning("Invalid completedTransfer")
-            return
-        }
-
-        if (!viewModel.isSameNode(completedTransfer)) {
-            logWarning("Not the same file, no update needed.")
-            return
-        }
-
-        if (completedTransfer.state != STATE_COMPLETED) {
-            createOrEditActionFailed()
-            return
-        }
-
-        viewModel.setContentText(binding.contentText.text.toString())
-        viewModel.updateNode(completedTransfer.nodeHandle.toLong())
-        binding.nameText.text = viewModel.getFileName()
-        binding.editFab.apply {
-            //Necessary to call hide first to avoid not being shown because the view doesn't exist yet
-            hide()
-            show()
-        }
-
-        showSnackbar(
-            when {
-                savingMode == EDIT_MODE -> StringResourcesUtils.getString(R.string.file_updated)
-                intent.getBooleanExtra(
-                    FROM_HOME_PAGE,
-                    false
-                ) -> StringResourcesUtils.getString(
-                    R.string.file_saved_to,
-                    StringResourcesUtils.getString(R.string.section_cloud_drive)
-                )
-                else -> StringResourcesUtils.getString(R.string.file_created)
-            }
-        )
-
-        savingMode = null
-    }
-
-    /**
-     * Updates the UI and warns about a failure on creation or edition of the file.
-     */
-    private fun createOrEditActionFailed() {
-        viewModel.setEditMode()
-        updateUIAfterChangeMode()
-
-        showSnackbar(
-            when {
-                savingMode == EDIT_MODE -> StringResourcesUtils.getString(R.string.file_update_failed)
-                intent.getBooleanExtra(
-                    FROM_HOME_PAGE,
-                    false
-                ) -> StringResourcesUtils.getString(
-                    R.string.file_saved_to_failed,
-                    StringResourcesUtils.getString(R.string.section_cloud_drive)
-                )
-                else -> StringResourcesUtils.getString(R.string.file_creation_failed)
-            }
-        )
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
