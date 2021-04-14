@@ -492,10 +492,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		
 	}
 
-	private void sendBroadcastUpdateAccountDetails() {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
-		sendBroadcast(intent);
+	public void sendBroadcastUpdateAccountDetails() {
+		sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+				.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
 	}
 
 	private final int interval = 3000;
@@ -944,6 +943,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+
+		// Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+		final int DESIRABLE_R_LIMIT = 20000; // SDK team recommended value
+		int currentLimit = megaApi.platformGetRLimitNumFile();
+		logDebug("Current resource limit is set to " + currentLimit);
+		if (currentLimit < DESIRABLE_R_LIMIT) {
+			logDebug("Resource limit is under desirable value. Trying to increase the resource limit...");
+			if (!megaApi.platformSetRLimitNumFile(DESIRABLE_R_LIMIT)) {
+				logWarning("Error setting resource limit.");
+			}
+
+			// Check new resource limit after set it in order to see if had been set successfully to the
+			// desired value or maybe to a lower value limited by the system.
+			logDebug("Resource limit is set to " + megaApi.platformGetRLimitNumFile());
+		}
 	}
 
 	/**
@@ -1313,16 +1327,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
-	}
-
-	public void updateBusinessStatus() {
-		myAccountInfo.setBusinessStatusReceived(true);
-		int status = megaApi.getBusinessStatus();
-		if (status == BUSINESS_STATUS_EXPIRED
-				|| (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD)){
-			myAccountInfo.setShouldShowBusinessAlert(true);
-		}
-		sendBroadcastUpdateAccountDetails();
 	}
 
 	/**
@@ -1848,6 +1852,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
+	}
+
+	public void resetMyAccountInfo() {
+    	myAccountInfo = new MyAccountInfo();
 	}
 
 	public static boolean getSpeakerStatus(long chatId) {
