@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -112,39 +113,41 @@ object MegaNodeUtil {
     }
 
     /**
-     * Gets the root parent folder of a node.
+     * Gets the path of a folder.
      *
-     * @param node  MegaNode to get its root parent path
-     * @return The path of the root parent of the node.
+     * @param nodeFolder  MegaNode to get its path
+     * @return The path of the of the folder.
      */
     @JvmStatic
-    fun getParentFolderPath(node: MegaNode?): String {
-        if (node != null) {
-            val megaApi = MegaApplication.getInstance().megaApi
-            var rootParent = node
-
-            while (megaApi.getParentNode(rootParent) != null) {
-                rootParent = megaApi.getParentNode(rootParent)
-            }
-
-            val path = megaApi.getNodePath(rootParent)
-
-            when {
-                rootParent!!.handle == megaApi.rootNode.handle -> {
-                    return getString(R.string.section_cloud_drive) + path
-                }
-                rootParent.handle == megaApi.rubbishNode.handle -> {
-                    return getString(R.string.section_rubbish_bin) +
-                            path.replace("bin" + Constants.SEPARATOR, "")
-                }
-                rootParent.isInShare -> {
-                    return getString(R.string.title_incoming_shares_explorer) +
-                            Constants.SEPARATOR + path.substring(path.indexOf(":") + 1)
-                }
-            }
+    fun getNodeFolderPath(nodeFolder: MegaNode?): String {
+        if (nodeFolder == null) {
+            logWarning("Node is null, cannot get its path.")
+            return ""
         }
 
-        return ""
+        val megaApi = MegaApplication.getInstance().megaApi
+        val path = megaApi.getNodePath(nodeFolder)
+
+        var rootParent = nodeFolder
+
+        while (megaApi.getParentNode(rootParent) != null) {
+            rootParent = megaApi.getParentNode(rootParent)
+        }
+
+        return when {
+            rootParent!!.handle == megaApi.rootNode.handle -> {
+                return getString(R.string.section_cloud_drive) + path
+            }
+            rootParent.handle == megaApi.rubbishNode.handle -> {
+                return getString(R.string.section_rubbish_bin) +
+                        path.replace("bin$SEPARATOR", "")
+            }
+            nodeFolder.isInShare -> {
+                return getString(R.string.title_incoming_shares_explorer) +
+                        SEPARATOR + path.substring(path.indexOf(":") + 1)
+            }
+            else -> ""
+        }
     }
 
     /**
@@ -1127,6 +1130,36 @@ object MegaNodeUtil {
                 megaApi.copyNode(node, parent, listener)
             }
         }
+
+        return true
+    }
+
+    /**
+     * Handle activity result of REQUEST_CODE_SELECT_IMPORT_FOLDER.
+     *
+     * @param resultCode resultCode parameter of onActivityResult
+     * @param toHandle the copy target node handle
+     * @param node the node to copy
+     * @param snackbarShower interface to show snackbar
+     * @param activityLauncher interface to start activity
+     */
+    @JvmStatic
+    fun handleSelectFolderToImportResult(
+        resultCode: Int, toHandle: Long, node: MegaNode,
+        snackbarShower: SnackbarShower, activityLauncher: ActivityLauncher
+    ): Boolean {
+        if (resultCode != RESULT_OK) {
+            return false
+        }
+
+        val megaApp = MegaApplication.getInstance()
+        val megaApi = megaApp.megaApi
+
+        val parent = megaApi.getNodeByHandle(toHandle) ?: return false
+
+        megaApi.copyNode(
+            node, parent, CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        )
 
         return true
     }

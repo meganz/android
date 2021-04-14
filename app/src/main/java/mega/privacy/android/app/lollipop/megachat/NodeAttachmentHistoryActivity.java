@@ -879,7 +879,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                 case R.id.chat_cab_menu_offline: {
                     clearSelections();
                     hideMultipleSelect();
-                    chatC.saveForOfflineWithMessages(messagesSelected, megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOfflineWithMessages(messagesSelected,
+                            megaChatApi.getChatRoom(chatId), NodeAttachmentHistoryActivity.this);
                     break;
                 }
             }
