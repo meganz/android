@@ -90,6 +90,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.listeners.StartChatCallListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -213,7 +214,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener {
+        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -591,6 +592,11 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void leaveChatSuccess() {
         joiningOrLeaving = false;
+    }
+
+    @Override
+    public void OnCallStarted() {
+        openCall();
     }
 
     private class UserTyping {
@@ -3047,7 +3053,8 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
-                megaChatApi.startChatCall(idChat, startVideo, true, this);
+                logDebug("++++++++++++++++++++ startChatCall");
+                megaChatApi.startChatCall(idChat, startVideo, true, new StartChatCallListener(this, this, this));
             }
             return;
         }
@@ -3055,7 +3062,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         if (!participatingInACall()) {
             logDebug("There is not a call in this chat and I am NOT in another call");
             addChecksForACall(chatRoom.getChatId(), startVideo);
-            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, this);
+            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
         }else{
             logDebug("There is not a call in this chat and I am in another call");
         }
@@ -3670,7 +3677,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 addChecksForACall(callInThisChat, false);
                                 megaChatApi.answerChatCall(callInThisChat, false, true, ChatActivityLollipop.this);
                             } else {
-                                megaChatApi.startChatCall(idChat, false, true, ChatActivityLollipop.this);
+                                megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
                             }
                         }
                     }else{
@@ -7662,19 +7669,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                     addChecksForACall(chatRoom.getChatId(), false);
                     api.answerChatCall(idChat, false, true, this);
                 } else {
-                    api.startChatCall(idChat, false, true, this);
+                    api.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
                 }
             } else {
                 logError("ERROR WHEN TYPE_HANG_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
-            }
-
-        } else if (request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug(" The call has been started success");
-                openCall();
-            } else {
-                logError("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
             }
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
@@ -7700,7 +7698,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         addChecksForACall(chatRoom.getChatId(), false);
                         megaChatApi.answerChatCall(idChat, false, true, this);
                     } else {
-                        megaChatApi.startChatCall(idChat, false, true, this);
+                        megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
                     }
                 } else {
                     logError("Error putting the call on hold" + e.getErrorCode());

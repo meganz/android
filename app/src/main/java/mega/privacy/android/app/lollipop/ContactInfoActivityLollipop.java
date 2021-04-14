@@ -77,6 +77,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
+import mega.privacy.android.app.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -1770,16 +1771,6 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
 			}
 		}
-		else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("TYPE_START_CHAT_CALL finished with success");
-				//getFlag - Returns true if it is a video-audio call or false for audio call
-			}
-			else{
-				logDebug("ERROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
-			}
-		}
 	}
 
 	@Override
@@ -2140,7 +2131,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		addChecksForACall(chatRoom.getChatId(), startVideo);
-		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true,this);
+		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this));
 		MegaApplication.setIsWaitingForCall(false);
 	}
 

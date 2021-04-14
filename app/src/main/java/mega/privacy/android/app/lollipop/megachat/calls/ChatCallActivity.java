@@ -410,6 +410,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         createFullScreenFragment();
 
         if (callStatus == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && callChat.isRinging()) {
+            logDebug("Incoming call");
             displayLinearFAB(true);
             checkOutgoingOrIncomingCall();
             return;
@@ -417,8 +418,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         displayLinearFAB(false);
         if (isRequestSent(callChat.getCallId())) {
+            logDebug("Outgoing call");
             checkOutgoingOrIncomingCall();
         } else if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING) {
+            logDebug("In progress call");
             checkCurrentParticipants();
             updateSubTitle();
         }
@@ -500,6 +503,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("The call status is "+callStatusToString(callStatus)+".  Call id "+callChat);
                 if (callStatus != INVALID_CALL_STATUS) {
                     switch (callStatus) {
+                        case MegaChatCall.CALL_STATUS_CONNECTING:
+                            updateSubTitle();
+                            break;
+
                         case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                             checkInProgressCall();
                             break;
@@ -675,6 +682,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             logWarning("Toolbar is Null");
             return;
         }
+
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
@@ -855,15 +863,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         IntentFilter filterCall = new IntentFilter(ACTION_UPDATE_CALL);
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
+        filterCall.addAction(ACTION_CHANGE_RINGING_STATUS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
+        filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AUDIO_LEVEL);
         filterCall.addAction(ACTION_CHANGE_NETWORK_QUALITY);
-        filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         registerReceiver(chatCallUpdateReceiver, filterCall);
 
-        IntentFilter filterSession = new IntentFilter(ACTION_UPDATE_CALL);
-        filterSession.addAction(ACTION_SESSION_STATUS_UPDATE);
+        IntentFilter filterSession = new IntentFilter(ACTION_SESSION_STATUS_UPDATE);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
+        filterSession.addAction(ACTION_CHANGE_SESSION_SPEAK_REQUESTED);
+        filterSession.addAction(ACTION_CHANGE_SESSION_ON_HIRES);
+        filterSession.addAction(ACTION_CHANGE_SESSION_ON_LOWRES);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AUDIO_LEVEL);
         filterSession.addAction(ACTION_CHANGE_SESSION_ON_HOLD);
         registerReceiver(chatSessionUpdateReceiver, filterSession);
@@ -1103,11 +1114,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("Type: " + request.getType());
 
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
-            logDebug("TYPE_HANG_CHAT_CALL");
             if (getCall() == null)
                 return;
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                logDebug("Call hung up");
                 if(request.getChatHandle() == callChat.getCallId()){
                     app.setSpeakerStatus(callChat.getChatid(), false);
                     finishActivity();
@@ -1117,7 +1128,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     clearAnimations();
                 }
             } else {
-                logError("Error: TYPE_HANG_CHAT_CALL");
+                logError("Error when hanging up the call, "+e.getErrorCode());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
 
@@ -1200,10 +1211,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         reconnectingLayout.setAlpha(1);
     }
 
-    private void connectingCall() {
+    private void connectingOrOutgoingCall(boolean isConnecting) {
         subtitleToobar.setVisibility(View.VISIBLE);
         activateChrono(false, callInProgressChrono, callChat);
-        subtitleToobar.setText(getString(R.string.chat_connecting));
+        subtitleToobar.setText(getString(isConnecting ? R.string.chat_connecting: R.string.outgoing_call_starting));
     }
 
     private void updateInfoUsersBar(String text) {
@@ -1229,7 +1240,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @param isIncomingCall True, if the call is incoming and the arrows should be displayed. False, if not.
      */
     private void displayLinearFAB(boolean isIncomingCall) {
-        logDebug("displayLinearFAB");
         RelativeLayout.LayoutParams layoutParams;
         if (isIncomingCall) {
             layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -1292,6 +1302,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 } else {
                     app.setSpeakerStatus(callChat.getChatid(), true);
                 }
+
                 updateLocalSpeakerStatus();
                 sendSignalPresence();
                 break;
@@ -1316,7 +1327,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             case R.id.reject_fab:
             case R.id.hang_fab:
-                logDebug("Click on reject fab or hang fab");
                 chatIdToHang = chatId;
                 if(getCall() == null)
                     break;
@@ -1389,43 +1399,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             microFAB.hide();
             hangFAB.hide();
 
-//            if (callChat.hasVideoInitialCall()) {
-//                displayLinearFAB(true);
-//
-//                answerCallFAB.setOnClickListener(this);
-//                videoFAB.setOnClickListener(null);
-//                linearArrowVideo.setVisibility(View.VISIBLE);
-//
-//                videoFAB.startAnimation(shake);
-//
-//                animationAlphaArrows(fourArrowVideo);
-//                handlerArrow1 = new Handler();
-//                handlerArrow1.postDelayed(new Runnable() {
-//                    public void run() {
-//                        animationAlphaArrows(thirdArrowVideo);
-//                        handlerArrow2 = new Handler();
-//                        handlerArrow2.postDelayed(new Runnable() {
-//                            public void run() {
-//                                animationAlphaArrows(secondArrowVideo);
-//                                handlerArrow3 = new Handler();
-//                                handlerArrow3.postDelayed(new Runnable() {
-//                                    public void run() {
-//                                        animationAlphaArrows(firstArrowVideo);
-//                                    }
-//                                }, ARROW_ANIMATION);
-//                            }
-//                        }, ARROW_ANIMATION);
-//                    }
-//                }, ARROW_ANIMATION);
-//
-//                videoFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
-//                    public void onSwipeTop() {
-//                        videoFAB.clearAnimation();
-//                        animationButtons(true);
-//                    }
-//                });
-//
-//            } else {
                 displayLinearFAB(true);
 
                 linearArrowCall.setVisibility(View.VISIBLE);
@@ -1458,9 +1431,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         animationButtons(false);
                     }
                 });
-           // }
 
-        } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+        } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING) {
             rejectFAB.hide();
 
             if (!microFAB.isShown()) microFAB.show();
@@ -2222,27 +2194,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
                 break;
             }
+            case MegaChatCall.CALL_STATUS_CONNECTING:
+                connectingOrOutgoingCall(true);
+                break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                 if (chat.isGroup()) {
-                    boolean isInProgress = false;
-                    MegaHandleList listClientids = callChat.getSessionsClientid();
-                    for (int i = 0; i < listClientids.size(); i++) {
-                        MegaChatSession userSession = callChat.getMegaChatSession(listClientids.get(i));
-                        if (userSession != null && userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                            isInProgress = true;
-                            break;
-                        }
-                    }
-                    if (isInProgress) {
-                        logDebug("Session in progress");
+                    logDebug("Session in progress");
+                    if(isRequestSent(callChat.getCallId())){
+                        connectingOrOutgoingCall(false);
+                    }else{
                         subtitleToobar.setVisibility(View.GONE);
                         activateChrono(true, callInProgressChrono, callChat);
-                        return;
                     }
-
-                    logWarning("Error getting the session of the user or session not in progress");
-                    connectingCall();
                     return;
                 }
 
@@ -2251,15 +2215,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsClientid().get(0));
                 if (userSession == null) {
                     logWarning("User session is null");
-                    connectingCall();
+                    connectingOrOutgoingCall(true);
                     return;
                 }
 
-                if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+                if(isRequestSent(callChat.getCallId())){
+                    connectingOrOutgoingCall(false);
+                }else{
                     subtitleToobar.setVisibility(View.GONE);
                     activateChrono(true, callInProgressChrono, callChat);
-                    return;
                 }
+                return;
         }
 
         subtitleToobar.setVisibility(View.GONE);
@@ -2536,7 +2502,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @return True if it is. False if it is not.
      */
     private boolean statusCallInProgress(int callStatus) {
-        return callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS;
+        return callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING;
     }
 
     /**
@@ -2588,13 +2554,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void checkInProgressCall() {
         if (getCall() == null  || isRequestSent(callChat.getCallId()))
             return;
-
-        if (reconnectingLayout.isShown()) {
-            hideReconnecting();
-            checkCurrentParticipants();
-            updateSubTitle();
-            return;
-        }
 
         if (!chat.isGroup()) {
             createSmallFragment();

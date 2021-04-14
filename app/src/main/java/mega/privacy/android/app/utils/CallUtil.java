@@ -30,6 +30,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
@@ -873,7 +874,7 @@ public class CallUtil {
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
         if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, true, (MegaChatRequestListenerInterface) activity);
+            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, true, new StartChatCallListener(activity));
             MegaApplication.setIsWaitingForCall(false);
         }
     }
