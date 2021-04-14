@@ -943,6 +943,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+
+		// Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+		final int DESIRABLE_R_LIMIT = 20000; // SDK team recommended value
+		int currentLimit = megaApi.platformGetRLimitNumFile();
+		logDebug("Current resource limit is set to " + currentLimit);
+		if (currentLimit < DESIRABLE_R_LIMIT) {
+			logDebug("Resource limit is under desirable value. Trying to increase the resource limit...");
+			if (!megaApi.platformSetRLimitNumFile(DESIRABLE_R_LIMIT)) {
+				logWarning("Error setting resource limit.");
+			}
+
+			// Check new resource limit after set it in order to see if had been set successfully to the
+			// desired value or maybe to a lower value limited by the system.
+			logDebug("Resource limit is set to " + megaApi.platformGetRLimitNumFile());
+		}
 	}
 
 	/**
