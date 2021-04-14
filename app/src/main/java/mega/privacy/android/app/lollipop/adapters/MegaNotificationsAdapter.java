@@ -36,8 +36,9 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.TextUtil.replaceFormatText;
+import static mega.privacy.android.app.utils.TextUtil.replaceFormatNotificationText;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -186,106 +187,106 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		String textToShow;
 		switch (alert.getType()) {
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:
-				textToShow = String.format(getString(R.string.notification_new_contact_request), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.notification_new_contact_request, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:
-				textToShow = String.format(getString(R.string.subtitle_contact_request_notification_cancelled), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_contact_request_notification_cancelled, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
-				textToShow = String.format(getString(R.string.notification_new_contact), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.notification_new_contact, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
-				textToShow = String.format(getString(R.string.subtitle_account_notification_deleted), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_account_notification_deleted, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
-				textToShow = String.format(getString(R.string.notification_reminder_contact_request), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.notification_reminder_contact_request, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
-				textToShow = String.format(getString(R.string.subtitle_contact_notification_deleted), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_contact_notification_deleted, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:
-				textToShow = String.format(getString(R.string.subtitle_contact_notification_blocked), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_contact_notification_blocked, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:
-				textToShow = String.format(getString(R.string.subtitle_outgoing_contact_request_accepted), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_outgoing_contact_request_accepted, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:
-				textToShow = String.format(getString(R.string.subtitle_outgoing_contact_request_denied), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_outgoing_contact_request_denied, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:
-				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_ignored), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_incoming_contact_request_ignored, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
-				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_accepted), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_incoming_contact_request_accepted, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:
-				textToShow = String.format(getString(R.string.subtitle_incoming_contact_request_denied), getNicknameForNotificationsSection(context, email));
-				holder.descriptionText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.subtitle_incoming_contact_request_denied, getNicknameForNotificationsSection(context, email));
+				holder.descriptionText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_NEWSHARE:
-				textToShow = String.format(getString(R.string.notification_new_shared_folder), getNicknameForNotificationsSection(context, email));
-				holder.titleText.setText(replaceFormatText(context, textToShow));
+				textToShow = getString(R.string.notification_new_shared_folder, getNicknameForNotificationsSection(context, email));
+				holder.titleText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_DELETEDSHARE:
 				if (alert.getNumber(0) == 0) {
 					MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
 					if (node != null) {
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), getNicknameForNotificationsSection(context, email), node.getName());
+						textToShow = getString(R.string.notification_left_shared_folder_with_name, getNicknameForNotificationsSection(context, email), node.getName());
 					} else {
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), getNicknameForNotificationsSection(context, email));
+						textToShow = getString(R.string.notification_left_shared_folder, getNicknameForNotificationsSection(context, email));
 					}
 				} else {
-					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), getNicknameForNotificationsSection(context, email));
+					textToShow = getString(R.string.notification_deleted_shared_folder, getNicknameForNotificationsSection(context, email));
 				}
 
-				holder.titleText.setText(replaceFormatText(context, textToShow));
+				holder.titleText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:
 				int numFiles = (int) alert.getNumber(1);
 				int numFolders = (int) alert.getNumber(0);
 				if (numFolders > 0 && numFiles > 0) {
-					String numFilesString = context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
-					String numFoldersString = context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
-					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, getNicknameForNotificationsSection(context, email), numFoldersString, numFilesString);
+					String numFilesString = getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
+					String numFoldersString = getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
+					textToShow = getString(R.string.subtitle_notification_added_folders_and_files, getNicknameForNotificationsSection(context, email), numFoldersString, numFilesString);
 				} else if (numFolders > 0) {
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, getNicknameForNotificationsSection(context, email), numFolders);
+					textToShow = getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, getNicknameForNotificationsSection(context, email), numFolders);
 				} else {
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, getNicknameForNotificationsSection(context, email), numFiles);
+					textToShow = getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, getNicknameForNotificationsSection(context, email), numFiles);
 				}
 
-				holder.titleText.setText(replaceFormatText(context, textToShow));
+				holder.titleText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 
 			case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
 				int itemCount = (int) alert.getNumber(0);
-				textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount,
+				textToShow = getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount,
 						getNicknameForNotificationsSection(context, email), itemCount);
-				holder.titleText.setText(replaceFormatText(context, textToShow));
+				holder.titleText.setText(replaceFormatNotificationText(context, textToShow));
 				break;
 		}
 	}
@@ -1401,6 +1402,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			if (handleUser != alert.getUserHandle()) {
 				return;
 			}
+
 			setTitleOrDescriptionTextWithEmail(position, view, alert, email);
 		}
 	}

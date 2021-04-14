@@ -25,7 +25,7 @@ class GetUserEmailListener(context: Context?) : BaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            dBH.setNonContactEmail(request.email, request.nodeHandle.toString() + "")
+            dBH.setNonContactEmail(request.email, request.nodeHandle.toString())
             callback?.onUserEmailUpdate(request.email, request.nodeHandle, position)
         } else {
             logError("Error getting user email: " + e.errorString)

@@ -89,7 +89,7 @@ public class TextUtil {
      * @param text    The text to format.
      * @return The string formatted.
      */
-    public static Spanned replaceFormatText(Context context, String text) {
+    public static Spanned replaceFormatNotificationText(Context context, String text) {
         try {
             text = text.replace("[A]", "<font color='"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
