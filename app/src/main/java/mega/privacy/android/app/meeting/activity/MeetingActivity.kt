@@ -14,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
@@ -32,7 +31,7 @@ import mega.privacy.android.app.utils.IncomingCallNotification
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     companion object {
-        //        const val MEETING_TYPE = "meetingType"
+//        const val MEETING_TYPE = "meetingType"
         const val MEETING_ACTION_JOIN = "join_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
@@ -40,6 +39,23 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
+
+        private var isGuest = true
+        private var isModerator = false
+
+        private fun updateRole() {
+            if (isGuest) {
+                isGuest = false
+            } else if (!isModerator) {
+                isModerator = true
+            } else {
+                isGuest = true
+                isModerator = false
+            }
+        }
+
+        private var wiredHeadsetConnected = false
+        private var bluetoothConnected = false
     }
 
     private lateinit var binding: ActivityMeetingBinding
@@ -161,11 +177,23 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
     }
 
     override fun onChangeMicState(micOn: Boolean) {
-        Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
+
+        wiredHeadsetConnected = !wiredHeadsetConnected
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeCamState(camOn: Boolean) {
-        Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
+
+        bluetoothConnected = !bluetoothConnected
+        bottomFloatingPanelViewHolder.onHeadphoneConnected(
+            wiredHeadsetConnected,
+            bluetoothConnected
+        )
     }
 
     override fun onChangeHoldState(isHold: Boolean) {
@@ -218,7 +246,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     fun setBottomFloatingPanelViewHolder(visible: Boolean) {
         when (visible) {
-            true -> bottom_floating_panel.visibility = View.VISIBLE;
+            true -> bottom_floating_panel.visibility = View.VISIBLE
             false -> bottom_floating_panel.visibility = View.GONE
         }
     }
