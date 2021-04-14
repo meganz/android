@@ -1,9 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -11,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
@@ -21,14 +19,22 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
-import mega.privacy.android.app.meeting.TestTool
+import mega.privacy.android.app.meeting.ParticipantRepository
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
+import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.IncomingCallNotification
+import mega.privacy.android.app.utils.LogUtil
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
 
 @AndroidEntryPoint
-class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
+class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
+    MegaChatRequestListenerInterface {
 
     companion object {
 //        const val MEETING_TYPE = "meetingType"
@@ -39,27 +45,13 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
-
-        private var isGuest = true
-        private var isModerator = false
-
-        private fun updateRole() {
-            if (isGuest) {
-                isGuest = false
-            } else if (!isModerator) {
-                isModerator = true
-            } else {
-                isGuest = true
-                isModerator = false
-            }
-        }
-
-        private var wiredHeadsetConnected = false
-        private var bluetoothConnected = false
     }
 
     private lateinit var binding: ActivityMeetingBinding
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
+
+    private var isGuest = false
+    private var isModerator = false
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -85,15 +77,20 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         initReceiver()
         initActionBar(meetingAction)
         initNavigation(meetingAction)
+        initFloatingPanel(meetingAction)
+    }
 
-        // TODO: pass real role here
-        bottomFloatingPanelViewHolder = BottomFloatingPanelViewHolder(binding, this, false, true)
+    private fun initFloatingPanel(meetAction: String?) {
+        // Get the value from meet action
+        isGuest = meetAction == MEETING_ACTION_GUEST
+        isModerator = meetAction == MEETING_ACTION_CREATE
 
-        // TODO: pass real headphone state here
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(false, false)
-
-        // TODO: load real participants and set it
-        bottomFloatingPanelViewHolder.setParticipants(TestTool.getTestParticipants(this))
+        bottomFloatingPanelViewHolder =
+            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator).apply {
+                // Create a repository get the participants
+                setParticipants(ParticipantRepository().getTestParticipants(this@MeetingActivity))
+                onHeadphoneConnected(wiredHeadset = false, bluetooth = false)
+            }
     }
 
     override fun onDestroy() {
@@ -177,79 +174,133 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
         return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
     }
 
-    override fun onChangeMicState(micOn: Boolean) {
-        // Toast.makeText(this, "onChangeMicState $micOn", Toast.LENGTH_SHORT).show()
+    val chatId = 12345L
 
-        wiredHeadsetConnected = !wiredHeadsetConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+    /**
+     * First, should determine the permission
+     * Should notify in-meeting fragment update if the state change successful
+     */
+    override fun onChangeMicState(micOn: Boolean): Boolean {
+        if (!haveAudioPermission()) {
+            return false
+        }
+
+        if (micOn) {
+            megaChatApi.enableAudio(chatId, this)
+        } else {
+            megaChatApi.disableAudio(chatId, this)
+        }
+
+        return true
     }
 
-    override fun onChangeCamState(camOn: Boolean) {
-        // Toast.makeText(this, "onChangeCamState $camOn", Toast.LENGTH_SHORT).show()
+    override fun onChangeCamState(camOn: Boolean): Boolean {
+        if (!haveVideoPermission()) {
+            return false
+        }
 
-        bluetoothConnected = !bluetoothConnected
-        bottomFloatingPanelViewHolder.onHeadphoneConnected(
-            wiredHeadsetConnected,
-            bluetoothConnected
-        )
+        if (camOn) {
+            megaChatApi.enableVideo(chatId, this)
+        } else {
+            megaChatApi.disableVideo(chatId, this)
+        }
+
+        return true
     }
 
-    override fun onChangeHoldState(isHold: Boolean) {
-        Toast.makeText(this, "onChangeHoldState $isHold", Toast.LENGTH_SHORT).show()
+    override fun onChangeHoldState(isHold: Boolean): Boolean {
+        return if (haveVideoPermission() && haveAudioPermission()) {
+            megaChatApi.setCallOnHold(chatId, isHold, this)
+            true
+        } else {
+            false
+        }
     }
 
-    override fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice) {
-        Toast.makeText(this, "onChangeAudioDevice $device", Toast.LENGTH_SHORT).show()
-    }
+    /**
+     * Speaker Button
+     */
+    override fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice): Boolean =
+        haveAudioPermission()
 
+    /**
+     * Pop up dialog
+     */
     override fun onEndMeeting() {
-        finish()
+        if (isModerator) {
+            val endMeetingBottomSheetDialogFragment =
+                EndMeetingBottomSheetDialogFragment.newInstance()
+            endMeetingBottomSheetDialogFragment.show(
+                supportFragmentManager,
+                endMeetingBottomSheetDialogFragment.tag
+            )
+        } else {
+            askConfirmationEndMeetingForUser()
+        }
     }
+
+    private fun askConfirmationEndMeetingForUser() {
+        LogUtil.logDebug("askConfirmationEndMeeting")
+        val dialogClickListener =
+            DialogInterface.OnClickListener { dialog, which ->
+                when (which) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        megaChatApi.hangChatCall(chatId, this)
+                        finish()
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        dialog.dismiss()
+                    }
+                }
+            }
+        MaterialAlertDialogBuilder(this).apply {
+            setTitle(getString(R.string.title_end_meeting))
+            setPositiveButton(R.string.general_ok, dialogClickListener)
+            setNegativeButton(R.string.general_cancel, dialogClickListener)
+            show()
+        }
+    }
+
 
     override fun onShareLink() {
         Toast.makeText(this, "onShareLink", Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * Open invite page
+     */
     override fun onInviteParticipants() {
         Toast.makeText(this, "onInviteParticipants", Toast.LENGTH_SHORT).show()
     }
 
     override fun onParticipantOption(participant: Participant) {
         Toast.makeText(this, "onParticipantOption ${participant.name}", Toast.LENGTH_SHORT).show()
+        val participantBottomSheet =
+            MeetingParticipantBottomSheetDialogFragment.newInstance(
+                isGuest,
+                isModerator,
+                participant
+            )
+        participantBottomSheet.show(supportFragmentManager, participantBottomSheet.tag)
     }
 
-    override fun onAddContact() {
 
+    /**
+     * Can use the permission same with `CreateMeetingFragment`
+     */
+    private fun haveAudioPermission(): Boolean {
+        return true
     }
 
-    override fun onContactInfo() {
-
-    }
-
-    override fun onSendMessage() {
-
-    }
-
-    override fun onPingToSpeakerView() {
-
-    }
-
-    override fun onMakeModerator() {
-
-    }
-
-    override fun onRemoveParticipant() {
-
+    /**
+     * Can use the permission same with `CreateMeetingFragment`
+     */
+    private fun haveVideoPermission(): Boolean {
+        return true
     }
 
     fun setBottomFloatingPanelViewHolder(visible: Boolean) {
-        when (visible) {
-            true -> bottom_floating_panel.visibility = View.VISIBLE
-            false -> bottom_floating_panel.visibility = View.GONE
-        }
+        bottom_floating_panel.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     fun bottomFloatingPanelInOut() {
@@ -262,5 +313,29 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
     fun hideActionBar() {
         binding.toolbar.visibility = View.GONE
+    }
+
+    override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
+        LogUtil.logDebug("Type: " + request?.type)
+    }
+
+    override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
+        LogUtil.logDebug("Type: " + request?.type)
+    }
+
+    override fun onRequestFinish(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+        LogUtil.logDebug("Type: " + request?.type)
+    }
+
+    override fun onRequestTemporaryError(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+        LogUtil.logDebug("Type: " + request?.type)
     }
 }

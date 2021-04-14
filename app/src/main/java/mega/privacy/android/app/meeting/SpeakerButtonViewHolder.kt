@@ -6,10 +6,13 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
+/**
+ * Should observer the changing of earphone and update the UI
+ */
 class SpeakerButtonViewHolder(
     private val speakerFab: OnOffFab,
     private val speakerLabel: TextView,
-    private val switchCallback: (AppRTCAudioManager.AudioDevice) -> Unit
+    private val switchCallback: (AppRTCAudioManager.AudioDevice) -> Boolean
 ) {
     private var currentDevice = AppRTCAudioManager.AudioDevice.EARPIECE
     private var wiredHeadsetConnected = false
@@ -70,12 +73,12 @@ class SpeakerButtonViewHolder(
         device: AppRTCAudioManager.AudioDevice,
         fireCallback: Boolean = true
     ) {
-        currentDevice = device
-
-        updateAppearance()
-
         if (fireCallback) {
-            switchCallback(currentDevice)
+            if (switchCallback(device)) {
+                currentDevice = device
+
+                updateAppearance()
+            }
         }
     }
 

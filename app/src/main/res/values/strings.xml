@@ -3073,6 +3073,15 @@
     <string name="ping_to_speaker" context="Ping the participant to speaker view in the meeting">Pin to Speaker View</string>
     <string name="make_moderator" context="Make the participant as moderator in the meeting">Make moderator</string>
     <string name="remove_participant" context="Remove the participant from meeting">Remove participant</string>
+    <string name="title_end_meeting" context="The title of dialog for end meeting confirmation">Leave meeting now?</string>
+    <string name="leave_meeting" context="Leave meeting option for the moderator">Leave meeting</string>
+    <string name="end_meeting_for_all" context="End meeting for all option for the moderator">End meeting for all</string>
+    <string name="end_meeting_for_all_dialog_title" context="The title of end meeting for all option for the moderator">End meeting for all?</string>
+    <string name="end_meeting_dialog_message" context="The message of the end meeting dialog">Once you(moderator) end the meeting for all, the meeting will end for all participants.</string>
+    <string name="no_moderator" context="no moderator when the moderator leave meeting">No moderator</string>
+    <string name="assign_moderator_message" context="assign moderator message when the moderator leave meeting">Before leaving, please assign (a) new moderator(s) in order to keep the meeting structure</string>
+    <string name="assign_moderator" context="assign moderator option when the moderator leave meeting">Assign moderator</string>
+    <string name="leave_anyway" context="leave anyway option when the moderator leave meeting">Leave anyway</string>
 
     <string name="meeting_link" context="The literal meeting link text">Meeting link</string>
     <string name="paste_meeting_link_instruction" context="Tell the user to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>

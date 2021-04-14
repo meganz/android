@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewmodel"
+            type="mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/no_moderator"
+            android:layout_width="113dp"
+            android:layout_height="21dp"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/no_moderator"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="@{viewmodel.currentMode==1 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/assign_moderator"
+            android:layout_width="331dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:text="@string/assign_moderator_message"
+            android:textSize="14sp"
+            android:visibility="@{viewmodel.currentMode==1 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/no_moderator" />
+
+
+        <TextView
+            android:id="@+id/leave_meeting"
+            style="@style/BottomSheetItem"
+            android:layout_marginTop="1dp"
+            android:gravity="center"
+            android:onClick="@{() -> viewmodel.leaveMeetingOrAssignModerator()}"
+            android:text="@{viewmodel.currentMode == 1 ? @string/assign_moderator:@string/leave_meeting}"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/assign_moderator" />
+
+        <View
+            android:id="@+id/divider"
+            style="@style/BottomSheetItemDivider"
+            android:layout_marginStart="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/leave_meeting" />
+
+        <TextView
+            android:id="@+id/end_meeting_for_all"
+            style="@style/BottomSheetItem"
+            android:gravity="center"
+            android:onClick="@{() -> viewmodel.endMeetingForAllOrLeaveAnyway()}"
+            android:text="@{viewmodel.currentMode == 1 ? @string/leave_anyway:@string/end_meeting_for_all}"
+            android:textColor="@color/red_600_red_300"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

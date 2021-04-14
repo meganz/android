@@ -37,7 +37,7 @@
         android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="44dp"
         android:background="@null"
         app:borderWidth="0dp"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
