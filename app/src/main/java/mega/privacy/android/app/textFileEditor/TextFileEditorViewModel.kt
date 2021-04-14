@@ -2,6 +2,7 @@ package mega.privacy.android.app.textFileEditor
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -281,11 +282,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Starts the save file content action by creating a temp file, setting the new or modified text,
      * and then uploading it to the Cloud.
      *
+     * @param context     Current context.
      * @param contentText The new or modified content text.
      */
-    fun saveFile(contentText: String): Boolean {
-        val app = MegaApplication.getInstance()
-        val tempFile = buildTempFile(app, fileName)
+    fun saveFile(context: Context, contentText: String): Boolean {
+        val tempFile = buildTempFile(context, fileName)
         if (tempFile == null) {
             logError("Cannot get temporal file.")
             return false
@@ -301,7 +302,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return false
         }
 
-        val uploadIntent = Intent(app, UploadService::class.java)
+        val uploadIntent = Intent(context, UploadService::class.java)
             .putExtra(UploadService.EXTRA_UPLOAD_TXT, true)
             .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
             .putExtra(UploadService.EXTRA_NAME, fileName)
@@ -317,7 +318,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 }
             )
 
-        app.startService(uploadIntent)
+        context.startService(uploadIntent)
 
         return true
     }

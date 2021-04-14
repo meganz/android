@@ -151,8 +151,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
-import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
@@ -2975,7 +2973,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		PsaManager.INSTANCE.startChecking();
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-			showNewTxtFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+			showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
 		}
 
 		logDebug("END onCreate");
@@ -9109,7 +9107,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void showNewTxtFileDialog(String typedName) {
+	public void showNewTextFileDialog(String typedName) {
 		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
 				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
 				drawerItem == DrawerItem.HOMEPAGE);

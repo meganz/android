@@ -253,7 +253,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public void showNewTxtFileDialog(String typedName) {
+	public void showNewTextFileDialog(String typedName) {
 		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
 				megaApi.getNodeByHandle(parentHandle), typedName, false);
 	}
@@ -453,7 +453,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			coordinatorLayout.invalidate();
 
 			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-				showNewTxtFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+				showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
 			}
 		}
 	}

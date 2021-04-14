@@ -8,7 +8,9 @@ import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /*
  * Mime type for files
@@ -16,6 +18,13 @@ import java.util.HashMap;
 public class MimeTypeList {
 	//20MB
 	private static final long MAX_SIZE_OPENABLE_TEXT_FILE = 20971520;
+	private static final List<String> TEXT_EXTENSIONS = Arrays.asList(
+			//Text
+			"txt", "ans", "ascii", "log", "wpd", "json", "md",
+			//Web data
+			"html", "xml", "shtml", "dhtml", "js", "css", "jar", "java", "class",
+			//Web lang
+			"php", "php3", "php4", "php5", "phtml", "inc", "asp", "pl", "cgi", "py", "sql", "accdb", "db", "dbf", "mdb", "pdb", "c", "cpp", "h", "cs", "sh", "vb", "swift");
 	
 	// Icon resource mapping for different file type extensions
 	private static HashMap<String, Integer> resourcesCache;
@@ -266,26 +275,12 @@ public class MimeTypeList {
 	 *
 	 * @return True if the file is openable, false otherwise.
 	 */
-	public boolean isOpenableTextFile() {
+	private boolean isValidTextFileType() {
 				//Text
-		return type.startsWith("text/plain") || extension.equals("txt") || extension.equals("ans")
-				|| extension.equals("ascii") || extension.equals("log") || extension.equals("wpd")
-				|| extension.equals("json") || extension.equals("md")
+		return type.startsWith("text/plain")
 
-				//Web data
-				|| extension.equals("html") || extension.equals("xml") || extension.equals("shtml")
-				|| extension.equals("dhtml") || extension.equals("js") || extension.equals("css")
-				|| extension.equals("jar") || extension.equals("java") || extension.equals("class")
-
-				//Web lang
-				|| extension.equals("php") || extension.equals("php3") || extension.equals("php4")
-				|| extension.equals("php5") || extension.equals("phtml") || extension.equals("inc")
-				|| extension.equals("asp") || extension.equals("pl") || extension.equals("cgi")
-				|| extension.equals("py") || extension.equals("sql") || extension.equals("accdb")
-				|| extension.equals("db") || extension.equals("dbf") || extension.equals("mdb")
-				|| extension.equals("pdb") || extension.equals("c") || extension.equals("cpp")
-				|| extension.equals("h") || extension.equals("cs") || extension.equals("sh")
-				|| extension.equals("vb") || extension.equals("swift")
+				//File extensions considered as plain text
+				|| TEXT_EXTENSIONS.contains(extension)
 
 				//Files without extension
 				|| type.startsWith("application/octet-stream");
@@ -298,6 +293,6 @@ public class MimeTypeList {
 	 * @return True if the file is openable, false otherwise.
 	 */
 	public boolean isOpenableTextFile(long fileSize) {
-		return  isOpenableTextFile() && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE;
+		return  isValidTextFileType() && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE;
 	}
 }

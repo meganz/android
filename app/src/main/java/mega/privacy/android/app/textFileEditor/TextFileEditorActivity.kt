@@ -442,7 +442,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (isFileEdited()) {
             savingMode = viewModel.getMode()
 
-            if (viewModel.saveFile(binding.contentText.text.toString())) {
+            if (viewModel.saveFile(this, binding.contentText.text.toString())) {
                 setViewMode(false)
                 binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
             } else {
