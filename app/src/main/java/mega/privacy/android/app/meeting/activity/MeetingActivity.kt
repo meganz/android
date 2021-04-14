@@ -145,6 +145,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener {
 
         if (meetAction == MEETING_ACTION_GUEST || meetAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
+            bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
 
         when (meetAction) {
