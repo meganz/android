@@ -82,9 +82,7 @@ public class CallService extends Service{
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
                 logDebug("Call status " + callStatusToString(callStatus)+" current chat = "+currentChatId);
                 switch (callStatus) {
-                    case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-                    case MegaChatCall.CALL_STATUS_RING_IN:
-                    case MegaChatCall.CALL_STATUS_JOINING:
+                    case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                         updateNotificationContent();
                         break;
@@ -154,16 +152,14 @@ public class CallService extends Service{
         if (call == null)
             return;
 
-        int notificationId = getCallNotificationId(call.getId());
+        int notificationId = getCallNotificationId(call.getCallId());
 
         Notification notif;
         String contentText = null;
 
-       if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-            contentText = getString(R.string.outgoing_call_starting);
-        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging()) {
             contentText = getString(R.string.title_notification_incoming_call);
-        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             contentText = getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress);
         }
 
@@ -401,7 +397,7 @@ public class CallService extends Service{
         if (call == null)
             return INVALID_CALL;
 
-        return getCallNotificationId(call.getId());
+        return getCallNotificationId(call.getCallId());
     }
 
     private void cancelNotification(){

@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -18,14 +19,23 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_NAME;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -149,7 +159,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		}
 
 		// Chat link
-        if (matchRegexs(url, CHAT_LINK_REGEXS)) {
+        if (matchRegexs(url, CHAT_LINK_REGEXS) && matchRegexs(url, MEETING_LINK_REGEXS)) {
 			logDebug("Open chat url");
 
 			if (dbH != null) {
@@ -408,10 +418,40 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-		openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-		openChatLinkIntent.setData(Uri.parse(url));
-		startActivity(openChatLinkIntent);
+		boolean isMeetingLink = matchRegexs(url, MEETING_LINK_REGEXS);
+
+		if (isMeetingLink) {
+			megaChatApi.checkChatLink(url, new ChatBaseListener(
+					OpenLinkActivity.this) {
+				@Override
+				public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+					if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
+							&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
+						goToMeetingActivity(request.getText());
+					} else {
+						setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
+					}
+				}
+			});
+		} else { // Normal Chat Link
+			goToChatActivity();
+		}
+	}
+
+	private void goToChatActivity() {
+		Intent intent = new Intent(this, ChatActivityLollipop.class);
+		intent.setAction(ACTION_OPEN_CHAT_LINK);
+		intent.setData(Uri.parse(url));
+		startActivity(intent);
+		finish();
+	}
+
+	private void goToMeetingActivity(String meetingName) {
+		Intent intent = new Intent(OpenLinkActivity.this, MeetingActivity.class);
+		intent.setAction(MEETING_ACTION_GUEST);
+		intent.putExtra(MEETING_NAME, meetingName);
+		intent.setData(Uri.parse(url));
+		startActivity(intent);
 		finish();
 	}
 

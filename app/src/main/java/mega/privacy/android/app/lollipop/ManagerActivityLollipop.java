@@ -141,6 +141,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -208,7 +209,6 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
-import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -277,9 +277,8 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_TYPE_JOIN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -1104,11 +1103,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_RECONNECTING:
-					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 						updateVisibleCallElements(chatIdReceived);
@@ -8943,26 +8938,27 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	public void showChatLink(String link) {
 		logDebug("Link: " + link);
-//		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-//
-//		if (joiningToChatLink) {
-//			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-//			resetJoiningChatLink();
-//		} else {
-//			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-//		}
-//
-//		openChatLinkIntent.setData(Uri.parse(link));
-//		startActivity(openChatLinkIntent);
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
 
-		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
-		joinMeetingLinkIntent.setAction(ACTION_JOIN_MEETING);
-		joinMeetingLinkIntent.setData(Uri.parse(link));
-		joinMeetingLinkIntent.putExtra(MEETING_TYPE, MEETING_TYPE_JOIN);
-		startActivity(joinMeetingLinkIntent);
+		if (joiningToChatLink) {
+			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
+			resetJoiningChatLink();
+		} else {
+			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
+		}
+
+		openChatLinkIntent.setData(Uri.parse(link));
+		startActivity(openChatLinkIntent);
 
 		drawerItem = DrawerItem.CHAT;
 		selectDrawerItemLollipop(drawerItem);
+	}
+
+	private void goToJoinMeeting(String link) {
+		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
+		joinMeetingLinkIntent.setData(Uri.parse(link));
+		joinMeetingLinkIntent.setAction(MEETING_ACTION_JOIN);
+		startActivity(joinMeetingLinkIntent);
 	}
 
 	/**
@@ -9506,7 +9502,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	@Override
 	public void onCreateMeeting() {
 		Intent meetingIntent = new Intent(this, MeetingActivity.class);
-		meetingIntent.putExtra("meetingType", MEETING_TYPE_CREATE);
+		meetingIntent.setAction(MEETING_ACTION_CREATE);
 		startActivity(meetingIntent);
 	}
 
@@ -12218,7 +12214,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					return;
 				}
 
-				showChatLink(request.getLink());
+				String link = request.getLink();
+				if (AndroidMegaRichLinkMessage.isMeetingLink(link)) {
+					goToJoinMeeting(link);
+				} else {
+					showChatLink(link);
+				}
+
 				dismissOpenLinkDialog();
 			}
 			else {
@@ -12231,11 +12233,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 			}
 		}
-		// TODO: Meeting project, Join meeting from here
-//		else if (request.getType() == MegaChatRequest.TYPE_JOIN_MEETING) {
-//showChatLink(request.getLink());
-//				dismissOpenLinkDialog();
-//		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: " + request.getFlag());

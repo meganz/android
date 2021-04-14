@@ -188,7 +188,7 @@ public class AppRTCAudioManager {
     }
 
     private void setValues() {
-        if ((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
+        if ((typeStatus != AUDIO_MANAGER_CALL_RINGING && typeStatus != AUDIO_MANAGER_CALL_OUTGOING) ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
             return;
@@ -198,31 +198,15 @@ public class AppRTCAudioManager {
     }
 
     private void setAudioManagerValues(int callStatus) {
-        logDebug("Call status: " + callStatusToString(callStatus));
-
         logDebug("Updating values of Chat Audio Manager...");
-        MegaHandleList listCallsRing = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-
-        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-            if (listCallsRing != null && listCallsRing.size() > 0) {
-                logDebug("There was also an incoming call (stop incoming call sound)");
-                stopAudioSignals();
-            }
-
+        if (callStatus == AUDIO_MANAGER_CALL_OUTGOING) {
+            logDebug("If there was also an incoming call (stop incoming call sound)");
+            stopAudioSignals();
             outgoingCallSound();
-        } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            MegaHandleList listCallsRequest = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-
-            if (listCallsRequest == null || listCallsRequest.size() < 1) {
-                logDebug("I'm not calling");
-                if (listCallsRing != null && listCallsRing.size() > 1) {
-                    logDebug("There is another incoming call (stop the sound of the previous incoming call)");
-                    stopAudioSignals();
-                }
-
-                incomingCallSound();
-            }
-
+        } else if (callStatus == AUDIO_MANAGER_CALL_RINGING) {
+            logDebug("If there is another incoming call (stop the sound of the previous incoming call)");
+            stopAudioSignals();
+            incomingCallSound();
             checkVibration();
         }
     }
@@ -535,7 +519,7 @@ public class AppRTCAudioManager {
         int typeStream = INVALID_TYPE_FOCUS;
         int typeFocus = INVALID_TYPE_FOCUS;
         if (apprtcContext instanceof MegaApplication) {
-            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (typeStatus == AUDIO_MANAGER_CALL_RINGING) {
                 typeStream = AudioManager.STREAM_RING;
                 typeFocus = AUDIOFOCUS_DEFAULT;
             } else {
@@ -557,7 +541,7 @@ public class AppRTCAudioManager {
 
             if (apprtcContext instanceof MegaApplication &&
                     (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) &&
-                    typeStatus != MegaChatCall.CALL_STATUS_RING_IN) {
+                    typeStatus != AUDIO_MANAGER_CALL_RINGING) {
                 logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             } else {
@@ -936,7 +920,7 @@ public class AppRTCAudioManager {
                 newAudioDevice = AudioDevice.WIRED_HEADSET;
             }
         } else if (userSelectedAudioDevice == AudioDevice.NONE) {
-            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (typeStatus == AUDIO_MANAGER_CALL_RINGING) {
                 newAudioDevice = AudioDevice.SPEAKER_PHONE;
             } else {
                 newAudioDevice = defaultAudioDevice;
