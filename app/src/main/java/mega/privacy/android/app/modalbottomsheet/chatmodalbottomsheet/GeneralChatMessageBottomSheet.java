@@ -475,7 +475,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 } else {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
-                    chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOfflineWithAndroidMessages(messages,
+                            megaChatApi.getChatRoom(chatId), (ChatActivityLollipop) context);
                 }
                 break;
 

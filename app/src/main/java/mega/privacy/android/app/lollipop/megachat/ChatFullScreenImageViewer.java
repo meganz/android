@@ -55,7 +55,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -84,8 +84,9 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		SnackbarShower {
+public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPageChangeListener,
+		MegaRequestListenerInterface, MegaGlobalListenerInterface,SnackbarShower {
+
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	RelativeLayout relativeImageViewerLayout;
@@ -185,7 +186,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
             importIcon.setVisible(false);
             saveForOfflineIcon.setVisible(false);
 
-            if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle()) && messages.get(positionG).isDeletable()) {
+            if (messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
+					&& messages.get(positionG).isDeletable()) {
                 removeIcon.setVisible(true);
             }
             else{
@@ -255,7 +257,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				logDebug("Save for offline option");
 //				showSnackbar("Coming soon...");
 				if (messages.get(positionG) != null){
-					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(), megaChatApi.getChatRoom(chatId));
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(),
+							megaChatApi.getChatRoom(chatId), true, this);
 				}
 				break;
 			}
@@ -479,7 +482,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
 				if (animationStart) {
 					updateViewForAnimation();
-				} else {
+				} else if (!isFinishing()) {
 					showActionBar();
 
 					fragmentContainer.setBackgroundColor(BLACK);

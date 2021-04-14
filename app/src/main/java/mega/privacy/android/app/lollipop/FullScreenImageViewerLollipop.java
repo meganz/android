@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -96,7 +97,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop
+public class FullScreenImageViewerLollipop extends PasscodeActivity
 		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		SnackbarShower {
 
@@ -1069,7 +1070,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
 				if (animationStart) {
 					updateViewForAnimation();
-				} else {
+				} else if (!isFinishing()) {
 					showActionBar();
 
 					fragmentContainer.setBackgroundColor(BLACK);

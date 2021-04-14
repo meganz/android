@@ -66,6 +66,7 @@ import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -136,7 +137,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop
+
+public class ContactInfoActivityLollipop extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
 		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower {

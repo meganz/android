@@ -42,6 +42,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter;
@@ -73,7 +74,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class FileContactListActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaGlobalListenerInterface {
+public class FileContactListActivityLollipop extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface {
 
 	private ContactController cC;
 	private NodeController nC;

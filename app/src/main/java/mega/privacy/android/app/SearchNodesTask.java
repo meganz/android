@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
@@ -30,6 +31,9 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
+
+    private final SortOrderManagement sortOrderManagement;
+
     private Context context;
     private ManagerActivityLollipop managerA;
     private FileExplorerActivityLollipop fileExplorerA;
@@ -44,12 +48,11 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     private long parentHandleSearch;
     private ArrayList<MegaNode> nodes;
 
-    private int orderCloud;
-    private int orderOthers;
-
-    public SearchNodesTask(Context mContext, Fragment mFragment, String mQuery, long mParentHandleSearch, ArrayList<MegaNode> mNodes){
+    public SearchNodesTask(Context mContext, Fragment mFragment, String mQuery, long mParentHandleSearch,
+                           ArrayList<MegaNode> mNodes, SortOrderManagement sortOrderManagement){
 
         context = mContext;
+        this.sortOrderManagement = sortOrderManagement;
 
         if (context instanceof ManagerActivityLollipop) {
             managerA = (ManagerActivityLollipop) context;
@@ -68,8 +71,6 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         query = mQuery;
         parentHandleSearch = mParentHandleSearch;
         nodes = mNodes;
-
-        getOrder();
 
         megaApi = MegaApplication.getInstance().getMegaApi();
     }
@@ -97,27 +98,6 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     public void cancelSearch() {
         if (megaCancelToken != null && !megaCancelToken.isCancelled()) {
             megaCancelToken.cancel();
-        }
-    }
-
-    private void getOrder() {
-        if (isSearchF()) {
-            orderCloud = managerA.orderCloud;
-            orderOthers = managerA.orderOthers;
-        } else {
-            MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
-
-            if (prefs != null && prefs.getPreferredSortCloud() != null) {
-                orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
-            } else {
-                orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
-            }
-
-            if (prefs != null && prefs.getPreferredSortOthers() != null) {
-                orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
-            } else {
-                orderOthers = MegaApiAndroid.ORDER_DEFAULT_ASC;
-            }
         }
     }
 
@@ -206,7 +186,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 nodes = megaApi.getChildren(parent);
             } else {
                 megaCancelToken = MegaCancelToken.createInstance();
-                nodes = megaApi.search(parent, query, megaCancelToken, true, orderCloud);
+                nodes = megaApi.search(parent, query, megaCancelToken, true, sortOrderManagement.getOrderCloud());
             }
         }
     }
@@ -218,12 +198,12 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         if (isTextEmpty(query)) {
             nodes = megaApi.getInShares();
 
-            if (orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+            if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
                 sortByMailDescending(nodes);
             }
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnInShares(query, megaCancelToken, orderCloud);
+            nodes = megaApi.searchOnInShares(query, megaCancelToken, sortOrderManagement.getOrderCloud());
         }
     }
 
@@ -246,14 +226,14 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 }
             }
 
-            if (orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+            if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
                 sortByNameDescending(nodes);
             } else {
                 sortByNameAscending(nodes);
             }
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnOutShares(query, megaCancelToken, orderCloud);
+            nodes = megaApi.searchOnOutShares(query, megaCancelToken, sortOrderManagement.getOrderCloud());
         }
     }
 
@@ -262,10 +242,11 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      */
     private void getLinks() {
         if (isTextEmpty(query)) {
-            nodes = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
+            nodes = megaApi.getPublicLinks(getLinksOrderCloud(
+                    sortOrderManagement.getOrderCloud(), managerA.isFirstNavigationLevel()));
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
-            nodes = megaApi.searchOnPublicLinks(query, megaCancelToken, orderCloud);
+            nodes = megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud());
         }
     }
 

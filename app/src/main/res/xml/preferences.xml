@@ -80,8 +80,8 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_pin_lock"
-			android:title="@string/settings_pin_lock_switch"
+			android:key="settings_passcode_lock"
+			android:title="@string/settings_passcode_lock_switch"
 			android:defaultValue="false"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"

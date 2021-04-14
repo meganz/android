@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -> MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -> 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -> MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -> MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGAは、強力な常時プライバシーを備えたクラウドストレージです。</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">このリンクは公開されなくなりました。</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">これらリンクは公開されなくなりました。</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">名前を変更</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">%1$sの名前を変更</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">リンク開設</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開く</string>
     <string name="context_renaming" context="while renaming a file or folder">名前を変更中</string>
@@ -681,7 +683,7 @@
     <string name="settings_features" context="settings of the Features section">各種機能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ストレージ</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">パスコードロック</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">パスコードロック</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は多くの電力を消費します。 MEGAはあなたに、圧縮する動画が%sより大きい場合、あなたの端末を積極的に充電することを求めます。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">有効にすると、あなたの写真が撮影された場所に関する情報をアップロードするため、それらを共有する際にご注意ください。</string>
 
@@ -773,7 +775,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">フォトと動画</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">パスコードロック</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">パスコードロック</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">パスコードの変更</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">入力</string>
@@ -1513,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">連絡先を表示</string>
 
-    <string name="import_success_message" context="Menu option">クラウドドライブに正常に追加されました</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">クラウドドライブに正常に追加されました</string>
     <string name="import_success_error" context="Menu option">エラー。クラウドドライブに正常に追加されていません</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">接続中&#8230;</string>
@@ -1734,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">設定日</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">要求された日付は無効です</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">許可されていない文字です</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">名前が無効です</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">先に進む前にファイル名を修正してください</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">無効な文字です</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">先に進む前にファイルに名前を付けてください</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">先に進む前にファイルに名前を付けてください</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">音声ファイル</string>
 
@@ -2047,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">オーセンティケータアプリで生成された6桁のコードをご入力ください。</string>
     <string name="general_verify" context="Text button">確認する</string>
     <string name="general_next" context="Text button">次へ</string>
+    <string name="general_previous" context="Text button">前</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">シードまたはQRコードの生成中にエラーが発生しました。もう一度お試しください。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">二要素認証が有効になりました</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
@@ -2079,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">コンテンツプレビュー</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">ストリーミングを実行できず、ファイルがダウンロードされていません</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">ファイルを開くことができません。</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">ネットワークに接続されていないため、ファイルを開くことができませんでした。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">ファイルはすでにオフライン用に保存されています</string>
 
@@ -2207,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">メッセージ</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">動画</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">リンクの送信先&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">送信先&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">アップロード先&#8230;</string>
 
@@ -2362,6 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">あなたの現在のアカウントは[A]%s[/A]です</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">当社の達成プログラムにご参加いただくことを条件とします。</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">支払方法</string>
 
     <string name="billing_period_title" context="title of billing period">お支払い請求期間</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]1回限り（月）[/A] %s</string>
@@ -2916,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">か月</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">年</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1時間</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d時間</item>
@@ -2972,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">紫の</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">グレーの</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">バックグラウンドで再生</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">バックグラウンドで再生しない</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">再生中</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">再生中（一時停止しました）</string>
+    <string name="audio_track_info" context="Title of the song info screen">トラック情報</string>
+
     <string name="action_more_information" context="Action to get more information">詳細情報</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">クッキーポリシー</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">クッキーの設定</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">続行する前に</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">当社は、ローカルストレージおよび同様のテクノロジー（「クッキー」）を使用して、お客様にサービスをご提供し、当社サービスのエクスペリエンスを向上させ、サードパーティを介して表示される広告を含め、お客様がご覧になる広告をカスタマイズいたします。ご訪問の最初から当社によるクッキーの使用を受け入れるか、クッキーの設定でクッキーをカスタマイズしてください。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">保存されていないクッキーの設定</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">クッキー設定の変更が保存されました。</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">サードパーティのクッキー</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google広告クッキー</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">カテゴリ：広告クッキー</string>
@@ -3005,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">暗い</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">デフォルトシステム</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">バッテリーセーバーで設定</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">SDカードのルートを選択してください。</string>
 </resources>

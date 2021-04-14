@@ -211,8 +211,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param psa the psa to display
      */
     private void launchPsaWebBrowser(Psa psa) {
-        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        // If there is a PsaWebBrowser launched, we should use it to load the new url.
         if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            psaWebBrowser.loadUrl(psa.getUrl());
             return;
         }
 
@@ -955,7 +956,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     if (!hasPermissions(baseActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         permissionLoggerSDK = sdk;
                         permissionLoggerKarere = karere;
-                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE,
+                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE_FOR_LOGS,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         break;
                     }
@@ -1055,7 +1056,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         logDebug("Request Code: " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_WRITE_STORAGE) {
+        if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
             if (permissionLoggerKarere) {
                 permissionLoggerKarere = false;
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

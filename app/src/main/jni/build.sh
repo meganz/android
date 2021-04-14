@@ -127,6 +127,13 @@ EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
+FFMPEG_VERSION=4.2
+FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+FLAC_VERSION=1.3.2
+FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
+FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
+FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
+FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
 
 function downloadCheckAndUnpack()
 {
@@ -262,6 +269,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
+    rm -rf ${EXOPLAYER}/${FLAC_SOURCE_FILE}
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
@@ -275,6 +283,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ../libs/arm64-v8a
     rm -rf ../libs/x86
     rm -rf ../libs/x86_64
+    rm -rf ${EXOPLAYER}/${FFMPEG_EXT_LIBRARY}
+    rm -rf ${EXOPLAYER}/${FLAC_EXT_LIBRARY}
 
     echo "* Task finished OK"
     exit 0
@@ -463,7 +473,7 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
     (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg)
     pushd ffmpeg &>> ${LOG_FILE}
-    git checkout release/4.2
+    git checkout release/${FFMPEG_VERSION}
     popd &>> ${LOG_FILE}
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
@@ -472,8 +482,23 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     NDK_REVISION=$(cat ${NDK_ROOT}/source.properties | grep Revision | cut -d " " -f 3)
     sed -i "s/android {/android {\n    ndkVersion '${NDK_REVISION}'/" common_library_config.gradle
     ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
-    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../${FFMPEG_EXT_LIBRARY}
     popd &>> ${LOG_FILE}
+
+    FLAC_EXT_PATH=${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}/extensions/flac/src/main/jni
+    downloadCheckAndUnpack ${FLAC_DOWNLOAD_URL} ${EXOPLAYER}/${FLAC_SOURCE_FILE} ${FLAC_SHA1} ${EXOPLAYER}
+    rm -rf ${FLAC_EXT_PATH}/flac
+    mv ${EXOPLAYER}/flac-${FLAC_VERSION} ${FLAC_EXT_PATH}/flac
+    echo "* Building FLAC"
+    pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
+    ${NDK_BUILD} APP_ABI=all -j4 &>> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
+    echo "* Building ExoPlayer FLAC extension"
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    ./gradlew :extension-flac:assembleRelease &>> ${LOG_FILE}
+    cp extensions/flac/buildout/outputs/aar/extension-flac-release.aar ../${FLAC_EXT_LIBRARY}
+    popd &>> ${LOG_FILE}
+
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"
