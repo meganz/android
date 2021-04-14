@@ -136,6 +136,7 @@ public class Constants {
     public static final int GO_ONLINE = 9007;
     public static final int START_RECONNECTION = 9008;
 
+    public static final int REQUEST_WRITE_STORAGE_FOR_LOGS = 0;
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;

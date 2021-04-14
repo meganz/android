@@ -528,7 +528,7 @@ class NodeSaver(
         var totalSize = 0L
 
         for (node in nodes) {
-            totalSize += node.size
+            totalSize += if (node.isFolder) nodesTotalSize(megaApi.getChildren(node)) else node.size
         }
 
         return totalSize

@@ -1357,11 +1357,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	if (firstLogin){
 					logDebug("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-//						if (firstLogin){
-//							firstLogin = false;
-//						}
-
 						if (typesCameraPermission==TAKE_PICTURE_OPTION){
 							logDebug("TAKE_PICTURE_OPTION");
 							if (!checkPermission(Manifest.permission.CAMERA)){
@@ -1371,6 +1366,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								checkTakePicture(this, TAKE_PHOTO_CODE);
 								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 							}
+
+							break;
 						}
 						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
 							logDebug("TAKE_PROFILE_PICTURE");
@@ -1383,6 +1380,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								this.takeProfilePicture();
 								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 							}
+
+							break;
 						}
 		        	}
 	        	}
@@ -1413,6 +1412,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					} else {
 						refreshOfflineNodes();
 					}
+
+					break;
 				}
 
 				nodeSaver.handleRequestPermissionsResult(requestCode);
@@ -6598,7 +6599,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (!searchExpand) {
 			if (isOnline(this)) {
 				if (fullscreenOfflineFragment.getItemCount() > 0
-						&& !fullscreenOfflineFragment.searchMode()) {
+						&& !fullscreenOfflineFragment.searchMode() && searchMenuItem != null) {
 					searchMenuItem.setVisible(true);
 				}
 			} else {
