@@ -492,10 +492,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		
 	}
 
-	private void sendBroadcastUpdateAccountDetails() {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
-		sendBroadcast(intent);
+	public void sendBroadcastUpdateAccountDetails() {
+		sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+				.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
 	}
 
 	private final int interval = 3000;
@@ -1315,16 +1314,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
 
-	public void updateBusinessStatus() {
-		myAccountInfo.setBusinessStatusReceived(true);
-		int status = megaApi.getBusinessStatus();
-		if (status == BUSINESS_STATUS_EXPIRED
-				|| (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD)){
-			myAccountInfo.setShouldShowBusinessAlert(true);
-		}
-		sendBroadcastUpdateAccountDetails();
-	}
-
 	/**
 	 * Method for showing an incoming group call notification.
 	 *
@@ -1848,6 +1837,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
+	}
+
+	public void resetMyAccountInfo() {
+    	myAccountInfo = new MyAccountInfo();
 	}
 
 	public static boolean getSpeakerStatus(long chatId) {

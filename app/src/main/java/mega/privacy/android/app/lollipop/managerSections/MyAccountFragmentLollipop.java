@@ -468,19 +468,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
 		}
 
-		//Set account details
-		if (!myAccountInfo.isBusinessStatusReceived()) {
-			businessAccountManagementAlert.setVisibility(View.GONE);
-			typeAccount.setText(getString(R.string.recovering_info));
-			upgradeButton.setVisibility(View.GONE);
-			achievementsLayout.setVisibility(View.GONE);
-			achievementsSeparator.setVisibility(View.GONE);
-			businessAccountContainer.setVisibility(View.GONE);
-			expiryRenewLayout.setVisibility(View.GONE);
-			expiryRenewSeparator.setVisibility(View.GONE);
-			return;
-		}
-
 		if (megaApi.isBusinessAccount()) {
 			accountTypeLayout.setVisibility(View.GONE);
 			accountTypeSeparator.setVisibility(View.GONE);
