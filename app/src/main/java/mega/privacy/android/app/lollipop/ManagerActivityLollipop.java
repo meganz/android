@@ -890,7 +890,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						upAFL.setPricingInfo();
 					}
 				}
-				else if(actionType == UPDATE_ACCOUNT_DETAILS || actionType == UPDATE_BUSINESS){
+				else if(actionType == UPDATE_ACCOUNT_DETAILS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
 					if (isFinishing()) {
 						return;

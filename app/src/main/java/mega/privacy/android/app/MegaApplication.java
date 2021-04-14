@@ -477,7 +477,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
 					}
 
-					sendBroadcastUpdateAccountDetails(false);
+					sendBroadcastUpdateAccountDetails();
 				}
 			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
 				dbH.setTransferQueueStatus(request.getFlag());
@@ -492,9 +492,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		
 	}
 
-	public void sendBroadcastUpdateAccountDetails(boolean isBusinessUpdate) {
+	public void sendBroadcastUpdateAccountDetails() {
 		sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-				.putExtra(ACTION_TYPE, isBusinessUpdate ? UPDATE_BUSINESS : UPDATE_ACCOUNT_DETAILS));
+				.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
 	}
 
 	private final int interval = 3000;
