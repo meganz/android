@@ -643,7 +643,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 intent.getBooleanExtra(
                     FROM_HOME_PAGE,
                     false
-                ) -> StringResourcesUtils.getString(R.string.file_saved_to_failed)
+                ) -> StringResourcesUtils.getString(
+                    R.string.file_saved_to_failed,
+                    StringResourcesUtils.getString(R.string.section_cloud_drive)
+                )
                 else -> StringResourcesUtils.getString(R.string.file_creation_failed)
             }
         )
