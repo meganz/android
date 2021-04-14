@@ -21,7 +21,6 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -64,7 +63,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
-import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
@@ -389,7 +388,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         if (service == null) {
             logDebug("refreshMenuOptionsVisibility null service")
 
-            toggleAllMenuItemsVisibility(menu, false)
+            menu.toggleAllMenuItemsVisibility(false)
             return
         }
 
@@ -399,18 +398,18 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         if (adapterType == null) {
             logDebug("refreshMenuOptionsVisibility null adapterType")
 
-            toggleAllMenuItemsVisibility(menu, false)
+            menu.toggleAllMenuItemsVisibility(false)
             return
         }
 
         when (currentFragment) {
             R.id.playlist -> {
-                toggleAllMenuItemsVisibility(menu, false)
+                menu.toggleAllMenuItemsVisibility(false)
                 searchMenuItem?.isVisible = true
             }
             R.id.main_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.properties).isVisible =
                         currentFragment == R.id.main_player
@@ -424,7 +423,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 if (adapterType == RUBBISH_BIN_ADAPTER
                     || megaApi.isInRubbish(megaApi.getNodeByHandle(service.viewModel.playingHandle))
                 ) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.properties).isVisible =
                         currentFragment == R.id.main_player
@@ -437,7 +436,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 if (adapterType == FROM_CHAT) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true
                     menu.findItem(R.id.chat_import).isVisible = true
@@ -466,7 +465,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true
                     menu.findItem(R.id.share).isVisible = true
@@ -475,7 +474,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 if (adapterType == FOLDER_LINK_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true
 
@@ -486,11 +485,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 if (node == null) {
                     logDebug("refreshMenuOptionsVisibility node is null")
 
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
                     return
                 }
 
-                toggleAllMenuItemsVisibility(menu, true)
+                menu.toggleAllMenuItemsVisibility(true)
                 searchMenuItem?.isVisible = false
 
                 menu.findItem(R.id.save_to_device).isVisible = true

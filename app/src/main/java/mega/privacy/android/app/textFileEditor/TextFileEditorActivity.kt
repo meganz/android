@@ -43,7 +43,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
-import mega.privacy.android.app.utils.MenuUtils.Companion.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -233,38 +233,38 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         val menu = this.menu ?: return
 
         if (!isOnline(this)) {
-            toggleAllMenuItemsVisibility(menu, false)
+            menu.toggleAllMenuItemsVisibility(false)
             return
         }
 
         if (viewModel.isViewMode()) {
             if (viewModel.getAdapterType() == OFFLINE_ADAPTER) {
-                toggleAllMenuItemsVisibility(menu, false)
+                menu.toggleAllMenuItemsVisibility(false)
                 menu.findItem(R.id.action_share).isVisible = true
                 return
             }
 
             if (viewModel.getNode() == null) {
-                toggleAllMenuItemsVisibility(menu, false)
+                menu.toggleAllMenuItemsVisibility(false)
                 return
             }
 
             when (viewModel.getAdapterType()) {
                 RUBBISH_BIN_ADAPTER -> {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_remove).isVisible = true
                 }
                 FILE_LINK_ADAPTER, ZIP_ADAPTER -> {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     menu.findItem(R.id.action_share).isVisible = true
                 }
                 FOLDER_LINK_ADAPTER -> {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                 }
                 FROM_CHAT -> {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
 
                     if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
@@ -280,12 +280,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 }
                 else -> {
                     if (megaApi.isInRubbish(viewModel.getNode())) {
-                        toggleAllMenuItemsVisibility(menu, false)
+                        menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
                         return
                     }
 
-                    toggleAllMenuItemsVisibility(menu, true)
+                    menu.toggleAllMenuItemsVisibility(true)
 
                     when (viewModel.getNodeAccess()) {
                         MegaShare.ACCESS_OWNER -> {
@@ -312,7 +312,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         } else {
-            toggleAllMenuItemsVisibility(menu, false)
+            menu.toggleAllMenuItemsVisibility(false)
             menu.findItem(R.id.action_save).isVisible = true
         }
     }
