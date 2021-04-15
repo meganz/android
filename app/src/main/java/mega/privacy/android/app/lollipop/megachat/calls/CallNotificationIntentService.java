@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.listeners.StartChatCallListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -37,7 +38,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
     private long callIdIncomingCall = MEGACHAT_INVALID_HANDLE;
 
     private long chatIdCurrentCall;
-    private boolean hasVideoInitialCall;
 
     public CallNotificationIntentService() {
         super("CallNotificationIntentService");
@@ -77,9 +77,9 @@ public class CallNotificationIntentService extends IntentService implements Mega
                         logDebug("Answering incoming call with status " + callStatusToString(call.getStatus()));
                         addChecksForACall(chatIdIncomingCall, false);
                         if (call.isRinging()) {
-                            megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                            megaChatApi.answerChatCall(chatIdIncomingCall, false, true, this);
                         } else {
-                            megaChatApi.startChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                            megaChatApi.startChatCall(chatIdIncomingCall, false, true, new StartChatCallListener(this));
                         }
                     }
 
@@ -88,7 +88,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                     if (currentCall == null) {
                         logDebug("Answering incoming call ...");
                         addChecksForACall(chatIdIncomingCall, false);
-                        megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                        megaChatApi.answerChatCall(chatIdIncomingCall, false, true, this);
                     } else {
                         logDebug("Hanging up current call ... ");
                         megaChatApi.hangChatCall(callIdIncomingCall, this);
@@ -116,7 +116,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 if (currentCall == null || currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     addChecksForACall(chatIdIncomingCall, false);
-                    megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                    megaChatApi.answerChatCall(chatIdIncomingCall, false, true, this);
                 } else {
                     logDebug("Putting the current call on hold...");
                     megaChatApi.setCallOnHold(chatIdCurrentCall, true, this);
@@ -148,17 +148,10 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");
                     addChecksForACall(chatIdIncomingCall, false);
-                    api.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                    api.answerChatCall(chatIdIncomingCall, false, true, this);
                 }
             } else {
                 logError("Error hanging up call" + e.getErrorCode());
-            }
-
-        } else if (request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Call started successfully");
-            } else {
-                logError("Error starting a call" + e.getErrorCode());
             }
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
@@ -180,7 +173,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Current call on hold. Answering incoming call ...");
                 addChecksForACall(chatIdIncomingCall, false);
-                api.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, true, this);
+                api.answerChatCall(chatIdIncomingCall, false, true, this);
             } else {
                 logError("Error putting the call on hold" + e.getErrorCode());
             }

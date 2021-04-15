@@ -44,6 +44,8 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentStatus.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
             intentStatus.putExtra(UPDATE_CALL_ID, call.getCallId());
             intentStatus.putExtra(UPDATE_CALL_STATUS, callStatus);
+            intentStatus.putExtra(CALL_IS_OUTGOING, call.isOutgoing());
+            intentStatus.putExtra(CALL_IS_RINGING, call.isRinging());
             if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
                 intentStatus.putExtra(UPDATE_CALL_TERM_CODE, call.getTermCode());
                 intentStatus.putExtra(UPDATE_CALL_IGNORE, call.isIgnored());
@@ -63,10 +65,12 @@ public class CallListener implements MegaChatCallListenerInterface {
 
         // Peer has changed its ringing state
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)) {
-            logDebug("Changes in local av flags ");
+            logDebug("Changes in ringing status call:: call.isRinging() = "+call.isRinging());
             Intent intent = new Intent(ACTION_CHANGE_RINGING_STATUS);
             intent.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
             intent.putExtra(UPDATE_CALL_ID, call.getCallId());
+            intent.putExtra(CALL_IS_RINGING, call.isRinging());
+            intent.putExtra(UPDATE_CALL_STATUS, call.getStatus());
             megaApplication.sendBroadcast(intent);
         }
 

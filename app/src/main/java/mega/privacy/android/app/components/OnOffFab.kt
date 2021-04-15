@@ -35,7 +35,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     @ColorInt
     private val offBackgroundTint: Int
 
-    private var onOffCallback: ((Boolean) -> Unit)? = null
+    private var onOffCallback: ((Boolean) -> Boolean)? = null
 
     constructor(context: Context) : this(context, null, 0)
 
@@ -72,15 +72,14 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         updateAppearance()
 
         setOnClickListener {
-            isOn = !isOn
-
-            updateAppearance()
-
-            onOffCallback?.invoke(isOn)
+            if (onOffCallback?.invoke(!isOn) == true) {
+                isOn = !isOn
+                updateAppearance()
+            }
         }
     }
 
-    fun setOnOffCallback(callback: (Boolean) -> Unit) {
+    fun setOnOffCallback(callback: (Boolean) -> Boolean) {
         onOffCallback = callback
     }
 
