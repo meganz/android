@@ -1681,7 +1681,7 @@ public class ChatUtil {
      */
     private static void removeSharedPreference(SharedPreferences preferences) {
         if (preferences != null) {
-            preferences.edit().clear().commit();
+            preferences.edit().clear().apply();
         }
     }
 }

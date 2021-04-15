@@ -484,6 +484,8 @@ public class AccountController {
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
+        removeEmojisSharedPreferences();
+
         new LastShowSMSDialogTimeChecker(context).reset();
         MediaPlayerService.stopAudioPlayer(context);
         MediaPlayerServiceViewModel.clearSettings(context);
