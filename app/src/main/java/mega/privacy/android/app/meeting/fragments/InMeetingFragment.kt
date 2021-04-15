@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.activity_meeting.*
@@ -13,6 +14,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import kotlin.random.Random
 
 class InMeetingFragment : MeetingBaseFragment() {
 
@@ -24,11 +26,11 @@ class InMeetingFragment : MeetingBaseFragment() {
     private lateinit var gridViewCallFragment: GridViewCallFragment
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
+    val inMeetingViewModel by viewModels<InMeetingViewModel>()
+
     companion object {
         fun newInstance() = InMeetingFragment()
     }
-
-    private lateinit var viewModel: InMeetingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,7 +101,7 @@ class InMeetingFragment : MeetingBaseFragment() {
         }
     }
 
-    private lateinit var dragTouchListener : OnDragTouchListener
+    private lateinit var dragTouchListener: OnDragTouchListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -114,7 +116,7 @@ class InMeetingFragment : MeetingBaseFragment() {
             object : OnDragTouchListener.OnDragActionListener {
 
                 override fun onDragStart(view: View?) {
-                    if(in_meeting_toolbar.visibility == View.VISIBLE) {
+                    if (in_meeting_toolbar.visibility == View.VISIBLE) {
                         dragTouchListener.setToolbarHeight(in_meeting_toolbar.bottom)
                         dragTouchListener.setBottomSheetHeight(meetingActivity.bottom_floating_panel.top)
                     } else {
@@ -139,8 +141,8 @@ class InMeetingFragment : MeetingBaseFragment() {
         //TODO test code start
         loadChildFragment(
             R.id.meeting_container,
-            individualCallFragment,
-            IndividualCallFragment.TAG
+            gridViewCallFragment,
+            GridViewCallFragment.TAG
         )
 
         floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
@@ -181,11 +183,6 @@ class InMeetingFragment : MeetingBaseFragment() {
         gridViewMenuItem = menu.findItem(R.id.grid_view)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(InMeetingViewModel::class.java)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -193,11 +190,11 @@ class InMeetingFragment : MeetingBaseFragment() {
                 true
             }
             R.id.swap_camera -> {
-                //TODO test code start: add participants
-                gridViewCallFragment.loadParticipants(true)
+                //TODO test code start: add or remove last participants
+                inMeetingViewModel.addParticipant(Random.nextBoolean())
 //                logDebug("Swap camera.")
 //                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
-                //TODO test code end: add participants
+                //TODO test code end: add or remove last participants
                 true
             }
             R.id.grid_view -> {

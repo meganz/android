@@ -6,16 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.indicator.enums.IndicatorStyle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.adapter.VideoGridViewAdapter
 import mega.privacy.android.app.utils.Util
-import kotlin.random.Random
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
@@ -25,10 +23,9 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     var maxHeight = 0
 
-    // TODO test code start
-    val data: MutableList<Participant> =
-        mutableListOf(Participant("Katayama Fumiki", null, "#1223ff", false, false, false, true))
-    // TODO test code end
+    private val participantsObserver = Observer<MutableList<Participant>> {
+        viewDataBinding.gridViewPager.refreshData(sliceBy6(it))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,30 +62,22 @@ class GridViewCallFragment : MeetingBaseFragment() {
             .setOnPageClickListener(null)
             .setAdapter(GridViewPagerAdapter(parentFragment, maxWidth, maxHeight))
             .create()
+
+        // TODO test code start
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
+            participantsObserver
+        )
+        // TODO test code end
     }
 
-
-    // TODO test code start
-    fun loadParticipants(add: Boolean) {
-        if (add) {
-            // Random.nextInt(TestTool.testData().size)
-//            if (data.size < 6) {
-//            } else {
-//                data.removeAll(data.subList(2, data.size))
-//            }
-            data.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])
-        } else {
-            if (data.size > 2) {
-                // Random.nextInt(data.size)
-                data.removeAt(data.size - 1)
-            }
-        }
-
-        viewDataBinding.gridViewPager.refreshData(sliceBy6())
+    override fun onDestroy() {
+        super.onDestroy()
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
+            participantsObserver
+        )
     }
-    // TODO test code end
 
-    private fun sliceBy6(): MutableList<List<Participant>> {
+    private fun sliceBy6(data: MutableList<Participant>): MutableList<List<Participant>> {
         val result = mutableListOf<List<Participant>>()
         val sliceCount = if (data.size % 6 == 0) data.size / 6 else data.size / 6 + 1
 

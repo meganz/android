@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.ItemClickViewModel
+import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
 import mega.privacy.android.app.utils.Util
 
@@ -20,6 +21,11 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     lateinit var adapter: VideoListViewAdapter
 
     private val itemClickViewModel by viewModels<ItemClickViewModel>()
+
+    private val participantsObserver = Observer<MutableList<Participant>> {
+        adapter.submitList(it)
+        adapter.notifyDataSetChanged()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,12 +51,20 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         })
 
         adapter = VideoListViewAdapter(itemClickViewModel)
+        participants_horizontal_list.adapter = adapter
 
         // TODO test code start
-        adapter.submitList(TestTool.testData())
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
+            participantsObserver
+        )
         // TODO test code end
+    }
 
-        participants_horizontal_list.adapter = adapter
+    override fun onDestroy() {
+        super.onDestroy()
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
+            participantsObserver
+        )
     }
 
     companion object {
