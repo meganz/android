@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -52,6 +51,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         const val CREATE_MODE = "CREATE_MODE"
         const val VIEW_MODE = "VIEW_MODE"
         const val EDIT_MODE = "EDIT_MODE"
+        const val NON_UPDATE_FINISH_ACTION = 0
+        const val SUCCESS_FINISH_ACTION = 1
+        const val ERROR_FINISH_ACTION = 2
     }
 
     private val textFileEditorData: MutableLiveData<TextFileEditorData> =
@@ -61,18 +63,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val contentText: MutableLiveData<String> = MutableLiveData()
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
-    private val editableAdapter: MutableLiveData<Boolean> = MutableLiveData()
-    private val creationOrEditionSuccess: MutableLiveData<Boolean> = MutableLiveData()
 
     fun onSavingMode(): LiveData<String> = savingMode
 
     fun getFileName(): LiveData<String> = fileName
 
     fun onContentTextRead(): LiveData<String> = contentText
-
-    fun isEditableAdapter(): LiveData<Boolean> = editableAdapter
-
-    fun onCreationOrEditionFinished(): LiveData<Boolean> = creationOrEditionSuccess
 
     fun getNode(): MegaNode? = textFileEditorData.value?.node
 
@@ -90,6 +86,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getAdapterType(): Int = textFileEditorData.value?.adapterType ?: INVALID_VALUE
 
+    fun isEditableAdapter(): Boolean = textFileEditorData.value?.editableAdapter ?: false
+
     fun getMsgChat(): MegaChatMessage? = textFileEditorData.value?.msgChat
 
     fun getChatRoom(): MegaChatRoom? = textFileEditorData.value?.chatRoom
@@ -97,6 +95,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun getMode(): LiveData<String> = mode
 
     fun isViewMode(): Boolean = mode.value == VIEW_MODE
+
+    fun isCreateMode(): Boolean = mode.value == CREATE_MODE
 
     private fun setViewMode() {
         mode.value = VIEW_MODE
@@ -122,16 +122,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getNameOfFile(): String = fileName.value ?: ""
 
-    fun removeCreationOrEditionSuccessObservers(owner: LifecycleOwner) {
-        creationOrEditionSuccess.removeObservers(owner)
-        creationOrEditionSuccess.value = false
-    }
-
     /**
      * Checks if the file can be editable depending on the current adapter.
      */
     private fun setEditableAdapter() {
-        editableAdapter.value = getAdapterType() != OFFLINE_ADAPTER
+        textFileEditorData.value?.editableAdapter = getAdapterType() != OFFLINE_ADAPTER
                 && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
                 && getAdapterType() != FILE_LINK_ADAPTER
                 && getAdapterType() != FOLDER_LINK_ADAPTER
@@ -304,7 +299,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * @param context Current context.
      */
     fun saveFile(context: Context) {
-        if (!isFileEdited()) {
+        if (!isFileEdited() && !isCreateMode()) {
             setViewMode()
             return
         }
@@ -318,7 +313,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         val fileWriter = FileWriter(tempFile.absolutePath)
         val out = BufferedWriter(fileWriter)
-        out.write(editedText.value)
+        out.write(editedText.value ?: "")
         out.close()
 
         if (!isFileAvailable(tempFile)) {
@@ -437,31 +432,31 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      *
      * @param completedTransferId The completed transfer identifier.
      */
-    fun finishCreationOrEdition(completedTransferId: Long) {
+    fun finishCreationOrEdition(completedTransferId: Long): Int {
         if (completedTransferId == INVALID_ID.toLong()) {
             LogUtil.logWarning("Invalid completedTransferId")
-            return
+            return NON_UPDATE_FINISH_ACTION
         }
 
         val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
         if (completedTransfer == null) {
             LogUtil.logWarning("Invalid completedTransfer")
-            return
+            return NON_UPDATE_FINISH_ACTION
         }
 
         if (!isSameNode(completedTransfer)) {
             LogUtil.logWarning("Not the same file, no update needed.")
-            return
+            return NON_UPDATE_FINISH_ACTION
         }
 
         if (completedTransfer.state != MegaTransfer.STATE_COMPLETED) {
-            creationOrEditionSuccess.value = false
-            return
+            return ERROR_FINISH_ACTION
         }
 
-        contentText.value = editedText.value
+        contentText.value = editedText.value ?: ""
         textFileEditorData.value?.node =
             megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
-        creationOrEditionSuccess.value = true
+
+        return SUCCESS_FINISH_ACTION
     }
 }

@@ -13,6 +13,7 @@ data class TextFileEditorData(
     var fileUri: Uri? = null,
     var fileSize: Long? = null,
     var adapterType: Int = INVALID_VALUE,
+    var editableAdapter: Boolean = false,
     var msgChat: MegaChatMessage? = null,
     var chatRoom: MegaChatRoom? = null,
     var needStopHttpServer: Boolean = false
