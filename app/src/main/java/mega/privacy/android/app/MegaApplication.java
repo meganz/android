@@ -322,6 +322,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("END logout sdk request - wait chat logout");
+					removeEmojisSharedPreferences();
 				} else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
 					if (request.getParamType() == MegaError.API_ESSL) {
 						logWarning("SSL verification failed");
