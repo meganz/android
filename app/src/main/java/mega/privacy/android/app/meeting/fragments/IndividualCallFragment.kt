@@ -25,6 +25,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     var videoAlpha = 255
 
+    var released = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -50,8 +52,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         surfaceHolder = video.holder
 
         if (isFloatingWindow) {
-            handleFloatingWindow()
-
             meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
                 view.alpha = 1 - it
             }
@@ -59,6 +59,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
             meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
                 videoAlpha = ((1 - it) * 255).toInt()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Start drawing here, so that after a lock screen, the drawing can resume.
+        if (isFloatingWindow) {
+            handleFloatingWindow()
         }
     }
 
@@ -71,8 +80,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
         surfaceHolder.addCallback(object : SurfaceHolder.Callback {
 
             override fun surfaceCreated(holder: SurfaceHolder?) {
+                released = false
+
                 Thread{
-                    while (true) {
+                    while (!released) {
                         Thread.sleep(100)
                         drawFrame()
                     }
@@ -87,7 +98,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             ) {
             }
 
-            override fun surfaceDestroyed(holder: SurfaceHolder?) {}
+            override fun surfaceDestroyed(holder: SurfaceHolder?) { released = true}
 
         })
         // TODO test code end
@@ -115,7 +126,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
             paint
         )
 
-        surfaceHolder.unlockCanvasAndPost(canvas)
+        if(!released) {
+            surfaceHolder.unlockCanvasAndPost(canvas)
+        }
     }
     // TODO test code end
 
