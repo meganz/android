@@ -24,27 +24,19 @@ import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.NON_UPDATE_FINISH_ACTION
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.SUCCESS_FINISH_ACTION
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
-import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.shareUri
-import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
-import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
-import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
@@ -146,7 +138,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         super.onResume()
 
         viewModel.updateNode()
-        refreshMenuOptionsVisibility()
     }
 
     override fun onDestroy() {
@@ -181,10 +172,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.action_save -> viewModel.saveFile(this)
-            R.id.action_download -> downloadFile()
-            R.id.action_get_link, R.id.action_remove_link -> manageLink()
+            R.id.action_download -> viewModel.downloadFile(nodeSaver)
+            R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
-            R.id.action_share -> share()
+            R.id.action_share -> viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
             R.id.action_rename -> renameNode()
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
@@ -200,7 +191,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 true,
                 this
             )
-            R.id.chat_action_remove -> ChatUtil.removeAttachmentMessage(
+            R.id.chat_action_remove -> removeAttachmentMessage(
                 this,
                 viewModel.getChatRoom()!!.chatId,
                 viewModel.getMsgChat()
@@ -347,10 +338,18 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun setUpObservers() {
+        viewModel.onTextFileEditorDataUpdate().observe(this, ::showDataUpdate)
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onSavingMode().observe(this, ::showSavingMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
+    }
+
+    /**
+     * Refresh menu options because of some change on data.
+     */
+    private fun showDataUpdate(data: TextFileEditorData) {
+        refreshMenuOptionsVisibility()
     }
 
     /**
@@ -496,74 +495,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun isDiscardChangesConfirmationDialogShown(): Boolean =
         discardChangesDialog?.isShowing ?: false
-
-    /**
-     * Manages the download action.
-     */
-    private fun downloadFile() {
-        when (viewModel.getAdapterType()) {
-            OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(viewModel.getNode()!!.handle, true)
-            ZIP_ADAPTER -> nodeSaver.saveUri(
-                viewModel.getFileUri()!!,
-                viewModel.getNameOfFile(),
-                viewModel.getFileSize()!!,
-                true
-            )
-            FROM_CHAT -> nodeSaver.saveNode(
-                viewModel.getNode()!!,
-                highPriority = true,
-                isFolderLink = true,
-                fromMediaViewer = true
-            )
-            else -> nodeSaver.saveHandle(
-                viewModel.getNode()!!.handle,
-                isFolderLink = viewModel.getAdapterType() == FOLDER_LINK_ADAPTER,
-                fromMediaViewer = true
-            )
-        }
-    }
-
-    /**
-     * Manages the get or remove link action depending on if the node is already exported or not.
-     */
-    private fun manageLink() {
-        if (showTakenDownNodeActionNotAvailableDialog(viewModel.getNode(), this)) {
-            return
-        }
-
-        if (viewModel.getNode()?.isExported == true) {
-            showConfirmRemoveLinkDialog(this) {
-                megaApi.disableExport(
-                    viewModel.getNode(),
-                    ExportListener(this) { runDelay(100L) { finishExportAction() } })
-            }
-        } else {
-            showGetLinkActivity(this, viewModel.getNode()!!.handle)
-        }
-    }
-
-    /**
-     * Manages the share action.
-     */
-    private fun share() {
-        when (viewModel.getAdapterType()) {
-            OFFLINE_ADAPTER, ZIP_ADAPTER -> shareUri(
-                this,
-                viewModel.getNameOfFile(),
-                viewModel.getFileUri()
-            )
-            FILE_LINK_ADAPTER -> shareLink(this, intent.getStringExtra(URL_FILE_LINK))
-            else -> shareNode(this, viewModel.getNode()!!) { finishExportAction() }
-        }
-    }
-
-    /**
-     * Updates the UI after finish the export action (get or remove link).
-     */
-    private fun finishExportAction() {
-        viewModel.updateNode()
-        refreshMenuOptionsVisibility()
-    }
 
     /**
      * Manages the rename action.

@@ -17,20 +17,27 @@ import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.getLocalFile
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
+import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
+import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
+import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -64,6 +71,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val contentText: MutableLiveData<String> = MutableLiveData()
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
+    fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
+
     fun onSavingMode(): LiveData<String> = savingMode
 
     fun getFileName(): LiveData<String> = fileName
@@ -78,11 +87,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         val node = textFileEditorData.value?.node ?: return
 
         textFileEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
+        textFileEditorData.notifyObserver()
     }
 
-    fun getFileUri(): Uri? = textFileEditorData.value?.fileUri
+    private fun getFileUri(): Uri? = textFileEditorData.value?.fileUri
 
-    fun getFileSize(): Long? = textFileEditorData.value?.fileSize
+    private fun getFileSize(): Long? = textFileEditorData.value?.fileSize
 
     fun getAdapterType(): Int = textFileEditorData.value?.adapterType ?: INVALID_VALUE
 
@@ -105,8 +115,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun setEditMode() {
         mode.value = EDIT_MODE
     }
-
-    fun isSavingMode(): Boolean = savingMode.value != null
 
     fun isSavingModeEdit(): Boolean = savingMode.value == EDIT_MODE
 
@@ -458,5 +466,72 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
 
         return SUCCESS_FINISH_ACTION
+    }
+
+    /**
+     * Manages the download action.
+     *
+     * @param nodeSaver Required object to save nodes.
+     */
+    fun downloadFile(nodeSaver: NodeSaver) {
+        when (getAdapterType()) {
+            OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(getNode()!!.handle, true)
+            ZIP_ADAPTER -> nodeSaver.saveUri(
+                getFileUri()!!,
+                getNameOfFile(),
+                getFileSize()!!,
+                true
+            )
+            FROM_CHAT -> nodeSaver.saveNode(
+                getNode()!!,
+                highPriority = true,
+                isFolderLink = true,
+                fromMediaViewer = true
+            )
+            else -> nodeSaver.saveHandle(
+                getNode()!!.handle,
+                isFolderLink = getAdapterType() == FOLDER_LINK_ADAPTER,
+                fromMediaViewer = true
+            )
+        }
+    }
+
+    /**
+     * Manages the get or remove link action depending on if the node is already exported or not.
+     *
+     * @param context Current context.
+     */
+    fun manageLink(context: Context) {
+        if (showTakenDownNodeActionNotAvailableDialog(getNode(), context)) {
+            return
+        }
+
+        if (getNode()?.isExported == true) {
+            showConfirmRemoveLinkDialog(context) {
+                megaApi.disableExport(
+                    getNode(),
+                    ExportListener(context) { runDelay(100L) { updateNode() } })
+            }
+        } else {
+            showGetLinkActivity(context as Activity, getNode()!!.handle)
+        }
+    }
+
+    /**
+     * Manages the share action.
+     *
+     * @param context     Current context.
+     * @param urlFileLink Link if FILE_LINK_ADAPTER, empty otherwise.
+     */
+    fun share(context: Context, urlFileLink: String) {
+        when (getAdapterType()) {
+            OFFLINE_ADAPTER, ZIP_ADAPTER -> shareUri(
+                context,
+                getNameOfFile(),
+                getFileUri()
+            )
+            FILE_LINK_ADAPTER -> shareLink(context, urlFileLink)
+            else -> shareNode(context, getNode()!!) { updateNode() }
+        }
     }
 }

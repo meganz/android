@@ -106,7 +106,9 @@ object MegaNodeUtil {
     @JvmStatic
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean {
         return if (isNodeTakenDown(node)) {
-            Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+            RunOnUIThreadUtils.post {
+                Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+            }
             true
         } else {
             false
