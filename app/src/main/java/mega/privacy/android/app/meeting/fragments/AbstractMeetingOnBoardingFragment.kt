@@ -19,15 +19,24 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
 
 
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
+    private var videoListener: MeetingVideoListener? = null
     private var bRefreshPermission: Boolean = false
+    private var bRequested = false; // If permission has been requested
     protected val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     private var requestCode = 0
@@ -39,12 +48,55 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         Manifest.permission.RECORD_AUDIO
     )
 
+    // Receive information about requests.
+    val listener = object : MegaChatRequestListenerInterface {
+        override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+        }
+
+        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+        }
+
+        override fun onRequestFinish(
+            api: MegaChatApiJava?,
+            request: MegaChatRequest?,
+            e: MegaChatError?
+        ) {
+            when (request?.type) {
+                MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
+                    val bOpen = request.flag
+                    logDebug("open video: $bOpen")
+                    if (request.chatHandle == MEGACHAT_INVALID_HANDLE) {
+                        if (bOpen) {
+                            fab_cam.isOn = true
+                            activateVideo()
+                        } else {
+                            fab_cam.isOn = false
+                            deactivateVideo()
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun onRequestTemporaryError(
+            api: MegaChatApiJava?,
+            request: MegaChatRequest?,
+            e: MegaChatError?
+        ) {
+
+        }
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         initBinding()
         initViewModel()
+        initComponents()
         return binding.root
     }
 
@@ -52,6 +104,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setProfileAvatar()
+
         (activity as AppCompatActivity).supportActionBar?.apply {
             title = arguments?.getString(MeetingActivity.MEETING_NAME)
             subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
@@ -122,6 +175,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 )
             }
         }
+    }
+
+    /**
+     * Initialize components of meeting
+     */
+    private fun initComponents() {
+        // TODO("Set front camera")
+
     }
 
     /**
@@ -203,6 +264,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         requestCode = 0
         for (i in permissions.indices) {
             val bPermission = PermissionUtils.hasPermissions(requireContext(), permissions[i])
+            // 1. If this permission has not been requested, the user will not necessarily refuse, so it returns false;
+            // 2. Requested but rejected, return true at this time;
+            // 3. The request for permission is forbidden, and the pop-up window is not reminded, so return false;
+            // 4. The request is allowed, so false is returned.
             val showRequestPermission =
                 PermissionUtils.shouldShowRequestPermissionRationale(
                     requireActivity(),
@@ -244,8 +309,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 }
             }
             if (!bPermission) {
-                // If 'Don't ask again' is not selected, show the permission request dialog
-                if (showRequestPermission) {
+                if (bRequested) {
+                    // If 'Don't ask again' is not selected, show the permission request dialog
+                    if (showRequestPermission) {
+                        mPermissionList.add(permissions[i])
+                    }
+                } else {
+                    // The first time, if bPermission == false, send request
                     mPermissionList.add(permissions[i])
                 }
             }
@@ -302,7 +372,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     ) {
         logDebug("onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
+        bRequested = true
         var i = 0
         while (i < grantResults.size) {
             val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
@@ -317,19 +387,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                     abstractMeetingOnBoardingViewModel.setRecordAudioPermission(bPermission)
                 }
             }
-            if (!bPermission) {
-                // Check if the user ticket 'Don't ask again' and deny a permission request.
-                val showRequestPermission =
-                    PermissionUtils.shouldShowRequestPermissionRationale(
-                        requireActivity(),
-                        permissions[i]
-                    )
-                // Don't show permission dialog again when user select "DENY", Recheck it when using
-                if (!showRequestPermission) {
-                    // The user ticket 'Don't ask again' and deny a permission request.
-                    logDebug("the user ticket 'Don't ask again' and deny a permission request.")
-                }
-            }
             i++
         }
     }
@@ -341,7 +398,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      *
      */
     private fun refreshPermissions(permission: Array<String>) {
-        if(bRefreshPermission) {
+        if (bRefreshPermission) {
             bRefreshPermission = false
             for (i in permission.indices) {
                 val bPermission = PermissionUtils.hasPermissions(requireContext(), permission[i])
@@ -366,7 +423,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * @param bOn true: turn on; off: turn off
      */
     fun switchCamera(bOn: Boolean) {
-        fab_cam.isOn = bOn
+        if (bOn) {
+            megaChatApi.openVideoDevice(listener)
+        } else {
+            megaChatApi.releaseVideoDevice(listener)
+        }
     }
 
     /**
@@ -385,5 +446,63 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     private fun switchMic(bOn: Boolean) {
         fab_mic.isOn = bOn
+    }
+
+    /**
+     * Method for activating the video.
+     * TODO("Refactor code")
+     */
+    private fun activateVideo() {
+        if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
+            LogUtil.logError("Error activating video")
+            return
+        }
+        if (videoListener == null) {
+            videoListener = MeetingVideoListener(
+                context,
+                localSurfaceView,
+                outMetrics,
+                false
+            )
+            megaChatApi.addChatLocalVideoListener(
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
+                videoListener
+            )
+        } else {
+            videoListener?.let {
+                it.height = 0
+                it.width = 0
+            }
+        }
+        localSurfaceView.visibility = View.VISIBLE
+    }
+
+    /**
+     * Method for deactivating the video.
+     * TODO("Refactor code")
+     */
+    private fun deactivateVideo() {
+        if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
+            LogUtil.logError("Error deactivating video")
+            return
+        }
+        logDebug("Removing suface view")
+        localSurfaceView.visibility = View.GONE
+        removeChatVideoListener()
+    }
+
+    /**
+     * Method for removing the video listener.
+     */
+    private fun removeChatVideoListener() {
+        if (videoListener == null) return
+        logDebug("Removing remote video listener")
+        megaChatApi.removeChatVideoListener(
+            MEGACHAT_INVALID_HANDLE,
+            MEGACHAT_INVALID_HANDLE,
+            false,
+            videoListener
+        )
+        videoListener = null
     }
 }

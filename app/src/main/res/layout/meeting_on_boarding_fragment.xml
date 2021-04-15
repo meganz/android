@@ -18,6 +18,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".meeting.fragments.CreateMeetingFragment">
+        <SurfaceView
+            android:id="@+id/localSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <EditText
             android:id="@+id/type_meeting_edit_text"

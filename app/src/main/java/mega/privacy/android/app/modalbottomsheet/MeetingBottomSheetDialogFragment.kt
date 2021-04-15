@@ -3,14 +3,12 @@ package mega.privacy.android.app.modalbottomsheet
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.app.lollipop.controllers.ContactController
 
 class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
 

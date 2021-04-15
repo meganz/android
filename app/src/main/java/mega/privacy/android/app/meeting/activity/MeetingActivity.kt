@@ -37,7 +37,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     MegaChatRequestListenerInterface {
 
     companion object {
-//        const val MEETING_TYPE = "meetingType"
         const val MEETING_ACTION_JOIN = "join_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
