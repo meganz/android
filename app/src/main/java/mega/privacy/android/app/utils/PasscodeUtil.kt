@@ -126,6 +126,10 @@ class PasscodeUtil @Inject constructor(
         val listView = ListView(context)
         listView.adapter = optionsAdapter
         val itemClicked = AtomicReference<Int>()
+        if (itemChecked != INVALID_POSITION) {
+            itemClicked.set(itemChecked)
+        }
+
         val initialRequiredTime = getPasscodeRequireTimeOption(dbH.passcodeRequiredTime)
 
         dialogBuilder.setSingleChoiceItems(
