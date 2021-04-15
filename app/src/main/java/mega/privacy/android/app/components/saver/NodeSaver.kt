@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
@@ -320,6 +321,25 @@ class NodeSaver(
     }
 
     /**
+     * Save an Uri into device.
+     *
+     * @param uri uri to save
+     * @param name name of this uri
+     * @param size size of this uri content
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    fun saveUri(
+        uri: Uri,
+        name: String,
+        size: Long,
+        fromMediaViewer: Boolean = false,
+    ) {
+        save {
+            UriSaving(uri, name, size, fromMediaViewer)
+        }
+    }
+
+    /**
      * Handle app result from FileStorageActivityLollipop launched by requestLocalFolder,
      * and take actions according to the state and result.
      *
@@ -508,7 +528,7 @@ class NodeSaver(
         var totalSize = 0L
 
         for (node in nodes) {
-            totalSize += node.size
+            totalSize += if (node.isFolder) nodesTotalSize(megaApi.getChildren(node)) else node.size
         }
 
         return totalSize

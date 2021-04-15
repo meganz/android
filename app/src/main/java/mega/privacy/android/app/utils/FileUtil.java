@@ -413,6 +413,28 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Copy an Uri to file
+     *
+     * @param uri Source Uri.
+     * @param dest   Final copied file.
+     * @throws IOException if some error happens while copying.
+     */
+    public static void copyUriToFile(Uri uri, File dest) throws IOException {
+        InputStream inputStream = MegaApplication.getInstance().getContentResolver().openInputStream(uri);
+        FileOutputStream outputStream = new FileOutputStream(dest);
+
+        byte[] buffer = new byte[COPY_FILE_BUFFER_SIZE];
+        int length;
+
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+
+        inputStream.close();
+        outputStream.close();
+    }
+
     public static boolean isVideoFile(String path) {
         logDebug("isVideoFile: " + path);
         try {

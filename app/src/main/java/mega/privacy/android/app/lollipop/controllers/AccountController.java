@@ -496,7 +496,7 @@ public class AccountController {
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
-        app.getMyAccountInfo().clear();
+        app.resetMyAccountInfo();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
 
         // Clear get banner success flag

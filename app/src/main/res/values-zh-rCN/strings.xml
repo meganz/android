@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - >拍照并将照片上传至MEGA\nREAD_CONTACTS - >从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - &gt;将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - &gt;拍照并将照片上传至MEGA\nREAD_CONTACTS - &gt;从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - &gt; MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA是全面专注隐私保护的云端存储平台。</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro精简版</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">该共享链接即将失效。</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">这些链接将失效。</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">重命名%1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">打开链接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">打开</string>
     <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
@@ -1513,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
-    <string name="import_success_message" context="Menu option">已添加至云端</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已添加至云端</string>
     <string name="import_success_error" context="Menu option">错误。添加至云端失败。</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">正在连接&#8230;</string>
@@ -1734,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">设定日期</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">选定日期无效</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">字符不符合要求</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">文件名无效</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">请更改您的文件名</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">无效的字符</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">请为您的文件命名</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">请为您的文件命名</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">音频文件</string>
 
@@ -2047,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">请输入验证程序中生成的6位验证码。</string>
     <string name="general_verify" context="Text button">确认</string>
     <string name="general_next" context="Text button">下一步</string>
+    <string name="general_previous" context="Text button">上一个</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成种子或QR码时出错，请再试一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">双重验证已启用</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">您在下次登录账户时，系统会要求您输入验证程序中提供的6位验证码。</string>
@@ -2079,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">预览内容</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">无法执行流式传输，文件未下载</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">无法打开此文件。</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">由于无网络连接，无法打开此文件。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">文件已存于离线储存</string>
 
@@ -2207,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">信息</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">视频</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">发送链接给&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">发送至&#8230;&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">上传至&#8230;&#8230;</string>
 
@@ -2362,6 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您的当前帐户是[A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取决于您所达成的奖励挑战。</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]一次性付款(月)[/A] %s</string>
@@ -2916,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">个月</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">年</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1小时</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d小时</item>
@@ -2972,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">兰紫</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">银灰</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">将在后台播放</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">无法在后台播放</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">正在播放</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">正在播放（已暂停）</string>
+    <string name="audio_track_info" context="Title of the song info screen">曲目信息</string>
+
     <string name="action_more_information" context="Action to get more information">更多信息</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie政策</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie设置</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">我们的Cookie政策</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">我们使用本地存储和类似技术（“ Cookies”）为您提供服务，通过我们的服务增强您的体验，并定制您所看到的广告（包括通过第三方）。从访问开始就接受我们对Cookie的使用，或在Cookie设置中自定义Cookie。您可以在我们的[A]《Cookie政策》[/A]中了解更多信息。</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie设置未保存</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie设置更改已保存。</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">第三方Cookie</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google广告Cookie</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">分类：广告Cookie</string>
@@ -3005,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">跟随系统</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">跟随省电模式设置</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">请选择SD卡根目录。</string>
 </resources>
