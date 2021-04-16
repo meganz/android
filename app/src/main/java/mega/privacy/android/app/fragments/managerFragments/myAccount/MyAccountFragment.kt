@@ -5,9 +5,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -74,10 +73,13 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         binding.phoneText.apply {
             if (!isTextEmpty(registeredPhoneNumber)) {
                 text = registeredPhoneNumber
-                binding.addPhoneNumberLayout.visibility = GONE
-            } else if (canVoluntaryVerifyPhoneNumber()) {
-                visibility = GONE
-                binding.addPhoneNumberLayout.visibility = VISIBLE
+                binding.addPhoneNumberLayout.isVisible = false
+            } else {
+                isVisible = false
+
+                if (canVoluntaryVerifyPhoneNumber()) {
+                    binding.addPhoneNumberLayout.isVisible = true
+                }
             }
         }
 
@@ -114,10 +116,10 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             return
         }
 
-        binding.accountTypeText.visibility = VISIBLE
-        binding.upgradeButton.visibility = VISIBLE
+        binding.accountTypeText.isVisible = true
+        binding.upgradeButton.isVisible = true
 
-        binding.achievementsLayout.visibility = if (megaApi.isAchievementsEnabled) VISIBLE else GONE
+        binding.achievementsLayout.isVisible = megaApi.isAchievementsEnabled
 
         binding.accountTypeText.text = StringResourcesUtils.getString(
             when (accountInfo?.accountType) {

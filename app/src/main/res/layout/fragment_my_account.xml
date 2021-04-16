@@ -35,8 +35,8 @@
                 android:layout_height="18dp"
                 android:layout_below="@+id/my_account_thumbnail"
                 android:layout_alignEnd="@+id/my_account_thumbnail"
-                android:layout_marginBottom="14dp"
                 android:layout_marginEnd="3dp"
+                android:layout_marginBottom="14dp"
                 android:background="@drawable/shape_white_circle">
 
                 <ImageView
@@ -49,48 +49,54 @@
 
             </RelativeLayout>
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                android:id="@+id/name_text"
+            <RelativeLayout
+                android:id="@+id/my_account_text_info_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/my_account_thumbnail"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
-                tools:text="Daphne Oram" />
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/my_account_thumbnail">
 
-            <ImageView
-                android:id="@+id/view_and_edit_profile_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/name_text"
-                android:src="@drawable/ic_view_edit_profile"
-                app:tint="@color/secondaryColor"
-                tools:ignore="ContentDescription" />
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
+                    tools:text="Daphne Oram" />
 
-            <TextView
-                android:id="@+id/email_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/name_text"
-                android:layout_marginTop="8dp"
-                android:layout_toEndOf="@+id/my_account_thumbnail"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-                tools:text="info@daphne_oram.com" />
+                <ImageView
+                    android:id="@+id/view_and_edit_profile_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/name_text"
+                    android:src="@drawable/ic_view_edit_profile"
+                    app:tint="@color/secondaryColor"
+                    tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/phone_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/email_text"
-                android:layout_marginTop="8dp"
-                android:layout_toEndOf="@+id/my_account_thumbnail"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
-                tools:text="+642734738292" />
+                <TextView
+                    android:id="@+id/email_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/name_text"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+                    tools:text="info@daphne_oram.com" />
+
+                <TextView
+                    android:id="@+id/phone_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/email_text"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+                    tools:text="+642734738292" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
@@ -109,6 +115,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="9dp"
+                app:tint="@color/white_dark_grey"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_free_account" />
 
@@ -273,6 +280,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:src="@drawable/ic_contacts_connections"
+                    app:tint="@color/grey_054_white_054"
                     tools:ignore="ContentDescription" />
 
                 <TextView
@@ -314,7 +322,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="32dp"
                     android:src="@drawable/ic_achievement"
-                    app:tint="@color/black_white"
+                    app:tint="@color/grey_054_white_054"
                     tools:ignore="ContentDescription" />
 
                 <TextView
@@ -355,7 +363,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:src="@drawable/ic_last_session"
-                    app:tint="@color/black_white"
+                    app:tint="@color/grey_054_white_054"
                     tools:ignore="ContentDescription" />
 
                 <TextView
