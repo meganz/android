@@ -18,6 +18,10 @@
     <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">The current document will be lost</string>
     <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Discard</string>
     <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Delete current scan?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">The Camera permission is needed to scan documents</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Invalid input</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Camera permissions are needed to scan documents</string>
+    <string name="scan_incorrect_name" context="Error text for incorrect name">Incorrect name</string>
+    <string name="scan_invalid_characters" context="Error text for invalid characters">Invalid characters</string>
+    <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Correct your filename before proceeding</string>
+    <string name="scan_snackbar_invalid_characters" context="Snackbar text for invalid characters">The following characters are not allowed: \" * / : &lt; > \? \ |</string>
+    <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait…</string>
 </resources>
