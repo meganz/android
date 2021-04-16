@@ -33,7 +33,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.fragments.managerFragments.MyAccountFragment;
+import mega.privacy.android.app.fragments.managerFragments.myAccount.MyAccountFragment;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments
+package mega.privacy.android.app.fragments.managerFragments.myAccount
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -50,7 +50,10 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpView()
+    }
 
+    private fun setUpView() {
         accountInfo = app.myAccountInfo
         setAccountDetails()
 
@@ -106,14 +109,8 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             StringResourcesUtils.getString(R.string.recovering_info)
         } else accountInfo?.lastSessionFormattedDate
 
-        if (accountInfo?.isBusinessStatusReceived == false) {
-            binding.accountTypeText.text = StringResourcesUtils.getString(R.string.recovering_info)
-            binding.upgradeButton.visibility = GONE
-            binding.achievementsLayout.visibility = GONE
-            return
-        }
-
         if (megaApi.isBusinessAccount) {
+
             return
         }
 
@@ -128,7 +125,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
                 PRO_I -> R.string.pro1_account
                 PRO_II -> R.string.pro2_account
                 PRO_III -> R.string.pro3_account
-                PRO_LITE -> R.string.lite_account
+                PRO_LITE -> R.string.prolite_account
                 else -> R.string.recovering_info
             }
         )

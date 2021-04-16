@@ -33,8 +33,10 @@
                 android:id="@+id/qr_code_layout"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_alignBottom="@+id/my_account_thumbnail"
-                android:layout_marginStart="55dp"
+                android:layout_below="@+id/my_account_thumbnail"
+                android:layout_alignEnd="@+id/my_account_thumbnail"
+                android:layout_marginBottom="14dp"
+                android:layout_marginEnd="3dp"
                 android:background="@drawable/shape_white_circle">
 
                 <ImageView
@@ -62,7 +64,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/name_text"
-                android:src="@drawable/ic_view_and_edit_profile"
+                android:src="@drawable/ic_view_edit_profile"
+                app:tint="@color/secondaryColor"
                 tools:ignore="ContentDescription" />
 
             <TextView
