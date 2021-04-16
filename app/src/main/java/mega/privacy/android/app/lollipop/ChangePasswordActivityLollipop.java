@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -318,15 +319,14 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 			}
 			case R.id.lost_authentication_device: {
 				try {
-					String url = "https://mega.nz/recovery";
 					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openTermsIntent.setData(Uri.parse(url));
+					openTermsIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(openTermsIntent);
 				}
 				catch (Exception e){
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					viewIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(viewIntent);
 				}
 				break;

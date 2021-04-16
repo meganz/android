@@ -269,6 +269,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -9617,15 +9618,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case R.id.lost_authentication_device: {
 				try {
-					String url = "https://mega.nz/recovery";
 					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openTermsIntent.setData(Uri.parse(url));
+					openTermsIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(openTermsIntent);
 				}
 				catch (Exception e){
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					viewIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(viewIntent);
 				}
 				break;

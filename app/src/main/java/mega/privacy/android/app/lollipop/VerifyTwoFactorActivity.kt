@@ -21,6 +21,7 @@ import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
@@ -116,17 +117,16 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
         binding.lostAuthenticationDevice.setOnClickListener {
             try {
-                val url = "https://mega.nz/recovery"
                 val openTermsIntent = Intent(this, WebViewActivity::class.java)
                 openTermsIntent.apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    data = Uri.parse(url)
+                    data = Uri.parse(RECOVERY_URL)
                 }
 
                 startActivity(openTermsIntent)
             } catch (e: Exception) {
                 val viewIntent = Intent(Intent.ACTION_VIEW)
-                viewIntent.data = Uri.parse("https://mega.nz/recovery")
+                viewIntent.data = Uri.parse(RECOVERY_URL)
                 startActivity(viewIntent)
             }
         }
