@@ -9,8 +9,8 @@
             name="createviewmodel"
             type="mega.privacy.android.app.meeting.fragments.CreateMeetingViewModel" />
         <variable
-            name="viewmodel"
-            type="mega.privacy.android.app.meeting.fragments.AbstractMeetingOnBoardingViewModel" />
+            name="sharedviewmodel"
+            type="mega.privacy.android.app.meeting.activity.MeetingActivityViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,7 +87,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/edit_first_name"
             android:layout_marginBottom="24dp"
-            bind:viewmodelFab="@{viewmodel}"
+            bind:viewmodelFab="@{sharedviewmodel}"
             layout="@layout/meeting_component_onofffab"/>
 
         <EditText
