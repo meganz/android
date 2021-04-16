@@ -5,6 +5,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.sync.cusync.CuSyncManager
 import mega.privacy.android.app.sync.cusync.CuSyncManager.setPrimaryBackup
 import mega.privacy.android.app.sync.cusync.CuSyncManager.setSecondaryBackup
+import mega.privacy.android.app.sync.cusync.CuSyncManager.updatePrimaryBackupName
+import mega.privacy.android.app.sync.cusync.CuSyncManager.updateSecondaryBackupName
 import mega.privacy.android.app.utils.CameraUploadUtil
 
 /**
@@ -36,7 +38,8 @@ fun updateSQL(backup: Backup) =
  * @param id Backup id which is to be deleted.
  * @return A delete backup SQL.
  */
-fun deleteSQL(id: Long) = "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"
+fun deleteSQL(id: Long) =
+    "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"
 
 /**
  * When user tries to logout, should delete backups first.
@@ -60,8 +63,15 @@ fun initCuSync() {
 
     if (CameraUploadUtil.isPrimaryEnabled() && dbH.cuBackup == null) {
         setPrimaryBackup()
+    } else if (dbH.cuBackup != null) {
+        // Update to make sure backup name is applied on startup.
+        updatePrimaryBackupName()
     }
+
     if (CameraUploadUtil.isSecondaryEnabled() && dbH.muBackup == null) {
         setSecondaryBackup()
+    } else if (dbH.muBackup != null) {
+        // Update to make sure backup name is applied on startup.
+        updateSecondaryBackupName()
     }
 }

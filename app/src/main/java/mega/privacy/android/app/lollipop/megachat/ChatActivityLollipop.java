@@ -4372,7 +4372,8 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 case R.id.chat_cab_menu_offline:
                     finishMultiselectionMode();
-                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
+                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
+                            ChatActivityLollipop.this);
                     break;
             }
             return false;
@@ -4487,6 +4488,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             importIcon.setVisible(false);
 
                         }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                            menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4610,7 +4612,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                         boolean allNodeImages = true;
                         boolean isRemoved = false;
                         boolean allNodeNonContacts = true;
-                        boolean allNodeContacts = true;
 
                         menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
@@ -4668,23 +4669,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     }
                                 }
                             }
-
-                            if (allNodeContacts) {
-                                if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                                    allNodeContacts = false;
-                                } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
-
-                                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                        long userHandle = selected.get(i).getMessage().getUserHandle(i);
-                                        if (!chatRoom.isGroup() && userHandle == chatRoom.getPeerHandle(0)) {
-                                            allNodeContacts = false;
-                                        }
-                                    } else {
-                                        allNodeContacts = false;
-                                    }
-                                }
-                            }
                     }
 
                         if (isUploading || isRemoved) {
@@ -4695,7 +4679,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             importIcon.setVisible(false);
                         }
                         else {
@@ -4708,6 +4691,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 } else {
                                     menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                                     menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(allNodeImages);
+                                    menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                                     menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                     importIcon.setVisible(true);
                                 }
@@ -4723,8 +4707,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible((isOnline(chatActivity) &&
                                     !chatC.isInAnonymousMode()) && showForward);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(allNodeNonContacts &&
-                                    isOnline(chatActivity) && !chatC.isInAnonymousMode());
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(allNodeContacts &&
                                     isOnline(chatActivity) && !chatC.isInAnonymousMode());
                         }
                     }

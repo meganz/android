@@ -197,7 +197,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isVideoNotSupported() {
-		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+		return extension.equals("mpg") || extension.equals("avi") || extension.equals("wmv");
 	}
 
 	public boolean isMp4Video() {
@@ -218,7 +218,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
+		return extension.equals("wma") || extension.equals("aif")
 				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
 				|| extension.equals("3ga");
 	}
