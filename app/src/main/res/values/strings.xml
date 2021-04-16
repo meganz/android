@@ -849,7 +849,6 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
     -->
 
-    <string name="sortby_owner_mail" context="category in sort by action">Owner’s Email</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
