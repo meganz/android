@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro léger</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Ce lien ne sera plus accessible publiquement.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Ces liens ne seront plus accessibles publiquement.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renommer</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Renommer %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Ouvrir un lien</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Ouvrir</string>
     <string name="context_renaming" context="while renaming a file or folder">Renommage</string>
@@ -717,8 +719,8 @@
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Renvoyer</string>
 	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">Ce numéro est déjà associé à un compte MEGA.</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">Vous avez atteint la limite quotidienne</string>
-	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">Le code de vérification ne correspond pas.</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">Le code a été vérifié</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">Le code de confirmation ne correspond pas.</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">Le code a été confirmé</string>
 	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
 	<string name="verify_account_successfully" context="verify phone number successfully">Votre numéro de téléphone a été confirmé avec succès</string>
 
@@ -1513,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">Visualiser les contacts</string>
 
-    <string name="import_success_message" context="Menu option">A été ajouté avec succès au disque nuagique</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">A été ajouté avec succès au disque nuagique</string>
     <string name="import_success_error" context="Menu option">Erreur. N\'a pas été ajouté au disque nuagique</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connexion&#8230;</string>
@@ -1734,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Définir le jour</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">La date demandée n\'est pas valide</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Caractères non autorisés</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Le nom est invalide</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Veuillez corriger les noms de vos fichiers avant de poursuivre</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Certains caractères sont invalides</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Les caractères suivants ne sont pas autorisés : ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Veuillez nommer votre fichier avant de poursuivre</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Veuillez nommer vos fichiers avant de poursuivre</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Fichier son</string>
 
@@ -2047,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Veuillez saisir le code à 6 chiffres généré par votre appli d\'authentification.</string>
     <string name="general_verify" context="Text button">Confirmer</string>
     <string name="general_next" context="Text button">Suivant</string>
+    <string name="general_previous" context="Text button">Précédent</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Une erreur est survenue lors de la génération de la graine ou du code QR, veuillez réessayer.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">L\'authentification à deux facteurs est activée</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
@@ -2079,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Aperçu du contenu</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">La diffusion en continu ne peut pas avoir lieu et le fichier n\'a pas été téléchargé</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">L\'ouverture du fichier est impossible.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Nous n\'avons pas pu ouvrir le fichier en raison de l\'absence de connexion réseau.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
 
@@ -2207,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Message</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Vidéo</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Envoyer le lien à&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Envoyer à&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Téléverser vers&#8230;</string>
 
@@ -2362,6 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Votre compte actuel est [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sous réserve de votre participation à notre programme d\'objectifs.</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Mode de paiement</string>
 
     <string name="billing_period_title" context="title of billing period">Cycle de facturation</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]une fois (mois)[/A] %s</string>
@@ -2916,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">mois</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">an</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 heure</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d heures</item>
@@ -2972,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">violette</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">grise</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Jouera en arrière-plan</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Ne jouera pas en arrière-plan</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Lecture en cours</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Lecture en cours (en pause)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Renseignements sur la plage</string>
+
     <string name="action_more_information" context="Action to get more information">Plus de précisions</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Politique sur les Témoins de navigation</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Paramètres des Témoins de navigation</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Avant que vous ne poursuiviez</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Nous utilisons la mémoire locale et des technologies semblables (« cookies ») pour vous fournir nos services, améliorer votre expérience d\'utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de navigation. Apprenez-en davantage dans notre [A]Politique sur les Témoins de navigation[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Des paramètres de témoins ne sont pas enregistrés</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Les modifications des paramètres des témoins ont été enregistrées.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Témoins tiers</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Témoins publicitaires de Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Catégorie : Témoins publicitaires</string>
@@ -3005,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Sombre</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">Valeur par défaut du système</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Défini par l\'économiseur de pile</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Veuillez sélectionner la racine de la carte SD.</string>
 </resources>

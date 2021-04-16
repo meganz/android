@@ -152,6 +152,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -178,6 +179,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
     implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
+    implementation(name: 'exoplayer-extension-flac-2.12.1', ext: 'aar')
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'

@@ -136,6 +136,7 @@ public class Constants {
     public static final int GO_ONLINE = 9007;
     public static final int START_RECONNECTION = 9008;
 
+    public static final int REQUEST_WRITE_STORAGE_FOR_LOGS = 0;
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
@@ -306,6 +307,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
     public static final String INTENT_EXTRA_KEY_COPY_HANDLES = "COPY_HANDLES";
     public static final String INTENT_EXTRA_KEY_COPY_TO = "COPY_TO";
+    public static final String INTENT_EXTRA_KEY_IMPORT_TO = "IMPORT_TO";
     public static final String INTENT_EXTRA_KEY_CONTACT_EMAIL = "contactEmail";
     public static final String INTENT_EXTRA_KEY_LOCATION_FILE_INFO = "locationFileInfo";
     public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
@@ -313,6 +315,9 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
+    public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
+    public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
+    public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -763,6 +768,9 @@ public class Constants {
 
     public static final int INVALID_VALUE = -1;
 
+    public static final long INVALID_SIZE = -1;
+    public static final int COPY_FILE_BUFFER_SIZE = 32 * 1024; // 32 KB
+
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
     public static final int LOCATION_INDEX_WIDTH = 2;
@@ -805,6 +813,7 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+    public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
@@ -818,4 +827,12 @@ public class Constants {
     public static final int NOT_OVERQUOTA_STATE = 0;
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
+
+    //Sort order management
+    public static final String NEW_ORDER = "NEW_ORDER";
+    public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
+    public static final int ORDER_CLOUD = 0;
+    public static final int ORDER_CONTACTS = 1;
+    public static final int ORDER_OTHERS = 2;
+    public static final int ORDER_CAMERA = 3;
 }

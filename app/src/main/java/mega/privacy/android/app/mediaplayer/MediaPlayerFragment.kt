@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
@@ -66,6 +67,8 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private var toolbarVisible = true
+
+    private var retryFailedDialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -132,7 +135,7 @@ class MediaPlayerFragment : Fragment() {
         super.onPause()
 
         if (isVideoPlayer() && playerService?.playing() == true) {
-            playerService?.exoPlayer?.playWhenReady = false
+            playerService?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
         }
     }
@@ -141,6 +144,12 @@ class MediaPlayerFragment : Fragment() {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        playlistObserved = false
     }
 
     override fun onDestroy() {
@@ -162,32 +171,34 @@ class MediaPlayerFragment : Fragment() {
             service.viewModel.playlist.observe(viewLifecycleOwner) {
                 logDebug("MediaPlayerService observed playlist ${it.first.size} items")
 
-                if (service.viewModel.playlistSearchQuery != null) {
-                    return@observe
-                }
-
                 audioPlayerVH?.togglePlaylistEnabled(it.first)
                 videoPlayerVH?.togglePlaylistEnabled(it.first)
             }
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
-                if (!it) {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setCancelable(false)
-                        .setMessage(
-                            StringResourcesUtils.getString(
-                                if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                else R.string.error_fail_to_open_file_no_network
+                when {
+                    !it && retryFailedDialog == null -> {
+                        retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                            .setCancelable(false)
+                            .setMessage(
+                                StringResourcesUtils.getString(
+                                    if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                    else R.string.error_fail_to_open_file_no_network
+                                )
                             )
-                        )
-                        .setPositiveButton(
-                            StringResourcesUtils.getString(R.string.general_ok)
-                                .toUpperCase(Locale.ROOT)
-                        ) { _, _ ->
-                            playerService?.stopAudioPlayer()
-                            requireActivity().finish()
-                        }
-                        .show()
+                            .setPositiveButton(
+                                StringResourcesUtils.getString(R.string.general_ok)
+                                    .toUpperCase(Locale.ROOT)
+                            ) { _, _ ->
+                                playerService?.stopAudioPlayer()
+                                requireActivity().finish()
+                            }
+                            .show()
+                    }
+                    it -> {
+                        retryFailedDialog?.dismiss()
+                        retryFailedDialog = null
+                    }
                 }
             }
         }
@@ -225,7 +236,7 @@ class MediaPlayerFragment : Fragment() {
             }
 
             if (videoPlayerPausedForPlaylist) {
-                service.exoPlayer.playWhenReady = true
+                service.setPlayWhenReady(true)
                 videoPlayerPausedForPlaylist = false
             }
         }
@@ -308,7 +319,7 @@ class MediaPlayerFragment : Fragment() {
         dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
             if (it) {
                 updateViewForAnimation()
-            } else {
+            } else if (isResumed) {
                 showToolbar()
                 videoPlayerVH?.showController()
 
