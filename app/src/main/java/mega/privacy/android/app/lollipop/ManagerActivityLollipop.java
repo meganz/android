@@ -916,7 +916,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
-				boolean enabled = intent.getBooleanExtra("enabled", false);
+				boolean enabled = intent.getBooleanExtra(INTENT_EXTRA_KEY_ENABLED, false);
 				is2FAEnabled = enabled;
 				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(enabled);

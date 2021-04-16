@@ -684,7 +684,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
     void update2FASetting () {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
-        intent.putExtra("enabled", true);
+        intent.putExtra(INTENT_EXTRA_KEY_ENABLED, true);
         sendBroadcast(intent);
     }
 

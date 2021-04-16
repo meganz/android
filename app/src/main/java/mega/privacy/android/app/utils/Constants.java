@@ -319,6 +319,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
+    public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

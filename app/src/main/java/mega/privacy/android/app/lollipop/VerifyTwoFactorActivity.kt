@@ -4,14 +4,11 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -24,7 +21,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.hideKeyboard
+import mega.privacy.android.app.utils.Util.showAlert
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.*
@@ -73,12 +71,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * @see KEY_NEW_PASSWORD
      */
     private var newPassword: String? = null
-
-    /** In progress indicator */
-    private lateinit var progressBar: ProgressBar
-
-    /** Text view for showing verify 2fa error */
-    private lateinit var pinError: TextView
 
     companion object {
         const val KEY_VERIFY_TYPE = "key_verify_type"
@@ -131,9 +123,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
             }
         }
 
-        progressBar = binding.progressbarVerify2fa
-        pinError = binding.pin2faErrorVerify
-
         setEditTextPINs()
     }
 
@@ -161,30 +150,29 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
         processEditTextPINs { index, total, editTextPIN ->
-            if (index == 0) {
-                editTextPIN.requestFocus()
-            } else {
-                editTextPIN.setEt(getEditTextPINByIndex(index - 1))
-            }
-
-            imm.showSoftInput(editTextPIN, InputMethodManager.SHOW_FORCED)
-
-            editTextPIN.setOnLongClickListener {
-                pinLongClick = true
-                editTextPIN.requestFocus()
-                false
-            }
-
-            editTextPIN.setOnFocusChangeListener { _, hasFoucs ->
-                if (hasFoucs) {
-                    editTextPIN.setText("")
+            editTextPIN.apply {
+                if (index == 0) {
+                    requestFocus()
+                } else {
+                    setEt(getEditTextPINByIndex(index - 1))
                 }
-            }
 
-            editTextPIN.addTextChangedListener(object : AfterTextChangedCallback() {
+                imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
 
-                override fun afterTextChanged(s: Editable) {
-                    if (editTextPIN.length() != 0) {
+                setOnLongClickListener {
+                    pinLongClick = true
+                    requestFocus()
+                    false
+                }
+
+                setOnFocusChangeListener { _, hasFoucs ->
+                    if (hasFoucs) {
+                        setText("")
+                    }
+                }
+
+                doAfterTextChanged {
+                    if (length() != 0) {
                         val next = getEditTextPINByIndex(index + 1)
                         next.requestFocus()
                         next.isCursorVisible = true
@@ -204,13 +192,11 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                         } else {
                             permitVerify()
                         }
-                    } else {
-                        if (isErrorShown) {
-                            verifyQuitError()
-                        }
+                    } else if (isErrorShown) {
+                        verifyQuitError()
                     }
                 }
-            })
+            }
         }
     }
 
@@ -252,15 +238,17 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     /**
      * Paste the content in the clipboard to each EditTextPIN.
      */
-    fun pasteClipboard() {
-        logDebug("pasteClipboard")
+    private fun pasteClipboard() {
         pinLongClick = false
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = clipboard.primaryClip
+
         if (clipData != null) {
             val code = clipData.getItemAt(0).text.toString()
+
             if (code.length == 6) {
                 var areDigits = true
+
                 for (i in 0..5) {
                     if (!Character.isDigit(code[i])) {
                         areDigits = false
@@ -303,10 +291,10 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     /**
      * Quit showing error.
      */
-    fun verifyQuitError() {
+    private fun verifyQuitError() {
         isErrorShown = false
 
-        pinError.visibility = View.GONE
+        binding.pin2faErrorVerify.isVisible = false
 
         processEditTextPINs { _, _, editTextPIN ->
             editTextPIN.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087))
@@ -321,10 +309,10 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         isFirstTime2fa = false
         isErrorShown = true
 
-        pinError.visibility = View.VISIBLE
+        binding.pin2faErrorVerify.isVisible = true
 
         processEditTextPINs { _, _, editTextPIN ->
-            editTextPIN.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+            editTextPIN.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300))
         }
     }
 
@@ -346,7 +334,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         }
 
         if (allInput && !isErrorShown) {
-            progressBar.visibility = View.VISIBLE
+            binding.progressbarVerify2fa.isVisible = true
             verify2FA(sb.toString())
         }
     }
@@ -441,10 +429,10 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         when (e.errorCode) {
             API_OK -> {
                 if (!request.flag) {
-                    // Send broardcast to notify.
+                    // Send broadcast to notify.
                     logDebug("Pin correct: Two-Factor Authentication disabled")
                     val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS)
-                    intent.putExtra("enabled", false)
+                    intent.putExtra(INTENT_EXTRA_KEY_ENABLED, false)
                     sendBroadcast(intent)
 
                     showAlert(R.string.label_2fa_disabled, INVALID_VALUE)
@@ -500,11 +488,11 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
             logDebug("${request.type}: ${request.requestString} finished.")
 
-            if(request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
+            if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
                 hideKeyboard()
             }
 
-            progressBar.visibility = View.GONE
+            binding.progressbarVerify2fa.isVisible = false
 
             // PIN code verification error.
             if (e.errorCode == API_EFAILED or API_EEXPIRED) {
@@ -512,30 +500,17 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 if (is2FAEnabled) {
                     verifyShowError()
                 }
-            } else {
-                when (request.type) {
-                    TYPE_MULTI_FACTOR_AUTH_CHECK -> check2faFinish(request, e)
-                    TYPE_GET_CHANGE_EMAIL_LINK -> changeEmailFinish(e)
-                    TYPE_GET_CANCEL_LINK -> cancelAccountFinish(e)
-                    TYPE_MULTI_FACTOR_AUTH_SET -> disable2faFinish(request, e)
-                    TYPE_CHANGE_PW -> changePasswordFinish(e)
-                }
+
+                return
+            }
+
+            when (request.type) {
+                TYPE_MULTI_FACTOR_AUTH_CHECK -> check2faFinish(request, e)
+                TYPE_GET_CHANGE_EMAIL_LINK -> changeEmailFinish(e)
+                TYPE_GET_CANCEL_LINK -> cancelAccountFinish(e)
+                TYPE_MULTI_FACTOR_AUTH_SET -> disable2faFinish(request, e)
+                TYPE_CHANGE_PW -> changePasswordFinish(e)
             }
         }
-    }
-
-    /**
-     * Adapter class for TextWatcher interface.
-     */
-    private abstract class AfterTextChangedCallback : TextWatcher {
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-        }
-
     }
 }
