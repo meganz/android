@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grey_020_grey_087">
 
     <LinearLayout
         android:id="@+id/parent_linear_layout"
@@ -106,42 +107,50 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="22dp"
             android:layout_marginEnd="22dp"
-            tools:background="@drawable/background_free_account_type">
+            android:background="@drawable/background_account_type">
 
-            <ImageView
-                android:id="@+id/account_type_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="9dp"
-                app:tint="@color/white_dark_grey"
-                tools:ignore="ContentDescription"
-                tools:src="@drawable/ic_free_account" />
+            <RelativeLayout
+                android:id="@+id/account_type_principal_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/account_type_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_toStartOf="@+id/upgrade_button"
-                android:layout_toEndOf="@+id/account_type_icon"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White"
-                tools:text="Free" />
+                <ImageView
+                    android:id="@+id/account_type_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="9dp"
+                    android:src="@drawable/ic_free_account"
+                    app:tint="@color/white_dark_grey"
+                    tools:ignore="ContentDescription" />
 
-            <Button
-                android:id="@+id/upgrade_button"
-                style="@style/Widget.Mega.Button.Variant4"
-                android:layout_alignParentEnd="true"
-                android:text="@string/my_account_upgrade_pro" />
+                <TextView
+                    android:id="@+id/account_type_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toStartOf="@+id/upgrade_button"
+                    android:layout_toEndOf="@+id/account_type_icon"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White"
+                    tools:text="Free" />
+
+                <Button
+                    android:id="@+id/upgrade_button"
+                    style="@style/Widget.Mega.Button.Variant4"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/my_account_upgrade_pro" />
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/renew_expiry_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/account_type_icon"
-                android:layout_alignStart="@+id/account_type_icon"
+                android:layout_below="@+id/account_type_principal_info"
+                android:layout_marginStart="12dp"
                 android:layout_marginBottom="10dp"
                 android:textAppearance="@style/TextAppearance.Mega.Caption.White87White"
                 tools:text="Renews on" />
@@ -150,7 +159,7 @@
                 android:id="@+id/renew_expiry_date_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/account_type_icon"
+                android:layout_below="@+id/account_type_principal_info"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="-2dp"
                 android:layout_toEndOf="@+id/renew_expiry_text"
@@ -162,7 +171,7 @@
         <LinearLayout
             android:id="@+id/account_options_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/background_account_options"
             android:elevation="3dp"
             android:orientation="vertical">

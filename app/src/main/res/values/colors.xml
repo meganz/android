@@ -87,6 +87,7 @@
     <color name="teal_400_alpha_090">#E600B092</color>
     <color name="teal_500_alpha_040">#6600B092</color>
 
+    <color name="red_200">#FB938F</color>
     <color name="red_300">#F46762</color>
     <color name="red_400">#FD3E38</color>
     <color name="red_500">#FF2310</color>
@@ -104,6 +105,7 @@
 
     <color name="orange_300">#FFB640</color>
     <color name="orange_400">#FFA500</color>
+    <color name="orange_600">#FC8A00</color>
 
     <color name="green_300">#78CC64</color>
     <color name="green_400">#56C13E</color>
@@ -125,8 +127,9 @@
     <color name="dark_blue_400">#3FB2E2</color>
     <color name="dark_blue_500">#2BA6DE</color>
 
-    <color name="blue_300">#00C0FD</color>
     <color name="blue_200">#61D2FF</color>
+    <color name="blue_300">#00C0FD</color>
+    <color name="blue_400">#00B2FC</color>
 
     <color name="amber_700">#FFA003</color>
     <color name="amber_600">#FFB300</color>
@@ -381,6 +384,7 @@
     <color name="jade_600_jade_300">@color/jade_600</color>
 
     <!--    Mask color for current plan-->
+    <!--    Mask color for current plan-->DE
     <color name="white_054_dark_grey_054">@color/white_alpha_054</color>
 
     <color name="white_050_dark_grey_050">@color/white_alpha_050</color>
@@ -420,4 +424,8 @@
     <color name="grey_050_grey_700">@color/grey_050</color>
     <color name="grey_054_white_060">@color/grey_alpha_054</color>
     <color name="white_087_white">@color/white_alpha_087</color>
+    <color name="orange_600_orange_300">@color/orange_600</color>
+    <color name="red_300_red_200">@color/red_300</color>
+    <color name="blue_400_blue_300">@color/blue_400</color>
+    <color name="grey_020_grey_087">@color/grey_020</color>
 </resources>

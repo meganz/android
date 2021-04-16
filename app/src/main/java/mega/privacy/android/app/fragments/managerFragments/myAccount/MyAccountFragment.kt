@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
@@ -17,6 +18,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
@@ -56,7 +58,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         accountInfo = app.myAccountInfo
         setAccountDetails()
 
-        binding.myAccountInfoLayout.setOnClickListener {
+        binding.myAccountTextInfoLayout.setOnClickListener {
             //Open edit my profile activity
         }
 
@@ -131,6 +133,26 @@ class MyAccountFragment : BaseFragment(), Scrollable {
                 else -> R.string.recovering_info
             }
         )
+
+        binding.accountTypeLayout.background = tintIcon(
+            requireContext(), R.drawable.background_account_type, ContextCompat.getColor(
+                requireContext(),
+                when (accountInfo?.accountType) {
+                    FREE -> R.color.green_400_green_300
+                    PRO_I -> R.color.orange_600_orange_300
+                    PRO_II, PRO_III, PRO_LITE -> R.color.red_300_red_200
+                    else -> R.color.blue_400_blue_300
+                }
+            )
+        )
+
+        if (accountInfo?.accountType == FREE) {
+            binding.renewExpiryText.isVisible = false
+            binding.renewExpiryDateText.isVisible = false
+        } else {
+            binding.renewExpiryText.isVisible = true
+            binding.renewExpiryDateText.isVisible = true
+        }
     }
 
     fun onBackPressed(): Int {
