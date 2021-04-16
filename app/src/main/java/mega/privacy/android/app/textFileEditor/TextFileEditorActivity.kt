@@ -477,7 +477,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         builder.setTitle(R.string.discard_changes_warning)
             .setCancelable(false)
-            .setPositiveButton(R.string.discard_action) { _, _ ->
+            .setPositiveButton(R.string.discard_close_action) { _, _ ->
                 finish()
             }
             .setNegativeButton(R.string.button_cancel) { dialog, _ ->
