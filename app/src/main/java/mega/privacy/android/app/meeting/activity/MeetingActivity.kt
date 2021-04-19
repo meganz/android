@@ -55,7 +55,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     private lateinit var binding: ActivityMeetingBinding
 
     // TODO: Move bottom floating panel to In-Meeting fragment
-    private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
+    lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
     // TODO: these member variables are not needed if move floating panel away
     private var isGuest = false

@@ -17,11 +17,11 @@ import mega.privacy.android.app.utils.Util
 
 class GridViewCallFragment : MeetingBaseFragment() {
 
-    lateinit var viewDataBinding: GridViewCallFragmentBinding
+    private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
-    var maxWidth = 0
+    private var maxWidth = 0
 
-    var maxHeight = 0
+    private var maxHeight = 0
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         viewDataBinding.gridViewPager.refreshData(sliceBy6(it))

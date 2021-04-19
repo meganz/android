@@ -26,11 +26,11 @@ class InMeetingFragment : MeetingBaseFragment() {
     private lateinit var gridViewCallFragment: GridViewCallFragment
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
-    val inMeetingViewModel by viewModels<InMeetingViewModel>()
+    private var lastTouch: Long = 0
 
-    companion object {
-        fun newInstance() = InMeetingFragment()
-    }
+    private var previousY = -1f
+
+    val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,10 +43,6 @@ class InMeetingFragment : MeetingBaseFragment() {
 
         return inflater.inflate(R.layout.in_meeting_fragment, container, false)
     }
-
-    var lastTouch: Long = 0
-
-    var previousY = -1f
 
     fun onPageClick() {
         // Prevent fast tapping.
