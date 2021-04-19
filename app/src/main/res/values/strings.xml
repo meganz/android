@@ -2070,14 +2070,14 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR code, please try again.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Two-Factor Authentication Enabled</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Next time you login to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Backup your Recovery Key</b></string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future. </string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Invalid code</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Lost your Authenticator device?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Login Verification</string>
     <string name="verify_2fa_subtitle_change_password" context="Subtitle of screen verify Two-Factor Authentication for changing password">Change password</string>
     <string name="verify_2fa_subtitle_change_email" context="Subtitle of screen verify Two-Factor Authentication for changing email">Change email</string>
     <string name="verify_2fa_subtitle_cancel_account" context="Subtitle of screen verify Two-Factor Authentication for cancelling account">Delete account</string>
-    <string name="verify_2fa_subtitle_diable_2fa" context="Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication">Disable Two-Factor Authentication</string>
+    <string name="verify_2fa_subtitle_diable_2fa" context="Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication">Disable</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Lost your Authenticator device?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
@@ -2088,10 +2088,10 @@
     <string name="general_close" context="Text button">Close</string>
 
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">Export your Recovery Key to finish</string>
-    <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">Authenticator App</string>
-    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you want to open Google Play to install an Authenticator App?</string>
+    <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">Two-Factor Authentication App</string>
+    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you like to open Google Play so you can install an Authenticator App?</string>
     <string name="play_store_label" context="Label Play Store">Play Store</string>
-    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.</string>
+    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticaor, Duo Mobile, Authy or Windows Phone Authenticator app for your phone or tablet.</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>

@@ -12132,12 +12132,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
+			// Re-enable 2fa switch first.
+			if (getSettingsFragment() != null) {
+				sttFLol.reEnable2faSwitch();
+			}
+
 			if (e.getErrorCode() == MegaError.API_OK) {
-				if (request.getFlag()) {
-					is2FAEnabled = true;
-				} else {
-					is2FAEnabled = false;
-				}
+				is2FAEnabled = request.getFlag();
+
 				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(is2FAEnabled);
 				}

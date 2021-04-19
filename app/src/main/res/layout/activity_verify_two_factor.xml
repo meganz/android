@@ -58,7 +58,7 @@
                 app:layout_constraintWidth_percent=".6">
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
+                    android:layout_width="32sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
@@ -70,7 +70,7 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
+                    android:layout_width="32sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
@@ -82,7 +82,19 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
+                    android:layout_width="32sp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="25dp"
+                    android:gravity="center_horizontal"
+                    android:imeOptions="actionNext|flagNoExtractUi"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="32sp"
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:layout_width="32sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
@@ -94,7 +106,7 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
+                    android:layout_width="32sp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center_horizontal"
@@ -106,19 +118,7 @@
                     android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="8dp"
-                    android:gravity="center_horizontal"
-                    android:imeOptions="actionNext|flagNoExtractUi"
-                    android:inputType="number"
-                    android:maxLength="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="32sp"
-                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
-
-                <mega.privacy.android.app.components.EditTextPIN
-                    android:layout_width="36sp"
+                    android:layout_width="32sp"
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal"
                     android:imeOptions="actionNext|flagNoExtractUi"

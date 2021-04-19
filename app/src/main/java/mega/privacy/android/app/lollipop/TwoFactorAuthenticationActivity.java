@@ -2,11 +2,10 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -23,7 +22,6 @@ import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +36,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -494,87 +493,14 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb1.width = scaleWidthPx(25, outMetrics);
-        }
-        firstPin.setLayoutParams(paramsb1);
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        firstPin.setLayoutParams(textParams);
-
-        secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb2.width = scaleWidthPx(25, outMetrics);
-        }
-        secondPin.setLayoutParams(paramsb2);
-        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
-        thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb3.width = scaleWidthPx(25, outMetrics);
-        }
-        thirdPin.setLayoutParams(paramsb3);
-        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-        thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
-        fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb4.width = scaleWidthPx(25, outMetrics);
-        }
-        fourthPin.setLayoutParams(paramsb4);
-        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
-        fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb5.width = scaleWidthPx(25, outMetrics);
-        }
-        fifthPin.setLayoutParams(paramsb5);
-        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
-        sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb6.width = scaleWidthPx(25, outMetrics);
-        }
-        sixthPin.setLayoutParams(paramsb6);
-        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-        textParams.setMargins(0, 0, 0, 0);
-        sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
 
         suggestionRK = (TextView) findViewById(R.id.recommendation_2fa_enabled);
@@ -590,6 +516,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         else if (confirm2FAIsShown){
             qrSeedContainer.setVisibility(View.GONE);
             confirmContainer.setVisibility(View.VISIBLE);
+            scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT);
             scrollContainer2FA.setVisibility(View.GONE);
             scrollContainerVerify.setVisibility(View.VISIBLE);
             scrollContainer2FAEnabled.setVisibility(View.GONE);
@@ -625,6 +552,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         confirmContainer.setVisibility(View.GONE);
         scrollContainer2FA.setVisibility(View.GONE);
         scrollContainerVerify.setVisibility(View.VISIBLE);
+        scrollContainerVerify.setBackgroundColor(ContextCompat.getColor(this,R.color.white_grey_700));
         scrollContainer2FAEnabled.setVisibility(View.GONE);
         if (seed != null){
             logDebug("Seed not null");
@@ -773,11 +701,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         url = null;
         String myEmail = megaApi.getMyEmail();
-//        String myEmail = "aw+@mega.nz";
-//        String myEmail = "";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@yopmail.com";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
 
         if (myEmail != null & seed != null){
             url = getString(R.string.url_qr_2fa, myEmail, seed);
@@ -915,6 +838,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 confirmContainer.setVisibility(View.VISIBLE);
                 scrollContainer2FA.setVisibility(View.GONE);
                 scrollContainerVerify.setVisibility(View.VISIBLE);
+                scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT);
                 scrollContainer2FAEnabled.setVisibility(View.GONE);
                 firstPin.requestFocus();
                 imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
@@ -1005,7 +929,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     void showAlertHelp () {
         logDebug("showAlertHelp");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_2fa_help, null);
         builder.setView(v);
@@ -1017,15 +941,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         helpDialog = builder.create();
         helpDialog.setCanceledOnTouchOutside(false);
-        helpDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isHelpDialogShown = false;
-            }
-        });
+        helpDialog.setOnDismissListener(dialog -> isHelpDialogShown = false);
         try {
             helpDialog.show();
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         isHelpDialogShown = true;
     }
@@ -1033,7 +954,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     void showAlertNotAppAvailable () {
         logDebug("showAlertNotAppAvailable");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_no_authentication_apps, null);
         builder.setView(v);
@@ -1045,15 +966,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         noAppsDialog = builder.create();
         noAppsDialog.setCanceledOnTouchOutside(false);
-        noAppsDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isNoAppsDialogShown = false;
-            }
-        });
+        noAppsDialog.setOnDismissListener(dialog -> isNoAppsDialogShown = false);
         try {
             noAppsDialog.show();
-        }catch (Exception e){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         isNoAppsDialogShown = true;
     }

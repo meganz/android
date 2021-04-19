@@ -468,12 +468,20 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         if (megaApi != null) {
             if (megaApi.multiFactorAuthAvailable()) {
+                twoFASwitch.setEnabled(false);
                 twoFASwitch.setVisible(true);
                 megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
             } else {
                 twoFASwitch.setVisible(false);
             }
         }
+    }
+
+    /**
+     * Re-enable 'twoFASwitch' after 'multiFactorAuthCheck' finished.
+     */
+    public void reEnable2faSwitch() {
+        twoFASwitch.setEnabled(true);
     }
 
     public void hidePreferencesChat() {
