@@ -278,6 +278,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
+    public static final String BROADCAST_ACTION_INTENT_HEADPHONE = "BROADCAST_ACTION_INTENT_HEADPHONE";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -639,6 +640,7 @@ public class Constants {
     public static final int AUDIO_MANAGER_CALL_RINGING = 0;
     public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 1;
     public static final int AUDIO_MANAGER_CALL_OUTGOING = 2;
+    public static final int AUDIO_MANAGER_CREATING_MEETING = 3;
 
     public static final String SEPARATOR = File.separator;
 

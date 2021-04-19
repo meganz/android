@@ -554,7 +554,8 @@ public class AppRTCAudioManager {
         setMicrophoneMute(false);
 
         // Set initial device states.
-        userSelectedAudioDevice = AudioDevice.NONE;
+        userSelectedAudioDevice = typeStatus == AUDIO_MANAGER_CREATING_MEETING ? AudioDevice.SPEAKER_PHONE : AudioDevice.NONE;
+
         selectedAudioDevice = AudioDevice.NONE;
         audioDevices.clear();
 
@@ -647,7 +648,6 @@ public class AppRTCAudioManager {
      */
     private void setDefaultAudioDevice(AudioDevice defaultDevice) {
         ThreadUtils.checkIsOnMainThread();
-
         switch (defaultDevice) {
             case SPEAKER_PHONE:
                 defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
@@ -780,7 +780,6 @@ public class AppRTCAudioManager {
      */
     public void updateAudioDeviceState() {
         startBluetooth();
-
         Log.d(TAG, "updateAudioDeviceState()");
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "--- updateAudioDeviceState: "
@@ -898,6 +897,10 @@ public class AppRTCAudioManager {
         Log.d(TAG, "updateAudioDeviceState done");
     }
 
+    public void sendBroadCastHeadsetUpdated(){
+        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_HEADPHONE));
+    }
+
     private void updateAudioDevice(boolean audioDeviceSetUpdated){
         // Update selected audio device.
         AudioDevice newAudioDevice;
@@ -989,7 +992,15 @@ public class AppRTCAudioManager {
                     + (microphone == HAS_MIC ? "mic" : "no mic") + ", n=" + name + ", sb="
                     + isInitialStickyBroadcast());
             hasWiredHeadset = (state == STATE_PLUGGED);
-            updateAudioDeviceState();
+            sendBroadCastHeadsetUpdated();
         }
+    }
+
+    public boolean isWiredHeadsetConnected() {
+        return hasWiredHeadset;
+    }
+
+    public boolean isBluetoothConnected() {
+        return bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED;
     }
 }

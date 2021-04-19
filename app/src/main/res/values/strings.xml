@@ -3067,6 +3067,7 @@
     <string name="general_speaker" context="General label for speaker">Speaker</string>
     <string name="general_headphone" context="General label for headphone">Headphone</string>
     <string name="general_speaker_headphone" context="General label for switch headphone/speaker">%s is on</string>
+    <string name="speaker_off" context="General label for disable speaker">%s is off</string>
     <string name="meeting_end" context="Label for end meeting">End</string>
     <string name="invite_participants" context="Invite contacts as participants of the meeting">Invite Participants</string>
     <string name="participants_number" context="The number of participants in the meeting">In the meeting (%d)</string>

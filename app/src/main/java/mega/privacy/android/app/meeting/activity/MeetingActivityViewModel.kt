@@ -4,7 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.android.synthetic.main.meeting_component_onofffab.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -44,7 +44,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
-
 
     // Receive information about requests.
     val listener = object : MegaChatRequestListenerInterface {
@@ -137,15 +136,23 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun clickSpeaker(bOn: Boolean) {
         if (meetingActivityRepository.switchSpeaker(bOn)) {
             _speakerLiveData.value = bOn
+            val hasWiredHeadset = MegaApplication.getInstance().audioManager.isWiredHeadsetConnected
+            val hasBluetooth = MegaApplication.getInstance().audioManager.isBluetoothConnected
             tips.value = when (bOn) {
                 true -> getString(
                     R.string.general_speaker_headphone,
                     "Speaker"
                 )
-                false -> getString(
-                    R.string.general_speaker_headphone,
-                    "Headphone"
-                )
+                false -> {
+                    if(hasWiredHeadset || hasBluetooth)
+                    getString(
+                        R.string.general_speaker_headphone,
+                        "Headphone")
+                    else
+                        getString(
+                            R.string.speaker_off,
+                            "Speaker")
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting
 
 import android.widget.TextView
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
@@ -19,6 +20,7 @@ class SpeakerButtonViewHolder(
     private var bluetoothConnected = false
 
     init {
+        currentDevice = MegaApplication.getInstance().audioManager.selectedAudioDevice
         updateAppearance()
 
         speakerFab.setOnClickListener {
@@ -73,10 +75,14 @@ class SpeakerButtonViewHolder(
         device: AppRTCAudioManager.AudioDevice,
         fireCallback: Boolean = true
     ) {
+
         if (fireCallback) {
             if (switchCallback(device)) {
                 currentDevice = device
-
+                MegaApplication.getInstance().audioManager.selectAudioDevice(
+                    currentDevice,
+                    false
+                )
                 updateAppearance()
             }
         }
@@ -89,19 +95,16 @@ class SpeakerButtonViewHolder(
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
                 speakerFab.isOn = true
                 speakerFab.setOnIcon(R.drawable.ic_speaker_on)
-
                 speakerLabel.text = getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
             AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
                 speakerFab.isOn = true
                 speakerFab.setOnIcon(R.drawable.ic_headphone)
-
                 speakerLabel.text = getString(R.string.general_headphone)
             }
             else -> {
                 speakerFab.isOn = false
-
                 speakerLabel.text = getString(R.string.general_speaker)
             }
         }

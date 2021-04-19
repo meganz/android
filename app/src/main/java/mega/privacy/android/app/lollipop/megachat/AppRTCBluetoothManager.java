@@ -446,7 +446,7 @@ public class AppRTCBluetoothManager {
     ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "updateAudioDeviceState");
     cancelTimeInit();
-    apprtcAudioManager.updateAudioDeviceState();
+    apprtcAudioManager.sendBroadCastHeadsetUpdated();
   }
 
     private void startTimerInit() {

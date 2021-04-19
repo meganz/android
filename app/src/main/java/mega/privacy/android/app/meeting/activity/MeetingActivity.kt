@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
@@ -27,6 +28,7 @@ import mega.privacy.android.app.meeting.fragments.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.IncomingCallNotification
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
@@ -78,6 +80,15 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
         }
     }
 
+    private val headphoneReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null) return
+
+            bottomFloatingPanelViewHolder.onHeadphoneConnected(MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
+                MegaApplication.getInstance().audioManager.isBluetoothConnected)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -101,18 +112,20 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
         // Get the value from meet action
         isGuest = meetingAction == MEETING_ACTION_GUEST
         isModerator = meetingAction == MEETING_ACTION_CREATE
+        MegaApplication.getInstance().createRTCAudioManagerWhenCreatingMeeting()
 
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator).apply {
                 // Create a repository get the participants
                 setParticipants(ParticipantRepository().getTestParticipants(this@MeetingActivity))
-                onHeadphoneConnected(wiredHeadset = false, bluetooth = false)
+                onHeadphoneConnected(MegaApplication.getInstance().audioManager.isWiredHeadsetConnected, MegaApplication.getInstance().audioManager.isBluetoothConnected)
             }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(networkReceiver)
+        unregisterReceiver(headphoneReceiver)
     }
 
     /**
@@ -121,6 +134,9 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     private fun initReceiver() {
         registerReceiver(
             networkReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
+        )
+        registerReceiver(
+            headphoneReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_HEADPHONE)
         )
     }
 

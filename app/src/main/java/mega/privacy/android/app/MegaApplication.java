@@ -1670,6 +1670,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return rtcAudioManager;
 	}
 
+	public void createRTCAudioManagerWhenCreatingMeeting(){
+		rtcAudioManager = AppRTCAudioManager.create(this, true, AUDIO_MANAGER_CREATING_MEETING);
+	}
+
 	/**
 	 * Create or update the AppRTCAudioManager for the in progress call.
 	 * @param isSpeakerOn Speaker status.
