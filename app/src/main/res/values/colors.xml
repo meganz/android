@@ -428,4 +428,5 @@
     <color name="red_300_red_200">@color/red_300</color>
     <color name="blue_400_blue_300">@color/blue_400</color>
     <color name="grey_020_grey_087">@color/grey_020</color>
+    <color name="white_grey_900">@color/white</color>
 </resources>

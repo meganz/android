@@ -261,4 +261,5 @@
     <color name="red_300_red_200">@color/red_200</color>
     <color name="blue_400_blue_300">@color/blue_300</color>
     <color name="grey_020_grey_087">@color/grey_alpha_087</color>
+    <color name="white_grey_900">@color/grey_900</color>
 </resources>

@@ -4,7 +4,8 @@
     android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_020_grey_087">
+    android:background="@color/grey_020_grey_087"
+    android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/parent_linear_layout"
@@ -231,7 +232,12 @@
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60"
                     tools:text="@string/sms_add_phone_number_dialog_msg_non_achievement_user" />
 
-                <include layout="@layout/view_relative_layout_separator_72" />
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/add_phone_subtitle"
+                    android:layout_marginStart="72dp" />
 
             </RelativeLayout>
 
@@ -272,7 +278,11 @@
                     android:text="@string/backup_recovery_key_subtitle"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60" />
 
-                <include layout="@layout/view_relative_layout_separator_72" />
+                <include layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/backup_recovery_key_subtitle"
+                    android:layout_marginStart="72dp" />
 
             </RelativeLayout>
 
@@ -313,7 +323,11 @@
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
                     tools:text="132 connections" />
 
-                <include layout="@layout/view_relative_layout_separator_72" />
+                <include layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/contacts_subtitle"
+                    android:layout_marginStart="72dp" />
 
             </RelativeLayout>
 
@@ -355,7 +369,11 @@
                     android:text="@string/achievements_subtitle"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14" />
 
-                <include layout="@layout/view_relative_layout_separator_72" />
+                <include layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/achievements_subtitle"
+                    android:layout_marginStart="72dp" />
 
             </RelativeLayout>
 
