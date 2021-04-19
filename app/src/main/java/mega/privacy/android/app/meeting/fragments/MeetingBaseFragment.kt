@@ -4,9 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.fragment.app.activityViewModels
+import android.os.Bundle
+import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -19,6 +22,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils
  * Use shareModel to share data between sub fragments
  */
 open class MeetingBaseFragment : BaseFragment() {
+
+    lateinit var meetingActivity : MeetingActivity
 
     // The name of the preference to retrieve.
     protected val KEY_SHOW_EDUCATION = "show_education"

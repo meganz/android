@@ -31,7 +31,7 @@ class BottomFloatingPanelViewHolder(
     private val floatingPanelView = binding.bottomFloatingPanel
 
     private val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomFloatingPanel.root)
-    private val propertyUpdaters = ArrayList<(Float) -> Unit>()
+    val propertyUpdaters = ArrayList<(Float) -> Unit>()
 
     private var bottomFloatingPanelExpanded = false
     private var expandedTop = 0
@@ -292,7 +292,7 @@ class BottomFloatingPanelViewHolder(
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
-    fun collpase() {
+    fun collapse() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
         onBottomFloatingPanelSlide(0F)

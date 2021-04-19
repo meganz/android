@@ -3086,6 +3086,7 @@
     <string name="meeting_link" context="The literal meeting link text">Meeting link</string>
     <string name="paste_meeting_link_instruction" context="Tell the user to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
     <string name="invite_to_meeting_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
+    <string name="duration_meeting" context="Subtitle of the meeting screen ">Duration</string>
 
     <string name="onboarding_no_mega_account" context="The question in on-boarding screen asking if the user don't have a mega account">Don\'t have a MEGA account?</string>
     <string name="join_meeting_as_guest" context="The question in on-boarding screen asking if the user is going to join meeting as guest">Join meeting as guest?</string>

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting
 
 import android.content.Context
+import android.view.View
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -44,5 +45,13 @@ object TestTool {
         Participant("Katayama Fumiki", null, "#12ffee", false, false, false, true),
         Participant("Katayama Fumiki", null, "#b323ee", false, false, false, true),
     )
+
+    fun View.showHide() {
+        visibility = if(visibility == View.VISIBLE) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+    }
 }
 

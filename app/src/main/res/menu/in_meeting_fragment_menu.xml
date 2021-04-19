@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/swap_camera"
+        android:enabled="true"
+        android:icon="@drawable/ic_camera_swap"
+        android:orderInCategory="100"
+        android:title="Swap camera"
+        app:iconTint="@color/white"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/grid_view"
+        android:enabled="true"
+        android:icon="@drawable/ic_grid_view"
+        android:orderInCategory="110"
+        android:title="Grid view"
+        android:visible="false"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/speaker_view"
+        android:enabled="true"
+        android:icon="@drawable/ic_speaker_view"
+        android:orderInCategory="120"
+        android:title="Speaker view"
+        android:visible="true"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
+</menu>
