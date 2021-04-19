@@ -13,11 +13,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MeetingBaseFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+// TODO: Add class comment
 open class MeetingBaseFragment : BaseFragment() {
 
     private val KEY_SHOW_EDUCATION: String = "show_education"
@@ -53,10 +49,10 @@ open class MeetingBaseFragment : BaseFragment() {
     /**
      * Process when it switch to offline
      *
-     * @param offLine true if off line mode, false if on line mode
+     * @param offline true if off line mode, false if on line mode
      */
-    fun processOfflineMode(offLine: Boolean) {
-        logDebug("processOfflineMode:$offLine")
+    fun processOfflineMode(offline: Boolean) {
+        logDebug("processOfflineMode:$offline")
     }
 
     /**
@@ -132,14 +128,6 @@ open class MeetingBaseFragment : BaseFragment() {
                 }
             }
             when (permissions[i]) {
-                Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                    sharedModel?.let {
-                        it.setStoragePermission(bPermission)
-                        if (!bPermission) {
-                            requestCode += Constants.REQUEST_READ_WRITE_STORAGE
-                        }
-                    }
-                }
                 Manifest.permission.CAMERA -> {
                     sharedModel?.let {
                         it.setCameraPermission(bPermission)
@@ -204,9 +192,6 @@ open class MeetingBaseFragment : BaseFragment() {
                     val bPermission =
                         PermissionUtils.hasPermissions(requireContext(), permission[i])
                     when (permission[i]) {
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                            it.setStoragePermission(bPermission)
-                        }
                         Manifest.permission.CAMERA -> {
                             it.setCameraPermission(bPermission)
                         }
@@ -232,9 +217,6 @@ open class MeetingBaseFragment : BaseFragment() {
         while (i < grantResults.size) {
             val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
             when (permissions[i]) {
-                Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                    sharedModel?.let { it.setStoragePermission(bPermission) }
-                }
                 Manifest.permission.CAMERA -> {
                     sharedModel?.let { it.setCameraPermission(bPermission) }
                 }

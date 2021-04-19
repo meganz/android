@@ -32,31 +32,46 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 
+// FIXME: Keep Meeting Activity from implementing this and that listeners
+// FIXME: And don't directly call megaChatApi in view layer, try don't put everything together and bloat the View layer file
+
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     MegaChatRequestListenerInterface {
 
     companion object {
+        /** Tne name of actions denoting set
+            JOIN/CREATE/JOIN AS GUEST/In-meeting screen as the initial screen */
         const val MEETING_ACTION_JOIN = "join_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
         const val MEETING_ACTION_IN = "in_meeting"
 
+        /** The names of the Extra data being passed to the initial fragment */
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
     }
 
     private lateinit var binding: ActivityMeetingBinding
+
+    // TODO: Move bottom floating panel to In-Meeting fragment
     private lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
+    // TODO: these member variables are not needed if move floating panel away
     private var isGuest = false
     private var isModerator = false
 
+    // TODO: Now I suggest we can set a state flag(livedata) in SharedViewModel when online/offline
+    // TODO: And let each fragment to observe the livedata. So getCurrentFragment()(iterate fragments) can be abandoned.
+    // TODO: Furthermore, is there already an app global network monitor implemented? If so, call LiveDataEventBus.post() there and
+    // TODO: anyone who cares about this event can observer this "Event", no need to register networkReceivers here and there.
+    // TODO: Make the VIEW layer, especially the view CONTAINER more light-weight and dumb is a goal
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
 
             when (intent.getIntExtra(BroadcastConstants.ACTION_TYPE, -1)) {
+                // TODO: Can it be just getCurrentFragment()?.processOfflineMode(action == Constants.GO_OFFLINE)
                 Constants.GO_OFFLINE -> getCurrentFragment()?.processOfflineMode(true)
                 Constants.GO_ONLINE -> getCurrentFragment()?.processOfflineMode(false)
             }
@@ -66,6 +81,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // FIXME: The Notification is responsible for its disappearance, not MeetingActivity's duty
         IncomingCallNotification.cancelIncomingCallNotification(this)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -76,13 +92,15 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
         initReceiver()
         initActionBar(meetingAction)
         initNavigation(meetingAction)
+
+        // FIXME: Move Floating Panel to In-Meeting fragment
         initFloatingPanel(meetingAction)
     }
 
-    private fun initFloatingPanel(meetAction: String?) {
+    private fun initFloatingPanel(meetingAction: String?) {
         // Get the value from meet action
-        isGuest = meetAction == MEETING_ACTION_GUEST
-        isModerator = meetAction == MEETING_ACTION_CREATE
+        isGuest = meetingAction == MEETING_ACTION_GUEST
+        isModerator = meetingAction == MEETING_ACTION_CREATE
 
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator).apply {
@@ -126,30 +144,32 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     }
 
     /**
-     * Initialize Navigation and set startDestination according to param
+     * Initialize Navigation and set startDestination(initial screen)
+     * according to the meeting action
      *
-     * @param meetAction Create Meeting or Join Meeting
+     * @param meetingAction Create Meeting or Join Meeting
      */
-    private fun initNavigation(meetAction: String?) {
+    private fun initNavigation(meetingAction: String?) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         val navGraph: NavGraph =
             navHostFragment.navController.navInflater.inflate(R.navigation.meeting)
 
+        // The args to be passed to startDestination
         val bundle = Bundle()
 
-        if (meetAction == MEETING_ACTION_GUEST || meetAction == MEETING_ACTION_JOIN) {
+        if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
 
-        when (meetAction) {
-            MEETING_ACTION_CREATE -> navGraph.startDestination = R.id.createMeetingFragment
-            MEETING_ACTION_JOIN -> navGraph.startDestination = R.id.joinMeetingFragment
-            MEETING_ACTION_GUEST -> navGraph.startDestination = R.id.joinMeetingAsGuestFragment
-            MEETING_ACTION_IN -> navGraph.startDestination = R.id.inMeetingFragment
-            else -> navGraph.startDestination = R.id.createMeetingFragment
+        navGraph.startDestination = when (meetingAction) {
+            MEETING_ACTION_CREATE -> R.id.createMeetingFragment
+            MEETING_ACTION_JOIN -> R.id.joinMeetingFragment
+            MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
+            MEETING_ACTION_IN -> R.id.inMeetingFragment
+            else -> R.id.createMeetingFragment
         }
 
         // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph

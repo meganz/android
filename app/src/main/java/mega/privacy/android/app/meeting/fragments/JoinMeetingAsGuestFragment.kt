@@ -14,7 +14,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
     private val viewModel: JoinMeetingAsGuestViewModel by viewModels()
 
-    override fun meetingButtonClick() {
+    override fun onMeetingButtonClick() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -24,7 +24,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     //Create first the chat
     var chats = ArrayList<MegaChatRoom>()
 
-    override fun meetingButtonClick() {
+    override fun onMeetingButtonClick() {
 
         meetingName = viewModel.meetingName.value
         if (meetingName.isNullOrEmpty()) {
