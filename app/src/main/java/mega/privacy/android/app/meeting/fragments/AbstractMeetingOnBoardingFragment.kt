@@ -10,24 +10,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
-import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
+import mega.privacy.android.app.utils.VideoCaptureUtils
+import nz.mega.sdk.MegaChatApiJava.*
+
 
 /**
  * The abstract class of Join/JoinAsGuest/Create Meeting Fragments
@@ -37,64 +33,15 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
  */
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
-    private var videoListener: MeetingVideoListener? = null
     private val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
-
-    // FIXME: We can use ChatBaseListener for avoiding those empty override functions
-    // TODO: I think both this listener and MegaVideoListener can be moved down to the SharedViewModel, move all megaChatApi calls
-    // TODO to Repo, and the Fragment observes liveData (camera on/off finished, frame buffer data)
-    // Receive information about requests.
-    val listener = object : MegaChatRequestListenerInterface {
-        override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
-        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
-        override fun onRequestFinish(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
-        ) {
-            when (request?.type) {
-                MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
-                    val bOpen = request.flag
-                    logDebug("open video: $bOpen")
-
-                    // TODO: Please comment why the handle should be INVALID_HANDLE?
-                    // TODO: and I suggest use if (request.chatHandle != MEGACHAT_INVALID_HANDLE) return; (no embedded if, for readability)
-                    if (request.chatHandle == MEGACHAT_INVALID_HANDLE) {
-                        if (bOpen) {
-                            fab_cam.isOn = true
-                            activateVideo()
-                        } else {
-                            fab_cam.isOn = false
-                            deactivateVideo()
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun onRequestTemporaryError(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
-        ) {
-
-        }
-    }
-
+    private var videoListener: MeetingVideoListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         initBinding()
-        initComponents()
         return binding.root
     }
 
@@ -110,17 +57,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        // TODO: Use ktx "by activityViewMode()"
-        sharedModel = ViewModelProvider(requireActivity()).get(MeetingActivityViewModel::class.java)
         binding.sharedviewmodel = sharedModel
 
         initViewModel()
         checkMeetingPermissions(permissions)
     }
 
-    /**
-     * Bind layout views to ViewModel
-     */
     private fun initBinding() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
@@ -132,15 +74,15 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Use ViewModel to manage UI-related data
      */
     private fun initViewModel() {
-        sharedModel?.let { model ->
+        sharedModel.let { model ->
             model.micLiveData.observe(viewLifecycleOwner) {
-                switchMic(it)
+                fab_mic.isOn = it
             }
             model.cameraLiveData.observe(viewLifecycleOwner) {
                 switchCamera(it)
             }
             model.speakerLiveData.observe(viewLifecycleOwner) {
-                switchSpeaker(it)
+                fab_speaker.isOn = it
             }
             model.tips.observe(viewLifecycleOwner) {
                 showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
@@ -160,14 +102,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 }
             }
         }
-    }
-
-    /**
-     * Initialize components of meeting
-     */
-    private fun initComponents() {
-        // TODO("Set front camera")
-
     }
 
     /**
@@ -238,31 +172,20 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      *
      * @param bOn true: turn on; off: turn off
      */
-    fun switchCamera(bOn: Boolean) = if (bOn) {
-        megaChatApi.openVideoDevice(listener)
-    } else {
-        megaChatApi.releaseVideoDevice(listener)
-    }
+    fun switchCamera(bOn: Boolean) {
+        fab_cam.isOn = bOn
 
-    // TODO: If the group of "switch" methods are as simple as xxx.isOn = bOn
-    // TODO: and only being called once, I think no need to seal as methods
-
-    /**
-     * Switch Speaker / Headphone
-     *
-     * @param bOn true: switch to speaker; false: switch to headphone
-     */
-    private fun switchSpeaker(bOn: Boolean) {
-        fab_speaker.isOn = bOn
-    }
-
-    /**
-     * Turn On / Off Mic
-     *
-     * @param bOn true: turn on; off: turn off
-     */
-    private fun switchMic(bOn: Boolean) {
-        fab_mic.isOn = bOn
+        // Always try to start the call using the front camera
+        val frontCamera = VideoCaptureUtils.getFrontCamera()
+        if (frontCamera != null) {
+            when (bOn) {
+                true -> {
+                    megaChatApi.setChatVideoInDevice(frontCamera, null)
+                    activateVideo()
+                }
+                false -> deactivateVideo()
+            }
+        }
     }
 
     /**
@@ -271,7 +194,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     private fun activateVideo() {
         if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
-            LogUtil.logError("Error activating video")
+            logError("Error activating video")
             return
         }
         if (videoListener == null) {
@@ -282,7 +205,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 false
             )
             megaChatApi.addChatLocalVideoListener(
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
+                MEGACHAT_INVALID_HANDLE,
                 videoListener
             )
         } else {
@@ -296,11 +219,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     /**
      * Method for deactivating the video.
-     * TODO("Refactor code")
      */
     private fun deactivateVideo() {
         if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
-            LogUtil.logError("Error deactivating video")
+            logError("Error deactivating video")
             return
         }
         logDebug("Removing suface view")

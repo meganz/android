@@ -41,7 +41,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         type_meeting_edit_text.visibility = View.VISIBLE
         type_meeting_edit_text.hint = StringResourcesUtils.getString(
             R.string.type_meeting_name, megaChatApi.myFullname
@@ -53,10 +52,14 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        binding?.let {
+        binding.let {
             it.createviewmodel = viewModel
             if (it.typeMeetingEditText.isVisible) {
                 showKeyboardDelayed(type_meeting_edit_text)
+                // Set default meeting name
+                viewModel.initMeetingName(StringResourcesUtils.getString(
+                    R.string.type_meeting_name, megaChatApi.myFullname
+                ))
             }
         }
     }

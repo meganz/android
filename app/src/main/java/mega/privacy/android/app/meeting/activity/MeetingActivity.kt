@@ -326,7 +326,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
         bottom_floating_panel.fadeInOut()
     }
 
-    fun collpaseFloatingPanel() {
+    fun collapseFloatingPanel() {
         bottomFloatingPanelViewHolder.collpase()
     }
 

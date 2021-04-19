@@ -1,17 +1,22 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Bitmap
+import android.view.View
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
@@ -68,4 +73,5 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
             }
         }
     }
+
 }

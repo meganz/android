@@ -3,7 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
@@ -13,14 +13,24 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 
-// TODO: Add class comment
+/**
+ * Base fragment for meeting fragment: [CreateMeetingFragment],[JoinMeetingAsGuestFragment],[JoinMeetingFragment],[InMeetingFragment]
+ * include some common functions: Permissions...
+ * Use shareModel to share data between sub fragments
+ */
 open class MeetingBaseFragment : BaseFragment() {
 
-    private val KEY_SHOW_EDUCATION: String = "show_education"
-    private val MEETINGS_PREFERENCE: String = "meeting_prefrence"
-    protected var sharedModel: MeetingActivityViewModel? = null
-    private var bRequested = false; // If permission has been requested
-    private var bRefreshPermission: Boolean = false
+    // The name of the preference to retrieve.
+    protected val KEY_SHOW_EDUCATION = "show_education"
+
+    // SharedPreference file name
+    protected val MEETINGS_PREFERENCE = "meeting_prefrence"
+
+    protected val sharedModel: MeetingActivityViewModel by activityViewModels()
+
+    // Indicate if permission has been requested. After requested, we should check "shouldShowRequestPermissionRationaleSnackBar"
+    private var bRequested = false;
+    private var bRefreshPermission = false
     protected var requestCode = 0
 
     // Default permission array for meeting
@@ -28,18 +38,6 @@ open class MeetingBaseFragment : BaseFragment() {
         Manifest.permission.CAMERA,
         Manifest.permission.RECORD_AUDIO
     )
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @return A new instance of fragment BlankFragment.
-         */
-        @JvmStatic
-        fun newInstance() =
-            MeetingBaseFragment()
-    }
 
     override fun onResume() {
         super.onResume()
@@ -116,20 +114,18 @@ open class MeetingBaseFragment : BaseFragment() {
                     requireActivity(),
                     permissions[i]
                 )
-            if (!bPermission && bRequested) {
-                if (!showRequestPermission) {
-                    // The user ticket 'Don't ask again' and deny a permission request.
-                    logDebug("the user ticket 'Don't ask again' and deny a permission request.")
-                    bRefreshPermission = true
-                    if (showSnackbar != null) {
-                        showSnackbar()
-                    }
-                    return
+            if (!bPermission && bRequested && !showRequestPermission) {
+                // The user ticket 'Don't ask again' and deny a permission request.
+                logDebug("the user ticket 'Don't ask again' and deny a permission request.")
+                bRefreshPermission = true
+                if (showSnackbar != null) {
+                    showSnackbar()
                 }
+                return
             }
             when (permissions[i]) {
                 Manifest.permission.CAMERA -> {
-                    sharedModel?.let {
+                    sharedModel.let {
                         it.setCameraPermission(bPermission)
                         if (!bPermission) {
                             requestCode += Constants.REQUEST_CAMERA
@@ -137,7 +133,7 @@ open class MeetingBaseFragment : BaseFragment() {
                     }
                 }
                 Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel?.let {
+                    sharedModel.let {
                         it.setRecordAudioPermission(bPermission)
                         if (!bPermission) {
                             requestCode += Constants.REQUEST_RECORD_AUDIO
@@ -187,7 +183,7 @@ open class MeetingBaseFragment : BaseFragment() {
     private fun refreshPermissions(permission: Array<String>) {
         if (bRefreshPermission) {
             bRefreshPermission = false
-            sharedModel?.let {
+            sharedModel.let {
                 for (i in permission.indices) {
                     val bPermission =
                         PermissionUtils.hasPermissions(requireContext(), permission[i])
@@ -218,10 +214,10 @@ open class MeetingBaseFragment : BaseFragment() {
             val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
             when (permissions[i]) {
                 Manifest.permission.CAMERA -> {
-                    sharedModel?.let { it.setCameraPermission(bPermission) }
+                    sharedModel.setCameraPermission(bPermission)
                 }
                 Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel?.let { it.setRecordAudioPermission(bPermission) }
+                    sharedModel.setRecordAudioPermission(bPermission)
                 }
             }
             i++
