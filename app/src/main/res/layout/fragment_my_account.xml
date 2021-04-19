@@ -177,7 +177,7 @@
             android:elevation="3dp"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/storage_transfer_layout"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
@@ -185,10 +185,101 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="14dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/background_storage_transfer">
+                android:background="@drawable/background_storage_transfer"
+                android:orientation="horizontal">
 
+                <RelativeLayout
+                    android:id="@+id/storage_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1">
 
-            </RelativeLayout>
+                    <ProgressBar
+                        android:id="@+id/storage_progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="9dp"
+                        android:progress="50"
+                        android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+                    <TextView
+                        android:id="@+id/storage_progress_percentage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="12.5dp"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                        tools:text="30%" />
+
+                    <TextView
+                        android:id="@+id/storage_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_toEndOf="@+id/storage_progress_bar"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
+                        tools:text="11GG/50GB" />
+
+                    <TextView
+                        android:id="@+id/storage_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/storage_progress"
+                        android:layout_toEndOf="@+id/storage_progress_bar"
+                        android:text="@string/label_storage_upgrade_account"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/transfer_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ProgressBar
+                        android:id="@+id/transfer_progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="9dp"
+                        android:indeterminate="false"
+                        android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+                    <TextView
+                        android:id="@+id/transfer_progress_percentage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="12.5dp"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                        tools:text="30%" />
+
+                    <TextView
+                        android:id="@+id/transfer_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_toEndOf="@+id/transfer_progress_bar"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
+                        tools:text="11GG/50GB" />
+
+                    <TextView
+                        android:id="@+id/transfer_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/transfer_progress"
+                        android:layout_toEndOf="@+id/transfer_progress_bar"
+                        android:text="@string/transfer_label"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/business_account_management_text"
@@ -278,7 +369,8 @@
                     android:text="@string/backup_recovery_key_subtitle"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60" />
 
-                <include layout="@layout/view_relative_layout_separator_72"
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@id/backup_recovery_key_subtitle"
@@ -323,7 +415,8 @@
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
                     tools:text="132 connections" />
 
-                <include layout="@layout/view_relative_layout_separator_72"
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@id/contacts_subtitle"
@@ -369,7 +462,8 @@
                     android:text="@string/achievements_subtitle"
                     android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14" />
 
-                <include layout="@layout/view_relative_layout_separator_72"
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@id/achievements_subtitle"

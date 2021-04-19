@@ -14715,4 +14715,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void actionConfirmed() {
 		//No update needed
 	}
+
+	public String getBonusStorageSMS() {
+		return bonusStorageSMS;
+	}
 }

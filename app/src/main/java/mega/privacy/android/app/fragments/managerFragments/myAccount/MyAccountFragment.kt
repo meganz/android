@@ -71,22 +71,34 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         binding.emailText.text = megaApi.myEmail
 
         val registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber()
+        val alreadyRegisteredPhoneNumber = !isTextEmpty(registeredPhoneNumber)
+        val canVerifyPhoneNumber = canVoluntaryVerifyPhoneNumber()
 
         binding.phoneText.apply {
-            if (!isTextEmpty(registeredPhoneNumber)) {
+            if (alreadyRegisteredPhoneNumber) {
+                isVisible = true
                 text = registeredPhoneNumber
-                binding.addPhoneNumberLayout.isVisible = false
             } else {
                 isVisible = false
-
-                if (canVoluntaryVerifyPhoneNumber()) {
-                    binding.addPhoneNumberLayout.isVisible = true
-                }
             }
         }
 
-        binding.addPhoneNumberLayout.setOnClickListener {
-            //Open add phone number activity
+        binding.addPhoneNumberLayout.apply {
+            isVisible = canVerifyPhoneNumber && !alreadyRegisteredPhoneNumber
+
+            setOnClickListener {
+                //Open add phone number activity
+            }
+        }
+
+        if (canVerifyPhoneNumber) {
+            binding.phoneText.text =
+                if (megaApi.isAchievementsEnabled) StringResourcesUtils.getString(
+                    R.string.sms_add_phone_number_dialog_msg_achievement_user,
+                    (requireContext() as ManagerActivityLollipop).bonusStorageSMS
+                ) else StringResourcesUtils.getString(
+                    R.string.sms_add_phone_number_dialog_msg_non_achievement_user
+                )
         }
 
         binding.backupRecoveryKeyLayout.setOnClickListener {
