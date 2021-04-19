@@ -684,6 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -777,6 +778,8 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Necesită cod de acces</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Imediat</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>

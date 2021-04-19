@@ -85,6 +85,11 @@ public class Constants {
 
     public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
+    public static final String PREFERENCE_EMOJI = "emoji-recent-manager";
+    public static final String PREFERENCE_REACTION = "reaction-recent-manager";
+    public static final String PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager";
+    public static final String PREFERENCE_VARIANT_REACTION = "variant-reaction-manager";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;

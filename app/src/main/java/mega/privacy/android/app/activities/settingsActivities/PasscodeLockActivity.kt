@@ -94,8 +94,10 @@ class PasscodeLockActivity : BaseActivity() {
             setSupportActionBar(binding.toolbarPasscode)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title =
-                StringResourcesUtils.getString(R.string.settings_passcode_lock)
-                    .toUpperCase(Locale.ROOT)
+                StringResourcesUtils.getString(
+                    if (mode == SET_MODE) R.string.settings_passcode_lock
+                    else R.string.title_change_passcode
+                ).toUpperCase(Locale.ROOT)
         }
 
         initPasscodeScreen()
