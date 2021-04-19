@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/call_in_progress_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,5 +37,51 @@
             android:layout_marginStart="5dp"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2"
             android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/micro_off_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=" &#183; "
+                android:textAlignment="gravity"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_mic_off_small"
+                app:tint="@color/white_black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/video_on_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=" &#183; "
+                android:textAlignment="gravity"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_video_small"
+                app:tint="@color/white_black" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
