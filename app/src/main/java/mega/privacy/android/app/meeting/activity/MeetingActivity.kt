@@ -11,6 +11,8 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import kotlinx.android.synthetic.main.meeting_component_onofffab.*
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -21,9 +23,7 @@ import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.ParticipantRepository
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogFragment
-import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.meeting.fragments.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.IncomingCallNotification
 import mega.privacy.android.app.utils.LogUtil
@@ -37,7 +37,6 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
     MegaChatRequestListenerInterface {
 
     companion object {
-//        const val MEETING_TYPE = "meetingType"
         const val MEETING_ACTION_JOIN = "join_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
@@ -121,7 +120,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
 
         when (meetAction) {
             MEETING_ACTION_JOIN, MEETING_ACTION_CREATE, MEETING_ACTION_GUEST
-                -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+            -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
     }

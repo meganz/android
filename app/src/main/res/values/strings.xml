@@ -3057,7 +3057,7 @@
     <string name="btn_start_meeting" context="Button that create a meeting">Start meeting</string>
     <string name="btn_join_meeting" context="Button that join a meeting">Join meeting</string>
     <string name="btn_join_meeting_as_guest" context="Button that join a meeting as guest">Join as a guest</string>
-    <string name="type_meeting_name" context="Hint shown to guide user on meeting name">Joanna\'s meeting</string>
+    <string name="type_meeting_name" context="Hint shown to guide user on meeting name">%s\'s meeting</string>
 
     <string name="general_mic" context="General label for microphone">Mic</string>
     <string name="general_mic_mute" context="General label for microphone unmuted/muted">Your microphone is %s</string>
@@ -3102,4 +3102,6 @@
     <string name="meeting_permission_info_message" context="Message of a dialog to show user the permissions that needed">For the best meeting experience, MEGA may ask to access to your microphone, camera, and storage.</string>
     <string name="button_permission_info" context="Button to confirm the action of restarting one transfer">Got it</string>
     <string name="meeting_required_permissions_warning" context="Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.">MEGA needs your permission in order to get the best meeting experience.</string>
+    <string name="error_meeting_name_error" context="Message on the EditText of meeting name ">Please input the meeting name.</string>
+
 </resources>

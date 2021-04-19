@@ -8,6 +8,11 @@
         android:id="@+id/createMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
         android:label="fragment_create_meeting">
+        <action
+            android:id="@+id/action_createMeetingFragment_to_inMeeting"
+            app:destination="@id/inMeetingFragment"
+            app:popUpTo="@id/createMeetingFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/joinMeetingFragment"

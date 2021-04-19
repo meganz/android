@@ -9,24 +9,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 class CreateMeetingViewModel @ViewModelInject constructor(
     private val repository: CreateMeetingRepository
 ) : ViewModel() {
-//    private val _avatar = MutableLiveData<Bitmap>()
-    val result = MutableLiveData<Boolean>()
-//    val avatar: LiveData<Bitmap> = _avatar
-    var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
-    /**
-     * Create Meeting
-     *
-     * @param group Flag to indicate if the chat is a group chat or not
-     * @param peers MegaChatPeerList including other users and their privilege level
-     * @param listener MegaChatRequestListener to track this request
-     */
-    fun createMeeting(
-        group: Boolean,
-        peers: MegaChatPeerList,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        repository.createMeeting(group, peers, listener)
-        result.postValue(true)
-    }
+    val result = MutableLiveData<Boolean>()
+    var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 }
