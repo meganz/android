@@ -38,7 +38,7 @@ class InMeetingFragment : MeetingBaseFragment() {
     ): View? {
 
         meetingActivity.setBottomFloatingPanelViewHolder(true)
-        meetingActivity.collpaseFloatingPanel()
+        meetingActivity.collapseFloatingPanel()
         meetingActivity.hideActionBar()
 
         return inflater.inflate(R.layout.in_meeting_fragment, container, false)

@@ -54,16 +54,4 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
             listener
         )
     }
-
-    fun switchMic(bOn: Boolean): Boolean {
-        return true
-    }
-
-    fun switchCamera(bOn: Boolean): Boolean {
-        return true
-    }
-
-    fun switchSpeaker(bOn: Boolean): Boolean {
-        return true
-    }
 }

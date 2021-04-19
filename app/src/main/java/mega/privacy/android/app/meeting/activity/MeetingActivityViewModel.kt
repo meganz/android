@@ -4,8 +4,14 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
 
 /**
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
@@ -39,6 +45,64 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
+
+    // Receive information about requests.
+    val listener = object : MegaChatRequestListenerInterface {
+        override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+        }
+
+        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
+
+        }
+
+        override fun onRequestFinish(
+            api: MegaChatApiJava?,
+            request: MegaChatRequest?,
+            e: MegaChatError?
+        ) {
+            when (request?.type) {
+                MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
+                    _cameraLiveData.value = request.flag
+                    LogUtil.logDebug("open video: $_cameraLiveData.value")
+                    tips.value = when (request.flag) {
+                        true -> getString(
+                            R.string.general_camera_disable,
+                            "enable"
+                        )
+                        false -> getString(
+                            R.string.general_camera_disable,
+                            "disable"
+                        )
+                    }
+                }
+
+                MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL -> {
+                    _micLiveData.value = request.flag
+                    LogUtil.logDebug("open Mic: $_micLiveData.value")
+                    tips.value = when (request.flag) {
+                        true -> getString(
+                            R.string.general_mic_mute,
+                            "unmute"
+                        )
+                        false -> getString(
+                            R.string.general_mic_mute,
+                            "mute"
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun onRequestTemporaryError(
+            api: MegaChatApiJava?,
+            request: MegaChatRequest?,
+            e: MegaChatError?
+        ) {
+
+        }
+    }
+
     /**
      * Response of clicking mic fab
      *
@@ -49,19 +113,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             _recordAudioPermissionCheck.value = true
             return
         }
-        if (meetingActivityRepository.switchMic(bOn)) {
-            _micLiveData.value = bOn
-            when (bOn) {
-                true -> tips.value = getString(
-                    R.string.general_mic_mute,
-                    "unmute"
-                )
-                false -> tips.value = getString(
-                    R.string.general_mic_mute,
-                    "mute"
-                )
-            }
-        }
+        meetingActivityRepository.switchMic(bOn, listener)
     }
 
     /**
@@ -74,19 +126,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             _cameraPermissionCheck.value = true
             return
         }
-        if (meetingActivityRepository.switchCamera(bOn)) {
-            _cameraLiveData.value = bOn
-            tips.value = when (bOn) {
-                true -> getString(
-                    R.string.general_camera_disable,
-                    "enable"
-                )
-                false -> getString(
-                    R.string.general_camera_disable,
-                    "disable"
-                )
-            }
-        }
+        meetingActivityRepository.switchCamera(bOn, listener)
     }
 
     /**
@@ -97,12 +137,12 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun clickSpeaker(bOn: Boolean) {
         if (meetingActivityRepository.switchSpeaker(bOn)) {
             _speakerLiveData.value = bOn
-            when (bOn) {
-                true -> tips.value = getString(
+            tips.value = when (bOn) {
+                true -> getString(
                     R.string.general_speaker_headphone,
                     "Speaker"
                 )
-                false -> tips.value = getString(
+                false -> getString(
                     R.string.general_speaker_headphone,
                     "Headphone"
                 )
