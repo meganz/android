@@ -25,13 +25,9 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="vertical" />
+            <include
+                android:id="@+id/separator"
+                layout="@layout/view_relative_layout_separator" />
         </LinearLayout>
 
         <androidx.core.widget.NestedScrollView
@@ -83,7 +79,7 @@
                 <RelativeLayout
                     android:id="@+id/forward_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="start"
                     android:visibility="gone">
 

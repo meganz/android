@@ -71,6 +71,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GiphyViewerActivity;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -630,7 +631,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
         RelativeLayout urlOwnMessageTextrl;
-        RelativeLayout forwardOwnRichLinks;
+        private ImageView forwardOwnRichLinks;
 
         private EmojiTextView urlOwnMessageText;
         LinearLayout urlOwnMessageWarningButtonsLayout;
@@ -665,7 +666,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout urlContactMessageTitleLayout;
         private EmojiTextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
-        RelativeLayout forwardContactRichLinks;
+        private ImageView forwardContactRichLinks;
 
         LinearLayout urlContactMessageIconAndLinkLayout;
         ImageView urlContactMessageIcon;
@@ -712,7 +713,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contentOwnMessageContactThumb;
         private EmojiTextView contentOwnMessageContactName;
         public EmojiTextView contentOwnMessageContactEmail;
-        RelativeLayout forwardOwnContact;
+        private ImageView forwardOwnContact;
 
         ImageView iconOwnTypeDocLandPreview;
         ImageView iconOwnTypeDocPortraitPreview;
@@ -725,9 +726,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout errorUploadingPortrait;
         RelativeLayout errorUploadingLandscape;
 
-        RelativeLayout forwardOwnPortrait;
-        RelativeLayout forwardOwnLandscape;
-        RelativeLayout forwardOwnFile;
+        private ImageView forwardOwnPortrait;
+        private ImageView forwardOwnLandscape;
+        private ImageView forwardOwnFile;
 
         LinearLayout newMessagesLayout;
         TextView newMessagesText;
@@ -738,7 +739,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //Location message
         RelativeLayout transparentCoatingLocation;
         RelativeLayout uploadingProgressBarLocation;
-        RelativeLayout forwardOwnMessageLocation;
+        private ImageView forwardOwnMessageLocation;
         RelativeLayout mainOwnMessageItemLocation;
         RoundedImageView previewOwnLocation;
         RelativeLayout separatorPreviewOwnLocation;
@@ -771,7 +772,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout gradientContactMessageThumbLand;
         ImageView videoIconContactMessageThumbLand;
         TextView videoTimecontentContactMessageThumbLand;
-        RelativeLayout forwardContactPreviewLandscape;
+        private ImageView forwardContactPreviewLandscape;
 
         RoundedImageView contentContactMessageThumbPort;
         ImageView gifIconContactMessageThumbPort;
@@ -780,12 +781,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout gradientContactMessageThumbPort;
         ImageView videoIconContactMessageThumbPort;
         TextView videoTimecontentContactMessageThumbPort;
-        RelativeLayout forwardContactPreviewPortrait;
+        private ImageView forwardContactPreviewPortrait;
 
         RelativeLayout contentContactMessageAttachLayout;
 
         RelativeLayout contentContactMessageFile;
-        RelativeLayout forwardContactFile;
+        private ImageView forwardContactFile;
         ImageView contentContactMessageFileThumb;
         TextView contentContactMessageFileName;
         TextView contentContactMessageFileSize;
@@ -793,7 +794,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout layoutAvatarMessages;
 
         RelativeLayout contentContactMessageContactLayout;
-        RelativeLayout forwardContactContact;
+        private ImageView forwardContactContact;
         RelativeLayout contentContactMessageContactLayoutAvatar;
         RoundedImageView contentContactMessageContactThumb;
         private EmojiTextView contentContactMessageContactName;
@@ -816,7 +817,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contactManagementMessageLayout;
 
         //Location message
-        RelativeLayout forwardContactMessageLocation;
+        private ImageView forwardContactMessageLocation;
         RelativeLayout mainContactMessageItemLocation;
         RoundedImageView previewContactLocation;
         RelativeLayout separatorPreviewContactLocation;
@@ -7652,8 +7653,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (imageView != null) {
             imageView.getLocationOnScreen(screenPosition);
-            dimens[0] = screenPosition[0] + (imageView.getWidth() / 2);
-            dimens[1] = screenPosition[1] + (imageView.getHeight() / 2);
+            dimens[0] = screenPosition[0];
+            dimens[1] = screenPosition[1];
             dimens[2] = imageView.getWidth();
             dimens[3] = imageView.getHeight();
         }
@@ -8007,6 +8008,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play the voice clip
      */
     private void playVoiceClip(MessageVoiceClip m, String voiceClipPath){
+        MediaPlayerService.pauseAudioPlayer(context);
 
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();
@@ -8527,15 +8529,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 notifyItemChanged(positionInAdapter);
                 return;
             }
-        }
-
-        if (multipleSelect) {
-            if (isMyMessage(megaMessage.getMessage())) {
-                holder.ownMessageReactionsLayout.setVisibility(View.GONE);
-            } else {
-                holder.contactMessageReactionsLayout.setVisibility(View.GONE);
-            }
-            return;
         }
 
         MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());

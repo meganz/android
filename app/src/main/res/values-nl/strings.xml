@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -> Neem een foto en upload je foto\'s naar MEGA \nREAD_CONTACTS -> Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -&gt; Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -&gt; Neem een foto en upload je foto\'s naar MEGA \nREAD_CONTACTS -&gt; Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -&gt; MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA is Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Deze koppeling is niet meer publiekelijk beschikbaar.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Deze links zijn niet meer openbaar beschikbaar.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Naam wijzigen</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Hernoem %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Open koppeling</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_renaming" context="while renaming a file or folder">Naam wijzigen</string>
@@ -793,7 +795,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Over</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">Privacybeleid</string>
     <string name="settings_about_terms_of_service" context="">Algemene Voorwaarden</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Applicatie versie</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK Versie</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK versie</string>
@@ -863,34 +864,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oudste datum</string>
     <string name="sort_by_largest_size" context="sort files by largest size">Grootste maat</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">Kleinste maat</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">per maand</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">per jaar</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Vul uw factuurgegevens:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adres 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adres 2 (optioneel)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Stad</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Staat/Provincie</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Land</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postcode</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Vul uw betalingsgegevens:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Voornaam</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Achternaam</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Creditcard nummer</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Maand</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Jaar</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV-Code</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">Verder gaan</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account met succes opgewaardeerd!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">De handeling is mislukt. Uw credit kaart was niet opgeladen</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">De credit kaart informatie was niet juist. De credit kaart wordt niet gebruikt</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Toegangscode Type</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 cijferige Toegangscode</string>
@@ -1542,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">Contacten weergeven</string>
 
-    <string name="import_success_message" context="Menu option">Succesvol toegevoegd aan Cloud Schijf</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Succesvol toegevoegd aan Cloud Schijf</string>
     <string name="import_success_error" context="Menu option">Fout. Niet toegevoegd aan de Cloud Schijf</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Verbinden&#8230;</string>
@@ -1763,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Dag instellen</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Datum verplicht is niet geldig</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Tekens niet toegestaan</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Ongeldige naam</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Corrigeer uw bestandsnamen voordat u verder gaat</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Ongeldige tekens</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">De volgende tekens zijn niet toegestaan: ”* /: &lt; &gt; ?​\ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Geef uw bestand een naam voordat u verder gaat</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Geef uw bestanden een naam voordat u verder gaat</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Audio Bestand</string>
 
@@ -2076,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Voer de 6-cijferige code gegenereerd door uw Authenticatie Applicatie in.</string>
     <string name="general_verify" context="Text button">Verifiëren</string>
     <string name="general_next" context="Text button">Volgende</string>
+    <string name="general_previous" context="Text button">Vorige</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Een fout heeft opgetreden bij het genereren van de seed of QR code, probeer nogmaals.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Twee-Stap Authenticatie Ingeschakeld</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
@@ -2108,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Inhoud Weergeven</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Het streamen kan niet uitgevoerd worden en het bestand was niet gedownload</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Kan bestand niet openen.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We konden het bestand niet openen omdat er geen netwerkverbinding was.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Bestand bestaat al in Opgeslagen voor Offline</string>
 
@@ -2236,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Bericht</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Link verzenden naar &#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Verstuur naar&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload naar&#8230;</string>
 
@@ -2391,7 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Uw huidige account is [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Afhankelijk van uw deelname in ons beloningsprogramma.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selecteer betalingsmethode</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Betaalmethode</string>
 
     <string name="billing_period_title" context="title of billing period">Betaal periode</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Eenmalige (maand)[/A] %s</string>
@@ -2403,9 +2387,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonnement)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay [/A] (abonnement)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abonnement)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile provider[/A] (éénmalig)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile provider[/A] (éénmalig)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NIEUW</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Als u uw huidige abonnement wilt upgraden, neem dan contact op met ons ondersteuningsteam voor een [A]aangepast plan [/A].</string>
@@ -2470,7 +2451,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Gesprekskoppeling gekopieerd naar het klembord</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Van[/A] %s / [A]maand[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Van[/A] %s per gebruiker/[A]maand[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*Periodieke abonnement kan op elk moment gestopt worden voor de herhaaldatum.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Oproep Gestart</string>
 
@@ -2763,9 +2743,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Hoewel MEGA geen toegang heeft tot uw gegevens, heeft uw zakelijke accountbeheerder de mogelijkheid om de camera-uploads in uw gebruikersaccount te beheren en te bekijken</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Er is iets fout gegaan</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**Wordt automatisch verhoogd, zonder koste, voor echte zakelijke doelen.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] Opslag [A]***[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Ongelimiteerde[/A] Overdrachtstegoed</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
@@ -2953,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">maanden</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">jaar</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 uur</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d uur</item>
@@ -3009,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Paars</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grijs</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Zal op de achtergrond spelen</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Zal niet op de achtergrond spelen</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Nu afspelen</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Nu afspelen (gepauzeerd)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Nummer info</string>
+
     <string name="action_more_information" context="Action to get more information">Meer Informatie</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Beleid</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Instellingen</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Voordat u doorgaat</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We gebruiken lokale opslag en vergelijkbare technologieën (‘cookies\') om u onze services te bieden, uw ervaring met onze services te verbeteren en de advertenties die u ziet, aan te passen, ook via derden. Accepteer ons gebruik van cookies vanaf het begin van uw bezoek of pas cookies aan in Cookie-instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie-Instellingen niet opgeslagen</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Wijzigingen in de cookie-instellingen zijn opgeslagen.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookies van derden</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google-Advertentiecookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Categorie: Advertentiecookies</string>
@@ -3042,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Donker</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">Systeem standaard</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Ingesteld door batterijbesparing</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Selecteer de root van de SD-kaart.</string>
 </resources>

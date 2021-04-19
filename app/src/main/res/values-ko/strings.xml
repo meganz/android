@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 휴대 기기를 위한 전용 앱과 함께 이용자 제어 암호화 클라우드 저장소와 대화를 표준 웹 브라우저를 통해 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 당신의 클라이언트 기기에서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로그하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제하세요. 당신의 지인들과 폴더를 공유하고 그들의 변경 사항을 실시간으로 보세요. 암호화 과정은 당신의 비밀번호를 재설정하거나 접근할 수 없다는 것을 의미하며 당신은 반드시 비밀번호를 기억해야하며 (복구 키를 백업하지 않았다면) 그렇지 않았다면 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 암호화 MEGA 영상 대화는 완전한 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 우리의 모바일 앱으로도 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 그들의 MEGA 클라우드 드라이브로부터 파일을 대화에 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전과제와 함께 가입한 모든 이용자에게 50 GB의 넉넉한 무료 용량을 제공하며, 훨씬 높은 한도의 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장  공간과 월 8 TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭한 후, Google ID로 로그인(만약 하지 않았다면)한 후 MEGA 앱을 클릭하세요. 그곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 당신의 사진을 MEGA에 업로드합니다\n연락처 읽기 -> 당신의 기기의 연락처를 쉽게 MEGA 연락처로 추가합니다\n오디오 녹음과 영상 출력 캡처 (마이크와 카메라) -> MEGA는 종단간 암호화 음성/영상 통화를 제공합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰 향상을 위해, 모든 클라이언트측 코드는 공개되며, 흥미있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android\n\n자세한 정보는, 우리의 웹사이트를 확인하세요: \nhttps://mega.nz/terms를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 휴대 기기를 위한 전용 앱과 함께 이용자 제어 암호화 클라우드 저장소와 대화를 표준 웹 브라우저를 통해 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 당신의 클라이언트 기기에서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로그하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제하세요. 당신의 지인들과 폴더를 공유하고 그들의 변경 사항을 실시간으로 보세요. 암호화 과정은 당신의 비밀번호를 재설정하거나 접근할 수 없다는 것을 의미하며 당신은 반드시 비밀번호를 기억해야하며 (복구 키를 백업하지 않았다면) 그렇지 않았다면 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 암호화 MEGA 영상 대화는 완전한 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 우리의 모바일 앱으로도 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 그들의 MEGA 클라우드 드라이브로부터 파일을 대화에 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전과제와 함께 가입한 모든 이용자에게 50 GB의 넉넉한 무료 용량을 제공하며, 훨씬 높은 한도의 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장  공간과 월 8 TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭한 후, Google ID로 로그인(만약 하지 않았다면)한 후 MEGA 앱을 클릭하세요. 그곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드합니다\n카메라 -&gt; 사진을 찍고 당신의 사진을 MEGA에 업로드합니다\n연락처 읽기 -&gt; 당신의 기기의 연락처를 쉽게 MEGA 연락처로 추가합니다\n오디오 녹음과 영상 출력 캡처 (마이크와 카메라) -&gt; MEGA는 종단간 암호화 음성/영상 통화를 제공합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰 향상을 위해, 모든 클라이언트측 코드는 공개되며, 흥미있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android\n\n자세한 정보는, 우리의 웹사이트를 확인하세요: \nhttps://mega.nz/terms를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -69,7 +69,7 @@
 
     <string name="error_general_nodes" context="Error getting the root node">오류. 다시 시도하세요.</string>
 
-    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-복구키</string>
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">외부 저장 공간이 탐지되지 않았습니다</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">이 링크는 더 이상 공개되지 않습니다.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">이 링크들은 더 이상 공개적으로 이용할 수 없습니다.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">이름 바꾸기</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">%1$s 이름 바꾸기</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">링크 열기</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">열기</string>
     <string name="context_renaming" context="while renaming a file or folder">이름을 바꾸는중</string>
@@ -793,7 +795,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK 버전</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK 버전</string>
@@ -863,34 +864,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">오래된 순</string>
     <string name="sort_by_largest_size" context="sort files by largest size">큰 파일 순</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">작은 파일 순</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">월간</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">연간</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">지불 정보를 입력하세요:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">주소 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">주소 2 (선택적)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">도시</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">주/지방</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">국가</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">우편번호</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">결제 정보를 입력하세요:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">이름</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">성</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">신용카드 번호</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">월</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">연</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">진행</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">계정이 성공적으로 업그레이드 되었습니다!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">작업이 실패하였습니다. 신용 카드가 결제되지 않았습니다</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">신용 카드 정보가 올바르지 않습니다. 신용 카드가 결제되지 않았습니다.</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">암호 유형</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">네 자리 암호</string>
@@ -1542,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">연락처 보기</string>
 
-    <string name="import_success_message" context="Menu option">클라우드 드라이브에 성공적으로 추가되었습니다</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">클라우드 드라이브에 성공적으로 추가되었습니다</string>
     <string name="import_success_error" context="Menu option">오류. 클라우드 드라이브에 추가되지 않았습니다</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">연결중&#8230;</string>
@@ -1763,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">날짜 설정</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">요구된 날짜가 유효하지 않습니다.</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">글자가 허용되지 않습니다.</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">잘못된 이름</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">진행하기 전에 파일 이름을 고치세요</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">잘못된 글자</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">진행하기 전에 파일에 이름을 지으세요</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">진행하기 전에 파일에 이름을 지으세요</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">오디오 파일</string>
 
@@ -2076,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">인증기 앱에서 생성된 6자리 코드를 입력하세요.</string>
     <string name="general_verify" context="Text button">인증</string>
     <string name="general_next" context="Text button">다음</string>
+    <string name="general_previous" context="Text button">이전</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">시드 또는 QR 코드를 생성하던 중 오류가 발생하였습니다, 다시 시도하세요.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">2단계 인증 활성화됨</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
@@ -2108,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">컨텐츠 미리보기</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">파일을 열 수 없습니다.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">네트워크 연결이 없어서 파일을 열 수 없습니다.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
 
@@ -2236,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">메시지</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">동영상</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">다음으로 링크 보내기&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">보내기&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">업로드&#8230;</string>
 
@@ -2391,7 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">결제 수단</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]1회 (월)[/A] %s</string>
@@ -2403,9 +2387,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (구독)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (구독)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]신용카드[/A] (구독)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 우리의 고객지원 팀에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
@@ -2470,7 +2451,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">클립보드에 대화 링크를 복사하였습니다</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">%s / [A]월[/A]* [A]부터[/A]</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">이용자/[A]개월[/A]당 %s [A]부터[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 정기 구독은 갱신일 이전에 언제든지 취소할 수 있습니다.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">통화 시작</string>
 
@@ -2763,9 +2743,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만, 추가 비용 없이, 자동으로 증가됩니다</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] 저장소 [A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]무제한[/A] 전송 할당량</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
@@ -2953,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">개월</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">년</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1시간</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d시간</item>
@@ -3009,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">보라</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">회색</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">백그라운드에서 재생됩니다</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">백그라운드에서 재생되지 않습니다</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">재생중</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">재생중 (일시정지)</string>
+    <string name="audio_track_info" context="Title of the song info screen">트랙 정보</string>
+
     <string name="action_more_information" context="Action to get more information">자세한 정보</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">쿠키 정책</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">쿠키 설정</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">진행하기 전에</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키\')를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">쿠키 설정이 저장되지 않았습니다</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">쿠키 설정 변경점이 저장되었습니다.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">제3자 쿠키</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">구글 광고 쿠키</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">분류: 광고 쿠키</string>
@@ -3042,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">어두움</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">시스템 기본값</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">배터리 세이버 설정에 따름</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">SD 카드 최상위를 선택하세요.</string>
 </resources>

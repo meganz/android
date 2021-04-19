@@ -43,7 +43,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -59,6 +59,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class FileUtil {
 
     static final String MAIN_DIR = File.separator + "MEGA";
+
+    public static final String CAMERA_FOLDER = "Camera";
 
     public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
 
@@ -109,18 +111,20 @@ public class FileUtil {
     }
 
     public static boolean setLocalIntentParams(Context context, MegaOffline offline, Intent intent,
-            String localPath, boolean isText) {
+            String localPath, boolean isText, SnackbarShower snackbarShower) {
         return setLocalIntentParams(context, getOfflineFile(context, offline).getName(), intent,
-                localPath, isText);
+                localPath, isText, snackbarShower);
     }
 
     public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent,
-            String localPath, boolean isText) {
-        return setLocalIntentParams(context, node.getName(), intent, localPath, isText);
+            String localPath, boolean isText, SnackbarShower snackbarShower) {
+        return setLocalIntentParams(context, node.getName(), intent, localPath, isText,
+                snackbarShower);
     }
 
     public static boolean setLocalIntentParams(Context context, String nodeName, Intent intent,
-            String localPath, boolean isText) {
+                                               String localPath, boolean isText,
+                                               SnackbarShower snackbarShower) {
         File mediaFile = new File(localPath);
 
         Uri mediaFileUri;
@@ -141,15 +145,18 @@ public class FileUtil {
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
-                getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+                MEGACHAT_INVALID_HANDLE);
 
         return false;
     }
 
-    public static boolean setStreamingIntentParams(Context context, MegaNode node, MegaApiJava megaApi, Intent intent) {
+    public static boolean setStreamingIntentParams(Context context, MegaNode node,
+                                                   MegaApiJava megaApi, Intent intent,
+                                                   SnackbarShower snackbarShower) {
         if (megaApi.httpServerIsRunning() == 0) {
             megaApi.httpServerStart();
+            intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
         }
 
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -175,13 +182,14 @@ public class FileUtil {
             }
         }
 
-        ((ManagerActivityLollipop) context)
-                .showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+                MEGACHAT_INVALID_HANDLE);
 
         return false;
     }
 
-    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent, String localPath) {
+    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent,
+                                             String localPath, SnackbarShower snackbarShower) {
         File mediaFile = new File(localPath);
         InputStream instream = null;
         boolean paramsSetSuccessfully = false;
@@ -216,7 +224,7 @@ public class FileUtil {
             return true;
         }
         logError("Not expected format: Exception on processing url file");
-        return setLocalIntentParams(context, node, intent, localPath, true);
+        return setLocalIntentParams(context, node, intent, localPath, true, snackbarShower);
     }
 
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
@@ -403,6 +411,28 @@ public class FileUtil {
 
             sendBroadcastToUpdateGallery(MegaApplication.getInstance(), dest);
         }
+    }
+
+    /**
+     * Copy an Uri to file
+     *
+     * @param uri Source Uri.
+     * @param dest   Final copied file.
+     * @throws IOException if some error happens while copying.
+     */
+    public static void copyUriToFile(Uri uri, File dest) throws IOException {
+        InputStream inputStream = MegaApplication.getInstance().getContentResolver().openInputStream(uri);
+        FileOutputStream outputStream = new FileOutputStream(dest);
+
+        byte[] buffer = new byte[COPY_FILE_BUFFER_SIZE];
+        int length;
+
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+
+        inputStream.close();
+        outputStream.close();
     }
 
     public static boolean isVideoFile(String path) {
@@ -603,6 +633,21 @@ public class FileUtil {
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
+    }
+
+    /**
+     * Shares an uri.
+     *
+     * @param context current Context.
+     * @param name name of the uri.
+     * @param uri uri to share.
+     */
+    public static void shareUri(Context context, String name, Uri uri) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeList.typeForName(name).getType() + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
     /**
@@ -825,10 +870,7 @@ public class FileUtil {
      * @return The copied file on DCIM.
      */
     public static File copyFileToDCIM(File fileToCopy) {
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
-        if (!storageDir.exists()) {
-            storageDir.mkdir();
-        }
+        File storageDir = getCameraFolder();
 
         File copyFile = new File(storageDir, fileToCopy.getName());
         try {
@@ -873,6 +915,16 @@ public class FileUtil {
         } catch (Exception e) {
             logWarning("Exception scanning file.", e);
         }
+    }
+
+    public static File getCameraFolder() {
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), CAMERA_FOLDER);
+
+        if (!storageDir.exists()) {
+            storageDir.mkdir();
+        }
+
+        return storageDir;
     }
 }
 

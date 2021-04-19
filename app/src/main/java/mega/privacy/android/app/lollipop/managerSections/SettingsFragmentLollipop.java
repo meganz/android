@@ -73,7 +73,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory aboutCategory;
     private Preference aboutPrivacy;
     private Preference aboutTOS;
-    private Preference aboutGDPR;
     private Preference codeLink;
     private Preference aboutSDK;
     private Preference aboutKarere;
@@ -122,8 +121,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         aboutPrivacy.setOnPreferenceClickListener(this);
         aboutTOS = findPreference(KEY_ABOUT_TOS);
         aboutTOS.setOnPreferenceClickListener(this);
-        aboutGDPR = findPreference(KEY_ABOUT_GDPR);
-        aboutGDPR.setOnPreferenceClickListener(this);
         codeLink = findPreference(KEY_ABOUT_CODE_LINK);
         codeLink.setOnPreferenceClickListener(this);
         aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
@@ -310,12 +307,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_TOS:
                 viewIntent = new Intent(Intent.ACTION_VIEW);
                 viewIntent.setData(Uri.parse("https://mega.nz/terms"));
-                startActivity(viewIntent);
-                break;
-
-            case KEY_ABOUT_GDPR:
-                viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
                 startActivity(viewIntent);
                 break;
 

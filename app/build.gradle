@@ -146,15 +146,13 @@ dependencies {
     // Architecture Components
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -173,30 +171,29 @@ dependencies {
     // Other libs
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
-    implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.8'
-    implementation(name: 'exoplayer-extension-ffmpeg-2.11.8', ext: 'aar')
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
+    implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
+    implementation(name: 'exoplayer-extension-flac-2.12.1', ext: 'aar')
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.emoji:emoji:1.1.0'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
-    implementation 'androidx.emoji:emoji-bundled:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
     implementation 'com.github.tony19:named-regexp:0.2.5'
     implementation 'org.hamcrest:hamcrest-library:1.3'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.android:flexbox:2.0.1'
     implementation 'jp.wasabeef:blurry:2.1.0'
     implementation 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.6'
 
@@ -220,8 +217,7 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-
-    implementation "android.arch.lifecycle:common-java8:$lifecycleVersion"
+    implementation files('src/main/libs/libwebrtc.jar')
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 

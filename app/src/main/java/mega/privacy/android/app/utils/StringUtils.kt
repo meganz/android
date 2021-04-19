@@ -8,4 +8,6 @@ object StringUtils {
     @JvmStatic
     fun String.toSpannedHtmlText(): Spanned =
         HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+    fun String.isTextEmpty() = TextUtil.isTextEmpty(this)
 }

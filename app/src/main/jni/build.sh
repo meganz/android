@@ -122,11 +122,18 @@ PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 EXOPLAYER=ExoPlayer
-EXOPLAYER_VERSION=2.11.8
+EXOPLAYER_VERSION=2.12.1
 EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SHA1="56ad241f26e1e48b387cd9606572b45799c24ad9"
+EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
+FFMPEG_VERSION=4.2
+FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+FLAC_VERSION=1.3.2
+FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
+FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
+FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
+FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
 
 function downloadCheckAndUnpack()
 {
@@ -262,6 +269,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
+    rm -rf ${EXOPLAYER}/${FLAC_SOURCE_FILE}
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
@@ -275,6 +283,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ../libs/arm64-v8a
     rm -rf ../libs/x86
     rm -rf ../libs/x86_64
+    rm -rf ${EXOPLAYER}/${FFMPEG_EXT_LIBRARY}
+    rm -rf ${EXOPLAYER}/${FLAC_EXT_LIBRARY}
 
     echo "* Task finished OK"
     exit 0
@@ -416,9 +426,10 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "d876e79e728f58c8c9387f02914591f61ccf5066" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s"
+    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
+    pwd
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "0755036bf7afd622e96289468fd753e20213cf01" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -452,24 +463,42 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${EXOPLAYER_DOWNLOAD_URL} ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE} ${EXOPLAYER_SHA1} ${EXOPLAYER}
     pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
     EXOPLAYER_ROOT="$(pwd)"
-    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main/jni"
+    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main"
     if [[ "$OSTYPE" == "darwin"* ]]; then
         HOST_PLATFORM="darwin-x86_64"
     else
         HOST_PLATFORM="linux-x86_64"
     fi
     ENABLED_DECODERS=(ac3)
-    cd "${FFMPEG_EXT_PATH}"
-    sed -i "s/APP_PLATFORM.*/APP_PLATFORM := ${APP_PLATFORM}/" Application.mk
+    pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
+    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg)
+    pushd ffmpeg &>> ${LOG_FILE}
+    git checkout release/${FFMPEG_VERSION}
+    popd &>> ${LOG_FILE}
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
-    cd "${FFMPEG_EXT_PATH}"
-    ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
-    cd "${EXOPLAYER_ROOT}"
-    echo "* Building ExoPlayer FFMPEG extension"
-    ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
-    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
     popd &>> ${LOG_FILE}
+    echo "* Building ExoPlayer FFMPEG extension"
+    NDK_REVISION=$(cat ${NDK_ROOT}/source.properties | grep Revision | cut -d " " -f 3)
+    sed -i "s/android {/android {\n    ndkVersion '${NDK_REVISION}'/" common_library_config.gradle
+    ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
+    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../${FFMPEG_EXT_LIBRARY}
+    popd &>> ${LOG_FILE}
+
+    FLAC_EXT_PATH=${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}/extensions/flac/src/main/jni
+    downloadCheckAndUnpack ${FLAC_DOWNLOAD_URL} ${EXOPLAYER}/${FLAC_SOURCE_FILE} ${FLAC_SHA1} ${EXOPLAYER}
+    rm -rf ${FLAC_EXT_PATH}/flac
+    mv ${EXOPLAYER}/flac-${FLAC_VERSION} ${FLAC_EXT_PATH}/flac
+    echo "* Building FLAC"
+    pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
+    ${NDK_BUILD} APP_ABI=all -j4 &>> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
+    echo "* Building ExoPlayer FLAC extension"
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    ./gradlew :extension-flac:assembleRelease &>> ${LOG_FILE}
+    cp extensions/flac/buildout/outputs/aar/extension-flac-release.aar ../${FLAC_EXT_LIBRARY}
+    popd &>> ${LOG_FILE}
+
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"

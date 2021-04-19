@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA خمسين غيغابايت (GB 50) كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I  برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -> تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-> التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -> إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -> تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android\n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA خمسين غيغابايت (GB 50) كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I  برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -&gt; تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-&gt; التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -&gt; إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -&gt; تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android\n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA هو تخزين سحابي مزود بخصوصية دائمة قوية</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">برو لايت</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">لن يكون هذا الرابط متاحا للعامة بعد الآن</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">تغيير الاسم</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">أعادة التسمية %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">فتح الرابط</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">فتح</string>
     <string name="context_renaming" context="while renaming a file or folder">جاري اعادة التسمية</string>
@@ -793,7 +795,6 @@
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">حول</string>
     <string name="settings_about_privacy_policy" context="Preference screen item action button">سياسة الخصوصية</string>
     <string name="settings_about_terms_of_service" context="">شروط الخدمة</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">نسخة التطبيق</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">نسخة MEGA ميغا SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">نسخة حزمة أدوات تطوير البرمجيات لمحادثة ميغا MEGAchat</string>
@@ -863,34 +864,6 @@
     <string name="sort_by_oldest_date" context="sort files by date oldest first">الأقدم</string>
     <string name="sort_by_largest_size" context="sort files by largest size">الأكبر حجماً</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">الأصغر حجماً</string>
-
-    <string name="per_month" context="in payments, for example: 4.99€ per month">شهرياً</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">سنوياً</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">أدخل تفاصيل الفواتير الخاصة بك:</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">عنوان 1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">عنوان 2 (اختياري)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">المدينة</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">الولاية/المقاطعة</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">الدولة</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">الرمز البريدي</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">أدخل تفاصيل الدفع الخاصة بك:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">الاسم الاول</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">اسم العائلة</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">رقم البطاقة الائتمانية</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">شهر</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">عام</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">التقدم</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">تم ترقية الحساب بنجاح!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">العملية فشلت. لم يتم تحصيل الرسوم من بطاقتك الائتمانية</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">لم تكن معلومات بطاقة الائتمان صحيحة. لن يتم تحصيل رسوم من بطاقة الائتمان</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">نوع  رمز المرور</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">رمز مرور مكون من أربع محارف</string>
@@ -1542,7 +1515,7 @@
 
     <string name="general_view_contacts" context="Menu option">عرض جهات الاتصال</string>
 
-    <string name="import_success_message" context="Menu option">تمت الاضافة بنجاح إلى سحابة التخزين</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">تمت الاضافة بنجاح إلى سحابة التخزين</string>
     <string name="import_success_error" context="Menu option">خطأ. لم يتم الإضافة إلى سحابة التخزين</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">جاري الاتصال&#8230;</string>
@@ -1763,7 +1736,15 @@
     <string name="label_set_day" context="title of a Search by date tag">حدد يوم</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">التاريخ المختار غير متوفر</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">عناصر غير مسموحة</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">اسم غير صالح</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">صحح أسماء الملفات قبل المتابعة</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">عناصر غير صالحة</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">قم بتسمية ملفك قبل المتابعة</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">قم بتسمية ملفاتك قبل المتابعة</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">ملف صوتي</string>
 
@@ -2076,6 +2057,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">يرجى إدخال الرمز المكون من 6 أرقام المولد بتطبيق المصادقة الخاص بك.</string>
     <string name="general_verify" context="Text button">تحقق</string>
     <string name="general_next" context="Text button">التالي</string>
+    <string name="general_previous" context="Text button">السابق</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">حدث خطأ اثناء عملية توليد رمز QR، يرجى إعادة المحاولة</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">تم تفعيل المصادقة المزدوجة 2FA</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">في المرة القادمة التي تسجل فيها الدخول الى حسابك سيطلب منك إدخال رمز من 6 أرقام ستزود به من تطبيق المصادقة الخاص بك.</string>
@@ -2108,6 +2090,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">استعراض المحتوى</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">الملف غير محمل و لا يمكن القيام بعرض الملف</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">غير قادر على فتح ملف.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">لم نتمكن من فتح الملف بسبب عدم وجود اتصال بالشبكة.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">الملف موجود ضمن الملفات المخزنة دون الاتصال بالإنترنت</string>
 
@@ -2236,6 +2219,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">رسالة</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">فيديو</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">إرسال الرابط إلى&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">ارسل الى&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">ترفيع الى&#8230;</string>
 
@@ -2391,7 +2375,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">حسابك الحالي هو [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">خاضع لمشاركاتك في برنامج إنجازاتنا.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">اختر طريقة الدفع</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">طرق الدفع</string>
 
     <string name="billing_period_title" context="title of billing period">فترة الفاتورة</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]لمرة واحدة (لشهر)[/A] %s</string>
@@ -2403,9 +2387,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]دفع عن طريق غوغل[/A] (اشتراك)</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay هواوي باي[/A] (اشتراك)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]بطاقة الإئتمان[/A] (اشتراك)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">جديد</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">لترقية اشتراكك الحالي، يرجى الاتصال بقسم الدعم للحصول على [A]باقة مخصصة[/A].</string>
@@ -2470,7 +2451,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">تم نسخ رابط المحادثة إلى الحافظة</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]من[/A] %s / [A]شهر[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]من[/A] %s لكل مستخدم/[A]شهرياً[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* الاشتراكات المجددة تلقائيا يمكن إلغاؤها في أي وقت قبل وقت التجديد.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">المكالمة بدأت</string>
 
@@ -2763,9 +2743,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">بينما لا يمكن لميغا MEGA الوصول إلى بياناتك، فإن مسؤول حساب الأعمال الخاص بك لديه القدرة على التحكم في ترفيعات الكاميرا وعرضها في حساب المستخدم الخاص بك</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">حدث خطأ ما</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">تواصل مع مشرف حساب الأعمال الخاص بك لحل هذه المشكلة وتفعيل حسابك.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** ستزيد تلقائيًا، بدون أي رسوم إضافية ، لأغراض تجارية صريحة.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]%s[/A] مساحة تخزين[A]**[/A]</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">حجم تراسل متاح [A]غير محدود[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">عند تسجيل الخروج، سيتم حذف الملفات من قسم غير متصل إلى الانترنت من جهازك.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">عند تسجيل الخروج، سيتم إلغاء عمليات النقل الجارية.</string>
@@ -2953,6 +2930,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">شهور</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">سنة</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 ساعة</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d ساعات</item>
@@ -3009,11 +2988,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">بنفسجي</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">رصاصي</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">سيتم التشغيل في خلفية التطبيق</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">لن يتم التشغيل في خلفية التطبيق</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">التشغيل الحالي</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">التشغيل الآن (متوقف مؤقتاً)</string>
+    <string name="audio_track_info" context="Title of the song info screen">معلومات التسجيل الموسيقي</string>
+
     <string name="action_more_information" context="Action to get more information">معلومات اكثر</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">سياسة ملفات تعريف الارتباط Cookie</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">إعدادات ملفات تعريف الارتباط Cookie</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">قبل أن تقوم بالمتابعة</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">نستخدم التخزين المحلي والتقنيات المماثلة (”ملفات تعريف الارتباط”) لتقديم خدماتنا لك، وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط في إعدادات ملفات تعريف الارتباط. اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط الخاصة بنا[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">إعدادات ملفات تعريف الارتباط Cookie غير محفوظة</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">تم حفظ تغييرات إعدادات ملفات تعريف الارتباط Cookie.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">ملفات تعريف الارتباط Cookie لطرف ثالث</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">ملفات تعريف ارتباط Cookies إعلانات غوغل Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">التصنيف: ملفات تعريف الارتباط Cookies الإعلانية</string>
@@ -3042,4 +3029,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">داكن</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">افتراضي النظام</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">اضبط حسب موفر البطارية</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">الرجاء تحديد جذر بطاقة الذاكرة SD.</string>
 </resources>

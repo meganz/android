@@ -216,6 +216,9 @@
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
+    <!-- AudioPlayer playlist position and duration  -->
+    <color name="grey_038_white">@color/grey_alpha_038</color>
+
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
@@ -230,6 +233,11 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- AudioPlayer artist name -->
+    <color name="grey_060_white_060">@color/grey_alpha_060</color>
+
+    <color name="grey_070_white_070">@color/grey_alpha_070</color>
 
     <!-- Recording voice clip feedback component background -->
     <color name="grey_087_white_085">@color/grey_alpha_087</color>
@@ -322,6 +330,8 @@
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
 
+    <color name="grey_200_grey_600">@color/grey_200</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_900</color>
 
@@ -398,7 +408,10 @@
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
     <!-- For drawing QR code -->
     <color name="dark_grey_white">@color/dark_grey</color>
-    
+
     <!-- Contact voice clip progress bar indicator color-->
     <color name="white_018_026">@color/white_alpha_018</color>
+
+    <!-- Error text highlight color (selection background), import to MEGA screen-->
+    <color name="teal_100_teal_500">@color/teal_100</color>
 </resources>
