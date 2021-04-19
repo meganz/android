@@ -29,14 +29,21 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 
-
+/**
+ * The abstract class of Join/JoinAsGuest/Create Meeting Fragments
+ * These 3 fragments have common major UI elements as well as UI behaviors.
+ * E.g. Turn on/off mic/camera/speaker buttons, self video preview,
+ * click the big bottom button to move forward, etc.
+ */
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     private var videoListener: MeetingVideoListener? = null
     private val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
 
-
+    // FIXME: We can use ChatBaseListener for avoiding those empty override functions
+    // TODO: I think both this listener and MegaVideoListener can be moved down to the SharedViewModel, move all megaChatApi calls
+    // TODO to Repo, and the Fragment observes liveData (camera on/off finished, frame buffer data)
     // Receive information about requests.
     val listener = object : MegaChatRequestListenerInterface {
         override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
@@ -56,6 +63,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
                     val bOpen = request.flag
                     logDebug("open video: $bOpen")
+
+                    // TODO: Please comment why the handle should be INVALID_HANDLE?
+                    // TODO: and I suggest use if (request.chatHandle != MEGACHAT_INVALID_HANDLE) return; (no embedded if, for readability)
                     if (request.chatHandle == MEGACHAT_INVALID_HANDLE) {
                         if (bOpen) {
                             fab_cam.isOn = true
@@ -100,6 +110,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        // TODO: Use ktx "by activityViewMode()"
         sharedModel = ViewModelProvider(requireActivity()).get(MeetingActivityViewModel::class.java)
         binding.sharedviewmodel = sharedModel
 
@@ -148,13 +159,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                     ) { showSnackbar() }
                 }
             }
-            model.storagePermissionCheck.observe(viewLifecycleOwner) {
-                if (it) {
-                    checkMeetingPermissions(
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    ) { showSnackbar() }
-                }
-            }
         }
     }
 
@@ -177,14 +181,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             binding.root,
             warningText
         )
-    }
-
-    /**
-     * Response to meeting button's 'onClick' event
-     * Dispatch to current sub fragment
-     */
-    private fun onMeetingButtonClick() {
-        meetingButtonClick()
     }
 
     /**
@@ -225,7 +221,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Used by inherit subclasses
      * Create / Join / Join as Guest
      */
-    abstract fun meetingButtonClick()
+    abstract fun onMeetingButtonClick()
 
     /**
      * Get Avatar and display
@@ -242,13 +238,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      *
      * @param bOn true: turn on; off: turn off
      */
-    fun switchCamera(bOn: Boolean) {
-        if (bOn) {
-            megaChatApi.openVideoDevice(listener)
-        } else {
-            megaChatApi.releaseVideoDevice(listener)
-        }
+    fun switchCamera(bOn: Boolean) = if (bOn) {
+        megaChatApi.openVideoDevice(listener)
+    } else {
+        megaChatApi.releaseVideoDevice(listener)
     }
+
+    // TODO: If the group of "switch" methods are as simple as xxx.isOn = bOn
+    // TODO: and only being called once, I think no need to seal as methods
 
     /**
      * Switch Speaker / Headphone

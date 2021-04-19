@@ -38,14 +38,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
-    private var storageGranted: Boolean = false
-    private val _storagePermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    val storagePermissionCheck: LiveData<Boolean> = _storagePermissionCheck
 
     /**
      * Response of clicking mic fab
      *
-     * @param bOn true: turn on; off: turn off
+     * @param bOn true: turn on; false: turn off
      */
     fun clickMic(bOn: Boolean) {
         if (!recordAudioGranted) {
@@ -79,12 +76,12 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         }
         if (meetingActivityRepository.switchCamera(bOn)) {
             _cameraLiveData.value = bOn
-            when (bOn) {
-                true -> tips.value = getString(
+            tips.value = when (bOn) {
+                true -> getString(
                     R.string.general_camera_disable,
                     "enable"
                 )
-                false -> tips.value = getString(
+                false -> getString(
                     R.string.general_camera_disable,
                     "disable"
                 )
@@ -129,14 +126,5 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
         recordAudioGranted = recordAudioPermission
-    }
-
-    /**
-     * Set storage permission
-     *
-     * @param storagePermission true: the permission is granted
-     */
-    fun setStoragePermission(storagePermission: Boolean) {
-        storageGranted = storagePermission
     }
 }

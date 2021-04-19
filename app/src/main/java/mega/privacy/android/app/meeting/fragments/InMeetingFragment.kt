@@ -49,20 +49,21 @@ class InMeetingFragment : MeetingBaseFragment() {
     var previousY = -1f
 
     fun onPageClick() {
-        if (System.currentTimeMillis() - lastTouch > 500) {
-            in_meeting_toolbar.fadeInOut(toTop = true)
-            meetingActivity.bottomFloatingPanelInOut()
+        // Prevent fast tapping.
+        if (System.currentTimeMillis() - lastTouch < 500) return
 
-            if (in_meeting_toolbar.visibility == View.VISIBLE) {
-                meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            } else {
-                meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
+        in_meeting_toolbar.fadeInOut(toTop = true)
+        meetingActivity.bottomFloatingPanelInOut()
 
-            placeFloatingWindow()
-
-            lastTouch = System.currentTimeMillis()
+        if (in_meeting_toolbar.visibility == View.VISIBLE) {
+            meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        } else {
+            meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
+
+        placeFloatingWindow()
+
+        lastTouch = System.currentTimeMillis()
     }
 
     private fun placeFloatingWindow() {

@@ -108,7 +108,7 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         this.columnWidth = columnWidth;
     }
 
-    class SingleTapDetector extends GestureDetector.SimpleOnGestureListener {
+    class SingleTapListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -119,7 +119,7 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         }
     }
 
-    private final GestureDetector detector = new GestureDetector(getContext(), new SingleTapDetector());
+    private final GestureDetector detector = new GestureDetector(getContext(), new SingleTapListener());
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {

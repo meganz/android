@@ -12,7 +12,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     private val viewModel: JoinMeetingViewModel by viewModels()
 
-    override fun meetingButtonClick() {
+    override fun onMeetingButtonClick() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
