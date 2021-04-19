@@ -1344,6 +1344,8 @@
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
+    <string name="used_storage_transfer" context="String to show the transfer quota and the used space in My Account section">%1$s / %2$s</string>
+    <string name="used_storage_transfer_percentage" context="String to show the transfer quota and the used space in My Account section">%1$s%%</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Remove from Offline?</string>
 

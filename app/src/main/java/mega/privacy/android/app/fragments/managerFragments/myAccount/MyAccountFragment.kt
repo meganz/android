@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.Scrollable
@@ -24,7 +25,10 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
+import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaUser
 import java.io.File
 
@@ -56,6 +60,11 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
     private fun setUpView() {
         accountInfo = app.myAccountInfo
+
+        ListenScrollChangesHelper().addViewToListen(
+            binding.scrollView
+        ) { _, _, _, _, _ -> checkScroll() }
+
         setAccountDetails()
 
         binding.myAccountTextInfoLayout.setOnClickListener {
@@ -113,7 +122,10 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     }
 
     override fun checkScroll() {
-        (requireActivity() as ManagerActivityLollipop).changeAppBarElevation(
+        if (!this::binding.isInitialized)
+            return
+
+        (requireActivity() as ManagerActivityLollipop).changeMyAccountAppBarElevation(
             binding.scrollView.canScrollVertically(
                 -1
             )
@@ -121,13 +133,21 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     }
 
     fun setAccountDetails() {
+        val gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
+
         binding.lastSessionSubtitle.text = if (isTextEmpty(accountInfo?.lastSessionFormattedDate)) {
-            StringResourcesUtils.getString(R.string.recovering_info)
+            gettingInfo
         } else accountInfo?.lastSessionFormattedDate
 
         if (megaApi.isBusinessAccount) {
-
+            binding.upgradeButton.isVisible = false
             return
+        }
+
+        binding.upgradeButton.apply {
+            isVisible = true
+
+            setOnClickListener { (requireActivity() as ManagerActivityLollipop).showUpAF() }
         }
 
         binding.accountTypeText.isVisible = true
@@ -158,12 +178,65 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             )
         )
 
-        if (accountInfo?.accountType == FREE) {
-            binding.renewExpiryText.isVisible = false
-            binding.renewExpiryDateText.isVisible = false
-        } else {
+        val hasRenewableSubscription =
+            accountInfo?.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+                    && accountInfo?.subscriptionRenewTime!! > 0
+
+        if (hasRenewableSubscription || accountInfo?.proExpirationTime!! > 0) {
             binding.renewExpiryText.isVisible = true
             binding.renewExpiryDateText.isVisible = true
+
+            binding.renewExpiryText.text = StringResourcesUtils.getString(
+                if (hasRenewableSubscription) R.string.renews_on else R.string.expires_on
+            )
+
+            binding.renewExpiryDateText.text = formatDate(
+                if (hasRenewableSubscription) accountInfo?.subscriptionRenewTime!! else accountInfo?.proExpirationTime!!,
+                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+            )
+        } else {
+            binding.renewExpiryText.isVisible = false
+            binding.renewExpiryDateText.isVisible = false
+        }
+
+        binding.transferLayout.isVisible = accountInfo?.accountType != FREE
+
+        if (accountInfo?.usedFormatted?.trim()?.isEmpty() == true) {
+            binding.storageProgressPercentage.isVisible = false
+            binding.storageProgressBar.progress = 0
+            binding.storageProgress.text = gettingInfo
+        } else {
+            binding.storageProgressPercentage.isVisible = true
+            binding.storageProgressPercentage.text = StringResourcesUtils.getString(
+                R.string.used_storage_transfer_percentage,
+                accountInfo?.usedPerc?.toString()
+            )
+
+            binding.storageProgressBar.progress = accountInfo?.usedPerc ?: 0
+            binding.storageProgress.text = StringResourcesUtils.getString(
+                R.string.used_storage_transfer,
+                accountInfo?.usedFormatted,
+                accountInfo?.totalFormatted
+            )
+        }
+
+        if (accountInfo?.usedTransferFormatted?.trim()?.isEmpty() == true) {
+            binding.transferProgressPercentage.isVisible = false
+            binding.transferProgressBar.progress = 0
+            binding.transferProgress.text = gettingInfo
+        } else {
+            binding.transferProgressPercentage.isVisible = true
+            binding.transferProgressPercentage.text = StringResourcesUtils.getString(
+                R.string.used_storage_transfer_percentage,
+                accountInfo?.usedTransferPerc?.toString()
+            )
+
+            binding.transferProgressBar.progress = accountInfo?.usedPerc ?: 0
+            binding.transferProgress.text = StringResourcesUtils.getString(
+                R.string.used_storage_transfer,
+                accountInfo?.usedTransferFormatted,
+                accountInfo?.totalTansferFormatted
+            )
         }
     }
 

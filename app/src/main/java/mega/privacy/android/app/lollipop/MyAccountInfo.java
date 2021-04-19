@@ -26,6 +26,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class MyAccountInfo {
 
     int usedPerc = -1;
+    int usedTransferPerc = -1;
     long usedStorage = -1;
     int accountType = -1;
     MegaAccountDetails accountInfo = null;
@@ -168,6 +169,11 @@ public class MyAccountInfo {
         if (transfer) {
             totalTransferFormatted = getSizeString(accountInfo.getTransferMax());
             usedTransferFormatted = getSizeString(accountInfo.getTransferUsed());
+
+            usedTransferPerc = 0;
+            if (accountInfo.getTransferMax() != 0) {
+                usedTransferPerc = (int) ((100 * accountInfo.getTransferUsed()) / accountInfo.getTransferMax());
+            }
         }
 
         if (pro) {
@@ -562,5 +568,9 @@ public class MyAccountInfo {
 
     public void setBusinessAlertAlreadyShown() {
         wasBusinessAlertAlreadyShown = true;
+    }
+
+    public int getUsedTransferPerc() {
+        return usedTransferPerc;
     }
 }

@@ -153,7 +153,7 @@
                 android:layout_below="@+id/account_type_principal_info"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="10dp"
-                android:textAppearance="@style/TextAppearance.Mega.Caption.White87White"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.WhiteGrey87"
                 tools:text="Renews on" />
 
             <TextView
@@ -164,7 +164,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="-2dp"
                 android:layout_toEndOf="@+id/renew_expiry_text"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.White87White"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.WhiteGrey87"
                 tools:text="Monday, 1 Feb 2021" />
 
         </RelativeLayout>
@@ -195,31 +195,37 @@
                     android:layout_marginStart="12dp"
                     android:layout_weight="1">
 
-                    <ProgressBar
-                        android:id="@+id/storage_progress_bar"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="9dp"
-                        android:progress="50"
-                        android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
-
-                    <TextView
-                        android:id="@+id/storage_progress_percentage"
+                    <RelativeLayout
+                        android:id="@+id/storage_progress_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="12.5dp"
-                        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
-                        tools:text="30%" />
+                        android:layout_marginEnd="9dp">
+
+                        <ProgressBar
+                            android:id="@+id/storage_progress_bar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:layout_centerVertical="true"
+                            android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+                        <TextView
+                            android:id="@+id/storage_progress_percentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                            tools:text="30%" />
+
+                    </RelativeLayout>
 
                     <TextView
                         android:id="@+id/storage_progress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:layout_toEndOf="@+id/storage_progress_bar"
+                        android:layout_toEndOf="@+id/storage_progress_layout"
                         android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
                         tools:text="11GG/50GB" />
 
@@ -228,7 +234,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/storage_progress"
-                        android:layout_toEndOf="@+id/storage_progress_bar"
+                        android:layout_toEndOf="@+id/storage_progress_layout"
                         android:text="@string/label_storage_upgrade_account"
                         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
 
@@ -240,31 +246,38 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <ProgressBar
-                        android:id="@+id/transfer_progress_bar"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="9dp"
-                        android:indeterminate="false"
-                        android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
-
-                    <TextView
-                        android:id="@+id/transfer_progress_percentage"
+                    <RelativeLayout
+                        android:id="@+id/transfer_progress_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="12.5dp"
-                        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
-                        tools:text="30%" />
+                        android:layout_marginEnd="9dp">
+
+                        <ProgressBar
+                            android:id="@+id/transfer_progress_bar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:layout_centerVertical="true"
+                            android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+                        <TextView
+                            android:id="@+id/transfer_progress_percentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginStart="12.5dp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                            tools:text="30%" />
+
+                    </RelativeLayout>
 
                     <TextView
                         android:id="@+id/transfer_progress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:layout_toEndOf="@+id/transfer_progress_bar"
+                        android:layout_toEndOf="@+id/transfer_progress_layout"
                         android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
                         tools:text="11GG/50GB" />
 
@@ -273,7 +286,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/transfer_progress"
-                        android:layout_toEndOf="@+id/transfer_progress_bar"
+                        android:layout_toEndOf="@+id/transfer_progress_layout"
                         android:text="@string/transfer_label"
                         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
 

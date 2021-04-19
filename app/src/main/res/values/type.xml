@@ -229,6 +229,10 @@
         <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.WhiteGrey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.White87White">
         <item name="android:textColor">@color/white_087_white</item>
     </style>
@@ -436,6 +440,10 @@
 
     <style name="TextAppearance.Mega.Caption.GreyWhite87">
         <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.WhiteGrey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
     </style>
 
     <style name="TextAppearance.Mega.Caption.White87White">

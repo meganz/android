@@ -13876,6 +13876,31 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
 	/**
+	 * Changes on My account fragment, the status bar and toolbar background colors depending on elevation.
+	 *
+	 * @param withElevation True if should set elevation, false otherwise.
+	 */
+	public void changeMyAccountAppBarElevation(boolean withElevation) {
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+
+		if (withElevation) {
+			if (Util.isDarkMode(this)) {
+				ColorUtils.changeStatusBarColorForElevation(this, true);
+				toolbar.setBackgroundColor(ColorUtils.getColorForElevation(this, elevation));
+				abL.setElevation(0);
+			} else {
+				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
+				toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
+				abL.setElevation(elevation);
+			}
+		} else {
+			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
+			toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
+			abL.setElevation(0);
+		}
+	}
+
+	/**
 	 * This method is used to change the elevation of the AppBarLayout when
 	 * scrolling the RecyclerView
 	 * @param withElevation true if need elevation, false otherwise
