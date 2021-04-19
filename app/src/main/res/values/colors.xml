@@ -422,6 +422,7 @@
     <!--   my account -->
     <color name="grey_020_black">@color/grey_020</color>
     <color name="grey_050_grey_700">@color/grey_050</color>
+    <color name="grey_050_grey_900">@color/grey_050</color>
     <color name="grey_054_white_060">@color/grey_alpha_054</color>
     <color name="white_087_white">@color/white_alpha_087</color>
     <color name="orange_600_orange_300">@color/orange_600</color>

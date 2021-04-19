@@ -324,8 +324,16 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Grey54White">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.Grey54White54">
         <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.White87Grey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
     </style>
 
     <!-- Medium, Accent -->

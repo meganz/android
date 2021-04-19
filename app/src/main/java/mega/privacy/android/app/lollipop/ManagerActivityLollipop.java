@@ -890,7 +890,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					//Check if myAccount section is visible
 					if (getMyAccountFragment() != null) {
 						logDebug("Update the account fragment");
-						maF.setAccountDetails();
+						maF.setUpAccountDetails();
 					}
 
 					if (getUpgradeAccountFragment() != null) {
@@ -12019,7 +12019,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setProfileAvatar();
 
 					if (getMyAccountFragment() != null) {
-						maF.updateAvatar(false);
+						maF.setUpAvatar(false);
 					}
 
 					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
@@ -12093,7 +12093,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					//refresh MyAccountFragment if visible
 					if(getMyAccountFragment()!=null){
 						logDebug("Update the account fragment");
-						maF.updateAvatar(false);
+						maF.setUpAvatar(false);
 					}
 				}
 				else{
@@ -12108,7 +12108,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					//refresh MyAccountFragment if visible
 					if (getMyAccountFragment() != null) {
 						logDebug("Update the account fragment");
-						maF.updateAvatar(false);
+						maF.setUpAvatar(false);
 					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
@@ -12865,7 +12865,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						//When last contact changes avatar, update view.
 						if(getMyAccountFragment() != null) {
-							maF.updateContactsCount();
+							maF.setUpContactConnections();
                         }
 					}
 				}

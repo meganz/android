@@ -167,6 +167,16 @@
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.WhiteGrey87"
                 tools:text="Monday, 1 Feb 2021" />
 
+            <TextView
+                android:id="@+id/business_status_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/account_type_principal_info"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="10dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.White87Grey87"
+                tools:text="Renews on" />
+
         </RelativeLayout>
 
         <LinearLayout
@@ -217,6 +227,17 @@
                             android:layout_centerInParent="true"
                             android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
                             tools:text="30%" />
+
+                        <ImageView
+                            android:id="@+id/business_storage_image"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="22dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginBottom="22dp"
+                            android:src="@drawable/ic_business_storage"
+                            tools:ignore="ContentDescription" />
 
                     </RelativeLayout>
 
@@ -270,6 +291,17 @@
                             android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
                             tools:text="30%" />
 
+                        <ImageView
+                            android:id="@+id/business_transfer_image"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="22dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginBottom="22dp"
+                            android:src="@drawable/ic_business_transfers"
+                            tools:ignore="ContentDescription" />
+
                     </RelativeLayout>
 
                     <TextView
@@ -297,7 +329,14 @@
             <TextView
                 android:id="@+id/business_account_management_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@color/grey_050_grey_900"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:text="@string/business_management_alert"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White" />
 
             <RelativeLayout
                 android:id="@+id/add_phone_number_layout"
