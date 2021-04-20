@@ -7188,9 +7188,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		openQR(openScanQR);
 	}
 
-	public void openQR(boolean openScanQr){
-		ScanCodeFragment fragment = new ScanCodeFragment();
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+	public void openQR(boolean openScanQr) {
+		if (openScanQr) {
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.fragment_container, new ScanCodeFragment()).commitNowAllowingStateLoss();
+		}
+
 		Intent intent = new Intent(this, QRCodeActivity.class);
 		intent.putExtra(OPEN_SCAN_QR, openScanQr);
 		startActivity(intent);

@@ -174,8 +174,8 @@
                 android:layout_below="@+id/account_type_principal_info"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="10dp"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.White87Grey87"
-                tools:text="Renews on" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Red400"
+                tools:text="Payment overdue" />
 
         </RelativeLayout>
 

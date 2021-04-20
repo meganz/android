@@ -531,24 +531,29 @@ public class Util {
 	 * @return The speed or size string.
 	 */
 	private static String getUnitString(long unit, boolean isSpeed) {
-		Context context = MegaApplication.getInstance().getApplicationContext();
 		DecimalFormat df = new DecimalFormat("#.##");
 
 		float KB = 1024;
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
+		float PB = TB * 1024;
+		float EB = PB * 1024;
 
 		if (unit < KB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
 		} else if (unit < MB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
 		} else if (unit < GB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
 		} else if (unit < TB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+		} else if (unit < PB) {
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+		} else if (unit < EB) {
+			return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
 		} else {
-			return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+			return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
 		}
 	}
 

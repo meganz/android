@@ -86,6 +86,10 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
         setUpAvatar(true)
 
+        binding.myAccountThumbnail.setOnClickListener {
+            (requireContext() as ManagerActivityLollipop).checkBeforeOpeningQR(false)
+        }
+
         if (!isTextEmpty(accountInfo?.fullName)) {
             binding.nameText.text = accountInfo?.fullName
         }
@@ -110,7 +114,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
         (requireContext() as ManagerActivityLollipop).changeMyAccountAppBarElevation(
             binding.scrollView.canScrollVertically(
-                -1
+                SCROLLING_UP_DIRECTION
             )
         )
     }
@@ -140,14 +144,14 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         setupEditProfile(true)
 
         binding.upgradeButton.apply {
-            isVisible = true
+            isEnabled = true
+            text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
             setOnClickListener { (requireActivity() as ManagerActivityLollipop).showUpAF() }
         }
 
         binding.accountTypeText.isVisible = true
         binding.upgradeButton.isVisible = true
-        binding.businessStatusText.isVisible = false
 
         binding.accountTypeText.text = StringResourcesUtils.getString(
             when (accountInfo?.accountType) {
@@ -172,26 +176,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             )
         )
 
-        val hasRenewableSubscription =
-            accountInfo?.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
-                    && accountInfo?.subscriptionRenewTime!! > 0
-
-        if (hasRenewableSubscription || accountInfo?.proExpirationTime!! > 0) {
-            binding.renewExpiryText.isVisible = true
-            binding.renewExpiryDateText.isVisible = true
-
-            binding.renewExpiryText.text = StringResourcesUtils.getString(
-                if (hasRenewableSubscription) R.string.renews_on else R.string.expires_on
-            )
-
-            binding.renewExpiryDateText.text = formatDate(
-                if (hasRenewableSubscription) accountInfo?.subscriptionRenewTime!! else accountInfo?.proExpirationTime!!,
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT
-            )
-        } else {
-            binding.renewExpiryText.isVisible = false
-            binding.renewExpiryDateText.isVisible = false
-        }
+        setUpPaymentDetails()
 
         binding.storageProgressPercentage.isVisible = true
         binding.storageProgressBar.isVisible = true
@@ -245,7 +230,14 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
     private fun setUpBusinessAccount() {
         binding.accountTypeText.text = StringResourcesUtils.getString(R.string.business_label)
-        binding.upgradeButton.isVisible = false
+        binding.upgradeButton.apply {
+            isEnabled = false
+            text = StringResourcesUtils.getString(
+                if (megaApi.isMasterBusinessAccount) R.string.admin_label
+                else R.string.user_label
+            )
+        }
+
         binding.accountTypeLayout.background = tintIcon(
             requireContext(), R.drawable.background_account_type, ContextCompat.getColor(
                 requireContext(),
@@ -253,25 +245,27 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             )
         )
 
-        binding.renewExpiryText.isVisible = false
-        binding.renewExpiryDateText.isVisible = false
-
         if (megaApi.isMasterBusinessAccount) {
-            binding.businessStatusText.apply {
-                isVisible = true
-
-                text = StringResourcesUtils.getString(
-                    when (megaApi.businessStatus) {
-                        BUSINESS_STATUS_EXPIRED -> R.string.payment_overdue_label
-                        BUSINESS_STATUS_GRACE_PERIOD -> R.string.payment_required_label
-                        else -> R.string.active_label
+            when (megaApi.businessStatus) {
+                BUSINESS_STATUS_EXPIRED, BUSINESS_STATUS_GRACE_PERIOD -> {
+                    binding.renewExpiryText.isVisible = false
+                    binding.renewExpiryDateText.isVisible = false
+                    binding.businessStatusText.apply {
+                        isVisible = true
+                        text = StringResourcesUtils.getString(
+                            if (megaApi.businessStatus == BUSINESS_STATUS_EXPIRED) R.string.payment_overdue_label
+                            else R.string.payment_required_label
+                        )
                     }
-                )
+                }
+                else -> setUpPaymentDetails() //BUSINESS_STATUS_ACTIVE
             }
 
             binding.businessAccountManagementText.isVisible = true
             setupEditProfile(true)
         } else {
+            binding.renewExpiryText.isVisible = false
+            binding.renewExpiryDateText.isVisible = false
             binding.businessStatusText.isVisible = false
             binding.businessAccountManagementText.isVisible = false
             setupEditProfile(false)
@@ -280,21 +274,52 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         binding.storageProgressPercentage.isVisible = false
         binding.storageProgressBar.isVisible = false
         binding.businessStorageImage.isVisible = true
-        binding.storageProgress.apply {
-            isVisible = true
-            text = accountInfo?.totalFormatted
+
+        val gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
+
+        binding.storageProgress.text = if (accountInfo?.usedFormatted?.trim()?.isEmpty() == true) {
+            gettingInfo
+        } else {
+            accountInfo?.usedFormatted
         }
 
         binding.transferProgressPercentage.isVisible = false
         binding.transferProgressBar.isVisible = false
         binding.businessTransferImage.isVisible = true
-        binding.transferProgress.apply {
-            isVisible = true
-            text = accountInfo?.totalTansferFormatted
-        }
 
+        binding.transferProgress.text =
+            if (accountInfo?.usedTransferFormatted?.trim()?.isEmpty() == true) {
+                gettingInfo
+            } else {
+                accountInfo?.usedTransferFormatted
+            }
 
         binding.achievementsLayout.isVisible = false
+    }
+
+    private fun setUpPaymentDetails() {
+        binding.businessStatusText.isVisible = false
+
+        val hasRenewableSubscription =
+            accountInfo?.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+                    && accountInfo?.subscriptionRenewTime!! > 0
+
+        if (hasRenewableSubscription || accountInfo?.proExpirationTime!! > 0) {
+            binding.renewExpiryText.isVisible = true
+            binding.renewExpiryDateText.isVisible = true
+
+            binding.renewExpiryText.text = StringResourcesUtils.getString(
+                if (hasRenewableSubscription) R.string.renews_on else R.string.expires_on
+            )
+
+            binding.renewExpiryDateText.text = formatDate(
+                if (hasRenewableSubscription) accountInfo?.subscriptionRenewTime!! else accountInfo?.proExpirationTime!!,
+                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+            )
+        } else {
+            binding.renewExpiryText.isVisible = false
+            binding.renewExpiryDateText.isVisible = false
+        }
     }
 
     private fun setUpPhoneNumber() {
