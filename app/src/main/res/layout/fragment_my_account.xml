@@ -102,13 +102,14 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/account_type_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="22dp"
             android:layout_marginEnd="22dp"
-            android:background="@drawable/background_account_type">
+            android:background="@drawable/background_account_type"
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/account_type_principal_info"
@@ -146,38 +147,43 @@
 
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/renew_expiry_text"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/payment_info_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/account_type_principal_info"
-                android:layout_marginStart="12dp"
-                android:layout_marginBottom="10dp"
-                android:textAppearance="@style/TextAppearance.Mega.Caption.WhiteGrey87"
-                tools:text="Renews on" />
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/renew_expiry_date_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/account_type_principal_info"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="-2dp"
-                android:layout_toEndOf="@+id/renew_expiry_text"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.WhiteGrey87"
-                tools:text="Monday, 1 Feb 2021" />
+                <TextView
+                    android:id="@+id/renew_expiry_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="10dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.WhiteGrey87"
+                    tools:text="Renews on" />
 
-            <TextView
-                android:id="@+id/business_status_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/account_type_principal_info"
-                android:layout_marginStart="12dp"
-                android:layout_marginBottom="10dp"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Red400"
-                tools:text="Payment overdue" />
+                <TextView
+                    android:id="@+id/renew_expiry_date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="-2dp"
+                    android:layout_toEndOf="@+id/renew_expiry_text"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.WhiteGrey87"
+                    tools:text="Monday, 1 Feb 2021" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/business_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="10dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Red400"
+                    tools:text="Payment overdue" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/account_options_layout"
