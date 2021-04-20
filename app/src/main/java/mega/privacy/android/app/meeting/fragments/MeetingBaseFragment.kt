@@ -44,6 +44,11 @@ open class MeetingBaseFragment : BaseFragment() {
         Manifest.permission.RECORD_AUDIO
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        meetingActivity = activity as MeetingActivity
+    }
+
     override fun onResume() {
         super.onResume()
         refreshPermissions(permissions)
