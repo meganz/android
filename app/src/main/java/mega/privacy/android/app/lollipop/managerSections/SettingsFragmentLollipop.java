@@ -58,6 +58,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
+    private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
+
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
     public int numberOfClicksAppVersion = 0;
@@ -92,6 +94,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private DisplayMetrics outMetrics;
     private boolean bEvaluateAppDialogShow = false;
     private AlertDialog evaluateAppDialog;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
@@ -222,9 +225,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         if (savedInstanceState != null) {
-            bEvaluateAppDialogShow = savedInstanceState.getBoolean("EvaluateAppDialogShow");
+            bEvaluateAppDialogShow = savedInstanceState.getBoolean(EVALUATE_APP_DIALOG_SHOW);
         }
-        if(bEvaluateAppDialogShow){
+        if (bEvaluateAppDialogShow) {
             showEvaluatedAppDialog();
         }
     }
@@ -232,8 +235,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(evaluateAppDialog!= null && evaluateAppDialog.isShowing()) {
-            outState.putBoolean("EvaluateAppDialogShow", bEvaluateAppDialogShow);
+        if (evaluateAppDialog != null && evaluateAppDialog.isShowing()) {
+            outState.putBoolean(EVALUATE_APP_DIALOG_SHOW, bEvaluateAppDialogShow);
         }
     }
 
@@ -448,7 +451,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     /**
      * Scroll to the beginning of Settings page.
      * In this case, the beginning is category KEY_FEATURES.
-     *
+     * <p>
      * Note: If the first category changes, this method should be updated with the new one.
      */
     public void goToFirstCategory() {
@@ -502,7 +505,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         }
     }
 
-    private void showEvaluatedAppDialog(){
+    private void showEvaluatedAppDialog() {
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
 
@@ -529,71 +532,65 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         rateAppCheck.setOnClickListener(v -> {
             logDebug("Rate the app");
             //Rate the app option:
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL) ) );
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)));
 
-            if (evaluateAppDialog!= null){
+            if (evaluateAppDialog != null) {
                 evaluateAppDialog.dismiss();
                 bEvaluateAppDialogShow = false;
             }
         });
 
-        sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
+        sendFeedbackCheck.setOnClickListener(v -> {
+            logDebug("Send Feedback");
 
-            @Override
-            public void onClick(View v) {
-                logDebug("Send Feedback");
+            //Send feedback option:
+            StringBuilder body = new StringBuilder();
+            body.append(getString(R.string.setting_feedback_body))
+            .append("\n\n\n\n\n\n\n\n\n\n\n")
+            .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
+            .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
+            .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
-                //Send feedback option:
-                StringBuilder body = new StringBuilder();
-                body.append(getString(R.string.setting_feedback_body));
-                body.append("\n\n\n\n\n\n\n\n\n\n\n");
-                body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
-                body.append(getString(R.string.settings_feedback_body_android_version)+"  "+ Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
-                body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-                if(((MegaApplication) getActivity().getApplication()).getMyAccountInfo()!=null){
-                    if(((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType()>4){
-                        body.append(" ("+getString(R.string.my_account_free)+")");
-                    }
-                    else{
-                        switch(((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType()){
-                            case 0:{
-                                body.append(" ("+getString(R.string.my_account_free)+")");
-                                break;
-                            }
-                            case 1:{
-                                body.append(" ("+getString(R.string.my_account_pro1)+")");
-                                break;
-                            }
-                            case 2:{
-                                body.append(" ("+getString(R.string.my_account_pro2)+")");
-                                break;
-                            }
-                            case 3:{
-                                body.append(" ("+getString(R.string.my_account_pro3)+")");
-                                break;
-                            }
-                            case 4:{
-                                body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-                                break;
-                            }
+            if (((MegaApplication) getActivity().getApplication()).getMyAccountInfo() != null) {
+                if (((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType() < 0 || ((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType() > 4) {
+                    body.append(" (").append(getString(R.string.my_account_free)).append(")");
+                } else {
+                    switch (((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType()) {
+                        case 0: {
+                            body.append(" (").append(getString(R.string.my_account_free)).append(")");
+                            break;
+                        }
+                        case 1: {
+                            body.append(" (").append(getString(R.string.my_account_pro1)).append(")");
+                            break;
+                        }
+                        case 2: {
+                            body.append(" (").append(getString(R.string.my_account_pro2)).append(")");
+                            break;
+                        }
+                        case 3: {
+                            body.append(" (").append(getString(R.string.my_account_pro3)).append(")");
+                            break;
+                        }
+                        case 4: {
+                            body.append(" (").append(getString(R.string.my_account_prolite_feedback_email)).append(")");
+                            break;
                         }
                     }
                 }
+            }
 
-                String emailAndroid = MAIL_ANDROID;
-                String versionApp = (getString(R.string.app_version));
-                String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
+            String versionApp = (getString(R.string.app_version));
+            String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
 
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-                startActivity(Intent.createChooser(emailIntent, " "));
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + MAIL_ANDROID));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
+            startActivity(Intent.createChooser(emailIntent, " "));
 
-                if (evaluateAppDialog != null){
-                    evaluateAppDialog.dismiss();
-                    bEvaluateAppDialogShow = false;
-                }
+            if (evaluateAppDialog != null) {
+                evaluateAppDialog.dismiss();
+                bEvaluateAppDialogShow = false;
             }
         });
 
