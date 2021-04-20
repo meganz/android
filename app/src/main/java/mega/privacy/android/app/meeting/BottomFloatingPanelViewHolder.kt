@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
-import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -17,12 +18,13 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 
 /**
- * Necessary value
+ * Bottom Panel view holder package the view and logic code of floating panel
  *
+ * Necessary value
  * Mic, Cam, Speaker state
  */
 class BottomFloatingPanelViewHolder(
-    private val binding: ActivityMeetingBinding,
+    private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private var isGuest: Boolean,
     private var isModerator: Boolean
@@ -83,12 +85,11 @@ class BottomFloatingPanelViewHolder(
     private fun initButtonsState() {
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
-        // End meeting for all isn't included in MVP version.
-        floatingPanelView.fabEnd.setImageResource(if (isModerator) R.drawable.ic_end_call else R.drawable.ic_remove)
+        floatingPanelView.fabEnd.setImageResource(R.drawable.ic_remove)
     }
 
     fun setParticipants(participants: List<Participant>) {
-        participantsAdapter.submitList(participants)
+        participantsAdapter.submitList(participants.toMutableList())
 
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
@@ -166,6 +167,7 @@ class BottomFloatingPanelViewHolder(
             fabHold.setOnOffCallback {
                 // if isHold is off, should disable the camera and mic
                 updateHoldState(it)
+                binding.bottomFloatingPanel.fabHold.isOn = !it
                 listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
             }
 
@@ -193,19 +195,24 @@ class BottomFloatingPanelViewHolder(
      * If meeting isn't hold, change to the previous state
      */
     private fun updateHoldState(isNotHold: Boolean) {
-        floatingPanelView.fabMic.isOn = if (isNotHold) savedMicState else false
-        floatingPanelView.fabCam.isOn = if (isNotHold) savedCamState else false
+        floatingPanelView.fabMic.apply {
+            enable = !isNotHold
+        }
+        floatingPanelView.fabCam.apply {
+            enable = !isNotHold
+        }
     }
 
     private fun setupRecyclerView() {
         floatingPanelView.participants.apply {
             layoutManager = LinearLayoutManager(context)
-            itemAnimator = noChangeRecyclerViewItemAnimator()
+            itemAnimator = null
             clipToPadding = false
-            setHasFixedSize(true)
             adapter = participantsAdapter
+            addItemDecoration(SimpleDividerItemDecoration(context))
         }
     }
+
 
     private fun updateBottomFloatingPanelIfNeeded() {
         if (bottomFloatingPanelExpanded) {
@@ -296,6 +303,14 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
         onBottomFloatingPanelSlide(0F)
+    }
+
+    fun updateMicIcon(micOn: Boolean) {
+        floatingPanelView.fabMic.isOn = micOn
+    }
+
+    fun updateCamIcon(micOn: Boolean) {
+        floatingPanelView.fabCam.isOn = micOn
     }
 
     companion object {

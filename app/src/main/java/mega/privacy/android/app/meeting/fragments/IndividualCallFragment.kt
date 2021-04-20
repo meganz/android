@@ -52,12 +52,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
         surfaceHolder = video.holder
 
         if (isFloatingWindow) {
-            meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
-                view.alpha = 1 - it
-            }
-
-            meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
-                videoAlpha = ((1 - it) * 255).toInt()
+            (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.apply {
+                add {
+                    view.alpha = 1 - it
+                }
+                add {
+                    videoAlpha = ((1 - it) * 255).toInt()
+                }
             }
         }
     }

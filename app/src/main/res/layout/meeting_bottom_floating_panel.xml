@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:behavior_expandedOffset="26dp"
+    app:behavior_expandedOffset="36dp"
     app:behavior_fitToContents="false"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/meeting_bottom_floating_panel_peek_height"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    app:layout_behavior="@string/bottom_sheet_behavior">
 
     <View
         android:id="@+id/background_mask"
@@ -51,6 +51,7 @@
         app:on_icon="@drawable/ic_mic_on"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
+        app:disable_icon="@drawable/ic_mic_disable"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -83,6 +84,7 @@
         app:on_icon="@drawable/ic_video"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
+        app:disable_icon="@drawable/ic_video_disable"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -115,6 +117,7 @@
         app:on_icon="@drawable/ic_transfers_pause"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
+        app:disable_icon="@drawable/ic_transfers_pause_disable"
         tools:ignore="ContentDescription" />
 
     <TextView

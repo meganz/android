@@ -26,8 +26,8 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 LEAVE_ANYWAY -> leaveAnyway()
                 END_MEETING_FOR_ALL -> askConfirmationEndMeetingForAll()
                 ASSIGN_MODERATOR -> assignModerator()
-
             }
+            dismiss()
         })
 
         binding =
@@ -49,25 +49,23 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun askConfirmationEndMeetingForAll() {
         LogUtil.logDebug("askConfirmationEndMeeting")
-        val dialogClickListener =
-            DialogInterface.OnClickListener { dialog, which ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        //End Meeting for all
-                        dialog.dismiss()
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        dialog.dismiss()
-                    }
-                }
-            }
+
         MaterialAlertDialogBuilder(requireContext()).apply {
             setTitle(getString(R.string.end_meeting_for_all_dialog_title))
             setMessage(getString(R.string.end_meeting_dialog_message))
-            setPositiveButton(R.string.general_ok, dialogClickListener)
-            setNegativeButton(R.string.general_cancel, dialogClickListener)
+            setPositiveButton(R.string.general_ok) { dialog, _ ->
+                run {
+                    dialog.dismiss()
+                    endMeetingForAll()
+                }
+            }
+            setNegativeButton(R.string.general_cancel) { dialog, _ -> dialog.dismiss() }
             show()
         }
+    }
+
+    private fun endMeetingForAll() {
+
     }
 
 

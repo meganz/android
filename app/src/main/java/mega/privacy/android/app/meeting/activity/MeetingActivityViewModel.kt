@@ -18,6 +18,9 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  */
+
+const val HEAD_PHONE_EVENT = 0
+
 class MeetingActivityViewModel @ViewModelInject constructor(
     private val meetingActivityRepository: MeetingActivityRepository
 ) : ViewModel() {
@@ -44,6 +47,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
+
+    // HeadPhone Event
+    private val _eventLiveData:MutableLiveData<Int> = MutableLiveData()
+    val eventLiveData = _eventLiveData
 
     // Receive information about requests.
     val listener = object : MegaChatRequestListenerInterface {
@@ -173,5 +180,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
         recordAudioGranted = recordAudioPermission
+    }
+
+    fun sendHeadPhoneEvent(){
+        _eventLiveData.postValue(HEAD_PHONE_EVENT)
     }
 }
