@@ -1833,15 +1833,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
-
 	    if (dbH.getEphemeral() != null){
             Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
             intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
@@ -14172,103 +14163,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		callBadge.setVisibility(View.VISIBLE);
-	}
-
-	public void showEvaluatedAppDialog(){
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
-
-		final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
-		rateAppCheck.setText(getString(R.string.rate_the_app_panel));
-		rateAppCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		rateAppCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
-		rateAppMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
-		sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
-		sendFeedbackCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		sendFeedbackCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
-		sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setView(dialoglayout);
-
-		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
-		evaluateAppDialog = builder.create();
-
-		evaluateAppDialog.show();
-
-		rateAppCheck.setOnClickListener(v -> {
-			logDebug("Rate the app");
-			//Rate the app option:
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL) ) );
-
-			if (evaluateAppDialog!= null){
-				evaluateAppDialog.dismiss();
-			}
-		});
-
-		sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				logDebug("Send Feedback");
-
-				//Send feedback option:
-				StringBuilder body = new StringBuilder();
-				body.append(getString(R.string.setting_feedback_body));
-				body.append("\n\n\n\n\n\n\n\n\n\n\n");
-				body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
-				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
-				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
-						body.append(" ("+getString(R.string.my_account_free)+")");
-					}
-					else{
-						switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
-							case 0:{
-								body.append(" ("+getString(R.string.my_account_free)+")");
-								break;
-							}
-							case 1:{
-								body.append(" ("+getString(R.string.my_account_pro1)+")");
-								break;
-							}
-							case 2:{
-								body.append(" ("+getString(R.string.my_account_pro2)+")");
-								break;
-							}
-							case 3:{
-								body.append(" ("+getString(R.string.my_account_pro3)+")");
-								break;
-							}
-							case 4:{
-								body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-								break;
-							}
-						}
-					}
-				}
-
-				String emailAndroid = MAIL_ANDROID;
-				String versionApp = (getString(R.string.app_version));
-				String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
-
-				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-				emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-				startActivity(Intent.createChooser(emailIntent, " "));
-
-				if (evaluateAppDialog != null){
-					evaluateAppDialog.dismiss();
-				}
-			}
-		});
-
 	}
 
 	public String getDeviceName() {
