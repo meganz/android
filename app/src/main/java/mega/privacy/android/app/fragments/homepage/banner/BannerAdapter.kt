@@ -1,22 +1,26 @@
 package mega.privacy.android.app.fragments.homepage.banner
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.widget.ImageView
 import android.widget.TextView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
-import mega.privacy.android.app.utils.LinksUtil
 import nz.mega.sdk.MegaBanner
 
 class BannerAdapter(private val viewModel: HomePageViewModel)
     : BaseBannerAdapter<MegaBanner>() {
+
+    private var clickBannerCallback : ClickBannerCallback? = null
+
+    interface ClickBannerCallback {
+        fun actOnActionLink(link: String)
+    }
+
+    fun setClickBannerCallback(cb: ClickBannerCallback) {
+        clickBannerCallback = cb;
+    }
 
     override fun bindData(
         holder: BaseViewHolder<MegaBanner>,
@@ -41,29 +45,12 @@ class BannerAdapter(private val viewModel: HomePageViewModel)
 
         data?.url?.let { link ->
             holder.itemView.setOnClickListener {
-                actOnActionLink(it.context, link)
+                clickBannerCallback?.actOnActionLink(link)
             }
         }
     }
 
     override fun getLayoutId(viewType: Int): Int {
         return R.layout.item_banner_view
-    }
-
-    private fun actOnActionLink(context: Context, link: String) {
-        when (link) {
-            ACHIEVEMENT -> {
-                val intent = Intent(context, AchievementsActivity::class.java)
-                context.startActivity(intent)
-            }
-            REFERRAL -> {
-                LinksUtil.requiresTransferSession(context, REFERRAL)
-            }
-        }
-    }
-
-    companion object {
-        private const val ACHIEVEMENT = "https://mega.nz/achievements"
-        private const val REFERRAL = "https://mega.nz/fm/refer"
     }
 }
