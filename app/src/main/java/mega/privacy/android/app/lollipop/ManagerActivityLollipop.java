@@ -5105,6 +5105,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (getMyAccountFragment() == null) {
 				maF = MyAccountFragment.newInstance();
+			} else {
+				maF.expandPaymentInfoIfNeeded();
 			}
 
 			replaceFragment(maF, FragmentTag.MY_ACCOUNT.getTag());
@@ -7544,14 +7546,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("The accountFragment is: " + accountFragment);
     		switch(accountFragment) {
 	    		case MY_ACCOUNT_FRAGMENT:
-	    			if (getMyAccountFragment() == null || maF.onBackPressed() == 0){
-						if (comesFromNotifications) {
-							comesFromNotifications = false;
-							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
-						} else {
-							backToDrawerItem(bottomNavigationCurrentItem);
-						}
-	    			}
+					if (comesFromNotifications) {
+						comesFromNotifications = false;
+						selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+					} else {
+						backToDrawerItem(bottomNavigationCurrentItem);
+					}
+
 	    			break;
 	    		case UPGRADE_ACCOUNT_FRAGMENT:
 					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");

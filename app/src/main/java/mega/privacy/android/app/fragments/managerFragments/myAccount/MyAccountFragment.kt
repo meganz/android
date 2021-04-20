@@ -305,11 +305,12 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         }
     }
 
-    private fun expandPaymentInfoIfNeeded() {
+    fun expandPaymentInfoIfNeeded() {
         if (!viewModel.shouldShowPaymentInfo())
             return
 
         val v = binding.paymentInfoLayout
+        v.isVisible = false
 
         val matchParentMeasureSpec =
             View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
@@ -424,10 +425,6 @@ class MyAccountFragment : BaseFragment(), Scrollable {
                     ).show()
             }
         }
-    }
-
-    fun onBackPressed(): Int {
-        return 0
     }
 
     fun resetPass() {
