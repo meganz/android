@@ -646,6 +646,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
+				setAvatar();
+
 				if(user!=null){
 					sharedFoldersLayout.setVisibility(View.VISIBLE);
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
