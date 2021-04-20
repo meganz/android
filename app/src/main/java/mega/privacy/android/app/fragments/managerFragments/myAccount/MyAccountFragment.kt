@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
+import mega.privacy.android.app.activities.editProfile.EditProfileActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -87,7 +88,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         setUpAvatar(true)
 
         binding.myAccountThumbnail.setOnClickListener {
-            (context as ManagerActivityLollipop).checkBeforeOpeningQR(false)
+            (mActivity as ManagerActivityLollipop).checkBeforeOpeningQR(false)
         }
 
         binding.nameText.text = viewModel.getName()
@@ -97,7 +98,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         setUpAccountDetails()
 
         binding.backupRecoveryKeyLayout.setOnClickListener {
-            (context as ManagerActivityLollipop).showMKLayout()
+            (mActivity as ManagerActivityLollipop).showMKLayout()
         }
 
         setUpAchievements()
@@ -109,7 +110,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
         if (!this::binding.isInitialized)
             return
 
-        (context as ManagerActivityLollipop).changeMyAccountAppBarElevation(
+        (mActivity as ManagerActivityLollipop).changeMyAccountAppBarElevation(
             binding.scrollView.canScrollVertically(
                 SCROLLING_UP_DIRECTION
             )
@@ -121,7 +122,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
 
         binding.myAccountTextInfoLayout.setOnClickListener {
             if (editable) {
-                //Open edit my profile activity
+                startActivity(Intent(context, EditProfileActivity::class.java))
             }
         }
     }
@@ -142,7 +143,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
-            setOnClickListener { (context as ManagerActivityLollipop).showUpAF() }
+            setOnClickListener { (mActivity as ManagerActivityLollipop).showUpAF() }
         }
 
         binding.accountTypeText.isVisible = true
@@ -358,8 +359,10 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             }
         }
 
+        val addPhoneNumberVisible = canVerifyPhoneNumber && !alreadyRegisteredPhoneNumber
+
         binding.addPhoneNumberLayout.apply {
-            isVisible = canVerifyPhoneNumber && !alreadyRegisteredPhoneNumber
+            isVisible = addPhoneNumberVisible
 
             setOnClickListener {
                 if (canVoluntaryVerifyPhoneNumber()) {
@@ -367,18 +370,18 @@ class MyAccountFragment : BaseFragment(), Scrollable {
                 } else if (!ModalBottomSheetUtil.isBottomSheetDialogShown(phoneNumberBottomSheet) && activity != null) {
                     phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
                     phoneNumberBottomSheet!!.show(
-                        (context as ManagerActivityLollipop).supportFragmentManager,
+                        (mActivity as ManagerActivityLollipop).supportFragmentManager,
                         phoneNumberBottomSheet!!.tag
                     )
                 }
             }
         }
 
-        if (canVerifyPhoneNumber) {
-            binding.phoneText.text =
+        if (addPhoneNumberVisible) {
+            binding.addPhoneSubtitle.text =
                 if (megaApi.isAchievementsEnabled) StringResourcesUtils.getString(
                     R.string.sms_add_phone_number_dialog_msg_achievement_user,
-                    (context as ManagerActivityLollipop).bonusStorageSMS
+                    (mActivity as ManagerActivityLollipop).bonusStorageSMS
                 ) else StringResourcesUtils.getString(
                     R.string.sms_add_phone_number_dialog_msg_non_achievement_user
                 )
@@ -392,7 +395,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             if (isVisible) {
                 setOnClickListener {
                     if (!isOnline(context)) {
-                        (context as ManagerActivityLollipop).showSnackbar(
+                        (mActivity as ManagerActivityLollipop).showSnackbar(
                             SNACKBAR_TYPE,
                             getString(R.string.error_server_connection_problem),
                             MEGACHAT_INVALID_HANDLE
@@ -463,7 +466,7 @@ class MyAccountFragment : BaseFragment(), Scrollable {
             megaApi.getUserAvatar(
                 megaApi.myUser,
                 buildAvatarFile(context, megaApi.myEmail).absolutePath,
-                context as ManagerActivityLollipop
+                mActivity as ManagerActivityLollipop
             )
         } else {
             setDefaultAvatar()

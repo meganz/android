@@ -509,7 +509,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
-			contactPropertiesImage = findViewById(R.id.chat_contact_properties_toolbar_image);
+			contactPropertiesImage = findViewById(R.id.toolbar_image);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 

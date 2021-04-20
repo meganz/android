@@ -623,6 +623,10 @@
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
+        <activity
+            android:name=".activities.editProfile.EditProfileActivity"
+            android:launchMode="singleTop" />
+
     </application>
 
 </manifest>
