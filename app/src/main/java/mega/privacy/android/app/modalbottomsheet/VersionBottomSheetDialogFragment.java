@@ -75,7 +75,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         nodeName.setText(node.getName());
-        nodeInfo.setText(getMegaNodeFolderInfo(node));
+        nodeInfo.setText(String.format("%s . %s", getSizeString(node.getSize()), getNodeDate(node)));
 
         setNodeThumbnail(context, node, nodeThumb);
 
