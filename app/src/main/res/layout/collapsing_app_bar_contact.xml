@@ -29,7 +29,7 @@
             app:layout_collapseMode="parallax">
 
             <RelativeLayout
-                android:id="@+id/chat_contact_properties_image_layout"
+                android:id="@+id/image_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 

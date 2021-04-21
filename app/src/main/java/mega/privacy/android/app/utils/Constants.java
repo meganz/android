@@ -840,4 +840,7 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    public final static float MAX_WIDTH_APPBAR_LAND = 400;
+    public final static float MAX_WIDTH_APPBAR_PORT = 200;
 }
