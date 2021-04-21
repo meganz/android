@@ -137,6 +137,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -5678,9 +5679,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     			break;
     		}
     		case CONTACTS:{
-				showHideBottomNavigationView(true);
-				selectDrawerItemContacts();
-				showFabButton();
+				startActivity(new Intent(this, ContactsActivity.class));
+//				showHideBottomNavigationView(true);
+//				selectDrawerItemContacts();
+//				showFabButton();
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -10120,8 +10122,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 			}
 			case R.id.contacts_section: {
-				sectionClicked = true;
-				drawerItem = DrawerItem.CONTACTS;
+				startActivity(new Intent(this, ContactsActivity.class));
+//				sectionClicked = true;
+//				drawerItem = DrawerItem.CONTACTS;
 				break;
 			}
 			case R.id.notifications_section: {
