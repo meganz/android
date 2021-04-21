@@ -21,6 +21,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.set
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.*;
@@ -75,7 +76,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         nodeName.setText(node.getName());
-        nodeInfo.setText(String.format("%s . %s", getSizeString(node.getSize()), getNodeDate(node)));
+        nodeInfo.setText(getFileInfo(node));
 
         setNodeThumbnail(context, node, nodeThumb);
 
@@ -137,11 +138,6 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         }
 
         setStateBottomSheetBehaviorHidden();
-    }
-
-    private String getNodeDate(MegaNode node) {
-        Calendar calendar = calculateDateFromTimestamp(node.getModificationTime());
-        return new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
     }
 
     @Override
