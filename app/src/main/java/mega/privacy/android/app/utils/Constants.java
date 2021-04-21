@@ -498,6 +498,7 @@ public class Constants {
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
     public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
+    public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
     //Indicates the data after it, is the value of a transfer parameter
     public static final String APP_DATA_INDICATOR = ">";
     //Indicates the data after it, is a new transfer parameter

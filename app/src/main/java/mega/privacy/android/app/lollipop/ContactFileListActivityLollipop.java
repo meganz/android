@@ -78,6 +78,9 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -134,6 +137,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private AlertDialog newTextFileDialog;
+
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -166,11 +171,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		logDebug("onSaveInstanceState");
-		super.onSaveInstanceState(outState);
 		outState.putLong(PARENT_HANDLE, parentHandle);
-
+		checkNewTextFileDialogState(newTextFileDialog, outState);
 		nodeSaver.saveState(outState);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -246,6 +250,12 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	@Override
 	public void showNewFolderDialog() {
 		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
+	}
+
+	@Override
+	public void showNewTextFileDialog(String typedName) {
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
+				megaApi.getNodeByHandle(parentHandle), typedName, false);
 	}
 
 	@Override
@@ -441,6 +451,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
+
+			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+				showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+			}
 		}
 	}
 
