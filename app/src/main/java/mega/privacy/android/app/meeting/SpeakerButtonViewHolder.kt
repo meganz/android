@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 class SpeakerButtonViewHolder(
     private val speakerFab: OnOffFab,
     private val speakerLabel: TextView,
-    private val switchCallback: (AppRTCAudioManager.AudioDevice) -> Boolean
+    private val switchCallback: (AppRTCAudioManager.AudioDevice) -> Unit
 ) {
     private var currentDevice = AppRTCAudioManager.AudioDevice.EARPIECE
     private var wiredHeadsetConnected = false
@@ -75,16 +75,16 @@ class SpeakerButtonViewHolder(
         device: AppRTCAudioManager.AudioDevice,
         fireCallback: Boolean = true
     ) {
+        currentDevice = device
+
+        updateAppearance()
 
         if (fireCallback) {
-            if (switchCallback(device)) {
-                currentDevice = device
-                MegaApplication.getInstance().audioManager.selectAudioDevice(
-                    currentDevice,
-                    false
-                )
-                updateAppearance()
-            }
+            MegaApplication.getInstance().audioManager.selectAudioDevice(
+                currentDevice,
+                false
+            )
+            switchCallback(currentDevice)
         }
     }
 
@@ -95,16 +95,19 @@ class SpeakerButtonViewHolder(
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
                 speakerFab.isOn = true
                 speakerFab.setOnIcon(R.drawable.ic_speaker_on)
+
                 speakerLabel.text = getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
             AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
                 speakerFab.isOn = true
                 speakerFab.setOnIcon(R.drawable.ic_headphone)
+
                 speakerLabel.text = getString(R.string.general_headphone)
             }
             else -> {
                 speakerFab.isOn = false
+
                 speakerLabel.text = getString(R.string.general_speaker)
             }
         }

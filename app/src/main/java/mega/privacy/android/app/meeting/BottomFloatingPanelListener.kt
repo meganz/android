@@ -7,10 +7,10 @@ interface BottomFloatingPanelListener {
     /**
      * Listener for button bar
      */
-    fun onChangeMicState(micOn: Boolean): Boolean
-    fun onChangeCamState(camOn: Boolean): Boolean
-    fun onChangeHoldState(isHold: Boolean): Boolean
-    fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice): Boolean
+    fun onChangeMicState(micOn: Boolean)
+    fun onChangeCamState(camOn: Boolean)
+    fun onChangeHoldState(isHold: Boolean)
+    fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice)
     fun onEndMeeting()
 
     /**

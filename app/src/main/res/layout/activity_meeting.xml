@@ -25,9 +25,4 @@
 
     </LinearLayout>
 
-    <include
-        android:visibility="gone"
-        android:id="@+id/bottom_floating_panel"
-        layout="@layout/meeting_bottom_floating_panel" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

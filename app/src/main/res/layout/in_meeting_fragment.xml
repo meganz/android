@@ -36,4 +36,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <include
+        android:id="@+id/bottom_floating_panel"
+        layout="@layout/meeting_bottom_floating_panel" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

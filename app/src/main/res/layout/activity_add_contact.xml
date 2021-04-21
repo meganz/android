@@ -501,9 +501,9 @@
 		android:id="@+id/fab_button_next"
 		android:layout_width="@dimen/fab_button_diameter"
 		android:layout_height="@dimen/fab_button_diameter"
-		android:layout_margin="16dp"
-		android:src="@drawable/ic_send_white"
+		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
-		android:layout_alignParentEnd="true"/>
+		android:layout_margin="16dp"
+		android:src="@drawable/ic_send_white" />
 
 </RelativeLayout>

@@ -144,5 +144,6 @@
         <attr name="off_icon_tint" format="color" />
         <attr name="on_background_tint" format="color" />
         <attr name="off_background_tint" format="color" />
+        <attr name="disable_icon" format="reference" />
     </declare-styleable>
 </resources>
