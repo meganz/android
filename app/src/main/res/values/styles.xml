@@ -211,13 +211,17 @@
         <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
     </style>
 
-    <!-- My Account "LOGOUT" Button, grey outlined in Light, outlined in Dark -->
+    <!-- My Account, Edit profile "LOGOUT" Button -->
     <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
-        <item name="strokeColor">@color/grey_alpha_026</item>
-        <item name="backgroundTint">@color/white</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="strokeColor">@color/grey_012_white_012</item>
+        <item name="backgroundTint">@color/grey_010_white_009</item>
+        <item name="android:textColor">?android:attr/colorAccent</item>
+        <item name="android:paddingStart">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
     </style>
     
     <style name="Widget.Mega.Button.Variant4" parent="Widget.Mega.Button.OutlinedButton">

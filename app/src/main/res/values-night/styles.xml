@@ -13,9 +13,4 @@
         <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
         <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
     </style>
-
-    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
-    </style>
 </resources>

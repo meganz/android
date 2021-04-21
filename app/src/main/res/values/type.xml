@@ -462,6 +462,10 @@
         <item name="android:textColor">@color/white_087_white</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Grey38Grey400">
+        <item name="android:textColor">@color/grey_038_grey_400</item>
+    </style>
+
     <style name="TextAppearance.Mega.Caption.Grey54White60.14">
         <item name="android:textSize">14sp</item>
     </style>

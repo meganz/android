@@ -264,4 +264,6 @@
     <color name="grey_020_grey_087">@color/grey_alpha_087</color>
     <color name="white_grey_900">@color/grey_900</color>
     <color name="grey_100_060_grey_100">@color/grey_100</color>
+    <color name="grey_038_grey_400">@color/grey_400</color>
+    <color name="grey_010_white_009">@color/white_alpha_009</color>
 </resources>

@@ -431,4 +431,6 @@
     <color name="grey_020_grey_087">@color/grey_020</color>
     <color name="white_grey_900">@color/white</color>
     <color name="grey_100_060_grey_100">@color/grey_100_alpha_060</color>
+    <color name="grey_038_grey_400">@color/grey_alpha_038</color>
+    <color name="grey_010_white_009">@color/grey_010</color>
 </resources>

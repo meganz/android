@@ -3045,6 +3045,9 @@
 
     <string name="add_phone_label" context="Title of Add phone number option in My account section">Add your phone number</string>
     <string name="backup_recovery_key_subtitle" context="Text of the option Backup Recovery Key in My account section">Do you remember your password?\nMEGA can\'t reset your password if you forget it.</string>
+    <string name="change_name_action" context="Action to change name">Change name</string>
+    <string name="add_photo_action" context="Action to add photo">Add photo</string>
+    <string name="add_phone_number_action" context="Action to add phone number">Add phone number</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
 
