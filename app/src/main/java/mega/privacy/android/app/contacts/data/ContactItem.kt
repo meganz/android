@@ -8,7 +8,7 @@ data class ContactItem constructor(
     val email: String,
     val name: String,
     val status: Int,
-    val lastSeen: String,
+    val lastSeen: String? = null,
     val imageColor: Int,
     var imageUri: Uri? = null,
     val isNew: Boolean = false

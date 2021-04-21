@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
@@ -43,48 +44,58 @@ class GetContactsUseCase @Inject constructor(
                     name = userName,
                     status = userStatus,
                     imageUri = userImageUri,
-                    imageColor = userImageColor,
-                    lastSeen = "Online"
+                    imageColor = userImageColor
                 )
             }.toMutableList()
 
             emitter.onNext(contacts)
 
-            val avatarListener = object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
+            val chatListener = buildChatListener(
+                onChatOnlineStatusUpdate = { userHandle, status ->
+                    val index = contacts.indexOfFirst { it.handle == userHandle }
 
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    if (emitter.isCancelled) return
-
-                    if (error.errorCode == MegaError.API_OK) {
-                        contacts.forEachIndexed { index, contact ->
-                            if (contact.email == request.email) {
-                                val userImageUri = File(request.file).toUri()
-
-                                contacts[index] = contact.copy(
-                                    imageUri = userImageUri
-                                )
-                                return@forEachIndexed
-                            }
-                        }
-
-                        emitter.onNext(contacts.toList())
-                    } else {
-                        logError(error.toThrowable().stackTraceToString())
+                    if (index != -1) {
+                        val contact = contacts[index]
+                        contacts[index] = contact.copy(
+                            status = status
+                        )
                     }
-                }
 
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
+                    emitter.onNext(contacts.toList())
+                },
+                onChatPresenceLastGreen = { userHandle, lastGreen ->
+                    val index = contacts.indexOfFirst { it.handle == userHandle }
+
+                    if (index != -1) {
+                        val contact = contacts[index]
+                        contacts[index] = contact.copy(
+                            lastSeen = lastGreen.toString()
+                        )
+                    }
+
+                    emitter.onNext(contacts.toList())
+                }
+            )
+
+            megaChatApi.addChatListener(chatListener)
+
+            val avatarListener = buildAvatarListener { request, error ->
+                if (emitter.isCancelled) return@buildAvatarListener
+
+                if (error.errorCode == MegaError.API_OK) {
+                    val index = contacts.indexOfFirst { it.email == request.email }
+
+                    if (index != -1) {
+                        val userImageUri = File(request.file).toUri()
+
+                        val oldContact = contacts[index]
+                        contacts[index] = oldContact.copy(
+                            imageUri = userImageUri
+                        )
+                    }
+
+                    emitter.onNext(contacts.toList())
+                } else {
                     logError(error.toThrowable().stackTraceToString())
                 }
             }
@@ -92,9 +103,59 @@ class GetContactsUseCase @Inject constructor(
             contacts.forEach { contact ->
                 val userImageFile = getUserImageFile(contact.email).absolutePath
                 megaApi.getUserAvatar(contact.email, userImageFile, avatarListener)
+
+                if (contact.status != MegaChatApi.STATUS_ONLINE) {
+                    megaChatApi.requestLastGreen(contact.handle, null)
+                }
             }
+
+            emitter.setDisposable(Disposable.fromAction {
+                megaChatApi.removeChatListener(chatListener)
+            })
         }, BackpressureStrategy.BUFFER)
 
     private fun getUserImageFile(userEmail: String): File =
         CacheFolderManager.buildAvatarFile(context, "$userEmail.jpg")
+
+    private fun buildAvatarListener(onFinishAction: (MegaRequest, MegaError) -> Unit) =
+        object : MegaRequestListenerInterface {
+            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+                onFinishAction.invoke(request, e)
+            }
+
+            override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+                logError(e.toThrowable().stackTraceToString())
+            }
+
+            override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
+            override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
+        }
+
+    private fun buildChatListener(
+        onChatOnlineStatusUpdate: (Long, Int) -> Unit,
+        onChatPresenceLastGreen: (Long, Int) -> Unit
+    ): MegaChatListenerInterface =
+        object : MegaChatListenerInterface {
+            override fun onChatOnlineStatusUpdate(
+                api: MegaChatApiJava,
+                userhandle: Long,
+                status: Int,
+                inProgress: Boolean
+            ) {
+                onChatOnlineStatusUpdate.invoke(userhandle, status)
+            }
+
+            override fun onChatPresenceLastGreen(
+                api: MegaChatApiJava,
+                userhandle: Long,
+                lastGreen: Int
+            ) {
+                onChatPresenceLastGreen.invoke(userhandle, lastGreen)
+            }
+
+            override fun onChatListItemUpdate(api: MegaChatApiJava, item: MegaChatListItem) {}
+            override fun onChatInitStateUpdate(api: MegaChatApiJava, newState: Int) {}
+            override fun onChatPresenceConfigUpdate(api: MegaChatApiJava, config: MegaChatPresenceConfig) {}
+            override fun onChatConnectionStateUpdate(api: MegaChatApiJava, chatid: Long, newState: Int) {}
+        }
 }
