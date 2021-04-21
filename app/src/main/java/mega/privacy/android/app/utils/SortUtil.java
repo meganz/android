@@ -15,29 +15,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 public class SortUtil {
 
-    public static void sortByMailDescending(ArrayList<MegaNode> nodes) {
-        ArrayList<MegaNode> folderNodes = new ArrayList<>();
-        ArrayList<MegaNode> fileNodes = new ArrayList<>();
-
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i) == null) {
-                continue;
-            }
-            if (nodes.get(i).isFolder()) {
-                folderNodes.add(nodes.get(i));
-            } else {
-                fileNodes.add(nodes.get(i));
-            }
-        }
-
-        Collections.reverse(folderNodes);
-        Collections.reverse(fileNodes);
-
-        nodes.clear();
-        nodes.addAll(folderNodes);
-        nodes.addAll(fileNodes);
-    }
-
     public static void sortByNameDescending(ArrayList<MegaNode> nodes) {
         sort(nodes, true);
     }

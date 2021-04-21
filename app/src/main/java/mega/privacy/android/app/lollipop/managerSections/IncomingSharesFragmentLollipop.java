@@ -245,11 +245,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	public void findNodes() {
-		nodes = megaApi.getInShares();
-
-		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
-			sortByMailDescending(nodes);
-		}
+		nodes = megaApi.getInShares(sortOrderManagement.getOrderOthers());
 		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 

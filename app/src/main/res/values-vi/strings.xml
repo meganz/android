@@ -682,8 +682,9 @@
     <string name="settings_appearance" context="settings of the Appearance section">Giao Diện</string>
     <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
-    <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu trữ</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
+    <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu Trữ</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
 
@@ -777,6 +778,8 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Chưa chỉnh</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Đổi Mã Số</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Yêu cầu passcode</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Ngay lập tức</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Nhập</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Tài khoản sẽ đăng xuất và tất cả các dữ liệu có liên quan đến MEGA trong điện thoại sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>

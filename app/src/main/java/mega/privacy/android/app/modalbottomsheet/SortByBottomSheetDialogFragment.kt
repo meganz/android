@@ -93,10 +93,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByVideosMediaType.isVisible = true
             }
             ORDER_OTHERS -> {
-                if (isIncomingRootOrder) {
-                    binding.sortBySubtitle.isVisible = true
-                }
-
                 binding.sortByNameSeparator.isVisible = false
                 binding.sortByLargestSize.isVisible = false
                 binding.sortBySmallestSize.isVisible = false
