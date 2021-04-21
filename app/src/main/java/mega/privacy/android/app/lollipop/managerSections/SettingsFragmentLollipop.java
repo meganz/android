@@ -507,22 +507,22 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     private void showEvaluatedAppDialog() {
         LayoutInflater inflater = getLayoutInflater();
-        View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
+        View dialogLayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
 
-        final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
+        final CheckedTextView rateAppCheck = (CheckedTextView) dialogLayout.findViewById(R.id.rate_the_app);
         rateAppCheck.setText(getString(R.string.rate_the_app_panel));
         rateAppCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
         rateAppMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
 
-        final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
+        final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialogLayout.findViewById(R.id.send_feedback);
         sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
         sendFeedbackCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
         sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this.context);
-        builder.setView(dialoglayout);
+        builder.setView(dialogLayout);
 
         builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
         evaluateAppDialog = builder.create();
@@ -551,39 +551,39 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
             .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
-            if (((MegaApplication) getActivity().getApplication()).getMyAccountInfo() != null) {
-                if (((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType() < 0 || ((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType() > 4) {
-                    body.append(" (").append(getString(R.string.my_account_free)).append(")");
-                } else {
-                    switch (((MegaApplication) getActivity().getApplication()).getMyAccountInfo().getAccountType()) {
-                        case 0: {
-                            body.append(" (").append(getString(R.string.my_account_free)).append(")");
-                            break;
-                        }
-                        case 1: {
-                            body.append(" (").append(getString(R.string.my_account_pro1)).append(")");
-                            break;
-                        }
-                        case 2: {
-                            body.append(" (").append(getString(R.string.my_account_pro2)).append(")");
-                            break;
-                        }
-                        case 3: {
-                            body.append(" (").append(getString(R.string.my_account_pro3)).append(")");
-                            break;
-                        }
-                        case 4: {
-                            body.append(" (").append(getString(R.string.my_account_prolite_feedback_email)).append(")");
-                            break;
-                        }
-                    }
+            MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+            if (myAccountInfo != null) {
+                body.append(" (");
+                switch (myAccountInfo.getAccountType()) {
+                    case FREE:
+                    default:
+                        body.append(getString(R.string.my_account_free));
+                        break;
+                    case PRO_I:
+                        body.append(getString(R.string.my_account_pro1));
+                        break;
+                    case PRO_II:
+                        body.append(getString(R.string.my_account_pro2));
+                        break;
+                    case PRO_III:
+                        body.append(getString(R.string.my_account_pro3));
+                        break;
+                    case PRO_LITE:
+                        body.append(getString(R.string.my_account_prolite_feedback_email));
+                        break;
+                    case BUSINESS:
+                        body.append(getString(R.string.business_label));
+                        break;
                 }
+                body.append(")");
             }
 
             String versionApp = (getString(R.string.app_version));
             String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
 
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + MAIL_ANDROID));
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setType("text/plain");
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
             startActivity(Intent.createChooser(emailIntent, " "));
