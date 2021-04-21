@@ -9,13 +9,14 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.CacheFolderManager
 import nz.mega.sdk.*
 import java.io.File
 import javax.inject.Inject
 
 class GetContactsUseCase @Inject constructor(
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val databaseHandler: DatabaseHandler
 ) {
