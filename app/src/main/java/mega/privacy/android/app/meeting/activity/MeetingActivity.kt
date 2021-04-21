@@ -52,6 +52,7 @@ class MeetingActivity : BaseActivity(), BottomFloatingPanelListener,
         /** The names of the Extra data being passed to the initial fragment */
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
+        const val MEETING_CHAT_ID = "chat_id"
     }
 
     private lateinit var binding: ActivityMeetingBinding

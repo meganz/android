@@ -290,7 +290,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if (clipData == null) return "";
         String content = clipData.getItemAt(0).getText().toString();
 
-        return AndroidMegaRichLinkMessage.isMeetingLink(content) ? content : "";
+        return AndroidMegaRichLinkMessage.isChatLink(content) ? content : "";
     }
 
     private boolean initMegaChat() {

@@ -279,6 +279,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_NAME;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -8757,13 +8758,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
-						case MEETING_LINK: {
-							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
-									android.R.attr.textColorPrimary));
-							openLinkErrorText.setText(R.string.valid_meeting_link);
-							openLinkOpenButton.setText(R.string.action_open_meeting_link);
-							break;
-						}
                         case CONTACT_LINK: {
 							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
@@ -8820,10 +8814,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			int linkType = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
                 switch (linkType) {
-                    case CHAT_LINK:
-					case MEETING_LINK:{
+                    case CHAT_LINK: {
 						logDebug("Open chat link: correct chat link");
-                        showChatLink(link);
+//                        showChatLink(link);
+						megaChatApi.checkChatLink(link, managerActivity);
                         dismissOpenLinkDialog();
                         break;
                     }
@@ -8849,7 +8843,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
                     }
                     case CHAT_LINK:
                     case CONTACT_LINK:
-					case MEETING_LINK:
                     case ERROR_LINK: {
 						logWarning("Show error: invalid link or correct chat or contact link");
                         showOpenLinkError(true, linkType);
@@ -8958,10 +8951,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	private void goToJoinMeeting(String link) {
+	private void goToJoinMeeting(String link, String name) {
 		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
 		joinMeetingLinkIntent.setData(Uri.parse(link));
 		joinMeetingLinkIntent.setAction(MEETING_ACTION_JOIN);
+		joinMeetingLinkIntent.putExtra(MEETING_NAME, name);
 		startActivity(joinMeetingLinkIntent);
 	}
 
@@ -12219,8 +12213,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				String link = request.getLink();
-				if (AndroidMegaRichLinkMessage.isMeetingLink(link)) {
-					goToJoinMeeting(link);
+				if (megaChatApi.getChatCall(request.getChatHandle()) != null) {
+					goToJoinMeeting(link, request.getText());
 				} else {
 					showChatLink(link);
 				}
