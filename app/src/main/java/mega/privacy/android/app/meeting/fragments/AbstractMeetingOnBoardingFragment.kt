@@ -22,7 +22,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.VideoCaptureUtils
-import nz.mega.sdk.MegaChatApiJava.*
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
 /**
@@ -86,6 +86,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             model.tips.observe(viewLifecycleOwner) {
                 showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
+            }
+            model.notificationNetworkState.observe(viewLifecycleOwner) {
+                logDebug("Network state changed, Online :$it")
             }
             model.cameraPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {

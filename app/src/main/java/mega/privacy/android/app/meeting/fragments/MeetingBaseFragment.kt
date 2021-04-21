@@ -50,18 +50,6 @@ open class MeetingBaseFragment : BaseFragment() {
         meetingActivity = activity as MeetingActivity
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        initViewModel()
-    }
-
-    private fun initViewModel() {
-        // Monitor network changes
-        sharedModel.notificationNetworkState.observe(viewLifecycleOwner) {
-            logDebug("Network state changed, Online :$it")
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         refreshPermissions(permissions)
