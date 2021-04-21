@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -51,6 +52,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -803,8 +805,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 addCompletedTransfer(completedTransfer);
 
                 if (APP_DATA_TXT_FILE.equals(transfer.getAppData())) {
-                    sendBroadcast(new Intent(BROADCAST_ACTION_TEXT_FILE_UPLOADED)
-                            .putExtra(COMPLETED_TRANSFER, completedTransfer.getId()));
+                    LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long.class)
+                            .post(completedTransfer.getId());
                 }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {

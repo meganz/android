@@ -1,10 +1,7 @@
 package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,14 +9,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TEXT_FILE_UPLOADED
-import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
+import mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -70,31 +68,19 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
     }
 
-    private val completedEditionReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null || BROADCAST_ACTION_TEXT_FILE_UPLOADED != intent.action) return
+    private val completedEditionObserver = Observer<Long> { completedTransferId ->
+        val result = viewModel.finishCreationOrEdition(completedTransferId)
 
-
-            val result = viewModel.finishCreationOrEdition(
-                intent.getLongExtra(
-                    COMPLETED_TRANSFER,
-                    INVALID_ID.toLong()
-                )
-            )
-
-            if (result != NON_UPDATE_FINISH_ACTION) {
-                showCreationOrEditionResult(result)
-            }
+        if (result != NON_UPDATE_FINISH_ACTION) {
+            showCreationOrEditionResult(result)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerReceiver(
-            completedEditionReceiver,
-            IntentFilter(BROADCAST_ACTION_TEXT_FILE_UPLOADED)
-        )
+        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
+            .observeForever(completedEditionObserver)
 
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -151,7 +137,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             renameDialog?.dismiss()
         }
 
-        unregisterReceiver(completedEditionReceiver)
+        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
+            .removeObserver(completedEditionObserver)
 
         super.onDestroy()
     }
@@ -338,18 +325,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun setUpObservers() {
-        viewModel.onTextFileEditorDataUpdate().observe(this, ::showDataUpdate)
+        viewModel.onTextFileEditorDataUpdate().observe(this) { refreshMenuOptionsVisibility() }
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onSavingMode().observe(this, ::showSavingMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
-    }
-
-    /**
-     * Refresh menu options because of some change on data.
-     */
-    private fun showDataUpdate(data: TextFileEditorData) {
-        refreshMenuOptionsVisibility()
     }
 
     /**
