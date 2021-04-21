@@ -616,7 +616,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_relative_layout_avatar:{
 				logDebug("Click layout avatar");
-				((ManagerActivityLollipop)context).showMyAccountOptionsPanel();
 				break;
 			}
 			case R.id.my_account_name:

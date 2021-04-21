@@ -11,6 +11,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
+import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -44,6 +46,8 @@ class EditProfileActivity : PasscodeActivity() {
     private var firstLineTextMaxWidthExpanded = 0
     private var stateToolbar = AppBarStateChangeListener.State.IDLE
 
+    private var photoBottomSheet: PhotoBottomSheetDialogFragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,6 +69,39 @@ class EditProfileActivity : PasscodeActivity() {
         setUpActionBar()
         setUpAvatar()
         setUpHeader()
+
+        binding.changeName.setOnClickListener {
+
+        }
+
+        binding.addPhoto.setOnClickListener {
+
+            if (ModalBottomSheetUtil.isBottomSheetDialogShown(photoBottomSheet))
+                return@setOnClickListener
+
+            photoBottomSheet = PhotoBottomSheetDialogFragment()
+            photoBottomSheet?.show(supportFragmentManager, photoBottomSheet?.tag)
+        }
+
+        binding.changeEmail.setOnClickListener {
+
+        }
+
+        binding.changePassword.setOnClickListener {
+
+        }
+
+        binding.addPhoneNumber.apply {
+
+        }
+
+        binding.recoveryKeyLayout.setOnClickListener {
+
+        }
+
+        binding.logoutButton.setOnClickListener {
+
+        }
     }
 
     private fun setUpActionBar() {
@@ -73,19 +110,6 @@ class EditProfileActivity : PasscodeActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = null
-
-//        val params = binding.headerLayout.appBar.layoutParams as CoordinatorLayout.LayoutParams
-//        val behaviour = params.behavior
-//
-//        behaviour?.onNestedPreScroll(
-//            binding.containerLayout,
-//            binding.headerLayout.appBar,
-//            binding.headerLayout.appBar,
-//            0,
-//            50,
-//            intArrayOf(0, 0),
-//            TYPE_TOUCH
-//        )
 
         var drawableArrow = ContextCompat.getDrawable(
             applicationContext,
@@ -130,7 +154,8 @@ class EditProfileActivity : PasscodeActivity() {
                     visibilityStateIcon()
                 }
 
-                binding.headerLayout.secondLineToolbar.setPadding(0, 0, 0,
+                binding.headerLayout.secondLineToolbar.setPadding(
+                    0, 0, 0,
                     dp2px(if (state == State.COLLAPSED) PADDING_COLLAPSED_BOTTOM_APP_BAR else PADDING_BOTTOM_APP_BAR)
                 )
             }

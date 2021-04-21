@@ -206,7 +206,6 @@ import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
@@ -9620,15 +9619,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		selectedRequest = request;
 		bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public void showMyAccountOptionsPanel() {
-		logDebug("showMyAccountOptionsPanel");
-
-		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
