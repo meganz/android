@@ -196,11 +196,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      */
     private void getInShares() {
         if (isTextEmpty(query)) {
-            nodes = megaApi.getInShares();
-
-            if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
-                sortByMailDescending(nodes);
-            }
+            nodes = megaApi.getInShares(sortOrderManagement.getOrderOthers());
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
             nodes = megaApi.searchOnInShares(query, megaCancelToken, sortOrderManagement.getOrderCloud());
