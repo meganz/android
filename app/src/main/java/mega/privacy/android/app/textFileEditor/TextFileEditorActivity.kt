@@ -229,7 +229,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 return
             }
 
-            if (viewModel.getNode() == null) {
+            if (viewModel.getNode() == null || viewModel.getNode()!!.isFolder) {
                 menu.toggleAllMenuItemsVisibility(false)
                 return
             }
@@ -398,6 +398,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
+        if (contentRead == binding.contentText.text.toString()) {
+            return
+        }
+
         readingContent = false
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
@@ -416,6 +420,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      *  ERROR_FINISH_ACTION otherwise.
      */
     private fun showCreationOrEditionResult(success: Int) {
+        refreshMenuOptionsVisibility()
+
         val successful = success == SUCCESS_FINISH_ACTION
 
         if (successful) {
