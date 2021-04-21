@@ -1038,9 +1038,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				    //stop cu process
                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
 					showOfflineMode();
+					LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
 				}
 				else if(actionType == GO_ONLINE){
 					showOnlineMode();
+					LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(true);
 				}
 				else if(actionType == START_RECONNECTION){
 					startConnection();

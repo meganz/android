@@ -45,23 +45,6 @@ class MeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
-    // TODO: Now I suggest we can set a state flag(livedata) in SharedViewModel when online/offline
-    // TODO: And let each fragment to observe the livedata. So getCurrentFragment()(iterate fragments) can be abandoned.
-    // TODO: Furthermore, is there already an app global network monitor implemented? If so, call LiveDataEventBus.post() there and
-    // TODO: anyone who cares about this event can observer this "Event", no need to register networkReceivers here and there.
-    // TODO: Make the VIEW layer, especially the view CONTAINER more light-weight and dumb is a goal
-    private val networkReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) return
-
-            when (intent.getIntExtra(BroadcastConstants.ACTION_TYPE, -1)) {
-                // TODO: Can it be just getCurrentFragment()?.processOfflineMode(action == Constants.GO_OFFLINE)
-                Constants.GO_OFFLINE -> getCurrentFragment()?.processOfflineMode(true)
-                Constants.GO_ONLINE -> getCurrentFragment()?.processOfflineMode(false)
-            }
-        }
-    }
-
     private val headphoneReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
@@ -88,7 +71,6 @@ class MeetingActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(networkReceiver)
         unregisterReceiver(headphoneReceiver)
     }
 
@@ -96,9 +78,6 @@ class MeetingActivity : BaseActivity() {
      * Register broadcast receiver that needed
      */
     private fun initReceiver() {
-        registerReceiver(
-            networkReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
-        )
         registerReceiver(
             headphoneReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_HEADPHONE)
         )

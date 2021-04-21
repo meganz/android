@@ -4,14 +4,16 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.listeners.ChatBaseListener
+import mega.privacy.android.app.utils.Constants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
 
 /**
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
@@ -49,23 +51,27 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
     // HeadPhone Event
-    private val _eventLiveData:MutableLiveData<Int> = MutableLiveData()
+    private val _eventLiveData: MutableLiveData<Int> = MutableLiveData()
     val eventLiveData = _eventLiveData
 
+    // Network State
+    private val _notificationNetworkState = MutableLiveData<Boolean>()
+
+    // Observe this property to get online/offline notification. true: online / false: offline
+    val notificationNetworkState: LiveData<Boolean> = _notificationNetworkState
+
+    private val notificationNetworkStateObserver = androidx.lifecycle.Observer<Boolean> {
+        _notificationNetworkState.value = it
+    }
+
     // Receive information about requests.
-    val listener = object : MegaChatRequestListenerInterface {
-        override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
-        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
+    val listener = object : ChatBaseListener(
+        MegaApplication.getInstance()
+    ) {
         override fun onRequestFinish(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
+            api: MegaChatApiJava,
+            request: MegaChatRequest,
+            e: MegaChatError
         ) {
             when (request?.type) {
                 MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
@@ -99,14 +105,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 }
             }
         }
+    }
 
-        override fun onRequestTemporaryError(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
-        ) {
-
-        }
+    init {
+        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
+            .observeForever(notificationNetworkStateObserver)
     }
 
     /**
@@ -151,14 +154,16 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                     "Speaker"
                 )
                 false -> {
-                    if(hasWiredHeadset || hasBluetooth)
-                    getString(
-                        R.string.general_speaker_headphone,
-                        "Headphone")
+                    if (hasWiredHeadset || hasBluetooth)
+                        getString(
+                            R.string.general_speaker_headphone,
+                            "Headphone"
+                        )
                     else
                         getString(
                             R.string.speaker_off,
-                            "Speaker")
+                            "Speaker"
+                        )
                 }
             }
         }
@@ -182,7 +187,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         recordAudioGranted = recordAudioPermission
     }
 
-    fun sendHeadPhoneEvent(){
+    fun sendHeadPhoneEvent() {
         _eventLiveData.postValue(HEAD_PHONE_EVENT)
     }
 }

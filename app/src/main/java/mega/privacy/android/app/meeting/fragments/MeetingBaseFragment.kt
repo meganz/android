@@ -7,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -47,6 +48,18 @@ open class MeetingBaseFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         meetingActivity = activity as MeetingActivity
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        initViewModel()
+    }
+
+    private fun initViewModel() {
+        // Monitor network changes
+        sharedModel.notificationNetworkState.observe(viewLifecycleOwner) {
+            logDebug("Network state changed, Online :$it")
+        }
     }
 
     override fun onResume() {
