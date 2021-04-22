@@ -152,7 +152,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun setValuesFromIntent(intent: Intent) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         textFileEditorData.value?.adapterType = adapterType
-        setEditableAdapter()
 
         when (adapterType) {
             FROM_CHAT -> {
@@ -210,6 +209,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 )
             }
         }
+
+        setEditableAdapter()
 
         textFileEditorData.value?.api =
             if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi

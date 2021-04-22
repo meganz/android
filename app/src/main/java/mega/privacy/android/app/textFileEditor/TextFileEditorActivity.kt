@@ -319,8 +319,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        binding.editFab.setOnClickListener {
-            viewModel.setEditMode()
+        binding.editFab.apply {
+            hide()
+
+            setOnClickListener {
+                viewModel.setEditMode()
+            }
         }
     }
 
@@ -408,7 +412,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.loadingProgressBar.isVisible = false
         binding.contentText.setText(contentRead)
 
-        if (viewModel.isViewMode()) {
+        if (viewModel.isViewMode() && viewModel.isEditableAdapter()) {
             binding.editFab.show()
         }
     }
