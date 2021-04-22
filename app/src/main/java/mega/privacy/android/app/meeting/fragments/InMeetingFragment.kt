@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.BaseActivity
@@ -37,6 +39,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     private lateinit var gridViewMenuItem: MenuItem
     private lateinit var speakerViewMenuItem: MenuItem
 
+    lateinit var toolbar: MaterialToolbar
+
     private lateinit var individualCallFragment: IndividualCallFragment
     private lateinit var floatingWindowFragment: IndividualCallFragment
     private lateinit var gridViewCallFragment: GridViewCallFragment
@@ -61,10 +65,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        meetingActivity.hideActionBar()
-
+    ): View {
         binding = InMeetingFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -73,10 +74,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < 500) return
 
-        in_meeting_toolbar.fadeInOut(toTop = true)
-        bottomFloatingPanelInOut()
+        toolbar.fadeInOut(toTop = true)
+        bottom_floating_panel.fadeInOut(dy = 400f)
 
-        if (in_meeting_toolbar.visibility == View.VISIBLE) {
+        if (toolbar.isVisible) {
             meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         } else {
             meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -93,13 +94,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     }
 
     private fun checkRelativePositionWithToolbar() {
-        val isIntersect = (in_meeting_toolbar.bottom - self_feed_floating_window_container.y) > 0
-        if (in_meeting_toolbar.visibility == View.VISIBLE && isIntersect) {
-            self_feed_floating_window_container.moveY(in_meeting_toolbar.bottom.toFloat())
+        val isIntersect = (toolbar.bottom - self_feed_floating_window_container.y) > 0
+        if (toolbar.visibility == View.VISIBLE && isIntersect) {
+            self_feed_floating_window_container.moveY(toolbar.bottom.toFloat())
         }
 
-        val isIntersectPreviously = (in_meeting_toolbar.bottom - previousY) > 0
-        if (in_meeting_toolbar.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
+        val isIntersectPreviously = (toolbar.bottom - previousY) > 0
+        if (toolbar.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
             self_feed_floating_window_container.moveY(previousY)
         }
     }
@@ -128,6 +129,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        toolbar = meetingActivity.toolbar
+        // TODO test code start
+        toolbar.title = "Joanna's meeting"
+        toolbar.subtitle = "Calling.."
+        // TODO test code end
+
         view.setOnClickListener {
             onPageClick()
         }
@@ -138,8 +145,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             object : OnDragTouchListener.OnDragActionListener {
 
                 override fun onDragStart(view: View?) {
-                    if (in_meeting_toolbar.visibility == View.VISIBLE) {
-                        dragTouchListener.setToolbarHeight(in_meeting_toolbar.bottom)
+                    if (toolbar.visibility == View.VISIBLE) {
+                        dragTouchListener.setToolbarHeight(toolbar.bottom)
                         dragTouchListener.setBottomSheetHeight(bottom_floating_panel.top)
                     } else {
                         dragTouchListener.setToolbarHeight(0)
@@ -175,7 +182,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         )
         //TODO test code end
 
-        meetingActivity.setSupportActionBar(view.in_meeting_toolbar)
+        meetingActivity.setSupportActionBar(toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
@@ -185,10 +192,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         meetingActivity.window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
-
-        view.setOnApplyWindowInsetsListener { _, insets ->
-            insets
-        }
 
         initFloatingPanel()
         initShareViewModel()
@@ -216,7 +219,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             }
             R.id.swap_camera -> {
                 //TODO test code start: add or remove last participants
-                inMeetingViewModel.addParticipant(Random.nextBoolean())
+                inMeetingViewModel.addParticipant(true)
 //                logDebug("Swap camera.")
 //                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
                 //TODO test code end: add or remove last participants
@@ -324,10 +327,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
                 bottomFloatingPanelViewHolder.setParticipants(it)
             }
         }
-    }
 
-    private fun bottomFloatingPanelInOut() {
-        bottom_floating_panel.fadeInOut()
+        bottomFloatingPanelViewHolder.propertyUpdaters.add {
+            toolbar.alpha = 1 - it
+        }
     }
 
     /**

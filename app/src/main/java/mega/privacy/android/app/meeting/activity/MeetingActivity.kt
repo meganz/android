@@ -182,8 +182,4 @@ class MeetingActivity : BaseActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
         return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
     }
-
-    fun hideActionBar() {
-        binding.toolbar.visibility = View.GONE
-    }
 }
