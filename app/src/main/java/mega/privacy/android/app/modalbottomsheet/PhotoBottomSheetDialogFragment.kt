@@ -6,29 +6,26 @@ import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.BottomSheetPhotoBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
 
-class PhotoBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
+class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
+        val callback = context as PhotoCallback
         val binding = BottomSheetPhotoBinding.inflate(layoutInflater, null, false)
+
         contentView = binding.root
         mainLinearLayout = binding.photoBottomSheet
         items_layout = binding.itemsLayout
 
         binding.capturePhotoAction.setOnClickListener {
-//                ((ManagerActivityLollipop) context).checkPermissions();
+            callback.capturePhoto()
             setStateBottomSheetBehaviorHidden()
         }
 
         binding.choosePhotoAction.setOnClickListener {
-//                Intent intent = new Intent();
-//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                intent.setType("image/*");
-//                ((ManagerActivityLollipop) context).startActivityForResult(Intent.createChooser(intent, null), CHOOSE_PICTURE_PROFILE_CODE);
+            callback.choosePhoto()
             setStateBottomSheetBehaviorHidden()
         }
 
@@ -37,7 +34,7 @@ class PhotoBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
 
             if (isVisible) {
                 setOnClickListener {
-//                ((ManagerActivityLollipop) context).showConfirmationDeleteAvatar();
+                    callback.deletePhoto()
                     setStateBottomSheetBehaviorHidden()
                 }
 
@@ -49,5 +46,11 @@ class PhotoBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
 
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+    }
+
+    interface PhotoCallback {
+        fun capturePhoto()
+        fun choosePhoto()
+        fun deletePhoto()
     }
 }

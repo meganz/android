@@ -7,10 +7,12 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
+import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
@@ -19,8 +21,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
-import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
@@ -28,7 +29,7 @@ import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaChatApi
 import java.util.*
 
-class EditProfileActivity : PasscodeActivity() {
+class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback {
 
     companion object {
         private const val PADDING_BOTTOM_APP_BAR = 19F
@@ -235,5 +236,22 @@ class EditProfileActivity : PasscodeActivity() {
             text = viewModel.getEmail()
             textSize = EMAIL_SIZE
         }
+    }
+
+    override fun capturePhoto() {
+        viewModel.capturePhoto(this)
+    }
+
+    override fun choosePhoto() {
+        viewModel.launchChoosePhotoIntent(this)
+    }
+
+    override fun deletePhoto() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setMessage(R.string.confirmation_delete_avatar)
+            .setPositiveButton(R.string.context_delete) { _, _ ->
+                AccountController(this).removeAvatar()
+            }
+            .setNegativeButton(R.string.general_cancel, null).show()
     }
 }

@@ -8823,28 +8823,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void checkPermissions(){
 		typesCameraPermission = TAKE_PROFILE_PICTURE;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
 
-			boolean hasCameraPermission = checkPermission(Manifest.permission.CAMERA);
-			if (!hasCameraPermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.CAMERA},
-						REQUEST_CAMERA);
-			}
-
-			if (hasStoragePermission && hasCameraPermission){
-				this.takeProfilePicture();
-			}
-		}
-		else{
-			this.takeProfilePicture();
-		}
 	}
 
 	public void takeProfilePicture(){
@@ -10233,31 +10212,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			sttFLol.numberOfClicksKarere = 0;
 		}
 		super.showConfirmationEnableLogsKarere();
-	}
-
-	public void showConfirmationDeleteAvatar(){
-		logDebug("showConfirmationDeleteAvatar");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						AccountController aC = new AccountController(managerActivity);
-						aC.removeAvatar();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
-		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void update2FASetting(){
