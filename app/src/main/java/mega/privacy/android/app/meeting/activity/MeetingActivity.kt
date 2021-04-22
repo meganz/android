@@ -5,22 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
+import android.view.*
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.IncomingCallNotification
+import mega.privacy.android.app.utils.Util
+
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
 // FIXME: And don't directly call megaChatApi in view layer, try don't put everything together and bloat the View layer file
@@ -52,6 +53,13 @@ class MeetingActivity : BaseActivity() {
         }
     }
 
+    // TODO: Move to a more common place
+    private fun View.setMarginTop(marginTop: Int) {
+        val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
+        menuLayoutParams.setMargins(0, marginTop, 0, 0)
+        this.layoutParams = menuLayoutParams
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,8 +74,31 @@ class MeetingActivity : BaseActivity() {
         initReceiver()
         initActionBar(meetingAction)
         initNavigation(meetingAction)
+        setStatusBarTranslucent(window, true)
     }
 
+    private fun setStatusBarTranslucent(window: Window, translucent: Boolean) {
+        val decorView: View = window.decorView
+
+        if (translucent) {
+            decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
+                val defaultInsets = v.onApplyWindowInsets(insets)
+
+                toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+
+                defaultInsets.replaceSystemWindowInsets(
+                    defaultInsets.systemWindowInsetLeft,
+                    0,
+                    defaultInsets.systemWindowInsetRight,
+                    defaultInsets.systemWindowInsetBottom
+                )
+            }
+        } else {
+            decorView.setOnApplyWindowInsetsListener(null)
+        }
+
+        ViewCompat.requestApplyInsets(decorView)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

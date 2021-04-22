@@ -3,6 +3,8 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
@@ -17,7 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -48,11 +51,22 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setProfileAvatar()
+        setMarginTopOfMeetingName(
+            Util.getStatusBarHeight() + ChatUtil.getActionBarHeight(
+                activity, activity?.resources
+            ) + Util.dp2px(16f)
+        )
 
         (activity as AppCompatActivity).supportActionBar?.apply {
             title = arguments?.getString(MeetingActivity.MEETING_NAME)
             subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
         }
+    }
+
+    private fun setMarginTopOfMeetingName(marginTop: Int) {
+        val menuLayoutParams = type_meeting_edit_text.layoutParams as ViewGroup.MarginLayoutParams
+        menuLayoutParams.setMargins(0, marginTop, 0, 0)
+        type_meeting_edit_text.layoutParams = menuLayoutParams
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

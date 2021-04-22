@@ -45,7 +45,7 @@ class MeetingVideoListener(
                 val viewWidth = surfaceView.width
                 val viewHeight = surfaceView.height
                 if (viewWidth != 0 && viewHeight != 0) {
-                    var holderWidth = Math.min(viewWidth, width)
+                    var holderWidth = viewWidth.coerceAtMost(width)
                     var holderHeight = holderWidth * viewHeight / viewWidth
                     if (holderHeight > viewHeight) {
                         holderHeight = viewHeight

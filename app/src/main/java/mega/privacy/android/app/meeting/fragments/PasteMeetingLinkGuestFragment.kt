@@ -88,6 +88,7 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                 // TODO: +Meeting, use open link activity or self logic to process the link?
 //                initMegaChat { checkMeetingLink() }
                 startOpenLinkActivity()
+                dismiss()
             } else {
                 showError(R.string.invalid_meeting_link_args)
             }
