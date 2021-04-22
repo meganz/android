@@ -1,7 +1,5 @@
 package mega.privacy.android.app.meeting.adapter
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.TestTool.showHide
@@ -21,7 +19,6 @@ class VideoListViewHolder(
         layoutParams.width = Util.dp2px(90f)
         layoutParams.height = Util.dp2px(90f)
 
-        binding.video.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
         binding.name.text = participant.name
 
         binding.root.setOnClickListener {

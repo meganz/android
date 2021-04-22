@@ -49,7 +49,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        surfaceHolder = video.holder
 
         if (isFloatingWindow) {
             meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
@@ -67,7 +66,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         // Start drawing here, so that after a lock screen, the drawing can resume.
         if (isFloatingWindow) {
-            handleFloatingWindow()
+//            handleFloatingWindow()
         }
     }
 

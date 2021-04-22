@@ -5,16 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <SurfaceView
+    <TextureView
         android:id="@+id/video"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <ImageView
         android:id="@+id/last_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:layout_height="match_parent" />
 
     <View
         android:id="@+id/selected_foreground"

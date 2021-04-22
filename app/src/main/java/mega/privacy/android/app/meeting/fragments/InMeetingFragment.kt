@@ -1,18 +1,23 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import ash.TL
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
+import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import kotlin.random.Random
 
@@ -22,7 +27,7 @@ class InMeetingFragment : MeetingBaseFragment() {
     private lateinit var speakerViewMenuItem: MenuItem
 
     private lateinit var individualCallFragment: IndividualCallFragment
-    private lateinit var floatingWindowFragment: IndividualCallFragment
+    private lateinit var floatingWindowFragment: SelfFeedFragment
     private lateinit var gridViewCallFragment: GridViewCallFragment
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
@@ -142,11 +147,11 @@ class InMeetingFragment : MeetingBaseFragment() {
             GridViewCallFragment.TAG
         )
 
-        floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
+        floatingWindowFragment = SelfFeedFragment.newInstance(1, 2)
         loadChildFragment(
             R.id.self_feed_floating_window_container,
             floatingWindowFragment,
-            IndividualCallFragment.TAG
+            SelfFeedFragment.TAG
         )
         //TODO test code end
 
@@ -164,6 +169,13 @@ class InMeetingFragment : MeetingBaseFragment() {
         view.setOnApplyWindowInsetsListener { _, insets ->
             insets
         }
+
+        // TODO test code start: add 4 participants
+        inMeetingViewModel.addParticipant(true)
+        inMeetingViewModel.addParticipant(true)
+        inMeetingViewModel.addParticipant(true)
+        inMeetingViewModel.addParticipant(true)
+        // TODO test code start
     }
 
     private fun loadChildFragment(containerId: Int, fragment: Fragment, tag: String) {
@@ -180,15 +192,16 @@ class InMeetingFragment : MeetingBaseFragment() {
         gridViewMenuItem = menu.findItem(R.id.grid_view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                findNavController().navigate(R.id.createMeetingFragment)
+                findNavController().popBackStack()
                 true
             }
             R.id.swap_camera -> {
                 //TODO test code start: add or remove last participants
-                inMeetingViewModel.addParticipant(Random.nextBoolean())
+                inMeetingViewModel.addParticipant(true)
 //                logDebug("Swap camera.")
 //                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
                 //TODO test code end: add or remove last participants

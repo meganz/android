@@ -37,10 +37,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
             findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
         }
-
-        // TODO delete test code start: to InMeetingFragment
-        findNavController().navigate(R.id.inMeetingFragment)
-        // TODO delete test code end: to InMeetingFragment
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,7 +45,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         type_meeting_edit_text.hint = StringResourcesUtils.getString(
             R.string.type_meeting_name, megaChatApi.myFullname
         )
-        initViewModel()
+//        initViewModel()
     }
 
     /**

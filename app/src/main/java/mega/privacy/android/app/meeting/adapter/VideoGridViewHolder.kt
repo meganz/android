@@ -1,11 +1,17 @@
 package mega.privacy.android.app.meeting.adapter
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Bitmap
+import android.graphics.Rect
+import android.graphics.SurfaceTexture
+import android.os.Build
+import android.view.TextureView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
+import mega.privacy.android.app.meeting.TestTool
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -18,15 +24,23 @@ class VideoGridViewHolder(
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int
-) : RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.ViewHolder(binding.root), TextureView.SurfaceTextureListener {
 
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    private val srcRect = Rect()
+    private val dstRect = Rect()
+
+    // TODO test start
+    lateinit var renderJob : Job
+    private val frameProducer = TestTool.FrameProducer()
+    // TODO test end
+
     fun bind(participant: Participant, itemCount: Int, isFirstPage: Boolean) {
         layout(isFirstPage, itemCount)
 
-        binding.video.background = ColorDrawable(Color.parseColor(participant.avatarBackground))
+//        binding.video.surfaceTextureListener = this
         binding.name.text = participant.name
     }
 
@@ -102,5 +116,52 @@ class VideoGridViewHolder(
             }
         }
         return Pair(w, w)
+    }
+
+    // TODO test start
+    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
+        if (bitmap.isRecycled) return
+
+        val canvas = binding.video.lockCanvas() ?: return
+
+        srcRect.top = 0
+        srcRect.left = 0
+        srcRect.right = width
+        srcRect.bottom = height
+
+
+        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
+        binding.video.unlockCanvasAndPost(canvas)
+
+        bitmap.recycle()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+        dstRect.top = 0
+        dstRect.left = 0
+        dstRect.right = width
+        dstRect.bottom = height
+
+        renderJob = GlobalScope.launch(Dispatchers.IO) {
+            frameProducer.getFrame(onChatVideoData)
+        }
+    }
+
+    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+        // TODO changeDestRect
+    }
+
+    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+        frameProducer.running = false
+        GlobalScope.launch(Dispatchers.Main) {
+            renderJob.cancelAndJoin()
+        }
+        return true
+    }
+    // TODO test code end
+
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+
     }
 }
