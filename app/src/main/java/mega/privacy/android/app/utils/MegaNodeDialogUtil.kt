@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
+import android.content.Intent
+import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -22,14 +24,19 @@ import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity.Companion.FROM_HOME_PAGE
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CREATE_MODE
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaNode
 
 class MegaNodeDialogUtil {
@@ -39,6 +46,9 @@ class MegaNodeDialogUtil {
         private const val TYPE_NEW_FOLDER = 1
         private const val TYPE_NEW_FILE = 2
         private const val TYPE_NEW_URL_FILE = 3
+        private const val TYPE_NEW_TXT_FILE = 4
+        const val IS_NEW_TEXT_FILE_SHOWN = "IS_NEW_TEXT_FILE_SHOWN"
+        const val NEW_TEXT_FILE_TEXT = "NEW_TEXT_FILE_TEXT"
 
         /**
          * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -65,14 +75,14 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, node, actionNodeCallback, snackbarShower,
-                null, null, renameDialogBuilder, TYPE_RENAME
+                null, null, false, renameDialogBuilder, TYPE_RENAME
             )
         }
 
         /**
          * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
          *
-         * @param context           Current context.
+         * @param context            Current context.
          * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
          * @return The create new folder dialog.
          */
@@ -90,7 +100,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, null, actionNodeCallback, null,
-                null, null, newFolderDialogBuilder, TYPE_NEW_FOLDER
+                null, null, false, newFolderDialogBuilder, TYPE_NEW_FOLDER
             )
         }
 
@@ -98,8 +108,8 @@ class MegaNodeDialogUtil {
          * Creates and shows a TYPE_NEW_FILE dialog to create a new file.
          *
          * @param context Current context.
-         * @param parent   A valid node. Specifically the parent in which the folder will be created.
-         * @param data     Valid data. Specifically the content of the new file.
+         * @param parent  A valid node. Specifically the parent in which the folder will be created.
+         * @param data    Valid data. Specifically the content of the new file.
          * @return The create new file dialog.
          */
         @JvmStatic
@@ -113,14 +123,14 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, parent, null, null,
-                data, null, newFileDialogBuilder, TYPE_NEW_FILE
+                data, null, false, newFileDialogBuilder, TYPE_NEW_FILE
             )
         }
 
         /**
          * Creates and shows a TYPE_NEW_URL_FILE dialog to create a new URL file.
          *
-         * @param context       Current context.
+         * @param context        Current context.
          * @param parent         A valid node. Specifically the parent in which the folder will be created.
          * @param data           Valid data. Specifically the content of the new URL file.
          * @param defaultURLName Default name of the URL if has, null otherwise.
@@ -142,19 +152,63 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 context, parent, null, null,
-                data, defaultURLName, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
+                data, defaultURLName, false, newURLFileDialogBuilder, TYPE_NEW_URL_FILE
             )
         }
 
         /**
-         * Finish the initialization of the dialog and shows it.
+         * Creates and shows a TYPE_NEW_TXT_FILE dialog to create a new text file.
          *
-         * @param context           Current context.
+         * @param context   Current context.
+         * @param parent    A valid node. Specifically the parent in which the file will be created.
+         * @param typedName The previous typed text.
+         * @param fromHome  True if the text file will be created from Homepage, false otherwise.
+         * @return The create new text file dialog.
+         */
+        @JvmStatic
+        fun showNewTxtFileDialog(
+            context: Context,
+            parent: MegaNode,
+            typedName: String?,
+            fromHome: Boolean
+        ): AlertDialog {
+            val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
+
+            newTxtFileDialogBuilder
+                .setTitle(R.string.dialog_title_new_text_file)
+                .setPositiveButton(R.string.general_create, null)
+                .setNegativeButton(R.string.general_cancel, null)
+
+            val dialog = setFinalValuesAndShowDialog(
+                context,
+                parent,
+                null,
+                null,
+                null,
+                null,
+                fromHome,
+                newTxtFileDialogBuilder,
+                TYPE_NEW_TXT_FILE
+            )
+
+            if (typedName != null && typedName != TXT_EXTENSION) {
+                dialog.findViewById<EmojiEditText>(R.id.type_text)?.setText(typedName)
+            }
+
+            return dialog
+        }
+
+
+        /**
+         * Finishes the initialization of the dialog and shows it.
+         *
+         * @param context            Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param snackbarShower interface to show snackbar.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
+         * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param builder            The AlertDialog.Builder to create and show the final dialog.
          * @param dialogType         Indicates the type of dialog. It can be:
          *                            - TYPE_RENAME:       Rename action.
@@ -170,6 +224,7 @@ class MegaNodeDialogUtil {
             snackbarShower: SnackbarShower?,
             data: String?,
             defaultURLName: String?,
+            fromHome: Boolean,
             builder: AlertDialog.Builder,
             dialogType: Int
         ): AlertDialog {
@@ -203,15 +258,22 @@ class MegaNodeDialogUtil {
                                     setSelection(0, getCursorPositionOfName(false, defaultURLName))
                                 }
                             }
+                            TYPE_NEW_TXT_FILE -> {
+                                setHint(R.string.context_new_file_name)
+                                setText(TXT_EXTENSION)
+                                runDelay(SHOW_IM_DELAY.toLong()) { setSelection(0) }
+                            }
                         }
 
-                        doAfterTextChanged { quitDialogError(typeText, errorText) }
+                        doAfterTextChanged {
+                            quitDialogError(typeText, errorText)
+                        }
 
                         setOnEditorActionListener { _, actionId, _ ->
                             if (actionId == EditorInfo.IME_ACTION_DONE) {
                                 checkActionDialogValue(
                                     context, node, actionNodeCallback, snackbarShower,
-                                    typeText, data, errorText, dialog, dialogType
+                                    typeText, data, errorText, fromHome, dialog, dialogType
                                 )
                             }
 
@@ -225,7 +287,7 @@ class MegaNodeDialogUtil {
                         .setOnClickListener {
                             checkActionDialogValue(
                                 context, node, actionNodeCallback, snackbarShower,
-                                typeText, data, errorText, dialog, dialogType
+                                typeText, data, errorText, fromHome, dialog, dialogType
                             )
                         }
 
@@ -248,6 +310,7 @@ class MegaNodeDialogUtil {
          * @param typeText           The input text field.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param errorText          The text field to show the error.
+         * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param dialog             The AlertDialog to check.
          * @param dialogType         Indicates the type of dialog. It can be:
          *                           - TYPE_RENAME:       Rename action.
@@ -263,6 +326,7 @@ class MegaNodeDialogUtil {
             typeText: EditText?,
             data: String?,
             errorText: TextView?,
+            fromHome: Boolean,
             dialog: AlertDialog,
             dialogType: Int
         ) {
@@ -319,6 +383,15 @@ class MegaNodeDialogUtil {
                                 context.createFile(typedString, data, node, true)
                             }
                         }
+                        TYPE_NEW_TXT_FILE -> {
+                            val textFileEditor = Intent(context, TextFileEditorActivity::class.java)
+                                .putExtra(MODE, CREATE_MODE)
+                                .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
+                                .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
+                                .putExtra(FROM_HOME_PAGE, fromHome)
+
+                            context.startActivity(textFileEditor)
+                        }
                     }
 
                     dialog.dismiss()
@@ -361,6 +434,26 @@ class MegaNodeDialogUtil {
 
             typeText?.requestFocus()
             errorText?.visibility = GONE
+        }
+
+        /**
+         * Checks if the newTextFileDialog is shown. If so, saves it's state on outState.
+         *
+         * @param newTextFileDialog The dialog to check.
+         * @param outState          Bundle where the state of the dialog will be save.
+         */
+        @JvmStatic
+        fun checkNewTextFileDialogState(newTextFileDialog: AlertDialog?, outState: Bundle) {
+            val isNewTextFileDialogShown = newTextFileDialog != null && newTextFileDialog.isShowing
+
+            if (isNewTextFileDialogShown) {
+                outState.putBoolean(IS_NEW_TEXT_FILE_SHOWN, true)
+                val typeText = newTextFileDialog?.findViewById<EmojiEditText>(R.id.type_text)
+
+                if (typeText != null) {
+                    outState.putString(NEW_TEXT_FILE_TEXT, typeText.text.toString())
+                }
+            }
         }
 
         /**

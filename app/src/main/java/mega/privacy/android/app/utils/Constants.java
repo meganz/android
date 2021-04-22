@@ -85,6 +85,11 @@ public class Constants {
 
     public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
+    public static final String PREFERENCE_EMOJI = "emoji-recent-manager";
+    public static final String PREFERENCE_REACTION = "reaction-recent-manager";
+    public static final String PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager";
+    public static final String PREFERENCE_VARIANT_REACTION = "variant-reaction-manager";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
@@ -495,6 +500,7 @@ public class Constants {
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
     public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
+    public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
     //Indicates the data after it, is the value of a transfer parameter
     public static final String APP_DATA_INDICATOR = ">";
     //Indicates the data after it, is a new transfer parameter

@@ -62,6 +62,7 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
 import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -487,6 +488,8 @@ public class AccountController {
 
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
+
+        removeEmojisSharedPreferences();
 
         new LastShowSMSDialogTimeChecker(context).reset();
         MediaPlayerService.stopAudioPlayer(context);

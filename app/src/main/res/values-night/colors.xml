@@ -251,4 +251,7 @@
 
     <!-- QR code page background color -->
     <color name="white_grey_700">@color/grey_700</color>
+
+    <!--  Background of text editor name layout  -->
+    <color name="white_090_grey_080">@color/grey_alpha_080</color>
 </resources>

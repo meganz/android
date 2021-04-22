@@ -21,15 +21,6 @@
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey54White54" />
 
         <TextView
-            android:id="@+id/sort_by_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/sortby_owner_mail"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54"
-            android:visibility="gone" />
-
-        <TextView
             android:id="@+id/sort_by_name_asc"
             android:layout_width="match_parent"
             android:layout_height="55dp"
