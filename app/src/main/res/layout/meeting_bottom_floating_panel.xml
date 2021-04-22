@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:elevation="3dp"
     app:behavior_expandedOffset="36dp"
     app:behavior_fitToContents="false"
     app:behavior_hideable="false"
