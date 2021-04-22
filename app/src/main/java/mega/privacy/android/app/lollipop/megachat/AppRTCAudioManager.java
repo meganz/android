@@ -26,6 +26,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.util.Log;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import org.webrtc.ThreadUtils;
 
 import java.io.IOException;
@@ -35,8 +38,6 @@ import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaHandleList;
 
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
@@ -450,7 +451,7 @@ public class AppRTCAudioManager {
      * Construction.
      */
    public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int callStatus) {
-        return new AppRTCAudioManager(context, isSpeakerOn, callStatus);
+       return new AppRTCAudioManager(context, isSpeakerOn, callStatus);
     }
 
     public void updateSpeakerStatus(boolean speakerStatus, int callStatus) {
@@ -638,8 +639,11 @@ public class AppRTCAudioManager {
                 break;
         }
 
-        selectedAudioDevice = device;
-        setValues();
+        if (selectedAudioDevice != device) {
+            selectedAudioDevice = device;
+            LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AudioDevice.class).post(selectedAudioDevice);
+            setValues();
+        }
     }
 
     /**
@@ -774,6 +778,10 @@ public class AppRTCAudioManager {
         }
     }
 
+    public void changeUserSelectedAudioDeviceForHeadphone(AudioDevice device){
+        userSelectedAudioDevice = device;
+    }
+
     /**
      * Updates list of possible audio devices and make new device selection.
      * TODO(henrika): add unit test to verify all state transitions.
@@ -897,10 +905,6 @@ public class AppRTCAudioManager {
         Log.d(TAG, "updateAudioDeviceState done");
     }
 
-    public void sendBroadCastHeadsetUpdated(){
-        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_HEADPHONE));
-    }
-
     private void updateAudioDevice(boolean audioDeviceSetUpdated){
         // Update selected audio device.
         AudioDevice newAudioDevice;
@@ -992,15 +996,11 @@ public class AppRTCAudioManager {
                     + (microphone == HAS_MIC ? "mic" : "no mic") + ", n=" + name + ", sb="
                     + isInitialStickyBroadcast());
             hasWiredHeadset = (state == STATE_PLUGGED);
-            sendBroadCastHeadsetUpdated();
+            if (state == STATE_PLUGGED) {
+                changeUserSelectedAudioDeviceForHeadphone(AudioDevice.WIRED_HEADSET);
+            }
+
+            updateAudioDeviceState();
         }
-    }
-
-    public boolean isWiredHeadsetConnected() {
-        return hasWiredHeadset;
-    }
-
-    public boolean isBluetoothConnected() {
-        return bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED;
     }
 }

@@ -66,5 +66,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
                 ))
             }
         }
+
+        viewModel.initAppRTCAudioManager()
     }
 }

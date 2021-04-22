@@ -278,7 +278,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
-    public static final String BROADCAST_ACTION_INTENT_HEADPHONE = "BROADCAST_ACTION_INTENT_HEADPHONE";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -812,6 +811,7 @@ public class Constants {
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
     public static final String EVENT_NETWORK_CHANGE = "network_change";
+    public static final String EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";

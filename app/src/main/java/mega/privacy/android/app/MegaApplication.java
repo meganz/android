@@ -1671,6 +1671,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void createRTCAudioManagerWhenCreatingMeeting(){
+		if(rtcAudioManager != null)
+			return;
+
 		rtcAudioManager = AppRTCAudioManager.create(this, true, AUDIO_MANAGER_CREATING_MEETING);
 	}
 
@@ -1737,7 +1740,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     /**
      * Remove the ongoing call AppRTCAudioManager.
      */
-    private void removeRTCAudioManager() {
+    public void removeRTCAudioManager() {
         if (rtcAudioManager == null)
             return;
 

@@ -1,18 +1,10 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -54,8 +46,15 @@ class MeetingActivityRepository @Inject constructor(
         }
     }
 
-    fun switchSpeaker(bOn: Boolean): Boolean {
-        //TODO:
-        return true
+    /**
+     * Select new output audio
+     *
+     * @param device AudioDevice
+     */
+    fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
+        MegaApplication.getInstance().audioManager!!.selectAudioDevice(
+            device,
+            false
+        )
     }
 }

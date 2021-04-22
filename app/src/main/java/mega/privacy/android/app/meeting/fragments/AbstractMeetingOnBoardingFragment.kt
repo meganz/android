@@ -13,11 +13,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import kotlinx.android.synthetic.main.activity_meeting.*
+import kotlinx.android.synthetic.main.item_chat_explorer_list.view.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.*
@@ -96,7 +98,26 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 switchCamera(it)
             }
             model.speakerLiveData.observe(viewLifecycleOwner) {
-                fab_speaker.isOn = it
+                when (it) {
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                        fab_speaker.isOn = true
+                        fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_speaker)
+                    }
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                        fab_speaker.isOn = false
+                        fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_speaker)
+                    }
+                    else -> {
+                        fab_speaker.isOn = true
+                        fab_speaker.setOnIcon(R.drawable.ic_headphone)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_headphone)
+                    }
+                }
             }
             model.tips.observe(viewLifecycleOwner) {
                 showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
@@ -242,7 +263,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             logError("Error deactivating video")
             return
         }
-        logDebug("Removing suface view")
+        logDebug("Removing surface view")
         localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
     }

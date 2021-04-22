@@ -46,13 +46,6 @@ class MeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
-    private val headphoneReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) return
-            meetingViewModel.sendHeadPhoneEvent()
-        }
-    }
-
     // TODO: Move to a more common place
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -71,7 +64,6 @@ class MeetingActivity : BaseActivity() {
 
         val meetingAction = intent.action
 
-        initReceiver()
         initActionBar(meetingAction)
         initNavigation(meetingAction)
         setStatusBarTranslucent(window, true)
@@ -98,20 +90,6 @@ class MeetingActivity : BaseActivity() {
         }
 
         ViewCompat.requestApplyInsets(decorView)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(headphoneReceiver)
-    }
-
-    /**
-     * Register broadcast receiver that needed
-     */
-    private fun initReceiver() {
-        registerReceiver(
-            headphoneReceiver, IntentFilter(Constants.BROADCAST_ACTION_INTENT_HEADPHONE)
-        )
     }
 
     /**

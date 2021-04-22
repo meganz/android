@@ -10,12 +10,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
@@ -44,17 +44,18 @@ class BottomFloatingPanelViewHolder(
      */
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
+    private var savedSpeakerState: AppRTCAudioManager.AudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
     private val participantsAdapter = ParticipantsAdapter(listener)
 
-    private val speakerVH = SpeakerButtonViewHolder(
-        binding.bottomFloatingPanel.fabSpeaker,
-        binding.bottomFloatingPanel.fabSpeakerLabel
-    ) {
-        updateBottomFloatingPanelIfNeeded()
-
-        listener.onChangeAudioDevice(it)
-    }
+//    private val speakerVH = SpeakerButtonViewHolder(
+//        binding.bottomFloatingPanel.fabSpeaker,
+//        binding.bottomFloatingPanel.fabSpeakerLabel
+//    ) {
+//        updateBottomFloatingPanelIfNeeded()
+//
+//        listener.onChangeAudioDevice(it)
+//    }
 
     init {
         initButtonsState()
@@ -85,6 +86,7 @@ class BottomFloatingPanelViewHolder(
     private fun initButtonsState() {
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
+        updateSpeakerIcon(savedSpeakerState)
         floatingPanelView.fabEnd.setImageResource(R.drawable.ic_remove)
     }
 
@@ -96,11 +98,11 @@ class BottomFloatingPanelViewHolder(
         )
     }
 
-    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) {
-        speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
-
-        updateBottomFloatingPanelIfNeeded()
-    }
+//    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) {
+//        speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
+//
+//        updateBottomFloatingPanelIfNeeded()
+//    }
 
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -164,6 +166,10 @@ class BottomFloatingPanelViewHolder(
                 listener.onChangeCamState(binding.bottomFloatingPanel.fabCam.isOn)
             }
 
+            fabSpeaker.setOnClickListener {
+                listener.onChangeSpeakerState()
+            }
+
             fabHold.setOnOffCallback {
                 // if isHold is off, should disable the camera and mic
                 updateHoldState(it)
@@ -212,7 +218,6 @@ class BottomFloatingPanelViewHolder(
             addItemDecoration(SimpleDividerItemDecoration(context))
         }
     }
-
 
     private fun updateBottomFloatingPanelIfNeeded() {
         if (bottomFloatingPanelExpanded) {
@@ -311,6 +316,26 @@ class BottomFloatingPanelViewHolder(
 
     fun updateCamIcon(micOn: Boolean) {
         floatingPanelView.fabCam.isOn = micOn
+    }
+
+    fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
+        when (device) {
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+            }
+            AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                floatingPanelView.fabSpeaker.isOn = false
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+            }
+            else -> {
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
+            }
+        }
     }
 
     companion object {

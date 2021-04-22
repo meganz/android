@@ -7,7 +7,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +23,6 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
-import mega.privacy.android.app.meeting.activity.HEAD_PHONE_EVENT
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -257,20 +255,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             updateAudio(it)
         }
+
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
             updateVideo(it)
         }
 
-        sharedModel.eventLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                HEAD_PHONE_EVENT -> {
-                    bottomFloatingPanelViewHolder.onHeadphoneConnected(
-                        MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
-                        MegaApplication.getInstance().audioManager.isBluetoothConnected
-                    )
-                }
-            }
+        sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
+            updateSpeaker(it)
         }
+
+//        sharedModel.eventLiveData.observe(viewLifecycleOwner) {
+//            when (it) {
+//                HEAD_PHONE_EVENT -> {
+//                    bottomFloatingPanelViewHolder.onHeadphoneConnected(
+//                        MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
+//                        MegaApplication.getInstance().audioManager.isBluetoothConnected
+//                    )
+//                }
+//            }
+//        }
         /**
          * Will Change after Andy modify the permission structure
          */
@@ -309,10 +312,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator).apply {
                 // Create a repository get the participants
-                onHeadphoneConnected(
-                    MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
-                    MegaApplication.getInstance().audioManager.isBluetoothConnected
-                )
+//                onHeadphoneConnected(
+//                    MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
+//                    MegaApplication.getInstance().audioManager.isBluetoothConnected
+//                )
             }
         bottomFloatingPanelViewHolder.collapse()
 
@@ -362,7 +365,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     /**
      * Change Speaker state
      */
-    override fun onChangeAudioDevice(device: AppRTCAudioManager.AudioDevice) {}
+    override fun onChangeSpeakerState() {
+        sharedModel.clickSpeaker()
+    }
+
+    private fun updateSpeaker(device: AppRTCAudioManager.AudioDevice) {
+        bottomFloatingPanelViewHolder.updateSpeakerIcon(device)
+    }
 
     /**
      * Pop up dialog for end meeting for the user/guest
