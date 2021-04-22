@@ -131,7 +131,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      */
     private fun setSubTitle() {
         val stringId = when (verifyType) {
-            CANCEL_ACCOUNT_2FA -> R.string.verify_2fa_subtitle_cancel_account
+            CANCEL_ACCOUNT_2FA -> R.string.verify_2fa_subtitle_delete_account
             CHANGE_MAIL_2FA -> R.string.verify_2fa_subtitle_change_email
             CHANGE_PASSWORD_2FA -> R.string.verify_2fa_subtitle_change_password
             DISABLE_2FA -> R.string.verify_2fa_subtitle_diable_2fa
@@ -320,7 +320,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * Permit PIN code for verification.
      * PIN code is from every single EditTextPIN.
      */
-    fun permitVerify() {
+    private fun permitVerify() {
         logDebug("permitVerify")
         var allInput = true
         val sb = StringBuilder(6)

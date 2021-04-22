@@ -33,7 +33,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -50,8 +49,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
 public class ChangePasswordActivityLollipop extends PasscodeActivity implements OnClickListener, MegaRequestListenerInterface {
-	
-	ChangePasswordActivityLollipop changePasswordActivity = this;
 
 	public static final String KEY_IS_LOGOUT = "logout";
 
@@ -584,7 +581,40 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK) {
+        if (request.getType() == MegaRequest.TYPE_CHANGE_PW) {
+            logDebug("TYPE_CHANGE_PW");
+
+            if (e.getErrorCode() != MegaError.API_OK) {
+                logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+                try {
+                    progress.dismiss();
+                } catch (Exception ex) {
+                    logWarning("Exception dismissing progress dialog", ex);
+                }
+
+                showSnackbar(getString(R.string.general_text_error));
+            } else {
+                logDebug("Pass changed OK");
+                try {
+                    progress.dismiss();
+                } catch (Exception ex) {
+                    logWarning("Exception dismissing progress dialog", ex);
+                }
+
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+                    AccountController ac = new AccountController(this);
+                    ac.logout(this, megaApi);
+                } else {
+                    //Intent to MyAccount
+                    Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+                    resetPassIntent.setAction(ACTION_PASS_CHANGED);
+                    resetPassIntent.putExtra(RESULT, e.getErrorCode());
+                    startActivity(resetPassIntent);
+                    finish();
+                }
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK) {
 			logDebug("TYPE_CONFIRM_RECOVERY_LINK");
 
 			try {
@@ -617,9 +647,10 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 			resetPassIntent.putExtra(RESULT, e.getErrorCode());
 			startActivity(resetPassIntent);
 			finish();
-		} else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
-			if (e.getErrorCode() == MegaError.API_OK){
-				if (request.getFlag()){Intent intent = new Intent(this, VerifyTwoFactorActivity.class);
+        } else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                if (request.getFlag()) {
+                    Intent intent = new Intent(this, VerifyTwoFactorActivity.class);
                     intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_PASSWORD_2FA);
                     intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_PASSWORD, newPassword1.getText().toString());
                     intent.putExtra(KEY_IS_LOGOUT, getIntent() != null && getIntent().getBooleanExtra(KEY_IS_LOGOUT, false));
@@ -628,8 +659,8 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
                 } else {
                     changePassword(newPassword1.getText().toString());
                 }
-			}
-		}
+            }
+        }
 	}
 
 	private void setError(final EditText editText, String error){
