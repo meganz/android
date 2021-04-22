@@ -71,6 +71,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val contentText: MutableLiveData<String> = MutableLiveData()
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
+    private var needsReadContent = false
+
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
     fun onSavingMode(): LiveData<String> = savingMode
@@ -116,6 +118,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode.value = EDIT_MODE
     }
 
+    private fun isSaving(): Boolean = savingMode.value != null
+
     fun isSavingModeEdit(): Boolean = savingMode.value == EDIT_MODE
 
     fun resetSavingMode() {
@@ -130,18 +134,24 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getNameOfFile(): String = fileName.value ?: ""
 
+    fun needsReadContent(): Boolean = needsReadContent
+
+    fun canShowEditFab(): Boolean = isViewMode() && isEditableAdapter() && !isSaving()
+
     /**
      * Checks if the file can be editable depending on the current adapter.
      */
     private fun setEditableAdapter() {
-        textFileEditorData.value?.editableAdapter = getAdapterType() != OFFLINE_ADAPTER
-                && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
-                && getAdapterType() != FILE_LINK_ADAPTER
-                && getAdapterType() != FOLDER_LINK_ADAPTER
-                && getAdapterType() != ZIP_ADAPTER
-                && getAdapterType() != FROM_CHAT
-                && getAdapterType() != INVALID_VALUE
-                && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
+        textFileEditorData.value?.editableAdapter =
+            if (isCreateMode()) true
+            else getAdapterType() != OFFLINE_ADAPTER
+                    && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
+                    && getAdapterType() != FILE_LINK_ADAPTER
+                    && getAdapterType() != FOLDER_LINK_ADAPTER
+                    && getAdapterType() != ZIP_ADAPTER
+                    && getAdapterType() != FROM_CHAT
+                    && getAdapterType() != INVALID_VALUE
+                    && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
     }
 
     /**
@@ -210,12 +220,16 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             }
         }
 
-        setEditableAdapter()
-
         textFileEditorData.value?.api =
             if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
+
+        if (isViewMode()) {
+            needsReadContent = true
+        }
+
+        setEditableAdapter()
 
         fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name!!
     }
@@ -296,6 +310,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 logError("Exception while reading text file.", e)
             }
 
+            needsReadContent = false
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
         }
@@ -348,7 +363,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         context.startService(uploadIntent)
         savingMode.value = mode.value
-        mode.value = VIEW_MODE
+        setViewMode()
     }
 
     /**
@@ -462,7 +477,13 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return ERROR_FINISH_ACTION
         }
 
-        contentText.value = editedText.value ?: ""
+        if (editedText.value == null) {
+            contentText.value = ""
+            editedText.value = ""
+        } else {
+            contentText.value = editedText.value
+        }
+
         textFileEditorData.value?.node =
             megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
 

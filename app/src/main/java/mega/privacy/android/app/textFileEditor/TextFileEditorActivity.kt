@@ -345,7 +345,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         refreshMenuOptionsVisibility()
 
         if (mode == VIEW_MODE) {
-            if (binding.contentText.text.isEmpty()) {
+            if (viewModel.needsReadContent()) {
                 val mi = ActivityManager.MemoryInfo()
                 (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
                 readingContent = true
@@ -359,7 +359,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             binding.nameText.isVisible = true
             binding.contentText.isEnabled = false
 
-            if (!readingContent && viewModel.isEditableAdapter()) {
+            if (!readingContent && viewModel.canShowEditFab()) {
                 binding.editFab.show()
             }
         } else {
@@ -402,17 +402,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
-        if (contentRead == binding.contentText.text.toString()) {
-            return
-        }
-
         readingContent = false
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
         binding.contentText.setText(contentRead)
 
-        if (viewModel.isViewMode() && viewModel.isEditableAdapter()) {
+        if (viewModel.canShowEditFab()) {
             binding.editFab.show()
         }
     }
