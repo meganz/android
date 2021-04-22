@@ -237,7 +237,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
-                context,
                 localSurfaceView,
                 outMetrics,
                 false

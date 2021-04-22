@@ -72,7 +72,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     private val audioOutputStateObserver =
         androidx.lifecycle.Observer<AppRTCAudioManager.AudioDevice> {
-            logDebug("************** RECIBO UN CAMBIO:: it = "+it);
             if(speakerLiveData.value != it){
                 speakerLiveData.value = it
                 when (it) {
