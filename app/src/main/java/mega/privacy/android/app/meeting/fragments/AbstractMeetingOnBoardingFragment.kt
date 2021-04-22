@@ -3,8 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.BaseActivity
@@ -23,8 +20,6 @@ import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
@@ -216,7 +211,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
-                context,
                 localSurfaceView,
                 outMetrics,
                 false
