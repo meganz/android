@@ -212,10 +212,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> {
-                findNavController().navigate(R.id.createMeetingFragment)
-                true
-            }
             R.id.swap_camera -> {
                 //TODO test code start: add or remove last participants
                 inMeetingViewModel.addParticipant(true)

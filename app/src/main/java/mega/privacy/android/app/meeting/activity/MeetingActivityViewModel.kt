@@ -100,7 +100,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             when (request.type) {
                 MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
                     _cameraLiveData.value = request.flag
-                    LogUtil.logDebug("open video: $_cameraLiveData.value")
+                    logDebug("open video: $_cameraLiveData.value")
                     tips.value = when (request.flag) {
                         true -> getString(
                             R.string.general_camera_disable,
@@ -115,7 +115,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
                 MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL -> {
                     _micLiveData.value = request.flag
-                    LogUtil.logDebug("open Mic: $_micLiveData.value")
+                    logDebug("open Mic: $_micLiveData.value")
                     tips.value = when (request.flag) {
                         true -> getString(
                             R.string.general_mic_mute,
@@ -146,6 +146,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)
+
+        // Remove observer on network state
+        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
+            .removeObserver(notificationNetworkStateObserver)
     }
 
     /**

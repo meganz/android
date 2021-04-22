@@ -12,10 +12,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.item_chat_explorer_list.view.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
+import kotlinx.coroutines.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
@@ -26,7 +28,6 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
@@ -212,27 +213,26 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun switchCamera(bOn: Boolean) {
         fab_cam.isOn = bOn
-
-        // Always try to start the call using the front camera
-        val frontCamera = VideoCaptureUtils.getFrontCamera()
-        if (frontCamera != null) {
-            when (bOn) {
-                true -> {
-                    megaChatApi.setChatVideoInDevice(frontCamera, null)
-                    activateVideo()
-                }
-                false -> deactivateVideo()
+        setViewClickable(fab_cam, false)
+        when (bOn) {
+            true -> {
+                // Always try to start the call using the front camera
+                abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
+                activateVideo()
+            }
+            false -> {
+                deactivateVideo()
             }
         }
     }
 
     /**
      * Method for activating the video.
-     * TODO("Refactor code")
      */
     private fun activateVideo() {
         if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
             logError("Error activating video")
+            setViewClickable(fab_cam, true)
             return
         }
         if (videoListener == null) {
@@ -252,6 +252,28 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
         }
         localSurfaceView.visibility = View.VISIBLE
+        setViewClickable(fab_cam, true, bSync = false)
+    }
+
+    /**
+     * Set the button state
+     *
+     * @param bClickable set the view to be able to click or not
+     * @param bSync execute synchronously or asynchronously
+     */
+    private fun setViewClickable(view: View, bClickable: Boolean, bSync: Boolean = true){
+        when {
+            bClickable && bSync -> view.isClickable = true
+            bClickable && !bSync -> {
+                lifecycleScope.launch {
+                    delay(1000L)
+                    withContext(Dispatchers.Main) {
+                        view.isClickable = true
+                    }
+                }
+            }
+            !bClickable -> view.isClickable = false
+        }
     }
 
     /**
@@ -260,11 +282,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun deactivateVideo() {
         if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
             logError("Error deactivating video")
+            setViewClickable(fab_cam, true)
             return
         }
         logDebug("Removing surface view")
         localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
+        setViewClickable(fab_cam, true)
     }
 
     /**
