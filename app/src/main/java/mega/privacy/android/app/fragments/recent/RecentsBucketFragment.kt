@@ -27,6 +27,7 @@ import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -185,6 +186,9 @@ class RecentsBucketFragment : BaseFragment() {
             }
             mime.isPdf -> {
                 openPdf(index, node, localPath)
+            }
+            mime.isOpenableTextFile(node.size) -> {
+                manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER)
             }
             else -> {
                 download(node.handle)

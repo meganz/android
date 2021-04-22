@@ -1408,8 +1408,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						downloadNodes(Collections.singletonList(nodes.get(position)));
 					}
 					overridePendingTransition(0,0);
-				}
-				else{
+				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+					manageTextFileIntent(this, nodes.get(position), FOLDER_LINK_ADAPTER);
+				} else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 						if (!hasStoragePermission) {

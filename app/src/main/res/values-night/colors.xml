@@ -252,6 +252,9 @@
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_500</color>
 
+    <!--  Background of text editor name layout  -->
+    <color name="white_090_grey_080">@color/grey_alpha_080</color>
+
     <!--   my account -->
     <color name="grey_020_black">@color/black</color>
     <color name="grey_050_grey_700">@color/grey_700</color>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_file_editor_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/file_editor_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
+
+    <ScrollView
+        android:id="@+id/file_editor_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
+
+        <EditText
+            android:id="@+id/content_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:inputType="textMultiLine"
+            android:paddingBottom="100dp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2"
+            android:theme="@style/TransparentEditText.Transparent"
+            tools:ignore="Autofill,LabelFor" />
+
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/loading_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="97dp"
+        android:src="@drawable/ic_text_thumbnail"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/file_editor_toolbar"
+        tools:ignore="ContentDescription" />
+
+    <ProgressBar
+        android:id="@+id/loading_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="44dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loading_image" />
+
+    <TextView
+        android:id="@+id/name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white_090_grey_080"
+        android:gravity="center_horizontal"
+        android:padding="14dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey87White87"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="Journal01.txt" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/edit_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin_span"
+        android:src="@drawable/ic_edit"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toTopOf="@id/name_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

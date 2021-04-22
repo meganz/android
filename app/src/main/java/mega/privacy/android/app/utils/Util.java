@@ -151,7 +151,7 @@ public class Util {
 	private static long lastClickTime;
 
 	// 150ms, a smaller value may cause the keyboard to fail to open
-	private final static int SHOW_IM_DELAY = 150;
+	public final static int SHOW_IM_DELAY = 150;
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
