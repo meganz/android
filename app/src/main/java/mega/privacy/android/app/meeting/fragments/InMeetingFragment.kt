@@ -11,6 +11,7 @@ import ash.TL
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -19,7 +20,6 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import kotlin.random.Random
 
 class InMeetingFragment : MeetingBaseFragment() {
 
@@ -108,6 +108,15 @@ class InMeetingFragment : MeetingBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //TODO test code start
+        val producer = TestTool.FrameProducer()
+
+        GlobalScope.launch(Dispatchers.IO) {
+            producer.load()
+            inMeetingViewModel.frames.postValue(producer.frames)
+        }
+        //TODO test code end
+
         view.setOnClickListener {
             onPageClick()
         }
@@ -171,8 +180,6 @@ class InMeetingFragment : MeetingBaseFragment() {
         }
 
         // TODO test code start: add 4 participants
-        inMeetingViewModel.addParticipant(true)
-        inMeetingViewModel.addParticipant(true)
         inMeetingViewModel.addParticipant(true)
         inMeetingViewModel.addParticipant(true)
         // TODO test code start

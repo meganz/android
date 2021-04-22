@@ -60,7 +60,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
-            .setAdapter(GridViewPagerAdapter(parentFragment, maxWidth, maxHeight))
+            .setAdapter(GridViewPagerAdapter((parentFragment as InMeetingFragment).inMeetingViewModel,parentFragment, maxWidth, maxHeight))
             .create()
 
         // TODO test code start

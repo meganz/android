@@ -4,14 +4,18 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.SurfaceTexture
 import android.os.Build
+import android.os.Build.VERSION_CODES.P
 import android.view.TextureView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ash.TL
 import kotlinx.coroutines.*
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.TestTool
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -29,18 +33,17 @@ class VideoGridViewHolder(
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    lateinit var inMeetingViewModel: InMeetingViewModel
+
     private val srcRect = Rect()
     private val dstRect = Rect()
 
-    // TODO test start
-    lateinit var renderJob : Job
-    private val frameProducer = TestTool.FrameProducer()
-    // TODO test end
+    fun bind(inMeetingViewModel: InMeetingViewModel, participant: Participant, itemCount: Int, isFirstPage: Boolean) {
+        this.inMeetingViewModel = inMeetingViewModel
 
-    fun bind(participant: Participant, itemCount: Int, isFirstPage: Boolean) {
         layout(isFirstPage, itemCount)
 
-//        binding.video.surfaceTextureListener = this
+        binding.video.surfaceTextureListener = this
         binding.name.text = participant.name
     }
 
@@ -132,19 +135,24 @@ class VideoGridViewHolder(
 
         canvas.drawBitmap(bitmap, srcRect, dstRect, null)
         binding.video.unlockCanvasAndPost(canvas)
-
-        bitmap.recycle()
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(P)
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
         dstRect.top = 0
         dstRect.left = 0
         dstRect.right = width
         dstRect.bottom = height
 
-        renderJob = GlobalScope.launch(Dispatchers.IO) {
-            frameProducer.getFrame(onChatVideoData)
+        inMeetingViewModel.frames.observeForever {
+            GlobalScope.launch(Dispatchers.IO) {
+                while (true) {
+                    it.forEach {
+                        delay(50)
+                        onChatVideoData(it.width, it.height, it)
+                    }
+                }
+            }
         }
     }
 
@@ -152,11 +160,8 @@ class VideoGridViewHolder(
         // TODO changeDestRect
     }
 
+    @RequiresApi(P)
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-        frameProducer.running = false
-        GlobalScope.launch(Dispatchers.Main) {
-            renderJob.cancelAndJoin()
-        }
         return true
     }
     // TODO test code end

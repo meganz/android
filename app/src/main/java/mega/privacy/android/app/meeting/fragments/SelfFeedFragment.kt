@@ -28,9 +28,6 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
 
     var released = false
 
-    // Render related
-    private lateinit var renderJob: Job
-
     private var surfaceWidth = 0
     private var surfaceHeight = 0
 
@@ -39,11 +36,6 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
     private val dstRect = Rect()
     private val modeSrcOver = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
     private val modeSrcIn = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-
-    // TODO test start
-    @RequiresApi(P)
-    private val frameProducer = TestTool.FrameProducer()
-    // TODO test end
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,14 +89,22 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
         video.unlockCanvasAndPost(canvas)
     }
 
+    @RequiresApi(P)
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
         dstRect.top = 0
         dstRect.left = 0
         dstRect.right = width
         dstRect.bottom = height
 
-        renderJob = GlobalScope.launch(Dispatchers.IO) {
-            frameProducer.getFrame(onChatVideoData)
+        (parentFragment as InMeetingFragment).inMeetingViewModel.frames.observeForever {
+            GlobalScope.launch(Dispatchers.IO) {
+                while (true) {
+                    it.forEach {
+                        delay(50)
+                        onChatVideoData(it.width, it.height, it)
+                    }
+                }
+            }
         }
     }
 
@@ -112,11 +112,8 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
         // TODO changeDestRect
     }
 
+    @RequiresApi(P)
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-        frameProducer.running = false
-        GlobalScope.launch(Dispatchers.Main) {
-            renderJob.cancelAndJoin()
-        }
         return true
     }
     // TODO test code end

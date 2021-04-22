@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
 import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT
 import android.os.Build
 import android.os.Environment
@@ -16,6 +17,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment
+import mega.privacy.android.app.meeting.fragments.SelfFeedFragment
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 import java.nio.ByteBuffer
@@ -67,14 +70,10 @@ object TestTool {
     @RequiresApi(Build.VERSION_CODES.P)
     class FrameProducer {
 
-        var running = true
-
         val frames = mutableListOf<Bitmap>()
 
-        init {
-//            GlobalScope.launch(Dispatchers.IO) {
-//                init()
-//            }
+        //processor: ((width: Int, height: Int, bitmap: Bitmap) -> Unit)
+        suspend fun load() {
             val videoPath =
                 Environment.getExternalStorageDirectory().absolutePath + "/DCIM/photos/20190819_111725.mp4"
             val retriever = MediaMetadataRetriever()
@@ -82,32 +81,10 @@ object TestTool {
 
             val frameCount = retriever.extractMetadata(METADATA_KEY_VIDEO_FRAME_COUNT).toInt()
 
-            for (i in 0 until frameCount) frames.add(retriever.getFrameAtIndex(i))
+            // In test, the bitmap won't be recycled, so don't put in too many bitmaps.
+            for (i in 0 until 300.coerceAtMost(frameCount)) frames.add(retriever.getFrameAtIndex(i))
         }
 
-        suspend fun init() {
-            // TODO Change the video path to point a local video on your test device.(Need storage read permission)
-            val videoPath =
-                Environment.getExternalStorageDirectory().absolutePath + "/DCIM/photos/20190819_111725.mp4"
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(videoPath)
-
-            val frameCount = retriever.extractMetadata(METADATA_KEY_VIDEO_FRAME_COUNT).toInt()
-
-            for (i in 0 until frameCount) frames.add(retriever.getFrameAtIndex(i))
-        }
-
-
-        suspend fun getFrame(processor: ((width: Int, height: Int, bitmap: Bitmap) -> Unit)) {
-            while (running) {
-                frames.forEach {
-                    delay(100)
-                    processor(it.width, it.height, it)
-
-                    if (!running) return@forEach
-                }
-            }
-        }
 
         private fun convertToByteBuffer(b: Bitmap): ByteArray {
             val capacity = b.byteCount
