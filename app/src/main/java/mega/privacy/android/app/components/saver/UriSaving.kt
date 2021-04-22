@@ -52,7 +52,7 @@ class UriSaving(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
-        snackbarShower: SnackbarShower,
+        snackbarShower: SnackbarShower?,
     ): AutoPlayInfo {
         if (externalSDCard && sdCardOperator != null) {
             try {
@@ -65,7 +65,7 @@ class UriSaving(
         }
 
         post {
-            snackbarShower.showSnackbar(getString(R.string.copy_already_downloaded))
+            snackbarShower?.showSnackbar(getString(R.string.copy_already_downloaded))
         }
 
         return AutoPlayInfo.NO_AUTO_PLAY
