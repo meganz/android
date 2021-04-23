@@ -15,8 +15,8 @@ class VideoGridViewAdapter(
     private val pagePosition: Int
 ) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
 
-    override fun onBindViewHolder(holderGrid: VideoGridViewHolder, position: Int) {
-        holderGrid.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
+    override fun onBindViewHolder(gridHolder: VideoGridViewHolder, position: Int) {
+        gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoGridViewHolder {

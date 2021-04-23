@@ -2,19 +2,12 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.graphics.SurfaceTexture
-import android.os.Build
-import android.os.Build.VERSION_CODES.P
-import android.view.TextureView
-import androidx.annotation.RequiresApi
+import android.view.SurfaceHolder
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ash.TL
 import kotlinx.coroutines.*
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.TestTool
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
@@ -28,23 +21,85 @@ class VideoGridViewHolder(
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int
-) : RecyclerView.ViewHolder(binding.root), TextureView.SurfaceTextureListener {
+) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
     lateinit var inMeetingViewModel: InMeetingViewModel
 
+    lateinit var holder: SurfaceHolder
+
+    var job: Job? = null
+
+    val callback = object : SurfaceHolder.Callback {
+
+        override fun surfaceCreated(holder: SurfaceHolder?) {
+            isDrawing = true
+
+            dstRect.top = 0
+            dstRect.left = 0
+            dstRect.right = binding.video.width
+            dstRect.bottom = binding.video.height
+
+            inMeetingViewModel.frames.observeForever {
+                job = GlobalScope.launch(Dispatchers.IO) {
+                    while (isDrawing) {
+                        it.forEach {
+                            delay(50)
+                            onChatVideoData(it.width, it.height, it)
+
+                            if (!isDrawing) return@forEach
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun surfaceChanged(
+            holder: SurfaceHolder?,
+            format: Int,
+            width: Int,
+            height: Int
+        ) {
+        }
+
+        override fun surfaceDestroyed(holder: SurfaceHolder?) {
+            onRecycle()
+        }
+    }
+
+    var isDrawing = true
+
     private val srcRect = Rect()
     private val dstRect = Rect()
 
-    fun bind(inMeetingViewModel: InMeetingViewModel, participant: Participant, itemCount: Int, isFirstPage: Boolean) {
+    fun onRecycle() {
+        isDrawing = false
+
+        holder.removeCallback(callback)
+
+        if (job != null && job!!.isActive) {
+            GlobalScope.launch(Dispatchers.IO) {
+                job!!.cancelAndJoin()
+            }
+        }
+    }
+
+    fun bind(
+        inMeetingViewModel: InMeetingViewModel,
+        participant: Participant,
+        itemCount: Int,
+        isFirstPage: Boolean
+    ) {
         this.inMeetingViewModel = inMeetingViewModel
 
         layout(isFirstPage, itemCount)
 
-        binding.video.surfaceTextureListener = this
         binding.name.text = participant.name
+
+        holder = binding.video.holder
+        holder.addCallback(callback)
     }
 
     private fun layout(isFirstPage: Boolean, itemCount: Int) {
@@ -125,48 +180,15 @@ class VideoGridViewHolder(
     val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
         if (bitmap.isRecycled) return
 
-        val canvas = binding.video.lockCanvas() ?: return
-
         srcRect.top = 0
         srcRect.left = 0
         srcRect.right = width
         srcRect.bottom = height
 
-
-        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
-        binding.video.unlockCanvasAndPost(canvas)
-    }
-
-    @RequiresApi(P)
-    override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-        dstRect.top = 0
-        dstRect.left = 0
-        dstRect.right = width
-        dstRect.bottom = height
-
-        inMeetingViewModel.frames.observeForever {
-            GlobalScope.launch(Dispatchers.IO) {
-                while (true) {
-                    it.forEach {
-                        delay(50)
-                        onChatVideoData(it.width, it.height, it)
-                    }
-                }
-            }
+        if (holder.surface.isValid) {
+            val canvas = holder.lockCanvas() ?: return
+            canvas.drawBitmap(bitmap, srcRect, dstRect, null)
+            holder.unlockCanvasAndPost(canvas)
         }
-    }
-
-    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-        // TODO changeDestRect
-    }
-
-    @RequiresApi(P)
-    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-        return true
-    }
-    // TODO test code end
-
-    override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
-
     }
 }

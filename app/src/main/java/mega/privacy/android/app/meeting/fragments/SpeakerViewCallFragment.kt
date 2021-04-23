@@ -47,10 +47,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         }
 
         itemClickViewModel.clickItemEvent.observe(viewLifecycleOwner, EventObserver {
-            speaker_video.setBackgroundColor(Color.parseColor(it.avatarBackground))
+//            speaker_video.setBackgroundColor(Color.parseColor(it.avatarBackground))
         })
 
-        adapter = VideoListViewAdapter(itemClickViewModel)
+        adapter = VideoListViewAdapter((parentFragment as InMeetingFragment).inMeetingViewModel,itemClickViewModel)
         participants_horizontal_list.adapter = adapter
 
         // TODO test code start

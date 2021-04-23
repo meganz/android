@@ -8,11 +8,9 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import ash.TL
 import kotlinx.coroutines.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
@@ -26,7 +24,7 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
 
     private lateinit var video: TextureView
 
-    var released = false
+    var isDrawing = true
 
     private var surfaceWidth = 0
     private var surfaceHeight = 0
@@ -98,10 +96,12 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.frames.observeForever {
             GlobalScope.launch(Dispatchers.IO) {
-                while (true) {
+                while (isDrawing) {
                     it.forEach {
                         delay(50)
                         onChatVideoData(it.width, it.height, it)
+
+                        if (!isDrawing) return@forEach
                     }
                 }
             }
@@ -114,6 +114,7 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
 
     @RequiresApi(P)
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+        isDrawing = false
         return true
     }
     // TODO test code end

@@ -7,7 +7,6 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import ash.TL
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
@@ -179,9 +178,11 @@ class InMeetingFragment : MeetingBaseFragment() {
             insets
         }
 
-        // TODO test code start: add 4 participants
-        inMeetingViewModel.addParticipant(true)
-        inMeetingViewModel.addParticipant(true)
+        // TODO test code start: add x participants
+        val x = 2
+        for (i in 0 until x) {
+            inMeetingViewModel.addParticipant(true)
+        }
         // TODO test code start
     }
 
@@ -240,5 +241,10 @@ class InMeetingFragment : MeetingBaseFragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        inMeetingViewModel.frames.value = mutableListOf()
     }
 }
