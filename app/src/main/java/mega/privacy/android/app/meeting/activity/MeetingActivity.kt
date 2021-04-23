@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
@@ -146,9 +147,6 @@ class MeetingActivity : BaseActivity() {
         // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
         // Change start destination dynamically
         navController.setGraph(navGraph, bundle)
-        // Must call getGraph() after calling setGraph()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
