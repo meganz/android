@@ -18,12 +18,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Observer;
 import androidx.palette.graphics.Palette;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -32,6 +34,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Menu;
@@ -73,6 +76,7 @@ import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -105,6 +109,7 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -300,57 +305,24 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 	};
 
-
-	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_DESTROYED:
-					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						checkScreenRotationToShowCall();
-						break;
-				}
-			}
-
-			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
+	private final Observer<MegaChatCall> callStatusObserver = call -> {
+		int callStatus = call.getStatus();
+		switch (callStatus) {
+			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+			case MegaChatCall.CALL_STATUS_DESTROYED:
+			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 				checkScreenRotationToShowCall();
-			}
+				break;
 		}
 	};
 
-	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-				return;
-
-			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				checkScreenRotationToShowCall();
-			}
-		}
+	private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+		checkScreenRotationToShowCall();
 	};
 
+	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
+		checkScreenRotationToShowCall();
+	};
 
 	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -710,12 +682,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		registerReceiver(userNameReceiver, userNameUpdateFilter);
 
-		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
-		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-		registerReceiver(chatCallUpdateReceiver, filterCall);
-
-		registerReceiver(chatSessionUpdateReceiver,
-				new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -1698,8 +1667,10 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
             askForDisplayOverDialog.recycle();
         }
 
-		unregisterReceiver(chatCallUpdateReceiver);
-		unregisterReceiver(chatSessionUpdateReceiver);
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).removeObserver(sessionOnHoldObserver);
+
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(retentionTimeReceiver);
 		unregisterReceiver(manageShareReceiver);

@@ -39,6 +39,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.appcompat.widget.Toolbar;
@@ -50,6 +51,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,6 +71,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -559,6 +563,42 @@ public class ChatActivityLollipop extends PasscodeActivity
         this.exportListener = exportListener;
     }
 
+    private final Observer<MegaChatCall> callStatusObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logDebug("Different chat");
+            updateCallBar();
+            return;
+        }
+
+        switch (call.getStatus()) {
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+                updateCallBar();
+                break;
+
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                updateCallBar();
+                cancelRecording();
+                break;
+
+            case MegaChatCall.CALL_STATUS_DESTROYED:
+                updateCallBar();
+                if (dialogCall != null) {
+                    dialogCall.dismiss();
+                }
+                break;
+        }
+    };
+
+    private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+        updateCallBar();
+    };
+
+    private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
+        updateCallBar();
+    };
+
+
     /**
      * Method for finding out if the selected message is deleted.
      *
@@ -681,64 +721,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                 || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
                 updateUserNameInChat();
-            }
-        }
-    };
-
-    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            if (chatId != getCurrentChatid()) {
-                logDebug("Different chat");
-                updateCallBar();
-                return;
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                updateCallBar();
-            }
-
-            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-
-                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-                if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) &&
-                        (callStatus == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
-                                callStatus >= MegaChatCall.CALL_STATUS_IN_PROGRESS)) {
-                    updateCallBar();
-                }
-                switch (callStatus) {
-                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                        cancelRecording();
-                        break;
-
-                    case MegaChatCall.CALL_STATUS_DESTROYED:
-                        if (dialogCall != null) {
-                            dialogCall.dismiss();
-                        }
-                        break;
-                }
-            }
-        }
-    };
-
-    private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            if (chatId != getCurrentChatid()) {
-                logWarning("Call different chat");
-                return;
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-                updateCallBar();
             }
         }
     };
@@ -952,15 +934,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
-        IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
-        filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
-        filterCall.addAction(ACTION_CHANGE_COMPOSITION);
-        filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-        registerReceiver(chatCallUpdateReceiver, filterCall);
-
-        IntentFilter filterSession = new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD);
-        filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
-        registerReceiver(chatSessionUpdateReceiver, filterSession);
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
+        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
 
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
@@ -7767,7 +7743,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 idChat = request.getChatHandle();
                 megaChatApi.addChatListener(this);
-                
+
                 if (idChat != MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
@@ -7994,14 +7970,16 @@ public class ChatActivityLollipop extends PasscodeActivity
         unregisterReceiver(voiceclipDownloadedReceiver);
         unregisterReceiver(userNameReceiver);
         unregisterReceiver(chatArchivedReceiver);
-        unregisterReceiver(chatCallUpdateReceiver);
-        unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
         unregisterReceiver(joinedSuccessfullyReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
         unregisterReceiver(errorCopyingNodesReceiver);
         unregisterReceiver(retryPendingMessageReceiver);
+
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).removeObserver(sessionOnHoldObserver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);

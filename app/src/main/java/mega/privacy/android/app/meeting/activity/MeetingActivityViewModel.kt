@@ -56,10 +56,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
-//    // HeadPhone Event
-//    private val _eventLiveData: MutableLiveData<Int> = MutableLiveData()
-//    val eventLiveData = _eventLiveData
-
     // Network State
     private val _notificationNetworkState = MutableLiveData<Boolean>()
 

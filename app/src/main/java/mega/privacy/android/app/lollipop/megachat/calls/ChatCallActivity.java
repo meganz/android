@@ -17,15 +17,19 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -472,150 +476,150 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         infoUsersBar.setVisibility(View.GONE);
     }
 
-    /**
-     * Method for controlling changes in the call.
-     */
-    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
+    private final Observer<MegaChatCall> updateCallObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logWarning("Call in different chat");
+            return;
+        }
 
-            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+        updateCall(call.getChatid());
+    };
 
-            if (chatIdReceived != getCurrentChatid()) {
-                logWarning("Call in different chat");
-                if (callChat != null && callIdReceived != callChat.getCallId() && (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD))) {
-                    checkAnotherCallOnHold();
-                }
-                return;
+    private final Observer<MegaChatCall> callStatusObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logWarning("Call in different chat");
+            if (callChat != null && call.getCallId() != callChat.getCallId()) {
+                checkAnotherCallOnHold();
             }
+            return;
+        }
 
-            if (callIdReceived == MEGACHAT_INVALID_HANDLE) {
-                logWarning("Call recovered is incorrect");
-                return;
-            }
+        int callStatus = call.getStatus();
+        logDebug("The call status is "+callStatusToString(callStatus)+".  Call id "+callChat);
+        if (callStatus != INVALID_CALL_STATUS) {
+            switch (callStatus) {
+                case MegaChatCall.CALL_STATUS_CONNECTING:
+                    updateSubTitle();
+                    break;
 
-            updateCall(callIdReceived);
-            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-                logDebug("The call status is "+callStatusToString(callStatus)+".  Call id "+callChat);
-                if (callStatus != INVALID_CALL_STATUS) {
-                    switch (callStatus) {
-                        case MegaChatCall.CALL_STATUS_CONNECTING:
-                            updateSubTitle();
-                            break;
+                case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                    checkInProgressCall();
+                    break;
 
-                        case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                            checkInProgressCall();
-                            break;
+                case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+                case MegaChatCall.CALL_STATUS_DESTROYED:
+                    checkTerminatingCall();
+                    break;
 
-                        case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-                        case MegaChatCall.CALL_STATUS_DESTROYED:
-                            checkTerminatingCall();
-                            break;
-
-                        case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                            checkUserNoPresentInCall();
-                            break;
-                    }
-                }
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                checkCallOnHold();
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_LOCAL_AVFLAGS)) {
-                updateLocalAV();
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_COMPOSITION)) {
-                int typeChange = intent.getIntExtra(TYPE_CHANGE_COMPOSITION, 0);
-                long peerIdReceived = intent.getLongExtra(UPDATE_PEER_ID, MEGACHAT_INVALID_HANDLE);
-                long clientIdReceived = intent.getLongExtra(UPDATE_CLIENT_ID, MEGACHAT_INVALID_HANDLE);
-                checkCompositionChanges(typeChange, peerIdReceived, clientIdReceived);
+                case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+                    checkUserNoPresentInCall();
+                    break;
             }
         }
     };
 
-    /**
-     * Method for controlling changes in sessions.
-     */
-    private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            if (chatIdReceived != getCurrentChatid()) {
-                logWarning("Call in different chat");
-                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
-                if (callChat != null && callIdReceived != callChat.getCallId() && (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD))) {
-                    checkAnotherCallOnHold();
-                }
-                return;
-            }
-
-            long callId = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            if (callId == MEGACHAT_INVALID_HANDLE) {
-                logWarning("Call recovered is incorrect");
-                return;
-            }
-
-            updateCall(callId);
-
-            if(!intent.getAction().equals(ACTION_UPDATE_CALL)){
-
-                long peerId = intent.getLongExtra(UPDATE_PEER_ID, MEGACHAT_INVALID_HANDLE);
-                long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, MEGACHAT_INVALID_HANDLE);
-                MegaChatSession session = getSessionCall(peerId, clientId);
-
-                if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
-                    updateRemoteAV(session);
-                }
-
-                if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AUDIO_LEVEL)) {
-                    checkAudioLevel(session);
-                }
-
-                if (intent.getAction().equals(ACTION_CHANGE_NETWORK_QUALITY)) {
-                    checkNetworkQuality(session);
-                }
-
-                if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-                    logDebug("The session on hold change");
-                    if(chat.isGroup()){
-                        checkSessionOnHold(peerId, clientId);
-                    }else{
-                        checkCallOnHold();
-                    }
-                }
-
-                if (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE)) {
-
-                    int sessionStatus = intent.getIntExtra(UPDATE_SESSION_STATUS, INVALID_CALL_STATUS);
-                    logDebug("The session status changed to "+sessionStatusToString(sessionStatus));
-
-                    if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED) {
-                        int termCode = intent.getIntExtra(UPDATE_SESSION_TERM_CODE, -1);
-                       // if (termCode == MegaChatCall.TERM_CODE_USER_HANGUP) {
-                            checkHangCall(callId);
-                        //}
-                    }
-
-                    if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                        if(cameraFragmentFullScreen != null){
-                            cameraFragmentFullScreen.changeUser(chatId, callId, peerId, clientId);
-                        }
-                        hideReconnecting();
-                        updateAVFlags(session);
-                    }
-                }
-            }
+    private final Observer<MegaChatCall> localAVFlagsObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logWarning("Call in different chat");
+            return;
         }
+
+        updateLocalAV();
+    };
+
+    private final Observer<MegaChatCall> callCompositionObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logWarning("Call in different chat");
+            return;
+        }
+
+        int typeChange = call.getCallCompositionChange();
+        long peerIdReceived = call.getPeeridCallCompositionChange();
+        checkCompositionChanges(typeChange, peerIdReceived, MEGACHAT_INVALID_HANDLE);
+    };
+
+    private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+        if (call.getChatid() != getCurrentChatid()) {
+            logWarning("Call in different chat");
+            if (callChat != null && call.getCallId() != callChat.getCallId()) {
+                checkAnotherCallOnHold();
+            }
+            return;
+        }
+
+        checkCallOnHold();
+    };
+
+    private final Observer<Pair> sessionsStatusObserver = sessionAndCall -> {
+        long callId = (long) sessionAndCall.first;
+        if(callId != callChat.getCallId()){
+            logWarning("Different call");
+            checkAnotherCallOnHold();
+            return;
+        }
+
+        MegaChatCall call = megaChatApi.getChatCallByCallId((long) sessionAndCall.first);
+        if (call == null)
+            return;
+
+        this.callChat = call;
+        MegaChatSession session = (MegaChatSession) sessionAndCall.second;
+        int sessionStatus = session.getStatus();
+        logDebug("The session status changed to " + sessionStatusToString(sessionStatus));
+
+        if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED) {
+            //int termCode = session.getTermCode();
+            // if (termCode == MegaChatCall.TERM_CODE_USER_HANGUP) {
+            checkHangCall(callId);
+            //}
+        }
+
+        if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+            if (cameraFragmentFullScreen != null) {
+                cameraFragmentFullScreen.changeUser(call.getChatid(), call.getCallId(), session.getPeerid(), session.getClientid());
+            }
+            hideReconnecting();
+            updateAVFlags(session);
+        }
+    };
+
+    private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
+        long callId = (long) sessionAndCall.first;
+        if(callId != callChat.getCallId()){
+            logWarning("Different call");
+            checkAnotherCallOnHold();
+            return;
+        }
+
+        MegaChatSession session = (MegaChatSession) sessionAndCall.second;
+        logDebug("The session on hold change");
+        if (chat.isGroup()) {
+            checkSessionOnHold(session.getPeerid(), session.getClientid());
+        } else {
+            checkCallOnHold();
+        }
+    };
+
+    private final Observer<Pair> remoteAVFlagsObserver = sessionAndCall -> {
+        long callId = (long) sessionAndCall.first;
+        if(callId != callChat.getCallId()){
+            logWarning("Different call");
+            return;
+        }
+
+        MegaChatSession session = (MegaChatSession) sessionAndCall.second;
+        updateRemoteAV(session);
+    };
+
+    private final Observer<Pair> remoteAudioLevelObserver = sessionAndCall -> {
+        long callId = (long) sessionAndCall.first;
+        if(callId != callChat.getCallId()){
+            logWarning("Different call");
+            return;
+        }
+
+        MegaChatSession session = (MegaChatSession) sessionAndCall.second;
+        checkAudioLevel(session);
     };
 
     private BroadcastReceiver proximitySensorReceiver = new BroadcastReceiver() {
@@ -860,24 +864,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             initialUI(chatId);
         }
 
-        IntentFilter filterCall = new IntentFilter(ACTION_UPDATE_CALL);
-        filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
-        filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
-        filterCall.addAction(ACTION_CHANGE_RINGING_STATUS);
-        filterCall.addAction(ACTION_CHANGE_COMPOSITION);
-        filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-        filterCall.addAction(ACTION_CHANGE_LOCAL_AUDIO_LEVEL);
-        filterCall.addAction(ACTION_CHANGE_NETWORK_QUALITY);
-        registerReceiver(chatCallUpdateReceiver, filterCall);
+        LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall.class).observeForever(updateCallObserver);
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+        LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall.class).observeForever(localAVFlagsObserver);
+        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observeForever(callCompositionObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
 
-        IntentFilter filterSession = new IntentFilter(ACTION_SESSION_STATUS_UPDATE);
-        filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
-        filterSession.addAction(ACTION_CHANGE_SESSION_SPEAK_REQUESTED);
-        filterSession.addAction(ACTION_CHANGE_SESSION_ON_HIRES);
-        filterSession.addAction(ACTION_CHANGE_SESSION_ON_LOWRES);
-        filterSession.addAction(ACTION_CHANGE_REMOTE_AUDIO_LEVEL);
-        filterSession.addAction(ACTION_CHANGE_SESSION_ON_HOLD);
-        registerReceiver(chatSessionUpdateReceiver, filterSession);
+        LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE, Pair.class).observeForever(sessionsStatusObserver);
+        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
+        LiveEventBus.get(EVENT_REMOTE_AUDIO_LEVEL_CHANGE, Pair.class).observeForever(remoteAudioLevelObserver);
+        LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE, Pair.class).observeForever(remoteAVFlagsObserver);
 
         IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
         registerReceiver(proximitySensorReceiver, filterProximitySensor);
@@ -1075,8 +1071,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             bigRecyclerView.setAdapter(null);
         }
 
-        unregisterReceiver(chatCallUpdateReceiver);
-        unregisterReceiver(chatSessionUpdateReceiver);
+        LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall.class).removeObserver(updateCallObserver);
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+        LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall.class).removeObserver(localAVFlagsObserver);
+        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).removeObserver(callCompositionObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+
+        LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE, Pair.class).removeObserver(sessionsStatusObserver);
+        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).removeObserver(sessionOnHoldObserver);
+        LiveEventBus.get(EVENT_REMOTE_AUDIO_LEVEL_CHANGE, Pair.class).removeObserver(remoteAudioLevelObserver);
+        LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE, Pair.class).removeObserver(remoteAVFlagsObserver);
+
         unregisterReceiver(proximitySensorReceiver);
 
         MediaPlayerService.resumeAudioPlayerIfNotInCall(this);

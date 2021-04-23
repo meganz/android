@@ -35,6 +35,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -1092,49 +1093,24 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		}
 	};
 
-	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-				return;
-
-			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_DESTROYED:
-					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						updateVisibleCallElements(chatIdReceived);
-						break;
-				}
-			}
-
-			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				updateVisibleCallElements(chatIdReceived);
-			}
+	private final Observer<MegaChatCall> callStatusObserver = call -> {
+		int callStatus = call.getStatus();
+		switch (callStatus) {
+			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+			case MegaChatCall.CALL_STATUS_DESTROYED:
+			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+				updateVisibleCallElements(call.getChatid());
+				break;
 		}
 	};
 
-	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
+	private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+		updateVisibleCallElements(call.getChatid());
+	};
 
-			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-				return;
-
-			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				updateVisibleCallElements(chatIdReceived);
-			}
-		}
+	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
+		MegaChatCall call = megaChatApi.getChatCallByCallId((long) sessionAndCall.first);
+		updateVisibleCallElements(call.getChatid());
 	};
 
 	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
@@ -1814,10 +1790,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
-		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
-		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
-		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-		registerReceiver(chatCallUpdateReceiver, filterCall);
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
 
 		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
@@ -4274,8 +4249,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
         }
 		isStorageStatusDialogShown = false;
 
-		unregisterReceiver(chatCallUpdateReceiver);
-		unregisterReceiver(chatSessionUpdateReceiver);
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).removeObserver(sessionOnHoldObserver);
+
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(updateMyAccountReceiver);
