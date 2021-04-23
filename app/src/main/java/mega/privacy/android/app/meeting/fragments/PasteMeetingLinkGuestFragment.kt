@@ -87,6 +87,10 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
             if (AndroidMegaRichLinkMessage.isChatLink(meetingLink)) {
                 // TODO: +Meeting, use open link activity or self logic to process the link?
 //                initMegaChat { checkMeetingLink() }
+                // Need to call the async checkChatLink() to check if the chat has a call and
+                // get the meeting name
+                // Delegate the checking to OpenLinkActivity
+                // If yes, show Join Meeting, If no, show Chat history
                 startOpenLinkActivity()
                 dismiss()
             } else {

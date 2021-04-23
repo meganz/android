@@ -12215,7 +12215,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				}
 
 				String link = request.getLink();
-				if (megaChatApi.getChatCall(request.getChatHandle()) != null) {
+				if (request.getMegaHandleList() != null) {
 					goToJoinMeeting(link, request.getText());
 				} else {
 					showChatLink(link);

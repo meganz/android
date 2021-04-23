@@ -424,7 +424,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 				if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
 						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
-//					if (megaChatApi.getChatCall(request.getChatHandle()) != null) {
+//                    if (request.getMegaHandleList() != null) {
 						goToMeetingActivity(request.getText());
 //					} else {
 						// Normal Chat Link
