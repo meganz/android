@@ -108,11 +108,10 @@ ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_
 ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=33a1e905113f05c3c1eec3b75e0727ca81a551b1
+LIBWEBSOCKETS_VERSION=v4.2-stable
 LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
-LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
+LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/${LIBWEBSOCKETS_VERSION}.zip
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.9.0
@@ -166,6 +165,33 @@ function downloadCheckAndUnpack()
     elif [[ "${FILENAME}" =~ \.zip$ ]]; then
         echo "* Extracting ZIP file..."
     	unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
+    else
+        echo "* Dont know how to extract '${FILENAME}'"
+        exit 1
+    fi
+
+    echo "* Extraction finished"
+}
+
+function downloadAndUnpack()
+{
+    local URL=$1
+    local FILENAME=$2
+    local TARGETPATH=$3
+
+    if [[ -f ${FILENAME} ]]; then
+        echo "* Already downloaded: '${FILENAME}'"
+    else
+        echo "* Downloading '${FILENAME}' ..."
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+    fi
+
+    if [[ "${FILENAME}" =~ \.tar\.[^\.]+$ ]]; then
+        echo "* Extracting TAR file..."
+        tar --overwrite -xf ${FILENAME} -C ${TARGETPATH} &>> ${LOG_FILE}
+    elif [[ "${FILENAME}" =~ \.zip$ ]]; then
+        echo "* Extracting ZIP file..."
+        unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
     else
         echo "* Dont know how to extract '${FILENAME}'"
         exit 1
@@ -417,7 +443,7 @@ echo "* crashlytics is ready"
 
 echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS_SHA1} ${LIBWEBSOCKETS}
+    downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
     ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
 fi
