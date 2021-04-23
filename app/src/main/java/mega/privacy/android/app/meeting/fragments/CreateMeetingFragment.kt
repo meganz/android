@@ -1,8 +1,9 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.MotionEvent.ACTION_DOWN
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -10,10 +11,11 @@ import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatRoom
 import java.util.*
+
 
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
@@ -34,39 +36,67 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
         logDebug("Meeting Name: $meetingName")
         meetingName?.let {
-            Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+            hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
             findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
         }
-
-        // TODO delete test code start: to InMeetingFragment
-        findNavController().navigate(R.id.inMeetingFragment)
-        // TODO delete test code end: to InMeetingFragment
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        type_meeting_edit_text.visibility = View.VISIBLE
-        type_meeting_edit_text.hint = StringResourcesUtils.getString(
-            R.string.type_meeting_name, megaChatApi.myFullname
-        )
         initViewModel()
+        initComponent()
+    }
+
+    /**
+     * Initialize components of UI
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initComponent() {
+        binding.root.setOnTouchListener { v, event ->
+            when (event.action) {
+                ACTION_DOWN -> {
+                    if (v != null) {
+                        if (v != type_meeting_edit_text)
+                            hideKeyboardView(
+                                type_meeting_edit_text.context,
+                                type_meeting_edit_text,
+                                0
+                            )
+                    }
+                }
+            }
+            true
+        }
+        binding.typeMeetingEditText.let {
+            it.visibility = View.VISIBLE
+            it.hint = StringResourcesUtils.getString(
+                R.string.type_meeting_name, megaChatApi.myFullname
+            )
+            showKeyboardDelayed(type_meeting_edit_text)
+            it.setOnFocusChangeListener { v, hasFocus ->
+                run {
+                    if (hasFocus) {
+                        type_meeting_edit_text.setSelection(type_meeting_edit_text.text.length);
+                    } else {
+                        hideKeyboardView(v.context, type_meeting_edit_text, 0)
+                    }
+                }
+            }
+        }
     }
 
     /**
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        binding.let {
-            it.createviewmodel = viewModel
-            if (it.typeMeetingEditText.isVisible) {
-                showKeyboardDelayed(type_meeting_edit_text)
-                // Set default meeting name
-                viewModel.initMeetingName(StringResourcesUtils.getString(
-                    R.string.type_meeting_name, megaChatApi.myFullname
-                ))
-            }
-        }
-
+        binding.createviewmodel = viewModel
+        // Set default meeting name
+        viewModel.initMeetingName(
+            StringResourcesUtils.getString(
+                R.string.type_meeting_name, megaChatApi.myFullname
+            )
+        )
         viewModel.initAppRTCAudioManager()
     }
+
 }

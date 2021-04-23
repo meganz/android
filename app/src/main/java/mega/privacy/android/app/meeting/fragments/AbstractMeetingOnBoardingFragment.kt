@@ -3,8 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,13 +11,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.item_chat_explorer_list.view.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -130,14 +127,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 if (it) {
                     checkMeetingPermissions(
                         arrayOf(Manifest.permission.CAMERA),
-                    ) { showSnackbar() }
+                    ) { showSnackBar() }
                 }
             }
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     checkMeetingPermissions(
                         arrayOf(Manifest.permission.RECORD_AUDIO),
-                    ) { showSnackbar() }
+                    ) { showSnackBar() }
                 }
             }
         }
@@ -146,7 +143,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
      */
-    fun showSnackbar() {
+    fun showSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
@@ -213,7 +210,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun switchCamera(bOn: Boolean) {
         fab_cam.isOn = bOn
-        setViewClickable(fab_cam, false)
+        setViewEnable(fab_cam, false)
         when (bOn) {
             true -> {
                 // Always try to start the call using the front camera
@@ -232,7 +229,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun activateVideo() {
         if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
             logError("Error activating video")
-            setViewClickable(fab_cam, true)
+            setViewEnable(fab_cam, true)
             return
         }
         if (videoListener == null) {
@@ -252,27 +249,35 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
         }
         localSurfaceView.visibility = View.VISIBLE
-        setViewClickable(fab_cam, true, bSync = false)
+        setViewEnable(fab_cam, true, bSync = false)
     }
 
     /**
      * Set the button state
      *
-     * @param bClickable set the view to be able to click or not
+     * @param bEnable set the view to be enable or not
      * @param bSync execute synchronously or asynchronously
      */
-    private fun setViewClickable(view: View, bClickable: Boolean, bSync: Boolean = true){
+    private fun setViewEnable(view: View, bEnable: Boolean, bSync: Boolean = true){
         when {
-            bClickable && bSync -> view.isClickable = true
-            bClickable && !bSync -> {
+            bEnable && bSync -> (view as OnOffFab).enable = true
+            bEnable && !bSync -> {
                 lifecycleScope.launch {
                     delay(1000L)
                     withContext(Dispatchers.Main) {
-                        view.isClickable = true
+                        (view as OnOffFab).enable = true
                     }
                 }
             }
-            !bClickable -> view.isClickable = false
+            !bEnable && bSync -> (view as OnOffFab).enable = false
+            !bEnable && !bSync -> {
+                lifecycleScope.launch {
+                    delay(1000L)
+                    withContext(Dispatchers.Main) {
+                        (view as OnOffFab).enable = false
+                    }
+                }
+            }
         }
     }
 
@@ -282,13 +287,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun deactivateVideo() {
         if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
             logError("Error deactivating video")
-            setViewClickable(fab_cam, true)
+            setViewEnable(fab_cam, true)
             return
         }
         logDebug("Removing surface view")
         localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
-        setViewClickable(fab_cam, true)
+        setViewEnable(fab_cam, true)
     }
 
     /**

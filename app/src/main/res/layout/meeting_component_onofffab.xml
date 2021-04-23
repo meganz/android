@@ -70,6 +70,7 @@
             app:on_background_tint="@color/grey_700"
             app:on_icon="@drawable/ic_video"
             app:on_icon_tint="@color/white"
+            app:disable_icon="@drawable/ic_video_disable"
             app:pressedTranslationZ="12dp"
             tools:ignore="ContentDescription" />
 
