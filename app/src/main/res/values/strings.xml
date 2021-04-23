@@ -3105,4 +3105,12 @@
     <string name="meeting_required_permissions_warning" context="Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.">MEGA needs your permission in order to get the best meeting experience.</string>
     <string name="error_meeting_name_error" context="Message on the EditText of meeting name ">Please input the meeting name.</string>
 
+    <string name="left_meeting" context="Alert the guest you have left MEGA meeting when left meeting">You have left MEGA meeting</string>
+    <string name="keep_track_meeting" context="Ask the guest for keeping track MEGA meeting when left meeting">Do you want to keep track of your MEGA meeting?</string>
+    <string name="end_to_end_encrypted_call" context="the title of e2e encrypted call on left meeting page">End-to-End Encrypted call</string>
+    <string name="invite_with_a_link" context="the title of e2e encrypted call on left meeting page">Invite with a link</string>
+    <string name="join_without_account" context="the title of join without account on left meeting page">Join without an account</string>
+    <string name="use_any_device" context="the title of use any device on left meeting page">Use any device</string>
+    <string name="free_large_group_meeting" context="the subtitle on left meeting page">Free large group meeting</string>
+    <string name="create_mega_account" context="the content of the button that allow user create account">CREATE MEGA ACCOUNT</string>
 </resources>

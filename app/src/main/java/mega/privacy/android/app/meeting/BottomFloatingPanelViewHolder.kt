@@ -20,8 +20,10 @@ import mega.privacy.android.app.utils.Util
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
  *
- * Necessary value
- * Mic, Cam, Speaker state
+ * @property binding InMeetingFragmentBinding, get views from this binding
+ * @property listener listen to the actions of all buttons
+ * @property isGuest the flag for determining if the current user is guest
+ * @property isModerator the flag for determining if the current user is moderator
  */
 class BottomFloatingPanelViewHolder(
     private val binding: InMeetingFragmentBinding,
@@ -48,15 +50,6 @@ class BottomFloatingPanelViewHolder(
 
     private val participantsAdapter = ParticipantsAdapter(listener)
 
-//    private val speakerVH = SpeakerButtonViewHolder(
-//        binding.bottomFloatingPanel.fabSpeaker,
-//        binding.bottomFloatingPanel.fabSpeakerLabel
-//    ) {
-//        updateBottomFloatingPanelIfNeeded()
-//
-//        listener.onChangeAudioDevice(it)
-//    }
-
     init {
         initButtonsState()
         setupBottomSheet()
@@ -74,6 +67,10 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Init the visibility of `ShareLink` & `Invite` Button
+     *
+     */
     private fun initShareAndInviteButton() {
         floatingPanelView.shareLink.isVisible = !isGuest
         floatingPanelView.invite.isVisible = !isGuest
@@ -81,7 +78,7 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Init the state for the buttons on button bar
+     * Init the state for the Mic, Cam and End button on button bar
      */
     private fun initButtonsState() {
         floatingPanelView.fabMic.isOn = savedMicState
@@ -90,6 +87,11 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.fabEnd.setImageResource(R.drawable.ic_remove)
     }
 
+    /**
+     * Init Participants and update the list, and update the text showing participants size
+     *
+     * @param participants newest participant list
+     */
     fun setParticipants(participants: List<Participant>) {
         participantsAdapter.submitList(participants.toMutableList())
 
@@ -98,12 +100,10 @@ class BottomFloatingPanelViewHolder(
         )
     }
 
-//    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) {
-//        speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
-//
-//        updateBottomFloatingPanelIfNeeded()
-//    }
-
+    /**
+     * Set the listener for bottom sheet behavior and property list
+     *
+     */
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -209,6 +209,10 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Init recyclerview
+     *
+     */
     private fun setupRecyclerView() {
         floatingPanelView.participants.apply {
             layoutManager = LinearLayoutManager(context)
@@ -217,6 +221,10 @@ class BottomFloatingPanelViewHolder(
             adapter = participantsAdapter
             addItemDecoration(SimpleDividerItemDecoration(context))
         }
+    }
+
+    fun updatePermission() {
+        isModerator = true
     }
 
     private fun updateBottomFloatingPanelIfNeeded() {

@@ -45,6 +45,7 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun leaveAnyway() {
         Toast.makeText(requireContext(), "Leave anyway", Toast.LENGTH_SHORT).show()
+        requireActivity().finish()
     }
 
     private fun askConfirmationEndMeetingForAll() {

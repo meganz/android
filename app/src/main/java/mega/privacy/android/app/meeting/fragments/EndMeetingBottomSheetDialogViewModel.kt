@@ -25,8 +25,11 @@ class EndMeetingBottomSheetDialogViewModel : ViewModel() {
     private val _clickEvent = MutableLiveData<Int>()
     var clickEvent: LiveData<Int> = _clickEvent
 
+    /**
+     * For now, only have assign mode, but will keep the code prevent the UI changing
+     */
     init {
-        _currentMode.postValue(LEAVE_CHOOSE_MODE)
+        _currentMode.postValue(ASSIGN_MODE)
     }
 
     fun leaveMeetingOrAssignModerator() {

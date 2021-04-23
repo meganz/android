@@ -146,4 +146,10 @@
         <attr name="off_background_tint" format="color" />
         <attr name="disable_icon" format="reference" />
     </declare-styleable>
+
+    <declare-styleable name="LeftMeetingItem">
+        <attr name="item_icon" format="reference"/>
+        <attr name="title" format="string"/>
+        <attr name="subTitle" format="string"/>
+    </declare-styleable>
 </resources>

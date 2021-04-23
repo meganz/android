@@ -53,9 +53,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
+                android:show="@{!viewModel.isGuest}"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
-                android:show="@{!viewModel.isGuest}"
                 tools:text="vf@mega.co.nz" />
         </LinearLayout>
 
@@ -73,8 +73,8 @@
         <TextView
             android:id="@+id/add_contact"
             style="@style/BottomSheetItem"
-            android:text="@string/menu_add_contact"
             android:show="@{viewModel.showAddContact()}"
+            android:text="@string/menu_add_contact"
             app:drawableStartCompat="@drawable/ic_g_add_contact"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider_info" />
@@ -82,8 +82,8 @@
         <TextView
             android:id="@+id/contact_info"
             style="@style/BottomSheetItem"
-            android:text="@{viewModel.getContactItemText()}"
             android:show="@{viewModel.showContactInfoOrEditProfile()}"
+            android:text="@{viewModel.getContactItemText()}"
             app:drawableStartCompat="@drawable/info_ic"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider_info" />
@@ -92,25 +92,25 @@
             android:id="@+id/divider_contact_info"
             style="@style/BottomSheetItemDivider"
             android:layout_marginTop="@dimen/bottom_sheet_item_height"
+            android:show="@{viewModel.showDividerContactInfo()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider_info" />
 
         <TextView
             android:id="@+id/send_message"
             style="@style/BottomSheetItem"
-            android:text="@string/context_send_message"
             android:show="@{viewModel.showSendMessage()}"
+            android:text="@string/context_send_message"
             app:drawableStartCompat="@drawable/ic_chat"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider_contact_info"/>
+            app:layout_constraintTop_toBottomOf="@id/divider_contact_info" />
 
         <View
             android:id="@+id/divider_send_message"
             style="@style/BottomSheetItemDivider"
-            android:show="@{viewModel.showSendMessage()}"
+            android:hide="@{viewModel.showSendMessage()}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/send_message"
-            tools:visibility="gone" />
+            app:layout_constraintTop_toBottomOf="@id/send_message" />
 
         <TextView
             android:id="@+id/ping_to_speaker"
@@ -130,8 +130,8 @@
         <TextView
             android:id="@+id/make_moderator"
             style="@style/BottomSheetItem"
-            android:text="@string/make_moderator"
             android:show="@{viewModel.showMakeModeratorItem()}"
+            android:text="@string/make_moderator"
             app:drawableStartCompat="@drawable/ic_moderator"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider_ping_to_speaker" />
@@ -146,9 +146,9 @@
         <TextView
             android:id="@+id/remove_participant"
             style="@style/BottomSheetItem"
+            android:show="@{viewModel.showRemoveItem()}"
             android:text="@string/remove_participant"
             android:textColor="@color/red_600_red_300"
-            android:show="@{viewModel.showRemoveItem()}"
             app:drawableStartCompat="@drawable/ic_move"
             app:drawableTint="@color/red_600_red_300"
             app:layout_constraintStart_toStartOf="parent"

@@ -37,4 +37,13 @@ object BindingAdapterMethods {
     fun isVisible(view: View, show: Boolean) {
         view.visibility = if (show) View.VISIBLE else View.GONE
     }
+
+    /**
+     * Determine if the item should visible
+     */
+    @JvmStatic
+    @BindingAdapter("android:hide")
+    fun isHidden(view: View, hide: Boolean) {
+        view.visibility = if (!hide) View.INVISIBLE else View.VISIBLE
+    }
 }

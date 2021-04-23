@@ -503,6 +503,10 @@
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize"/>
 
+        <activity android:name=".meeting.activity.LeftMeetingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >

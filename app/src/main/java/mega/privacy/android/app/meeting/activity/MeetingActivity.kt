@@ -1,9 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
@@ -18,12 +15,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.listeners.InviteToChatRoomListener
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.IncomingCallNotification
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.LogUtil
 
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -58,9 +55,6 @@ class MeetingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // FIXME: The Notification is responsible for its disappearance, not MeetingActivity's duty
-        IncomingCallNotification.cancelIncomingCallNotification(this)
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -163,5 +157,24 @@ class MeetingActivity : BaseActivity() {
         val navHostFragment: Fragment? =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
         return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        LogUtil.logDebug("Result Code: $resultCode")
+        if (intent == null) {
+            LogUtil.logWarning("Intent is null")
+            return
+        }
+        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+            LogUtil.logDebug("Participants successfully added")
+            val contactsData: List<String>? =
+                intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+            if (contactsData != null) {
+//                InviteToChatRoomListener(this).inviteToChat(chatHandle, contactsData)
+            }
+        } else {
+            LogUtil.logError("Error adding participants")
+        }
+        super.onActivityResult(requestCode, resultCode, intent)
     }
 }

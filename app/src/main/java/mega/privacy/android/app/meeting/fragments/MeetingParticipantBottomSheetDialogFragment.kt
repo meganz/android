@@ -162,14 +162,11 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      *
      */
     private fun onRemoveParticipant() {
-        Toast.makeText(requireContext(), "onRemoveParticipant", Toast.LENGTH_SHORT).show()
-
-//        val name: String = chatC.getParticipantFullName(handle)
         MaterialAlertDialogBuilder(
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).apply {
-            setMessage(resources.getString(R.string.confirmation_remove_chat_contact, "name"))
+            setMessage(resources.getString(R.string.confirmation_remove_chat_contact, participantItem.name))
             setPositiveButton(R.string.general_remove) { _, _ -> removeParticipant() }
             setNegativeButton(R.string.general_cancel, null)
             show()
@@ -179,7 +176,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     private fun removeParticipant() {
 //        chatC.removeParticipant(chatHandle, selectedHandleParticipant)
     }
-
 
     /**
      * Open edit profile page

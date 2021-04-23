@@ -26,6 +26,7 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -255,7 +256,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             updateAudio(it)
         }
-
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
             updateVideo(it)
         }
@@ -310,13 +310,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         MegaApplication.getInstance().createRTCAudioManagerWhenCreatingMeeting()
 
         bottomFloatingPanelViewHolder =
-            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator).apply {
-                // Create a repository get the participants
-//                onHeadphoneConnected(
-//                    MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
-//                    MegaApplication.getInstance().audioManager.isBluetoothConnected
-//                )
-            }
+            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
         bottomFloatingPanelViewHolder.collapse()
 
         /**
@@ -407,7 +401,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     }
 
     private fun leaveMeeting() {
-        inMeetingViewModel.leaveMeeting()
+        if (isGuest) {
+            meetingActivity.startActivity(Intent(meetingActivity, LeftMeetingActivity::class.java))
+            meetingActivity.finish()
+        } else {
+            inMeetingViewModel.leaveMeeting()
+        }
     }
 
 
@@ -438,13 +437,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         logDebug("chooseAddContactDialog")
 
         val inviteParticipantIntent =
-            Intent(requireActivity(), AddContactActivityLollipop::class.java).apply {
+            Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
                 putExtra("contactType", Constants.CONTACT_TYPE_MEGA)
                 putExtra("chat", true)
                 putExtra("chatId", 123L)
                 putExtra("aBtitle", getString(R.string.invite_participants))
             }
-        startActivityForResult(
+        meetingActivity.startActivityForResult(
             inviteParticipantIntent, Constants.REQUEST_ADD_PARTICIPANTS
         )
     }

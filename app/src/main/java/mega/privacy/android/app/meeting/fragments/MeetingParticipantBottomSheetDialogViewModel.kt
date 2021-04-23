@@ -43,6 +43,8 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
         !isGuest && (participant?.isContact == true || participant?.isMe == true)
 
 
+    fun showDividerContactInfo(): Boolean = showAddContact() || showContactInfoOrEditProfile()
+
     /**
      * Determine if show the `Edit Profile` item
      *
