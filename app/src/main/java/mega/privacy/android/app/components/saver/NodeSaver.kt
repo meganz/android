@@ -312,7 +312,7 @@ class NodeSaver(
                 )
 
                 voiceClipSaving.doDownload(
-                    megaApi, megaApiFolder, parentPath, false, null, snackbarShower
+                    megaApi, megaApiFolder, parentPath, false, null, null
                 )
             })
             .subscribeOn(Schedulers.io())
