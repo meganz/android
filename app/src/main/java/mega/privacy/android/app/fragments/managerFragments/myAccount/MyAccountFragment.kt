@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -17,16 +18,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
-import mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile.EditProfileActivity
+import mega.privacy.android.app.listeners.GetUserDataListener
+import mega.privacy.android.app.listeners.ResetPhoneNumberListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
-import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
+import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -34,23 +39,29 @@ import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.TimeUtils.formatDate
-import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
-import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiJava.*
+import mega.privacy.android.app.utils.Util.*
+import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED
+import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
 import java.io.File
 
 @AndroidEntryPoint
-class MyAccountFragment : BaseFragment(), Scrollable {
+class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
 
     companion object {
         private const val ANIMATION_DURATION = 200L
         private const val ANIMATION_DELAY = 500L
+        private const val PHONE_NUMBER_CHANGE_DELAY = 3000L
 
         @JvmStatic
         fun newInstance(): MyAccountFragment {
@@ -65,6 +76,9 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     private var phoneNumberBottomSheet: PhoneNumberBottomSheetDialogFragment? = null
 
     private var gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
+
+    private var isModify = false
+    private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -516,6 +530,72 @@ class MyAccountFragment : BaseFragment(), Scrollable {
     }
 
     fun updateAddPhoneNumberLabel() {
+        runDelay(PHONE_NUMBER_CHANGE_DELAY) {
+            //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
+            val registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber()
+            LogUtil.logDebug("updateAddPhoneNumberLabel $registeredPhoneNumber")
 
+            binding.phoneText.apply {
+                if (!isTextEmpty(registeredPhoneNumber)) {
+                    isVisible = true
+                    text = registeredPhoneNumber
+                } else {
+                    isVisible = false
+                }
+            }
+        }
+    }
+
+    override fun showConfirmation(isModify: Boolean) {
+        this.isModify = isModify
+        removeOrModifyPhoneNumberDialog =
+            showRemoveOrModifyPhoneNumberConfirmDialog(context, isModify, this)
+    }
+
+    override fun reset() {
+        megaApi.resetSmsVerifiedPhoneNumber(ResetPhoneNumberListener(context, this))
+    }
+
+    override fun onReset(error: MegaError) {        /*
+          Reset phone number successfully or the account has reset the phone number,
+          but user data hasn't refreshed successfully need to refresh user data again.
+        */
+        if (error.errorCode == MegaError.API_OK || error.errorCode == MegaError.API_ENOENT) {
+            // Have to getUserData to refresh, otherwise, phone number remains previous value.
+            megaApi.getUserData(GetUserDataListener(context, this))
+        } else {
+            binding.phoneText.isClickable = true
+            showSnackbar(context, getString(R.string.remove_phone_number_fail))
+            logWarning("Reset phone number failed: " + getTranslatedErrorString(error))
+        }
+    }
+
+    override fun onUserDataUpdate(error: MegaError) {
+        binding.phoneText.isClickable = true
+
+        if (error.errorCode == MegaError.API_OK) {
+            if (canVoluntaryVerifyPhoneNumber()) {
+                binding.phoneText.text =
+                    StringResourcesUtils.getString(R.string.add_phone_number_label)
+                binding.phoneText.isVisible = true
+
+                if (context is ManagerActivityLollipop) {
+                    (context as ManagerActivityLollipop).showAddPhoneNumberInMenu();
+                }
+
+                if (isModify) {
+                    startActivity(Intent(context, SMSVerificationActivity::class.java))
+                } else {
+                    showSnackbar(context, getString(R.string.remove_phone_number_success))
+                }
+            }
+        } else {
+            showSnackbar(context, getString(R.string.remove_phone_number_fail));
+            logWarning(
+                "Get user data for updating phone number failed: " + getTranslatedErrorString(
+                    error
+                )
+            )
+        }
     }
 }

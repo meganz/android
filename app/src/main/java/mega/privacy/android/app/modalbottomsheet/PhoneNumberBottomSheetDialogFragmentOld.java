@@ -11,7 +11,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 
-public class PhoneNumberBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+public class PhoneNumberBottomSheetDialogFragmentOld extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MyAccountFragmentLollipop myAccountFragment;
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 
@@ -12,9 +13,9 @@ import nz.mega.sdk.MegaRequest
 
 class GetUserDataListener(context: Context?) : BaseListener(context) {
 
-    private var callback: OnUserDataUpdateCallback? = null
+    private var callback: PhoneNumberCallback? = null
 
-    constructor(context: Context?, callback: OnUserDataUpdateCallback) : this(context) {
+    constructor(context: Context?, callback: PhoneNumberCallback) : this(context) {
         this.callback = callback
     }
 
@@ -31,9 +32,5 @@ class GetUserDataListener(context: Context?) : BaseListener(context) {
         } else {
             LogUtil.logError("Error getting user data: " + e.errorString)
         }
-    }
-
-    interface OnUserDataUpdateCallback {
-        fun onUserDataUpdate(e: MegaError?)
     }
 }

@@ -134,6 +134,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -611,8 +612,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public boolean isSmallGridCameraUploads = false;
-
-	public boolean passwordReminderFromMyAccount = false;
 
 	public boolean isList = true;
 
@@ -1549,9 +1548,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}else {
 			textsearchQuery = false;
 		}
-		if (passwordReminderFromMyAccount){
-			outState.putBoolean("passwordReminderFromMyAccount", true);
-		}
+
 		if (turnOnNotifications){
 			outState.putBoolean("turnOnNotifications", turnOnNotifications);
 		}
@@ -1675,7 +1672,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
-			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
 			verify2FADialogIsShown = savedInstanceState.getBoolean("verify2FADialogIsShown", false);
@@ -2920,7 +2916,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		megaApi.shouldShowPasswordReminderDialog(false, this);
+		megaApi.shouldShowPasswordReminderDialog(false,
+				new ShouldShowPasswordReminderDialogListener(this, false));
 
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
@@ -7109,8 +7106,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 	        case R.id.action_menu_logout:{
 				logDebug("Action menu logout pressed");
-				passwordReminderFromMyAccount = true;
-				megaApi.shouldShowPasswordReminderDialog(true, this);
+				megaApi.shouldShowPasswordReminderDialog(true,
+						new ShouldShowPasswordReminderDialogListener(this, true));
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
@@ -12048,26 +12045,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
-				//Listener from logout menu
-				logDebug("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
-				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
-					logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
-					if (request.getFlag()){
-						Intent intent = new Intent(this, TestPasswordActivity.class);
-						intent.putExtra("logout", getPasswordReminderFromMyAccount());
-						startActivity(intent);
-					}
-					else if (getPasswordReminderFromMyAccount()){
-						if (aC == null){
-							aC = new AccountController(this);
-						}
-						aC.logout(this, megaApi);
-					}
-				}
-				setPasswordReminderFromMyAccount(false);
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
+			if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
 				logDebug("Request avatar");
 				if (e.getErrorCode() == MegaError.API_OK){
 					setProfileAvatar();
@@ -14115,14 +14093,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			return Character.toUpperCase(first) + s.substring(1);
 		}
-	}
-
-	public boolean getPasswordReminderFromMyAccount() {
-		return passwordReminderFromMyAccount;
-	}
-
-	public void setPasswordReminderFromMyAccount(boolean passwordReminderFromMyAccount) {
-		this.passwordReminderFromMyAccount = passwordReminderFromMyAccount;
 	}
 
 	public void refreshMenu(){

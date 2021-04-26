@@ -2,6 +2,9 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import org.jetbrains.annotations.NotNull;
+
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -13,23 +16,19 @@ import nz.mega.sdk.MegaRequest;
  */
 public class ResetPhoneNumberListener extends BaseListener {
 
-    private OnResetPhoneNumberCallback callback;
+    private PhoneNumberCallback callback;
 
-    public ResetPhoneNumberListener(Context context, OnResetPhoneNumberCallback callback) {
+    public ResetPhoneNumberListener(Context context, PhoneNumberCallback callback) {
         super(context);
         this.callback = callback;
     }
 
     @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestFinish(@NotNull MegaApiJava api, MegaRequest request, @NotNull MegaError e) {
         if (request.getType() != MegaRequest.TYPE_RESET_SMS_VERIFIED_NUMBER) return;
+
         if (callback != null) {
-            callback.onResetPhoneNumber(e);
+            callback.onReset(e);
         }
-    }
-
-    public interface OnResetPhoneNumberCallback {
-
-        void onResetPhoneNumber(MegaError e);
     }
 }

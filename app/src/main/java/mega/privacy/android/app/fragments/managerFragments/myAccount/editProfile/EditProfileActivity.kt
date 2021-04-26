@@ -6,17 +6,23 @@ import android.graphics.*
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.SMSVerificationActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
+import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -27,11 +33,14 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaError
 import java.util.*
 
-class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback {
+class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
+    PhoneNumberCallback {
 
     companion object {
         private const val PADDING_BOTTOM_APP_BAR = 19F
@@ -39,6 +48,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val NAME_SIZE = 16F
         private const val EMAIL_SIZE = 12F
         private const val PADDING_LEFT_STATE = 8F
+
+        private const val REMOVE_OR_MODIFY_PHONE_SHOWN = "REMOVE_OR_MODIFY_PHONE_SHOWN"
+        private const val IS_MODIFY = "IS_MODIFY"
     }
 
     private val viewModel by viewModels<EditProfileViewModel>()
@@ -51,6 +63,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     private var photoBottomSheet: PhotoBottomSheetDialogFragment? = null
 
+    private var phoneNumberBottomSheetOld: PhoneNumberBottomSheetDialogFragment? = null
+
+    private var isModify = false
+    private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,6 +75,29 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setContentView(binding.root)
 
         setUpView()
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, false)) {
+                showConfirmation(savedInstanceState.getBoolean(IS_MODIFY, false))
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (isRemoveOrModifyDialogShowing()) {
+            outState.putBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, true)
+            outState.putBoolean(IS_MODIFY, isModify)
+        }
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isRemoveOrModifyDialogShowing()) {
+            removeOrModifyPhoneNumberDialog?.dismiss()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -94,7 +134,15 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.addPhoneNumber.apply {
-
+            if (canVoluntaryVerifyPhoneNumber()) {
+                startActivity(Intent(context, SMSVerificationActivity::class.java))
+            } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
+                phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
+                phoneNumberBottomSheetOld!!.show(
+                    supportFragmentManager,
+                    phoneNumberBottomSheetOld!!.tag
+                )
+            }
         }
 
         binding.recoveryKeyLayout.setOnClickListener {
@@ -250,5 +298,27 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 AccountController(this).removeAvatar()
             }
             .setNegativeButton(R.string.general_cancel, null).show()
+    }
+
+    private fun isRemoveOrModifyDialogShowing(): Boolean {
+        return removeOrModifyPhoneNumberDialog != null && removeOrModifyPhoneNumberDialog?.isShowing == true
+    }
+
+    override fun showConfirmation(isModify: Boolean) {
+        this.isModify = isModify
+        removeOrModifyPhoneNumberDialog =
+            showRemoveOrModifyPhoneNumberConfirmDialog(this, isModify, this)
+    }
+
+    override fun reset() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onReset(error: MegaError) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onUserDataUpdate(error: MegaError) {
+        TODO("Not yet implemented")
     }
 }

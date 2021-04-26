@@ -7,12 +7,14 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
@@ -172,5 +174,35 @@ object AlertsAndWarnings {
                 .create()
                 .show()
         }
+    }
+
+    @JvmStatic
+    fun showRemoveOrModifyPhoneNumberConfirmDialog(
+        context: Context,
+        isModify: Boolean,
+        phoneNumberCallback: PhoneNumberCallback
+    ): AlertDialog {
+        val title = getString(
+            if (isModify) R.string.title_modify_phone_number
+            else R.string.title_remove_phone_number
+        )
+
+        val message = getString(
+            if (isModify) R.string.modify_phone_number_message
+            else R.string.remove_phone_number_message
+        )
+
+        return MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(R.string.general_ok) { _, _ ->
+                if (isModify) {
+                    phoneNumberCallback.modify()
+                } else {
+                    phoneNumberCallback.reset()
+                }
+            }
+            .setNegativeButton(getString(R.string.general_cancel), null)
+            .show()
     }
 }

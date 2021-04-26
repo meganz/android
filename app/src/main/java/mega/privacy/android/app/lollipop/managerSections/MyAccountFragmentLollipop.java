@@ -54,8 +54,6 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.GetUserDataListener;
-import mega.privacy.android.app.listeners.ResetPhoneNumberListener;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -63,7 +61,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
-import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -86,7 +84,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, GetUserDataListener.OnUserDataUpdateCallback, ResetPhoneNumberListener.OnResetPhoneNumberCallback {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -610,7 +608,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				logDebug("Logout button");
-				((ManagerActivityLollipop) context).setPasswordReminderFromMyAccount(true);
 				megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop) context);
 				break;
 			}
@@ -754,7 +751,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     }
 
     private void resetPhoneNumber() {
-        megaApi.resetSmsVerifiedPhoneNumber(new ResetPhoneNumberListener(context, this));
+//        megaApi.resetSmsVerifiedPhoneNumber(new ResetPhoneNumberListener(context, this));
     }
 
     @Override
@@ -965,7 +962,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-    @Override
     public void onUserDataUpdate(MegaError e) {
         addPhoneNumber.setClickable(true);
         if (e.getErrorCode() == MegaError.API_OK) {
@@ -987,7 +983,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         }
     }
 
-    @Override
     public void onResetPhoneNumber(MegaError e) {
         /*
           Reset phone number successfully or the account has reset the phone number,
@@ -995,7 +990,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         */
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             // Have to getUserData to refresh, otherwise, phone number remains previous value.
-            megaApi.getUserData(new GetUserDataListener(context, this));
+//            megaApi.getUserData(new GetUserDataListener(context, this));
         } else {
             addPhoneNumber.setClickable(true);
             showSnackbar(context, getString(R.string.remove_phone_number_fail));
