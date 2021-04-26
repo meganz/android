@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -107,7 +108,9 @@ object MegaNodeUtil {
     @JvmStatic
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean {
         return if (isNodeTakenDown(node)) {
-            Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+            RunOnUIThreadUtils.post {
+                Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+            }
             true
         } else {
             false
@@ -155,14 +158,31 @@ object MegaNodeUtil {
     /**
      *
      * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
      *
-     * @param context   current Context.
-     * @param node      node to share.
+     * @param context Current Context.
+     * @param node    Node to share.
      */
     @JvmStatic
     fun shareNode(context: Context, node: MegaNode) {
+        shareNode(context, node, null)
+    }
+
+    /**
+     *
+     * Shares a node.
+     * If the node is a folder creates and/or shares the folder link.
+     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
+     *
+     * @param context                  Current Context.
+     * @param node                     Node to share.
+     * @param onExportFinishedListener Listener to manage the result of export request.
+     */
+    @JvmStatic
+    fun shareNode(
+        context: Context,
+        node: MegaNode,
+        onExportFinishedListener: ExportListener.OnExportFinishedListener?
+    ) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             val path = getLocalFile(context, node.name, node.size)
 
@@ -172,7 +192,8 @@ object MegaNodeUtil {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
                 MegaApplication.getInstance().megaApi.exportNode(
-                    node, ExportListener(context, ACTION_SHARE_NODE, Intent(Intent.ACTION_SEND))
+                    node,
+                    ExportListener(context, Intent(Intent.ACTION_SEND), onExportFinishedListener)
                 )
             }
         }
@@ -260,9 +281,8 @@ object MegaNodeUtil {
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
-        val exportListener = ExportListener(
-            context, ACTION_SHARE_NODE, notExportedNodes, links, Intent(Intent.ACTION_SEND)
-        )
+        val exportListener =
+            ExportListener(context, notExportedNodes, links, Intent(Intent.ACTION_SEND))
 
         for (node in nodes) {
             if (!node.isExported) {
@@ -1474,5 +1494,45 @@ object MegaNodeUtil {
             getSizeString(node.size),
             formatLongDateTime(node.modificationTime)
         )
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
+        manageTextFileIntent(context, node, adapterType, null)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     * @param urlFileLink Link of the file if the adapter is FILE_LINK_ADAPTER.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(
+        context: Context,
+        node: MegaNode,
+        adapterType: Int,
+        urlFileLink: String?
+    ) {
+        val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
+
+        if (adapterType == FILE_LINK_ADAPTER) {
+            textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
+            textFileIntent.putExtra(URL_FILE_LINK, urlFileLink)
+        } else {
+            textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        }
+
+        textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+        context.startActivity(textFileIntent)
     }
 }
