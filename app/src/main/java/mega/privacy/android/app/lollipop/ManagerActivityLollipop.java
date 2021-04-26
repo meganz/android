@@ -8881,7 +8881,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			});
 			openLinkDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) ->
 					dismissOpenLinkDialog());
-		}catch (Exception e){}
+			openLinkDialog.setOnKeyListener((dialog, keyCode, event) -> {
+				if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+					dismissOpenLinkDialog();
+				}
+				return true;
+			});
+		} catch (Exception e) {
+		}
 	}
 
 	public void showChatLink(String link) {
