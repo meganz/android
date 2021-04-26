@@ -17,7 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
-import mega.privacy.android.app.activities.editProfile.EditProfileActivity
+import mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment

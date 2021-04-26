@@ -1,7 +1,8 @@
-package mega.privacy.android.app.activities.editProfile
+package mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -11,6 +12,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.MyAccountInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
@@ -75,6 +77,16 @@ class EditProfileViewModel @ViewModelInject constructor(
         intent.action = Intent.ACTION_GET_CONTENT
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.type = "image/*";
-        activity.startActivityForResult(Intent.createChooser(intent, null), CHOOSE_PICTURE_PROFILE_CODE)
+        activity.startActivityForResult(
+            Intent.createChooser(intent, null),
+            CHOOSE_PICTURE_PROFILE_CODE
+        )
+    }
+
+    fun logout(context: Context) {
+        megaApi.shouldShowPasswordReminderDialog(
+            true,
+            ShouldShowPasswordReminderDialogListener(context, true)
+        )
     }
 }

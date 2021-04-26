@@ -629,7 +629,7 @@
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
         <activity
-            android:name=".activities.editProfile.EditProfileActivity"
+            android:name="mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile.EditProfileActivity"
             android:launchMode="singleTop" />
 
     </application>

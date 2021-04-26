@@ -1,5 +1,6 @@
-package mega.privacy.android.app.activities.editProfile
+package mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.os.Bundle
@@ -12,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
@@ -76,7 +78,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.addPhoto.setOnClickListener {
-
             if (ModalBottomSheetUtil.isBottomSheetDialogShown(photoBottomSheet))
                 return@setOnClickListener
 
@@ -89,7 +90,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.changePassword.setOnClickListener {
-
+            startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
         }
 
         binding.addPhoneNumber.apply {
@@ -101,7 +102,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.logoutButton.setOnClickListener {
-
+            viewModel.logout(this@EditProfileActivity)
         }
     }
 
@@ -116,10 +117,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             applicationContext,
             R.drawable.ic_arrow_back_white
         )
-
-        val contactStateIcon =
-            if (Util.isDarkMode(this)) R.drawable.ic_offline_dark_standard
-            else R.drawable.ic_offline_light
 
         drawableArrow = drawableArrow?.mutate()
 

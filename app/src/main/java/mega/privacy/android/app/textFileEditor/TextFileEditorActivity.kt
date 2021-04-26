@@ -27,7 +27,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.NON_UPDATE_FINISH_ACTION
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.SUCCESS_FINISH_ACTION
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
