@@ -14,8 +14,4 @@ class CreateMeetingViewModel @ViewModelInject constructor(
     fun initMeetingName(meetName: String) {
         meetingName.value = meetName
     }
-
-    fun initAppRTCAudioManager() {
-        MegaApplication.getInstance().createRTCAudioManagerWhenCreatingMeeting()
-    }
 }

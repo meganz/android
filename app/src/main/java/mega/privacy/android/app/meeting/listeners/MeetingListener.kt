@@ -1,4 +1,4 @@
-package mega.privacy.android.app.listeners
+package mega.privacy.android.app.meeting.listeners
 
 import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus

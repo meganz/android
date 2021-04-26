@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,7 +15,6 @@ import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
@@ -27,11 +25,12 @@ import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
-import kotlin.random.Random
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
@@ -47,6 +46,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
     private var lastTouch: Long = 0
+    private var chatId: Long = MEGACHAT_INVALID_HANDLE
 
     private var previousY = -1f
 
@@ -59,6 +59,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      */
     private var isGuest = false
     private var isModerator = true
+    private var isOneToOneChat = false
 
     private lateinit var binding: InMeetingFragmentBinding
 
@@ -134,6 +135,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         toolbar.title = "Joanna's meeting"
         toolbar.subtitle = "Calling.."
         // TODO test code end
+
+        chatId = arguments?.getLong(MEETING_CHAT_ID)!!
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
+            val chatRoom = megaChatApi.getChatRoom(chatId)
+            if(chatRoom != null){
+                isOneToOneChat = !chatRoom.isGroup
+            }
+        }
 
         view.setOnClickListener {
             onPageClick()
@@ -253,6 +262,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Init Share View Model
      */
     private fun initShareViewModel() {
+
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             updateAudio(it)
         }
@@ -264,16 +274,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             updateSpeaker(it)
         }
 
-//        sharedModel.eventLiveData.observe(viewLifecycleOwner) {
-//            when (it) {
-//                HEAD_PHONE_EVENT -> {
-//                    bottomFloatingPanelViewHolder.onHeadphoneConnected(
-//                        MegaApplication.getInstance().audioManager.isWiredHeadsetConnected,
-//                        MegaApplication.getInstance().audioManager.isBluetoothConnected
-//                    )
-//                }
-//            }
-//        }
+
         /**
          * Will Change after Andy modify the permission structure
          */
@@ -307,8 +308,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Init Floating Panel, will move to `inMeetingFragment` later
      */
     private fun initFloatingPanel() {
-        MegaApplication.getInstance().createRTCAudioManagerWhenCreatingMeeting()
-
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
         bottomFloatingPanelViewHolder.collapse()
@@ -373,7 +372,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-        if (isModerator) {
+        if (isOneToOneChat) {
+            leaveMeeting()
+        } else if (isModerator) {
             val endMeetingBottomSheetDialogFragment =
                 EndMeetingBottomSheetDialogFragment.newInstance()
             endMeetingBottomSheetDialogFragment.show(
@@ -401,11 +402,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     }
 
     private fun leaveMeeting() {
-        if (isGuest) {
+        if (isGuest && !isOneToOneChat) {
             meetingActivity.startActivity(Intent(meetingActivity, LeftMeetingActivity::class.java))
             meetingActivity.finish()
         } else {
-            inMeetingViewModel.leaveMeeting()
+            inMeetingViewModel.leaveMeeting(chatId)
+            meetingActivity.finish()
         }
     }
 

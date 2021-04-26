@@ -9,12 +9,15 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NETWORK_CHANGE
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util.showSnackbar
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 
@@ -23,8 +26,6 @@ import nz.mega.sdk.MegaChatRequest
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  */
-
-const val HEAD_PHONE_EVENT = 0
 
 class MeetingActivityViewModel @ViewModelInject constructor(
     private val meetingActivityRepository: MeetingActivityRepository
@@ -40,7 +41,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         MutableLiveData<Boolean>().apply { value = false }
     private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
         MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
-            value = MegaApplication.getInstance().audioManager!!.selectedAudioDevice
+            if (MegaApplication.getInstance().audioManager == null) {
+                value = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+            } else {
+                value = MegaApplication.getInstance().audioManager!!.selectedAudioDevice
+            }
         }
 
     val micLiveData: LiveData<Boolean> = _micLiveData
@@ -205,8 +210,4 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
         recordAudioGranted = recordAudioPermission
     }
-
-//    fun sendHeadPhoneEvent() {
-//        _eventLiveData.postValue(HEAD_PHONE_EVENT)
-//    }
 }

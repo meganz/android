@@ -1,10 +1,11 @@
-package mega.privacy.android.app.listeners
+package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -38,9 +39,7 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
 
         if (e.errorCode == MegaError.API_OK) {
             logDebug("Call started")
-            val call: MegaChatCall = api.getChatCall(request.chatHandle)
-            MegaApplication.setRequestSentCall(call.callId, true)
-            callback?.OnCallStarted()
+            callback?.onCallStarted()
         } else {
             logError("Error Starting call")
             snackbarShower?.showSnackbar(getString(R.string.call_error))
@@ -48,6 +47,6 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnCallStartedCallback {
-        fun OnCallStarted()
+        fun onCallStarted()
     }
 }

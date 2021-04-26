@@ -27,7 +27,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     var chats = ArrayList<MegaChatRoom>()
 
     override fun onMeetingButtonClick() {
-
         meetingName = viewModel.meetingName.value
         if (meetingName.isNullOrEmpty()) {
             type_meeting_edit_text.error =
@@ -96,7 +95,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
                 R.string.type_meeting_name, megaChatApi.myFullname
             )
         )
-        viewModel.initAppRTCAudioManager()
     }
 
 }

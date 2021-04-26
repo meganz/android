@@ -60,6 +60,8 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -88,7 +90,7 @@ import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback, HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback {
 
     final private static int MIN_PEERS_LIST = 7;
     final private static int ARROW_ANIMATION = 250;
@@ -1117,46 +1119,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("Type: " + request.getType());
-
-        if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
-            if (getCall() == null)
-                return;
-
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Call hung up");
-                if(request.getChatHandle() == callChat.getCallId()){
-                    app.setSpeakerStatus(callChat.getChatid(), false);
-                    finishActivity();
-                }else{
-                    app.setSpeakerStatus(callChat.getChatid(), answerWithVideo);
-                    megaChatApi.answerChatCall(chatId, answerWithVideo, true, ChatCallActivity.this);
-                    clearAnimations();
-                }
-            } else {
-                logError("Error when hanging up the call, "+e.getErrorCode());
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
-
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                if (request.getFlag() == true) {
-                    logDebug("Ok answer with video");
-                } else {
-                    logDebug("Ok answer with NO video - ");
-                }
-
-                updateLocalAV();
-            } else {
-                logWarning("Error call: " + e.getErrorString());
-
-                if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
-                    showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
-                } else {
-                    if (getCall() == null) return;
-                    app.setSpeakerStatus(callChat.getChatid(), false);
-                    finishActivity();
-                }
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL) {
+       if (request.getType() == MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL) {
 
             if (e.getErrorCode() != MegaChatError.ERROR_OK) {
                 logWarning("Error changing audio or video: " + e.getErrorString());
@@ -1336,7 +1299,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if(getCall() == null)
                     break;
 
-                megaChatApi.hangChatCall(callChat.getCallId(), this);
+                megaChatApi.hangChatCall(callChat.getCallId(), new HangChatCallListener(this, this));
                 sendSignalPresence();
                 break;
 
@@ -2152,12 +2115,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         long chatIdOfCallActive = existsAnotherCall(chatId);
         if(chatIdOfCallActive == chatId) {
             app.setSpeakerStatus(callChat.getChatid(), isVideoCall);
-            megaChatApi.answerChatCall(chatId, isVideoCall, true, this);
+            megaChatApi.answerChatCall(chatId, isVideoCall, true, new AnswerChatCallListener(this, this));
             clearAnimations();
         }else{
             chatIdToHang = chatIdOfCallActive;
             answerWithVideo = isVideoCall;
-            megaChatApi.hangChatCall(chatIdOfCallActive, this);
+            MegaChatCall callActive = megaChatApi.getChatCall(chatIdOfCallActive);
+            if(callActive != null) {
+                megaChatApi.hangChatCall(callActive.getCallId(), new HangChatCallListener(this, this));
+            }
         }
     }
 
@@ -3131,6 +3097,43 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
+        }
+    }
+
+    @Override
+    public void onCallHungUp(long chatId) {
+        if (getCall() == null)
+            return;
+        logDebug("Call hung up");
+        if (chatId == callChat.getChatid()) {
+            MegaApplication.setSpeakerStatus(callChat.getChatid(), false);
+            finishActivity();
+        } else {
+            MegaApplication.setSpeakerStatus(callChat.getChatid(), answerWithVideo);
+            megaChatApi.answerChatCall(chatId, answerWithVideo, true, new AnswerChatCallListener(this, this));
+            clearAnimations();
+        }
+    }
+
+    @Override
+    public void onCallAnswered(long chatid, boolean flag) {
+        if (flag == true) {
+            logDebug("Ok answer with video");
+        } else {
+            logDebug("Ok answer with NO video");
+        }
+
+        updateLocalAV();
+    }
+
+    @Override
+    public void onErrorAnsweredCall(int errorCode) {
+        if (errorCode == MegaChatError.ERROR_TOOMANY) {
+            showErrorAlertDialogGroupCall(getString(R.string.call_error_too_many_participants), true, this);
+        } else {
+            if (getCall() == null) return;
+            MegaApplication.setSpeakerStatus(callChat.getChatid(), false);
+            finishActivity();
         }
     }
 }

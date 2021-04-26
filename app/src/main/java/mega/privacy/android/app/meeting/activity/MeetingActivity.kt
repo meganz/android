@@ -21,6 +21,8 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -55,7 +57,6 @@ class MeetingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -129,6 +130,7 @@ class MeetingActivity : BaseActivity() {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
+        bundle.putLong(MEETING_CHAT_ID, intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE))
 
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
@@ -160,13 +162,13 @@ class MeetingActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        LogUtil.logDebug("Result Code: $resultCode")
+        logDebug("Result Code: $resultCode")
         if (intent == null) {
             LogUtil.logWarning("Intent is null")
             return
         }
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            LogUtil.logDebug("Participants successfully added")
+            logDebug("Participants successfully added")
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
             if (contactsData != null) {

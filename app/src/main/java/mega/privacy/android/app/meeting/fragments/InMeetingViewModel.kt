@@ -30,7 +30,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         inMeetingRepository.setCallOnHold(isHold)
     }
 
-    fun leaveMeeting() {
-        inMeetingRepository.leaveMeeting()
+    fun leaveMeeting(chatId: Long?) {
+        inMeetingRepository.leaveMeeting(chatId)
     }
 }

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
@@ -94,7 +92,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.listeners.StartChatCallListener;
+import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -137,7 +137,6 @@ import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
@@ -194,6 +193,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -218,7 +218,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback {
+        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback, HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -635,8 +635,38 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     @Override
-    public void OnCallStarted() {
-        openCall();
+    public void onCallStarted() {
+        openMeeting(idChat);
+    }
+
+    @Override
+    public void onCallHungUp(long chatId) {
+        logDebug("The call has been successfully hung up");
+        MegaChatCall call = megaChatApi.getChatCall(idChat);
+        if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
+            return;
+
+        if (call.isRinging()) {
+            addChecksForACall(chatRoom.getChatId(), false);
+            megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
+        } else {
+            megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
+        }
+    }
+
+    @Override
+    public void onCallAnswered(long chatId, boolean flag) {
+        logDebug("The call has been answered success");
+        openMeeting(chatId);
+    }
+
+    @Override
+    public void onErrorAnsweredCall(int errorCode) {
+        if (errorCode == MegaChatError.ERROR_TOOMANY) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
+        } else {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
+        }
     }
 
     private class UserTyping {
@@ -2543,11 +2573,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             case R.id.cab_menu_video_chat:{
                 logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
-                if(chatRoom.isGroup()){
-                    // In a group, directly enter meeting room
-                    onCreateMeeting(MEETING_ACTION_IN);
-                    break;
-                }
+
                 startVideo = true;
                 if(checkPermissionsCall()){
                     startCall();
@@ -2611,11 +2637,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    private void onCreateMeeting(String meetingType) {
-        Intent meetingIntent = new Intent(this, MeetingActivity.class);
-        meetingIntent.setAction(meetingType);
-        startActivity(meetingIntent);
-    }
     /*
      *Prepare recording
      */
@@ -3020,16 +3041,12 @@ public class ChatActivityLollipop extends PasscodeActivity
                     logDebug("The call in this chat is Ring in");
                     addChecksForACall(chatRoom.getChatId(), false);
                     MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-                    Intent intent = new Intent(this, ChatCallActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra(CHAT_ID, idChat);
-                    startActivity(intent);
+                    logDebug("Incoming call, open Meeting to answer the call");
                     return;
                 }
 
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
-                logDebug("++++++++++++++++++++ startChatCall");
                 megaChatApi.startChatCall(idChat, startVideo, true, new StartChatCallListener(this, this, this));
             }
             return;
@@ -3620,7 +3637,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
     private void endCall(long callId){
         if(megaChatApi!=null){
-            megaChatApi.hangChatCall(callId, this);
+            megaChatApi.hangChatCall(callId, new HangChatCallListener(this, this));
         }
     }
 
@@ -3651,7 +3668,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         if (callInChat != null && callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                             if (callInChat.isRinging()) {
                                 addChecksForACall(callInThisChat, false);
-                                megaChatApi.answerChatCall(callInThisChat, false, true, ChatActivityLollipop.this);
+                                megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
                             } else {
                                 megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
                             }
@@ -7634,36 +7651,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("onRequestFinish: " + request.getRequestString() + " " + request.getType());
 
-       if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("The call has been successfully hung up");
-                MegaChatCall call = api.getChatCall(idChat);
-                if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
-                    return;
-
-                if (call.isRinging()) {
-                    addChecksForACall(chatRoom.getChatId(), false);
-                    api.answerChatCall(idChat, false, true, this);
-                } else {
-                    api.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
-                }
-            } else {
-                logError("ERROR WHEN TYPE_HANG_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("The call has been answered success");
-                openCall();
-            } else {
-                logError("ERROR WHEN TYPE_ANSWER_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
-                if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
-                } else {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
-                }
-            }
-
-        }else if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
+      if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
                 if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                     MegaChatCall call = megaChatApi.getChatCall(idChat);
                     if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
@@ -7672,7 +7660,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     logDebug("Active call on hold. Joinning in the group chat.");
                     if (call.isRinging()) {
                         addChecksForACall(chatRoom.getChatId(), false);
-                        megaChatApi.answerChatCall(idChat, false, true, this);
+                        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
                     } else {
                         megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
                     }
@@ -9536,13 +9524,13 @@ public class ChatActivityLollipop extends PasscodeActivity
     /**
      * Method for opening the Call Activity.
      */
-    private void openCall(){
+    private void openMeeting(long chatId){
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        Intent i = new Intent(this, ChatCallActivity.class);
-        i.putExtra(CHAT_ID, idChat);
-        i.setAction(SECOND_CALL);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.startActivity(i);
+        MegaApplication.getInstance().openCallService(chatId);
+        Intent meetingIntent = new Intent(this, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        startActivity(meetingIntent);
     }
 
     /*
