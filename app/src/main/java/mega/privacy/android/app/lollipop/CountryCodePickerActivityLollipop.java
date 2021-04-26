@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
@@ -33,7 +34,7 @@ import mega.privacy.android.app.utils.Util;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
+public class CountryCodePickerActivityLollipop extends PasscodeActivity implements CountryListAdapter.CountrySelectedCallback {
     private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
     private static List<Country> countries;
 

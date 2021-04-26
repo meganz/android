@@ -323,6 +323,10 @@ public class FileUtil {
      * @return The path of the file if the local file exists, null otherwise
      */
     public static String getLocalFile(Context context, String fileName, long fileSize) {
+        if (context == null) {
+            context = MegaApplication.getInstance();
+        }
+
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
         final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";

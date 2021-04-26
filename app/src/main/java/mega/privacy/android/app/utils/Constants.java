@@ -85,6 +85,11 @@ public class Constants {
 
     public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
+    public static final String PREFERENCE_EMOJI = "emoji-recent-manager";
+    public static final String PREFERENCE_REACTION = "reaction-recent-manager";
+    public static final String PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager";
+    public static final String PREFERENCE_VARIANT_REACTION = "variant-reaction-manager";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
@@ -493,6 +498,7 @@ public class Constants {
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
     public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
+    public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
     //Indicates the data after it, is the value of a transfer parameter
     public static final String APP_DATA_INDICATOR = ">";
     //Indicates the data after it, is a new transfer parameter
@@ -827,4 +833,12 @@ public class Constants {
     public static final int NOT_OVERQUOTA_STATE = 0;
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
+
+    //Sort order management
+    public static final String NEW_ORDER = "NEW_ORDER";
+    public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
+    public static final int ORDER_CLOUD = 0;
+    public static final int ORDER_CONTACTS = 1;
+    public static final int ORDER_OTHERS = 2;
+    public static final int ORDER_CAMERA = 3;
 }

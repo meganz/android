@@ -13,8 +13,6 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 @SuppressWarnings("PMD.ForLoopCanBeForeach")
 public final class VariantEmojiManager implements VariantEmoji {
     private static final int EMOJI_GUESS_SIZE = 5;
-    private static final String PREFERENCE_EMOJI = "variant-emoji-manager";
-    private static final String PREFERENCE_REACTION = "variant-reaction-manager";
     private static final String EMOJI_DELIMITER = "~";
     private static final String VARIANT_EMOJIS = "variant-emojis";
     private static final String VARIANT_REACTIONS = "variant-reactions";
@@ -119,6 +117,6 @@ public final class VariantEmojiManager implements VariantEmoji {
     }
 
     private SharedPreferences getPreferences() {
-        return context.getSharedPreferences(type.equals(TYPE_REACTION) ? PREFERENCE_REACTION : PREFERENCE_EMOJI, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(type.equals(TYPE_REACTION) ? PREFERENCE_VARIANT_REACTION : PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE);
     }
 }

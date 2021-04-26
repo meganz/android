@@ -98,6 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
+    <string name="action_create_txt" context="Option which allows create a new text file">Create new text file</string>
     <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Open link</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
@@ -683,7 +684,8 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
@@ -775,21 +777,30 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change passcode</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Change passcode lock</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Require passcode</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Immediately</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 failed passcode attempt</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">You will be logged out and your offline files will be deleted after 10 further failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Wrong Passcode, please try again. You have 1 attempt left</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong Passcode, please try again. You have %2d attempts left</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your Passcode</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your Passcode</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new Passcode</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new Passcode</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match. Try again.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your passcode</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your passcode</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new passcode</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new passcode</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>
@@ -840,7 +851,6 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
     -->
 
-    <string name="sortby_owner_mail" context="category in sort by action">Owner’s Email</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
@@ -866,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric Passcode</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 Digits</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 Digits</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
@@ -1708,6 +1718,7 @@
     <string name="settings_feedback_body_device_model" context="mail body">Device model</string>
     <string name="settings_feedback_body_android_version" context="mail body">Android version</string>
 
+    <string name="dialog_title_new_text_file" context="Title of the dialog to create a new text file by inserting the name">New text file</string>
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">New file</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">File Name</string>
 
@@ -3024,11 +3035,22 @@
 
     <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not in your contacts list</string>
 
-
     <string name="theme_light" context="Option of color theme, light mode.">Light</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">Dark</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
+
+    <string name="cloud_drive_select_destination" context="Cloud Drive screen subtitle indicating a destination is required to be selected">Select destination</string>
+    
+    <string name="discard_changes_warning" context="Warning which alerts the user before discard changes">Discard changes and close the editor?</string>
+    <string name="discard_close_action" context="Action discard">Discard and close</string>
+    <string name="saving_file" context="Label indicating saving a file is in progress">Saving file&#8230;</string>
+    <string name="file_created" context="Label indicating a file was created successfully">File created</string>
+    <string name="file_creation_failed" context="Warning indicating a file was not created successfully">File creation failed. Try again.</string>
+    <string name="file_saved_to" context="Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive">File saved to %1$s</string>
+    <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
+    <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
+    <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
 </resources>

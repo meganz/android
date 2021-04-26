@@ -68,6 +68,7 @@
     <!-- Action bar title -->
     <style name="Widget.Mega.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
         <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.Mega.Caption.Secondary</item>
         <item name="android:elevation">0dp</item>
     </style>
 
@@ -194,8 +195,10 @@
 
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
     <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
-        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
-        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
     </style>
 
     <!-- My Account "CHANGE PASSWORD" Button, solid white in Light, outlined in Dark -->
@@ -204,8 +207,8 @@
         <item name="backgroundTint">@color/white</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:elevation">2dp</item>
-        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
-        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
     </style>
 
     <!-- My Account "LOGOUT" Button, grey outlined in Light, outlined in Dark -->
@@ -213,10 +216,11 @@
         <item name="strokeColor">@color/grey_alpha_026</item>
         <item name="backgroundTint">@color/white</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
-        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
     </style>
 
+    <!--  Same in dark mode and light mode  -->
     <style name="Widget.Mega.Button.Transparent" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -224,6 +228,19 @@
         <item name="android:textColor">?android:attr/colorAccent</item>
         <item name="android:paddingStart">@dimen/btn_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/btn_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+    </style>
+
+    <!--  Same in dark mode and light mode  -->
+    <style name="Widget.Mega.Button.Transparent.Stroke" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="android:minWidth">10dp</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:paddingStart">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_21_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
     </style>
@@ -432,6 +449,60 @@
         <item name="useMaterialThemeColors">false</item>
     </style>
 
+    <style name="PinPasscodeStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:imeOptions">actionNext|flagNoFullscreen</item>
+        <item name="android:inputType">numberPassword</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="WarningPasscodeStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/red_900_red_400</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="OnlyTextBottomSheetHeaderStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginBottom">12dp</item>m>
+        <item name="android:textColor">@color/grey_054_white_054</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="OnlyTextBottomSheetOptionStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">55dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/grey_087_white_087</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SeparatorBottomSheetStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:background">@color/grey_012_white_012</item>
+    </style>
+
     <style name="Widget.Mega.Button.Preferences" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAllCaps">false</item>
         <item name="android:minHeight">0dp</item>
@@ -443,5 +514,20 @@
         <item name="android:colorControlNormal">@android:color/transparent</item>
         <item name="android:colorControlActivated">?attr/colorSecondary</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
+    </style>
+
+    <style name="TransparentEditText.Transparent">
+        <item name="android:colorControlActivated">@android:color/transparent</item>
+    </style>
+
+    <style name="BottomSheetOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:drawablePadding">35dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
 </resources>

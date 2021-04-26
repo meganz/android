@@ -38,10 +38,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -51,6 +53,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
@@ -68,8 +71,12 @@ import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
 		OnClickListener, CheckScrollInterface {
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -297,7 +304,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		cancelButton.setText(StringResourcesUtils.getString(R.string.general_cancel));
 		fabSelect = v.findViewById(R.id.fab_select);
 		fabSelect.setOnClickListener(this);
 
@@ -352,7 +359,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		switch (modeCloud) {
 			case FileExplorerActivityLollipop.MOVE:
-				optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_move));
 
 				MegaNode parentMove= ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
@@ -362,18 +369,22 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.COPY:
-				optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_copy));
 
 				MegaNode parentCopy = ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentCopy == null || parentCopy.getHandle() != parentHandle);
 				break;
 
 			case FileExplorerActivityLollipop.UPLOAD:
-				optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+				optionButton.setText(StringResourcesUtils.getString(R.string.context_upload));
 				break;
 
 			case FileExplorerActivityLollipop.IMPORT:
-				optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+				optionButton.setText(StringResourcesUtils.getString(R.string.add_to_cloud));
+				break;
+
+			case FileExplorerActivityLollipop.SAVE:
+				optionButton.setText(StringResourcesUtils.getString(R.string.save_action));
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
@@ -382,7 +393,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				//No break; needed: the text should be set with SELECT mode
 
 			default:
-				optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+				optionButton.setText(StringResourcesUtils.getString(R.string.general_select));
 				break;
 		}
 
@@ -868,11 +879,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context,
-				this,
-				s,
-				-1,
-				nodes);
+		searchNodesTask = new SearchNodesTask(context, this, s, INVALID_HANDLE, nodes, sortOrderManagement);
 		searchNodesTask.execute();
 	}
 

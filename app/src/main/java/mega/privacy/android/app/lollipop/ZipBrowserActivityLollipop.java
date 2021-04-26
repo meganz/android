@@ -43,8 +43,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 
@@ -57,8 +59,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
+public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
-public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP ="HANDLE_ZIP";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
@@ -467,8 +469,12 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			startActivity(pdfIntent);
 			overridePendingTransition(0,0);
-		}
-		else{
+		} else if (MimeTypeList.typeForName(currentFile.getName()).isOpenableTextFile(currentFile.length())) {
+			startActivity(new Intent(this, TextFileEditorActivity.class)
+					.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName())
+					.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
+					.putExtra(INTENT_EXTRA_KEY_PATH, currentFile.getAbsolutePath()));
+		} else{
             logDebug("NOT Image, video, audio or pdf");
 			try {
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);

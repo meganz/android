@@ -57,6 +57,10 @@
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey38White38">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
         <item name="android:textSize">18sp</item>
     </style>
@@ -86,6 +90,10 @@
 
     <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
     </style>
 
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
@@ -153,6 +161,11 @@
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, grey 87% - white 87% -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
     <!-- Bold, 18sp, 0px, textColorPrimary -->
@@ -298,6 +311,10 @@
     <!-- Accent -->
     <style name="TextAppearance.Mega.Body2.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
     </style>
 
     <!-- Medium, Accent -->

@@ -41,7 +41,6 @@ import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
@@ -62,6 +61,7 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
 import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -485,6 +485,8 @@ public class AccountController {
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
+        removeEmojisSharedPreferences();
+
         new LastShowSMSDialogTimeChecker(context).reset();
         MediaPlayerService.stopAudioPlayer(context);
         MediaPlayerServiceViewModel.clearSettings(context);
@@ -493,7 +495,7 @@ public class AccountController {
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
-        app.getMyAccountInfo().clear();
+        app.resetMyAccountInfo();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
 
         // Clear get banner success flag
@@ -518,19 +520,13 @@ public class AccountController {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
-        if (context instanceof ManagerActivityLollipop){
-            megaApi.logout((ManagerActivityLollipop)context);
-        }
-        else if (context instanceof OpenLinkActivity){
-            megaApi.logout((OpenLinkActivity)context);
-        }
-        else if (context instanceof PinLockActivityLollipop){
-            megaApi.logout((PinLockActivityLollipop)context);
-        }
-        else if (context instanceof TestPasswordActivity){
-            megaApi.logout(((TestPasswordActivity)context));
-        }
-        else{
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.logout((ManagerActivityLollipop) context);
+        } else if (context instanceof OpenLinkActivity) {
+            megaApi.logout((OpenLinkActivity) context);
+        } else if (context instanceof TestPasswordActivity) {
+            megaApi.logout(((TestPasswordActivity) context));
+        } else {
             megaApi.logout(new LogoutListener(context));
         }
 

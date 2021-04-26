@@ -683,7 +683,8 @@
     <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">儲存空間</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">密碼鎖</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">密碼鎖</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
 
@@ -775,8 +776,10 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和影片</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">密碼鎖</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">密碼鎖</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">更改密碼</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">需要密碼</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">立即</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">輸入</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10次輸入失敗後，您的本機檔案將被刪除且您將被強制登出</string>

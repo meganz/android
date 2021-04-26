@@ -62,6 +62,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
@@ -398,6 +399,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
                         (ManagerActivityLollipop) requireActivity());
             }
+        } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+            manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
+            return;
         }
 
         if (intent != null && !isIntentAvailable(context, intent)) {
