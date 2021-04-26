@@ -98,8 +98,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             if (file.isDirectory()) {
                 nodeInfo.setText(getFileFolderInfo(file));
             } else {
-                long nodeSize = file.length();
-                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(file.lastModified() / 1000)));
+                nodeInfo.setText(getFileInfo(file));
             }
 
             if (file.isFile()) {
