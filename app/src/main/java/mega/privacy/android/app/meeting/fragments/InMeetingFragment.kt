@@ -352,7 +352,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Change Hold State
      */
     override fun onChangeHoldState(isHold: Boolean) {
-        inMeetingViewModel.setCallOnHold(isHold)
+        inMeetingViewModel.setCallOnHold(chatId, isHold)
     }
 
     /**

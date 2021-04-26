@@ -94,6 +94,7 @@ import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
@@ -218,7 +219,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback, HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback {
+        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback,
+        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
+SetCallOnHoldListener.OnCallOnHoldCallback{
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -666,6 +669,23 @@ public class ChatActivityLollipop extends PasscodeActivity
             showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
         } else {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
+        }
+    }
+
+    @Override
+    public void onCallOnHold(long chatId, boolean isOnHold) {
+        if (chatId == idChat && isOnHold) {
+            MegaChatCall call = megaChatApi.getChatCall(idChat);
+            if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
+                return;
+
+            logDebug("Active call on hold. Joinning in the group chat.");
+            if (call.isRinging()) {
+                addChecksForACall(chatRoom.getChatId(), false);
+                megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
+            } else {
+                megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
+            }
         }
     }
 
@@ -3674,7 +3694,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             }
                         }
                     }else{
-                        megaChatApi.setCallOnHold(anotherCall.getChatid(), true, ChatActivityLollipop.this);
+                        megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
                     }
                     break;
 
@@ -7651,24 +7671,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("onRequestFinish: " + request.getRequestString() + " " + request.getType());
 
-      if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
-                if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                    MegaChatCall call = megaChatApi.getChatCall(idChat);
-                    if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
-                        return;
-
-                    logDebug("Active call on hold. Joinning in the group chat.");
-                    if (call.isRinging()) {
-                        addChecksForACall(chatRoom.getChatId(), false);
-                        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
-                    } else {
-                        megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
-                    }
-                } else {
-                    logError("Error putting the call on hold" + e.getErrorCode());
-                }
-
-       } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
+      if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
            logDebug("Remove participant: " + request.getUserHandle() + " my user: " + megaChatApi.getMyUserHandle());
 
            if (e.getErrorCode() == MegaChatError.ERROR_OK) {

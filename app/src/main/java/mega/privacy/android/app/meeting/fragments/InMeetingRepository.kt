@@ -4,8 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
@@ -19,8 +18,10 @@ class InMeetingRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    fun setCallOnHold(isHold: Boolean) {
-       // megaChatApi.setCallOnHold(chatId, isHold, this)
+    fun setCallOnHold(chatId: Long?, isHold: Boolean) {
+        if (chatId != null) {
+            megaChatApi.setCallOnHold(chatId, isHold, SetCallOnHoldListener(context))
+        }
     }
 
     fun leaveMeeting(chatId: Long?) {

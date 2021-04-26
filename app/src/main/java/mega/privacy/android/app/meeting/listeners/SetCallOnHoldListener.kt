@@ -1,0 +1,59 @@
+package mega.privacy.android.app.meeting.listeners
+
+import android.content.Context
+import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.listeners.ChatBaseListener
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+
+class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
+
+    private var callback: OnCallOnHoldCallback? = null
+    private var snackbarShower: SnackbarShower? = null
+
+    constructor(
+        context: Context?,
+        snackbarShower: SnackbarShower,
+    ) : this(context) {
+        this.snackbarShower = snackbarShower
+    }
+
+    constructor(
+        context: Context?,
+        snackbarShower: SnackbarShower,
+        callback: OnCallOnHoldCallback
+    ) : this(context) {
+        this.callback = callback
+        this.snackbarShower = snackbarShower
+    }
+
+    override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
+        if (request.type != MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
+            return
+        }
+
+        if (e.errorCode == MegaError.API_OK) {
+            LogUtil.logDebug("Call on hold")
+            callback?.onCallOnHold(request.chatHandle, request.flag)
+        } else {
+            if (e.errorCode == MegaChatError.ERROR_NOENT) {
+                LogUtil.logWarning("Error. No calls in this chat " + e.errorString)
+            } else if (e.errorCode == MegaChatError.ERROR_ACCESS) {
+                LogUtil.logWarning("Error. The call is not in progress " + e.errorString)
+                snackbarShower?.showSnackbar(StringResourcesUtils.getString(R.string.call_error_call_on_hold))
+            } else if (e.errorCode == MegaChatError.ERROR_ARGS) {
+                LogUtil.logWarning("Error. The call was already in that state " + e.errorString)
+            }
+        }
+    }
+
+    interface OnCallOnHoldCallback {
+        fun onCallOnHold(chatId: Long, isOnHold : Boolean)
+    }
+}

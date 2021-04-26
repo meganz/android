@@ -62,6 +62,7 @@ import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -90,7 +91,9 @@ import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback, HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface,
+        MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback,
+        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback {
 
     final private static int MIN_PEERS_LIST = 7;
     final private static int ARROW_ANIMATION = 250;
@@ -1127,15 +1130,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     showSnackbar(getString(R.string.call_error_too_many_video));
                 }
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
-            if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
-                logWarning("Error. No calls in this chat " + e.getErrorString());
-            } else if (e.getErrorCode() == MegaChatError.ERROR_ACCESS) {
-                logWarning("Error. The call is not in progress " + e.getErrorString());
-                showSnackbar(getString(R.string.call_error_call_on_hold));
-            } else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
-                logWarning("Error. The call was already in that state " + e.getErrorString());
-            }
         }
     }
 
@@ -1285,7 +1279,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (callChat.isOnHold()) {
                         checkAnotherCallActive();
                     } else {
-                        megaChatApi.setCallOnHold(chatId, true, this);
+                        megaChatApi.setCallOnHold(chatId, true, new SetCallOnHoldListener(this));
                         sendSignalPresence();
                     }
                 } else {
@@ -1655,13 +1649,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (chatsIDsWithCallActive != null || !chatsIDsWithCallActive.isEmpty()) {
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (callChat.getChatid() != anotherChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
-                    megaChatApi.setCallOnHold(anotherChatId, true, this);
+                    megaChatApi.setCallOnHold(anotherChatId, true, new SetCallOnHoldListener(this));
                     break;
                 }
             }
         }
 
-        megaChatApi.setCallOnHold(chatId, false, this);
+        megaChatApi.setCallOnHold(chatId, false, new SetCallOnHoldListener(this));
         sendSignalPresence();
     }
 
@@ -1680,8 +1674,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        megaChatApi.setCallOnHold(chatId, true, this);
-        megaChatApi.setCallOnHold(chatCallOnHold.getChatId(), false, this);
+        megaChatApi.setCallOnHold(chatId, true, new SetCallOnHoldListener(this));
+        megaChatApi.setCallOnHold(chatCallOnHold.getChatId(), false, new SetCallOnHoldListener(this));
 
         sendSignalPresence();
 
