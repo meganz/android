@@ -139,6 +139,7 @@ class NodeSaver(
 
     /**
      * Save a list of MegaNode into device.
+     * No matter if the list contains only files, or files and folders.
      *
      * @param handles the handle list of nodes to save
      * @param highPriority whether this download is high priority or not
@@ -155,20 +156,17 @@ class NodeSaver(
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
-            var totalSize = 0L
-
             val api = if (isFolderLink) megaApiFolder else megaApi
 
             for (handle in handles) {
                 val node = api.getNodeByHandle(handle)
                 if (node != null) {
                     nodes.add(node)
-                    totalSize += node.size
                 }
             }
 
             MegaNodeSaving(
-                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
             )
         }
     }
