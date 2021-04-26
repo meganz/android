@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -303,8 +304,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         else{
             holder.permissionsIcon.setVisibility(View.GONE);
 
-            long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
+            holder.textViewFileSize.setText(MegaNodeUtil.getFileInfo(node));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 

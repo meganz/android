@@ -235,8 +235,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
-                long nodeSize = node.getSize();
-                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
+                nodeInfo.setText(getFileInfo(node));
 
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
