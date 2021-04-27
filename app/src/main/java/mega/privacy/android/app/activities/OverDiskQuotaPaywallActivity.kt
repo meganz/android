@@ -11,10 +11,12 @@ import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
@@ -26,8 +28,13 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
 import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
+
+    @Inject
+    lateinit var myAccountInfo: MyAccountInfo
 
     private var timer: CountDownTimer? = null
 
@@ -129,7 +136,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
         val email = megaApi.myEmail
         val warningsTs = megaApi.overquotaWarningsTs
         val files = megaApi.numNodes
-        val size = app.myAccountInfo.usedFormatted
+        val size = myAccountInfo.usedFormatted
         deadlineTs = megaApi.overquotaDeadlineTs
 
         if (warningsTs == null || warningsTs.size() == 0) {
@@ -206,12 +213,12 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
      * space used by the user.
      */
     private fun getProPlanNeeded(): String {
-        val plans = app.myAccountInfo.pricing ?: return getString(R.string.pro_account)
+        val plans = myAccountInfo.pricing ?: return getString(R.string.pro_account)
 
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
 
         for (i in 0 until plans.numProducts) {
-            if (plans.getGBStorage(i) > app.myAccountInfo.usedStorage / gb) {
+            if (plans.getGBStorage(i) > myAccountInfo.usedStorage / gb) {
                 proPlanNeeded = plans.getProLevel(i)
                 return when(plans.getProLevel(i)) {
                     1 -> getString(R.string.pro1_account)

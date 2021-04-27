@@ -58,11 +58,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -102,6 +101,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	String myEmail;
 	private RoundedImageView avatarImage;
@@ -119,7 +120,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
-	MyAccountInfo myAccountInfo;
 	Context context;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
@@ -860,10 +860,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		if(myAccountInfo == null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);

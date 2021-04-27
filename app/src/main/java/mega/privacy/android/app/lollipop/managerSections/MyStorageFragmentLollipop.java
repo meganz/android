@@ -18,22 +18,28 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+@AndroidEntryPoint
 public class MyStorageFragmentLollipop extends Fragment {
+
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	private ScrollView scrollView;
 	private Context context;
-	private MyAccountInfo myAccountInfo;
 
 	private MegaUser myUser;
 
@@ -133,11 +139,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 		previousVersionsText = v.findViewById(R.id.my_storage_account_previous_versions_text);
 		rubbishSeparator = v.findViewById(R.id.rubbish_separator);
 
-		if(myAccountInfo==null){
-			logWarning("MyAccountInfo is NULL");
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-
 		sansSerifLightBoldTypeface = Typeface.create("sans-serif-light", Typeface.BOLD);
 		normalTypeface = totalUsedSpace.getTypeface();
 
@@ -188,11 +189,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 			}
 		}
 
-		if(myAccountInfo.getAccountInfo()==null){
-			logWarning("Account info NULL");
-			return;
-		}
-
 		//Check size of the different nodes
 		cloudDriveUsedText.setText(myAccountInfo.getFormattedUsedCloud());
 
@@ -225,7 +221,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 				transferQuotaUsedText.setText(myAccountInfo.getUsedTransferFormatted());
 				transferQuotaUsedText.setTypeface(sansSerifLightBoldTypeface);
 			} else {
-				String textToShow = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedTransferFormatted(), myAccountInfo.getTotalTansferFormatted());
+				String textToShow = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedTransferFormatted(), myAccountInfo.getTotalTransferFormatted());
 				try {
 					textToShow = textToShow.replace("[A]", "<b><font face=\"sans-serif-light\">");
 					textToShow = textToShow.replace("[/A]", "</font></b>");

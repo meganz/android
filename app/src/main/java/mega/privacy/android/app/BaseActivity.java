@@ -17,7 +17,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
@@ -39,6 +38,10 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
@@ -72,11 +75,15 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     private BaseActivity baseActivity;
 
@@ -1011,7 +1018,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         final boolean isLoggedIn = megaApi.isLoggedIn() != 0 && dbH.getCredentials() != null;
         if (isLoggedIn) {
-            boolean isFreeAccount = MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            boolean isFreeAccount = myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
             paymentButton.setText(getString(isFreeAccount ? R.string.my_account_upgrade_pro : R.string.plans_depleted_transfer_overquota));
         } else {
             paymentButton.setText(getString(R.string.login_text));

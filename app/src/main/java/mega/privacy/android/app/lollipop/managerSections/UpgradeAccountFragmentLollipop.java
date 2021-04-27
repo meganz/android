@@ -24,13 +24,16 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Currency;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
@@ -42,8 +45,10 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
+@AndroidEntryPoint
 public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnClickListener{
 
+	@Inject
 	protected MyAccountInfo myAccountInfo;
 
 	protected ScrollView scrollView;
@@ -106,8 +111,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
-
-		myAccountInfo = app.getMyAccountInfo();
 
 		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 		scrollView = v.findViewById(R.id.scroll_view_upgrade);

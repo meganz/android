@@ -41,9 +41,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        myAccountInfo = app.getMyAccountInfo();
-
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);

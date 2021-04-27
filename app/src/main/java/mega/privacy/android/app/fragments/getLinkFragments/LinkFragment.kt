@@ -15,12 +15,14 @@ import android.widget.DatePicker
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
 import mega.privacy.android.app.activities.GetLinkActivity.Companion.PASSWORD_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
@@ -34,8 +36,9 @@ import nz.mega.sdk.MegaAccountDetails.ACCOUNT_TYPE_FREE
 import nz.mega.sdk.MegaNode
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment(),
     DatePickerDialog.OnDateSetListener {
 
@@ -45,6 +48,9 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         private const val INVALID_EXPIRATION_TIME = -1L
         private const val LAST_MINUTE = "2359"
     }
+
+    @Inject
+    lateinit var myAccountInfo: MyAccountInfo
 
     private lateinit var binding: FragmentGetLinkBinding
 
@@ -69,7 +75,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
+        isPro = myAccountInfo.accountType > ACCOUNT_TYPE_FREE
 
         node = getLinkInterface.getNode()
 

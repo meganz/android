@@ -19,6 +19,9 @@ import android.view.ViewGroup;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
@@ -31,9 +34,9 @@ import mega.privacy.android.app.activities.settingsActivities.DownloadPreference
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.ThemeHelper;
 
@@ -45,8 +48,12 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+@AndroidEntryPoint
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment {
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
@@ -441,7 +448,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private void refreshAccountInfo() {
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
-        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
         if (callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
             ((MegaApplication) ((Activity) context).getApplication()).askForAccountDetails();
         }

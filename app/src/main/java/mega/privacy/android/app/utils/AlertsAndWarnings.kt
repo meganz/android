@@ -195,13 +195,7 @@ object AlertsAndWarnings {
         return MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(R.string.general_ok) { _, _ ->
-                if (isModify) {
-                    phoneNumberCallback.modify()
-                } else {
-                    phoneNumberCallback.reset()
-                }
-            }
+            .setPositiveButton(R.string.general_ok) { _, _ -> phoneNumberCallback.reset() }
             .setNegativeButton(getString(R.string.general_cancel), null)
             .show()
     }

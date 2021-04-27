@@ -266,7 +266,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         firstLineTextMaxWidthExpanded = outMetrics.widthPixels - dp2px(108f, outMetrics)
         binding.headerLayout.firstLineToolbar.apply {
             setMaxWidthEmojis(firstLineTextMaxWidthExpanded)
-            text = viewModel.getName()?.toUpperCase(Locale.getDefault())
+            text = viewModel.getName().toUpperCase(Locale.getDefault())
             textSize = NAME_SIZE
         }
 

@@ -30,8 +30,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -49,9 +53,13 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+@AndroidEntryPoint
 public class QRCodeActivity extends PasscodeActivity implements MegaRequestListenerInterface{
 
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -280,7 +288,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     }
 
     public String getName(){
-       return  ((MegaApplication) getApplication()).getMyAccountInfo().getFullName();
+       return  myAccountInfo.getFullName();
 
     }
 

@@ -4,12 +4,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.MyAccountInfo
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -17,7 +16,8 @@ import nz.mega.sdk.MegaApiJava
 
 class MyAccountViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
+    private val accountInfo: MyAccountInfo
 ) : BaseRxViewModel() {
 
     companion object {
@@ -30,9 +30,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     private var numOfClicksLastSession = 0
     private var staging = false
 
-    private var accountInfo: MyAccountInfo = MegaApplication.getInstance().myAccountInfo
-
-    fun getName(): String? = accountInfo.fullName
+    fun getName(): String = accountInfo.fullName
 
     fun getEmail(): String = megaApi.myEmail
 
@@ -42,15 +40,15 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     fun getUsedStorage(): String = accountInfo.usedFormatted
 
-    fun getUsedStoragePercentage(): Int = accountInfo.usedPerc
+    fun getUsedStoragePercentage(): Int = accountInfo.usedPercentage
 
     fun getTotalStorage(): String = accountInfo.totalFormatted
 
     fun getUsedTransfer(): String = accountInfo.usedTransferFormatted
 
-    fun getUsedTransferPercentage(): Int = accountInfo.usedTransferPerc
+    fun getUsedTransferPercentage(): Int = accountInfo.usedTransferPercentage
 
-    fun getTotalTransfer(): String = accountInfo.totalTansferFormatted
+    fun getTotalTransfer(): String = accountInfo.totalTransferFormatted
 
     fun getRenewTime(): Long = accountInfo.subscriptionRenewTime
 

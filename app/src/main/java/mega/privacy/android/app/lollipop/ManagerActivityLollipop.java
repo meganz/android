@@ -134,6 +134,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
@@ -370,6 +371,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	CookieDialogHandler cookieDialogHandler;
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	public int accountFragment;
 
@@ -1116,7 +1119,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        MegaPurchase purchase = app.getMyAccountInfo().getActiveSubscription();
+        MegaPurchase purchase = myAccountInfo.getActiveSubscription();
         String oldSku = purchase == null ? null : purchase.getSku();
         String token = purchase == null ? null : purchase.getToken();
         if (mBillingManager != null) {
@@ -1146,7 +1149,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         logInfo("Billing client setup finished");
         mBillingManager.getInventory(skuList -> {
             mSkuDetailsList = skuList;
-            app.getMyAccountInfo().setAvailableSkus(skuList);
+            myAccountInfo.setAvailableSkus(skuList);
 
             upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
             if (upAFL != null) {
@@ -1163,7 +1166,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		updateAccountInfo(purchases);
-		updateSubscriptionLevel(app.getMyAccountInfo());
+		updateSubscriptionLevel();
 	}
 
 	@Override
@@ -1181,7 +1184,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     updateAccountInfo(purchases);
                     logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
                     message = getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
-                    updateSubscriptionLevel(app.getMyAccountInfo());
+                    updateSubscriptionLevel();
                 } else {
                     //payment is being processed or in unknown state
                     logDebug("Purchase " + sku + " is being processed or in unknown state.");
@@ -1201,7 +1204,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private void updateAccountInfo(List<MegaPurchase> purchases) {
-		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
 		int highest = -1;
 		int temp = -1;
 		MegaPurchase max = null;
@@ -1264,7 +1266,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
+	private void updateSubscriptionLevel() {
 		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveSubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
@@ -2968,7 +2970,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	private void checkInitialScreens() {
 		if (checkBusinessStatus()) {
-			setBusinessAlertShown(true);
+			myAccountInfo.setBusinessAlertShown(true);
 			return;
 		}
 
@@ -2982,18 +2984,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
 			askForSMSVerification();
-		}
-	}
-
-	/**
-	 * Updates the state of the flag indicating if there is a business alert shown.
-	 *
-	 * @param shown	true if there is any business alert shown, false otherwise.
-	 */
-	private void setBusinessAlertShown(boolean shown) {
-		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if (myAccountInfo != null) {
-			myAccountInfo.setBusinessAlertShown(shown);
 		}
 	}
 
@@ -3017,8 +3007,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return true;
 		}
 
-		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if (myAccountInfo == null || myAccountInfo.isBusinessAlertShown()) {
+		if (myAccountInfo.isBusinessAlertShown()) {
 			return false;
 		}
 
@@ -3026,11 +3015,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			int status = megaApi.getBusinessStatus();
 
 			if (status == BUSINESS_STATUS_EXPIRED) {
-				myAccountInfo.setBusinessAlertAlreadyShown();
+				myAccountInfo.setBusinessAlertShown(true);
 				startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
 				return true;
 			} else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
-				myAccountInfo.setBusinessAlertAlreadyShown();
+				myAccountInfo.setBusinessAlertShown(true);
 				showBusinessGraceAlert();
 				return true;
 			}
@@ -3051,7 +3040,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		businessGraceAlert = builder.setView(v)
 				.setPositiveButton(R.string.general_dismiss, (dialog, which) -> {
-					setBusinessAlertShown(isBusinessGraceAlertShown = false);
+					myAccountInfo.setBusinessAlertShown(isBusinessGraceAlertShown = false);
 					try {
 						businessGraceAlert.dismiss();
 					} catch (Exception e) {
@@ -3090,7 +3079,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
 				.setCancelable(false)
-				.setOnDismissListener(dialog -> setBusinessAlertShown(isBusinessCUAlertShown = false));
+				.setOnDismissListener(dialog -> myAccountInfo.setBusinessAlertShown(isBusinessCUAlertShown = false));
         businessCUAlert = builder.create();
         businessCUAlert.show();
         isBusinessCUAlertShown = true;
@@ -3820,7 +3809,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-		nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), myAccountInfo.getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
@@ -3986,7 +3975,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						inputLastName.requestFocus();
 					} else {
 						logDebug("Positive button pressed - change user attribute(s)");
-						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
+						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				} else {
@@ -3998,7 +3987,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		inputFirstName.setSingleLine();
 		inputFirstName.setHint(R.string.first_name_text);
-		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
+		inputFirstName.setText(myAccountInfo.getFirstNameText());
 		inputFirstName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -4030,7 +4019,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		inputLastName.setSingleLine();
 		inputLastName.setHint(R.string.lastname_text);
-		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
+		inputLastName.setText(myAccountInfo.getLastNameText());
 		inputLastName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -4147,7 +4136,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				else {
 					logDebug("Positive button pressed - change user attribute");
-					countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
+					countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 					changeUserAttributeDialog.dismiss();
 				}
 			}
@@ -4379,8 +4368,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public void checkBeforeShowSMSVerificationDialog() {
         //This account hasn't verified a phone number and first login.
 
-		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if (myAccountInfo != null && myAccountInfo.isBusinessAlertShown()) {
+		if (myAccountInfo.isBusinessAlertShown()) {
 			//The business alerts has priority over SMS verification
 			return;
 		}
@@ -5100,9 +5088,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void selectDrawerItemAccount(){
-		MyAccountInfo accountInfo = app.getMyAccountInfo();
-
-		if (accountInfo != null && accountInfo.getNumVersions() == -1) {
+		if (myAccountInfo.getNumVersions() == -1) {
 			megaApi.getFolderInfo(megaApi.getRootNode(), this);
 		}
 
@@ -5625,7 +5611,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
     		case SETTINGS:{
 				showHideBottomNavigationView(true);
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
+				if(myAccountInfo.getNumVersions() == -1){
 					megaApi.getFolderInfo(megaApi.getRootNode(), this);
 				}
 
@@ -6054,9 +6040,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		MyAccountInfo accountInfo = app.getMyAccountInfo();
-
-		cancelSubscription.setVisible(accountInfo != null && accountInfo.getNumberOfSubscriptions() > 0
+		cancelSubscription.setVisible(myAccountInfo.getNumberOfSubscriptions() > 0
 				&& drawerItem == DrawerItem.ACCOUNT && getMyAccountFragment() != null);
 	}
 
@@ -6423,7 +6407,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						logoutMenuItem.setVisible(true);
 						exportMK.setVisible(true);
 
-						if (app.getMyAccountInfo() != null && app.getMyAccountInfo().getNumberOfSubscriptions() > 0) {
+						if (myAccountInfo.getNumberOfSubscriptions() > 0) {
 							cancelSubscription.setVisible(true);
 						}
 					} else {
@@ -9650,11 +9634,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		if (app == null || app.getMyAccountInfo() == null) {
-			return;
-		}
-
-		MyAccountInfo info = app.getMyAccountInfo();
 		View settingsSeparator = null;
 
 		if (nV != null) {
@@ -9682,7 +9661,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					settingsSeparator.setVisibility(View.GONE);
 				}
 
-				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
+				String textToShow = String.format(getResources().getString(R.string.used_space), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
                 String colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary);
 				switch (storageState) {
                     case MegaApiJava.STORAGE_STATE_GREEN:
@@ -9692,7 +9671,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                         break;
                     case MegaApiJava.STORAGE_STATE_RED:
                     case MegaApiJava.STORAGE_STATE_PAYWALL:
-                        ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+						myAccountInfo.setUsedPercentage(100);
                         colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
                         break;
                 }
@@ -9710,8 +9689,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logWarning("Exception formatting string", e);
 				}
 				spaceTV.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
-				int progress = info.getUsedPerc();
-				long usedSpace = info.getUsedStorage();
+				int progress = myAccountInfo.getUsedPercentage();
+				long usedSpace = myAccountInfo.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
 				usedSpacePB.setProgress(progress);
 				if (progress >= 0 && usedSpace >= 0) {
@@ -9725,7 +9704,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logWarning("usedSpaceLayout is NULL");
 		}
 
-		updateSubscriptionLevel(app.getMyAccountInfo());
+		updateSubscriptionLevel();
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
@@ -9736,7 +9715,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 break;
             case MegaApiJava.STORAGE_STATE_RED:
             case MegaApiJava.STORAGE_STATE_PAYWALL:
-                ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+				myAccountInfo.setUsedPercentage(100);
                 resId = R.drawable.custom_progress_bar_horizontal_exceed;
                 break;
         }
@@ -11095,8 +11074,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					e.printStackTrace();
 				}
 
-				int accountType = app.getMyAccountInfo().getAccountType();
-				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
+				if(myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					logDebug("ACCOUNT TYPE FREE");
 					if(showMessageRandom()){
 						logDebug("Show message random: TRUE");
@@ -11224,7 +11202,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private void showStorageStatusDialog(int storageState, boolean overquotaAlert, boolean preWarning){
 		logDebug("showStorageStatusDialog");
 
-		if(((MegaApplication) getApplication()).getMyAccountInfo()==null || ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==-1){
+		if (myAccountInfo.getAccountType() == -1) {
 			logWarning("Do not show dialog, not info of the account received yet");
 			return;
 		}
@@ -11328,7 +11306,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_achievements);
 		achievementsButton.setOnClickListener(achievementsClickListener);
 
-		switch (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()) {
+		switch (myAccountInfo.getAccountType()) {
 			case MegaAccountDetails.ACCOUNT_TYPE_PROIII:
 				logDebug("Show storage status dialog for USER PRO III");
 				if (!overquotaAlert) {
@@ -11390,7 +11368,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private Product getPRO3OneMonth() {
-		List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
+		List<Product> products = myAccountInfo.getProductAccounts();
 		if (products != null) {
 			for (Product product : products) {
 				if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
@@ -11413,32 +11391,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		body.append(getString(R.string.settings_about_app_version)+" v"+getString(R.string.app_version)+"\n");
 		body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
 
-		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
-				body.append(" ("+getString(R.string.my_account_free)+")");
-			}
-			else{
-				switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
-					case 0:{
-						body.append(" ("+getString(R.string.my_account_free)+")");
-						break;
-					}
-					case 1:{
-						body.append(" ("+getString(R.string.my_account_pro1)+")");
-						break;
-					}
-					case 2:{
-						body.append(" ("+getString(R.string.my_account_pro2)+")");
-						break;
-					}
-					case 3:{
-						body.append(" ("+getString(R.string.my_account_pro3)+")");
-						break;
-					}
-					case 4:{
-						body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-						break;
-					}
+		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
+			body.append(" (" + getString(R.string.my_account_free) + ")");
+		} else {
+			switch (myAccountInfo.getAccountType()) {
+				case 0: {
+					body.append(" (" + getString(R.string.my_account_free) + ")");
+					break;
+				}
+				case 1: {
+					body.append(" (" + getString(R.string.my_account_pro1) + ")");
+					break;
+				}
+				case 2: {
+					body.append(" (" + getString(R.string.my_account_pro2) + ")");
+					break;
+				}
+				case 3: {
+					body.append(" (" + getString(R.string.my_account_pro3) + ")");
+					break;
+				}
+				case 4: {
+					body.append(" (" + getString(R.string.my_account_prolite_feedback_email) + ")");
+					break;
 				}
 			}
 		}
@@ -11458,8 +11433,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-		MyAccountInfo accountInfo = app.getMyAccountInfo();
-		cancelSubscription.setVisible(accountInfo != null && accountInfo.getNumberOfSubscriptions() > 0
+		cancelSubscription.setVisible(myAccountInfo.getNumberOfSubscriptions() > 0
 				&& cancelSubscription != null && drawerItem == DrawerItem.ACCOUNT
 				&& getMyAccountFragment() != null);
 	}
@@ -11902,18 +11876,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				logDebug("request.getText(): "+request.getText());
 				countUserAttributes--;
-				if(((MegaApplication) getApplication()).getMyAccountInfo() == null){
-					logError("ERROR: MyAccountInfo is NULL");
-				}
-				((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
+
+				myAccountInfo.setFirstNameText(request.getText());
+
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The first name has changed");
-					MyAccountInfo accountInfo = app.getMyAccountInfo();
-					if (accountInfo != null && getMyAccountFragment() != null) {
-						maF.updateNameView(accountInfo.getFullName());
-					}
-
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					String fullName = myAccountInfo.getFullName();
+					maF.updateNameView(fullName);
+					updateUserNameNavigationView(fullName);
 				}
 				else{
 					logError("Error with first name");
@@ -11937,18 +11907,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				logDebug("request.getText(): " + request.getText());
 				countUserAttributes--;
-				if(((MegaApplication) getApplication()).getMyAccountInfo() == null){
-					logError("ERROR: MyAccountInfo is NULL");
-				}
-				((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
+				myAccountInfo.setLastNameText(request.getText());
+
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The last name has changed");
-					MyAccountInfo accountInfo = app.getMyAccountInfo();
-					if (accountInfo != null && getMyAccountFragment() != null) {
-						maF.updateNameView(accountInfo.getFullName());
-					}
-
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					maF.updateNameView(myAccountInfo.getFullName());
+					updateUserNameNavigationView(myAccountInfo.getFullName());
 				}
 				else{
 					logError("Error with last name");
@@ -12657,10 +12621,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				long previousVersions = info.getVersionsSize();
 				logDebug("Previous versions: " + previousVersions);
 
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					((MegaApplication) getApplication()).getMyAccountInfo().setNumVersions(numVersions);
-					((MegaApplication) getApplication()).getMyAccountInfo().setPreviousVersionsSize(previousVersions);
-				}
+				myAccountInfo.setNumVersions(numVersions);
+				myAccountInfo.setPreviousVersionsSize(previousVersions);
 
 			} else {
 				logError("ERROR requesting version info of the account");
@@ -12681,16 +12643,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param e         MegaError of the request.
 	 */
 	private void updateMyData(boolean firstName, String newName, MegaError e) {
-		MyAccountInfo accountInfo = app.getMyAccountInfo();
-		AccountController.updateMyData(firstName, newName, e);
-
-		if (accountInfo != null) {
-			accountInfo.setFullName();
-			updateUserNameNavigationView(accountInfo.getFullName());
+		if (myAccountInfo != null) {
+			myAccountInfo.updateMyData(firstName, newName, e);
+			updateUserNameNavigationView(myAccountInfo.getFullName());
 
 			if (getMyAccountFragment() != null) {
 				logDebug("Update the account fragment");
-				maF.updateNameView(accountInfo.getFullName());
+				maF.updateNameView(myAccountInfo.getFullName());
 			}
 		}
 	}
@@ -14026,32 +13985,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
 				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
 
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
-						body.append(" ("+getString(R.string.my_account_free)+")");
-					}
-					else{
-						switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
-							case 0:{
-								body.append(" ("+getString(R.string.my_account_free)+")");
-								break;
-							}
-							case 1:{
-								body.append(" ("+getString(R.string.my_account_pro1)+")");
-								break;
-							}
-							case 2:{
-								body.append(" ("+getString(R.string.my_account_pro2)+")");
-								break;
-							}
-							case 3:{
-								body.append(" ("+getString(R.string.my_account_pro3)+")");
-								break;
-							}
-							case 4:{
-								body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-								break;
-							}
+				if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
+					body.append(" (" + getString(R.string.my_account_free) + ")");
+				} else {
+					switch (myAccountInfo.getAccountType()) {
+						case 0: {
+							body.append(" (" + getString(R.string.my_account_free) + ")");
+							break;
+						}
+						case 1: {
+							body.append(" (" + getString(R.string.my_account_pro1) + ")");
+							break;
+						}
+						case 2: {
+							body.append(" (" + getString(R.string.my_account_pro2) + ")");
+							break;
+						}
+						case 3: {
+							body.append(" (" + getString(R.string.my_account_pro3) + ")");
+							break;
+						}
+						case 4: {
+							body.append(" (" + getString(R.string.my_account_prolite_feedback_email) + ")");
+							break;
 						}
 					}
 				}

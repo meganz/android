@@ -45,6 +45,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -54,10 +57,10 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
@@ -84,15 +87,16 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
+@AndroidEntryPoint
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
-	
-	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
+
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	private final int WIDTH = 500;
 
 	private ScrollView scrollView;
 	private Context context;
-	private MyAccountInfo myAccountInfo;
 
 	private RelativeLayout avatarLayout;
 	private RoundedImageView myAccountImage;
@@ -326,10 +330,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButton.setOnClickListener(this);
 
 		parentLinearLayout = v.findViewById(R.id.parent_linear_layout);
-
-		if(myAccountInfo==null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
 
 		if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
 			logDebug("MyName is: " + myAccountInfo.getFullName());

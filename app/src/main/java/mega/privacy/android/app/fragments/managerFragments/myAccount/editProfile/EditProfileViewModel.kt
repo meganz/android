@@ -9,11 +9,10 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.hilt.lifecycle.ViewModelInject
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
-import mega.privacy.android.app.lollipop.MyAccountInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
@@ -21,12 +20,11 @@ import mega.privacy.android.app.utils.Util.checkTakePicture
 import nz.mega.sdk.MegaApiAndroid
 
 class EditProfileViewModel @ViewModelInject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val accountInfo: MyAccountInfo
 ) : BaseRxViewModel() {
 
-    private var accountInfo: MyAccountInfo = MegaApplication.getInstance().myAccountInfo
-
-    fun getName(): String? = accountInfo.fullName
+    fun getName(): String = accountInfo.fullName
 
     fun getEmail(): String = megaApi.myEmail
 
