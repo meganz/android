@@ -113,7 +113,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURSOR_POSITION, binding.contentText.selectionStart)
+        outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
 
@@ -311,7 +311,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param savedInstanceState Saved state if available.
      */
     private fun setUpView(savedInstanceState: Bundle?) {
-        binding.contentText.apply {
+        binding.contentEditText.apply {
             doAfterTextChanged { editable ->
                 viewModel.setEditedText(editable?.toString())
             }
@@ -361,9 +361,14 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             supportActionBar?.title = null
             binding.nameText.isVisible = true
 
-            binding.contentText.apply {
-                inputType = InputType.TYPE_NULL
+            binding.contentEditText.apply {
+                isVisible = false
                 hideKeyboard()
+            }
+
+            binding.contentText.apply {
+                isVisible = true
+                text = binding.contentEditText.text
             }
 
             if (!readingContent && viewModel.canShowEditFab()) {
@@ -372,10 +377,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             supportActionBar?.title = viewModel.getNameOfFile()
             binding.nameText.isVisible = false
+            binding.contentText.isVisible = false
 
-            binding.contentText.apply {
-                imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            binding.contentEditText.apply {
+                isVisible = true
                 showKeyboardDelayed(this)
             }
 
@@ -414,7 +419,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
-        binding.contentText.setText(contentRead)
+        binding.contentText.text = contentRead
+        binding.contentEditText.setText(contentRead)
 
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
