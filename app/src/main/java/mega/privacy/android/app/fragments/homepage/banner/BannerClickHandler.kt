@@ -27,6 +27,9 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
                 (fragment.activity as ManagerActivityLollipop).selectDrawerItemLollipop(
                     ManagerActivityLollipop.DrawerItem.SETTINGS)
             }
+            TEXT_EDITOR -> {
+                (fragment.activity as ManagerActivityLollipop).showNewTextFileDialog(null)
+            }
         }
     }
 
@@ -34,5 +37,6 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
         private const val ACHIEVEMENT = "https://mega.nz/achievements"
         private const val REFERRAL = "https://mega.nz/fm/refer"
         private const val SETTINGS = "https://mega.nz/appSettings"
+        private const val TEXT_EDITOR = "https://mega.nz/newText"
     }
 }
