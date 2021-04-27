@@ -500,6 +500,11 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.textFileEditor.TextFileEditorActivity"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.contacts.ContactsActivity"
             android:label="@string/section_contacts"
             android:launchMode="singleTop" />
