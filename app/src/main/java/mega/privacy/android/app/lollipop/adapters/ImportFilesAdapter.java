@@ -210,11 +210,12 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
         holder.thumbnail.setVisibility(VISIBLE);
 
+        Uri uri = null;
+
         if (typeForName(file.getTitle()).isImage()
                 || typeForName(file.getTitle()).isVideo()
                 || typeForName(file.getTitle()).isVideoReproducible()) {
             File thumb = getThumbnail(file);
-            Uri uri = null;
 
             if (thumb.exists()) {
                 uri = Uri.parse(thumb.getAbsolutePath());
@@ -225,10 +226,10 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
             } else {
                 new ThumbnailsTask().execute(file, holder);
             }
+        }
 
-            if (uri == null) {
-                holder.thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
-            }
+        if (uri == null) {
+            holder.thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
         }
 
         RelativeLayout.LayoutParams params;
