@@ -14,6 +14,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
 import java.io.File
 import javax.inject.Inject
@@ -69,7 +70,7 @@ class GetContactsUseCase @Inject constructor(
                     if (index != -1) {
                         val contact = contacts[index]
                         contacts[index] = contact.copy(
-                            lastSeen = lastGreen.toString()
+                            lastSeen = TimeUtils.lastGreenDate(context, lastGreen)
                         )
                     }
 
