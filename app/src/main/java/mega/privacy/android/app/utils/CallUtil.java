@@ -65,6 +65,18 @@ public class CallUtil {
     public static final int MAX_PARTICIPANTS_IN_CALL = 20;
 
     /**
+     * Method for opening the Meeting Activity.
+     */
+    public static void openMeeting(Context context, long chatId) {
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        MegaApplication.getInstance().openCallService(chatId);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
      * Retrieve if there's a call in progress that you're participating in.
      *
      * @return True if you're on a call in progress. Otherwise false.
@@ -135,18 +147,13 @@ public class CallUtil {
     public static void returnActiveCall(Context context) {
         ArrayList<Long> currentCalls = getCallsParticipating();
 
-//        for(Long chatIdCall:currentCalls){
-//            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
-//            if(call != null){
-//                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-//                Intent intent = new Intent(context, ChatCallActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                intent.putExtra(CHAT_ID, call.getChatid());
-//                intent.putExtra(CALL_ID, call.getCallId());
-//                context.startActivity(intent);
-//                break;
-//            }
-//        }
+        for(Long chatIdCall:currentCalls){
+            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
+            if(call != null){
+                openMeeting(context, chatIdCall);
+                break;
+            }
+        }
     }
 
     /**
@@ -159,18 +166,12 @@ public class CallUtil {
         if(currentCalls == null || currentCalls.isEmpty())
             return;
 
-//        for(Long chatIdCall:currentCalls){
-//            if(chatIdCall == chatId){
-//                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-//                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-//                Intent intent = new Intent(context, ChatCallActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                intent.putExtra(CHAT_ID, call.getChatid());
-//                intent.putExtra(CALL_ID, call.getCallId());
-//                context.startActivity(intent);
-//                return;
-//            }
-//        }
+        for(Long chatIdCall:currentCalls){
+            if(chatIdCall == chatId){
+                openMeeting(context, chatId);
+                return;
+            }
+        }
     }
 
     /**
@@ -212,10 +213,10 @@ public class CallUtil {
         callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
         callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
-        if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            activateChrono(true, callInProgressChrono, call);
-        } else {
+        if(MegaApplication.getInstance().isRequestSent(call.getCallId())){
             activateChrono(false, callInProgressChrono, null);
+        }else{
+            activateChrono(true, callInProgressChrono, call);
         }
 
         callInProgressLayout.setVisibility(View.VISIBLE);
@@ -243,7 +244,6 @@ public class CallUtil {
         }
 
         ArrayList<Long> currentChatCallsList = getCallsParticipating();
-
         if (!participatingInACall() || currentChatCallsList == null || !isScreenInPortrait(context)) {
             hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
             return;

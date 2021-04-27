@@ -31,6 +31,6 @@ class HangChatCallListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnCallHungUpCallback {
-        fun onCallHungUp(chatId: Long)
+        fun onCallHungUp(callId: Long)
     }
 }

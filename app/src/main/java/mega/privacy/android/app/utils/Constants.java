@@ -646,10 +646,11 @@ public class Constants {
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
 
-    public static final int AUDIO_MANAGER_CALL_RINGING = 0;
-    public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 1;
-    public static final int AUDIO_MANAGER_CALL_OUTGOING = 2;
-    public static final int AUDIO_MANAGER_CREATING_MEETING = 3;
+    public static final int AUDIO_MANAGER_PLAY_VOICE_CLIP = 0;
+    public static final int AUDIO_MANAGER_CALL_RINGING = 1;
+    public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 2;
+    public static final int AUDIO_MANAGER_CALL_OUTGOING = 3;
+    public static final int AUDIO_MANAGER_CREATING_MEETING = 4;
 
     public static final String SEPARATOR = File.separator;
 

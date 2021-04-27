@@ -7,6 +7,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +20,7 @@ class InMeetingRepository @Inject constructor(
 ) {
 
     fun setCallOnHold(chatId: Long, isHold: Boolean) {
-        if (chatId != null) {
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
             megaChatApi.setCallOnHold(chatId, isHold, SetCallOnHoldListener(context))
         }
     }

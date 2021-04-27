@@ -143,8 +143,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        MegaApplication.getInstance().removeRTCAudioManager()
-
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)
 

@@ -416,7 +416,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onEndMeeting() {
         when {
             isOneToOneChat -> {
-                leaveMeeting()
+                inMeetingViewModel.leaveMeeting(chatId)
+                meetingActivity.finish()
             }
             isModerator -> {
                 val endMeetingBottomSheetDialogFragment =
@@ -448,12 +449,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun leaveMeeting() {
-        if (isGuest && !isOneToOneChat) {
-            meetingActivity.startActivity(Intent(meetingActivity, LeftMeetingActivity::class.java))
-            meetingActivity.finish()
-        } else {
-            inMeetingViewModel.leaveMeeting(chatId)
-            meetingActivity.finish()
+        when {
+            isGuest -> {
+                meetingActivity.startActivity(
+                    Intent(
+                        meetingActivity,
+                        LeftMeetingActivity::class.java
+                    )
+                )
+                meetingActivity.finish()
+            }
+            else -> {
+                inMeetingViewModel.leaveMeeting(chatId)
+            }
         }
     }
 

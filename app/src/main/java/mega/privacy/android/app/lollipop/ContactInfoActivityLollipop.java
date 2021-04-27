@@ -148,7 +148,7 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
-		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower {
+		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.OnCallStartedCallback {
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -989,17 +989,16 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
+			logDebug("Chat exists");
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
-				MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-				MegaApplication.getInstance().openCallService(chatRoomTo.getChatId());
-				Intent meetingIntent = new Intent(this, MeetingActivity.class);
-				meetingIntent.setAction(MEETING_ACTION_IN);
-				meetingIntent.putExtra(MEETING_CHAT_ID, chatRoomTo.getChatId());
-				startActivity(meetingIntent);
+				logDebug("There is a call, open it");
+				openMeeting(this, chatRoomTo.getChatId());
 			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
+				logDebug("There is no call, start it");
 				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
+			logDebug("Chat doesn't exist");
 			//Create first the chat
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
@@ -2107,7 +2106,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		addChecksForACall(chatRoom.getChatId(), startVideo);
-		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this));
+		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
 		MegaApplication.setIsWaitingForCall(false);
 	}
 
@@ -2186,5 +2185,13 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	@Override
 	public void createFolder(@NotNull String folderName) {
 		//No action needed
+	}
+
+	@Override
+	public void onCallStarted(long chatId) {
+		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
+		if(chatRoomTo != null && chatRoomTo.getChatId() == chatId){
+			openMeeting(this, chatId);
+		}
 	}
 }

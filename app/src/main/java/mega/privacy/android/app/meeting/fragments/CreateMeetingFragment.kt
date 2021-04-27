@@ -95,6 +95,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
                 R.string.type_meeting_name, megaChatApi.myFullname
             )
         )
+
+        viewModel.initRTCAudioManager()
     }
 
 }

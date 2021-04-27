@@ -569,23 +569,23 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     private final Observer<MegaChatCall> callStatusObserver = call -> {
         if (call.getChatid() != getCurrentChatid()) {
             logDebug("Different chat");
-            updateCallBar();
+            updateCallBanner();
             return;
         }
 
         switch (call.getStatus()) {
             case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                updateCallBar();
+                updateCallBanner();
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                updateCallBar();
+                updateCallBanner();
                 cancelRecording();
                 break;
 
             case MegaChatCall.CALL_STATUS_DESTROYED:
-                updateCallBar();
+                updateCallBanner();
                 if (dialogCall != null) {
                     dialogCall.dismiss();
                 }
@@ -594,11 +594,11 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     };
 
     private final Observer<MegaChatCall> callOnHoldObserver = call -> {
-        updateCallBar();
+        updateCallBanner();
     };
 
     private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
-        updateCallBar();
+        updateCallBanner();
     };
 
 
@@ -638,12 +638,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     @Override
-    public void onCallStarted() {
-        openMeeting(idChat);
-    }
-
-    @Override
-    public void onCallHungUp(long chatId) {
+    public void onCallHungUp(long callId) {
         logDebug("The call has been successfully hung up");
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
@@ -660,7 +655,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     @Override
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
-        openMeeting(chatId);
+        openMeeting(this, chatId);
     }
 
     @Override
@@ -686,6 +681,13 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             } else {
                 megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
             }
+        }
+    }
+
+    @Override
+    public void onCallStarted(long chatId) {
+        if (idChat == chatId) {
+            openMeeting(this, idChat);
         }
     }
 
@@ -1649,7 +1651,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     public void updateUserNameInChat() {
-        if (chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
@@ -3062,6 +3064,12 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     addChecksForACall(chatRoom.getChatId(), false);
                     MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                     logDebug("Incoming call, open Meeting to answer the call");
+                    //Open INCOMING CALL ACTIVITY
+//                    MegaApplication.getInstance().openCallService(chatId);
+//                    Intent meetingIntent = new Intent(context, MeetingActivity.class);
+//                    meetingIntent.setAction(MEETING_ACTION_IN);
+//                    meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+//                    context.startActivity(meetingIntent);
                     return;
                 }
 
@@ -8454,7 +8462,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             }
 
             activityVisible = true;
-            updateCallBar();
+            updateCallBanner();
             if(aB != null && aB.getTitle() != null){
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
@@ -8627,7 +8635,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 setAsRead = false;
             }
 
-            updateCallBar();
+            updateCallBanner();
             setChatSubtitle();
             supportInvalidateOptionsMenu();
         }
@@ -8891,9 +8899,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     /**
-     * Method for updating the bar that indicates the current call in this chat.
+     * Method for updating the banner that indicates the current call in this chat.
      */
-    private void updateCallBar() {
+    private void updateCallBanner() {
         if (chatRoom == null || chatRoom.isPreview() || !chatRoom.isActive() ||
                 megaChatApi.getNumCalls() <= 0 || !isStatusConnected(this, idChat)) {
             /*No calls*/
@@ -8923,31 +8931,39 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         /*Call in this chatRoom*/
         int callStatus = callInThisChat.getStatus();
         logDebug("The call status in this chatRoom is "+callStatusToString(callStatus));
-        if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
-            subtitleCall.setVisibility(View.GONE);
-            setSubtitleVisibility();
-            if (anotherActiveCall != null || anotherOnHoldCall != null) {
-                updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                        getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
-                returnCallOnHoldButton.setVisibility(View.GONE);
-            } else {
-                hideCallBar(megaChatApi.getChatCall(idChat));
-            }
-            return;
-        }
 
-        if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS && (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid()))) {
-            if (anotherActiveCall != null || anotherOnHoldCall != null) {
-                updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                        getString(R.string.call_in_progress_layout));
-                returnCallOnHoldButtonText.setText(getResources().getString(R.string.call_on_hold));
-                returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
-                returnCallOnHoldButton.setVisibility(View.VISIBLE);
-            } else {
-                updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
-                returnCallOnHoldButton.setVisibility(View.GONE);
-            }
-            return;
+        // Check call on hold button
+        switch (callStatus) {
+            case MegaChatCall.CALL_STATUS_DESTROYED:
+                subtitleCall.setVisibility(View.GONE);
+                setSubtitleVisibility();
+                if (anotherActiveCall != null || anotherOnHoldCall != null) {
+                    updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
+                            getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
+                    returnCallOnHoldButton.setVisibility(View.GONE);
+                } else {
+                    hideCallBar(megaChatApi.getChatCall(idChat));
+                }
+                return;
+
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                if(MegaApplication.getInstance().isRequestSent(callInThisChat.getCallId())){
+                    break;
+                }
+                if (!MegaApplication.isRequestSent(callInThisChat.getCallId()) &&
+                        (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid()))) {
+                    if (anotherActiveCall != null || anotherOnHoldCall != null) {
+                        updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
+                                getString(R.string.call_in_progress_layout));
+                        returnCallOnHoldButtonText.setText(getResources().getString(R.string.call_on_hold));
+                        returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
+                        returnCallOnHoldButton.setVisibility(View.VISIBLE);
+                    } else {
+                        updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
+                        returnCallOnHoldButton.setVisibility(View.GONE);
+                    }
+                    return;
+                }
         }
 
         returnCallOnHoldButton.setVisibility(View.GONE);
@@ -8978,7 +8994,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                         returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
                     }
                 }else{
-
                     if(anotherActiveCall == null && anotherOnHoldCall == null) {
                         if(callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)){
                             tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
@@ -8993,8 +9008,12 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
-                updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
+                if (MegaApplication.isRequestSent(callInThisChat.getCallId())) {
+                    tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
+                } else {
+                    callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                    updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
+                }
                 break;
         }
     }
@@ -9239,7 +9258,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
         if(rtcAudioManager == null){
             speakerWasActivated = true;
-            rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
+            rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, AUDIO_MANAGER_PLAY_VOICE_CLIP);
         }else{
             activateSpeaker();
         }
@@ -9274,10 +9293,10 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             if (call != null && chatIdOfCall != MEGACHAT_INVALID_HANDLE) {
                 if (!MegaApplication.getSpeakerStatus(chatIdOfCall)) {
                     MegaApplication.setSpeakerStatus(chatIdOfCall, true);
-                    app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS, chatIdOfCall, call.isRinging());
+                    app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
             } else {
-                rtcAudioManager.updateSpeakerStatus(true, INVALID_CALL_STATUS);
+                rtcAudioManager.updateSpeakerStatus(true, AUDIO_MANAGER_PLAY_VOICE_CLIP);
             }
         }
     }
@@ -9505,18 +9524,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
         adapter.updatePausedUploadingMessages(mLayoutManager.findFirstVisibleItemPosition(),
                 mLayoutManager.findLastVisibleItemPosition());
-    }
-
-    /**
-     * Method for opening the Call Activity.
-     */
-    private void openMeeting(long chatId){
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.getInstance().openCallService(chatId);
-        Intent meetingIntent = new Intent(this, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_IN);
-        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-        startActivity(meetingIntent);
     }
 
     /*

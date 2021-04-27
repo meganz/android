@@ -52,9 +52,11 @@ class MeetingActivityRepository @Inject constructor(
      * @param device AudioDevice
      */
     fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
-        MegaApplication.getInstance().audioManager!!.selectAudioDevice(
-            device,
-            false
-        )
+        if (MegaApplication.getInstance().audioManager != null) {
+            MegaApplication.getInstance().audioManager.selectAudioDevice(
+                device,
+                false
+            )
+        }
     }
 }

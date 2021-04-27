@@ -45,6 +45,7 @@ public class CallNotificationIntentService extends IntentService implements Snac
     private long callIdIncomingCall = MEGACHAT_INVALID_HANDLE;
 
     private long chatIdCurrentCall;
+    private long callIdCurrentCall = MEGACHAT_INVALID_HANDLE;
 
     public CallNotificationIntentService() {
         super("CallNotificationIntentService");
@@ -61,7 +62,13 @@ public class CallNotificationIntentService extends IntentService implements Snac
     @Override
     protected void onHandleIntent(Intent intent) {
         logDebug("onHandleIntent");
+
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
+        MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
+        if(currentCall != null){
+            callIdCurrentCall = currentCall.getCallId();
+        }
+
         chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
         MegaChatCall incomingCall = megaChatApi.getChatCall(chatIdIncomingCall);
         if(incomingCall != null){
@@ -91,7 +98,6 @@ public class CallNotificationIntentService extends IntentService implements Snac
                     }
 
                 } else {
-                    MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
                     if (currentCall == null) {
                         logDebug("Answering incoming call ...");
                         addChecksForACall(chatIdIncomingCall, false);
@@ -119,7 +125,6 @@ public class CallNotificationIntentService extends IntentService implements Snac
 
             case HOLD_ANSWER:
             case HOLD_JOIN:
-                MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
                 if (currentCall == null || currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     addChecksForACall(chatIdIncomingCall, false);
@@ -136,12 +141,12 @@ public class CallNotificationIntentService extends IntentService implements Snac
     }
 
     @Override
-    public void onCallHungUp(long chatId) {
-        if (chatId == chatIdIncomingCall) {
+    public void onCallHungUp(long callId) {
+        if (callId == callIdIncomingCall) {
             logDebug("Incoming call hung up. ");
             clearIncomingCallNotification(callIdIncomingCall);
             stopSelf();
-        } else if (chatId == chatIdCurrentCall) {
+        } else if (callId == callIdCurrentCall) {
             logDebug("Current call hung up. Answering incoming call ...");
             addChecksForACall(chatIdIncomingCall, false);
             megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));

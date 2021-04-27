@@ -1613,8 +1613,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         boolean isSpeakerOn = MegaApplication.getSpeakerStatus(callChat.getChatid());
         app.updateSpeakerStatus(isSpeakerOn,
-                isRequestSent(callChat.getCallId()) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS,
-                callChat.getChatid(), callChat.isRinging());
+                isRequestSent(callChat.getCallId()) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_300)));
@@ -3095,11 +3094,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     @Override
-    public void onCallHungUp(long chatId) {
-        if (getCall() == null)
-            return;
-        logDebug("Call hung up");
-        if (chatId == callChat.getChatid()) {
+    public void onCallHungUp(long callId) {
+        if (callChat.getCallId() == callId) {
+            logDebug("Call hung up");
             MegaApplication.setSpeakerStatus(callChat.getChatid(), false);
             finishActivity();
         } else {
