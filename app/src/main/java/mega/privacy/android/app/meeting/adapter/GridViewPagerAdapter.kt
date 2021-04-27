@@ -25,7 +25,7 @@ class GridViewPagerAdapter(
         val gridView = holder.findViewById<CustomizedGridCallRecyclerView>(R.id.grid_view)
         gridView.itemAnimator = DefaultItemAnimator()
         gridView.setOnTouchCallback {
-            (fragment as? InMeetingFragment)?.onPageClick()
+            (fragment as InMeetingFragment).onPageClick()
         }
 
         if(position == 0) {
