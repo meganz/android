@@ -1322,7 +1322,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				message = getString(R.string.download_preparing_files);
 			}
 			else{
-				int inProgress = totalTransfers - pendingTransfers + 1;
+				int inProgress = pendingTransfers == 0 ? totalTransfers
+						: totalTransfers - pendingTransfers + 1;
 
 				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
 					message = getResources().getQuantityString(R.plurals.download_service_paused_notification, totalTransfers, inProgress, totalTransfers);

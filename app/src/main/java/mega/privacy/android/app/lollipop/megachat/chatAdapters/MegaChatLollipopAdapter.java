@@ -13,6 +13,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -8060,6 +8061,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 completionMediaPlayer(mId);
             }
         });
+    }
+
+    /**
+     * Update media player when switching AudioManager mode
+     */
+    public void refreshVoiceClipPlayback() {
+        if (messagesPlaying == null || messagesPlaying.isEmpty()) return;
+        for (MessageVoiceClip m : messagesPlaying) {
+            if (m.getMediaPlayer().isPlaying()) {
+                m.getMediaPlayer().seekTo(0);
+                break;
+            }
+        }
     }
 
     /*

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -&gt; Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -&gt; Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -&gt; Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -&gt; MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, serviciul de stocare în cloud cu confidențialitate puternică mereu activă.</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Acest link nu va mai fi disponibil publicului.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Aceste linkuri nu vor mai fi disponibile publicului.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Redenumește</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Deschide un link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
     <string name="context_renaming" context="while renaming a file or folder">Se redenumește</string>
@@ -654,7 +656,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Anulează toate transferurile</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Realizează o fotografie</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capturează</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permite notificări pentru apelurile MEGA primite</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA are nevoie de autorizarea ta pentru a permite interfața de apel să apară de pe fundal.</string>
@@ -682,6 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -775,6 +778,8 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Necesită cod de acces</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Imediat</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
@@ -917,7 +922,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">Cheia de recuperare se introduce aici</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">parola se introduce aici</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Acesta este ultimul pas pentru a-ți anula contul. Vei pierde definitiv toate datele stocate în cloud. Te rugăm să introduci parola mai jos.</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">Acesta este ultimul pas pentru a-ți șterge contul. Vei pierde definitiv toate datele stocate în unitatea cloud. Te rugăm să introduci parola mai jos.</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verificarea e-mailului</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Te rugăm să verifici e-mailul pentru a continua.</string>
@@ -981,7 +986,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Beneficiază pe deplin de contul tău MEGA upgradându-l la Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editează poza de profil</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Realizează o fotografie</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">Capturează</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Alege poza</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Șterge poza</string>
 
@@ -1337,7 +1342,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Ofline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Setează statusul</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Colour theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Înlătură</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Indisponibil</string>
 
@@ -1513,7 +1518,7 @@
 
     <string name="general_view_contacts" context="Menu option">Vezi contactele</string>
 
-    <string name="import_success_message" context="Menu option">Adăugat cu succes în unitatea cloud</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Adăugat cu succes în unitatea cloud</string>
     <string name="import_success_error" context="Menu option">Eroare. Nu a fost adăugat în unitatea cloud</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Se conectează&#8230;</string>
@@ -1734,7 +1739,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Setează ziua</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Data cerută nu este validă</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Caractere nepermise</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Caractere nevalide</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Fișier audio</string>
 
@@ -1896,7 +1909,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Încărcare pe chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitate video în chaturi</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitate video</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Calitate video</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Încărcări cameră are nevoie să îți acceseze fotografiile și alt conținut media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2047,6 +2060,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Te rugăm să introduci codul din 6 cifre generat de aplicația de autentificare.</string>
     <string name="general_verify" context="Text button">Verifică</string>
     <string name="general_next" context="Text button">Înainte</string>
+    <string name="general_previous" context="Text button">Anterior</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">A apărut o eroare la generarea sămânței sau a codului QR, te rugăm să încerci din nou.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Autentificarea cu doi factori activată</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Data viitoare când te autentifici în contul ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
@@ -2079,6 +2093,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Previzualizează conținutul</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Redarea în flux nu poate fi executată și fișierul nu a fost descărcat</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Nu am putut deschide fișierul din cauza lipsei de conexiune la rețea.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Fișierul există deja în Salvate pentru offline</string>
 
@@ -2207,6 +2222,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Mesaj</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Trimite către&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Încarcă către&#8230;</string>
 
@@ -2362,6 +2378,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Contul tău actual este [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Obiectul participării tale în programul nostru de realizări</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Metodă de plată</string>
 
     <string name="billing_period_title" context="title of billing period">Perioadă de facturare</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Unică (o lună)[/A] %s</string>
@@ -2916,6 +2933,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">luni</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">an</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 oră</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
@@ -2972,11 +2991,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Violet</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Gri</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Will play in the background</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Will not play in the background</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now playing</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now playing (paused)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+
     <string name="action_more_information" context="Action to get more information">Mai multe informații</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
@@ -3005,4 +3032,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Întunecată</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
 </resources>

@@ -52,6 +52,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -60,6 +63,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -79,13 +83,18 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class SearchFragmentLollipop extends RotatableFragment{
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	private Context context;
 	private RecyclerView recyclerView;
@@ -636,11 +645,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public void newSearchNodesTask() {
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context,
-				this,
-				((ManagerActivityLollipop) context).getSearchQuery(),
-				((ManagerActivityLollipop) context).getParentHandleSearch(),
-				nodes);
+		searchNodesTask = new SearchNodesTask(context, this, ((ManagerActivityLollipop) context).getSearchQuery(),
+				((ManagerActivityLollipop) context).getParentHandleSearch(), nodes, sortOrderManagement);
 		searchNodesTask.execute();
 	}
 
@@ -731,7 +737,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
 					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
@@ -772,7 +778,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+
+					mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					manageNodes(mediaIntent);
 
@@ -971,6 +978,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 								Collections.singletonList(nodes.get(position)),
 								true, false, false, false);
 					}
+				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+					manageTextFileIntent(requireContext(), nodes.get(position), SEARCH_ADAPTER);
 				} else{
 					adapter.notifyDataSetChanged();
 					((ManagerActivityLollipop) context).saveNodesToDevice(

@@ -93,6 +93,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -691,6 +692,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                                 showNodeAttachmentBottomSheet(m, position);
                             }
                             overridePendingTransition(0, 0);
+                        } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                            manageTextFileIntent(this, m.getMsgId(), chatId);
                         } else {
                             logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
                             showNodeAttachmentBottomSheet(m, position);
@@ -879,7 +882,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                 case R.id.chat_cab_menu_offline: {
                     clearSelections();
                     hideMultipleSelect();
-                    chatC.saveForOfflineWithMessages(messagesSelected, megaChatApi.getChatRoom(chatId));
+                    chatC.saveForOfflineWithMessages(messagesSelected,
+                            megaChatApi.getChatRoom(chatId), NodeAttachmentHistoryActivity.this);
                     break;
                 }
             }

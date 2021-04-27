@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
@@ -69,7 +70,7 @@ class NodeSaver(
     private val megaApiFolder = app.megaApiFolder
     private val dbHandler = DatabaseHandler.getDbHandler(app)
 
-    private var saving = Saving.NOTHING
+    private var saving : Saving = Saving.Companion.NOTHING
 
     /**
      * Save an offline node into device.
@@ -311,12 +312,31 @@ class NodeSaver(
                 )
 
                 voiceClipSaving.doDownload(
-                    megaApi, megaApiFolder, parentPath, false, null, snackbarShower
+                    megaApi, megaApiFolder, parentPath, false, null, null
                 )
             })
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { logErr("NodeSaver downloadVoiceClip") })
             .addTo(compositeDisposable)
+    }
+
+    /**
+     * Save an Uri into device.
+     *
+     * @param uri uri to save
+     * @param name name of this uri
+     * @param size size of this uri content
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    fun saveUri(
+        uri: Uri,
+        name: String,
+        size: Long,
+        fromMediaViewer: Boolean = false,
+    ) {
+        save {
+            UriSaving(uri, name, size, fromMediaViewer)
+        }
     }
 
     /**
@@ -332,7 +352,7 @@ class NodeSaver(
      * fragment/app should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (saving == Saving.NOTHING) {
+        if (saving == Saving.Companion.NOTHING) {
             return false
         }
 
@@ -418,7 +438,7 @@ class NodeSaver(
      */
     fun handleRequestPermissionsResult(requestCode: Int): Boolean {
         if (requestCode != REQUEST_WRITE_STORAGE) {
-            return false;
+            return false
         }
 
         if (hasWriteExternalStoragePermission()) {
@@ -508,7 +528,7 @@ class NodeSaver(
         var totalSize = 0L
 
         for (node in nodes) {
-            totalSize += node.size
+            totalSize += if (node.isFolder) nodesTotalSize(megaApi.getChildren(node)) else node.size
         }
 
         return totalSize

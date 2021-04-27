@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -58,6 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -73,11 +77,14 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class RubbishBinFragmentLollipop extends Fragment{
 
-	public static int GRID_WIDTH =400;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 	
 	Context context;
 	RecyclerView recyclerView;
@@ -315,7 +322,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		if (((ManagerActivityLollipop)context).getParentHandleRubbish() == -1||((ManagerActivityLollipop)context).getParentHandleRubbish()==megaApi.getRubbishNode().getHandle()){
 			logDebug("Parent is the Rubbish: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
 
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
 
 		}
 		else{
@@ -323,11 +330,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 			if (parentNode != null){
 				logDebug("The parent node is: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 		}
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
@@ -595,7 +602,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
@@ -683,7 +690,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 
 					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
 					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
@@ -922,7 +929,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								Collections.singletonList(nodes.get(position)),
 								true, false, false, false);
 					}
-				} else{
+				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
+				} else {
 					adapter.notifyDataSetChanged();
 					((ManagerActivityLollipop) context).saveNodesToDevice(
 							Collections.singletonList(nodes.get(position)),
@@ -1016,7 +1025,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 

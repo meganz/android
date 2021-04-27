@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка Pro Lite: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка Pro I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка Pro II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка Pro III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -> Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -> Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -> Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -> MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка Pro Lite: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка Pro I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка Pro II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка Pro III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -&gt; Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -&gt; Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -&gt; Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -&gt; MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA — это облачное хранилище с мощной и постоянной конфиденциальностью.</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -219,7 +219,7 @@
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Загрузки медиафайлов</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
-    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
+    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
     <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Эта ссылка больше не будет общедоступна.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Эти ссылки больше не будут доступны публично.</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Переименовать</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Переименовать %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Открыть ссылку</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Открыть</string>
     <string name="context_renaming" context="while renaming a file or folder">Переименование</string>
@@ -682,6 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Хранилище</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">Код блокировки</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Сжатие видео очень энергозатратно. MEGA потребует подключить зарядное устройство, если размер сжимаемых видео превышает %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Если включено, вы будете загружать информацию о том, где были сняты ваши фотографии. Поэтому будьте осторожны, когда делитесь ими.</string>
 
@@ -775,6 +778,8 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Не установлено</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Код блокировки</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Изменить код</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Требовать пароль</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Сразу же</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Ввод</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">После 10 неудачных попыток локальные файлы будут удалены, а вы выйдете из системы</string>
@@ -1171,7 +1176,7 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">Ничего не найдено</string>
 
-    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
+    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
     <string name="online_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</string>
     <string name="away_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</string>
     <string name="busy_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</string>
@@ -1366,7 +1371,7 @@
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</item>
-        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</item>
     </string-array>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">Нет локальных файлов</string>
@@ -1513,7 +1518,7 @@
 
     <string name="general_view_contacts" context="Menu option">Просмотр контактов</string>
 
-    <string name="import_success_message" context="Menu option">Добавлено в облачный диск</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Добавлено в облачный диск</string>
     <string name="import_success_error" context="Menu option">Ошибка. Не добавлено в облачный диск</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Соединение&#8230;</string>
@@ -1734,7 +1739,15 @@
     <string name="label_set_day" context="title of a Search by date tag">Выбрать день</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Введённая дата недействительна</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Символы не разрешены</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Неправильное имя</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Исправьте имена файлов, прежде чем продолжить</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Недопустимые символы</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Назовите файл, прежде чем продолжить</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Назовите файлы, прежде чем продолжить</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Аудиофайл</string>
 
@@ -2047,6 +2060,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Введите шестизначный код из приложения-аутентификатора.</string>
     <string name="general_verify" context="Text button">Подтвердить</string>
     <string name="general_next" context="Text button">Вперёд</string>
+    <string name="general_previous" context="Text button">Назад</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Произошла ошибка при генерации seed-ключа или QR-кода, попробуйте снова.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Двухфакторная аутентификация включена.</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">При следующем входе в аккаунт система запросит 6-значный код из приложения-аутентификатора.</string>
@@ -2079,6 +2093,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Предпросмотр</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Потоковая передача не может быть выполнена, файл не был загружен</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Невозможно открыть файл.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Нам не удалось открыть файл из-за отсутствия сетевого подключения.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Файл уже сохранён локально</string>
 
@@ -2207,6 +2222,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Сообщение</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Видео</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Отправить ссылку&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Отправить в&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Загрузить в&#8230;</string>
 
@@ -2362,6 +2378,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Ваш текущий аккаунт — [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">При условии вашего участия в программе достижений.</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">Вид оплаты</string>
 
     <string name="billing_period_title" context="title of billing period">Расчётный период</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Единоразово (месяц)[/A] %s</string>
@@ -2916,6 +2933,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">месяцев</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">год</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 час</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d ч.</item>
@@ -2972,11 +2991,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Фиолетовый</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Серый</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Будет играть в фоновом режиме</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Не будет играть в фоновом режиме</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Сейчас играет</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Сейчас играет (пауза)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Информация о треке</string>
+
     <string name="action_more_information" context="Action to get more information">Дополнительная информация</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Политика использования куки-файлов</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Настройки куки-файлов</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Прежде чем продолжить</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Мы используем локальное хранилище и аналогичные технологии («Cookies») для предоставления вам наших услуг, улучшения вашего опыта работы с нашими услугами и настройки рекламы, которую вы видите, в том числе через третьих лиц. Согласитесь с использованием куки-файлов с самого начала вашего посещения или настройте куки в настройках файлов куки. Подробнее читайте в нашей [A]Политике в отношении куки-файлов[/A].</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Настройки куки-файлов не сохранены</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Изменения настроек куки-файлов сохранены.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Сторонние куки-файлы</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Рекламные куки-файлы Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Категория: рекламные куки-файлы</string>
@@ -3005,4 +3032,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">Тёмная</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">Системная</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Устанавливается функцией экономии заряда батареи</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Выберите корень SD-карты.</string>
 </resources>
