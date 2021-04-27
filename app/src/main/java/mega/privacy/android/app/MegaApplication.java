@@ -44,6 +44,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -149,6 +150,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	DatabaseHandler dbH;
 	@Inject
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -321,7 +324,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("END logout sdk request - wait chat logout");
@@ -495,10 +498,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		
 	}
 
-	private void sendBroadcastUpdateAccountDetails() {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
-		sendBroadcast(intent);
+	public void sendBroadcastUpdateAccountDetails() {
+		sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+				.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
 	}
 
 	private final int interval = 3000;
@@ -978,6 +980,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+
+		// Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+		final int DESIRABLE_R_LIMIT = 20000; // SDK team recommended value
+		int currentLimit = megaApi.platformGetRLimitNumFile();
+		logDebug("Current resource limit is set to " + currentLimit);
+		if (currentLimit < DESIRABLE_R_LIMIT) {
+			logDebug("Resource limit is under desirable value. Trying to increase the resource limit...");
+			if (!megaApi.platformSetRLimitNumFile(DESIRABLE_R_LIMIT)) {
+				logWarning("Error setting resource limit.");
+			}
+
+			// Check new resource limit after set it in order to see if had been set successfully to the
+			// desired value or maybe to a lower value limited by the system.
+			logDebug("Resource limit is set to " + megaApi.platformGetRLimitNumFile());
+		}
 	}
 
 	/**
@@ -1253,6 +1270,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 
+			sortOrderManagement.resetDefaults();
+
 			try{
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
@@ -1348,16 +1367,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
-	}
-
-	public void updateBusinessStatus() {
-		myAccountInfo.setBusinessStatusReceived(true);
-		int status = megaApi.getBusinessStatus();
-		if (status == BUSINESS_STATUS_EXPIRED
-				|| (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD)){
-			myAccountInfo.setShouldShowBusinessAlert(true);
-		}
-		sendBroadcastUpdateAccountDetails();
 	}
 
 	/**
@@ -1890,6 +1899,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
+	}
+
+	public void resetMyAccountInfo() {
+    	myAccountInfo = new MyAccountInfo();
 	}
 
 	public static boolean getSpeakerStatus(long chatId) {

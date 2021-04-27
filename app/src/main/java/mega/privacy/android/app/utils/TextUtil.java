@@ -82,6 +82,32 @@ public class TextUtil {
     }
 
     /**
+     * Formats a String of notification screen.
+     *
+     * @param context Current Context object, to get a resource(for example, color)
+     *                should not use application context, need to pass it from the caller.
+     * @param text    The text to format.
+     * @return The string formatted.
+     */
+    public static Spanned replaceFormatNotificationText(Context context, String text) {
+        try {
+            text = text.replace("[A]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "'>");
+            text = text.replace("[/A]", "</font>");
+            text = text.replace("[B]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                    + "'>");
+
+            text = text.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
+    }
+
+    /**
      * Gets the latest position of a file name before the .extension in order to set the cursor
      * or select the entire file name.
      *
@@ -160,6 +186,17 @@ public class TextUtil {
         } else {
             return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
         }
+    }
+
+    /**
+     * Gets the string to show as file info details with the next format: "size · date".
+     *
+     * @param size The file size.
+     * @param date The file modification date.
+     * @return The string so show as file info details.
+     */
+    public static String getFileInfo(String size, String date) {
+        return String.format("%s · %s", size, date);
     }
 
     /**

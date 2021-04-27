@@ -59,11 +59,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
-            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(INVALID_POSITION)
-            requirePasscodeDialog.setOnDismissListener {
-                requirePasscode?.summary =
-                    passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
-            }
+            showRequirePasscodeDialog(INVALID_POSITION)
             true
         }
 
@@ -80,14 +76,12 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         if (savedInstanceState != null
             && savedInstanceState.getBoolean(IS_REQUIRE_PASSCODE_DIALOG_SHOWN, false)
         ) {
-            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(
-                savedInstanceState.getInt(REQUIRE_PASSCODE_DIALOG_OPTION)
-            )
+            showRequirePasscodeDialog(savedInstanceState.getInt(REQUIRE_PASSCODE_DIALOG_OPTION))
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (this::requirePasscodeDialog.isInitialized && requirePasscodeDialog.isShowing) {
+        if (isRequirePasscodeDialogShow()) {
             outState.putBoolean(IS_REQUIRE_PASSCODE_DIALOG_SHOWN, true)
             outState.putInt(
                 REQUIRE_PASSCODE_DIALOG_OPTION,
@@ -97,6 +91,17 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         super.onSaveInstanceState(outState)
     }
+
+    private fun showRequirePasscodeDialog(selectedPosition: Int) {
+        requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(selectedPosition)
+        requirePasscodeDialog.setOnDismissListener {
+            requirePasscode?.summary =
+                passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
+        }
+    }
+
+    private fun isRequirePasscodeDialogShow(): Boolean =
+        this::requirePasscodeDialog.isInitialized && requirePasscodeDialog.isShowing
 
     private fun enablePasscode() {
         passcodeLock = true
@@ -134,7 +139,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     override fun onDestroy() {
-        if (this::requirePasscodeDialog.isInitialized && requirePasscodeDialog.isShowing) {
+        if (isRequirePasscodeDialogShow()) {
             requirePasscodeDialog.dismiss()
         }
 

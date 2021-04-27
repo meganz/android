@@ -8,12 +8,23 @@ import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /*
  * Mime type for files
  */
 public class MimeTypeList {
+	//20MB
+	private static final long MAX_SIZE_OPENABLE_TEXT_FILE = 20971520;
+	private static final List<String> TEXT_EXTENSIONS = Arrays.asList(
+			//Text
+			"txt", "ans", "ascii", "log", "wpd", "json", "md",
+			//Web data
+			"html", "xml", "shtml", "dhtml", "js", "css", "jar", "java", "class",
+			//Web lang
+			"php", "php3", "php4", "php5", "phtml", "inc", "asp", "pl", "cgi", "py", "sql", "accdb", "db", "dbf", "mdb", "pdb", "c", "cpp", "h", "cs", "sh", "vb", "swift");
 	
 	// Icon resource mapping for different file type extensions
 	private static HashMap<String, Integer> resourcesCache;
@@ -197,7 +208,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isVideoNotSupported() {
-		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+		return extension.equals("mpg") || extension.equals("avi") || extension.equals("wmv");
 	}
 
 	public boolean isMp4Video() {
@@ -218,7 +229,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
+		return extension.equals("wma") || extension.equals("aif")
 				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
 				|| extension.equals("3ga");
 	}
@@ -254,5 +265,34 @@ public class MimeTypeList {
 
 	public boolean isGIF () {
 		return extension.equals("gif") || extension.equals("webp");
+	}
+
+	/**
+	 * Checks if a file is openable in Text editor.
+	 *
+	 * All the contemplated extension are supported by Web client, so mobile clients should try
+	 * to support them too.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	private boolean isValidTextFileType() {
+				//Text
+		return type.startsWith("text/plain")
+
+				//File extensions considered as plain text
+				|| TEXT_EXTENSIONS.contains(extension)
+
+				//Files without extension
+				|| type.startsWith("application/octet-stream");
+	}
+
+	/**
+	 * Checks if a file is openable in Text editor.
+	 * It's openable if its size is not bigger than MAX_SIZE_OPENABLE_TEXT_FILE.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	public boolean isOpenableTextFile(long fileSize) {
+		return  isValidTextFileType() && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE;
 	}
 }

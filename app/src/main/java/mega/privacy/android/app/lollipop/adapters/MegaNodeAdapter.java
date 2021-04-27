@@ -72,6 +72,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -517,18 +518,20 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     public void updateItem(long contactHandle) {
         for (MegaNode node : nodes) {
-            if (node.isFolder()) {
-                if (type == INCOMING_SHARES_ADAPTER || type == OUTGOING_SHARES_ADAPTER) {
-                    ArrayList<MegaShare> shares = type == INCOMING_SHARES_ADAPTER ?
-                            megaApi.getInSharesList() : megaApi.getOutShares(node);
-                    if (shares != null && !shares.isEmpty()) {
-                        for (MegaShare share : shares) {
-                            MegaUser user = megaApi.getContact(share.getUser());
-                            if (user != null && user.getHandle() == contactHandle) {
-                                int position = nodes.indexOf(node);
-                                notifyItemChanged(position);
-                            }
-                        }
+            if (node == null || !node.isFolder()
+                    || (type != INCOMING_SHARES_ADAPTER && type != OUTGOING_SHARES_ADAPTER))
+                continue;
+
+            ArrayList<MegaShare> shares = type == INCOMING_SHARES_ADAPTER
+                    ? megaApi.getInSharesList()
+                    : megaApi.getOutShares(node);
+
+            if (shares != null && !shares.isEmpty()) {
+                for (MegaShare share : shares) {
+                    MegaUser user = megaApi.getContact(share.getUser());
+
+                    if (user != null && user.getHandle() == contactHandle) {
+                        notifyItemChanged(nodes.indexOf(node));
                     }
                 }
             }
@@ -958,7 +961,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else {
             logDebug("Node is file");
             boolean isLinksRoot = type == LINKS_ADAPTER && ((ManagerActivityLollipop) context).getDeepBrowserTreeLinks() == 0;
-            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(node.getSize()),
+            holder.textViewFileSize.setText(getFileInfo(getSizeString(node.getSize()),
                     formatLongDateTime(isLinksRoot ? node.getPublicLinkCreationTime() : node.getModificationTime())));
 
             if(megaApi.hasVersions(node)){

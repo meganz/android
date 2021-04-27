@@ -617,6 +617,10 @@ public class AppRTCAudioManager {
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
         switch (device) {
             case SPEAKER_PHONE:
+                if(apprtcContext instanceof ChatActivityLollipop){
+                    audioManager.setMode(AudioManager.MODE_NORMAL);
+                }
+
                 MegaApplication.isSpeakerOn = true;
                 setSpeakerphoneOn(true);
                 break;
@@ -625,6 +629,11 @@ public class AppRTCAudioManager {
                 if(!isTemporary) {
                     MegaApplication.isSpeakerOn = false;
                 }
+
+                if(apprtcContext instanceof ChatActivityLollipop){
+                    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                }
+
                 setSpeakerphoneOn(false);
                 break;
 
@@ -727,6 +736,7 @@ public class AppRTCAudioManager {
         if (wasOn == on) {
             return;
         }
+
         audioManager.setSpeakerphoneOn(on);
     }
 

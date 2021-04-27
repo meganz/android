@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ให้ที่เก็บข้อมูลบนคลาวด์แบบเข้ารหัสที่ควบคุมโดยผู้ใช้ มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ต่างจากผู้ให้บริการจัดเก็บข้อมูลบนคลาวด์รายอื่นตรงที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยใช้อุปกรณ์ไคลเอนต์ของคุณเท่านั้น ไม่มีการดำเนินการใด ๆ จากเราทั้งสิ้น\n\nสามารถอัปโหลดไฟล์ได้จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้ในทุก ๆ ที่ อีกทั้งยังแชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ได้เช่นเดียวกัน กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำรหัสผ่านไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้แล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้เลย\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน Pro LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน Pro I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน Pro II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน Pro III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอปมีดังนี้:\nWRITE_EXTERNAL_STORAGE -> ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -> ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -> เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -> MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ให้ที่เก็บข้อมูลบนคลาวด์แบบเข้ารหัสที่ควบคุมโดยผู้ใช้ มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ต่างจากผู้ให้บริการจัดเก็บข้อมูลบนคลาวด์รายอื่นตรงที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยใช้อุปกรณ์ไคลเอนต์ของคุณเท่านั้น ไม่มีการดำเนินการใด ๆ จากเราทั้งสิ้น\n\nสามารถอัปโหลดไฟล์ได้จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้ในทุก ๆ ที่ อีกทั้งยังแชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ได้เช่นเดียวกัน กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำรหัสผ่านไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้แล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้เลย\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน Pro LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน Pro I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน Pro II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน Pro III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอปมีดังนี้:\nWRITE_EXTERNAL_STORAGE -&gt; ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -&gt; ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -&gt; เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -&gt; MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA เป็นระบบจัดเก็บไฟล์ในระบบคลาวด์ พร้อมด้วยความเป็นส่วนตัวอย่างทรงพลัง</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
@@ -365,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">ลิงก์นี้จะไม่เปิดเผยต่อสาธารณะอีกต่อไป</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">ลิงก์เหล่านี้จะไม่มีการเผยแพร่แบบสาธารณะอีกต่อไป</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">เปลี่ยนชื่อ</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">Rename %1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">เปิดลิงก์</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">เปิด</string>
     <string name="context_renaming" context="while renaming a file or folder">กำลังเปลี่ยนชื่อ</string>
@@ -682,6 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ที่เก็บข้อมูล</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">การบีบอัดวิดีโอใช้พลังงานมาก MEGA จะต้องให้คุณชาร์จอุปกรณ์ของคุณด้วย หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า %s</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">หากเปิดใช้งาน คุณจะอัปโหลดข้อมูลเกี่ยวกับตำแหน่งที่ถ่ายภาพของคุณ ดังนั้นโปรดระมัดระวังถ้าคุณจะแชร์ตำแหน่งที่ตั้งนี้</string>
 
@@ -775,6 +778,8 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">ยังไม่ได้กำหนดค่า</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">เปลี่ยนรหัสผ่าน</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">ต้องใช้รหัส</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">ทันที</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">ตกลง</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">ไฟล์ภายในเครื่องของคุณจะถูกลบและคุณจะถูกออกจากระบบหลังจากที่กรอกรหัสผิดเกิน 10 ครั้ง</string>
@@ -1337,7 +1342,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">นำออกจากออฟไลน์หรือไม่</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">ตั้งค่าสถานะ</string>
-    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Color theme</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">Colour theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">ละทิ้ง</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">ไม่พร้อมใช้งาน</string>
 
@@ -1513,7 +1518,7 @@
 
     <string name="general_view_contacts" context="Menu option">ดูรายชื่อติดต่อ</string>
 
-    <string name="import_success_message" context="Menu option">เพิ่มลงในคลาวด์ไดรฟ์</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">เพิ่มลงในคลาวด์ไดรฟ์</string>
     <string name="import_success_error" context="Menu option">ผิดพลาด ไม่ได้เพิ่มลงในคลาวด์ไดรฟ์</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">กำลังเชื่อมต่อ&#8230;</string>
@@ -1734,7 +1739,15 @@
     <string name="label_set_day" context="title of a Search by date tag">ตั้งวันที่</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">วันที่ที่ระบุไม่ถูกต้อง</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">ไฟล์เสียง</string>
 
@@ -2047,6 +2060,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">กรุณากรอกรหัส 6 หลักที่สร้างโดยแอปตัวรับรองความถูกต้องของคุณ</string>
     <string name="general_verify" context="Text button">ตรวจสอบ</string>
     <string name="general_next" context="Text button">ต่อไป</string>
+    <string name="general_previous" context="Text button">ก่อนหน้า</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">เกิดข้อผิดพลาดในการสร้างรหัสหรือคิวอาร์โค้ด กรุณาลองอีกครั้ง</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">เปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยแล้ว</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
@@ -2079,6 +2093,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">ดูตัวอย่างเนื้อหา</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">ไม่สามารถเรียกใช้สตรีมมิ่งและไม่ได้ดาวน์โหลดไฟล์</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">Unable to open file.</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">เราไม่สามารถเปิดไฟล์ได้ เนื่องจากไม่มีการเชื่อมต่อกับเครือข่าย</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">ไฟล์มีอยู่แล้วในบันทึกแบบออฟไลน์</string>
 
@@ -2207,6 +2222,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">ข้อความ</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">วิดีโอ</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">ส่งไปยัง&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">อัปโหลดไปที่&#8230;</string>
 
@@ -2362,6 +2378,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">บัญชีปัจจุบันของคุณคือ [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">ขึ้นอยู่กับการมีส่วนร่วมในโครงการความสำเร็จของเรา</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">วิธีการชำระเงิน</string>
 
     <string name="billing_period_title" context="title of billing period">ระยะเวลาการเรียกเก็บเงิน</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]ครั้งเดียว (เดือน)[/A] %s</string>
@@ -2916,6 +2933,8 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">เดือน</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">ปี</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 ชั่วโมง</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d ชั่วโมง</item>
@@ -2972,11 +2991,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">ม่วง</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">เทา</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">Will play in the background</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">Will not play in the background</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now playing</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now playing (paused)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
+
     <string name="action_more_information" context="Action to get more information">ข้อมูลเพิ่มเติม</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">นโยบายคุกกี้</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">การตั้งค่าคุกกี้</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">ก่อนที่คุณจะดำเนินการต่อ</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">เราได้มีการใช้คุกกี้และเทคโนโลยีที่คล้ายกัน (‘คุกกี้\') เพื่อให้บริการแก่คุณ ปรับปรุงประสบการณ์ของคุณด้วยบริการของเรา และปรับแต่งโฆษณาที่ปรากฎให้คุณเห็น รวมถึงผ่านบุคคลที่สาม ยอมรับการใช้คุกกี้ของเราตั้งแต่เริ่มเยี่ยมชมหรือปรับแต่งคุกกี้ในการตั้งค่าคุกกี้ อ่านเพิ่มเติมใน[A]นโยบายคุกกี้[/A]ของเรา</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">คุกกี้จากที่อื่น</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">คุกกี้สำหรับโฆษณาของ Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">หมวดหมู่: คุกกี้สำหรับโฆษณา</string>
@@ -3005,4 +3032,6 @@
     <string name="theme_dark" context="Option of color theme, dark mode.">มืด</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">System default</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">Set by Battery Saver</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">Please select SD card root.</string>
 </resources>

@@ -130,6 +130,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.getDescription;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -614,6 +615,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
+				setAvatar();
+
 				if(user!=null){
 					sharedFoldersLayout.setVisibility(View.VISIBLE);
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
@@ -1996,7 +1999,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
     
     private void setFoldersButtonText(ArrayList<MegaNode> nodes){
 		if (nodes != null) {
-			sharedFoldersButton.setText(getDescription(nodes));
+			sharedFoldersButton.setText(getQuantityString(R.plurals.num_folders_with_parameter, nodes.size(), nodes.size()));
 			if (nodes.size() == 0) {
 				sharedFoldersButton.setClickable(false);
 				sharedFoldersLayout.setClickable(false);

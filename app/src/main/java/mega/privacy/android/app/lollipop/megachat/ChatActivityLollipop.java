@@ -4399,7 +4399,8 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
                 case R.id.chat_cab_menu_offline:
                     finishMultiselectionMode();
-                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
+                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
+                            ChatActivityLollipop.this);
                     break;
             }
             return false;
@@ -4514,6 +4515,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                             importIcon.setVisible(false);
 
                         }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                            menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4637,7 +4639,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                         boolean allNodeImages = true;
                         boolean isRemoved = false;
                         boolean allNodeNonContacts = true;
-                        boolean allNodeContacts = true;
 
                         menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
@@ -4695,23 +4696,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                     }
                                 }
                             }
-
-                            if (allNodeContacts) {
-                                if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                                    allNodeContacts = false;
-                                } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
-
-                                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                        long userHandle = selected.get(i).getMessage().getUserHandle(i);
-                                        if (!chatRoom.isGroup() && userHandle == chatRoom.getPeerHandle(0)) {
-                                            allNodeContacts = false;
-                                        }
-                                    } else {
-                                        allNodeContacts = false;
-                                    }
-                                }
-                            }
                     }
 
                         if (isUploading || isRemoved) {
@@ -4722,7 +4706,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             importIcon.setVisible(false);
                         }
                         else {
@@ -4735,6 +4718,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                 } else {
                                     menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                                     menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(allNodeImages);
+                                    menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                                     menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                     importIcon.setVisible(true);
                                 }
@@ -4750,8 +4734,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible((isOnline(chatActivity) &&
                                     !chatC.isInAnonymousMode()) && showForward);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(allNodeNonContacts &&
-                                    isOnline(chatActivity) && !chatC.isInAnonymousMode());
-                            menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(allNodeContacts &&
                                     isOnline(chatActivity) && !chatC.isInAnonymousMode());
                         }
                     }
@@ -5238,6 +5220,8 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                             openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
+                                    } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                                        manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
                                     } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
                                         openWith(this, node);
@@ -9252,19 +9236,21 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
     private void createSpeakerAudioManger(){
         rtcAudioManager = app.getAudioManager();
-        if(rtcAudioManager != null) {
+
+        if(rtcAudioManager == null){
+            speakerWasActivated = true;
+            rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
+        }else{
             activateSpeaker();
-            return;
         }
 
-        speakerWasActivated = true;
-        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
                 if(!speakerWasActivated && !isNear){
                     adapter.pausePlaybackInProgress();
                 }else if(speakerWasActivated && isNear){
+                    adapter.refreshVoiceClipPlayback();
                     speakerWasActivated = false;
                 }
             }
@@ -9297,12 +9283,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     public void stopProximitySensor(){
-        if(rtcAudioManager == null) return;
+        if(rtcAudioManager == null || participatingInACall()) return;
 
-        if(!participatingInACall()){
-            activateSpeaker();
-        }
-
+        activateSpeaker();
         rtcAudioManager.unregisterProximitySensor();
         destroySpeakerAudioManger();
     }

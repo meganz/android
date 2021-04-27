@@ -43,6 +43,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -51,6 +54,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
@@ -72,9 +76,12 @@ import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
-
+@AndroidEntryPoint
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		implements OnClickListener, CheckScrollInterface{
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	private DisplayMetrics outMetrics;
 	private Context context;
@@ -862,11 +869,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context,
-				this,
-				s,
-				-1,
-				nodes);
+		searchNodesTask = new SearchNodesTask(context, this, s, INVALID_HANDLE,
+				nodes, sortOrderManagement);
 		searchNodesTask.execute();
 	}
 
