@@ -3,8 +3,10 @@ package mega.privacy.android.app.textFileEditor
 import android.app.ActivityManager
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -38,6 +40,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 
@@ -357,7 +360,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             supportActionBar?.title = null
             binding.nameText.isVisible = true
-            binding.contentText.isEnabled = false
+
+            binding.contentText.apply {
+                inputType = InputType.TYPE_NULL
+                hideKeyboard()
+            }
 
             if (!readingContent && viewModel.canShowEditFab()) {
                 binding.editFab.show()
@@ -367,7 +374,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             binding.nameText.isVisible = false
 
             binding.contentText.apply {
-                isEnabled = true
+                imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 showKeyboardDelayed(this)
             }
 

@@ -31,6 +31,7 @@
             android:inputType="textMultiLine"
             android:paddingBottom="100dp"
             android:textAppearance="@style/TextAppearance.Mega.Body2"
+            android:textIsSelectable="true"
             android:theme="@style/TransparentEditText.Transparent"
             tools:ignore="Autofill,LabelFor" />
 
