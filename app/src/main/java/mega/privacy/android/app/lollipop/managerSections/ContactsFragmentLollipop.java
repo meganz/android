@@ -47,6 +47,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -55,6 +58,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -88,12 +92,16 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
+@AndroidEntryPoint
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 
 	public static int GRID_WIDTH =400;
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
 	
 	public static final String ARG_OBJECT = "object";
+
+	@Inject
+	SortOrderManagement sortOrderManagement;
 
 	String myEmail;
 	private RoundedImageView avatarImage;
@@ -1304,7 +1312,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void sortBy(){
 		logDebug("sortBy");
 
-		switch (((ManagerActivityLollipop)context).orderContacts) {
+		switch (sortOrderManagement.getOrderContacts()) {
 			case ORDER_DEFAULT_DESC:
 				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					String name1 = getContactOrderName(c1);

@@ -49,9 +49,8 @@ public class MyAccountInfo {
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
-    private boolean businessStatusReceived = false;
-    private boolean shouldShowBusinessAlert = false;
     private boolean isBusinessAlertShown;
+    private boolean wasBusinessAlertAlreadyShown;
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -95,59 +94,6 @@ public class MyAccountInfo {
         if (dbH == null){
             dbH = app.getDbH();
         }
-    }
-
-    /**
-     * Clear all MyAccountInfo
-     */
-    public void clear() {
-        usedPerc = -1;
-        usedStorage = -1;
-        accountType = -1;
-        accountInfo = null;
-        paymentBitSet = null;
-        numberOfSubscriptions = -1;
-        subscriptionStatus = -1;
-        subscriptionRenewTime = -1;
-        proExpirationTime = -1;
-        usedFormatted = "";
-        totalFormatted = "";
-        formattedUsedCloud = "";
-        formattedUsedInbox = "";
-        formattedUsedIncoming = "";
-        formattedUsedRubbish = "";
-        formattedAvailableSpace = "";
-        usedTransferFormatted = "";
-        totalTransferFormatted = "";
-        levelInventory = -1;
-        levelAccountDetails = -1;
-
-        inventoryFinished = false;
-        accountDetailsFinished = false;
-        getPaymentMethodsBoolean = false;
-
-        firstNameText = "";
-        lastNameText = "";
-        firstLetter = "";
-        fullName = "";
-
-        lastSessionFormattedDate = "";
-        createSessionTimeStamp = -1;
-
-        if (productAccounts != null) {
-            productAccounts.clear();
-        }
-
-        if (availableSkus != null) {
-            availableSkus.clear();
-        }
-
-        activeSubscription = null;
-
-        pricing = null;
-
-        numVersions = -1;
-        previousVersionsSize = -1;
     }
 
     public void setAccountDetails(int numDetails){
@@ -575,22 +521,6 @@ public class MyAccountInfo {
         return usedStorage;
     }
 
-    public void setBusinessStatusReceived(boolean businessStatusReceived) {
-        this.businessStatusReceived = businessStatusReceived;
-    }
-
-    public boolean isBusinessStatusReceived() {
-        return businessStatusReceived;
-    }
-
-    public void setShouldShowBusinessAlert(boolean shouldShowBusinessAlert) {
-        this.shouldShowBusinessAlert = shouldShowBusinessAlert;
-    }
-
-    public boolean shouldShowBusinessAlert() {
-        return shouldShowBusinessAlert;
-    }
-
     public MegaPurchase getActiveSubscription() {
         return activeSubscription;
     }
@@ -624,5 +554,13 @@ public class MyAccountInfo {
 
     public void setBusinessAlertShown(boolean businessAlertShown) {
         isBusinessAlertShown = businessAlertShown;
+    }
+
+    public boolean wasNotBusinessAlertShownYet() {
+        return !wasBusinessAlertAlreadyShown;
+    }
+
+    public void setBusinessAlertAlreadyShown() {
+        wasBusinessAlertAlreadyShown = true;
     }
 }

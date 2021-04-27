@@ -15,6 +15,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatRequestListenerInterface
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,5 +54,12 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
             listener
         )
+    }
+
+    /**
+     *  Select the video device to be used in calls
+     */
+    fun setChatVideoInDevice(cameraDevice: String, listener: MegaChatRequestListenerInterface?) {
+        megaChatApi.setChatVideoInDevice(cameraDevice, listener)
     }
 }

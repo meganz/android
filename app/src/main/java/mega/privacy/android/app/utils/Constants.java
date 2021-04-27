@@ -85,6 +85,11 @@ public class Constants {
 
     public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
+    public static final String PREFERENCE_EMOJI = "emoji-recent-manager";
+    public static final String PREFERENCE_REACTION = "reaction-recent-manager";
+    public static final String PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager";
+    public static final String PREFERENCE_VARIANT_REACTION = "variant-reaction-manager";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
@@ -136,6 +141,7 @@ public class Constants {
     public static final int GO_ONLINE = 9007;
     public static final int START_RECONNECTION = 9008;
 
+    public static final int REQUEST_WRITE_STORAGE_FOR_LOGS = 0;
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
@@ -278,7 +284,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
-    public static final String BROADCAST_ACTION_INTENT_HEADPHONE = "BROADCAST_ACTION_INTENT_HEADPHONE";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -307,6 +312,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
     public static final String INTENT_EXTRA_KEY_COPY_HANDLES = "COPY_HANDLES";
     public static final String INTENT_EXTRA_KEY_COPY_TO = "COPY_TO";
+    public static final String INTENT_EXTRA_KEY_IMPORT_TO = "IMPORT_TO";
     public static final String INTENT_EXTRA_KEY_CONTACT_EMAIL = "contactEmail";
     public static final String INTENT_EXTRA_KEY_LOCATION_FILE_INFO = "locationFileInfo";
     public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
@@ -314,6 +320,9 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
     public static final String INTENT_EXTRA_PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
+    public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
+    public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
+    public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -489,6 +498,7 @@ public class Constants {
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
     public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
+    public static final String APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD";
     //Indicates the data after it, is the value of a transfer parameter
     public static final String APP_DATA_INDICATOR = ">";
     //Indicates the data after it, is a new transfer parameter
@@ -550,7 +560,6 @@ public class Constants {
     public static final int FOLDER_LINK = 201;
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
-    public static final int MEETING_LINK = 204;
     public static final int ERROR_LINK = -1;
     public static final int INVALID_CALL_STATUS = -1;
     public static final int MAX_PARTICIPANTS_GRID = 6;
@@ -673,11 +682,6 @@ public class Constants {
             "^https://mega\\.nz/.*chat/.+$"
     };
 
-    public static final String[] MEETING_LINK_REGEXS = {
-            "^https://mega\\.co\\.nz/.*chat/.+$",
-            "^https://mega\\.nz/.*chat/.+$"
-    };
-
     public static final String[] PASSWORD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#P!.+$",
             "^https://mega\\.nz/.*#P!.+$"
@@ -775,6 +779,9 @@ public class Constants {
 
     public static final int INVALID_VALUE = -1;
 
+    public static final long INVALID_SIZE = -1;
+    public static final int COPY_FILE_BUFFER_SIZE = 32 * 1024; // 32 KB
+
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
     public static final int LOCATION_INDEX_WIDTH = 2;
@@ -817,6 +824,29 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+    public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
+    public static final String EVENT_NETWORK_CHANGE = "network_change";
+    public static final String EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change";
+
+    /** Event Keys related to calls*/
+    public static final String EVENT_UPDATE_CALL = "update_call";
+    public static final String EVENT_CALL_STATUS_CHANGE = "call_status_change";
+    public static final String EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change";
+    public static final String EVENT_RINGING_STATUS_CHANGE = "ringing_status_change";
+    public static final String EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change";
+    public static final String EVENT_CALL_ON_HOLD_CHANGE = "call_on_hold_change";
+    public static final String EVENT_CALL_SPEAK_CHANGE = "call_speak_change";
+    public static final String EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change";
+    public static final String EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change";
+
+    /** Event Keys related to sessions*/
+    public static final String EVENT_SESSION_STATUS_CHANGE = "session_status_change";
+    public static final String EVENT_REMOTE_AVFLAGS_CHANGE = "remote_avflags_change";
+    public static final String EVENT_SESSION_SPEAK_REQUESTED = "session_speak_requested_change";
+    public static final String EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change";
+    public static final String EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change";
+    public static final String EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change";
+    public static final String EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
@@ -830,4 +860,12 @@ public class Constants {
     public static final int NOT_OVERQUOTA_STATE = 0;
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
+
+    //Sort order management
+    public static final String NEW_ORDER = "NEW_ORDER";
+    public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
+    public static final int ORDER_CLOUD = 0;
+    public static final int ORDER_CONTACTS = 1;
+    public static final int ORDER_OTHERS = 2;
+    public static final int ORDER_CAMERA = 3;
 }

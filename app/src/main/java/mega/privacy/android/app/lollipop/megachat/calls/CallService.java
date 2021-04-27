@@ -23,7 +23,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,37 +69,23 @@ public class CallService extends Service{
 
     private ChatController chatC;
 
-    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-            if (chatIdReceived == MEGACHAT_INVALID_HANDLE || chatIdReceived != currentChatId) {
-                logError("Invalid call or different call:: "+chatIdReceived);
-                return;
-            }
-
-            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-                logDebug("Call status " + callStatusToString(callStatus)+" current chat = "+currentChatId);
-                switch (callStatus) {
-                    case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                        updateNotificationContent();
-                        break;
-                    case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-                    case MegaChatCall.CALL_STATUS_DESTROYED:
-                        removeNotification(chatIdReceived);
-                        break;
-                }
-            }
-
-            if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                checkAnotherActiveCall();
-            }
+    private final Observer<MegaChatCall> callStatusObserver = call -> {
+        int callStatus = call.getStatus();
+        logDebug("Call status " + callStatusToString(callStatus)+" current chat = "+currentChatId);
+        switch (callStatus) {
+            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                updateNotificationContent();
+                break;
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+            case MegaChatCall.CALL_STATUS_DESTROYED:
+                removeNotification(call.getChatid());
+                break;
         }
+    };
+
+    private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+        checkAnotherActiveCall();
     };
 
     public void onCreate() {
@@ -113,9 +102,8 @@ public class CallService extends Service{
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        IntentFilter filter = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
-        filter.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-        registerReceiver(chatCallUpdateReceiver, filter);
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
     }
 
     @Override
@@ -193,7 +181,7 @@ public class CallService extends Service{
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
 
-            PendingIntent intentCall = getPendingIntentCall(this, currentChatId, notificationId+1);
+            PendingIntent intentCall = getPendingIntentMeeting(this, currentChatId, notificationId+1);
 
             mBuilderCompatO = new NotificationCompat.Builder(this, notificationChannelId);
             mBuilderCompatO
@@ -243,7 +231,7 @@ public class CallService extends Service{
             mBuilderCompat = new NotificationCompat.Builder(this);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            PendingIntent intentCall = getPendingIntentCall(this, currentChatId, notificationId+1);
+            PendingIntent intentCall = getPendingIntentMeeting(this, currentChatId, notificationId+1);
 
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
@@ -296,6 +284,7 @@ public class CallService extends Service{
         stopForeground(true);
         cancelNotification();
         currentChatId = newChatIdCall;
+
         if (MegaApplication.getOpenCallChatId() != currentChatId) {
             MegaApplication.setOpenCallChatId(currentChatId);
         }
@@ -420,7 +409,9 @@ public class CallService extends Service{
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(chatCallUpdateReceiver);
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+
         cancelNotification();
         MegaApplication.setOpenCallChatId(-1);
 

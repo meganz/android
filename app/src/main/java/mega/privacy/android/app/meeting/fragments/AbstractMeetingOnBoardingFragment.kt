@@ -10,19 +10,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
+import kotlinx.coroutines.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.VideoCaptureUtils
-import nz.mega.sdk.MegaChatApiJava.*
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
 /**
@@ -48,11 +51,22 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setProfileAvatar()
+        setMarginTopOfMeetingName(
+            Util.getStatusBarHeight() + ChatUtil.getActionBarHeight(
+                activity, activity?.resources
+            ) + Util.dp2px(16f)
+        )
 
         (activity as AppCompatActivity).supportActionBar?.apply {
             title = arguments?.getString(MeetingActivity.MEETING_NAME)
             subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
         }
+    }
+
+    private fun setMarginTopOfMeetingName(marginTop: Int) {
+        val menuLayoutParams = type_meeting_edit_text.layoutParams as ViewGroup.MarginLayoutParams
+        menuLayoutParams.setMargins(0, marginTop, 0, 0)
+        type_meeting_edit_text.layoutParams = menuLayoutParams
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -82,23 +96,45 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 switchCamera(it)
             }
             model.speakerLiveData.observe(viewLifecycleOwner) {
-                fab_speaker.isOn = it
+                when (it) {
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                        fab_speaker.isOn = true
+                        fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_speaker)
+                    }
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                        fab_speaker.isOn = false
+                        fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_speaker)
+                    }
+                    else -> {
+                        fab_speaker.isOn = true
+                        fab_speaker.setOnIcon(R.drawable.ic_headphone)
+                        fab_speaker_label.text =
+                            StringResourcesUtils.getString(R.string.general_headphone)
+                    }
+                }
             }
             model.tips.observe(viewLifecycleOwner) {
                 showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
+            }
+            model.notificationNetworkState.observe(viewLifecycleOwner) {
+                logDebug("Network state changed, Online :$it")
             }
             model.cameraPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     checkMeetingPermissions(
                         arrayOf(Manifest.permission.CAMERA),
-                    ) { showSnackbar() }
+                    ) { showSnackBar() }
                 }
             }
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     checkMeetingPermissions(
                         arrayOf(Manifest.permission.RECORD_AUDIO),
-                    ) { showSnackbar() }
+                    ) { showSnackBar() }
                 }
             }
         }
@@ -107,7 +143,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
      */
-    fun showSnackbar() {
+    fun showSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
@@ -174,32 +210,30 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun switchCamera(bOn: Boolean) {
         fab_cam.isOn = bOn
-
-        // Always try to start the call using the front camera
-        val frontCamera = VideoCaptureUtils.getFrontCamera()
-        if (frontCamera != null) {
-            when (bOn) {
-                true -> {
-                    megaChatApi.setChatVideoInDevice(frontCamera, null)
-                    activateVideo()
-                }
-                false -> deactivateVideo()
+        setViewEnable(fab_cam, false)
+        when (bOn) {
+            true -> {
+                // Always try to start the call using the front camera
+                abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
+                activateVideo()
+            }
+            false -> {
+                deactivateVideo()
             }
         }
     }
 
     /**
      * Method for activating the video.
-     * TODO("Refactor code")
      */
     private fun activateVideo() {
         if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
             logError("Error activating video")
+            setViewEnable(fab_cam, true)
             return
         }
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
-                context,
                 localSurfaceView,
                 outMetrics,
                 false
@@ -215,6 +249,36 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
         }
         localSurfaceView.visibility = View.VISIBLE
+        setViewEnable(fab_cam, true, bSync = false)
+    }
+
+    /**
+     * Set the button state
+     *
+     * @param bEnable set the view to be enable or not
+     * @param bSync execute synchronously or asynchronously
+     */
+    private fun setViewEnable(view: View, bEnable: Boolean, bSync: Boolean = true){
+        when {
+            bEnable && bSync -> (view as OnOffFab).enable = true
+            bEnable && !bSync -> {
+                lifecycleScope.launch {
+                    delay(1000L)
+                    withContext(Dispatchers.Main) {
+                        (view as OnOffFab).enable = true
+                    }
+                }
+            }
+            !bEnable && bSync -> (view as OnOffFab).enable = false
+            !bEnable && !bSync -> {
+                lifecycleScope.launch {
+                    delay(1000L)
+                    withContext(Dispatchers.Main) {
+                        (view as OnOffFab).enable = false
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -223,11 +287,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun deactivateVideo() {
         if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
             logError("Error deactivating video")
+            setViewEnable(fab_cam, true)
             return
         }
-        logDebug("Removing suface view")
+        logDebug("Removing surface view")
         localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
+        setViewEnable(fab_cam, true)
     }
 
     /**

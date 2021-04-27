@@ -234,11 +234,19 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
 
+        // Call it only once at the first launch of the post-installation
+        // So the user would always not login at this moment
 //        if (Util.readAppLaunchedTime(this) <= 1) {
             checkClipboardMeetingLink();
 //        }
     }
 
+    /**
+     * Check if the clipboard has a meeting link
+     * In the case of the app isn't installed, the web JS will copy the meeting link into
+     * the system clipboard. In this way relay the link to the app later installed from Play store
+     * Since Android 10, the system prohibits any app without focus to read the clipboard
+     */
     private void checkClipboardMeetingLink() {
         ViewTreeObserver observer = getWindow().getDecorView().findViewById(android.R.id.content)
                 .getViewTreeObserver();
@@ -251,6 +259,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
             // TODO: +Meeting, Either make use of OpenLinkActivity or own code to process the meeting link
             // Should talk to UI designer
+            // Need to call the async checkChatLink() to check if the chat has a call and
+            // get the meeting name
+            // Delegate the checking to OpenLinkActivity
+            // If yes, show Join Meeting, If no, show Chat history
             startOpenLinkActivity(meetingLink);
 //            if (TextUtil.isTextEmpty(meetingLink) || !initMegaChat()) return;
 //
@@ -283,6 +295,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         startActivity(intent);
     }
 
+    /**
+     * Read the meeting link (if any) from the system clipboard
+     * @return The Meeting link String or "" if no link was found
+     */
     private String extractMeetingLink() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
@@ -290,7 +306,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if (clipData == null) return "";
         String content = clipData.getItemAt(0).getText().toString();
 
-        return AndroidMegaRichLinkMessage.isMeetingLink(content) ? content : "";
+        return AndroidMegaRichLinkMessage.isChatLink(content) ? content : "";
     }
 
     private boolean initMegaChat() {

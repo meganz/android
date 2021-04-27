@@ -272,8 +272,6 @@ public class NodeController {
             return CHAT_LINK;
         } else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
             return CONTACT_LINK;
-        } else if (AndroidMegaRichLinkMessage.isMeetingLink(url)) {
-            return MEETING_LINK;
         }
 
         logWarning("wrong url");
@@ -286,7 +284,7 @@ public class NodeController {
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
         } else if(context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, new ExportListener(context, ACTION_GET_LINK));
+            megaApi.exportNode(document, new ExportListener(context));
         } else if(context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -297,7 +295,7 @@ public class NodeController {
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
         } else if (context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, timestamp, new ExportListener(context, ACTION_GET_LINK));
+            megaApi.exportNode(document, timestamp, new ExportListener(context));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
@@ -313,7 +311,7 @@ public class NodeController {
             return;
         }
 
-        ExportListener exportListener = new ExportListener(context, ACTION_REMOVE_LINK, nodes.size());
+        ExportListener exportListener = new ExportListener(context, nodes.size());
 
         for (MegaNode node : nodes) {
             removeLink(node, exportListener);

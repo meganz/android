@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.isVisible
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -18,6 +20,7 @@ import mega.privacy.android.app.utils.Constants
  * Can use the SDK api from BaseFragment
  */
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+    private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
 
     // Get from activity
     private var isModerator = true
@@ -25,57 +28,55 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
     // Get from participant
     private var isContact = false
-    private var isMe = true
+    private var isMe = false
 
-    private lateinit var participant: Participant
+    private lateinit var participantItem: Participant
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
+
+        if (arguments?.getSerializable(EXTRA_PARTICIPANT) != null) {
+            participantItem = arguments?.getSerializable(EXTRA_PARTICIPANT) as Participant
+            isMe = participantItem.isMe
+            isContact = participantItem.isContact
+        }
+
+        isGuest = arguments?.getBoolean(EXTRA_IS_GUEST) == true
+        isModerator = arguments?.getBoolean(EXTRA_IS_MODERATOR) == true
+
+        bottomViewModel.initValue(requireContext(), isModerator, isGuest, participantItem)
+
         val binding =
             BottomSheetMeetingParticipantBinding.inflate(LayoutInflater.from(context), null, false)
+                .apply {
+                    lifecycleOwner = this@MeetingParticipantBottomSheetDialogFragment
+                    viewModel = bottomViewModel
+                    participant = participantItem
+                }
+
         contentView = binding.root
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
 
-        if (arguments?.getSerializable(EXTRA_PARTICIPANT) != null) {
-            participant = arguments?.getSerializable(EXTRA_PARTICIPANT) as Participant
-            isMe = participant.isMe
-        }
-
-        initItem(binding)
+        initHost()
         initItemAction(binding)
     }
 
-    private fun initItem(binding: BottomSheetMeetingParticipantBinding) {
-        if (!isModerator || isGuest || isMe) {
-            binding.dividerPingToSpeaker.isVisible = false
-            binding.makeModerator.isVisible = false
-            binding.dividerMakeModerator.isVisible = false
-            binding.removeParticipant.isVisible = false
-        }
+    private fun initGuest() {
+        isGuest = true
+        isModerator = false
+    }
 
-        if (!isContact || isGuest) {
-            if (isGuest) {
-                binding.dividerContactInfo.isVisible = false
-            } else {
-                binding.addContact.isVisible = !isMe
-            }
 
-            binding.contactInfo.isVisible = false
-            binding.dividerSendMessage.isVisible = false
-            binding.sendMessage.isVisible = false
-        }
+    private fun initHost() {
+        isGuest = false
+        isModerator = true
+    }
 
-        /**
-         * If user click the own item, for users, will show the `Edit Profile` item
-         * if Guest, will disable the three dots button
-         */
-        if (isMe && !isGuest) {
-            binding.pingToSpeaker.isVisible = false
-            binding.contactInfo.isVisible = true
-            binding.contactInfo.text = context.getString(R.string.group_chat_edit_profile_label)
-        }
+    private fun initUser() {
+        isGuest = false
+        isModerator = false
     }
 
     /**
@@ -83,7 +84,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      */
     private fun initItemAction(binding: BottomSheetMeetingParticipantBinding) {
         listenAction(binding.addContact) { onAddContact() }
-        listenAction(binding.contactInfo) { onContactInfo() }
+        listenAction(binding.contactInfo) { onContactInfoOrEditProfile() }
         listenAction(binding.sendMessage) { onSendMessage() }
         listenAction(binding.pingToSpeaker) { onPingToSpeakerView() }
         listenAction(binding.makeModerator) { onMakeModerator() }
@@ -101,15 +102,25 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onAddContact() {
+        Toast.makeText(requireContext(), "onAddContact", Toast.LENGTH_SHORT).show()
 //        ContactController(this).inviteContact(email)
     }
 
-    private fun onContactInfo() {
+    private fun onContactInfoOrEditProfile() {
+        if (!bottomViewModel.showEditProfile()) {
+            Toast.makeText(requireContext(), "onContactInfo", Toast.LENGTH_SHORT).show()
 //        ContactUtil.openContactInfoActivity(context, chatC.getParticipantEmail(participantHandle))
+        } else {
+            Toast.makeText(requireContext(), "onEditProfile", Toast.LENGTH_SHORT).show()
+            editProfile()
+        }
+
     }
 
     private fun onSendMessage() {
 //        startConversation()
+
+        Toast.makeText(requireContext(), "onSendMessage", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -131,21 +142,45 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onPingToSpeakerView() {
-
+        Toast.makeText(requireContext(), "onPingToSpeakerView", Toast.LENGTH_SHORT).show()
+        // Notify the `in-meeting-fragment` to update the background
     }
 
     private fun onMakeModerator() {
+        Toast.makeText(requireContext(), "onMakeModerator", Toast.LENGTH_SHORT).show()
 
+//        megaChatApi.updateChatPermissions(
+//            chatid,
+//            handler,
+//            privilege,
+//            context as GroupChatInfoActivityLollipop
+//        )
     }
 
+    /**
+     * Shows an alert dialog to confirm the deletion of a participant.
+     *
+     */
     private fun onRemoveParticipant() {
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        ).apply {
+            setMessage(resources.getString(R.string.confirmation_remove_chat_contact, participantItem.name))
+            setPositiveButton(R.string.general_remove) { _, _ -> removeParticipant() }
+            setNegativeButton(R.string.general_cancel, null)
+            show()
+        }
+    }
 
+    private fun removeParticipant() {
+//        chatC.removeParticipant(chatHandle, selectedHandleParticipant)
     }
 
     /**
      * Open edit profile page
      */
-    private fun editProfile(){
+    private fun editProfile() {
         val editProfile = Intent(context, ManagerActivityLollipop::class.java)
         editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
         startActivity(editProfile)

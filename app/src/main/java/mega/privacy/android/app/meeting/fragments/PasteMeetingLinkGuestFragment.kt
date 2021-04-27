@@ -76,10 +76,25 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             meetingLink = linkEdit.text.toString()
 
-            if (validateLink(meetingLink)) {
+            if (TextUtils.isEmpty(meetingLink)) {
+                showError(R.string.invalid_meeting_link_empty);
+                return@setOnClickListener;
+            }
+
+            // Meeting Link and Chat Link are exactly the same format.
+            // Using extra approach(getMegaHandleList of openChatPreview())
+            // to judge if its a meeting link later on
+            if (AndroidMegaRichLinkMessage.isChatLink(meetingLink)) {
                 // TODO: +Meeting, use open link activity or self logic to process the link?
 //                initMegaChat { checkMeetingLink() }
+                // Need to call the async checkChatLink() to check if the chat has a call and
+                // get the meeting name
+                // Delegate the checking to OpenLinkActivity
+                // If yes, show Join Meeting, If no, show Chat history
                 startOpenLinkActivity()
+                dismiss()
+            } else {
+                showError(R.string.invalid_meeting_link_args)
             }
         }
 
@@ -90,20 +105,6 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
         val intent = Intent(requireContext(), OpenLinkActivity::class.java)
         intent.data = Uri.parse(meetingLink)
         startActivity(intent)
-    }
-
-    private fun validateLink(link: String): Boolean {
-        val isEmpty = TextUtils.isEmpty(link)
-        val isMeetingLink = AndroidMegaRichLinkMessage.isMeetingLink(link)
-
-        if (!isEmpty && isMeetingLink) return true
-
-        showError(
-            if (isEmpty) R.string.invalid_meeting_link_empty
-            else R.string.invalid_meeting_link_args
-        )
-
-        return false
     }
 
     private fun initMegaChat(doAfterConnect: (() -> Unit)?) {

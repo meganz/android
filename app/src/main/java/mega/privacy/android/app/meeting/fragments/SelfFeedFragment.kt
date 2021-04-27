@@ -56,7 +56,7 @@ class SelfFeedFragment : MeetingBaseFragment(), TextureView.SurfaceTextureListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        meetingActivity.bottomFloatingPanelViewHolder.propertyUpdaters.add {
+        (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.add {
             view.alpha = 1 - it
         }
 

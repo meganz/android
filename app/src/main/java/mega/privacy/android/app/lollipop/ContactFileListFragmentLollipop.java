@@ -68,6 +68,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -794,8 +795,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						((ContactFileListActivityLollipop)context).downloadFile(
 								Collections.singletonList(contactNodes.get(position)));
 					}
-				}
-				else {
+				} else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isOpenableTextFile(contactNodes.get(position).getSize())) {
+					manageTextFileIntent(requireContext(), contactNodes.get(position), CONTACT_FILE_ADAPTER);
+				} else {
 					adapter.notifyDataSetChanged();
 					((ContactFileListActivityLollipop)context).downloadFile(
 							Collections.singletonList(contactNodes.get(position)));

@@ -158,8 +158,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			return;
 		}
 
-		// Chat link
-        if (matchRegexs(url, CHAT_LINK_REGEXS) && matchRegexs(url, MEETING_LINK_REGEXS)) {
+		// Chat link or Meeting link
+        if (matchRegexs(url, CHAT_LINK_REGEXS)) {
 			logDebug("Open chat url");
 
 			if (dbH != null) {
@@ -418,24 +418,23 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		boolean isMeetingLink = matchRegexs(url, MEETING_LINK_REGEXS);
-
-		if (isMeetingLink) {
-			megaChatApi.checkChatLink(url, new ChatBaseListener(
-					OpenLinkActivity.this) {
-				@Override
-				public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-					if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
-							&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
+		megaChatApi.checkChatLink(url, new ChatBaseListener(
+				OpenLinkActivity.this) {
+			@Override
+			public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+				if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
+						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
+//                    if (request.getMegaHandleList() != null) {
 						goToMeetingActivity(request.getText());
-					} else {
-						setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
-					}
+//					} else {
+						// Normal Chat Link
+//						goToChatActivity();
+//					}
+				} else {
+					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
 				}
-			});
-		} else { // Normal Chat Link
-			goToChatActivity();
-		}
+			}
+		});
 	}
 
 	private void goToChatActivity() {
@@ -450,6 +449,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		Intent intent = new Intent(OpenLinkActivity.this, MeetingActivity.class);
 		intent.setAction(MEETING_ACTION_GUEST);
 		intent.putExtra(MEETING_NAME, meetingName);
+
 		intent.setData(Uri.parse(url));
 		startActivity(intent);
 		finish();

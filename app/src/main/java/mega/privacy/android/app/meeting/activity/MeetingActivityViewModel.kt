@@ -4,20 +4,29 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.listeners.ChatBaseListener
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_AUDIO_OUTPUT_CHANGE
+import mega.privacy.android.app.utils.Constants.EVENT_NETWORK_CHANGE
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util.showSnackbar
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
 
 /**
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  */
+
 class MeetingActivityViewModel @ViewModelInject constructor(
     private val meetingActivityRepository: MeetingActivityRepository
 ) : ViewModel() {
@@ -26,15 +35,22 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> =
-        MutableLiveData<Boolean>().apply { value = false }
+        MutableLiveData<Boolean>().apply {
+            value = false }
     private val _cameraLiveData: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>().apply { value = false }
-    private val _speakerLiveData: MutableLiveData<Boolean> =
-        MutableLiveData<Boolean>().apply { value = true }
+    private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
+        MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
+            if (MegaApplication.getInstance().audioManager == null) {
+                value = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+            } else {
+                value = MegaApplication.getInstance().audioManager!!.selectedAudioDevice
+            }
+        }
 
     val micLiveData: LiveData<Boolean> = _micLiveData
     val cameraLiveData: LiveData<Boolean> = _cameraLiveData
-    val speakerLiveData: LiveData<Boolean> = _speakerLiveData
+    val speakerLiveData = _speakerLiveData
 
     // Permissions
     private var cameraGranted: Boolean = false
@@ -45,25 +61,47 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
+    // Network State
+    private val _notificationNetworkState = MutableLiveData<Boolean>()
+
+    // Observe this property to get online/offline notification. true: online / false: offline
+    val notificationNetworkState: LiveData<Boolean> = _notificationNetworkState
+
+    private val notificationNetworkStateObserver = androidx.lifecycle.Observer<Boolean> {
+        _notificationNetworkState.value = it
+    }
+
+    private val audioOutputStateObserver =
+        androidx.lifecycle.Observer<AppRTCAudioManager.AudioDevice> {
+            if(speakerLiveData.value != it){
+                speakerLiveData.value = it
+                when (it) {
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                        tips.value = getString(R.string.speaker_off, "Speaker")
+                    }
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                        tips.value = getString(R.string.general_speaker_headphone, "Speaker")
+                    }
+                    else -> {
+                        tips.value = getString(R.string.general_speaker_headphone, "Headphone")
+                    }
+                }
+            }
+        }
+
     // Receive information about requests.
-    val listener = object : MegaChatRequestListenerInterface {
-        override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
-        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
-
-        }
-
+    val listener = object : ChatBaseListener(
+        MegaApplication.getInstance()
+    ) {
         override fun onRequestFinish(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
+            api: MegaChatApiJava,
+            request: MegaChatRequest,
+            e: MegaChatError
         ) {
-            when (request?.type) {
+            when (request.type) {
                 MegaChatRequest.TYPE_OPEN_VIDEO_DEVICE -> {
                     _cameraLiveData.value = request.flag
-                    LogUtil.logDebug("open video: $_cameraLiveData.value")
+                    logDebug("open video: $_cameraLiveData.value")
                     tips.value = when (request.flag) {
                         true -> getString(
                             R.string.general_camera_disable,
@@ -78,7 +116,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
                 MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL -> {
                     _micLiveData.value = request.flag
-                    LogUtil.logDebug("open Mic: $_micLiveData.value")
+                    logDebug("open Mic: $_micLiveData.value")
                     tips.value = when (request.flag) {
                         true -> getString(
                             R.string.general_mic_mute,
@@ -92,14 +130,27 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 }
             }
         }
+    }
 
-        override fun onRequestTemporaryError(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
-        ) {
+    init {
+        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
+            .observeForever(notificationNetworkStateObserver)
 
-        }
+        LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
+            .observeForever(audioOutputStateObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        MegaApplication.getInstance().removeRTCAudioManager()
+
+        LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
+            .removeObserver(audioOutputStateObserver)
+
+        // Remove observer on network state
+        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
+            .removeObserver(notificationNetworkStateObserver)
     }
 
     /**
@@ -130,29 +181,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     /**
      * Response of clicking Speaker Fab
-     *
-     * @param bOn true: switch to speaker; false: switch to headphone
      */
-    fun clickSpeaker(bOn: Boolean) {
-        if (meetingActivityRepository.switchSpeaker(bOn)) {
-            _speakerLiveData.value = bOn
-            val hasWiredHeadset = MegaApplication.getInstance().audioManager.isWiredHeadsetConnected
-            val hasBluetooth = MegaApplication.getInstance().audioManager.isBluetoothConnected
-            tips.value = when (bOn) {
-                true -> getString(
-                    R.string.general_speaker_headphone,
-                    "Speaker"
-                )
-                false -> {
-                    if(hasWiredHeadset || hasBluetooth)
-                    getString(
-                        R.string.general_speaker_headphone,
-                        "Headphone")
-                    else
-                        getString(
-                            R.string.speaker_off,
-                            "Speaker")
-                }
+    fun clickSpeaker() {
+        when (_speakerLiveData.value) {
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
+            }
+            else -> {
+                meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
             }
         }
     }

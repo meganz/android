@@ -1,29 +1,51 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
+import mega.privacy.android.app.BaseActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.InMeetingFragmentBinding
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
+import mega.privacy.android.app.meeting.BottomFloatingPanelListener
+import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
+import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
-class InMeetingFragment : MeetingBaseFragment() {
+@AndroidEntryPoint
+class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
 
     private lateinit var gridViewMenuItem: MenuItem
     private lateinit var speakerViewMenuItem: MenuItem
+
+    lateinit var toolbar: MaterialToolbar
 
     private lateinit var individualCallFragment: IndividualCallFragment
     private lateinit var floatingWindowFragment: SelfFeedFragment
@@ -31,31 +53,39 @@ class InMeetingFragment : MeetingBaseFragment() {
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
     private var lastTouch: Long = 0
+    private var chatId: Long = MEGACHAT_INVALID_HANDLE
 
     private var previousY = -1f
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
+    lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
+
+    /**
+     * Should get the value from somewhere
+     */
+    private var isGuest = false
+    private var isModerator = true
+    private var isOneToOneChat = false
+
+    private lateinit var binding: InMeetingFragmentBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        meetingActivity.setBottomFloatingPanelViewHolder(true)
-        meetingActivity.collapseFloatingPanel()
-        meetingActivity.hideActionBar()
-
-        return inflater.inflate(R.layout.in_meeting_fragment, container, false)
+    ): View {
+        binding = InMeetingFragmentBinding.inflate(inflater)
+        return binding.root
     }
 
     fun onPageClick() {
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < 500) return
 
-        in_meeting_toolbar.fadeInOut(toTop = true)
-        meetingActivity.bottomFloatingPanelInOut()
+        toolbar.fadeInOut(toTop = true)
+        bottom_floating_panel.fadeInOut(dy = 400f)
 
-        if (in_meeting_toolbar.visibility == View.VISIBLE) {
+        if (toolbar.isVisible) {
             meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         } else {
             meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -72,13 +102,13 @@ class InMeetingFragment : MeetingBaseFragment() {
     }
 
     private fun checkRelativePositionWithToolbar() {
-        val isIntersect = (in_meeting_toolbar.bottom - self_feed_floating_window_container.y) > 0
-        if (in_meeting_toolbar.visibility == View.VISIBLE && isIntersect) {
-            self_feed_floating_window_container.moveY(in_meeting_toolbar.bottom.toFloat())
+        val isIntersect = (toolbar.bottom - self_feed_floating_window_container.y) > 0
+        if (toolbar.visibility == View.VISIBLE && isIntersect) {
+            self_feed_floating_window_container.moveY(toolbar.bottom.toFloat())
         }
 
-        val isIntersectPreviously = (in_meeting_toolbar.bottom - previousY) > 0
-        if (in_meeting_toolbar.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
+        val isIntersectPreviously = (toolbar.bottom - previousY) > 0
+        if (toolbar.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
             self_feed_floating_window_container.moveY(previousY)
         }
     }
@@ -86,18 +116,18 @@ class InMeetingFragment : MeetingBaseFragment() {
     private fun checkRelativePositionWithBottomSheet() {
         val bottom =
             self_feed_floating_window_container.y + self_feed_floating_window_container.height
-        val top = meetingActivity.bottom_floating_panel.top
+        val top = bottom_floating_panel.top
         val margin1 = bottom - top
 
         val isIntersect = margin1 > 0
-        if (meetingActivity.bottom_floating_panel.visibility == View.VISIBLE && isIntersect) {
+        if (bottom_floating_panel.visibility == View.VISIBLE && isIntersect) {
             self_feed_floating_window_container.moveY(self_feed_floating_window_container.y - margin1)
         }
 
         val margin2 =
-            previousY + self_feed_floating_window_container.height - meetingActivity.bottom_floating_panel.top
+            previousY + self_feed_floating_window_container.height - bottom_floating_panel.top
         val isIntersectPreviously = margin2 > 0
-        if (meetingActivity.bottom_floating_panel.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
+        if (bottom_floating_panel.visibility == View.GONE && isIntersectPreviously && previousY >= 0) {
             self_feed_floating_window_container.moveY(previousY)
         }
     }
@@ -107,6 +137,13 @@ class InMeetingFragment : MeetingBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // TODO test code start: add x participants
+        val x = 2
+        for (i in 0 until x) {
+            inMeetingViewModel.addParticipant(true)
+        }
+        // TODO test code start
+
         //TODO test code start
         val producer = TestTool.FrameProducer()
 
@@ -115,6 +152,20 @@ class InMeetingFragment : MeetingBaseFragment() {
             inMeetingViewModel.frames.postValue(producer.frames)
         }
         //TODO test code end
+
+        toolbar = meetingActivity.toolbar
+        // TODO test code start
+        toolbar.title = "Joanna's meeting"
+        toolbar.subtitle = "Calling.."
+        // TODO test code end
+
+        chatId = arguments?.getLong(MEETING_CHAT_ID)!!
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
+            val chatRoom = megaChatApi.getChatRoom(chatId)
+            if(chatRoom != null){
+                isOneToOneChat = !chatRoom.isGroup
+            }
+        }
 
         view.setOnClickListener {
             onPageClick()
@@ -126,9 +177,9 @@ class InMeetingFragment : MeetingBaseFragment() {
             object : OnDragTouchListener.OnDragActionListener {
 
                 override fun onDragStart(view: View?) {
-                    if (in_meeting_toolbar.visibility == View.VISIBLE) {
-                        dragTouchListener.setToolbarHeight(in_meeting_toolbar.bottom)
-                        dragTouchListener.setBottomSheetHeight(meetingActivity.bottom_floating_panel.top)
+                    if (toolbar.visibility == View.VISIBLE) {
+                        dragTouchListener.setToolbarHeight(toolbar.bottom)
+                        dragTouchListener.setBottomSheetHeight(bottom_floating_panel.top)
                     } else {
                         dragTouchListener.setToolbarHeight(0)
                         dragTouchListener.setBottomSheetHeight(0)
@@ -163,7 +214,7 @@ class InMeetingFragment : MeetingBaseFragment() {
         )
         //TODO test code end
 
-        meetingActivity.setSupportActionBar(view.in_meeting_toolbar)
+        meetingActivity.setSupportActionBar(toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
@@ -174,16 +225,8 @@ class InMeetingFragment : MeetingBaseFragment() {
         meetingActivity.window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
-        view.setOnApplyWindowInsetsListener { _, insets ->
-            insets
-        }
-
-        // TODO test code start: add x participants
-        val x = 2
-        for (i in 0 until x) {
-            inMeetingViewModel.addParticipant(true)
-        }
-        // TODO test code start
+        initFloatingPanel()
+        initShareViewModel()
     }
 
     private fun loadChildFragment(containerId: Int, fragment: Fragment, tag: String) {
@@ -203,10 +246,6 @@ class InMeetingFragment : MeetingBaseFragment() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> {
-                findNavController().popBackStack()
-                true
-            }
             R.id.swap_camera -> {
                 //TODO test code start: add or remove last participants
                 inMeetingViewModel.addParticipant(true)
@@ -241,6 +280,216 @@ class InMeetingFragment : MeetingBaseFragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /**
+     * Init Share View Model
+     */
+    private fun initShareViewModel() {
+
+        sharedModel.micLiveData.observe(viewLifecycleOwner) {
+            updateAudio(it)
+        }
+        sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
+            updateVideo(it)
+        }
+
+        sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
+            updateSpeaker(it)
+        }
+
+
+        /**
+         * Will Change after Andy modify the permission structure
+         */
+        sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
+            if (it) {
+                checkMeetingPermissions(
+                    arrayOf(Manifest.permission.CAMERA),
+                ) { showSnackbar() }
+            }
+        }
+        sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
+            if (it) {
+                checkMeetingPermissions(
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                ) { showSnackbar() }
+            }
+        }
+    }
+
+    fun showSnackbar() {
+        val warningText =
+            StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
+        (activity as BaseActivity).showSnackbar(
+            Constants.PERMISSIONS_TYPE,
+            binding.root,
+            warningText
+        )
+    }
+
+    /**
+     * Init Floating Panel, will move to `inMeetingFragment` later
+     */
+    private fun initFloatingPanel() {
+        bottomFloatingPanelViewHolder =
+            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
+        bottomFloatingPanelViewHolder.collapse()
+
+        /**
+         * Observer the participant List
+         */
+        inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
+            participants?.let {
+                bottomFloatingPanelViewHolder.setParticipants(it)
+            }
+        }
+
+        bottomFloatingPanelViewHolder.propertyUpdaters.add {
+            toolbar.alpha = 1 - it
+        }
+    }
+
+    /**
+     * Change Mic State
+     */
+    override fun onChangeMicState(micOn: Boolean) {
+        sharedModel.clickMic(!micOn)
+    }
+
+    private fun updateAudio(micOn: Boolean) {
+        bottomFloatingPanelViewHolder.updateMicIcon(micOn)
+    }
+
+    /**
+     * Change Cam State
+     */
+    override fun onChangeCamState(camOn: Boolean) {
+        sharedModel.clickCamera(!camOn)
+    }
+
+    private fun updateVideo(camOn: Boolean) {
+        bottomFloatingPanelViewHolder.updateCamIcon(camOn)
+    }
+
+    /**
+     * Change Hold State
+     */
+    override fun onChangeHoldState(isHold: Boolean) {
+        inMeetingViewModel.setCallOnHold(chatId, isHold)
+    }
+
+    /**
+     * Change Speaker state
+     */
+    override fun onChangeSpeakerState() {
+        sharedModel.clickSpeaker()
+    }
+
+    private fun updateSpeaker(device: AppRTCAudioManager.AudioDevice) {
+        bottomFloatingPanelViewHolder.updateSpeakerIcon(device)
+    }
+
+    /**
+     * Pop up dialog for end meeting for the user/guest
+     *
+     * Will show bottom sheet fragment for the moderator
+     */
+    override fun onEndMeeting() {
+        if (isOneToOneChat) {
+            leaveMeeting()
+        } else if (isModerator) {
+            val endMeetingBottomSheetDialogFragment =
+                EndMeetingBottomSheetDialogFragment.newInstance()
+            endMeetingBottomSheetDialogFragment.show(
+                parentFragmentManager,
+                endMeetingBottomSheetDialogFragment.tag
+            )
+        } else {
+            askConfirmationEndMeetingForUser()
+        }
+    }
+
+    /**
+     * Dialog for confirming leave meeting action
+     */
+    private fun askConfirmationEndMeetingForUser() {
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        ).apply {
+            setMessage(getString(R.string.title_end_meeting))
+            setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
+            setNegativeButton(R.string.general_cancel, null)
+            show()
+        }
+    }
+
+    private fun leaveMeeting() {
+        if (isGuest && !isOneToOneChat) {
+            meetingActivity.startActivity(Intent(meetingActivity, LeftMeetingActivity::class.java))
+            meetingActivity.finish()
+        } else {
+            inMeetingViewModel.leaveMeeting(chatId)
+            meetingActivity.finish()
+        }
+    }
+
+
+    /**
+     * Send share link
+     */
+    override fun onShareLink() {
+        showShortToast("onShareLink")
+
+        startActivity(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, getShareLink())
+            type = "text/plain"
+        })
+    }
+
+    /**
+     * Get the special link
+     */
+    private fun getShareLink(): String {
+        return "This is the share link"
+    }
+
+    /**
+     * Open invite participant page
+     */
+    override fun onInviteParticipants() {
+        logDebug("chooseAddContactDialog")
+
+        val inviteParticipantIntent =
+            Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
+                putExtra("contactType", Constants.CONTACT_TYPE_MEGA)
+                putExtra("chat", true)
+                putExtra("chatId", 123L)
+                putExtra("aBtitle", getString(R.string.invite_participants))
+            }
+        meetingActivity.startActivityForResult(
+            inviteParticipantIntent, Constants.REQUEST_ADD_PARTICIPANTS
+        )
+    }
+
+
+    /**
+     * Show participant bottom sheet when user click the three dots on participant item
+     */
+    override fun onParticipantOption(participant: Participant) {
+        val participantBottomSheet =
+            MeetingParticipantBottomSheetDialogFragment.newInstance(
+                isGuest,
+                isModerator,
+                participant
+            )
+        participantBottomSheet.show(parentFragmentManager, participantBottomSheet.tag)
+    }
+
+    private fun showShortToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

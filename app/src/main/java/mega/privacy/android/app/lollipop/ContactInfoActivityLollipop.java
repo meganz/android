@@ -18,12 +18,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Observer;
 import androidx.palette.graphics.Palette;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -32,6 +34,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Menu;
@@ -77,14 +80,14 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.listeners.StartChatCallListener;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -115,6 +118,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -125,6 +130,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.getDescription;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -300,57 +306,24 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 	};
 
-
-	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-					case MegaChatCall.CALL_STATUS_DESTROYED:
-					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						checkScreenRotationToShowCall();
-						break;
-				}
-			}
-
-			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
+	private final Observer<MegaChatCall> callStatusObserver = call -> {
+		int callStatus = call.getStatus();
+		switch (callStatus) {
+			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+			case MegaChatCall.CALL_STATUS_DESTROYED:
+			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 				checkScreenRotationToShowCall();
-			}
+				break;
 		}
 	};
 
-	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-				return;
-
-			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				checkScreenRotationToShowCall();
-			}
-		}
+	private final Observer<MegaChatCall> callOnHoldObserver = call -> {
+		checkScreenRotationToShowCall();
 	};
 
+	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
+		checkScreenRotationToShowCall();
+	};
 
 	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -642,6 +615,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
+				setAvatar();
+
 				if(user!=null){
 					sharedFoldersLayout.setVisibility(View.VISIBLE);
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
@@ -710,12 +685,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		registerReceiver(userNameReceiver, userNameUpdateFilter);
 
-		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
-		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-		registerReceiver(chatCallUpdateReceiver, filterCall);
-
-		registerReceiver(chatSessionUpdateReceiver,
-				new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -1018,10 +990,12 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
-				Intent i = new Intent(this, ChatCallActivity.class);
-				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
-				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(i);
+				MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+				MegaApplication.getInstance().openCallService(chatRoomTo.getChatId());
+				Intent meetingIntent = new Intent(this, MeetingActivity.class);
+				meetingIntent.setAction(MEETING_ACTION_IN);
+				meetingIntent.putExtra(MEETING_CHAT_ID, chatRoomTo.getChatId());
+				startActivity(meetingIntent);
 			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				startCallWithChatOnline(chatRoomTo);
 			}
@@ -1698,8 +1672,10 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
             askForDisplayOverDialog.recycle();
         }
 
-		unregisterReceiver(chatCallUpdateReceiver);
-		unregisterReceiver(chatSessionUpdateReceiver);
+		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
+		LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).removeObserver(sessionOnHoldObserver);
+
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(retentionTimeReceiver);
 		unregisterReceiver(manageShareReceiver);
@@ -2023,7 +1999,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
     
     private void setFoldersButtonText(ArrayList<MegaNode> nodes){
 		if (nodes != null) {
-			sharedFoldersButton.setText(getDescription(nodes));
+			sharedFoldersButton.setText(getQuantityString(R.plurals.num_folders_with_parameter, nodes.size(), nodes.size()));
 			if (nodes.size() == 0) {
 				sharedFoldersButton.setClickable(false);
 				sharedFoldersLayout.setClickable(false);

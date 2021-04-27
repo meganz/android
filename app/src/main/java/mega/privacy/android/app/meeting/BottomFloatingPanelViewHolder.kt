@@ -8,21 +8,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
-import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.databinding.InMeetingFragmentBinding
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 
 /**
- * Necessary value
+ * Bottom Panel view holder package the view and logic code of floating panel
  *
- * Mic, Cam, Speaker state
+ * @property binding InMeetingFragmentBinding, get views from this binding
+ * @property listener listen to the actions of all buttons
+ * @property isGuest the flag for determining if the current user is guest
+ * @property isModerator the flag for determining if the current user is moderator
  */
 class BottomFloatingPanelViewHolder(
-    private val binding: ActivityMeetingBinding,
+    private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private var isGuest: Boolean,
     private var isModerator: Boolean
@@ -42,17 +46,9 @@ class BottomFloatingPanelViewHolder(
      */
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
+    private var savedSpeakerState: AppRTCAudioManager.AudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
     private val participantsAdapter = ParticipantsAdapter(listener)
-
-    private val speakerVH = SpeakerButtonViewHolder(
-        binding.bottomFloatingPanel.fabSpeaker,
-        binding.bottomFloatingPanel.fabSpeakerLabel
-    ) {
-        updateBottomFloatingPanelIfNeeded()
-
-        listener.onChangeAudioDevice(it)
-    }
 
     init {
         initButtonsState()
@@ -71,6 +67,10 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Init the visibility of `ShareLink` & `Invite` Button
+     *
+     */
     private fun initShareAndInviteButton() {
         floatingPanelView.shareLink.isVisible = !isGuest
         floatingPanelView.invite.isVisible = !isGuest
@@ -78,29 +78,32 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Init the state for the buttons on button bar
+     * Init the state for the Mic, Cam and End button on button bar
      */
     private fun initButtonsState() {
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
-        // End meeting for all isn't included in MVP version.
-        floatingPanelView.fabEnd.setImageResource(if (isModerator) R.drawable.ic_end_call else R.drawable.ic_remove)
+        updateSpeakerIcon(savedSpeakerState)
+        floatingPanelView.fabEnd.setImageResource(R.drawable.ic_remove)
     }
 
+    /**
+     * Init Participants and update the list, and update the text showing participants size
+     *
+     * @param participants newest participant list
+     */
     fun setParticipants(participants: List<Participant>) {
-        participantsAdapter.submitList(participants)
+        participantsAdapter.submitList(participants.toMutableList())
 
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
         )
     }
 
-    fun onHeadphoneConnected(wiredHeadset: Boolean, bluetooth: Boolean) {
-        speakerVH.onHeadphoneConnected(wiredHeadset, bluetooth)
-
-        updateBottomFloatingPanelIfNeeded()
-    }
-
+    /**
+     * Set the listener for bottom sheet behavior and property list
+     *
+     */
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -163,9 +166,14 @@ class BottomFloatingPanelViewHolder(
                 listener.onChangeCamState(binding.bottomFloatingPanel.fabCam.isOn)
             }
 
+            fabSpeaker.setOnClickListener {
+                listener.onChangeSpeakerState()
+            }
+
             fabHold.setOnOffCallback {
                 // if isHold is off, should disable the camera and mic
                 updateHoldState(it)
+                binding.bottomFloatingPanel.fabHold.isOn = !it
                 listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
             }
 
@@ -193,18 +201,30 @@ class BottomFloatingPanelViewHolder(
      * If meeting isn't hold, change to the previous state
      */
     private fun updateHoldState(isNotHold: Boolean) {
-        floatingPanelView.fabMic.isOn = if (isNotHold) savedMicState else false
-        floatingPanelView.fabCam.isOn = if (isNotHold) savedCamState else false
+        floatingPanelView.fabMic.apply {
+            enable = !isNotHold
+        }
+        floatingPanelView.fabCam.apply {
+            enable = !isNotHold
+        }
     }
 
+    /**
+     * Init recyclerview
+     *
+     */
     private fun setupRecyclerView() {
         floatingPanelView.participants.apply {
             layoutManager = LinearLayoutManager(context)
-            itemAnimator = noChangeRecyclerViewItemAnimator()
+            itemAnimator = null
             clipToPadding = false
-            setHasFixedSize(true)
             adapter = participantsAdapter
+            addItemDecoration(SimpleDividerItemDecoration(context))
         }
+    }
+
+    fun updatePermission() {
+        isModerator = true
     }
 
     private fun updateBottomFloatingPanelIfNeeded() {
@@ -296,6 +316,34 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
         onBottomFloatingPanelSlide(0F)
+    }
+
+    fun updateMicIcon(micOn: Boolean) {
+        floatingPanelView.fabMic.isOn = micOn
+    }
+
+    fun updateCamIcon(micOn: Boolean) {
+        floatingPanelView.fabCam.isOn = micOn
+    }
+
+    fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
+        when (device) {
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+            }
+            AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                floatingPanelView.fabSpeaker.isOn = false
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+            }
+            else -> {
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
+            }
+        }
     }
 
     companion object {

@@ -38,7 +38,9 @@ import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.*
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
@@ -46,20 +48,21 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util.getMediaIntent
-import mega.privacy.android.app.utils.Util.scaleHeightPx
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
+import javax.inject.Inject
 import java.util.*
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
+
+    @Inject
+    lateinit var sortOrderManagement: SortOrderManagement
+
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -156,7 +159,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            callManager { it.orderCloud } ?: ORDER_DEFAULT_ASC
+            sortOrderManagement.getOrderCloud()
         )
     }
 
@@ -378,7 +381,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
@@ -386,7 +389,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
@@ -635,6 +638,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             mime.isURL -> {
                 logDebug("Is URL file")
                 viewModel.processUrlFile(file)
+            }
+            mime.isOpenableTextFile(file.length()) -> {
+                startActivity(
+                    Intent(requireContext(), TextFileEditorActivity::class.java)
+                        .putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.name)
+                        .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
+                        .putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
+                )
             }
             else -> {
                 openFile(file)

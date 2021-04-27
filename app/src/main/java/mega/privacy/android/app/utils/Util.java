@@ -152,7 +152,7 @@ public class Util {
 	private static long lastClickTime;
 
 	// 150ms, a smaller value may cause the keyboard to fail to open
-	private final static int SHOW_IM_DELAY = 150;
+	public final static int SHOW_IM_DELAY = 150;
 
 	// How many times the app has been launched till now
 	private final static String KEY_LAUNCHED_TIME = "launched_time";

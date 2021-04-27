@@ -1,13 +1,16 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Bitmap
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import kotlin.random.Random
 
-class InMeetingViewModel : ViewModel() {
+class InMeetingViewModel @ViewModelInject constructor(
+    private val inMeetingRepository: InMeetingRepository
+) : ViewModel() {
 
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
@@ -25,4 +28,12 @@ class InMeetingViewModel : ViewModel() {
         participants.value = participants.value
     }
     //TODO test code end
+
+    fun setCallOnHold(chatId: Long?, isHold: Boolean) {
+        inMeetingRepository.setCallOnHold(chatId, isHold)
+    }
+
+    fun leaveMeeting(chatId: Long?) {
+        inMeetingRepository.leaveMeeting(chatId)
+    }
 }

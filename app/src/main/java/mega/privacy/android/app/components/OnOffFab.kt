@@ -20,8 +20,17 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             updateAppearance()
         }
 
+    var enable: Boolean = true
+        set(value) {
+            field = value
+            this.isEnabled = value
+            updateAppearance()
+        }
+
     private var onIcon: Drawable?
     private val offIcon: Drawable?
+
+    private val disableIcon: Drawable?
 
     @ColorInt
     private val onIconTint: Int
@@ -35,7 +44,8 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     @ColorInt
     private val offBackgroundTint: Int
 
-    private var onOffCallback: ((Boolean) -> Boolean)? = null
+
+    private var onOffCallback: ((Boolean) -> Unit)? = null
 
     constructor(context: Context) : this(context, null, 0)
 
@@ -48,6 +58,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 
         onIcon = a.getDrawable(R.styleable.OnOffFab_on_icon)
         offIcon = a.getDrawable(R.styleable.OnOffFab_off_icon)
+        disableIcon = a.getDrawable(R.styleable.OnOffFab_disable_icon)
 
         onIconTint = a.getColor(
             R.styleable.OnOffFab_on_icon_tint,
@@ -72,14 +83,11 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         updateAppearance()
 
         setOnClickListener {
-            if (onOffCallback?.invoke(!isOn) == true) {
-                isOn = !isOn
-                updateAppearance()
-            }
+            onOffCallback?.invoke(isOn)
         }
     }
 
-    fun setOnOffCallback(callback: (Boolean) -> Boolean) {
+    fun setOnOffCallback(callback: (Boolean) -> Unit) {
         onOffCallback = callback
     }
 
@@ -89,9 +97,14 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     }
 
     private fun updateAppearance() {
-        setImageDrawable(if (isOn) onIcon else offIcon)
-        imageTintList = ColorStateList.valueOf(if (isOn) onIconTint else offIconTint)
+        setImageDrawable(if (!enable) disableIcon else if (isOn) onIcon else offIcon)
+        imageTintList = if (!enable){
+            null
+        } else {
+            ColorStateList.valueOf(if (isOn) onIconTint else offIconTint)
+        }
+
         backgroundTintList =
-            ColorStateList.valueOf(if (isOn) onBackgroundTint else offBackgroundTint)
+            ColorStateList.valueOf(if (!enable) onBackgroundTint else if (isOn) onBackgroundTint else offBackgroundTint)
     }
 }

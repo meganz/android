@@ -1,133 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toTopOf="@id/divider_info"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/avatar"
-        app:layout_constraintTop_toTopOf="@id/avatar"
-        tools:text="Yeray RosalesRosalesRosalesRosalesRosalesRosales" />
+        <variable
+            name="participant"
+            type="mega.privacy.android.app.meeting.adapter.Participant" />
 
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
-        app:layout_constraintEnd_toEndOf="@id/name"
-        app:layout_constraintStart_toStartOf="@id/name"
-        app:layout_constraintTop_toBottomOf="@id/name"
-        tools:text="vf@mega.co.nz" />
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogViewModel" />
+    </data>
 
-    <View
-        android:id="@+id/divider_info"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="77dp"
-        android:background="@color/grey_012_white_012"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/add_contact"
-        style="@style/BottomSheetItem"
-        android:text="@string/menu_add_contact"
-        android:visibility="gone"
-        app:drawableStartCompat="@drawable/ic_g_add_contact"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_info"
-        tools:visibility="visible" />
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toTopOf="@id/divider_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/contact_info"
-        style="@style/BottomSheetItem"
-        android:text="@string/contact_properties_activity"
-        app:drawableStartCompat="@drawable/info_ic"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_info"
-        tools:visibility="gone" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/divider_info"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <View
-        android:id="@+id/divider_contact_info"
-        style="@style/BottomSheetItemDivider"
-        android:layout_marginTop="@dimen/bottom_sheet_item_height"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_info" />
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:gravity="center_vertical"
+                android:showModeratorIcon="@{participant.moderator}"
+                android:singleLine="true"
+                android:text="@{participant.name}"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
-    <TextView
-        android:id="@+id/send_message"
-        style="@style/BottomSheetItem"
-        android:text="@string/context_send_message"
-        app:drawableStartCompat="@drawable/ic_chat"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_contact_info"
-        tools:visibility="gone" />
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:show="@{!viewModel.isGuest}"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
+                tools:text="vf@mega.co.nz" />
+        </LinearLayout>
 
-    <View
-        android:id="@+id/divider_send_message"
-        style="@style/BottomSheetItemDivider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/send_message"
-        tools:visibility="gone" />
+        <View
+            android:id="@+id/divider_info"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="77dp"
+            android:background="@color/grey_012_white_012"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/ping_to_speaker"
-        style="@style/BottomSheetItem"
-        android:text="@string/ping_to_speaker"
-        app:drawableStartCompat="@drawable/ic_speaker_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_send_message" />
+        <TextView
+            android:id="@+id/add_contact"
+            style="@style/BottomSheetItem"
+            android:show="@{viewModel.showAddContact()}"
+            android:text="@string/menu_add_contact"
+            app:drawableStartCompat="@drawable/ic_g_add_contact"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_info" />
 
-    <View
-        android:id="@+id/divider_ping_to_speaker"
-        style="@style/BottomSheetItemDivider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ping_to_speaker" />
+        <TextView
+            android:id="@+id/contact_info"
+            style="@style/BottomSheetItem"
+            android:show="@{viewModel.showContactInfoOrEditProfile()}"
+            android:text="@{viewModel.getContactItemText()}"
+            app:drawableStartCompat="@drawable/info_ic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_info" />
 
-    <TextView
-        android:id="@+id/make_moderator"
-        style="@style/BottomSheetItem"
-        android:text="@string/make_moderator"
-        app:drawableStartCompat="@drawable/ic_moderator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_ping_to_speaker" />
+        <View
+            android:id="@+id/divider_contact_info"
+            style="@style/BottomSheetItemDivider"
+            android:layout_marginTop="@dimen/bottom_sheet_item_height"
+            android:show="@{viewModel.showDividerContactInfo()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_info" />
 
-    <View
-        android:id="@+id/divider_make_moderator"
-        style="@style/BottomSheetItemDivider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/make_moderator" />
+        <TextView
+            android:id="@+id/send_message"
+            style="@style/BottomSheetItem"
+            android:show="@{viewModel.showSendMessage()}"
+            android:text="@string/context_send_message"
+            app:drawableStartCompat="@drawable/ic_chat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_contact_info" />
 
-    <TextView
-        android:id="@+id/remove_participant"
-        style="@style/BottomSheetItem"
-        android:text="@string/remove_participant"
-        android:textColor="@color/red_600_red_300"
-        app:drawableStartCompat="@drawable/ic_move"
-        app:drawableTint="@color/red_600_red_300"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_make_moderator" />
+        <View
+            android:id="@+id/divider_send_message"
+            style="@style/BottomSheetItemDivider"
+            android:hide="@{viewModel.showSendMessage()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/send_message" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/ping_to_speaker"
+            style="@style/BottomSheetItem"
+            android:text="@string/ping_to_speaker"
+            app:drawableStartCompat="@drawable/ic_speaker_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_send_message" />
+
+        <View
+            android:id="@+id/divider_ping_to_speaker"
+            style="@style/BottomSheetItemDivider"
+            android:show="@{viewModel.showMakeModeratorItem()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ping_to_speaker" />
+
+        <TextView
+            android:id="@+id/make_moderator"
+            style="@style/BottomSheetItem"
+            android:show="@{viewModel.showMakeModeratorItem()}"
+            android:text="@string/make_moderator"
+            app:drawableStartCompat="@drawable/ic_moderator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_ping_to_speaker" />
+
+        <View
+            android:id="@+id/divider_make_moderator"
+            style="@style/BottomSheetItemDivider"
+            android:show="@{viewModel.showRemoveItem()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/make_moderator" />
+
+        <TextView
+            android:id="@+id/remove_participant"
+            style="@style/BottomSheetItem"
+            android:show="@{viewModel.showRemoveItem()}"
+            android:text="@string/remove_participant"
+            android:textColor="@color/red_600_red_300"
+            app:drawableStartCompat="@drawable/ic_move"
+            app:drawableTint="@color/red_600_red_300"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_make_moderator" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

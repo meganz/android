@@ -30,7 +30,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.listeners.StartChatCallListener;
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
@@ -38,18 +38,20 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -133,18 +135,18 @@ public class CallUtil {
     public static void returnActiveCall(Context context) {
         ArrayList<Long> currentCalls = getCallsParticipating();
 
-        for(Long chatIdCall:currentCalls){
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
-            if(call != null){
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-                Intent intent = new Intent(context, ChatCallActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(CHAT_ID, call.getChatid());
-                intent.putExtra(CALL_ID, call.getCallId());
-                context.startActivity(intent);
-                break;
-            }
-        }
+//        for(Long chatIdCall:currentCalls){
+//            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
+//            if(call != null){
+//                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+//                Intent intent = new Intent(context, ChatCallActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                intent.putExtra(CHAT_ID, call.getChatid());
+//                intent.putExtra(CALL_ID, call.getCallId());
+//                context.startActivity(intent);
+//                break;
+//            }
+//        }
     }
 
     /**
@@ -157,18 +159,18 @@ public class CallUtil {
         if(currentCalls == null || currentCalls.isEmpty())
             return;
 
-        for(Long chatIdCall:currentCalls){
-            if(chatIdCall == chatId){
-                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-                Intent intent = new Intent(context, ChatCallActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(CHAT_ID, call.getChatid());
-                intent.putExtra(CALL_ID, call.getCallId());
-                context.startActivity(intent);
-                return;
-            }
-        }
+//        for(Long chatIdCall:currentCalls){
+//            if(chatIdCall == chatId){
+//                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+//                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+//                Intent intent = new Intent(context, ChatCallActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                intent.putExtra(CHAT_ID, call.getChatid());
+//                intent.putExtra(CALL_ID, call.getCallId());
+//                context.startActivity(intent);
+//                return;
+//            }
+//        }
     }
 
     /**
@@ -241,6 +243,7 @@ public class CallUtil {
         }
 
         ArrayList<Long> currentChatCallsList = getCallsParticipating();
+
         if (!participatingInACall() || currentChatCallsList == null || !isScreenInPortrait(context)) {
             hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
             return;
@@ -821,6 +824,13 @@ public class CallUtil {
         return PendingIntent.getActivity(context, requestCode, intentCall, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    public static PendingIntent getPendingIntentMeeting(Context context, long chatIdCallToAnswer, int requestCode){
+        Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        intentMeeting.setAction(MEETING_ACTION_IN);
+        intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
+        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     /**
      * Method for knowing if the call start button should be enabled or not.
      *
@@ -855,10 +865,10 @@ public class CallUtil {
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, listener);
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
-            Intent i = new Intent(activity, ChatCallActivity.class);
-            i.putExtra(CHAT_ID, chat.getChatId());
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            activity.startActivity(i);
+//            Intent i = new Intent(activity, ChatCallActivity.class);
+//            i.putExtra(CHAT_ID, chat.getChatId());
+//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            activity.startActivity(i);
         } else if (isStatusConnected(activity, chat.getChatId())) {
             MegaApplication.setUserWaitingForCall(user.getHandle());
             startCallWithChatOnline(activity, chat);

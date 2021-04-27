@@ -23,6 +23,7 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -122,9 +123,9 @@ public class ContactController {
                 MegaChatCall call = megaChatApi.getChatCall(chatId);
                 if (call != null) {
                     if (context instanceof ManagerActivityLollipop) {
-                        megaChatApi.hangChatCall(call.getCallId(), (ManagerActivityLollipop) context);
+                        megaChatApi.hangChatCall(call.getCallId(), new HangChatCallListener(context));
                     } else if (context instanceof ContactInfoActivityLollipop) {
-                        megaChatApi.hangChatCall(call.getCallId(), (ContactInfoActivityLollipop) context);
+                        megaChatApi.hangChatCall(call.getCallId(),  new HangChatCallListener(context));
                     }
                 }
             }

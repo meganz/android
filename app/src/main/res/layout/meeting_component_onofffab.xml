@@ -70,6 +70,7 @@
             app:on_background_tint="@color/grey_700"
             app:on_icon="@drawable/ic_video"
             app:on_icon_tint="@color/white"
+            app:disable_icon="@drawable/ic_video_disable"
             app:pressedTranslationZ="12dp"
             tools:ignore="ContentDescription" />
 
@@ -91,7 +92,7 @@
             android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
             android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
             android:background="@null"
-            android:onClick="@{() -> viewmodelFab.clickSpeaker(!viewmodelFab.speakerLiveData)}"
+            android:onClick="@{() -> viewmodelFab.clickSpeaker()}"
             app:borderWidth="0dp"
             app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
             app:layout_constraintEnd_toEndOf="parent"

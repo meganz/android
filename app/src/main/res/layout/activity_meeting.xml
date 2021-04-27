@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-    <LinearLayout
-        android:id="@+id/fragment_layout"
+    android:background="@color/dark_grey">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_shape_callschat"
+        android:elevation="1dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
+        app:subtitleTextAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
+        app:subtitleTextColor="@color/white"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+        app:titleTextColor="@color/white" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:defaultNavHost="true" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/nav_host_fragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:defaultNavHost="true" />
-
-    </LinearLayout>
-
-    <include
-        android:visibility="gone"
-        android:id="@+id/bottom_floating_panel"
-        layout="@layout/meeting_bottom_floating_panel" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

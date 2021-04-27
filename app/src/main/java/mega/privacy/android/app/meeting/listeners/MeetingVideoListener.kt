@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.listeners
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.util.DisplayMetrics
@@ -16,17 +15,20 @@ import java.nio.ByteBuffer
  * A listener for metadata corresponding to video being rendered.
  */
 class MeetingVideoListener(
-    context: Context?,
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
     isFrontCamera: Boolean = true
 ) : MegaChatVideoListenerInterface {
+
     var width = 0
     var height = 0
     private val isLocal = true
     val renderer: MegaSurfaceRenderer
     private val surfaceHolder: SurfaceHolder
     private var bitmap: Bitmap? = null
+    private var viewWidth = 0
+    private var viewHeight = 0
+
     override fun onChatVideoData(
         api: MegaChatApiJava,
         chatid: Long,
@@ -37,15 +39,17 @@ class MeetingVideoListener(
         if (width == 0 || height == 0) {
             return
         }
-        if (this.width != width || this.height != height) {
+        if (this.width != width || this.height != height
+            || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
             this.width = width
             this.height = height
             val holder = surfaceView.holder
             if (holder != null) {
-                val viewWidth = surfaceView.width
-                val viewHeight = surfaceView.height
+                viewWidth = surfaceView.width
+                viewHeight = surfaceView.height
+
                 if (viewWidth != 0 && viewHeight != 0) {
-                    var holderWidth = Math.min(viewWidth, width)
+                    var holderWidth = viewWidth.coerceAtMost(width)
                     var holderHeight = holderWidth * viewHeight / viewWidth
                     if (holderHeight > viewHeight) {
                         holderHeight = viewHeight

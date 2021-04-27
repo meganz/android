@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -58,6 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -76,12 +80,14 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
-
+@AndroidEntryPoint
 public class InboxFragmentLollipop extends RotatableFragment{
 
-	public static int GRID_WIDTH = 400;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 	
 	Context context;
 	RecyclerView recyclerView;
@@ -452,7 +458,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			if (megaApi.getInboxNode() != null){
 				logDebug("InboxNode != null");
 				inboxNode = megaApi.getInboxNode();
-				nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud());
 			}
 		}
 		else{
@@ -461,7 +467,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			}
 
 		}
@@ -559,13 +565,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public void refresh(){
 		logDebug("refresh");
 		if(inboxNode != null && (((ManagerActivityLollipop) context).getParentHandleInbox()==-1||((ManagerActivityLollipop) context).getParentHandleInbox()==inboxNode.getHandle())){
-			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud());
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 			if(parentNode!=null){
 				logDebug("Parent Node Handle: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			}
 		}
 
@@ -591,7 +597,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 
-			intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+			intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 
 			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
 			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
@@ -623,7 +629,8 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			} else {
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
-			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+
+			mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
 			mediaIntent.putExtra("placeholder", placeholderCount);
 			mediaIntent.putExtra("HANDLE", file.getHandle());
@@ -813,6 +820,8 @@ public class InboxFragmentLollipop extends RotatableFragment{
 						Collections.singletonList(node),
 						true, false, false, false);
 			}
+		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+			manageTextFileIntent(requireContext(), node, INBOX_ADAPTER);
 		} else {
 			adapter.notifyDataSetChanged();
 			((ManagerActivityLollipop) context).saveNodesToDevice(
@@ -855,7 +864,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop) context).orderCloud);
+				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes, adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
@@ -982,7 +991,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				setNodes(nodes);
 
 				int lastVisiblePosition = 0;

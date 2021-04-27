@@ -86,7 +86,7 @@ public class IncomingCallNotification {
         mBuilderCompat
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
