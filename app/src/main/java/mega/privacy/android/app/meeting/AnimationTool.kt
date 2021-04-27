@@ -2,13 +2,12 @@ package mega.privacy.android.app.meeting
 
 import android.view.View
 import android.view.animation.TranslateAnimation
+import androidx.core.view.isVisible
 
 object AnimationTool {
 
     fun View.fadeInOut(dy: Float = 300f, duration: Long = 500, toTop: Boolean = false) {
-        val isVisible = visibility == View.VISIBLE
-
-        val animation = if (isVisible) TranslateAnimation(
+      val animation = if (isVisible) TranslateAnimation(
             0f,
             0f,
             0f,
@@ -23,7 +22,7 @@ object AnimationTool {
         animation.duration = duration
         animation.fillAfter = false
         startAnimation(animation)
-        visibility = if (isVisible) View.GONE else View.VISIBLE
+        isVisible = !isVisible
     }
 
     fun View.moveY(dy: Float, duration: Long = 500) {

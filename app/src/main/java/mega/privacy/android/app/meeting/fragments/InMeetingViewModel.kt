@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
     //TODO test code start
+    val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
+
     fun addParticipant(add: Boolean) {
         if (add) {
             participants.value!!.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])

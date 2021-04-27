@@ -7,8 +7,10 @@ import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 
 class GridViewPagerAdapter(
+    private val inMeetingViewModel: InMeetingViewModel,
     private val fragment: Fragment?,
     private val maxWidth: Int,
     private val maxHeight: Int,
@@ -38,7 +40,7 @@ class GridViewPagerAdapter(
             gridView.setColumnWidth(maxWidth / 2)
         }
 
-        val adapter = VideoGridViewAdapter(gridView, maxWidth, maxHeight, position)
+        val adapter = VideoGridViewAdapter(inMeetingViewModel, gridView, maxWidth, maxHeight, position)
         adapter.submitList(data)
 
         gridView.adapter = adapter

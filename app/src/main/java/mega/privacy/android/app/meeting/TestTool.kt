@@ -1,15 +1,23 @@
 package mega.privacy.android.app.meeting
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT
+import android.os.Build
+import android.os.Environment
 import android.view.View
+import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
+import java.nio.ByteBuffer
 
 object TestTool {
 
-    fun getTestParticipants(context: Context) : List<Participant> {
+    fun getTestParticipants(context: Context): List<Participant> {
         val megaApi = MegaApplication.getInstance().megaApi
         val avatar =
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + FileUtil.JPG_EXTENSION)
@@ -47,11 +55,37 @@ object TestTool {
     )
 
     fun View.showHide() {
-        visibility = if(visibility == View.VISIBLE) {
-            View.GONE
-        } else {
-            View.VISIBLE
+        isVisible = !isVisible
+    }
+
+    // TODO test start: Change the video path to point a local video on your test device.(Need storage read permission)
+    @RequiresApi(Build.VERSION_CODES.P)
+    class FrameProducer {
+
+        val frames = mutableListOf<Bitmap>()
+
+        //processor: ((width: Int, height: Int, bitmap: Bitmap) -> Unit)
+        suspend fun load() {
+            val videoPath =
+                Environment.getExternalStorageDirectory().absolutePath + "/DCIM/photos/20190819_111725.mp4"
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(videoPath)
+
+            val frameCount = retriever.extractMetadata(METADATA_KEY_VIDEO_FRAME_COUNT).toInt()
+
+            // In test, the bitmap won't be recycled, so don't put in too many bitmaps.
+            for (i in 0 until 300.coerceAtMost(frameCount)) frames.add(retriever.getFrameAtIndex(i))
+        }
+
+
+        private fun convertToByteBuffer(b: Bitmap): ByteArray {
+            val capacity = b.byteCount
+            val buffer = ByteBuffer.allocate(capacity)
+            b.copyPixelsToBuffer(buffer)
+
+            return buffer.array()
         }
     }
+    // TODO test end
 }
 

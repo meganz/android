@@ -2,19 +2,25 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.*
 import kotlinx.android.synthetic.main.in_meeting_fragment.view.*
 import mega.privacy.android.app.BaseActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
@@ -28,6 +34,7 @@ import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -130,6 +137,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // TODO test code start: add x participants
+        val x = 2
+        for (i in 0 until x) {
+            inMeetingViewModel.addParticipant(true)
+        }
+        // TODO test code start
+
+        //TODO test code start
+        val producer = TestTool.FrameProducer()
+
+        GlobalScope.launch(Dispatchers.IO) {
+            producer.load()
+            inMeetingViewModel.frames.postValue(producer.frames)
+        }
+        //TODO test code end
+
         toolbar = meetingActivity.toolbar
         // TODO test code start
         toolbar.title = "Joanna's meeting"
@@ -220,6 +243,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         gridViewMenuItem = menu.findItem(R.id.grid_view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.swap_camera -> {
@@ -466,5 +490,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
 
     private fun showShortToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        inMeetingViewModel.frames.value = mutableListOf()
     }
 }

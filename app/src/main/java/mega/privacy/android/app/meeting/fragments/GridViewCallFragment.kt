@@ -60,7 +60,14 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
-            .setAdapter(GridViewPagerAdapter(parentFragment, maxWidth, maxHeight))
+            .setAdapter(
+                GridViewPagerAdapter(
+                    (parentFragment as InMeetingFragment).inMeetingViewModel,
+                    parentFragment,
+                    maxWidth,
+                    maxHeight
+                )
+            )
             .create()
 
         // TODO test code start
@@ -79,15 +86,16 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     private fun sliceBy6(data: MutableList<Participant>): MutableList<List<Participant>> {
         val result = mutableListOf<List<Participant>>()
-        val sliceCount = if (data.size % 6 == 0) data.size / 6 else data.size / 6 + 1
+        val sliceCount =
+            if (data.size % PARTICIPANTS_COUNT_PER_SCREEN == 0) data.size / PARTICIPANTS_COUNT_PER_SCREEN else data.size / PARTICIPANTS_COUNT_PER_SCREEN + 1
 
         for (i in 0 until sliceCount) {
-            var to = i * 6 + 5
+            var to = i * PARTICIPANTS_COUNT_PER_SCREEN + PARTICIPANTS_COUNT_PER_SCREEN - 1
             if (to >= data.size) {
                 to = data.size - 1
             }
 
-            result.add(i, data.slice(IntRange(i * 6, to)))
+            result.add(i, data.slice(IntRange(i * PARTICIPANTS_COUNT_PER_SCREEN, to)))
         }
 
         return result
@@ -96,6 +104,8 @@ class GridViewCallFragment : MeetingBaseFragment() {
     companion object {
 
         const val TAG = "GridViewCallFragment"
+
+        const val PARTICIPANTS_COUNT_PER_SCREEN = 6
 
         @JvmStatic
         fun newInstance() = GridViewCallFragment()
