@@ -48,7 +48,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
     lateinit var toolbar: MaterialToolbar
 
     private lateinit var individualCallFragment: IndividualCallFragment
-    private lateinit var floatingWindowFragment: SelfFeedFragment
+    private lateinit var floatingWindowFragment: IndividualCallFragment
     private lateinit var gridViewCallFragment: GridViewCallFragment
     private lateinit var speakerViewCallFragment: SpeakerViewCallFragment
 
@@ -206,11 +206,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             GridViewCallFragment.TAG
         )
 
-        floatingWindowFragment = SelfFeedFragment.newInstance(1, 2)
+        floatingWindowFragment = IndividualCallFragment.newInstance(1, 2, true)
         loadChildFragment(
             R.id.self_feed_floating_window_container,
             floatingWindowFragment,
-            SelfFeedFragment.TAG
+            IndividualCallFragment.TAG
         )
         //TODO test code end
 

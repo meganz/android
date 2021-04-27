@@ -7,6 +7,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_local_camera_call.*
+import kotlinx.coroutines.*
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.utils.Constants
@@ -21,11 +22,84 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private var chat: MegaChatRoom? = null
     private var isFloatingWindow = false
 
-    private lateinit var surfaceHolder: SurfaceHolder
+    lateinit var inMeetingViewModel: InMeetingViewModel
+
+    val paint = Paint()
 
     var videoAlpha = 255
 
-    var released = false
+    lateinit var holder: SurfaceHolder
+
+    var isDrawing = true
+
+    private val srcRect = Rect()
+    private val dstRect = Rect()
+
+    // TODO test start
+    var job: Job? = null
+
+    val callback = object : SurfaceHolder.Callback {
+
+        override fun surfaceCreated(holder: SurfaceHolder?) {
+            isDrawing = true
+
+            dstRect.top = 0
+            dstRect.left = 0
+            dstRect.right = video.width
+            dstRect.bottom = video.height
+
+            inMeetingViewModel.frames.observeForever {
+                job = GlobalScope.launch(Dispatchers.IO) {
+                    while (isDrawing) {
+                        it.forEach {
+                            delay(50)
+                            onChatVideoData(it.width, it.height, it)
+
+                            if (!isDrawing) return@forEach
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun surfaceChanged(
+            holder: SurfaceHolder?,
+            format: Int,
+            width: Int,
+            height: Int
+        ) {
+        }
+
+        override fun surfaceDestroyed(holder: SurfaceHolder?) {
+            onRecycle()
+        }
+    }
+
+    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
+        if (bitmap.isRecycled || !holder.surface.isValid) return
+
+        val canvas = holder.lockCanvas() ?: return
+
+        srcRect.top = 0
+        srcRect.left = 0
+        srcRect.right = width
+        srcRect.bottom = height
+
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+
+        paint.alpha = videoAlpha
+
+//        canvas.drawRoundRect(
+//            RectF(0f, 0f, video.width.toFloat(), video.height.toFloat()),
+//            Util.dp2px(16f, outMetrics).toFloat(),
+//            Util.dp2px(16f, outMetrics).toFloat(),
+//            paint
+//        )
+
+        canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
+        holder.unlockCanvasAndPost(canvas)
+    }
+    // TODO test end
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +108,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
             clientId = it.getLong(Constants.CLIENT_ID)
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW)
         }
-    }
 
+        this.inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +126,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (isFloatingWindow) {
+            holder = video.holder
+
+            // Set background of SurfaceView as transparent after drew a round corner rect.
+            video.setZOrderOnTop(true)
+            holder.setFormat(PixelFormat.TRANSLUCENT)
+
             (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.apply {
                 add {
                     view.alpha = 1 - it
@@ -67,70 +148,23 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         // Start drawing here, so that after a lock screen, the drawing can resume.
         if (isFloatingWindow) {
-//            handleFloatingWindow()
+            // TODO test start
+            holder.addCallback(callback)
+            // TODO test code end
         }
     }
 
-    private fun handleFloatingWindow() {
-        // Set background of SurfaceView as transparent after drew a round corner rect.
-        video.setZOrderOnTop(true)
-        surfaceHolder.setFormat(PixelFormat.TRANSLUCENT)
+    fun onRecycle() {
+        isDrawing = false
 
-        // TODO test start
-        surfaceHolder.addCallback(object : SurfaceHolder.Callback {
+        holder.removeCallback(callback)
 
-            override fun surfaceCreated(holder: SurfaceHolder?) {
-                released = false
-
-                Thread{
-                    while (!released) {
-                        Thread.sleep(100)
-                        drawFrame()
-                    }
-                }.start()
+        if (job != null && job!!.isActive) {
+            GlobalScope.launch(Dispatchers.IO) {
+                job!!.cancelAndJoin()
             }
-
-            override fun surfaceChanged(
-                holder: SurfaceHolder?,
-                format: Int,
-                width: Int,
-                height: Int
-            ) {
-            }
-
-            override fun surfaceDestroyed(holder: SurfaceHolder?) { released = true}
-
-        })
-        // TODO test code end
-    }
-
-    // TODO test start
-    private fun drawFrame() {
-        val w = video.width.toFloat()
-        val h = video.height.toFloat()
-        val rectF = RectF(0f, 0f, w, h)
-
-        val canvas = surfaceHolder.lockCanvas()
-
-        canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        val paint = Paint()
-        paint.apply {
-            color = Color.parseColor("#ABCDEF")
-            alpha = videoAlpha
-        }
-
-        canvas?.drawRoundRect(
-            rectF,
-            Util.dp2px(16f, outMetrics).toFloat(),
-            Util.dp2px(16f, outMetrics).toFloat(),
-            paint
-        )
-
-        if(!released) {
-            surfaceHolder.unlockCanvasAndPost(canvas)
         }
     }
-    // TODO test code end
 
     companion object {
 

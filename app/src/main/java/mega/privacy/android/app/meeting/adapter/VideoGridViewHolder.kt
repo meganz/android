@@ -30,6 +30,12 @@ class VideoGridViewHolder(
 
     lateinit var holder: SurfaceHolder
 
+    var isDrawing = true
+
+    private val srcRect = Rect()
+    private val dstRect = Rect()
+
+    // TODO test start
     var job: Job? = null
 
     val callback = object : SurfaceHolder.Callback {
@@ -69,22 +75,20 @@ class VideoGridViewHolder(
         }
     }
 
-    var isDrawing = true
+    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
+        if (bitmap.isRecycled || !holder.surface.isValid) return
 
-    private val srcRect = Rect()
-    private val dstRect = Rect()
+        val canvas = holder.lockCanvas() ?: return
 
-    fun onRecycle() {
-        isDrawing = false
+        srcRect.top = 0
+        srcRect.left = 0
+        srcRect.right = width
+        srcRect.bottom = height
 
-        holder.removeCallback(callback)
-
-        if (job != null && job!!.isActive) {
-            GlobalScope.launch(Dispatchers.IO) {
-                job!!.cancelAndJoin()
-            }
-        }
+        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
+        holder.unlockCanvasAndPost(canvas)
     }
+    // TODO test end
 
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
@@ -100,6 +104,18 @@ class VideoGridViewHolder(
 
         holder = binding.video.holder
         holder.addCallback(callback)
+    }
+
+    fun onRecycle() {
+        isDrawing = false
+
+        holder.removeCallback(callback)
+
+        if (job != null && job!!.isActive) {
+            GlobalScope.launch(Dispatchers.IO) {
+                job!!.cancelAndJoin()
+            }
+        }
     }
 
     private fun layout(isFirstPage: Boolean, itemCount: Int) {
@@ -174,21 +190,5 @@ class VideoGridViewHolder(
             }
         }
         return Pair(w, w)
-    }
-
-    // TODO test start
-    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
-        if (bitmap.isRecycled) return
-
-        srcRect.top = 0
-        srcRect.left = 0
-        srcRect.right = width
-        srcRect.bottom = height
-
-        if (holder.surface.isValid) {
-            val canvas = holder.lockCanvas() ?: return
-            canvas.drawBitmap(bitmap, srcRect, dstRect, null)
-            holder.unlockCanvasAndPost(canvas)
-        }
     }
 }
