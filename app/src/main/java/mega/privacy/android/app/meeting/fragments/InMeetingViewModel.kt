@@ -26,11 +26,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
     //TODO test code end
 
-    fun setCallOnHold(chatId: Long?, isHold: Boolean) {
+    fun setCallOnHold(chatId: Long, isHold: Boolean) {
         inMeetingRepository.setCallOnHold(chatId, isHold)
     }
 
-    fun leaveMeeting(chatId: Long?) {
+    fun leaveMeeting(chatId: Long) {
         inMeetingRepository.leaveMeeting(chatId)
     }
 }

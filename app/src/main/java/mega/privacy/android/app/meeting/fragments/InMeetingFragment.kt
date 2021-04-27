@@ -262,7 +262,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Init Share View Model
      */
     private fun initShareViewModel() {
-
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             updateAudio(it)
         }
@@ -273,7 +272,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
             updateSpeaker(it)
         }
-
 
         /**
          * Will Change after Andy modify the permission structure
@@ -372,17 +370,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-        if (isOneToOneChat) {
-            leaveMeeting()
-        } else if (isModerator) {
-            val endMeetingBottomSheetDialogFragment =
-                EndMeetingBottomSheetDialogFragment.newInstance()
-            endMeetingBottomSheetDialogFragment.show(
-                parentFragmentManager,
-                endMeetingBottomSheetDialogFragment.tag
-            )
-        } else {
-            askConfirmationEndMeetingForUser()
+        when {
+            isOneToOneChat -> {
+                leaveMeeting()
+            }
+            isModerator -> {
+                val endMeetingBottomSheetDialogFragment =
+                    EndMeetingBottomSheetDialogFragment.newInstance()
+                endMeetingBottomSheetDialogFragment.show(
+                    parentFragmentManager,
+                    endMeetingBottomSheetDialogFragment.tag
+                )
+            }
+            else -> {
+                askConfirmationEndMeetingForUser()
+            }
         }
     }
 
@@ -410,7 +412,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             meetingActivity.finish()
         }
     }
-
 
     /**
      * Send share link
@@ -449,7 +450,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener {
             inviteParticipantIntent, Constants.REQUEST_ADD_PARTICIPANTS
         )
     }
-
 
     /**
      * Show participant bottom sheet when user click the three dots on participant item

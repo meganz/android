@@ -2,14 +2,15 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
+import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.ASSIGN_MODERATOR
+import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.END_MEETING_FOR_ALL
+import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.LEAVE_ANYWAY
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.LogUtil
 
@@ -69,11 +70,9 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     }
 
-
     companion object {
         fun newInstance(): EndMeetingBottomSheetDialogFragment {
-            val fragment = EndMeetingBottomSheetDialogFragment()
-            return fragment
+            return EndMeetingBottomSheetDialogFragment()
         }
     }
 }

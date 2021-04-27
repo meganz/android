@@ -18,14 +18,14 @@ class InMeetingRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    fun setCallOnHold(chatId: Long?, isHold: Boolean) {
+    fun setCallOnHold(chatId: Long, isHold: Boolean) {
         if (chatId != null) {
             megaChatApi.setCallOnHold(chatId, isHold, SetCallOnHoldListener(context))
         }
     }
 
-    fun leaveMeeting(chatId: Long?) {
-        val call: MegaChatCall = megaChatApi.getChatCall(chatId!!)
+    fun leaveMeeting(chatId: Long) {
+        val call: MegaChatCall = megaChatApi.getChatCall(chatId)
         megaChatApi.hangChatCall(call.callId, HangChatCallListener(context))
     }
 }
