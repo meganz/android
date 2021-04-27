@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.LinksUtil
 
 /**
  * Take actions when the user clicking on a banner
+ * @param fragment The Homepage fragment which contains the banners
  */
 class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter.ClickBannerCallback {
 

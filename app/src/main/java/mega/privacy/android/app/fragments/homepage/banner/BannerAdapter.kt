@@ -19,7 +19,7 @@ class BannerAdapter(private val viewModel: HomePageViewModel)
     }
 
     fun setClickBannerCallback(cb: ClickBannerCallback) {
-        clickBannerCallback = cb;
+        clickBannerCallback = cb
     }
 
     override fun bindData(
