@@ -698,8 +698,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
-	private MenuItem changePass;
-	private MenuItem exportMK;
 	private MenuItem takePicture;
 	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
@@ -6240,7 +6238,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		takePicture = menu.findItem(R.id.action_take_picture);
 		searchByDate = menu.findItem(R.id.action_search_by_date);
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
-		exportMK = menu.findItem(R.id.action_menu_export_MK);
 		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
@@ -6251,8 +6248,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		chronometerMenuItem.setVisibility(View.GONE);
 
 		rootView.setOnClickListener(v1 -> onOptionsItemSelected(returnCallMenuItem));
-
-		changePass = menu.findItem(R.id.action_menu_change_pass);
 
 		if (bNV != null) {
 			Menu bNVMenu = bNV.getMenu();
@@ -6403,9 +6398,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
 						refreshMenuItem.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
-						changePass.setVisible(true);
 						logoutMenuItem.setVisible(true);
-						exportMK.setVisible(true);
 
 						if (myAccountInfo.getNumberOfSubscriptions() > 0) {
 							cancelSubscription.setVisible(true);
@@ -7072,18 +7065,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				selectDrawerItemLollipop(drawerItem);
 				return true;
 	        }
-
-	        case R.id.action_menu_change_pass:{
-	        	Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
-				startActivity(intent);
-				return true;
-	        }
-	        case R.id.action_menu_export_MK:{
-				logDebug("Export MK option selected");
-
-				showMKLayout();
-	        	return true;
-	        }
 	        case R.id.action_menu_logout:{
 				logDebug("Action menu logout pressed");
 				megaApi.shouldShowPasswordReminderDialog(true,
@@ -7147,7 +7128,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             refreshMenuItem.setVisible(false);
             sortByMenuItem.setVisible(false);
             unSelectMenuItem.setVisible(false);
-            changePass.setVisible(false);
             clearRubbishBinMenuitem.setVisible(false);
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
@@ -7160,7 +7140,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
-            exportMK.setVisible(false);
         }
     }
 
@@ -12418,17 +12397,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 
-		} else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
-			logDebug("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_KILL_SESSION);
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Success kill sessions");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_kill_all_sessions), -1);
-			}
-			else
-			{
-				logError("Error when killing sessions: " + e.getErrorString());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_kill_all_sessions), -1);
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			logDebug("requestFinish " + MegaRequest.TYPE_REMOVE);

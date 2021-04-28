@@ -636,6 +636,10 @@
             android:name=".activities.myAccount.MyAccountActivity"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name=".activities.exportMK.ExportRecoveryKeyActivity"
+            android:launchMode="singleTop" />
+
     </application>
 
 </manifest>

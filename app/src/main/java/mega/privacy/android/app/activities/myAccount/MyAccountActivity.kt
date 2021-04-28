@@ -14,6 +14,9 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_OK
+import org.jetbrains.anko.contentView
 
 class MyAccountActivity : PasscodeActivity() {
 
@@ -30,6 +33,8 @@ class MyAccountActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_account)
+
+        setUpObservers()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -62,10 +67,8 @@ class MyAccountActivity : PasscodeActivity() {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
-            R.id.action_change_pass -> {
-            }
-            R.id.action_export_MK -> {
-            }
+            R.id.action_change_pass -> viewModel.changePassword(this)
+            R.id.action_export_MK -> viewModel.exportMK(this)
             R.id.action_refresh -> {
             }
             R.id.action_upgrade_account -> {
@@ -112,6 +115,19 @@ class MyAccountActivity : PasscodeActivity() {
         }
     }
 
+    private fun setUpObservers() {
+        viewModel.onKillSessionsFinished().observe(this, ::showKillSessionsResult)
+    }
+
+    private fun showKillSessionsResult(error: MegaError) {
+        showSnackbar(
+            StringResourcesUtils.getString(
+                if (error.errorCode == API_OK) R.string.success_kill_all_sessions
+                else R.string.error_kill_all_sessions
+            )
+        )
+    }
+
     private fun showConfirmationKillSessions() {
         if (isAlertDialogShown(killSessionsConfirmationDialog)) {
             return
@@ -124,5 +140,9 @@ class MyAccountActivity : PasscodeActivity() {
                 viewModel.killSessions()
             }.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()
+    }
+
+    fun showSnackbar(text: String) {
+        showSnackbar(contentView?.findViewById(R.id.container), text)
     }
 }

@@ -48,26 +48,10 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_menu_change_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/my_account_change_password"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_menu_forgot_pass"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="90"
         android:title="@string/forgot_pass_menu"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_export_MK"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="95"
-        android:title="@string/action_export_master_key"
         android:visible="false"
         app:showAsAction="never" />
 
