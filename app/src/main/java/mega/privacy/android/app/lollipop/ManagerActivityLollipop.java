@@ -11746,7 +11746,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					mStorageFLol.refreshVersionsInfo();
 				}
 			}
-		}
+        } else if (request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+            logDebug("TYPE_GET_CHANGE_EMAIL_LINK: " + request.getEmail());
+            hideKeyboard(managerActivity, 0);
+
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("The change link has been sent");
+                showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
+            } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+                logWarning("The new mail already exists");
+                showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+            } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+                logWarning("Email change already requested (confirmation link already sent).");
+                showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
+            } else {
+                logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
+                showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+            }
+        }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
 			logDebug("CONFIRM_CHANGE_EMAIL_LINK: " + request.getEmail());
 			if(e.getErrorCode() == MegaError.API_OK){
@@ -11795,7 +11812,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logError("Error when asking for recovery pass link: " + e.getErrorString() + "___" + e.getErrorCode());
 				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
-		}
+        } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
+            logDebug("TYPE_GET_CANCEL_LINK");
+            hideKeyboard(managerActivity, 0);
+
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Cancelation link received!");
+                showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+            } else {
+                logError("Error when asking for the cancelation link: " + e.getErrorString() + "___" + e.getErrorCode());
+                showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+            }
+        }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("ACCOUNT CANCELED");

@@ -72,6 +72,13 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      */
     private var newPassword: String? = null
 
+    /**
+     * If there's an in-progress request(except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
+     * quitting the activity is not allowed.
+     * Reset to false once the request finished.
+     */
+    var isRequesting = false
+
     companion object {
         const val KEY_VERIFY_TYPE = "key_verify_type"
         const val KEY_NEW_EMAIL = "key_new_email"
@@ -86,7 +93,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
 
         // Popup soft input.
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -99,6 +106,13 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
         // Check current 2fa enable state again.
         megaApi.multiFactorAuthCheck(megaApi.myEmail, listener)
+    }
+
+    override fun onBackPressed() {
+        // Prevent to quit when the request starts.
+        if (!isRequesting) {
+            super.onBackPressed()
+        }
     }
 
     /**
@@ -209,7 +223,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * Show alert dialog.
      *
      * @param messageResId Res id for the text shown in the alert dialog as content.
-     * @param titleResId Res id for the title of the alert dialog. May be [INVALID_VALUE], if2 the dialog has no title.
+     * @param titleResId Res id for the title of the alert dialog. May be [INVALID_VALUE], if the dialog has no title.
      * @param callback Callback executes when the dialog dismisses.
      *                 By default, the activity finishes when press the OK button in the dialog.
      */
@@ -217,11 +231,15 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         messageResId: Int,
         titleResId: Int,
         callback: () -> Unit = this::finish
-    ) = showAlert(
-        this,
-        StringResourcesUtils.getString(messageResId),
-        if (titleResId == INVALID_VALUE) null else StringResourcesUtils.getString(titleResId)
-    ) { callback.invoke() }
+    ) {
+        if (!this.isActivityInForeground) return
+
+        showAlert(
+            this,
+            StringResourcesUtils.getString(messageResId),
+            if (titleResId == INVALID_VALUE) null else StringResourcesUtils.getString(titleResId)
+        ) { callback.invoke() }
+    }
 
     /**
      * Setup each EditTextPIN with process.
@@ -483,10 +501,16 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
         override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
             logDebug("Start ${request.type}: ${request.requestString} request.")
+
+            // Prevent to quit when the request starts.
+            if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
+                isRequesting = true
+            }
         }
 
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
             logDebug("${request.type}: ${request.requestString} finished.")
+            isRequesting = false
 
             if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
                 hideKeyboard()
