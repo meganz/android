@@ -146,12 +146,13 @@ public class CallUtil {
      */
     public static void returnActiveCall(Context context) {
         ArrayList<Long> currentCalls = getCallsParticipating();
-
-        for(Long chatIdCall:currentCalls){
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
-            if(call != null){
-                openMeeting(context, chatIdCall);
-                break;
+        if(currentCalls!= null && !currentCalls.isEmpty()){
+            for(Long chatIdCall:currentCalls){
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
+                if(call != null){
+                    openMeeting(context, chatIdCall);
+                    break;
+                }
             }
         }
     }

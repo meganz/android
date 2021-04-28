@@ -133,8 +133,8 @@ class MeetingListener : MegaChatCallListenerInterface {
         ).post(call)
     }
 
-    private fun sendSessionEvent(type: String, session: MegaChatSession, callid: Long) {
-        val sessionAndCall = Pair.create(callid, session)
+    private fun sendSessionEvent(type: String, session: MegaChatSession, callId: Long) {
+        val sessionAndCall = Pair.create(callId, session)
         LiveEventBus.get(
             type,
             Pair::class.java

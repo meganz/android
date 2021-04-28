@@ -9,6 +9,8 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.hideKeyboardView
@@ -18,7 +20,7 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
+class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), StartChatCallListener.OnCallStartedCallback, SnackbarShower {
 
     private val viewModel: CreateMeetingViewModel by viewModels()
     private var meetingName: String? = null
@@ -36,7 +38,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         logDebug("Meeting Name: $meetingName")
         meetingName?.let {
             hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
-            findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
+            sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
         }
     }
 
@@ -99,4 +101,13 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         viewModel.initRTCAudioManager()
     }
 
+    override fun onCallStarted(chatId: Long) {
+        sharedModel.updateChatAndCall(chatId)
+        meetingName?.let { sharedModel.setTitleChat(it) }
+        findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        meetingActivity.showSnackbar(type, binding.root, content, chatId)
+    }
 }

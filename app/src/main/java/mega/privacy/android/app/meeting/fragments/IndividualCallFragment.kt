@@ -12,6 +12,7 @@ import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
 
@@ -174,17 +175,40 @@ class IndividualCallFragment : MeetingBaseFragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param chatId Parameter 1.
-         * @param clientId Parameter 2.
+         * @param chatId Chat ID
+         * @param peerId peer ID
+         * @param isFloatingWindow True, if it's floating window. False, otherwise.
          * @return A new instance of fragment MeetingFragment.
          */
         @JvmStatic
-        fun newInstance(chatId: Long, clientId: Long, isFloatingWindow: Boolean) =
+        fun newInstance(chatId: Long, peerId: Long, isFloatingWindow: Boolean) =
             IndividualCallFragment().apply {
                 arguments = Bundle().apply {
                     putLong(Constants.CHAT_ID, chatId)
-                    putLong(Constants.CLIENT_ID, clientId)
+                    putLong(Constants.PEER_ID, peerId)
+                    putLong(Constants.CLIENT_ID, MEGACHAT_INVALID_HANDLE)
+
                     putBoolean(Constants.IS_FLOATING_WINDOW, isFloatingWindow)
+                }
+            }
+
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param chatId Chat ID
+         * @param peerId peer ID
+         * @param clientId client ID
+         * @return A new instance of fragment MeetingFragment.
+         */
+        fun newInstance(chatId: Long, peerId: Long, clientId: Long) =
+            IndividualCallFragment().apply {
+                arguments = Bundle().apply {
+                    putLong(Constants.CHAT_ID, chatId)
+                    putLong(Constants.PEER_ID, peerId)
+                    putLong(Constants.CLIENT_ID, clientId)
+                    putBoolean(Constants.IS_FLOATING_WINDOW, false)
+
                 }
             }
     }

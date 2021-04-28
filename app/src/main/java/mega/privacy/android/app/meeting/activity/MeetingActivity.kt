@@ -15,7 +15,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
@@ -29,7 +31,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 // FIXME: And don't directly call megaChatApi in view layer, try don't put everything together and bloat the View layer file
 
 @AndroidEntryPoint
-class MeetingActivity : BaseActivity() {
+class MeetingActivity : PasscodeActivity() {
 
     companion object {
         /** Tne name of actions denoting set
@@ -130,7 +132,11 @@ class MeetingActivity : BaseActivity() {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
-        bundle.putLong(MEETING_CHAT_ID, intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE))
+
+        val chatId = intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+        bundle.putLong(MEETING_CHAT_ID, chatId)
+
+        meetingViewModel.updateChatAndCall(chatId)
 
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment

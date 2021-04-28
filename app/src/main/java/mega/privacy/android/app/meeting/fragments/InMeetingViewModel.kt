@@ -4,8 +4,11 @@ import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.utils.Constants
+import nz.mega.sdk.MegaChatCall
 import kotlin.random.Random
 
 class InMeetingViewModel @ViewModelInject constructor(
@@ -16,6 +19,11 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     //TODO test code start
     val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
+
+    private val callStatusObserver =
+        androidx.lifecycle.Observer<MegaChatCall> {
+
+        }
 
     fun addParticipant(add: Boolean) {
         if (add) {
@@ -35,5 +43,21 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     fun leaveMeeting(chatId: Long) {
         inMeetingRepository.leaveMeeting(chatId)
+    }
+
+    init {
+        LiveEventBus.get(
+            Constants.EVENT_CALL_STATUS_CHANGE,
+            MegaChatCall::class.java
+        ).observeForever(callStatusObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        LiveEventBus.get(
+            Constants.EVENT_CALL_STATUS_CHANGE,
+            MegaChatCall::class.java
+        ).removeObserver(callStatusObserver)
     }
 }
