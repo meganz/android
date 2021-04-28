@@ -98,6 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">登出</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">上傳</string>
     <string name="action_create_folder" context="Menu item">創建新資料夾</string>
+    <string name="action_create_txt" context="Option which allows create a new text file">Create new text file</string>
     <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">打開連接</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
@@ -219,7 +220,7 @@
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">媒體上傳</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件夾</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">儲存為可離線存取</string>
-    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線存取</string>
+    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線</string>
     <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s (%2$s)</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
@@ -683,8 +684,8 @@
     <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">儲存空間</string>
-    <string name="settings_passcode_lock" context="Settings of the Passcode">密碼鎖</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">密碼鎖定</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">密碼選項</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
 
@@ -776,23 +777,30 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和影片</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">密碼鎖</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">密碼鎖定</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">更改密碼</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">更改密碼鎖定</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">需要密碼</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">立即</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">輸入</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10次輸入失敗後，您的本機檔案將被刪除且您將被強制登出</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">密碼輸入錯誤1次</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">密碼錯誤%1$d次</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">嘗試10次失敗後，您將被強制登出而且您的離線檔案將被刪除</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">密碼錯誤</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">錯誤的密碼，請重新再試。你還剩1次的嘗試機會</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">錯誤的密碼，請重新再試。您還剩%2d次的嘗試機會</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">密碼不符合</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的密碼</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的密碼</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的新密碼</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的新密碼</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">密碼錯誤，請重試！</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">輸入密碼</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新輸入密碼</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">輸入新密碼</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新輸入新密碼</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的本機資料將被刪除，且您將在%1d秒後被強制登出</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">關於</string>
@@ -843,7 +851,6 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
     -->
 
-    <string name="sortby_owner_mail" context="category in sort by action">擁有者的電子郵件</string>
     <string name="sortby_name" context="category in sort by action">名稱</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">升序</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">降序</string>
@@ -869,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小檔案尺寸</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">密碼類型</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">四位密碼</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">六位密碼</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">字母與數字的密碼</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4位數字</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6位數字</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">字母與數字混合</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日誌已啟用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日誌已關閉</string>
@@ -1176,7 +1183,7 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">未搜尋到相關結果</string>
 
-    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線存取</string>
+    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線</string>
     <string name="online_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">在線</string>
     <string name="away_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離開</string>
     <string name="busy_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">忙碌</string>
@@ -1371,7 +1378,7 @@
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">在線</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離開</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">忙碌</item>
-        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線存取</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線</item>
     </string-array>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">沒有任何可離線存取檔案</string>
@@ -1518,7 +1525,7 @@
 
     <string name="general_view_contacts" context="Menu option">查看聯絡人</string>
 
-    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已成功新增至雲端硬碟中</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已成功新增至雲端硬碟</string>
     <string name="import_success_error" context="Menu option">發生錯誤，無法新增至雲端硬碟中。</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">正在連線中&#8230;</string>
@@ -1711,6 +1718,7 @@
     <string name="settings_feedback_body_device_model" context="mail body">設備型號</string>
     <string name="settings_feedback_body_android_version" context="mail body">Android安卓版本</string>
 
+    <string name="dialog_title_new_text_file" context="Title of the dialog to create a new text file by inserting the name">New text file</string>
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">新檔案</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">檔案名稱</string>
 
@@ -1741,7 +1749,7 @@
 
     <string name="empty_name" context="Error shown when the user left a name empty">無效的名稱</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">在繼續操作前，請更正您的檔案名稱</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">無效字元</string>
+    <string name="invalid_characters" context="Error text for invalid characters">無效字元</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允許使用以下字元：” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
@@ -2023,7 +2031,7 @@
 
     <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">總是允許</string>
     <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">稍後再說</string>
-    <string name="button_never_rich_links" context="Button do not allow the rich links previews on chat">從不</string>
+    <string name="button_never_rich_links" context="Button do not allow the rich links previews on chat">尚未</string>
 
     <string name="title_enable_rich_links" context="Title of the dialog to enable the rich links previews on chat">啟用網址連結預覽功能</string>
 
@@ -2350,16 +2358,16 @@
     <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]您公開分享的檔案[/A][B]%s[/B][C]已被移除。[/C]</string>
     <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]您公開分享的資料夾[/A][B]%s[/B][C]已被移除。[/C]</string>
 
-    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">此檔案接獲下架通知且已被移除</string>
+    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">此檔案已認定需被移除。</string>
     <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">此資料夾已認定需被移除。</string>
-    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">爭議移除</string>
+    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">爭議撤除</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">由於ToS/AUP違規而無法存取</string>
     <plurals name="alert_taken_down_files">
         <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">由於違反服務條款 / 可接受使用政策，%d個檔案未下載。</item>
         <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">由於違反服務條款 / 可接受使用政策，%d個檔案未下載。</item>
     </plurals>
 
-    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]您公開分享的檔案[/A][B]%s[/B][C]已經恢復。[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]您公開分享的檔案[/A][B]%s[/B][C]已經復原。[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]您公開分享的資料夾[/A][B]%s[/B][C]已經恢復。[/C]</string>
 
     <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">發送的邀請</string>
@@ -3002,8 +3010,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie設定</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">在繼續之前</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">我們使用本機儲存及類似技術（Cookies）來為您提供我們的服務，提升您使用我們服務的體驗並自訂您看到的，包括來自第三方的廣告，從到訪網站開始接受我們所使用的Cookie，或在Cookie設定中自訂Cookie選項。在我們的[A]Cookie政策[/A]了解更多信息。</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie設定未儲存</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie設定變更已儲存。</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie設定未儲存。</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie設定變更已儲存</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">第三方Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google廣告Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">類別：廣告Cookies</string>
@@ -3027,11 +3035,22 @@
 
     <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s不在您的聯絡人列表</string>
 
-
     <string name="theme_light" context="Option of color theme, light mode.">輕度</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">系統預設</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">由省電模式設定</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">請選擇SD卡根目錄</string>
+
+    <string name="cloud_drive_select_destination" context="Cloud Drive screen subtitle indicating a destination is required to be selected">選擇目的地</string>
+    
+    <string name="discard_changes_warning" context="Warning which alerts the user before discard changes">Discard changes and close the editor?</string>
+    <string name="discard_close_action" context="Action discard">Discard and close</string>
+    <string name="saving_file" context="Label indicating saving a file is in progress">Saving file&#8230;</string>
+    <string name="file_created" context="Label indicating a file was created successfully">File created</string>
+    <string name="file_creation_failed" context="Warning indicating a file was not created successfully">File creation failed. Try again.</string>
+    <string name="file_saved_to" context="Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive">File saved to %1$s</string>
+    <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
+    <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
+    <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
 </resources>
