@@ -3,8 +3,10 @@ package mega.privacy.android.app.textFileEditor
 import android.app.ActivityManager
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -38,6 +40,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 
@@ -110,7 +113,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURSOR_POSITION, binding.contentText.selectionStart)
+        outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
 
@@ -308,7 +311,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param savedInstanceState Saved state if available.
      */
     private fun setUpView(savedInstanceState: Bundle?) {
-        binding.contentText.apply {
+        binding.contentEditText.apply {
             doAfterTextChanged { editable ->
                 viewModel.setEditedText(editable?.toString())
             }
@@ -357,7 +360,16 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             supportActionBar?.title = null
             binding.nameText.isVisible = true
-            binding.contentText.isEnabled = false
+
+            binding.contentEditText.apply {
+                isVisible = false
+                hideKeyboard()
+            }
+
+            binding.contentText.apply {
+                isVisible = true
+                text = binding.contentEditText.text
+            }
 
             if (!readingContent && viewModel.canShowEditFab()) {
                 binding.editFab.show()
@@ -365,9 +377,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             supportActionBar?.title = viewModel.getNameOfFile()
             binding.nameText.isVisible = false
+            binding.contentText.isVisible = false
 
-            binding.contentText.apply {
-                isEnabled = true
+            binding.contentEditText.apply {
+                isVisible = true
                 showKeyboardDelayed(this)
             }
 
@@ -406,7 +419,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
-        binding.contentText.setText(contentRead)
+        binding.contentText.text = contentRead
+        binding.contentEditText.setText(contentRead)
 
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
