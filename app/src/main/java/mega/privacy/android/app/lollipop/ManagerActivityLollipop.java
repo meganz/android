@@ -134,6 +134,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.myAccount.MyAccountActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
@@ -702,7 +703,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem takePicture;
 	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
-	private MenuItem killAllSessions;
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
@@ -5099,7 +5099,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			accountFragment = MY_ACCOUNT_FRAGMENT;
 
 			if (getMyAccountFragment() == null) {
-				maF = MyAccountFragment.newInstance();
+				maF = new MyAccountFragment();
 			} else {
 				maF.expandPaymentInfoIfNeeded();
 			}
@@ -5660,12 +5660,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     			break;
     		}
 			case ACCOUNT:{
-				showHideBottomNavigationView(true);
-				logDebug("Case ACCOUNT: " + accountFragment);
-//    			tB.setVisibility(View.GONE);
-				aB.setSubtitle(null);
-				selectDrawerItemAccount();
-				supportInvalidateOptionsMenu();
+				showMyAccount();
+//				showHideBottomNavigationView(true);
+//				logDebug("Case ACCOUNT: " + accountFragment);
+////    			tB.setVisibility(View.GONE);
+//				aB.setSubtitle(null);
+//				selectDrawerItemAccount();
+//				supportInvalidateOptionsMenu();
 				break;
 			}
     		case TRANSFERS:{
@@ -6031,8 +6032,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showMyAccount(){
-		drawerItem = DrawerItem.ACCOUNT;
-		selectDrawerItemLollipop(drawerItem);
+		startActivity(new Intent(this, MyAccountActivity.class));
+//		drawerItem = DrawerItem.ACCOUNT;
+//		selectDrawerItemLollipop(drawerItem);
 	}
 
 	public void updateInfoNumberOfSubscriptions() {
@@ -6239,7 +6241,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		searchByDate = menu.findItem(R.id.action_search_by_date);
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
-		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
@@ -6401,7 +6402,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case ACCOUNT:
 					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
 						refreshMenuItem.setVisible(true);
-						killAllSessions.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
 						changePass.setVisible(true);
 						logoutMenuItem.setVisible(true);
@@ -6797,10 +6797,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				return true;
 
-	        case R.id.action_menu_kill_all_sessions:{
-				showConfirmationCloseAllSessions();
-	        	return true;
-	        }
 	        case R.id.action_new_folder:{
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
 	        		showNewFolderDialog();
@@ -7164,7 +7160,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
-            killAllSessions.setVisible(false);
             exportMK.setVisible(false);
         }
     }
@@ -10078,34 +10073,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	void exportRecoveryKey (){
 		AccountController aC = new AccountController(this);
 		aC.saveRkToFileSystem();
-	}
-
-	public void showConfirmationCloseAllSessions(){
-		logDebug("showConfirmationCloseAllSessions");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						AccountController aC = new AccountController(managerActivity);
-						aC.killAllSessions(managerActivity);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
-		builder.setTitle(R.string.confirmation_close_sessions_title);
-
-		builder.setMessage(R.string.confirmation_close_sessions_text).setPositiveButton(R.string.contact_accept, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	public void showConfirmationRemoveFromOffline(MegaOffline node, Runnable onConfirmed) {

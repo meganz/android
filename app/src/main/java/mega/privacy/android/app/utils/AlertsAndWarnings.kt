@@ -199,4 +199,12 @@ object AlertsAndWarnings {
             .setNegativeButton(getString(R.string.general_cancel), null)
             .show()
     }
+
+    @JvmStatic
+    fun isAlertDialogShown(dialog: AlertDialog?): Boolean = dialog?.isShowing == true
+
+    @JvmStatic
+    fun dismissAlertDialogIfShown(dialog: AlertDialog?) {
+        dialog?.dismiss()
+    }
 }

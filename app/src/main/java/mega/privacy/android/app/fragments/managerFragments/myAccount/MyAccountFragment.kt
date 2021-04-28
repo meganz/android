@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -35,6 +36,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneN
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
@@ -62,14 +65,9 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
         private const val ANIMATION_DURATION = 200L
         private const val ANIMATION_DELAY = 500L
         private const val PHONE_NUMBER_CHANGE_DELAY = 3000L
-
-        @JvmStatic
-        fun newInstance(): MyAccountFragment {
-            return MyAccountFragment()
-        }
     }
 
-    private val viewModel by viewModels<MyAccountViewModel>()
+    private val viewModel by viewModels<MyAccountFragmentViewModel>()
 
     private lateinit var binding: FragmentMyAccountBinding
 
@@ -95,9 +93,19 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
     }
 
     private fun setUpView() {
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            title = null
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         ListenScrollChangesHelper().addViewToListen(
             binding.scrollView
         ) { _, _, _, _, _ -> checkScroll() }
+
+        checkScroll()
 
         setUpAvatar(true)
 
@@ -124,11 +132,30 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
         if (!this::binding.isInitialized)
             return
 
-        (mActivity as ManagerActivityLollipop).changeMyAccountAppBarElevation(
-            binding.scrollView.canScrollVertically(
-                SCROLLING_UP_DIRECTION
+        val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+        val isDark = isDarkMode(requireContext())
+        val darkAndElevation = withElevation && isDark
+        val background = ContextCompat.getColor(requireContext(), R.color.grey_020_grey_087)
+
+        if (darkAndElevation) {
+            changeStatusBarColorForElevation(requireActivity(), true)
+        } else {
+            requireActivity().window.statusBarColor = background
+        }
+
+        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+
+        binding.toolbar.apply {
+            setBackgroundColor(
+                if (darkAndElevation) getColorForElevation(
+                    requireContext(),
+                    elevation
+                ) else background
             )
-        )
+        }
+
+        (activity as AppCompatActivity).supportActionBar?.elevation =
+            if (withElevation && !isDark) elevation else 0F
     }
 
     private fun setupEditProfile(editable: Boolean) {
@@ -476,15 +503,15 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
             }
         }
 
-        if (retry) {
-            megaApi.getUserAvatar(
-                megaApi.myUser,
-                buildAvatarFile(context, megaApi.myEmail).absolutePath,
-                mActivity as ManagerActivityLollipop
-            )
-        } else {
-            setDefaultAvatar()
-        }
+//        if (retry) {
+//            megaApi.getUserAvatar(
+//                megaApi.myUser,
+//                buildAvatarFile(context, megaApi.myEmail).absolutePath,
+//                mActivity as ManagerActivityLollipop
+//            )
+//        } else {
+        setDefaultAvatar()
+//        }
     }
 
     private fun setDefaultAvatar() {

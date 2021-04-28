@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
-class MyAccountViewModel @ViewModelInject constructor(
+class MyAccountFragmentViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val accountInfo: MyAccountInfo

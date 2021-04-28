@@ -48,14 +48,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_menu_kill_all_sessions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/action_kill_all_sessions"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_menu_change_pass"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="90"

@@ -391,11 +391,6 @@ public class AccountController {
         builder.show();
     }
 
-    public void killAllSessions(Context context){
-        logDebug("killAllSessions");
-        megaApi.killSession(-1, (ManagerActivityLollipop) context);
-    }
-
     static public void localLogoutApp(Context context){
         logDebug("localLogoutApp");
 
