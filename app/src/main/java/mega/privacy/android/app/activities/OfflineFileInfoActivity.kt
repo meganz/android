@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.LogUtil.logError
 
 @AndroidEntryPoint
-class OfflineFileInfoActivity : BaseActivity() {
+class OfflineFileInfoActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_offline_file_info)

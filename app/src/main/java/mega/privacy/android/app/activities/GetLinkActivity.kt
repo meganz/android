@@ -28,7 +28,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.*
 
-class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
+class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
     companion object {
         const val GET_LINK_FRAGMENT = 0
         const val COPYRIGHT_FRAGMENT = 1
