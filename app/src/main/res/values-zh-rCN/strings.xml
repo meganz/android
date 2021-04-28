@@ -684,7 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">密码锁</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">密码锁选项</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">压缩视频会消耗电池电量，当压缩的视频大于%s时，MEGA会提醒您需为设备充电。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">开启后，您的相关照片的拍摄地点信息会被上传，分享前请谨慎选择。</string>
 
@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">密码锁</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改应用锁密码</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改验证码</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">更改密码锁</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">密码请求</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">立即</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">输入</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1次密码尝试失败</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">密码尝试失败%1$d次</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">尝试10次失败后，您的帐户将被登出，您的离线文件将被删除。</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">代码错误</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">应用锁密码错误。请再试一次。您还有1此尝试机会</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">应用锁密码错误。请重试。您还剩余%2d次尝试</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">应用锁密码不匹配</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的应用锁密码</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的新应用锁密码</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">密码不正确,请重试!</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">输入你的密码</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新输入你的密码</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">输入你的新密码</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新输入你的新密码</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的所有本地数据将被删除，您将以％1d秒后注销</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">关于</string>
@@ -1518,7 +1525,7 @@
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
-    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已添加至云端</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已成功添加到云盘</string>
     <string name="import_success_error" context="Menu option">错误。添加至云端失败。</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">正在连接&#8230;</string>
@@ -1740,13 +1747,13 @@
     <string name="snackbar_search_by_date" context="the user can’t choose this date">选定日期无效</string>
 
     <string name="empty_name" context="Error shown when the user left a name empty">文件名无效</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">请更改您的文件名</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">请先更改您的文件名</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">无效的字符</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">请为您的文件命名</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">请为您的文件命名</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">请先为您的文件命名</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">请先为您的文件命名</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">音频文件</string>
@@ -3002,7 +3009,7 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie设置</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">我们的Cookie政策</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">我们使用本地存储和类似技术（“ Cookies”）为您提供服务，通过我们的服务增强您的体验，并定制您所看到的广告（包括通过第三方）。从访问开始就接受我们对Cookie的使用，或在Cookie设置中自定义Cookie。您可以在我们的[A]《Cookie政策》[/A]中了解更多信息。</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie设置未保存</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie设置未保存。</string>
     <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie设置更改已保存。</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">第三方Cookie</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google广告Cookie</string>

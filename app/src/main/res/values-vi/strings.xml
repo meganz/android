@@ -682,9 +682,9 @@
     <string name="settings_appearance" context="settings of the Appearance section">Giao Diện</string>
     <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
-    <string name="settings_passcode_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu Trữ</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Khóa bằng mã số</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Tùy chọn mã số</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
 
@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Chưa chỉnh</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Đổi Mã Số</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Đổi mã passcode</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Đổi mã số</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Yêu cầu passcode</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Ngay lập tức</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Nhập</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Tài khoản sẽ đăng xuất và tất cả các dữ liệu có liên quan đến MEGA trong điện thoại sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 lần thử mã số bị sai</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d lần thử mã số bị sai</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">Tài khoản sẽ đăng xuất và tất cả tệp tin lưu về ngoại tuyến sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Mã chưa đúng</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Mã Số nhập sai, xin thử lại. Chỉ còn lại 1 lần thử</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Mã Số nhập sai, xin thử lại. Chỉ còn lại %2d lần thử</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Mã Số không trùng khớp</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập Mã Số</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại Mã Số một lần nữa</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập vào Mã Số muốn sử dụng</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại Mã Số mới một lần nữa</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Hai mã mới nhập không khớp. Thử lại.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập mã số</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại mã số</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập mã số mới</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại mã số mới</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Tất cả dữ liệu tải về từ MEGA lưu vào trong máy sẽ bị xóa, và tài khoản sẽ đăng xuất trong %1d giây</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Thông Tin</string>
@@ -871,7 +878,7 @@
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Dạng Mã Số</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">Mã 4 số</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">Mã 6 số</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Mã Số có chữ cái</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Chữ và số</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Bản ghi chép đã được bật</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Bản ghi chép đã được tắt</string>
@@ -1165,7 +1172,7 @@
 
     <string name="mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">Bảo vệ các cuộc trò chuyện nghiêm ngặt với công nghệ bảo mật đầu-cuối (người dùng kiểm soát) cung cấp sự đảm bảo an toàn cần thiết:</string>
     <string name="mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">Hệ thống được đảm bảo rằng các dữ liệu nhận được từ người gửi sẽ hiển thị rõ ràng, và nội dung đó sẽ được nguyên vẹn và không bị chế tác trong quá trình truyền tải.</string>
-    <string name="mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Chỉ có tác giả hay người sở hữu và người được giao quyền sử dụng hay được nhận mới có thể giải mã và đọc nội dung.</string>
+    <string name="mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Chỉ có tác giả và người được cấp phép nhận tin mới có thể giải mã và đọc nội dung.</string>
 
     <string name="title_mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">MEGA</string>
     <string name="title_mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">Xác Minh Trung Thực</string>
@@ -1740,13 +1747,13 @@
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Ngày vừa điền không hợp lệ</string>
 
     <string name="empty_name" context="Error shown when the user left a name empty">Tên không hợp lệ</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Sửa lại tên tệp tin cho phù hợp trước khi tiếp tục</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Xin sửa lại tên tệp tin cho phù hợp trước khi tiếp tục</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Ký tự không hợp lệ</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Đặt tên cho tệp tin trước khi tiếp tục</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Đặt tên cho các tệp tin trước khi tiếp tục</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Xin đặt tên cho tệp tin trước khi tiếp tục</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Xin đặt tên cho các tệp tin trước khi tiếp tục</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Tệp Âm Thanh</string>
@@ -2900,7 +2907,7 @@
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Xóa lịch sử nội dung chát</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] đã vô hiệu tính năng tự động xóa tin nhắn đã có lâu.[/B]</string>
     <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Xóa tất cả tin nhắn và tệp tin đã chia sẻ trong cuộc trò chuyện này. Việc này sẽ không thể hoàn tác.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">Dọn dẹp lịch sử</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">Tự dọn lịch sử</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Tự động xóa đi các tin nhắn đã tồn đọng trong một khoảng thời gian.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Đã vô hiệu</string>
     <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">Một ngày</string>
@@ -3002,8 +3009,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cài Đặt Cookie</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Trước khi tiếp tục</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Chúng tôi sử dụng không gian lưu trữ nội bộ và các công nghệ tương tự (“Cookies”) để cung cấp dịch vụ của chúng tôi cho khách hàng, nâng cao trải nghiệm của khách hàng với các dịch vụ của chúng tôi và tùy chỉnh các quảng cáo mà khách hàng thấy, bao gồm cả thông qua các bên thứ ba. Xin chấp nhận việc sử dụng Cookies của chúng tôi hoặc tùy chỉnh theo ý thích trong phần Cài Đặt Cookie. Đọc thêm về [A]Chính Sách Cookie[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cài Đặt Cookie chưa được lưu lại</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Thay đổi cho Cài Đặt Cookie đã được lưu lại.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cài Đặt Cookie chưa được lưu lại.</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Thay đổi cho Cài Đặt Cookie đã được lưu lại</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookies Bên Thứ Ba</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookies Quảng Cáo của Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Thể loại: Cookies Quảng Cáo</string>
