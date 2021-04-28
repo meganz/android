@@ -1,16 +1,19 @@
 package mega.privacy.android.app.contacts.data
 
 import android.net.Uri
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
 
 data class ContactItem constructor(
     val handle: Long,
     val email: String,
-    val name: String,
+    val name: String? = null,
     val status: Int,
-    val lastSeen: String? = null,
-    val imageColor: Int,
+    @ColorRes val statusColor: Int,
     var imageUri: Uri? = null,
+    @ColorInt val imageColor: Int,
+    val lastSeen: String? = null,
     val isNew: Boolean = false
 ) {
 

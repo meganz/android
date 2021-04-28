@@ -34,10 +34,10 @@ class ContactsViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-                    contacts.value = items
+                    contacts.value = items.toList()
                 },
-                onError = {
-                    Log.e(TAG, it.stackTraceToString())
+                onError = { error ->
+                    Log.e(TAG, error.stackTraceToString())
                 }
             )
             .addTo(composite)

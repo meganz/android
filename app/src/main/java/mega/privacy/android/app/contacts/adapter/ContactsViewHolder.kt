@@ -1,6 +1,7 @@
 package mega.privacy.android.app.contacts.adapter
 
-import android.graphics.drawable.ColorDrawable
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.data.ContactItem
@@ -12,7 +13,8 @@ class ContactsViewHolder(private val binding: ItemContactBinding) :
     fun bind(item: ContactItem) {
         binding.txtName.text = item.name
         binding.txtLastSeen.text = item.lastSeen
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(ColorDrawable(item.imageColor))
+        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.imageColor.toDrawable())
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
+        binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, item.statusColor))
     }
 }

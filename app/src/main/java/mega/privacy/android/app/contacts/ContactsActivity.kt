@@ -3,15 +3,15 @@ package mega.privacy.android.app.contacts
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.adapter.ContactsAdapter
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 
 @AndroidEntryPoint
-class ContactsActivity : AppCompatActivity() {
+class ContactsActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityContactsBinding
 
