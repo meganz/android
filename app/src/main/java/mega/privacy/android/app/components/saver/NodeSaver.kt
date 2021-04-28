@@ -70,7 +70,7 @@ class NodeSaver(
     private val megaApiFolder = app.megaApiFolder
     private val dbHandler = DatabaseHandler.getDbHandler(app)
 
-    private var saving = Saving.NOTHING
+    private var saving : Saving = Saving.Companion.NOTHING
 
     /**
      * Save an offline node into device.
@@ -312,7 +312,7 @@ class NodeSaver(
                 )
 
                 voiceClipSaving.doDownload(
-                    megaApi, megaApiFolder, parentPath, false, null, snackbarShower
+                    megaApi, megaApiFolder, parentPath, false, null, null
                 )
             })
             .subscribeOn(Schedulers.io())
@@ -352,7 +352,7 @@ class NodeSaver(
      * fragment/app should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (saving == Saving.NOTHING) {
+        if (saving == Saving.Companion.NOTHING) {
             return false
         }
 
@@ -438,7 +438,7 @@ class NodeSaver(
      */
     fun handleRequestPermissionsResult(requestCode: Int): Boolean {
         if (requestCode != REQUEST_WRITE_STORAGE) {
-            return false;
+            return false
         }
 
         if (hasWriteExternalStoragePermission()) {
