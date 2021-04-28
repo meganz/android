@@ -2,7 +2,6 @@ package mega.privacy.android.app.activities
 
 import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragmentArgs
