@@ -214,8 +214,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         setViewEnable(fab_cam, false)
         when (bOn) {
             true -> {
-                // Always try to start the call using the front camera
-                abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
+                // Always try to start the video using the front camera
+                abstractMeetingOnBoardingViewModel.setChatVideoInDevice(null)
                 activateVideo()
             }
             false -> {
