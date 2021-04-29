@@ -7,11 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
-import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.legacy.content.WakefulBroadcastReceiver
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.utils.TimeUtils.SECOND
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -19,15 +17,11 @@ import nz.mega.sdk.MegaRequest
 class AlarmReceiver : BroadcastReceiver() {
     private val megaApi = MegaApplication.getInstance().megaApi
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val wakeLock: PowerManager.WakeLock =
-            (context?.getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag").apply {
-                    acquire(60*1000L)
-                }
-            }
-        Log.i("Alex", "broadcast receive")
+    override fun onReceive(context: Context, intent: Intent) {
+        wakeLock.acquire(30 * SECOND)  // The wakelock will be held for at most 30 Secs
+
         megaApi.getPSAWithUrl(object : BaseListener(context) {
+
             override fun onRequestFinish(
                 api: MegaApiJava,
                 request: MegaRequest,
@@ -44,22 +38,18 @@ class AlarmReceiver : BroadcastReceiver() {
                             request.password, request.link, request.email
                         )
                     )
-                    Log.i("Alex", "PSA got")
                 }
 
-                setAlarm(context, PsaManager.GET_PSA_INTERVAL_MS,
-                    callback
-                )
-                wakeLock.release()
+                setAlarm(context, PsaManager.GET_PSA_INTERVAL_MS, callback)
             }
         })
-
-        /* enqueue the job */
-//        CheckingJobIntentService.enqueueWork(context, intent, callback)
     }
 
     companion object {
         const val CHECK_PSA_INTENT = "android.intent.action.checking.psa"
+        val wakeLock: PowerManager.WakeLock =
+            (MegaApplication.getInstance().getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")}
 
         var callback : ((Psa) -> Unit)? = null
 

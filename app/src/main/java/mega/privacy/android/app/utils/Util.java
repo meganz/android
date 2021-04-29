@@ -3,8 +3,6 @@ package mega.privacy.android.app.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.TaskInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,7 +42,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -63,7 +60,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +86,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1616,6 +1611,12 @@ public class Util {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
 
+	/**
+	 * Judge if an activity is on the top of the running app task
+	 * @param cls the class of the activity
+	 * @param context
+	 * @return true if the activity is on the task top, false otherwise
+	 */
 	public static boolean isTopActivity(Class cls, Context context) {
 		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
 
@@ -1624,7 +1625,6 @@ public class Util {
 			for (ActivityManager.AppTask task : tasks) {
 				ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
 				if (taskInfo.id != -1) {  // Task is running
-					Log.i("Alex", "top name:" + taskInfo.topActivity.getClassName());
 					return taskInfo.topActivity.getClassName().contains(cls.getName());
 				}
 			}
