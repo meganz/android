@@ -14,7 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.StatFs;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.print.PrintHelper;
@@ -22,9 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -44,8 +42,6 @@ import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
-import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,6 +56,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class AccountController {
@@ -142,12 +140,9 @@ public class AccountController {
         if (rKBitmap != null){
             PrintHelper printHelper = new PrintHelper(context);
             printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
-                @Override
-                public void onFinish() {
-                    if (context instanceof TestPasswordActivity) {
-                        ((TestPasswordActivity) context).passwordReminderSucceeded();
-                    }
+            printHelper.printBitmap("rKPrint", rKBitmap, () -> {
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
                 }
             });
         }
@@ -159,95 +154,44 @@ public class AccountController {
      * @param path The selected location.
      * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      */
-    public void exportMK(String path, String sdCardUriString){
+    public void exportMK(String path, String sdCardUriString) {
         logDebug("exportMK");
-        if (!isOnline(context)){
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            }
-            else if (context instanceof TestPasswordActivity) {
-                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            }
+        if (isOffline(context)) {
             return;
         }
 
         String key = megaApi.exportMasterKey();
+
         if (context instanceof ManagerActivityLollipop) {
             megaApi.masterKeyExported((ManagerActivityLollipop) context);
-        }
-        else if (context instanceof TestPasswordActivity) {
+        } else if (context instanceof TestPasswordActivity) {
             ((TestPasswordActivity) context).incrementRequests();
             megaApi.masterKeyExported((TestPasswordActivity) context);
         }
 
-        BufferedWriter out;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    if (context instanceof ManagerActivityLollipop) {
-                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                    }
-                    else if (context instanceof TestPasswordActivity) {
-                        ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                    }
-                    return;
-                }
-            }
 
-            double availableFreeSpace = Double.MAX_VALUE;
-            try{
-                StatFs stat = new StatFs(path);
-                availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-            }
-            catch(Exception ex){}
-
-            File file = new File(path);
-            if(availableFreeSpace < file.length()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
-                }
-                else if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                    ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+                } else if (context instanceof TestPasswordActivity) {
+                    ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
                 }
                 return;
             }
+        }
 
-            // If export the file to SD card.
-            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
-                // Export to cache folder root first.
-                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
-                FileWriter fileWriter = new FileWriter(temp);
-                out = new BufferedWriter(fileWriter);
-                out.write(key);
-                out.close();
+        if (thereIsNotEnoughFreeSpace(path)) {
+            showSnackbar(context, getString(R.string.error_not_enough_free_space));
+            return;
+        }
 
-                // Copy to target location on SD card.
-                SDCardOperator sdCardOperator = new SDCardOperator(context);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                // If the `sdCardUriString` is null, get SD card root uri from database.
-                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
-                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
+        if (saveTextOnFile(context, key, path, sdCardUriString)) {
+            showSnackbar(context, getString(R.string.save_MK_confirmation));
 
-                // Delete the temp file.
-                temp.delete();
-            } else {
-                FileWriter fileWriter = new FileWriter(path);
-                out = new BufferedWriter(fileWriter);
-                out.write(key);
-                out.close();
-            }
-
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
-            }
-            else if (context instanceof TestPasswordActivity) {
-                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+            if (context instanceof TestPasswordActivity) {
                 ((TestPasswordActivity) context).passwordReminderSucceeded();
             }
-
-        } catch (SDCardOperator.SDCardException | IOException e) {
-            e.printStackTrace();
-            logError("ERROR", e);
         }
     }
 
@@ -302,21 +246,12 @@ public class AccountController {
         }
     }
 
-    public void saveRkToFileSystem () {
-        logDebug("saveRkToFileSystem");
+    public static void saveRkToFileSystem(Activity activity) {
+        Intent intent = new Intent(activity, FileStorageActivityLollipop.class)
+                .setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction())
+                .putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
 
-        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
-        if (context instanceof TestPasswordActivity){
-            ((TestPasswordActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
-        else if (context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
-        else if (context instanceof TwoFactorAuthenticationActivity){
-            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
+        activity.startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 
     public void copyRkToClipboard () {

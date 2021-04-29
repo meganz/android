@@ -15,6 +15,8 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class TextUtil {
 
+    private static final String COPIED = "Copied Text";
+
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
     }
@@ -196,5 +198,18 @@ public class TextUtil {
      */
     public static String addStringSeparator(String text) {
         return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
+    }
+
+    /**
+     * Copies something to clipboard.
+     *
+     * @param context       Current context.
+     * @param contentToCopy Content to copy.
+     */
+    public static void copyToClipboard(Context context, String contentToCopy) {
+        android.content.ClipboardManager clipboard =
+                (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED, contentToCopy);
+        clipboard.setPrimaryClip(clip);
     }
 }

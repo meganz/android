@@ -21,10 +21,12 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -929,6 +931,66 @@ public class FileUtil {
         }
 
         return storageDir;
+    }
+
+    /**
+     * Saves some text on a file.
+     *
+     * @param context         Current context.
+     * @param content         The content to store.
+     * @param path            The selected location to save the file.
+     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
+     * @return True if content was correctly saved, false otherwise.
+     */
+    public static boolean saveTextOnFile(Context context, String content, String path, String sdCardUriString) {
+        try {
+            // If export the file to SD card.
+            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                // Export to cache folder root first.
+                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
+
+                if (!saveContentOnFile(content, new FileWriter(temp))){
+                    return false;
+                }
+
+                // Copy to target location on SD card.
+                SDCardOperator sdCardOperator = new SDCardOperator(context);
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+                // If the `sdCardUriString` is null, get SD card root uri from database.
+                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
+
+                // Delete the temp file.
+                temp.delete();
+            } else {
+                return saveContentOnFile(content, new FileWriter(path));
+            }
+        } catch (SDCardOperator.SDCardException | IOException e) {
+            logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Saves some text on a file.
+     *
+     * @param content    Text content to save.
+     * @param fileWriter The selected location to save the file.
+     * @return True if content was correctly saved, false otherwise.
+     */
+    private static boolean saveContentOnFile(String content, FileWriter fileWriter) {
+        try {
+            BufferedWriter out = new BufferedWriter(fileWriter);
+            out.write(content);
+            out.close();
+        } catch (IOException e) {
+            logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
     }
 }
 

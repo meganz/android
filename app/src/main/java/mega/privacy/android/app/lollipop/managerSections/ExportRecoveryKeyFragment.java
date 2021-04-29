@@ -107,8 +107,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     private void toFileSystem() {
         hideMKLayout();
-        AccountController aC = new AccountController(context);
-        aC.saveRkToFileSystem();
+        AccountController.saveRkToFileSystem(getActivity());
     }
 
     private boolean checkStoragePermission() {

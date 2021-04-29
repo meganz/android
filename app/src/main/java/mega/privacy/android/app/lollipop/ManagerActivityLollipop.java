@@ -10050,8 +10050,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	void exportRecoveryKey (){
-		AccountController aC = new AccountController(this);
-		aC.saveRkToFileSystem();
+		AccountController.saveRkToFileSystem(this);
 	}
 
 	public void showConfirmationRemoveFromOffline(MegaOffline node, Runnable onConfirmed) {

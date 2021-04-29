@@ -3063,4 +3063,6 @@
     <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
     <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
     <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
+
+    <string name="denied_write_permissions" context="Warning indicating the app needs write permissions to do any action">MEGA needs write permissions to to proceed with this action.</string>
 </resources>
