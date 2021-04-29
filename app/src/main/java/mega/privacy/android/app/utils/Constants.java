@@ -828,8 +828,11 @@ public class Constants {
     public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
     public static final String EVENT_NETWORK_CHANGE = "network_change";
     public static final String EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change";
+    public static final String EVENT_CHAT_TITLE_CHANGE = "chat_title_change";
+    public static final String EVENT_PUBLIC_CHAT_CREATED = "public_chat_created";
 
     /** Event Keys related to calls*/
+    public static final String EVENT_ERROR_STARTING_CALL = "error_starting_call";
     public static final String EVENT_UPDATE_CALL = "update_call";
     public static final String EVENT_CALL_STATUS_CHANGE = "call_status_change";
     public static final String EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change";

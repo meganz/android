@@ -10,7 +10,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener
+import mega.privacy.android.app.utils.ChatUtil.*
+
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.hideKeyboardView
@@ -30,14 +31,16 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), SnackbarShowe
 
     override fun onMeetingButtonClick() {
         meetingName = viewModel.meetingName.value
-        if (meetingName.isNullOrEmpty()) {
+        if (meetingName.isNullOrEmpty() || !isAllowedTitle(meetingName)) {
             type_meeting_edit_text.error =
                 StringResourcesUtils.getString(R.string.error_meeting_name_error)
             return
         }
+
         logDebug("Meeting Name: $meetingName")
         meetingName?.let {
             hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+            sharedModel.setTitleChat(meetingName!!)
             findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
         }
     }

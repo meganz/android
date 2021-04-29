@@ -108,7 +108,12 @@ class MeetingActivityRepository @Inject constructor(
         megaChatApi.setChatTitle(chatId, newTitle, listener)
     }
 
-    fun startMeeting(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.startChatCall(chatId, true, true, listener)
+    fun startMeeting(chatId: Long, audioEnabled:Boolean, videoEnabled:Boolean, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.startChatCall(chatId, audioEnabled, videoEnabled, listener)
+    }
+
+    fun createPublicChat(title: String, listener: MegaChatRequestListenerInterface){
+        val participants = MegaChatPeerList.createInstance()
+        megaChatApi.createPublicChat(participants, title, listener);
     }
 }

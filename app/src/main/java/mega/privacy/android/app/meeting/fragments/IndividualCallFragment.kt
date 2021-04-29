@@ -6,7 +6,6 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.individual_call_fragment.view.*
@@ -14,6 +13,8 @@ import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -49,13 +50,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
             clientId = it.getLong(Constants.CLIENT_ID)
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW)
         }
+
+        chat = abstractMeetingOnBoardingViewModel.getChatRoom(chatId!!)
+        if(chat == null || abstractMeetingOnBoardingViewModel.getChatCall(chatId!!) == null || peerId == MEGACHAT_INVALID_HANDLE){
+            return
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = if (isFloatingWindow) IndividualCallFragmentBinding.inflate(
+
+        val binding = if (!isFloatingWindow) IndividualCallFragmentBinding.inflate(
             inflater,
             container,
             false
@@ -74,8 +81,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
         return binding.root
     }
 
+    private fun initialiseAvatar(){
+        var avatar = getImageAvatarCall(sharedModel.chatRoomLiveData.value!!, peerId!!)
+        if(avatar == null){
+            avatar = CallUtil.getDefaultAvatarCall(context, peerId!!)
+        }
+        vAvatar.setImageBitmap(avatar)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initialiseAvatar()
+        initShareViewModel()
 
         if (isFloatingWindow) {
             (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.apply {
@@ -94,18 +112,30 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     fun activateVideo() {
         // Always try to start the call using the front camera
-        abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
+        vAvatar.visibility = View.GONE
+
+//        abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
 
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
                 vVideo,
                 outMetrics,
-                false
-            )
-            megaChatApi.addChatLocalVideoListener(
                 MEGACHAT_INVALID_HANDLE,
-                videoListener
+                isFloatingWindow
             )
+
+            if (abstractMeetingOnBoardingViewModel.isMe(peerId!!)) {
+                abstractMeetingOnBoardingViewModel.activateLocalVideo(
+                    chatId!!, videoListener!!
+                )
+            } else {
+                abstractMeetingOnBoardingViewModel.activateRemoteVideo(
+                    chatId!!,
+                    clientId!!,
+                    true,
+                    videoListener!!
+                )
+            }
         } else {
             videoListener?.let {
                 it.height = 0
@@ -113,7 +143,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-        vVideo.isVisible = true
+        vVideo.visibility = View.VISIBLE
     }
 
     fun closeVideo() {
@@ -122,8 +152,27 @@ class IndividualCallFragment : MeetingBaseFragment() {
             return
         }
         logDebug("Removing surface view")
-        vVideo.isVisible = false
+        vVideo.visibility = View.GONE
+
         removeChatVideoListener()
+
+        checkOneToOneCallAudioCall()
+    }
+
+    /**
+     * Method for updating the muted call bar on individual calls.
+     */
+    private fun checkOneToOneCallAudioCall() {
+        if (!isFloatingWindow) {
+            vAvatar.visibility = View.VISIBLE
+            return
+        }
+
+        if (sharedModel.isOneToOneCall()) {
+            vAvatar.visibility = View.GONE
+        } else {
+            vAvatar.visibility = View.VISIBLE
+        }
     }
 
     private fun removeChatVideoListener() {
@@ -131,12 +180,18 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         logDebug("Removing remote video listener")
 
-        megaChatApi.removeChatVideoListener(
-            chatId!!,
-            clientId!!,
-            false,
-            videoListener
-        )
+        if (abstractMeetingOnBoardingViewModel.isMe(peerId!!)) {
+            abstractMeetingOnBoardingViewModel.closeLocalVideo(
+                chatId!!, videoListener!!
+            )
+        } else {
+            abstractMeetingOnBoardingViewModel.closeRemoteVideo(
+                chatId!!,
+                clientId!!,
+                true,
+                videoListener!!
+            )
+        }
 
         videoListener = null
     }
@@ -183,4 +238,26 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 }
             }
     }
+
+    /**
+     * Init Share View Model
+     */
+    private fun initShareViewModel() {
+        sharedModel.micLiveData.observe(viewLifecycleOwner) {
+            logDebug("show banner SILENCIADA")
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        if (vVideo.parent != null && vVideo.parent.parent != null) {
+            logDebug("Removing suface view")
+            (vVideo.parent as ViewGroup).removeView(vVideo)
+        }
+
+        removeChatVideoListener()
+        vAvatar.setImageBitmap(null)
+    }
+
 }

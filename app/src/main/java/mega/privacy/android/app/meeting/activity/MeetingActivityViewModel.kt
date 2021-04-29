@@ -10,9 +10,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener
+import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -86,6 +89,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _meetingSubtitleLiveData: MutableLiveData<String> = MutableLiveData<String>()
     val meetingSubtitleLiveData: LiveData<String> = _meetingSubtitleLiveData
 
+    // link of meeting
+    private val _meetingLinkLiveData: MutableLiveData<String> = MutableLiveData<String>()
+    val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
+
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
             if (speakerLiveData.value != it) {
@@ -104,9 +111,30 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             }
         }
 
+    private val titleMeetingChangeObserver =
+        Observer<MegaChatRoom> {
+            if (it.chatId == _chatRoomLiveData.value?.chatId) {
+                //Changes chat title
+                _meetingNameLiveData.value = getTitleChat(it)
+            }
+        }
+
+    private val publicChatLinkCreatedObserver =
+        Observer<Pair<Long, String>> {
+            logDebug("Chat created and Public link created ")
+            _meetingLinkLiveData.value = it.second
+            updateChatAndCall(it.first)
+            if(_callLiveData.value == null){
+                meetingActivityRepository.startMeeting(_chatRoomLiveData.value!!.chatId, _micLiveData.value!!, _cameraLiveData.value!!, StartChatCallListener(MegaApplication.getInstance()))
+            }
+        }
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
-            _callLiveData.value = it
+            if(it.chatid == _chatRoomLiveData.value?.chatId){
+                //Changes in this call
+                _callLiveData.value = it
+            }
         }
 
     private val sessionStatusObserver =
@@ -122,6 +150,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 
+        LiveEventBus.get(
+            EVENT_CHAT_TITLE_CHANGE,
+            MegaChatRoom::class.java
+        ).observeForever(titleMeetingChangeObserver)
+
+        LiveEventBus.get(EVENT_PUBLIC_CHAT_CREATED)
+            .observeForever(publicChatLinkCreatedObserver as Observer<Any>)
+
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
 
@@ -131,6 +167,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     fun updateChatAndCall(chatId: Long) {
         _chatRoomLiveData.value = meetingActivityRepository.getChatRoom(chatId)
+        if(_chatRoomLiveData.value!= null){
+            _meetingNameLiveData.value = getTitleChat(_chatRoomLiveData.value!!)
+        }
         _callLiveData.value = meetingActivityRepository.getMeeting(chatId)
     }
 
@@ -162,19 +201,31 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun startMeeting(listener: MegaChatRequestListenerInterface) {
         if (_chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE) {
             //The chat exists
-            meetingActivityRepository.startMeeting(_chatRoomLiveData.value!!.chatId, listener)
+            meetingActivityRepository.startMeeting(_chatRoomLiveData.value!!.chatId, _micLiveData.value!!, _cameraLiveData.value!!, listener)
         } else {
-            //The chat doesn't exists
-            // It is necessary to create the public chat
+            //The chat doesn't exist
+                meetingActivityRepository.createPublicChat(
+                _meetingNameLiveData.value!!,
+                CreateGroupChatWithPublicLink(
+                    MegaApplication.getInstance(),
+                    _meetingNameLiveData.value
+                )
+            )
         }
     }
 
     fun setTitleChat(newTitle: String) {
-        meetingActivityRepository.setTitleChatRoom(
-            _chatRoomLiveData.value!!.chatId,
-            newTitle,
-            EditChatRoomNameListener(MegaApplication.getInstance(), this)
-        )
+        if(_chatRoomLiveData.value == null){
+            _meetingNameLiveData.value = newTitle
+        }else{
+            _chatRoomLiveData.value?.chatId?.let {
+                meetingActivityRepository.setTitleChatRoom(
+                    it,
+                    newTitle,
+                    EditChatRoomNameListener(MegaApplication.getInstance(), this)
+                )
+            }
+        }
     }
 
     override fun onCleared() {
@@ -186,6 +237,13 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         // Remove observer on network state
         LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
             .removeObserver(notificationNetworkStateObserver)
+
+        LiveEventBus.get(
+            EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java
+        ).removeObserver(titleMeetingChangeObserver)
+
+        LiveEventBus.get(EVENT_PUBLIC_CHAT_CREATED)
+            .removeObserver(publicChatLinkCreatedObserver as Observer<Any>)
 
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .removeObserver(updateCallObserver)
@@ -200,15 +258,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; false: turn off
      */
     fun clickMic(bOn: Boolean) {
-        if (!recordAudioGranted) {
-            _recordAudioPermissionCheck.value = true
-            return
-        }
 
-        val chatId = _chatRoomLiveData.value?.chatId
-        if(chatId != MEGACHAT_INVALID_HANDLE) {
-
-        }
+//        if (!recordAudioGranted) {
+//            _recordAudioPermissionCheck.value = true
+//            return
+//        }
 
         when {
             _chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE -> {
@@ -242,10 +296,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; off: turn off
      */
     fun clickCamera(bOn: Boolean) {
-        if (!cameraGranted) {
-            _cameraPermissionCheck.value = true
-            return
-        }
+//        if (!cameraGranted) {
+//            _cameraPermissionCheck.value = true
+//            return
+//        }
+
         if (_chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE) {
             meetingActivityRepository.switchCamera(
                 _chatRoomLiveData.value!!.chatId,
@@ -294,6 +349,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     override fun onVideoDeviceOpened(isEnable: Boolean) {
+        logDebug("onVideoDeviceOpened:: isEnable = "+isEnable)
         _cameraLiveData.value = isEnable
         logDebug("open video: $_cameraLiveData.value")
         tips.value = when (isEnable) {
@@ -309,6 +365,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     override fun onDisableAudioVideo(chatId: Long, typeChange: Int, isEnable: Boolean) {
+
         when (typeChange) {
             MegaChatRequest.AUDIO -> {
                 _micLiveData.value = isEnable
@@ -324,7 +381,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                     )
                 }
             }
-            else -> {
+            MegaChatRequest.VIDEO -> {
                 _cameraLiveData.value = isEnable
                 logDebug("open video: $_cameraLiveData.value")
                 tips.value = when (isEnable) {

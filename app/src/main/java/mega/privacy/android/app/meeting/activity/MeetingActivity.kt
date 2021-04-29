@@ -8,24 +8,18 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
-import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
 // FIXME: And don't directly call megaChatApi in view layer, try don't put everything together and bloat the View layer file
@@ -132,11 +126,10 @@ class MeetingActivity : PasscodeActivity() {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
-
-        val chatId = intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-        bundle.putLong(MEETING_CHAT_ID, chatId)
-
-        meetingViewModel.updateChatAndCall(chatId)
+        bundle.putLong(
+            MEETING_CHAT_ID,
+            intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+        )
 
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
@@ -153,7 +146,12 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> {
+                if (meetingViewModel.callLiveData.value == null) {
+                    MegaApplication.getInstance().removeRTCAudioManager()
+                }
+                onBackPressed()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

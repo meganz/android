@@ -5,16 +5,17 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -27,16 +28,20 @@ import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
 
 @AndroidEntryPoint
-class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower, StartChatCallListener.OnCallStartedCallback {
+class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
+    StartChatCallListener.OnCallStartedCallback {
 
     // Views
     lateinit var toolbar: MaterialToolbar
@@ -68,6 +73,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
+    private val errorStatingCallObserver = Observer<Long> {
+        if (sharedModel.chatRoomLiveData.value?.chatId == it) {
+            MegaApplication.getInstance().removeRTCAudioManager()
+            meetingActivity.finish()
+        }
+    }
+    private val callStatusObserver = Observer<MegaChatCall> {
+        if (sharedModel.callLiveData.value?.callId == it.callId) {
+           enableOnHoldFab()
+        }
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -90,6 +108,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 //        }
 //        //TODO test code end
 
+        LiveEventBus.get(Constants.EVENT_ERROR_STARTING_CALL, Long::class.java)
+            .observeForever(errorStatingCallObserver)
+
+        LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .observeForever(callStatusObserver)
+
+        val chatId: Long? = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+        sharedModel.updateChatAndCall(chatId!!)
+
+        initCall()
         initToolbar()
         initShareViewModel()
         initFloatingWindowContainerDragListener(view)
@@ -98,8 +126,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Set on page tapping listener.
         setPageOnClickListener(view)
         setSystemUIVisibility()
+    }
 
-        sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+    override fun onDestroy() {
+        super.onDestroy()
+
+        LiveEventBus.get(Constants.EVENT_ERROR_STARTING_CALL, Long::class.java)
+            .removeObserver(errorStatingCallObserver)
+        LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .removeObserver(callStatusObserver)
     }
 
     override fun onCallStarted(chatId: Long) {
@@ -274,6 +309,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         floatingWindowContainer.setOnTouchListener(dragTouchListener)
     }
 
+    private fun initCall() {
+        if (sharedModel.callLiveData.value == null) {
+            sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+        }
+    }
+
     private fun initToolbar() {
         toolbar = meetingActivity.toolbar
         toolbar.title = sharedModel.meetingNameLiveData.value
@@ -296,6 +337,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 toolbar.subtitle = "Duration 00:00"
             }
         }
+    }
+
+    private fun checkIfSpeakerViewIsAutomatic(){
+        if(MegaApplication.isSpeakerViewAutomatic(sharedModel.callLiveData.value!!.callId)){
+            //Check to speakerView
+        }else{
+            //Keep grid view
+        }
+
     }
 
     private fun loadChildFragment(containerId: Int, fragment: Fragment, tag: String) {
@@ -346,6 +396,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             R.id.speaker_view -> {
                 logDebug("Change to speaker view.")
+                MegaApplication.setSpeakerViewAutomatic(sharedModel.callLiveData.value!!.callId, false)
                 gridViewMenuItem.isVisible = true
                 speakerViewMenuItem.isVisible = false
 
@@ -379,11 +430,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
-            updateAudio(it)
+            updateLocalAudio(it)
         }
 
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
-            updateVideo(it)
+            updateLocalVideo(it)
         }
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
@@ -448,8 +499,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.clickMic(!micOn)
     }
 
-    private fun updateAudio(micOn: Boolean) {
+    private fun updateLocalAudio(micOn: Boolean) {
         bottomFloatingPanelViewHolder.updateMicIcon(micOn)
+    }
+
+    /**
+     * Check if a call is outgoing, on hold button must be disabled
+     */
+    private fun enableOnHoldFab() {
+        bottomFloatingPanelViewHolder.enableHoldIcon(!sharedModel.isRequestSent())
     }
 
     /**
@@ -460,24 +518,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     }
 
-    private fun updateVideo(camOn: Boolean) {
+    private fun updateLocalVideo(camOn: Boolean) {
         bottomFloatingPanelViewHolder.updateCamIcon(camOn)
 
         when (camOn) {
             true -> {
-                if (individualCallFragment.isAdded) {
-                    individualCallFragment.activateVideo()
-                }
-                if (floatingWindowFragment.isAdded) {
-                    floatingWindowFragment.activateVideo()
+                if (sharedModel.isRequestSent()) {
+                    if (individualCallFragment.isAdded) {
+                        individualCallFragment.activateVideo()
+                    }
+                } else {
+                    if (floatingWindowFragment.isAdded) {
+                        floatingWindowFragment.activateVideo()
+                    }
                 }
             }
             false -> {
-                if (individualCallFragment.isAdded) {
-                    individualCallFragment.closeVideo()
-                }
-                if (floatingWindowFragment.isAdded) {
-                    floatingWindowFragment.closeVideo()
+                if (sharedModel.isRequestSent()) {
+                    if (individualCallFragment.isAdded) {
+                        individualCallFragment.closeVideo()
+                    }
+                } else {
+                    if (floatingWindowFragment.isAdded) {
+                        floatingWindowFragment.closeVideo()
+                    }
                 }
             }
         }
@@ -562,7 +626,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Send share link
      */
     override fun onShareLink() {
-        showShortToast("onShareLink")
+        if(sharedModel.isOneToOneCall() || !sharedModel.chatRoomLiveData.value!!.isPublic){
+            logError("Error getting the link, it is a private chat")
+            return
+        }
 
         meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND
@@ -575,7 +642,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Get the special link
      */
     private fun getShareLink(): String {
-        return "This is the share link"
+        return sharedModel.meetingLinkLiveData.value!!
     }
 
     /**
@@ -608,10 +675,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 participant
             )
         participantBottomSheet.show(parentFragmentManager, participantBottomSheet.tag)
-    }
-
-    private fun showShortToast(message: String) {
-        Toast.makeText(meetingActivity, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

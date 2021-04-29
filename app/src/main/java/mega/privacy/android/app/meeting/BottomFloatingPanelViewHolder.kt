@@ -331,6 +331,10 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.fabMic.isOn = micOn
     }
 
+    fun enableHoldIcon(isEnabled: Boolean) {
+        floatingPanelView.fabHold.enable = isEnabled
+    }
+
     fun updateCamIcon(micOn: Boolean) {
         floatingPanelView.fabCam.isOn = micOn
     }

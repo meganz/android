@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRenderer
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatVideoListenerInterface
@@ -17,12 +18,13 @@ import java.nio.ByteBuffer
 class MeetingVideoListener(
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
-    isFrontCamera: Boolean = true
+    clientId: Long,
+    isFloatingWindow: Boolean = true
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
     var height = 0
-    private val isLocal = true
+    private var isLocal = true
     val renderer: MegaSurfaceRenderer
     private val surfaceHolder: SurfaceHolder
     private var bitmap: Bitmap? = null
@@ -71,11 +73,11 @@ class MeetingVideoListener(
     }
 
     init {
-        if (isFrontCamera && isLocal) {
+        if (isFloatingWindow && isLocal) {
             surfaceView.setZOrderMediaOverlay(true)
         }
         surfaceHolder = surfaceView.holder
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT)
-        renderer = MegaSurfaceRenderer(surfaceView, isFrontCamera, outMetrics)
+        renderer = MegaSurfaceRenderer(surfaceView, isFloatingWindow, outMetrics)
     }
 }
