@@ -69,18 +69,14 @@ class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     /**
      *  Select the video device to be used in calls
      *
-     *  @param bFrontCamera true: front camera / false: back camera
+     *  @param listener Receive information about requests.
      */
-    fun setChatVideoInDevice(bFrontCamera: Boolean, listener: MegaChatRequestListenerInterface?) {
-        // Always try to start the call using the front camera
+    fun setChatVideoInDevice(listener: MegaChatRequestListenerInterface?) {
+        // Always try to start the video using the front camera
         var cameraDevice = VideoCaptureUtils.getFrontCamera()
-        if(!bFrontCamera) {
-            cameraDevice = VideoCaptureUtils.getBackCamera()
-        }
         if (cameraDevice != null) {
             abstractMeetingOnBoardingRepository.setChatVideoInDevice(cameraDevice, listener)
         }
-
     }
 
 }
