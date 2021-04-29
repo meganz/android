@@ -12,6 +12,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
 
     var isGuest = false
     var isModerator = false
+    var isSpeakerMode = false
 
     var participant: Participant? = null
     var context: Context? = null
@@ -19,11 +20,12 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
     /**
      * Init value for View Model
      */
-    fun initValue(con: Context, moderator: Boolean, guest: Boolean, info: Participant) {
+    fun initValue(con: Context, moderator: Boolean, guest: Boolean, speakerMode:Boolean, info: Participant) {
         isModerator = moderator
         isGuest = guest
         participant = info
         context = con
+        isSpeakerMode = speakerMode
     }
 
     /**
@@ -59,6 +61,14 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
     fun showSendMessage(): Boolean =
         !isGuest && participant?.isContact == true && participant?.isMe == false
 
+
+    /**
+     * Determine if show the `Pin to speaker view` item
+     *
+     * it will show if current mode is speaker mode
+     */
+    fun showPinItem(): Boolean = isSpeakerMode
+
     /**
      * Set the text for Contact Info item
      *
@@ -71,6 +81,8 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
             context?.getString(R.string.contact_properties_activity)
         }
     }
+
+
 
     /**
      * Determine if show the `Make Moderator` item

@@ -425,7 +425,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Init Floating Panel, will move to `inMeetingFragment` later
+     * Init Floating Panel
      */
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
@@ -549,7 +549,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onShareLink() {
         showShortToast("onShareLink")
 
-        startActivity(Intent().apply {
+        meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, getShareLink())
             type = "text/plain"
@@ -589,6 +589,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MeetingParticipantBottomSheetDialogFragment.newInstance(
                 isGuest,
                 isModerator,
+                !speakerViewMenuItem.isVisible,
                 participant
             )
         participantBottomSheet.show(parentFragmentManager, participantBottomSheet.tag)

@@ -2,12 +2,14 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
+import mega.privacy.android.app.meeting.activity.AssignModeratorActivity
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.ASSIGN_MODERATOR
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.END_MEETING_FOR_ALL
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.LEAVE_ANYWAY
@@ -42,6 +44,7 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun assignModerator() {
         Toast.makeText(requireContext(), "Assign Moderator", Toast.LENGTH_SHORT).show()
+        activity?.startActivity(Intent(requireActivity(), AssignModeratorActivity::class.java))
     }
 
     private fun leaveAnyway() {

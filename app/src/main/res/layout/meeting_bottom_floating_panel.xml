@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:behavior_expandedOffset="36dp"
     app:behavior_fitToContents="false"
+    app:behavior_skipCollapsed="true"
+    app:behavior_expandedOffset="36dp"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/meeting_bottom_floating_panel_peek_height"
     app:layout_behavior="@string/bottom_sheet_behavior">
@@ -40,6 +41,7 @@
         android:layout_marginTop="44dp"
         android:background="@null"
         app:borderWidth="0dp"
+        app:disable_icon="@drawable/ic_mic_disable"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
         app:is_on="true"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +53,6 @@
         app:on_icon="@drawable/ic_mic_on"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
-        app:disable_icon="@drawable/ic_mic_disable"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -71,6 +72,7 @@
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
         android:background="@null"
         app:borderWidth="0dp"
+        app:disable_icon="@drawable/ic_video_disable"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_hold"
@@ -84,7 +86,6 @@
         app:on_icon="@drawable/ic_video"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
-        app:disable_icon="@drawable/ic_video_disable"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -104,6 +105,7 @@
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
         android:background="@null"
         app:borderWidth="0dp"
+        app:disable_icon="@drawable/ic_transfers_pause_disable"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_cam"
@@ -117,7 +119,6 @@
         app:on_icon="@drawable/ic_transfers_pause"
         app:on_icon_tint="@color/white"
         app:pressedTranslationZ="12dp"
-        app:disable_icon="@drawable/ic_transfers_pause_disable"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -258,13 +259,31 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintTop_toTopOf="@id/participants_num" />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/participants"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="21dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/participants_num" />
+
+
+    <!--    <RelativeLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_marginTop="21dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/participants_num">-->
+
+    <!--        <androidx.recyclerview.widget.RecyclerView-->
+    <!--            android:id="@+id/participants"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
+    <!--    </RelativeLayout>-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>

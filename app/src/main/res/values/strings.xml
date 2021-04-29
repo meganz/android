@@ -3096,6 +3096,7 @@
     <string name="assign_moderator_message" context="assign moderator message when the moderator leave meeting">Before leaving, please assign (a) new moderator(s) in order to keep the meeting structure</string>
     <string name="assign_moderator" context="assign moderator option when the moderator leave meeting">Assign moderator</string>
     <string name="leave_anyway" context="leave anyway option when the moderator leave meeting">Leave anyway</string>
+    <string name="pick_new_moderator_message" context="The message alert user to pick new moderator on assign moderator page">Please pick one or more to be new moderator</string>
 
     <string name="meeting_link" context="The literal meeting link text">Meeting link</string>
     <string name="paste_meeting_link_instruction" context="Tell the user to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>

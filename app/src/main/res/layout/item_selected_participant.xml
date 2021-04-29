@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_layout_chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/chip_layout"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginBottom="8dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            app:roundedCornerRadius="20dp" />
+
+        <ImageView
+            android:id="@+id/delete_icon_chip"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_cancel_avatar" />
+    </RelativeLayout>
+
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
+        android:id="@+id/name_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chip_layout"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:maxWidth="60dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
+        app:emojiSize="10sp" />
+
+</RelativeLayout>

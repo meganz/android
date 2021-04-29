@@ -13,15 +13,17 @@ class EndMeetingBottomSheetDialogViewModel : ViewModel() {
     var clickEvent: LiveData<Int> = _clickEvent
 
     fun leaveMeetingOrAssignModerator() {
-        _currentMode.value = if (_currentMode.value == LEAVE_CHOOSE_MODE) {
-            ASSIGN_MODE
+
+        if (_currentMode.value == LEAVE_CHOOSE_MODE) {
+            _currentMode.value = ASSIGN_MODE
         } else {
-            ASSIGN_MODERATOR
+            _clickEvent.value = ASSIGN_MODERATOR
         }
+
     }
 
     fun endMeetingForAllOrLeaveAnyway() {
-        _currentMode.value = if (_currentMode.value == LEAVE_CHOOSE_MODE) {
+        _clickEvent.value = if (_currentMode.value == LEAVE_CHOOSE_MODE) {
             END_MEETING_FOR_ALL
         } else {
             LEAVE_ANYWAY

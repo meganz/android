@@ -46,7 +46,10 @@ class BottomFloatingPanelViewHolder(
      */
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
-    private var savedSpeakerState: AppRTCAudioManager.AudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+    private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
+        AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+
+    private var isSpeakerMode = false
 
     private val participantsAdapter = ParticipantsAdapter(listener)
 
@@ -143,11 +146,17 @@ class BottomFloatingPanelViewHolder(
         setupFabUpdater()
         setupFabLabelUpdater()
 
+        // Set the half expanded ratio, to set the height for the `STATE_HALF_EXPANDED`
+        // if ratio is not between 0 and 1, will set to 0.001f
         post {
             val peekHeight =
                 context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
-            bottomSheetBehavior.halfExpandedRatio =
-                peekHeight.toFloat() / binding.root.measuredHeight
+
+            var ratio = peekHeight.toFloat() / binding.root.measuredHeight
+            if ((ratio <= 0) || (ratio >= 1)) {
+                ratio = 0.001f
+            }
+            bottomSheetBehavior.halfExpandedRatio = ratio
         }
     }
 

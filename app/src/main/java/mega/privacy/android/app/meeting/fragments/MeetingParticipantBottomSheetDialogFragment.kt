@@ -25,6 +25,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     // Get from activity
     private var isModerator = true
     private var isGuest = false
+    private var isSpeakerMode = false
 
     // Get from participant
     private var isContact = false
@@ -44,8 +45,15 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         isGuest = arguments?.getBoolean(EXTRA_IS_GUEST) == true
         isModerator = arguments?.getBoolean(EXTRA_IS_MODERATOR) == true
+        isSpeakerMode = arguments?.getBoolean(EXTRA_IS_SPEAKER_MODE) == true
 
-        bottomViewModel.initValue(requireContext(), isModerator, isGuest, participantItem)
+        bottomViewModel.initValue(
+            requireContext(),
+            isModerator,
+            isGuest,
+            isSpeakerMode,
+            participantItem
+        )
 
         val binding =
             BottomSheetMeetingParticipantBinding.inflate(LayoutInflater.from(context), null, false)
@@ -166,7 +174,12 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).apply {
-            setMessage(resources.getString(R.string.confirmation_remove_chat_contact, participantItem.name))
+            setMessage(
+                resources.getString(
+                    R.string.confirmation_remove_chat_contact,
+                    participantItem.name
+                )
+            )
             setPositiveButton(R.string.general_remove) { _, _ -> removeParticipant() }
             setNegativeButton(R.string.general_cancel, null)
             show()
@@ -191,6 +204,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         private const val EXTRA_PARTICIPANT = "extra_participant"
         private const val EXTRA_IS_GUEST = "extra_is_guest"
         private const val EXTRA_IS_MODERATOR = "extra_is_moderator"
+        private const val EXTRA_IS_SPEAKER_MODE = "extra_is_speaker_mode"
 
         /**
          * Get the participant object
@@ -198,6 +212,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         fun newInstance(
             isGuest: Boolean,
             isModerator: Boolean,
+            isSpeakerMode: Boolean,
             participant: Participant
         ): MeetingParticipantBottomSheetDialogFragment {
             val args = Bundle()
@@ -205,6 +220,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             args.putSerializable(EXTRA_PARTICIPANT, participant)
             args.putBoolean(EXTRA_IS_GUEST, isGuest)
             args.putBoolean(EXTRA_IS_MODERATOR, isModerator)
+            args.putBoolean(EXTRA_IS_SPEAKER_MODE, isSpeakerMode)
             val fragment = MeetingParticipantBottomSheetDialogFragment()
             fragment.arguments = args
             return fragment

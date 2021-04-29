@@ -11,5 +11,8 @@ data class Participant(
     val isModerator: Boolean,
     val isAudioOn: Boolean,
     val isVideoOn: Boolean,
-    val isContact: Boolean = false
-) : Serializable
+    val isGuest:Boolean = false,
+    val isContact: Boolean = true,
+    var isSelected: Boolean = false
+) : Serializable {
+}
