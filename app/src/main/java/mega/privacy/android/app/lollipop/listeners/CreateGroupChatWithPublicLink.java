@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Pair;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -65,7 +67,9 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             logDebug("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
             if (request.getFlag() == false) {
                if (request.getNumRetry() == 1) {
-                   logDebug("Chat link exported!");
+                   logDebug("Chat link exported");
+                   Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
+                   LiveEventBus.get(EVENT_PUBLIC_CHAT_CREATED, Pair.class).post(chatAndLink);
 
                    if(context instanceof ManagerActivityLollipop){
                        Intent intent = new Intent(context, ChatActivityLollipop.class);

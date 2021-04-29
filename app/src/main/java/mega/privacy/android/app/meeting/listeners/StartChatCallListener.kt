@@ -1,11 +1,13 @@
 package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ChatBaseListener
+import mega.privacy.android.app.utils.Constants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -48,6 +50,9 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
         } else {
             logError("Error Starting call")
             snackbarShower?.showSnackbar(getString(R.string.call_error))
+            LiveEventBus.get(EVENT_ERROR_STARTING_CALL,
+                Long::class.java
+            ).post(request.chatHandle)
         }
     }
 

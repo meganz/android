@@ -10,11 +10,13 @@ import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -36,7 +38,8 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
-class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower, StartChatCallListener.OnCallStartedCallback {
+class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
+    StartChatCallListener.OnCallStartedCallback {
 
     // Views
     lateinit var toolbar: MaterialToolbar
@@ -68,6 +71,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
+    private val errorStatingCallObserver = Observer<Long> {
+        if (sharedModel.chatRoomLiveData.value?.chatId == it) {
+            MegaApplication.getInstance().removeRTCAudioManager()
+            meetingActivity.finish()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -90,6 +100,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 //        }
 //        //TODO test code end
 
+        LiveEventBus.get(Constants.EVENT_ERROR_STARTING_CALL, Long::class.java)
+            .observeForever(errorStatingCallObserver)
+
+        initCall()
         initToolbar()
         initShareViewModel()
         initFloatingWindowContainerDragListener(view)
@@ -98,8 +112,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Set on page tapping listener.
         setPageOnClickListener(view)
         setSystemUIVisibility()
+    }
 
-        sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+    override fun onDestroy() {
+        super.onDestroy()
+
+        LiveEventBus.get(Constants.EVENT_ERROR_STARTING_CALL, Long::class.java)
+            .removeObserver(errorStatingCallObserver)
     }
 
     override fun onCallStarted(chatId: Long) {
@@ -272,6 +291,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         )
 
         floatingWindowContainer.setOnTouchListener(dragTouchListener)
+    }
+
+    private fun initCall() {
+        if (sharedModel.callLiveData.value == null) {
+            sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+        }
     }
 
     private fun initToolbar() {

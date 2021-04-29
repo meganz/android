@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Base fragment for meeting fragment: [CreateMeetingFragment],[JoinMeetingAsGuestFragment],[JoinMeetingFragment],[InMeetingFragment]
@@ -49,6 +50,9 @@ open class MeetingBaseFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         meetingActivity = activity as MeetingActivity
+
+        val chatId: Long? = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+        sharedModel.updateChatAndCall(chatId!!)
     }
 
     override fun onResume() {

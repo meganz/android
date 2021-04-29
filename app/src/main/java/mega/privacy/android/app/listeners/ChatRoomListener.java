@@ -2,6 +2,8 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatMessage;
@@ -9,8 +11,10 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.EVENT_CHAT_TITLE_CHANGE;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
 
 public class ChatRoomListener implements MegaChatRoomListenerInterface {
 
@@ -24,6 +28,11 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
+        }
+
+        if(chat.hasChanged(CHANGE_TYPE_TITLE)){
+            logDebug("CHANGE_TYPE_TITLE for the chat: " + chat.getChatId());
+            LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).post(chat);
         }
     }
 
