@@ -37,6 +37,9 @@ object PsaManager {
         if (delay < 0) delay = 0
 
         AlarmReceiver.setAlarm(application.applicationContext, delay) {
+            preferences.edit()
+                .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
+                .apply()
             psa = it
             LiveEventBus.get(EVENT_PSA, Psa::class.java).post(it)
         }
