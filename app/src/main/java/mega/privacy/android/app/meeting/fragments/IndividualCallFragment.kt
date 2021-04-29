@@ -1,138 +1,83 @@
 package mega.privacy.android.app.meeting.fragments
 
-import android.graphics.*
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_local_camera_call.*
-import kotlinx.coroutines.*
+import android.widget.ImageView
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.individual_call_fragment.view.*
+import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
-
+@AndroidEntryPoint
 class IndividualCallFragment : MeetingBaseFragment() {
 
     private var chatId: Long? = null
+    private var peerId: Long? = null
     private var clientId: Long? = null
     private var chat: MegaChatRoom? = null
+
     private var isFloatingWindow = false
 
-    lateinit var inMeetingViewModel: InMeetingViewModel
+    // Views
+    private lateinit var vVideo: SurfaceView
+    private lateinit var vAvatar: RoundedImageView
+    private lateinit var vOnHold: ImageView
 
-    val paint = Paint()
+    private val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
+
+    private var videoListener: MeetingVideoListener? = null
 
     var videoAlpha = 255
-
-    lateinit var holder: SurfaceHolder
-
-    var isDrawing = true
-
-    private val srcRect = Rect()
-    private val dstRect = Rect()
-
-    // TODO test start
-    var job: Job? = null
-
-    val callback = object : SurfaceHolder.Callback {
-
-        override fun surfaceCreated(holder: SurfaceHolder?) {
-            isDrawing = true
-
-            dstRect.top = 0
-            dstRect.left = 0
-            dstRect.right = video.width
-            dstRect.bottom = video.height
-
-            inMeetingViewModel.frames.observeForever {
-                job = GlobalScope.launch(Dispatchers.IO) {
-                    while (isDrawing) {
-                        it.forEach {
-                            delay(50)
-                            onChatVideoData(it.width, it.height, it)
-
-                            if (!isDrawing) return@forEach
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun surfaceChanged(
-            holder: SurfaceHolder?,
-            format: Int,
-            width: Int,
-            height: Int
-        ) {
-        }
-
-        override fun surfaceDestroyed(holder: SurfaceHolder?) {
-            onRecycle()
-        }
-    }
-
-    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
-        if (bitmap.isRecycled || !holder.surface.isValid) return
-
-        val canvas = holder.lockCanvas() ?: return
-
-        srcRect.top = 0
-        srcRect.left = 0
-        srcRect.right = width
-        srcRect.bottom = height
-
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-
-        paint.alpha = videoAlpha
-
-//        canvas.drawRoundRect(
-//            RectF(0f, 0f, video.width.toFloat(), video.height.toFloat()),
-//            Util.dp2px(16f, outMetrics).toFloat(),
-//            Util.dp2px(16f, outMetrics).toFloat(),
-//            paint
-//        )
-
-        canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
-        holder.unlockCanvasAndPost(canvas)
-    }
-    // TODO test end
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             chatId = it.getLong(Constants.CHAT_ID)
+            peerId = it.getLong(Constants.PEER_ID)
             clientId = it.getLong(Constants.CLIENT_ID)
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW)
         }
-
-        this.inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return if (isFloatingWindow)
-            SelfFeedFloatingWindowFragmentBinding.inflate(inflater, container, false).root
-        else
-            IndividualCallFragmentBinding.inflate(inflater, container, false).root
+        val binding = if (isFloatingWindow) IndividualCallFragmentBinding.inflate(
+            inflater,
+            container,
+            false
+        ) else SelfFeedFloatingWindowFragmentBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        binding.root.let {
+            vVideo = it.video
+            vAvatar = it.avatar
+            vOnHold = it.on_hold_icon
+        }
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         if (isFloatingWindow) {
-            holder = video.holder
-
-            // Set background of SurfaceView as transparent after drew a round corner rect.
-            video.setZOrderOnTop(true)
-            holder.setFormat(PixelFormat.TRANSLUCENT)
-
             (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.apply {
                 add {
                     view.alpha = 1 - it
@@ -144,27 +89,56 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    /**
+     * Method for activating the video.
+     */
+    fun activateVideo() {
+        // Always try to start the call using the front camera
+        abstractMeetingOnBoardingViewModel.setChatVideoInDevice(true, null)
 
-        // Start drawing here, so that after a lock screen, the drawing can resume.
-        if (isFloatingWindow) {
-            // TODO test start
-            holder.addCallback(callback)
-            // TODO test code end
-        }
-    }
-
-    fun onRecycle() {
-        isDrawing = false
-
-        holder.removeCallback(callback)
-
-        if (job != null && job!!.isActive) {
-            GlobalScope.launch(Dispatchers.IO) {
-                job!!.cancelAndJoin()
+        if (videoListener == null) {
+            videoListener = MeetingVideoListener(
+                vVideo,
+                outMetrics,
+                false
+            )
+            megaChatApi.addChatLocalVideoListener(
+                MEGACHAT_INVALID_HANDLE,
+                videoListener
+            )
+        } else {
+            videoListener?.let {
+                it.height = 0
+                it.width = 0
             }
         }
+
+        vVideo.isVisible = true
+    }
+
+    fun closeVideo() {
+        if (videoListener == null) {
+            logError("Error deactivating video")
+            return
+        }
+        logDebug("Removing surface view")
+        vVideo.isVisible = false
+        removeChatVideoListener()
+    }
+
+    private fun removeChatVideoListener() {
+        if (videoListener == null) return
+
+        logDebug("Removing remote video listener")
+
+        megaChatApi.removeChatVideoListener(
+            chatId!!,
+            clientId!!,
+            false,
+            videoListener
+        )
+
+        videoListener = null
     }
 
     companion object {
@@ -186,8 +160,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 arguments = Bundle().apply {
                     putLong(Constants.CHAT_ID, chatId)
                     putLong(Constants.PEER_ID, peerId)
-                    putLong(Constants.CLIENT_ID, MEGACHAT_INVALID_HANDLE)
-
                     putBoolean(Constants.IS_FLOATING_WINDOW, isFloatingWindow)
                 }
             }
@@ -208,7 +180,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     putLong(Constants.PEER_ID, peerId)
                     putLong(Constants.CLIENT_ID, clientId)
                     putBoolean(Constants.IS_FLOATING_WINDOW, false)
-
                 }
             }
     }

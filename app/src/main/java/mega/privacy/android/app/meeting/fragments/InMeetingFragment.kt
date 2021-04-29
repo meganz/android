@@ -10,13 +10,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -28,9 +26,9 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -38,7 +36,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
-class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower {
+class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower, StartChatCallListener.OnCallStartedCallback {
 
     // Views
     lateinit var toolbar: MaterialToolbar
@@ -84,44 +82,39 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO test code start: add x participants
-        val x = 2
-        for (i in 0 until x) {
-            inMeetingViewModel.addParticipant(true)
-        }
-        // TODO test code start
 
-        //TODO test code start
-        val producer = TestTool.FrameProducer()
-
-        GlobalScope.launch(Dispatchers.IO) {
-            producer.load()
-            inMeetingViewModel.frames.postValue(producer.frames)
-        }
-        //TODO test code end
+//        // TODO test code start: add x participants
+//        val x = 2
+//        for (i in 0 until x) {
+//            inMeetingViewModel.addParticipant(true)
+//        }
+//        //TODO test code end
 
         initToolbar()
         initShareViewModel()
         initFloatingWindowContainerDragListener(view)
         initChildrenFragments()
         initFloatingPanel()
-
         // Set on page tapping listener.
-        view.setOnClickListener {
-            onPageClick()
-        }
+        setPageOnClickListener(view)
+        setSystemUIVisibility()
 
+        sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+    }
+
+    override fun onCallStarted(chatId: Long) {
+        sharedModel.updateChatAndCall(chatId)
+    }
+
+    private fun setSystemUIVisibility() {
         // Set system UI color to make them visible.
         // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         meetingActivity.window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        //TODO test code start
-        inMeetingViewModel.frames.value = mutableListOf()
-        //TODO test code end
+    private fun setPageOnClickListener(view: View) = view.setOnClickListener {
+        onPageClick()
     }
 
     fun onPageClick() {
@@ -172,82 +165,87 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun initChildrenFragments(){
+    private fun initChildrenFragments() {
+        val chatId = sharedModel.chatRoomLiveData.value?.chatId ?: return
+
         val isRequestSent = sharedModel.isRequestSent()
         val isOneToOneChat = sharedModel.isOneToOneCall()
-        val chatId = sharedModel.chatRoomLiveData.value!!.chatId
 
-        when{
-            isRequestSent -> {
-                //I am calling
-                individualCallFragment = IndividualCallFragment.newInstance(
-                    chatId,
-                    megaChatApi.myUserHandle,
-                    false
-                )
-
-                loadChildFragment(
-                    R.id.meeting_container,
-                    individualCallFragment,
-                    IndividualCallFragment.TAG
-                )
-            }
-            else -> {
-                when {
-                    isOneToOneChat -> {
-                        //I am in a call in progress in a one to one chat
-                        floatingWindowFragment = IndividualCallFragment.newInstance(
-                            chatId,
-                            megaChatApi.myUserHandle,
-                            true
-                        )
-
-                        loadChildFragment(
-                            R.id.self_feed_floating_window_container,
-                            floatingWindowFragment,
-                            IndividualCallFragment.TAG
-                        )
-
-                        val clientId = sharedModel.callLiveData.value!!.sessionsClientid.get(0)
-                        val session =
-                            sharedModel.callLiveData.value!!.getMegaChatSession(clientId)
-                        individualCallFragment = IndividualCallFragment.newInstance(
-                            chatId,
-                            session.peerid,
-                            session.clientid
-                        )
-
-                        loadChildFragment(
-                            R.id.meeting_container,
-                            individualCallFragment,
-                            IndividualCallFragment.TAG
-                        )
-                    }
-                    else -> {
-                        //I am in a meeting in progress
-                        floatingWindowFragment = IndividualCallFragment.newInstance(
-                            chatId,
-                            megaChatApi.myUserHandle,
-                            true
-                        )
-                        loadChildFragment(
-                            R.id.self_feed_floating_window_container,
-                            floatingWindowFragment,
-                            IndividualCallFragment.TAG
-                        )
-
-                        gridViewCallFragment = GridViewCallFragment.newInstance()
-                        loadChildFragment(
-                            R.id.meeting_container,
-                            gridViewCallFragment,
-                            GridViewCallFragment.TAG
-                        )
-
-                        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
-                    }
-                }
+        if (isRequestSent) {
+            waitingForConnection(chatId)
+        } else {
+            if (isOneToOneChat) {
+                initOneToOneCall(chatId)
+            } else {
+                initGroupCall(chatId)
             }
         }
+    }
+
+    private fun waitingForConnection(chatId: Long) {
+        //I am calling
+        individualCallFragment = IndividualCallFragment.newInstance(
+            chatId,
+            megaChatApi.myUserHandle,
+            false
+        )
+
+        loadChildFragment(
+            R.id.meeting_container,
+            individualCallFragment,
+            IndividualCallFragment.TAG
+        )
+    }
+
+    private fun initOneToOneCall(chatId: Long) {
+        initLocal(chatId)
+
+        val chatCall = sharedModel.callLiveData.value
+        val clientId = chatCall?.sessionsClientid?.get(0)
+
+        clientId?.let {
+            val session = chatCall.getMegaChatSession(it)
+
+            individualCallFragment = IndividualCallFragment.newInstance(
+                chatId,
+                session.peerid,
+                session.clientid
+            )
+
+            loadChildFragment(
+                R.id.meeting_container,
+                individualCallFragment,
+                IndividualCallFragment.TAG
+            )
+        }
+    }
+
+    private fun initLocal(chatId: Long) {
+        //I am in a call in progress in a one to one chat
+        floatingWindowFragment = IndividualCallFragment.newInstance(
+            chatId,
+            megaChatApi.myUserHandle,
+            true
+        )
+
+        loadChildFragment(
+            R.id.self_feed_floating_window_container,
+            floatingWindowFragment,
+            IndividualCallFragment.TAG
+        )
+    }
+
+    private fun initGroupCall(chatId: Long) {
+        initLocal(chatId)
+
+        gridViewCallFragment = GridViewCallFragment.newInstance()
+        loadChildFragment(
+            R.id.meeting_container,
+            gridViewCallFragment,
+            GridViewCallFragment.TAG
+        )
+
+        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
     }
 
     private fun initFloatingWindowContainerDragListener(view: View) {
@@ -315,10 +313,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         gridViewMenuItem = menu.findItem(R.id.grid_view)
         swapCameraMenuItem = menu.findItem(R.id.swap_camera)
 
-        if(sharedModel.isOneToOneCall()){
+        if (sharedModel.isOneToOneCall()) {
             gridViewMenuItem.isVisible = false
             speakerViewMenuItem.isVisible = false
-        }else{
+        } else {
             speakerViewMenuItem.isVisible = false
             gridViewMenuItem.isVisible = true
         }
@@ -330,11 +328,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.swap_camera -> {
-                //TODO test code start: add or remove last participants
-                //inMeetingViewModel.addParticipant(true)
                 logDebug("Swap camera.")
-                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(requireContext()))
-                //TODO test code end: add or remove last participants
+                VideoCaptureUtils.swapCamera(ChatChangeVideoStreamListener(meetingActivity))
                 true
             }
             R.id.grid_view -> {
@@ -462,10 +457,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     override fun onChangeCamState(camOn: Boolean) {
         sharedModel.clickCamera(!camOn)
+
     }
 
     private fun updateVideo(camOn: Boolean) {
         bottomFloatingPanelViewHolder.updateCamIcon(camOn)
+
+        when (camOn) {
+            true -> {
+                if (individualCallFragment.isAdded) {
+                    individualCallFragment.activateVideo()
+                }
+                if (floatingWindowFragment.isAdded) {
+                    floatingWindowFragment.activateVideo()
+                }
+            }
+            false -> {
+                if (individualCallFragment.isAdded) {
+                    individualCallFragment.closeVideo()
+                }
+                if (floatingWindowFragment.isAdded) {
+                    floatingWindowFragment.closeVideo()
+                }
+            }
+        }
     }
 
     /**

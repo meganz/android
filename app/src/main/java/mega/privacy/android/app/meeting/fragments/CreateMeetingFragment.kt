@@ -20,7 +20,7 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), StartChatCallListener.OnCallStartedCallback, SnackbarShower {
+class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), SnackbarShower {
 
     private val viewModel: CreateMeetingViewModel by viewModels()
     private var meetingName: String? = null
@@ -38,7 +38,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), StartChatCall
         logDebug("Meeting Name: $meetingName")
         meetingName?.let {
             hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
-            sharedModel.startMeeting(StartChatCallListener(meetingActivity, this, this))
+            findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
         }
     }
 
@@ -99,12 +99,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), StartChatCall
         )
 
         viewModel.initRTCAudioManager()
-    }
-
-    override fun onCallStarted(chatId: Long) {
-        sharedModel.updateChatAndCall(chatId)
-        meetingName?.let { sharedModel.setTitleChat(it) }
-        findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
