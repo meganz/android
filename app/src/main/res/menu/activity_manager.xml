@@ -170,14 +170,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_menu_refresh"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="130"
-        android:title="@string/action_refresh"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_menu_help"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="135"

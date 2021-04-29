@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.myAccount
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -52,6 +53,11 @@ class MyAccountActivity : PasscodeActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.manageActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onDestroy() {
         dismissAlertDialogIfShown(killSessionsConfirmationDialog)
         super.onDestroy()
@@ -69,8 +75,7 @@ class MyAccountActivity : PasscodeActivity() {
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
             R.id.action_change_pass -> viewModel.changePassword(this)
             R.id.action_export_MK -> viewModel.exportMK(this)
-            R.id.action_refresh -> {
-            }
+            R.id.action_refresh -> viewModel.refresh(this)
             R.id.action_upgrade_account -> {
             }
             R.id.action_cancel_subscriptions -> {

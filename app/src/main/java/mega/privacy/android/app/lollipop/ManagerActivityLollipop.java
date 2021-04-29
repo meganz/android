@@ -30,6 +30,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -266,6 +267,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
@@ -688,7 +690,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
 	private MenuItem thumbViewMenuItem;
-	private MenuItem refreshMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem doNotDisturbMenuItem;
@@ -1107,6 +1108,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
 				sttFLol.refreshCameraUploadsSettings();
 			}
+		}
+	};
+
+	private final Observer<Boolean> refreshObserver = refreshed -> {
+		if (!refreshed) {
+			return;
+		}
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+
+			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
+							? parentNode
+							: megaApi.getRootNode(),
+					sortOrderManagement.getOrderCloud());
+
+			fbFLol.setNodes(nodes);
+			fbFLol.getRecyclerView().invalidate();
+		} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
+			refreshIncomingShares();
 		}
 	};
 
@@ -1772,6 +1793,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
+
+		LiveEventBus.get(EVENT_REFRESH, Boolean.class).observeForever(refreshObserver);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -4182,6 +4205,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(transferFinishReceiver);
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
+        LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -6211,7 +6235,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem = menu.findItem(R.id.action_grid);
-		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
@@ -6384,7 +6407,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				case ACCOUNT:
 					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
-						refreshMenuItem.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
 						logoutMenuItem.setVisible(true);
 
@@ -6392,7 +6414,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							cancelSubscription.setVisible(true);
 						}
 					} else {
-						refreshMenuItem.setVisible(true);
 						logoutMenuItem.setVisible(true);
 					}
 					break;
@@ -6984,20 +7005,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	showClearRubbishBinDialog();
 	        	return true;
 	        }
-	        case R.id.action_menu_refresh:{
-	        	switch(drawerItem){
-		        	case ACCOUNT:{
-						//Refresh all the info of My Account
-		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			    		intent.setAction(ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-			    		break;
-		        	}
-	        	}
-	        	return true;
-	        }
 	        case R.id.action_menu_sort_by:{
 	        	int orderType;
 
@@ -7113,13 +7120,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             createFolderMenuItem.setVisible(false);
             addContactMenuItem.setVisible(false);
             addMenuItem.setVisible(false);
-            refreshMenuItem.setVisible(false);
             sortByMenuItem.setVisible(false);
             unSelectMenuItem.setVisible(false);
             clearRubbishBinMenuitem.setVisible(false);
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
-            refreshMenuItem.setVisible(false);
             helpMenuItem.setVisible(false);
             gridSmallLargeMenuItem.setVisible(false);
             logoutMenuItem.setVisible(false);
@@ -10341,33 +10346,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
 			nC.copyNodes(copyHandles, toHandle);
-		}
-		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
-			logDebug("Resfresh DONE");
-
-			if (intent == null) {
-				logWarning("Intent NULL");
-				return;
-			}
-
-			((MegaApplication) getApplication()).askForFullAccountInfo();
-			((MegaApplication) getApplication()).askForExtendedAccountDetails();
-
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-
-				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-								? parentNode
-								: megaApi.getRootNode(),
-						sortOrderManagement.getOrderCloud());
-
-				fbFLol.setNodes(nodes);
-				fbFLol.getRecyclerView().invalidate();
-			}
-			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				refreshIncomingShares();
-			}
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH_STAGING && resultCode == RESULT_OK) {
 			logDebug("Resfresh DONE");
