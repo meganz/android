@@ -30,6 +30,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -4368,7 +4369,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private void observePsa() {
         psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
+		LiveEventBus.get(EVENT_PSA, Psa.class).observe(this, new Observer<Psa>() {
+			@Override
+			public void onChanged(Psa psa) {
+				if (psa.getUrl() == null) {
+					showPsa(psa);
+				}
+			}
+		});
+//		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
     }
 
 	/**
@@ -6802,6 +6811,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 					} else {
 						super.onBackPressed();
+//						moveTaskToBack(false);
 					}
 				}
 		    	return true;
@@ -7533,9 +7543,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
 		// keep executing the remaining logic, we would go back to cloud drive tab after close
 		// the PSA browser.
-		if (closeDisplayingPsa()) {
-			return;
-		}
+//		if (closeDisplayingPsa()) {
+//			return;
+//		}
+		if (psaWebBrowser.consumeBack()) return;
 
 		retryConnectionsAndSignalPresence();
 
@@ -7676,7 +7687,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
             } else {
-                super.onBackPressed();
+//                super.onBackPressed();
+				moveTaskToBack(false);
             }
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
@@ -7694,6 +7706,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				drawerItem = DrawerItem.HOMEPAGE;
 			}
 			super.onBackPressed();
+//			moveTaskToBack(false);
 		}
 	}
 
@@ -7826,6 +7839,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				drawerItem = DrawerItem.HOMEPAGE;
 				if (fullscreenOfflineFragment != null) {
 					super.onBackPressed();
+//					moveTaskToBack(false);
 					return true;
 				} else {
 					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);

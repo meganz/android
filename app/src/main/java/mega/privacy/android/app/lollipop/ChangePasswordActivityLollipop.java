@@ -305,6 +305,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+		if (psaWebBrowser.consumeBack()) return;
 		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
 			Intent intent = new Intent(this, TestPasswordActivity.class);
 			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));

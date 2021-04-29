@@ -2,6 +2,9 @@ package mega.privacy.android.app.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.TaskInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +44,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -59,6 +63,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +94,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -120,6 +126,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -1608,4 +1615,28 @@ public class Util {
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
+
+	public static boolean isTopActivity(Class cls, Context context) {
+		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			List<ActivityManager.AppTask> tasks = am.getAppTasks();
+			for (ActivityManager.AppTask task : tasks) {
+				ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+				if (taskInfo.id != -1) {  // Task is running
+					Log.i("Alex", "top name:" + taskInfo.topActivity.getClassName());
+					return taskInfo.topActivity.getClassName().contains(cls.getName());
+				}
+			}
+		} else {
+			List<ActivityManager.RunningTaskInfo> runningTaskInfos = am.getRunningTasks(100);
+			for (ActivityManager.RunningTaskInfo info : runningTaskInfos) {
+				if (info.topActivity.getClassName().contains(cls.getName())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }

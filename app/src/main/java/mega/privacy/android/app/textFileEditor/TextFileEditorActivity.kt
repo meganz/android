@@ -147,6 +147,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (viewModel.isFileEdited()) {
             showDiscardChangesConfirmationDialog()
         } else {
