@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
+import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -624,7 +625,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				logDebug("Master Key button");
-				((ManagerActivityLollipop)context).showMKLayout();
+				startActivity(new Intent(context, ExportRecoveryKeyActivity.class));
 				break;
 			}
 

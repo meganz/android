@@ -119,9 +119,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
         setUpPhoneNumber()
         setUpAccountDetails()
 
-        binding.backupRecoveryKeyLayout.setOnClickListener {
-            (mActivity as ManagerActivityLollipop).showMKLayout()
-        }
+        binding.backupRecoveryKeyLayout.setOnClickListener { viewModel.exportMK(context) }
 
         setUpAchievements()
         setUpLastSession()

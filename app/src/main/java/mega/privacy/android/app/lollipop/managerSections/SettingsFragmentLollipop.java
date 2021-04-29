@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
@@ -263,7 +264,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 break;
 
             case KEY_RECOVERY_KEY:
-                ((ManagerActivityLollipop) context).showMKLayout();
+                startActivity(new Intent(context, ExportRecoveryKeyActivity.class));
                 break;
 
             case KEY_PASSCODE_LOCK:

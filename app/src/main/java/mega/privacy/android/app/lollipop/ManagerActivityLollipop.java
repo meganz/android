@@ -134,6 +134,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.myAccount.MyAccountActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
@@ -176,7 +177,6 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -397,8 +397,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	MegaNode inboxNode = null;
 
-	private boolean mkLayoutVisible = false;
-
 	MegaNode rootNode = null;
 
 	NodeController nC;
@@ -485,7 +483,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES,
 		OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT,
-		TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -509,7 +507,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case NOTIFICATIONS: return "notificFragment";
 				case UPGRADE_ACCOUNT: return "upAFL";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
-				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
 				case LINKS: return "lF";
@@ -657,7 +654,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private RecentChatsFragmentLollipop rChatFL;
 	private NotificationsFragmentLollipop notificFragment;
 	private TurnOnNotificationsFragment tonF;
-	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
 
@@ -1538,7 +1534,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if(drawerItem==DrawerItem.ACCOUNT){
 			outState.putInt("accountFragment", accountFragment);
 		}
-		outState.putBoolean(MK_LAYOUT_VISIBLE, mkLayoutVisible);
 
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
@@ -1667,7 +1662,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			logDebug("savedInstanceState -> pathNavigationOffline: " + pathNavigationOffline);
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
-			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
@@ -2445,9 +2439,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
 						logDebug("Intent to export Master Key - im logged in!");
-						drawerItem=DrawerItem.ACCOUNT;
-						showMKLayout();
-						selectDrawerItemLollipop(drawerItem);
+						startActivity(new Intent(this, ExportRecoveryKeyActivity.class));
 						return;
 					}
 					else if(getIntent().getAction().equals(ACTION_CANCEL_ACCOUNT)){
@@ -2938,10 +2930,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (openLinkDialogIsErrorShown) {
 				openLink(text);
 			}
-		}
-
-		if (mkLayoutVisible) {
-			showMKLayout();
 		}
 
 		if (drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown) {
@@ -7204,43 +7192,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         refreshFragment(FragmentTag.INBOX.getTag());
     }
 
-	public void hideMKLayout(){
-		logDebug("hideMKLayout");
-		mkLayoutVisible= false;
-
-		abL.setVisibility(View.VISIBLE);
-
-		eRKeyF = null;
-
-		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-		supportInvalidateOptionsMenu();
-		selectDrawerItemLollipop(drawerItem);
-	}
-
-	public void showMKLayout(){
-		logDebug("showMKLayout");
-
-		accountFragment = BACKUP_RECOVERY_KEY_FRAGMENT;
-		mkLayoutVisible=true;
-
-		aB.setSubtitle(null);
-		abL.setVisibility(View.GONE);
-
-		deleteCurrentFragment();
-
-		if (eRKeyF == null){
-			eRKeyF = new ExportRecoveryKeyFragment();
-		}
-		replaceFragment(eRKeyF, FragmentTag.EXPORT_RECOVERY_KEY.getTag());
-
-		abL.setVisibility(View.GONE);
-
-		setTabsVisibility();
-		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		supportInvalidateOptionsMenu();
-		hideFabButton();
-	}
-
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
 
@@ -7435,10 +7386,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 		if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
-			return;
-		}
-		if (mkLayoutVisible) {
-			hideMKLayout();
 			return;
 		}
 

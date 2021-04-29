@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -119,5 +120,9 @@ class MyAccountFragmentViewModel @ViewModelInject constructor(
 
         return isBusinessPaymentAttentionNeeded()
                 || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
+    }
+
+    fun exportMK(context: Context) {
+        context.startActivity(Intent(context, ExportRecoveryKeyActivity::class.java))
     }
 }
