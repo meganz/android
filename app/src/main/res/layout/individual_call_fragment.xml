@@ -8,7 +8,8 @@
     <SurfaceView
         android:id="@+id/video"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"/>
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
@@ -16,7 +17,6 @@
         android:layout_height="128dp"
         android:layout_centerInParent="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_import_to_cloud_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,5 +33,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

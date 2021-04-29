@@ -182,7 +182,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean closedChat = true;
 	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
-	private static HashMap<Long, Boolean> hashMapCallLayout = new HashMap<>();
+	private static HashMap<Long, Boolean> hashMapOutgoingCall = new HashMap<>();
+	private static HashMap<Long, Boolean> hashSpeakerViewAutomatic = new HashMap<>();
 
 	private static long openCallChatId = -1;
 
@@ -1904,9 +1905,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public static boolean isRequestSent(long callId) {
-		boolean entryExists = hashMapCallLayout.containsKey(callId);
+		boolean entryExists = hashMapOutgoingCall.containsKey(callId);
 		if (entryExists) {
-			return hashMapCallLayout.get(callId);
+			return hashMapOutgoingCall.get(callId);
 		}
 
 		setRequestSentCall(callId, false);
@@ -1914,7 +1915,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public static void setRequestSentCall(long callId, boolean isRequestSent) {
-		hashMapCallLayout.put(callId, isRequestSent);
+		hashMapOutgoingCall.put(callId, isRequestSent);
+	}
+
+	public static boolean isSpeakerViewAutomatic(long callId) {
+		boolean entryExists = hashSpeakerViewAutomatic.containsKey(callId);
+		if (entryExists) {
+			return hashSpeakerViewAutomatic.get(callId);
+		}
+
+		setSpeakerViewAutomatic(callId, true);
+		return false;
+	}
+
+	public static void setSpeakerViewAutomatic(long callId, boolean isAutomatic) {
+		hashSpeakerViewAutomatic.put(callId, isAutomatic);
 	}
 
 	public int getStorageState() {

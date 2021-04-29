@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.listeners
 import android.content.Context
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 
 class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(context) {
@@ -28,19 +29,20 @@ class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(contex
                 when (typeChange) {
                     MegaChatRequest.AUDIO -> {
                         when {
-                            isEnable -> LogUtil.logDebug("Audio enabled")
-                            else -> LogUtil.logDebug("Audio disabled")
+                            isEnable -> logDebug("Audio enabled")
+                            else -> logDebug("Audio disabled")
                         }
+                        callback?.onDisableAudioVideo(request.chatHandle, typeChange, isEnable)
                     }
-                    else -> {
+                    MegaChatRequest.VIDEO -> {
                         when {
-                            isEnable -> LogUtil.logDebug("Video enabled")
-                            else -> LogUtil.logDebug("Video disabled")
+                            isEnable -> logDebug("Video enabled")
+                            else -> logDebug("Video disabled")
+
                         }
+                        callback?.onDisableAudioVideo(request.chatHandle, typeChange, isEnable)
                     }
                 }
-
-                callback?.onDisableAudioVideo(request.chatHandle, typeChange, isEnable)
             }
             MegaChatError.ERROR_TOOMANY -> {
                 when (typeChange) {

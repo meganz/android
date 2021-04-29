@@ -8,14 +8,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -61,5 +61,33 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
      */
     fun setChatVideoInDevice(cameraDevice: String, listener: MegaChatRequestListenerInterface?) {
         megaChatApi.setChatVideoInDevice(cameraDevice, listener)
+    }
+
+    fun getChatRoom(chatId: Long) : MegaChatRoom {
+        return megaChatApi.getChatRoom(chatId)
+    }
+
+    fun getChatCall(chatId: Long) : MegaChatCall {
+        return megaChatApi.getChatCall(chatId)
+    }
+
+    fun isMe(peerId: Long): Boolean {
+        return peerId == megaChatApi.myUserHandle
+    }
+
+    fun activateLocalVideo(chatId:Long, listener: MeetingVideoListener){
+        megaChatApi.addChatLocalVideoListener(chatId, listener)
+    }
+
+    fun activateRemoteVideo(chatId:Long, clientId: Long, hiRes: Boolean, listener: MeetingVideoListener){
+        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    fun closeLocalVideo(chatId:Long, listener: MeetingVideoListener){
+        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener);
+    }
+
+    fun closeRemoteVideo(chatId:Long, clientId: Long, hiRes: Boolean, listener: MeetingVideoListener){
+        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener);
     }
 }

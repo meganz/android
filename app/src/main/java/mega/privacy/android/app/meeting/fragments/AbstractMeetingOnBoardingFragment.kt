@@ -93,7 +93,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 fab_mic.isOn = it
             }
             model.cameraLiveData.observe(viewLifecycleOwner) {
-                switchCamera(it)
+                //switchCamera(it)
             }
             model.speakerLiveData.observe(viewLifecycleOwner) {
                 when (it) {
@@ -198,10 +198,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun setProfileAvatar() {
         logDebug("setProfileAvatar")
-        abstractMeetingOnBoardingViewModel.avatar.observe(viewLifecycleOwner) {
+        abstractMeetingOnBoardingViewModel.avatarLiveData.observe(viewLifecycleOwner) {
             meeting_thumbnail.setImageBitmap(it)
         }
     }
+
 
     /**
      * Switch Camera
@@ -227,29 +228,29 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Method for activating the video.
      */
     private fun activateVideo() {
-        if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
-            logError("Error activating video")
-            setViewEnable(fab_cam, true)
-            return
-        }
-        if (videoListener == null) {
-            videoListener = MeetingVideoListener(
-                localSurfaceView,
-                outMetrics,
-                false
-            )
-            megaChatApi.addChatLocalVideoListener(
-                MEGACHAT_INVALID_HANDLE,
-                videoListener
-            )
-        } else {
-            videoListener?.let {
-                it.height = 0
-                it.width = 0
-            }
-        }
-        localSurfaceView.visibility = View.VISIBLE
-        setViewEnable(fab_cam, true, bSync = false)
+//        if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
+//            logError("Error activating video")
+//            setViewEnable(fab_cam, true)
+//            return
+//        }
+//        if (videoListener == null) {
+//            videoListener = MeetingVideoListener(
+//                localSurfaceView,
+//                outMetrics,
+//                false
+//            )
+//            megaChatApi.addChatLocalVideoListener(
+//                MEGACHAT_INVALID_HANDLE,
+//                videoListener
+//            )
+//        } else {
+//            videoListener?.let {
+//                it.height = 0
+//                it.width = 0
+//            }
+//        }
+//        localSurfaceView.visibility = View.VISIBLE
+//        setViewEnable(fab_cam, true, bSync = false)
     }
 
     /**

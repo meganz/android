@@ -167,6 +167,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     fun updateChatAndCall(chatId: Long) {
         _chatRoomLiveData.value = meetingActivityRepository.getChatRoom(chatId)
+        if(_chatRoomLiveData.value!= null){
+            _meetingNameLiveData.value = getTitleChat(_chatRoomLiveData.value!!)
+        }
         _callLiveData.value = meetingActivityRepository.getMeeting(chatId)
     }
 
@@ -255,15 +258,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; false: turn off
      */
     fun clickMic(bOn: Boolean) {
-        if (!recordAudioGranted) {
-            _recordAudioPermissionCheck.value = true
-            return
-        }
 
-        val chatId = _chatRoomLiveData.value?.chatId
-        if(chatId != MEGACHAT_INVALID_HANDLE) {
-
-        }
+//        if (!recordAudioGranted) {
+//            _recordAudioPermissionCheck.value = true
+//            return
+//        }
 
         when {
             _chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE -> {
@@ -297,10 +296,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; off: turn off
      */
     fun clickCamera(bOn: Boolean) {
-        if (!cameraGranted) {
-            _cameraPermissionCheck.value = true
-            return
-        }
+//        if (!cameraGranted) {
+//            _cameraPermissionCheck.value = true
+//            return
+//        }
+
         if (_chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE) {
             meetingActivityRepository.switchCamera(
                 _chatRoomLiveData.value!!.chatId,
@@ -349,6 +349,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     override fun onVideoDeviceOpened(isEnable: Boolean) {
+        logDebug("onVideoDeviceOpened:: isEnable = "+isEnable)
         _cameraLiveData.value = isEnable
         logDebug("open video: $_cameraLiveData.value")
         tips.value = when (isEnable) {
@@ -364,6 +365,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     override fun onDisableAudioVideo(chatId: Long, typeChange: Int, isEnable: Boolean) {
+
         when (typeChange) {
             MegaChatRequest.AUDIO -> {
                 _micLiveData.value = isEnable
@@ -379,7 +381,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                     )
                 }
             }
-            else -> {
+            MegaChatRequest.VIDEO -> {
                 _cameraLiveData.value = isEnable
                 logDebug("open video: $_cameraLiveData.value")
                 tips.value = when (isEnable) {

@@ -430,7 +430,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.avatarImage.setImageBitmap(bitmap);
             holder.avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
         }else{
-            Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
+            Bitmap defaultBitmap = getDefaultAvatarCall(context, peer.getPeerId());
             holder.avatarImage.setImageBitmap(defaultBitmap);
             holder.avatarImage.setCornerRadius(dp2px(getRadius(defaultBitmap), outMetrics));
         }

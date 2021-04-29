@@ -610,13 +610,12 @@ public class CallUtil {
      * Method to get the default avatar in calls.
      *
      * @param context    Context of the Activity.
-     * @param chat       Chat room identifier where the call is.
      * @param peerId     User handle from whom the avatar is obtained.
      * @return Bitmap with the default avatar created.
      */
-    public static Bitmap getDefaultAvatarCall(Context context, MegaChatRoom chat, long peerId) {
+    public static Bitmap getDefaultAvatarCall(Context context, long peerId) {
         return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), getUserNameCall(context, peerId),
-                dp2px(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
+                dp2px(AVATAR_SIZE_CALLS, context.getResources().getDisplayMetrics()), true);
     }
 
     /**

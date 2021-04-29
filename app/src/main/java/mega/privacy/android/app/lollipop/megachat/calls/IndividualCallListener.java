@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class IndividualCallListener implements MegaChatVideoListenerInterface {
 
@@ -29,7 +30,7 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
         this.width = 0;
         this.height = 0;
         this.surfaceView = video;
-        this.isLocal = isItMe(chatId, peerid, clientid);
+        this.isLocal = clientid == MEGACHAT_INVALID_HANDLE;
 
         if (isSmallCamera && isLocal) {
             this.surfaceView.setZOrderMediaOverlay(true);
@@ -45,7 +46,7 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
     }
 
     @Override
-    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+    public void onChatVideoData(MegaChatApiJava api, long chatId, int width, int height, byte[] byteBuffer) {
 
         if ((width == 0) || (height == 0)) {
             return;

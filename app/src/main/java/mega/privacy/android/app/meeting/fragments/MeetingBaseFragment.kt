@@ -50,9 +50,6 @@ open class MeetingBaseFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         meetingActivity = activity as MeetingActivity
-
-        val chatId: Long? = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-        sharedModel.updateChatAndCall(chatId!!)
     }
 
     override fun onResume() {

@@ -108,7 +108,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             avatarImage.setImageBitmap(bitmap);
             avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
         }else{
-            Bitmap defaultAvatar = getDefaultAvatarCall(context, chatRoom, peerid);
+            Bitmap defaultAvatar = getDefaultAvatarCall(context, peerid);
             avatarImage.setImageBitmap(defaultAvatar);
             avatarImage.setCornerRadius(dp2px(getRadius(defaultAvatar), outMetrics));
         }
