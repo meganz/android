@@ -1096,7 +1096,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	@Override
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
-
 		if (tabShown == CLOUD_TAB) {
 			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 

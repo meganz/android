@@ -433,6 +433,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
+        if (psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         if (allowResend) {
             finish();

@@ -667,6 +667,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if (confirm2FAIsShown) {
