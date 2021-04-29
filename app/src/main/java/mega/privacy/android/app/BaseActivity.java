@@ -8,11 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -20,17 +18,14 @@ import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -77,7 +72,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
 public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
@@ -106,10 +100,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
 
+    /**
+     * Load the psa in the web browser fragment if the psa is a web one and this activity
+     * is on the top of the task stack
+     */
     private final Observer<Psa> psaObserver = psa -> {
         if (psa.getUrl() != null && isTopActivity(getClass(), this)) {
-            Log.i("Alex", "launchPsaWebBrowser:" + getClass().getName());
-            launchPsaWebBrowser(psa);
+            loadPsaInWebBrowser(psa);
         }
     };
 
@@ -139,7 +136,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private AlertDialog resumeTransfersWarning;
 
     private FrameLayout psaWebBrowserContainer;
+
+    /**
+     * Every sub-class activity has an embedded PsaWebBrowser fragment, either visible or invisible.
+     * In order to show the newly retrieved PSA at any occasion
+     */
     protected PsaWebBrowser psaWebBrowser;
+
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @Override
@@ -202,14 +205,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
         }
 
-//        PsaManager.INSTANCE.getPsa().observe(this, psa -> {
-//            if (/*getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
-//                    &&*/ psa != null && !TextUtils.isEmpty(psa.getUrl())) {
-//                launchPsaWebBrowser(psa);
-//            }
-//        });
 
-        // And an invisible full screen Psa web browser fragment to each activity.
+        // Add an invisible  full screen Psa web browser fragment to the activity.
         // Then show or hide it for browsing the PSA.
         addPsaWebBrowser();
         LiveEventBus.get(EVENT_PSA, Psa.class).observeStickyForever(psaObserver);
@@ -224,7 +221,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
-     * Create the web browser fragment and its view container, add them to the activity
+     * Create a fragment container and the web browser fragment, add them to the activity
      */
     private void addPsaWebBrowser() {
         // Execute after the sub-class activity finish its setContentView()
@@ -242,7 +239,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
             // Don't put the fragment to the back stack. Since pressing back key just hide it,
             // never pop it up. onBackPressed() will let PSA browser to consume the back
-            // key event as the first step
+            // key event anyway
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.psa_web_browser_container, psaWebBrowser)
@@ -251,80 +248,16 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
-     * Launch web browser to display the new url PSA.
+     * Display the new url PSA in the web browser
      *
      * @param psa the psa to display
      */
-    private void launchPsaWebBrowser(Psa psa) {
-        // If there is a PsaWebBrowser launched, we should use it to load the new url.
-        Log.i("Alex", "launchPsaWebBrowser 1");
-        if (psaWebBrowser != null/* && psaWebBrowser.isResumed()*/) {
-            Log.i("Alex", "launchPsaWebBrowser 2");
-            psaWebBrowser.loadUrl(psa.getUrl());
-            Log.i("Alex", "launchPsaWebBrowser 3");
-//            return;
-        }
+    private void loadPsaInWebBrowser(Psa psa) {
+        String url = psa.getUrl();
+        if (psaWebBrowser == null || url == null) return;
 
-//        Log.i("Alex", "launchPsaWebBrowser 4");
-//        if (psaWebBrowserContainer == null) {
-//            Log.i("Alex", "launchPsaWebBrowser 5");
-//            psaWebBrowserContainer = new FrameLayout(this);
-//            psaWebBrowserContainer.setId(R.id.psa_web_browser_container);
-//
-//            ViewGroup contentView = findViewById(android.R.id.content);
-//
-//            contentView.addView(psaWebBrowserContainer,
-//                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-//                            ViewGroup.LayoutParams.MATCH_PARENT));
-//        }
-//
-//        Bundle args = new Bundle();
-//        args.putString(PsaWebBrowser.ARGS_URL_KEY, psa.getUrl());
-//        psaWebBrowser = new PsaWebBrowser();
-//        psaWebBrowser.setArguments(args);
-//
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.psa_web_browser_container, psaWebBrowser)
-////                .addToBackStack(PsaWebBrowser.class.getSimpleName())
-//                .commit();
+        psaWebBrowser.loadPsa(url, psa.getId());
     }
-
-    /**
-     * Notify the PSA web browser is closed.
-     *
-     * @param visible whether it's visible when closed
-     */
-//    public void onPsaWebViewDestroyed(boolean visible) {
-//        if (psaWebBrowserContainer != null) {
-//            ViewGroup contentView = findViewById(android.R.id.content);
-//            contentView.removeView(psaWebBrowserContainer);
-//        }
-//
-//        psaWebBrowserContainer = null;
-//        psaWebBrowser = null;
-//
-//        // The PsaWebBrowser is launched, but isn't displayed yet, and a back press is consumed
-//        // by it, so we need fire another back press event, so user will get expected result
-//        // from the consumed back press.
-//        if (!visible) {
-//            uiHandler.post(this::onBackPressed);
-//        }
-//    }
-
-    /**
-     * Close the displaying PSA if there is one.
-     *
-     * @return whether there is one PSA closed
-     */
-//    public boolean closeDisplayingPsa() {
-//        if (psaWebBrowser != null) {
-//            super.onBackPressed();
-//            return true;
-//        }
-//
-//        return false;
-//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -337,17 +270,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     protected void onPause() {
-        // If the PsaWebBrowser is launched but not visible, and current activity is paused,
-        // we should close PsaWebBrowser, otherwise new PsaWebBrowser won't be launched
-        // because of the check in launchPsaWebBrowser.
-//        if (psaWebBrowser != null && !psaWebBrowser.visible()) {
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .remove(psaWebBrowser)
-//                    .commitAllowingStateLoss();
-//            psaWebBrowser = null;
-//        }
-
         checkMegaObjects();
         isPaused = true;
         super.onPause();
@@ -690,12 +612,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void onBackPressed() {
-        Log.i("Alex", "onBackPressed");
         if (psaWebBrowser.consumeBack()) return;
-        Log.i("Alex", "onBackPressed 2");
-
         retryConnectionsAndSignalPresence();
-
         super.onBackPressed();
     }
 
