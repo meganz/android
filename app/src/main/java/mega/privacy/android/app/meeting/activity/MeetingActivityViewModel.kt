@@ -258,11 +258,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; false: turn off
      */
     fun clickMic(bOn: Boolean) {
-
-//        if (!recordAudioGranted) {
-//            _recordAudioPermissionCheck.value = true
-//            return
-//        }
+        /**
+         * check audio permission
+         * if haven't been granted, ask for the permission and return
+         */
+        if (!recordAudioGranted) {
+            _recordAudioPermissionCheck.value = true
+            return
+        }
 
         when {
             _chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE -> {
@@ -296,10 +299,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param bOn true: turn on; off: turn off
      */
     fun clickCamera(bOn: Boolean) {
-//        if (!cameraGranted) {
-//            _cameraPermissionCheck.value = true
-//            return
-//        }
+        /**
+         * check camera permission
+         * if haven't been granted, ask for the permission and return
+         */
+        if (!cameraGranted) {
+            _cameraPermissionCheck.value = true
+            return
+        }
 
         if (_chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE) {
             meetingActivityRepository.switchCamera(

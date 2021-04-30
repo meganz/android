@@ -73,7 +73,7 @@ open class MeetingBaseFragment : BaseFragment() {
      * @param context current Context.
      * @param checkPermission a callback for check permissions
      */
-    private fun showPermissionsEducation(context: Context, checkPermission: () -> Unit) {
+    protected fun showPermissionsEducation(context: Context, checkPermission: () -> Unit) {
 
         val permissionsWarningDialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)

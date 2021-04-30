@@ -10,6 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.ChatUtil.*
 
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -105,6 +106,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment(), SnackbarShowe
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        meetingActivity.showSnackbar(type, binding.root, content, chatId)
+        (activity as MeetingActivity).showSnackbar(type, binding.root, content, chatId)
     }
 }
