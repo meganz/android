@@ -8888,6 +8888,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				return true;
 			});
 		} catch (Exception e) {
+			logError("Exception showing Open Link dialog", e);
 		}
 	}
 
