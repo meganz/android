@@ -2,17 +2,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    android:padding="16dp">
+    android:minHeight="72dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/txt_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.Mega.Body2"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="A"
+        tools:visibility="visible" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_header"
         app:roundAsCircle="true"
         tools:src="@android:drawable/ic_menu_camera" />
 
@@ -21,11 +39,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:maxLines="1"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
         app:emojiSize="14sp"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_header"
         tools:text="Alan Ruby" />
 
     <ImageView
@@ -43,21 +62,20 @@
         android:id="@+id/txt_last_seen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="none"
-        android:singleLine="true"
-        android:textSize="14sp"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
         app:layout_constraintStart_toStartOf="@id/txt_name"
         app:layout_constraintTop_toBottomOf="@id/txt_name"
         tools:text="Last seen Yesterday at 11:45" />
 
     <ImageButton
         android:id="@+id/btn_more"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/ic_dots_vertical_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/txt_last_seen"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/txt_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

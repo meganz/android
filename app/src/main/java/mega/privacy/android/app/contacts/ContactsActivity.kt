@@ -3,7 +3,10 @@ package mega.privacy.android.app.contacts
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.adapter.ContactsAdapter
 import mega.privacy.android.app.contacts.data.ContactItem
@@ -35,6 +38,11 @@ class ContactsActivity : PasscodeActivity() {
 
         binding.btnAddContact.setOnClickListener { openAddContactScreen() }
         binding.listContacts.adapter = adapter
+        binding.listContacts.addItemDecoration(
+            DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
+                setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
+            }
+        )
     }
 
     private fun setupObservers() {

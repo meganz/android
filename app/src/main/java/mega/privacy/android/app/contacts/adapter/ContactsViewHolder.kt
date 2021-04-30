@@ -7,11 +7,13 @@ import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactBinding
 
-class ContactsViewHolder(private val binding: ItemContactBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+class ContactsViewHolder(
+    private val binding: ItemContactBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactItem) {
         binding.txtName.text = item.name
+        binding.txtHeader.text = item.name?.firstOrNull()?.toString()
         binding.txtLastSeen.text = item.lastSeen
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.imageColor.toDrawable())
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))

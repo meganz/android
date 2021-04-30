@@ -2,6 +2,7 @@ package mega.privacy.android.app.contacts.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactBinding
@@ -12,6 +13,11 @@ class ContactsAdapter constructor(
     private val itemInfoCallback: (Long) -> Unit,
 ) : ListAdapter<ContactItem, ContactsViewHolder>(ContactItem.DiffCallback()) {
 
+    companion object {
+        private const val VIEW_TYPE_ITEM_WITH_HEADER = 0
+        private const val VIEW_TYPE_ITEM = 1
+    }
+
     init {
         setHasStableIds(true)
     }
@@ -19,17 +25,16 @@ class ContactsAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemContactBinding.inflate(layoutInflater, parent, false)
-
         return ContactsViewHolder(binding).apply {
+            binding.txtHeader.isVisible = viewType == VIEW_TYPE_ITEM_WITH_HEADER
             binding.root.setOnClickListener {
-                if (isValidPosition(adapterPosition)) {
-                    itemCallback.invoke(getItem(adapterPosition).handle)
+                if (isValidPosition(bindingAdapterPosition)) {
+                    itemCallback.invoke(getItem(bindingAdapterPosition).handle)
                 }
             }
-
             binding.btnMore.setOnClickListener {
-                if (isValidPosition(adapterPosition)) {
-                    itemInfoCallback.invoke(getItem(adapterPosition).handle)
+                if (isValidPosition(bindingAdapterPosition)) {
+                    itemInfoCallback.invoke(getItem(bindingAdapterPosition).handle)
                 }
             }
         }
@@ -41,4 +46,14 @@ class ContactsAdapter constructor(
 
     override fun getItemId(position: Int): Long =
         getItem(position).handle
+
+    override fun getItemViewType(position: Int): Int =
+        when {
+            position == 0 ->
+                VIEW_TYPE_ITEM_WITH_HEADER
+            getItem(position - 1).name?.firstOrNull() != getItem(position).name?.firstOrNull() ->
+                VIEW_TYPE_ITEM_WITH_HEADER
+            else ->
+                VIEW_TYPE_ITEM
+        }
 }
