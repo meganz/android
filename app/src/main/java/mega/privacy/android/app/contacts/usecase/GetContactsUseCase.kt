@@ -23,7 +23,13 @@ import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaUser
 import java.io.File
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.*
 import javax.inject.Inject
 
 class GetContactsUseCase @Inject constructor(
@@ -34,6 +40,7 @@ class GetContactsUseCase @Inject constructor(
 
     companion object {
         private const val NOT_FOUND = -1
+        private const val RECENTLY_ADDED_HOURS = 24
     }
 
     fun get(): Flowable<List<ContactItem>> =
@@ -56,7 +63,8 @@ class GetContactsUseCase @Inject constructor(
                     status = userStatus,
                     statusColor = getUserStatusColor(userStatus),
                     imageUri = userImageUri,
-                    imageColor = userImageColor
+                    imageColor = userImageColor,
+                    isNew = megaUser.wasRecentlyAdded()
                 )
             }.toMutableList()
 
@@ -157,4 +165,12 @@ class GetContactsUseCase @Inject constructor(
 
     private fun getUserImageFile(userEmail: String): File =
         CacheFolderManager.buildAvatarFile(context, "$userEmail.jpg")
+
+    private fun MegaUser.wasRecentlyAdded(): Boolean {
+        val now = LocalDateTime.now()
+        val addedTime = Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+        return Duration.between(addedTime, now).toHours() < RECENTLY_ADDED_HOURS
+    }
 }

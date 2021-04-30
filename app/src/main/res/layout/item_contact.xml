@@ -78,4 +78,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/txt_name" />
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NEW"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:chipBackgroundColor="?colorSecondary"
+        app:chipEndPadding="0dp"
+        app:chipStartPadding="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/txt_last_seen"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
