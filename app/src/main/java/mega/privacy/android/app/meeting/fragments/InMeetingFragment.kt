@@ -476,7 +476,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
-        bottomFloatingPanelViewHolder.collapse()
 
         /**
          * Observer the participant List

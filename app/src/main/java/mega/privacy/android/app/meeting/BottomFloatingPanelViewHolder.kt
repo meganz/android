@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -29,7 +30,8 @@ class BottomFloatingPanelViewHolder(
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private var isGuest: Boolean,
-    private var isModerator: Boolean
+    private var isModerator: Boolean,
+    private var isGroup: Boolean = false
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -49,8 +51,6 @@ class BottomFloatingPanelViewHolder(
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
-    private var isSpeakerMode = false
-
     private val participantsAdapter = ParticipantsAdapter(listener)
 
     init {
@@ -61,13 +61,16 @@ class BottomFloatingPanelViewHolder(
         initShareAndInviteButton()
 
         /**
-         * Expanded bottom sheet when init
+         * Expanded bottom sheet when the meeting is group chat
+         * If the meeting is one-to-one chat, just show the control button, and would not let user drag the bottom panel
          */
-        post {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            bottomFloatingPanelExpanded = true
-            onBottomFloatingPanelSlide(1F)
+        if (isGroup) {
+            expand()
+        } else {
+            collapse()
         }
+
+        floatingPanelView.indicator.isVisible = isGroup
     }
 
     /**
@@ -111,7 +114,11 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                Log.d("bottomSheetBehavior", "newState:$newState")
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
 
                 when {
                     newState == BottomSheetBehavior.STATE_EXPANDED && expandedTop == 0 -> {
@@ -124,6 +131,7 @@ class BottomFloatingPanelViewHolder(
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                Log.d("bottomSheetBehavior", "onSlide")
                 onBottomFloatingPanelSlide(slideOffset)
             }
         })
@@ -232,10 +240,6 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
-    fun updatePermission() {
-        isModerator = true
-    }
-
     private fun updateBottomFloatingPanelIfNeeded() {
         if (bottomFloatingPanelExpanded) {
             onBottomFloatingPanelSlide(1F)
@@ -321,10 +325,24 @@ class BottomFloatingPanelViewHolder(
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
+    /**
+     * Collapse the bottom sheet
+     *
+     */
     fun collapse() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
         onBottomFloatingPanelSlide(0F)
+    }
+
+    /**
+     * Expand the bottom sheet
+     *
+     */
+    fun expand() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomFloatingPanelExpanded = true
+        onBottomFloatingPanelSlide(1F)
     }
 
     fun updateMicIcon(micOn: Boolean) {
