@@ -527,9 +527,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         individualCallFragment.activateVideo()
                     }
                 } else {
-//                    if (floatingWindowFragment.isAdded) {
-//                        floatingWindowFragment.activateVideo()
-//                    }
+                    if (floatingWindowFragment.isAdded) {
+                        floatingWindowFragment.activateVideo()
+                    }
                 }
             }
             false -> {
@@ -538,9 +538,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         individualCallFragment.closeVideo()
                     }
                 } else {
-//                    if (floatingWindowFragment?.isAdded) {
-//                        floatingWindowFragment.closeVideo()
-//                    }
+                    if (floatingWindowFragment.isAdded) {
+                        floatingWindowFragment.closeVideo()
+                    }
                 }
             }
         }
