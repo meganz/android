@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -51,6 +52,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -78,6 +80,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
+    public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
 
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
@@ -284,7 +287,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                         if (transfer.isFolderTransfer()) {
                             mapProgressFolderTransfers.put(transfer.getTag(), transfer);
-                        } else {
+                        } else if (transfer.getAppData() == null){
                             mapProgressFileTransfers.put(transfer.getTag(), transfer);
                         }
                     }
@@ -338,6 +341,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         final File file = new File(filePath);
         logDebug("File to manage: " + file.getAbsolutePath());
 
+        boolean isTextFile = intent.getBooleanExtra(EXTRA_UPLOAD_TXT, false);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
         String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
         String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
@@ -348,7 +352,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-        if (file.isDirectory()) {
+        if (isTextFile) {
+            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, APP_DATA_TXT_FILE, true, nameInMEGA);
+        } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
             if (nameInMEGA != null) {
@@ -392,10 +398,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		return null;
 	}
 
-	/*
-	 * No more intents in the queue
+	/**
+	 * No more intents in the queue, reset and finish service.
+     *
+     * @param showSnackbar True if should show finish snackbar, false otherwise.
 	 */
-	private void onQueueComplete() {
+	private void onQueueComplete(boolean showSnackbar) {
 		logDebug("onQueueComplete");
         releaseLocks();
         if (isOverquota != NOT_OVERQUOTA_STATE) {
@@ -413,7 +421,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 showFolderUploadCompleteNotification();
             }
 
-            sendUploadFinishBroadcast();
+            if (showSnackbar) {
+                sendUploadFinishBroadcast();
+            }
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
@@ -451,7 +461,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -461,7 +471,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -791,7 +801,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 		    if (!transfer.isFolderTransfer()) {
-                addCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
+		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
+                addCompletedTransfer(completedTransfer);
+
+                if (APP_DATA_TXT_FILE.equals(transfer.getAppData())) {
+                    LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long.class)
+                            .post(completedTransfer.getId());
+                }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
                     MegaApplication.getTransfersManagement().setFailedTransfers(true);
@@ -811,8 +827,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 return;
             }
 
-            String appData = transfer.getAppData();
-            if(appData!=null){
+            if (transfer.getAppData() != null) {
+                if (megaApi.getNumPendingUploads() == 0) {
+                    onQueueComplete(false);
+                }
+
                 return;
             }
 
@@ -1022,7 +1041,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                         && (totalFileUploadsCompleted + totalFolderUploadsCompleted) == currentUpload
                         && (totalFileUploadsCompleted + totalFolderUploadsCompleted) >= uploadCount
                 ) {
-                    onQueueComplete();
+                    onQueueComplete(true);
                 } else {
                     updateProgressNotification(transfer.isFolderTransfer());
                 }

@@ -7,6 +7,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment
 import mega.privacy.android.app.fragments.offline.OfflineFileInfoFragmentArgs
 import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.LogUtil.logError
 
 @AndroidEntryPoint
 class OfflineFileInfoActivity : BaseActivity() {
@@ -16,14 +17,18 @@ class OfflineFileInfoActivity : BaseActivity() {
 
         val handle = intent.getStringExtra(HANDLE)
         if (handle == null) {
+            logError("OfflineFileInfoActivity handle is null")
+
             finish()
             return
         }
 
-        val fragment = OfflineFileInfoFragment()
-        fragment.arguments = OfflineFileInfoFragmentArgs(handle).toBundle()
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container, fragment)
-            .commit()
+        if (savedInstanceState == null) {
+            val fragment = OfflineFileInfoFragment()
+            fragment.arguments = OfflineFileInfoFragmentArgs(handle).toBundle()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.container, fragment)
+                .commit()
+        }
     }
 }

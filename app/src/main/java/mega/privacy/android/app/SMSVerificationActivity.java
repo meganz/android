@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.utils.Constants;
@@ -49,7 +49,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SMSVerificationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
+public class SMSVerificationActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";

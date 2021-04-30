@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
-    <string name="lite_account" context="PRO Lite account" translatable="false">Lite</string>
     <string name="pro_account" context="PRO account" translatable="false">Pro</string>
     <string name="pro1_account" context="PRO I account" translatable="false">Pro I</string>
     <string name="pro2_account" context="PRO II account" translatable="false">Pro II</string>
     <string name="pro3_account" context="PRO III account" translatable="false">Pro III</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code" translatable="false">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
+
+    <string name="audio_player_notification_channel_name" context="Name of audio player notification channel" translatable="false">MEGA Audio Player</string>
 </resources>

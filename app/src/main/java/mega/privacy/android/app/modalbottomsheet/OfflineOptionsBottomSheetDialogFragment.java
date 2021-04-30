@@ -15,14 +15,13 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import java.io.File;
+import java.util.Collections;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_MARGIN_DP;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -99,8 +98,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             if (file.isDirectory()) {
                 nodeInfo.setText(getFileFolderInfo(file));
             } else {
-                long nodeSize = file.length();
-                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(file.lastModified() / 1000)));
+                nodeInfo.setText(getFileInfo(file));
             }
 
             if (file.isFile()) {
@@ -151,7 +149,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 shareOfflineNode(context, nodeOffline);
                 break;
             case R.id.option_download_layout:
-                ((ManagerActivityLollipop) context).saveOfflineNodeToDevice(nodeOffline);
+                ((ManagerActivityLollipop) context).saveOfflineNodesToDevice(
+                        Collections.singletonList(nodeOffline));
                 break;
             case R.id.option_properties_layout:
                 ((ManagerActivityLollipop) requireActivity()).showOfflineFileInfo(nodeOffline);

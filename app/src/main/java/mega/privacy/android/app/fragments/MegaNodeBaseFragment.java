@@ -38,11 +38,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -51,7 +55,8 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -65,26 +70,31 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
+@AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
 
     private static final String AD_SLOT = "and4";
 
-    protected ManagerActivityLollipop managerActivity;
+    @Inject
+    protected
+    SortOrderManagement sortOrderManagement;
 
-    public static ImageView imageDrag;
+    protected ManagerActivityLollipop managerActivity;
 
     protected ActionMode actionMode;
 
@@ -113,7 +123,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected abstract int onBackPressed();
 
-    protected abstract void itemClick(int position, int[] screenPosition, ImageView imageView);
+    protected abstract void itemClick(int position);
 
     protected abstract void refresh();
 
@@ -168,7 +178,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
-                    nC.prepareForDownload(handleList, false);
+                    managerActivity.saveNodesToDevice(selected, false, false, false, false);
                     hideActionMode();
                     break;
 
@@ -177,7 +187,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         logWarning("The selected node is NULL");
                         break;
                     }
-                    managerActivity.showRenameDialog(selected.get(0), selected.get(0).getName());
+                    managerActivity.showRenameDialog(selected.get(0));
                     hideActionMode();
                     break;
 
@@ -223,15 +233,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_leave_share:
-                    showConfirmationLeaveIncomingShares(context, handleList);
+                    showConfirmationLeaveIncomingShares(requireActivity(),
+                            (SnackbarShower) requireActivity(), handleList);
                     break;
 
                 case R.id.cab_menu_send_to_chat:
-                    if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                        showOverDiskQuotaPaywallWarning();
-                        break;
-                    }
-                    nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
+                    managerActivity.attachNodesToChats(adapter.getArrayListSelectedNodes());
                     hideActionMode();
                     break;
 
@@ -409,35 +416,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public ImageView getImageDrag(int position) {
-        logDebug("Position: " + position);
-        if (adapter != null) {
-            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-                View v = mLayoutManager.findViewByPosition(position);
-                if (v != null) {
-                    return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-                }
-            } else if (gridLayoutManager != null) {
-                View v = gridLayoutManager.findViewByPosition(position);
-                if (v != null) {
-                    return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-                }
-            }
-        }
-        return null;
-    }
-
-    public void updateScrollPosition(int position) {
-        logDebug("Position: " + position);
-        if (adapter != null) {
-            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-                mLayoutManager.scrollToPosition(position);
-            } else if (gridLayoutManager != null) {
-                gridLayoutManager.scrollToPosition(position);
-            }
-        }
-    }
-
     public void addSectionTitle(List<MegaNode> nodes, int type) {
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
@@ -517,7 +495,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public void openFile(MegaNode node, int fragmentAdapter, int position, int[] screenPosition, ImageView imageView) {
+    public void openFile(MegaNode node, int fragmentAdapter, int position) {
         MimeTypeList mimeType = MimeTypeList.typeForName(node.getName());
         String mimeTypeType = mimeType.getType();
         Intent intent = null;
@@ -532,7 +510,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("isFolderLink", false);
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
-            intent.putExtra("screenPosition", screenPosition);
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
@@ -542,7 +520,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 String[] s = node.getName().split("\\.");
                 opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
-                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                intent = getMediaIntent(context, node.getName());
                 internalIntent = true;
             }
 
@@ -551,7 +529,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
-            intent.putExtra("screenPosition", screenPosition);
             intent.putExtra("HANDLE", node.getHandle());
             intent.putExtra("FILENAME", node.getName());
 
@@ -567,6 +544,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             } else {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
+                    intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                 } else {
                     logWarning("ERROR:httpServerAlreadyRunning");
                 }
@@ -654,7 +632,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
-            intent.putExtra("screenPosition", screenPosition);
 
             String localPath = getLocalFile(context, node.getName(), node.getSize());
             if (localPath != null) {
@@ -668,6 +645,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             } else {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
+                    intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
                 }
 
                 ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -696,13 +674,16 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     return;
                 }
             }
+        } else if (mimeType.isOpenableTextFile(node.getSize())) {
+            manageTextFileIntent(requireContext(), node, fragmentAdapter);
+            return;
         }
 
         if (intent != null) {
             if (internalIntent || isIntentAvailable(context, intent)) {
+                putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
                 context.startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
-                imageDrag = imageView;
 
                 return;
             } else {
@@ -710,25 +691,25 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         }
 
-        ArrayList<Long> handleList = new ArrayList<>();
-        handleList.add(node.getHandle());
-        NodeController nC = new NodeController(context);
-        nC.prepareForDownload(handleList, true);
+        managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
+
+    protected abstract int viewerFrom();
 
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
-                return getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel());
+                return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
+                        managerActivity.isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
                 if (managerActivity.isFirstNavigationLevel()) {
-                    return managerActivity.getOrderOthers();
+                    return sortOrderManagement.getOrderOthers();
                 }
 
             default:
-                return managerActivity.orderCloud;
+                return sortOrderManagement.getOrderCloud();
         }
     }
 
@@ -800,9 +781,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     private String getGeneralEmptyView() {
         if (isScreenInPortrait(context)) {
-            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+            emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
         } else {
-            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+            emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
         }
 
         return context.getString(R.string.file_browser_empty_folder_new);
@@ -859,5 +840,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         // in order to let it know in where to show the Ads
         mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
                 managerActivity.getOutMetrics());
+
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
     }
 }

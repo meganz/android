@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,11 +44,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -54,28 +61,30 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class RubbishBinFragmentLollipop extends Fragment{
 
-	public static ImageView imageDrag;
-
-	public static int GRID_WIDTH =400;
+	@Inject
+	SortOrderManagement sortOrderManagement;
 	
 	Context context;
 	RecyclerView recyclerView;
@@ -111,38 +120,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
-	}
-
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				mLayoutManager.scrollToPosition(position);
-			}
-			else if (gridLayoutManager != null) {
-				gridLayoutManager.scrollToPosition(position);
-			}
-		}
-	}
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null){
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
-				View v = mLayoutManager.findViewByPosition(position);
-				if (v != null){
-					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-				}
-			}
-			else if (gridLayoutManager != null){
-				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
-			}
-		}
-
-		return null;
 	}
 
 	public void checkScroll() {
@@ -345,7 +322,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		if (((ManagerActivityLollipop)context).getParentHandleRubbish() == -1||((ManagerActivityLollipop)context).getParentHandleRubbish()==megaApi.getRubbishNode().getHandle()){
 			logDebug("Parent is the Rubbish: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
 
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
 
 		}
 		else{
@@ -353,11 +330,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 			if (parentNode != null){
 				logDebug("The parent node is: " + parentNode.getHandle());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 		}
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
@@ -576,12 +553,19 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	}
 
 	@Override
+	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_RUBBISH_BIN);
+	}
+
+	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
     }
 
-    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+    public void itemClick(int position) {
 		logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
@@ -618,7 +602,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
@@ -706,11 +690,13 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					intent.putExtra("screenPosition", screenPosition);
+					intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
+
+					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
+
 					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
-					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -731,10 +717,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					else {
 						internalIntent = true;
-						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
-					mediaIntent.putExtra("screenPosition", screenPosition);
+					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 
@@ -761,6 +747,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else {
 						if (megaApi.httpServerIsRunning() == 0) {
 							megaApi.httpServerStart();
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -780,7 +767,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
-					imageDrag = imageView;
 					if (opusFile){
 						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
 					}
@@ -794,10 +780,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						else {
 							((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(nodes.get(position).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList, true);
+							((ManagerActivityLollipop) context).saveNodesToDevice(
+									Collections.singletonList(nodes.get(position)),
+									true, false, false, false);
 						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -831,6 +816,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else {
 						if (megaApi.httpServerIsRunning() == 0) {
 							megaApi.httpServerStart();
+							pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -850,18 +836,16 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
+					putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					if (isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -908,10 +892,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 									if (isIntentAvailable(context, intent)) {
 										startActivity(intent);
 									} else {
-										ArrayList<Long> handleList = new ArrayList<Long>();
-										handleList.add(nodes.get(position).getHandle());
-										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList, true);
+										((ManagerActivityLollipop) context).saveNodesToDevice(
+												Collections.singletonList(nodes.get(position)),
+												true, false, false, false);
 									}
 								}
 							}
@@ -928,10 +911,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							if (isIntentAvailable(context, intent)) {
 								startActivity(intent);
 							} else {
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(nodes.get(position).getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList, true);
+								((ManagerActivityLollipop) context).saveNodesToDevice(
+										Collections.singletonList(nodes.get(position)),
+										true, false, false, false);
 							}
 
 						} finally {
@@ -943,17 +925,17 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							}
 						}
 					} else {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
-				} else{
+				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
+					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
+				} else {
 					adapter.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(nodes.get(position).getHandle());
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, true);
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							Collections.singletonList(nodes.get(position)),
+							true, false, false, false);
 				}
 			}
 		}
@@ -1043,7 +1025,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 

@@ -1,13 +1,10 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -28,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -37,6 +35,8 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -48,12 +48,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -72,7 +73,8 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
+public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener,
+		SnackbarShower {
 
 	private static final String TAG_DECRYPT = "decrypt";
 	private static final String AD_SLOT = "and5";
@@ -119,12 +121,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	private String mKey;
 
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+
 	private MenuItem shareMenuItem;
 	private Drawable upArrow;
 	private Drawable drawableShare;
 
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+    CookieDialogHandler cookieDialogHandler;
 
 	private GoogleAdsLoader mAdsLoader;
 
@@ -134,7 +139,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		{
 			megaApi.removeRequestListener(this);
 		}
-		
+
+		nodeSaver.destroy();
+
 		super.onDestroy();
 	}
 	
@@ -147,11 +154,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
-		
+
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -189,6 +192,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				finish();
 				return;
 			}
+		}
+
+		if (savedInstanceState != null) {
+			nodeSaver.restoreState(savedInstanceState);
 		}
 
 		setContentView(R.layout.activity_file_link);
@@ -251,8 +258,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
 		initAdsLoader();
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		cookieDialogHandler.showDialogIfNeeded(this, true);
 	}
 
 	/**
@@ -264,6 +278,13 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
 		getLifecycle().addObserver(mAdsLoader);
 		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		nodeSaver.saveState(outState);
 	}
 
 	@Override
@@ -528,7 +549,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
 							buttonPreviewContent.setVisibility(View.VISIBLE);
 						}else{
-							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() || MimeTypeList.typeForName(document.getName()).isPdf()){
+							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible()
+									|| MimeTypeList.typeForName(document.getName()).isAudio()
+									|| MimeTypeList.typeForName(document.getName()).isPdf()
+									||  MimeTypeList.typeForName(document.getName()).isOpenableTextFile(document.getSize())){
 								imageViewLayout.setVisibility(View.GONE);
 								iconViewLayout.setVisibility(View.VISIBLE);
 
@@ -628,7 +652,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 						if (preview.length() > 0) {
 							Bitmap bitmap = getBitmapForCache(preview, this);
 							previewCache.put(document.getHandle(), bitmap);
+							this.preview = bitmap;
+
 							if (iconView != null) {
+								trySetupCollapsingToolbar();
 								imageView.setImageBitmap(bitmap);
 								buttonPreviewContent.setEnabled(true);
 								imageViewLayout.setVisibility(View.VISIBLE);
@@ -696,8 +723,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		switch(v.getId()){
 			case R.id.file_link_button_download:{
-				NodeController nC = new NodeController(this);
-				nC.downloadFileLink(document, url);
+				nodeSaver.saveNode(document, false, false, false, true);
 				break;
 			}
 			case R.id.file_link_button_import:{
@@ -731,6 +757,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 			intent.putExtra("isFileLink", true);
+
+			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, document.getHandle());
+
 			startActivity(intent);
 
 		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
@@ -751,8 +780,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				}
 			} else {
 				logDebug("setIntentToAudioVideoPlayer");
-				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				mediaIntent = getMediaIntent(this, document.getName());
 				mediaIntent.putExtra("adapterType", FILE_LINK_ADAPTER);
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 				mediaIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 				mediaIntent.putExtra(URL_FILE_LINK, url);
 				internalIntent = true;
@@ -761,6 +791,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 			if (megaApi.httpServerIsRunning() == 0) {
 				megaApi.httpServerStart();
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 			} else {
 				logWarning("ERROR: HTTP server already running");
 			}
@@ -785,10 +816,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				} else {
 					logWarning("ERROR: HTTP server get local link");
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
+					return;
 				}
 			} else {
 				logWarning("ERROR: HTTP server get local link");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
+				return;
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());
@@ -822,6 +855,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			if (isOnline(this)){
 				if (megaApi.httpServerIsRunning() == 0) {
 					megaApi.httpServerStart();
+					pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
 				}
 				else{
 					logWarning("ERROR: HTTP server already running");
@@ -865,7 +899,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			else{
 				logWarning("No Available Intent");
 			}
-		}else{
+		} else if (MimeTypeList.typeForName(document.getName()).isOpenableTextFile(document.getSize())) {
+			manageTextFileIntent(this, document, FILE_LINK_ADAPTER, url);
+		} else{
 			logWarning("none");
 		}
 	}
@@ -876,18 +912,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("Local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			logDebug("URL: " + url + ", SIZE: " + size);
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
 
-			storeDownloadLocationIfNeeded(parentPath);
-
-			NodeController nC = new NodeController(this);
-			nC.downloadTo(document, parentPath, url);
-		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();
@@ -935,13 +964,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, fragmentContainer, s);
 	}
-	
-	@SuppressLint("NewApi") 
-	public void downloadWithPermissions(){
-	    logDebug("downloadWithPermissions");
-        NodeController nC = new NodeController(this);
-        nC.downloadFileLink(document, url);
-	}
 
 	public void successfulCopy(){
 		if (getIntent() != null && getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
@@ -968,15 +990,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-        	case REQUEST_WRITE_STORAGE:{
-		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					downloadWithPermissions();
-				}
-	        	break;
-	        }
-        }
+
+        nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
 	public void errorOverquota() {
@@ -1002,5 +1017,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	@Override
 	public void onDialogNegativeClick() {
 		finish();
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

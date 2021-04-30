@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
@@ -36,6 +37,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
+import mega.privacy.android.app.interfaces.ActivityLauncher;
+import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -46,6 +51,7 @@ import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,7 +72,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
@@ -163,6 +169,9 @@ public class BaseActivity extends AppCompatActivity {
         registerReceiver(resumeTransfersReceiver,
                 new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
 
+        registerReceiver(cookieSettingsReceiver,
+                new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -202,8 +211,9 @@ public class BaseActivity extends AppCompatActivity {
      * @param psa the psa to display
      */
     private void launchPsaWebBrowser(Psa psa) {
-        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        // If there is a PsaWebBrowser launched, we should use it to load the new url.
         if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            psaWebBrowser.loadUrl(psa.getUrl());
             return;
         }
 
@@ -518,6 +528,23 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
+     * Broadcast to show a snackbar when the Cookie settings has been saved
+     */
+    protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || !isActivityInForeground() || intent == null) {
+                return;
+            }
+
+            View view = getWindow().getDecorView().findViewById(android.R.id.content);
+            if (view != null) {
+                showSnackbar(view, StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved));
+            }
+        }
+    };
+
+    /**
      * Method to display an alert dialog indicating that the MEGA SSL key
      * can't be verified (API_ESSL Error) and giving the user several options.
      */
@@ -747,15 +774,14 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * Method to display a simple Snackbar.
      *
-     * @param context Context of the Activity where the snackbar has to be displayed
      * @param outMetrics DisplayMetrics of the current device
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
      */
-    public static void showSimpleSnackbar(Context context, DisplayMetrics outMetrics, View view, String s) {
+    public static void showSimpleSnackbar(DisplayMetrics outMetrics, View view, String s) {
         Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
+        snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
         params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
@@ -930,7 +956,7 @@ public class BaseActivity extends AppCompatActivity {
                     if (!hasPermissions(baseActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         permissionLoggerSDK = sdk;
                         permissionLoggerKarere = karere;
-                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE,
+                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE_FOR_LOGS,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         break;
                     }
@@ -1030,7 +1056,7 @@ public class BaseActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         logDebug("Request Code: " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_WRITE_STORAGE) {
+        if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
             if (permissionLoggerKarere) {
                 permissionLoggerKarere = false;
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1111,5 +1137,20 @@ public class BaseActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void launchActivity(@NotNull Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void askPermissions(@NotNull String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 }

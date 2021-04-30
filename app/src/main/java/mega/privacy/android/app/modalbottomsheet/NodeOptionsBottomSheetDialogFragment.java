@@ -18,10 +18,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -32,7 +34,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -44,7 +45,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
@@ -235,8 +235,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
-                long nodeSize = node.getSize();
-                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
+                nodeInfo.setText(getFileInfo(node));
 
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
@@ -642,10 +641,63 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case MODE5:
+                if (megaApi.isInRubbish(node)) {
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                    } else {
+                        optionInfoText.setText(R.string.general_file_info);
+                    }
+
+                    MegaNode restoreNode = megaApi.getNodeByHandle(node.getRestoreHandle());
+
+                    if (!megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                        counterModify--;
+                        optionRestoreFromRubbish.setVisibility(View.GONE);
+                    } else {
+                        optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                    }
+
+                    nodeIconLayout.setVisibility(View.GONE);
+
+                    optionRemove.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    counterOpen--;
+                    optionOpenWith.setVisibility(View.GONE);
+                    counterModify--;
+                    optionMove.setVisibility(View.GONE);
+                    counterModify--;
+                    optionRename.setVisibility(View.GONE);
+                    counterModify--;
+                    optionCopy.setVisibility(View.GONE);
+                    counterShares--;
+                    optionClearShares.setVisibility(View.GONE);
+                    optionLeaveShares.setVisibility(View.GONE);
+                    optionRubbishBin.setVisibility(View.GONE);
+                    counterShares--;
+                    optionShare.setVisibility(View.GONE);
+                    counterShares--;
+                    optionShareFolder.setVisibility(View.GONE);
+                    counterShares--;
+                    optionLink.setVisibility(View.GONE);
+                    counterShares--;
+                    optionRemoveLink.setVisibility(View.GONE);
+                    counterOpen--;
+                    optionOpenFolder.setVisibility(View.GONE);
+                    counterSave--;
+                    optionDownload.setVisibility(View.GONE);
+                    counterSave--;
+                    optionOffline.setVisibility(View.GONE);
+                    counterShares--;
+                    optionSendChat.setVisibility(View.GONE);
+
+                    break;
+                }
+
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
-
                 } else {
                     optionInfoText.setText(R.string.general_file_info);
                     counterShares--;
@@ -916,7 +968,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (v.getId()) {
             case R.id.option_download_layout:
-                nC.prepareForDownload(handleList, false);
+                ((ManagerActivityLollipop) context).saveNodesToDevice(
+                        Collections.singletonList(node), false, false, false, false);
                 break;
 
             case R.id.option_favourite_layout:
@@ -999,20 +1052,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                showConfirmationLeaveIncomingShare(context, node);
+                showConfirmationLeaveIncomingShare(requireActivity(),
+                        (SnackbarShower) requireActivity(), node);
                 break;
 
             case R.id.option_send_chat_layout:
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning();
-                    break;
-                }
-                nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
+                ((ManagerActivityLollipop) context).attachNodeToChats(node);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.option_rename_layout:
-                ((ManagerActivityLollipop) context).showRenameDialog(node, node.getName());
+                ((ManagerActivityLollipop) context).showRenameDialog(node);
 
                 break;
 

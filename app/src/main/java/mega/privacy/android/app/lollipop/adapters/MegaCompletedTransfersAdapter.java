@@ -2,11 +2,11 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.PorterDuff;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +27,9 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
@@ -137,7 +137,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
 				params2.setMargins(0, -12, -12, 0);
 				holder.iconDownloadUploadView.setLayoutParams(params2);
-				holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+				holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_CORNER_RADIUS_DP)));
 			}
 		}
 
@@ -150,6 +150,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:
 				holder.textViewCompleted.setText(transfer.getPath());
+				holder.imageViewCompleted.setColorFilter(ContextCompat.getColor(context, R.color.green_500_300), PorterDuff.Mode.SRC_IN);
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed);
 				break;
 
@@ -168,6 +169,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 			default:
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
+				holder.imageViewCompleted.clearColorFilter();
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
 		}

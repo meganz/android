@@ -6,27 +6,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/info_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/btn_layout"/>
+        android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:id="@+id/btn_layout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:paddingStart="150dp"
-        android:paddingEnd="10dp">
-
-        <Button
-            android:id="@+id/btn_cancel"
-            style="?attr/borderlessButtonStyle"
-            android:layout_marginEnd="10dp"
-            android:text="@string/button_cancel" />
-
-        <Button
-            android:id="@+id/btn_ok"
-            style="?attr/borderlessButtonStyle"
-            android:text="@string/general_ok" />
-    </LinearLayout>
 </RelativeLayout>

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -45,6 +46,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 						.startSupportActionMode(new ActionBarCallBack(OUTGOING_TAB));
 			}
 		}
+	}
+
+	@Override
+	protected int viewerFrom() {
+		return VIEWER_FROM_OUTGOING_SHARES;
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
@@ -165,7 +171,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			logDebug("Parent Handle: " + managerActivity.getParentHandleOutgoing());
 
-			nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -191,7 +197,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode n = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(n, managerActivity.orderCloud);
+			nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
@@ -225,7 +231,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+	public void itemClick(int position) {
 		if (adapter.isMultipleSelect()) {
 			logDebug("multiselect ON");
 
@@ -259,7 +265,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.supportInvalidateOptionsMenu();
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(nodes.get(position), managerActivity.orderCloud);
+			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 			addSectionTitle(nodes, adapter.getAdapterType());
 
 			adapter.setNodes(nodes);
@@ -270,7 +276,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.showFabButton();
 		} else {
 			//Is file
-			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
+			openFile(nodes.get(position), OUTGOING_SHARES_ADAPTER, position);
 		}
 	}
 
@@ -281,7 +287,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	protected void orderNodes() {
-		if (managerActivity.orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByNameDescending(this.nodes);
 		} else {
 			sortByNameAscending(this.nodes);
@@ -346,7 +352,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				managerActivity.setToolbarTitle();
 				managerActivity.supportInvalidateOptionsMenu();
 
-				nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 				addSectionTitle(nodes, adapter.getAdapterType());
 
 				adapter.setNodes(nodes);
@@ -382,9 +388,9 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
 				|| managerActivity.getParentHandleOutgoing() == -1) {
 			if (isScreenInPortrait(context)) {
-				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait);
 			} else {
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+				emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape);
 			}
 			textToShow = context.getString(R.string.context_empty_outgoing);
 		}

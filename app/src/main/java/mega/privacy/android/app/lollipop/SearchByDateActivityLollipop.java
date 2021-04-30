@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
@@ -27,6 +28,7 @@ import java.util.Date;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -41,7 +43,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SearchByDateActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class SearchByDateActivityLollipop extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     float scaleH, scaleW;
     float density;
@@ -345,10 +347,10 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         if(option.equals("day")){
             tsDay = ts;
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutDay.setEnabled(true);
             textViewDay.setText(date);
-            textViewDay.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+            setDateInputTextViewEnabled(textViewDay);
             removeDay.setVisibility(View.VISIBLE);
 
             textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
@@ -356,26 +358,26 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             relativeLayoutFrom.setEnabled(false);
             textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewFrom);
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(false);
             textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewTo);
             removePeriodTo.setVisibility(View.GONE);
 
         }else if (option.equals("from")){
             tsFrom = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleFrom.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
             if((tsTo == 0) || (tsTo > ts)){
 
                 textViewFrom.setText(date);
-                textViewFrom.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                setDateInputTextViewEnabled(textViewFrom);
                 removePeriodFrom.setVisibility(View.VISIBLE);
                 optionPeriodFrom = true;
 
@@ -389,34 +391,34 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewDay);
             removeDay.setVisibility(View.GONE);
 
         }else if(option.equals("to")){
             tsTo = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleTo.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
             if((tsFrom ==0 ) || (tsFrom < ts)){
 
                 textViewTo.setText(date);
-                textViewTo.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                setDateInputTextViewEnabled(textViewTo);
                 removePeriodTo.setVisibility(View.VISIBLE);
                 optionPeriodTo = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewTo.setText(weekDay);
-                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+                setDateInputTextViewDisabled(textViewTo);
                 removePeriodTo.setVisibility(View.GONE);
             }
 
             textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewDay);
             removeDay.setVisibility(View.GONE);
         }
 
@@ -441,36 +443,36 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             tsDay = 0;
 
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewDay);
             removeDay.setVisibility(View.GONE);
 
             buttonLastMonth.setEnabled(true);
 
             buttonLastYear.setEnabled(true);
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewSetPeriod.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleFrom.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewFrom);
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+            textViewTitleTo.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewTo);
             removePeriodTo.setVisibility(View.GONE);
 
         }else if(element.equals("from")){
             optionPeriodFrom = false;
             tsFrom = 0;
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewFrom);
             removePeriodFrom.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+                textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
@@ -482,12 +484,12 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             optionPeriodTo = false;
             tsTo = 0;
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.grey_012_white_012));
+            setDateInputTextViewDisabled(textViewTo);
             removePeriodTo.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
 
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.grey_054_white_054));
+                textViewSetDay.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
@@ -532,9 +534,36 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }
     }
 
-
     public void showSnackbar(String message){
         showSnackbar(fragmentContainer, message);
+    }
+
+    /**
+     *  Apply enabled style for input date TextView.
+     *
+     * @param tv The input date TextView.
+     */
+    private void setDateInputTextViewEnabled(TextView tv) {
+        setTextStyle(tv, R.style.TextAppearance_Mega_Subtitle1_DateEnabled, R.attr.colorSecondary, true);
+    }
+
+    /**
+     *  Apply disabled style for input date TextView.
+     *
+     * @param tv The input date TextView.
+     */
+    private void setDateInputTextViewDisabled(TextView tv) {
+        setTextStyle(tv, R.style.TextAppearance_Mega_Subtitle1_DateDisabled, R.color.grey_012_white_012, false);
+    }
+
+    private void setTextStyle(TextView textView, int textAppearance, int textColor, boolean isTextAttrColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            textView.setTextAppearance(textAppearance);
+        } else {
+            textView.setTextColor(isTextAttrColor
+                    ? ColorUtils.getThemeColor(this, textColor)
+                    : ContextCompat.getColor(this, textColor));
+        }
     }
 }
 

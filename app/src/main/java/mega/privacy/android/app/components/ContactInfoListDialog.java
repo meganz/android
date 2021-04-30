@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.telephony.PhoneNumberUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -24,7 +26,9 @@ import java.util.Set;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.utils.TextUtil;
 
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class ContactInfoListDialog {
@@ -67,23 +71,17 @@ public class ContactInfoListDialog {
     private static final float HEIGHT_L = 0.9f;
     private static final float CHECKBOX_ALPHA = 0.3f;
 
-    public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, final OnMultipleSelectedListener listener) {
+    private OnMultipleSelectedListener listener;
+
+    public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, OnMultipleSelectedListener listener) {
         this.context = context;
         this.current = contact;
+        this.listener = listener;
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         contentView = inflater.inflate(R.layout.dialog_contact_info_list, null);
         listView = contentView.findViewById(R.id.info_list_view);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        contentView.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
-            dialog.dismiss();
-            listener.cancel();
-
-        });
-        contentView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
-            dialog.dismiss();
-            listener.onSelect(selected, unSelected);
-        });
     }
 
     /**
@@ -106,8 +104,17 @@ public class ContactInfoListDialog {
                 .setTitle(current.getName())
                 .setView(contentView)
                 .setCancelable(false)
+                .setPositiveButton(getString(R.string.general_ok), (dialog, which) -> {
+                    dialog.dismiss();
+                    listener.onSelect(selected, unSelected);
+                })
+                .setNegativeButton(getString(R.string.button_cancel), (dialog, which) -> {
+                    dialog.dismiss();
+                    listener.cancel();
+                })
                 .create();
         dialog.show();
+
         // get current device's screen size in pixel
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -159,8 +166,28 @@ public class ContactInfoListDialog {
         private List<String> added;
 
         private ContactInfoAdapter(List<String> contents, List<String> added) {
-            this.contents = contents;
+            this.contents = removeDuplicateNumber(contents);
             this.added = added;
+        }
+
+        /**
+         * Format phone numbers by stripping separators like "-", "_" or " ".
+         * After this remove the duplicate phone number.
+         * For example:
+         * after stripping separators,
+         * 12-345-678, 12 345 678 should be 12345678, and considered as one phone number.
+         *
+         * @param contents A list contains a contact's email and/or phone numbers.
+         * @return Phone number list without duplicate phone numbers.
+         */
+        private List<String> removeDuplicateNumber(List<String> contents) {
+            Set<String> set = new HashSet<>();
+            for(String content : contents) {
+                // Stripping separators only for phone numbers.
+                set.add(TextUtil.isEmail(content) ? content : PhoneNumberUtils.stripSeparators(content));
+            }
+
+            return  new ArrayList<>(set);
         }
 
         @NonNull

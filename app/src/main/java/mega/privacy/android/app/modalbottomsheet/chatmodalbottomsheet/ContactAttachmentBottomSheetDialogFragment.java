@@ -130,7 +130,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             optionInfo.setVisibility(View.VISIBLE);
 
             long userHandle = message.getMessage().getUserHandle(0);
-            setContactStatus(getUserStatus(userHandle), stateIcon);
+            setContactStatus(getUserStatus(userHandle), stateIcon, StatusIconLocation.DRAWER);
 
             if (userHandle != megaChatApi.getMyUserHandle()) {
 
@@ -158,12 +158,12 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                         optionStartConversation.setVisibility(View.VISIBLE);
                     }
                     optionInvite.setVisibility(View.GONE);
+                    userHandle = contact.getHandle();
                 } else {
                     optionInfo.setVisibility(View.GONE);
                     optionStartConversation.setVisibility(View.GONE);
                     optionInvite.setVisibility(View.VISIBLE);
                 }
-
                 setImageAvatar(userHandle, userEmail, userName, contactImageView);
             }
         } else {

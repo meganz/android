@@ -104,7 +104,7 @@ import static nz.mega.sdk.MegaApiJava.*;
  * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
  */
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
 	public static final int INVALID_TAB = -1;
 	public static final int CLOUD_TAB = 0;
@@ -1566,7 +1566,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	public void showSnackbar(String s) {
 		if (scrollView != null) {
-			BaseActivity.showSimpleSnackbar(this, outMetrics, scrollView, s);
+			BaseActivity.showSimpleSnackbar(outMetrics, scrollView, s);
 		}
 	}
 

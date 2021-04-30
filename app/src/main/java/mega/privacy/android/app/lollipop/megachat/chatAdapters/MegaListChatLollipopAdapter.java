@@ -215,7 +215,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
 				if (isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
@@ -246,7 +245,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 
 				if (isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
@@ -907,7 +905,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			setContactStatus(getUserStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon);
+			setContactStatus(getUserStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon, StatusIconLocation.STANDARD);
 		}
 		else{
 			logWarning("Holder is NULL: " + position);
@@ -919,7 +917,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void updateContactStatus(int position, long userHandle, int state) {
 		holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
 		if (holder != null) {
-			setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ((ViewHolderNormalChatList) holder).contactStateIcon);
+			setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ((ViewHolderNormalChatList) holder).contactStateIcon, StatusIconLocation.STANDARD);
 		} else {
 			logWarning("Holder is NULL");
 			notifyItemChanged(position);

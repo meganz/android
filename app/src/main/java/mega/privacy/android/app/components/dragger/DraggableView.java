@@ -1,12 +1,11 @@
 package mega.privacy.android.app.components.dragger;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.core.view.ViewCompat;
-import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,10 +16,11 @@ import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+@SuppressLint("ViewConstructor")
 public class DraggableView extends FrameLayout{
 
     boolean animate = false;
-    int[] screenPosition;
+    private int[] screenPosition;
     View currentView;
     public float normalizedScale;
 
@@ -57,17 +57,13 @@ public class DraggableView extends FrameLayout{
 
     private int[] selfInitialLocationOnWindow;
 
-    public DraggableView(Context context) {
-        this(context, null);
-    }
+    private final ViewAnimator.Listener animatorListener;
 
-    public DraggableView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public DraggableView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public DraggableView(Context context, ViewAnimator.Listener listener) {
+        super(context, null, 0);
         initialize(context);
+
+        animatorListener = listener;
     }
 
     @Nullable
@@ -370,11 +366,9 @@ public class DraggableView extends FrameLayout{
                 }
 
             } else {
-                Activity activity = (Activity) getContext();
                 animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection,
-                    activity, screenPosition, currentView,
-                    selfInitialLocationOnWindow == null ? new int[] {0, 0}
-                    : selfInitialLocationOnWindow);
+                        animatorListener, screenPosition, currentView,
+                        selfInitialLocationOnWindow == null ? new int[] {0, 0} : selfInitialLocationOnWindow);
 
                 if (draggableListener != null){
                     draggableListener.onDragActivated(true);

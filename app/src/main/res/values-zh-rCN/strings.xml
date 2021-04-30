@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - >拍照并将照片上传至MEGA\nREAD_CONTACTS - >从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - &gt;将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - &gt;拍照并将照片上传至MEGA\nREAD_CONTACTS - &gt;从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - &gt; MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA是全面专注隐私保护的云端存储平台。</string>
 
     <string name="prolite_account" context="PRO Lite account" translatable="false">Pro精简版</string>
@@ -220,6 +220,7 @@
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件箱</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">保存为离线</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">离线</string>
+    <string name="location_label" context="Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive)">%1$s（%2$s）</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -346,6 +347,7 @@
     <string name="error_file_size_greater_than_4gb" context="Warning message">大多数设备无法下载超过4GB 的文件。您的下载可能会失败。</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">您的设备上没有可用的应用程序执行此文件</string>
     <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">您的设备上没有可用应用程序打开此位置</string>
+    <string name="intent_not_available_file" context="message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt">您似乎未安装任何支持此文件类型的应用程序</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
@@ -363,7 +365,9 @@
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">该共享链接即将失效。</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">这些链接将失效。</item>
     </plurals>
+
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
+    <string name="rename_dialog_title" context="Title of a dialog to rename a node. The place holder is to set the current name of the node.">重命名%1$s</string>
     <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">打开链接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">打开</string>
     <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
@@ -652,7 +656,7 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">取消所有传输</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">拍摄</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">允许接收MEGA来电通知</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA需要您的授权才能允许呼叫界面从后台弹出。</string>
@@ -675,10 +679,12 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">相机上传完成</string>
+    <string name="settings_appearance" context="settings of the Appearance section">外观</string>
     <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">密码锁</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">密码锁</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">密码锁选项</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">压缩视频会消耗电池电量，当压缩的视频大于%s时，MEGA会提醒您需为设备充电。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">开启后，您的相关照片的拍摄地点信息会被上传，分享前请谨慎选择。</string>
 
@@ -720,8 +726,8 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">您的手机号已成功验证</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</item>
+        <item context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">外置储存</item>
     </string-array>
 
     <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">内部存储</string>
@@ -770,27 +776,35 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和视频</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">密码锁</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改应用锁密码</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">密码锁</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改验证码</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">更改密码锁</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">密码请求</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">立即</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">输入</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1次密码尝试失败</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">密码尝试失败%1$d次</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">尝试10次失败后，您的帐户将被登出，您的离线文件将被删除。</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">代码错误</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">应用锁密码错误。请再试一次。您还有1此尝试机会</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">应用锁密码错误。请重试。您还剩余%2d次尝试</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">应用锁密码不匹配</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的应用锁密码</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的新应用锁密码</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">密码不正确,请重试!</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">输入你的密码</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新输入你的密码</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">输入你的新密码</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">重新输入你的新密码</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的所有本地数据将被删除，您将以％1d秒后注销</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">关于</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">隐私政策</string>
+    <string name="settings_about_privacy_policy" context="Preference screen item action button">隐私政策</string>
     <string name="settings_about_terms_of_service" context="">服务条款</string>
-    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">数据保护条例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK版本</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK版本</string>
@@ -861,34 +875,6 @@
     <string name="sort_by_largest_size" context="sort files by largest size">最大尺寸</string>
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小尺寸</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
-
-    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">输入您的账单资料：</string>
-    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">地址1</string>
-    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">地址2（可选）</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">城市</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">国家/省</string>
-    <string name="country_cc" context="Hint text of the country edittext for billing purposes">国家</string>
-    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">邮编</string>
-
-    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">输入您的付款资料：</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">名</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">姓</string>
-    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">信用卡卡号</string>
-    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">月</string>
-    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">年</string>
-    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">校验码</string>
-
-    <string name="proceed_cc" context="Text of the button which proceeds the payment">继续</string>
-
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">账户已成功升级！</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">操作失败。您的信用卡尚未被扣款</string>
-    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">信用卡信息不正确。您的信用卡尚未被扣款</string>
-    <!--
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
-    -->
-
     <string name="pin_lock_type" context="Title to choose the type of Passcode">应用锁密码类型</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4位数字密码</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6位数字密码</string>
@@ -903,7 +889,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免费账户</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro精简版帐户</string>
+    <string name="my_account_prolite" context="Type of account info added to the feedback email sent to support">Pro精简版帐户</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 帐户</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 帐户</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 帐户</string>
@@ -943,7 +929,7 @@
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">在这里输入您的恢复密钥</string>
 
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">请在此处写下密码</string>
-    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">这是删除您账户的最后一步。您将永久失去储存在云端空间中的所有资料。请在下方输入您的密码。</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm delete user account">这是删除帐户的最后一步。您将永久丢失保存在云盘中的所有数据。请在下方输入您的密码。</string>
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">电子邮件验证</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">请确认您的电子信箱以继续</string>
@@ -1007,7 +993,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">升级至Pro帐户，尊享MEGA会员服务。</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">编辑个人照片</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar">拍摄</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">选择照片</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">删除照片</string>
 
@@ -1128,6 +1114,7 @@
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">正在载入手机联系薄&#8230;</string>
 
+    <string name="number_existing_invite_contact_request" context="Warning message when reinviting multiple contacts">已发送%d个请求。</string>
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">已发送%d个联系人请求</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d个联系人邀请发送成功，%2$d个邀请发送失败</string>
 
@@ -1149,19 +1136,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">聊天通知将静音%s</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">聊天通知将静音至%1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">聊天通知将静音至%1$s</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">聊天通知将静音至%1$s %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">聊天通知将静音至%1$s %2$s</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">聊天通知已静音</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">聊天通知已开启</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">静音至%1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">静音至%1$s</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">通知</string>
@@ -1362,6 +1349,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线中删除？</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the colour theme">主题颜色</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">无法使用</string>
 
@@ -1467,6 +1455,11 @@
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">已上传%1$d个文件</item>
     </plurals>
 
+    <plurals name="upload_service_notification_already_uploaded">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">已上传1个文件</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">已上传%1$d个文件</item>
+    </plurals>
+
 	<plurals name="folder_upload_service_final_notification">
 		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">%1$d个文件夹已上传</item>
 		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">%1$d个文件夹已上传</item>
@@ -1532,7 +1525,7 @@
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
-    <string name="import_success_message" context="Menu option">已添加至云端</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">已成功添加到云盘</string>
     <string name="import_success_error" context="Menu option">错误。添加至云端失败。</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">正在连接&#8230;</string>
@@ -1611,6 +1604,7 @@
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">传输已暂停！</string>
     <string name="attachment_uploading_state_uploading">正在上传&#8230;</string>
+    <string name="attachment_uploading_state_compressing">正在压缩&#8230;</string>
     <string name="attachment_uploading_state_error">错误！未发送</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">已下载%d的文件。</string>
@@ -1636,7 +1630,7 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">从</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">新的分享文件夹</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">新的联系人请求</string>
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">清除聊天记录</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">删除联系人</string>
 
@@ -1717,6 +1711,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">没有分享的文件夹</string>
 
     <string name="settings_help" context="Menu item">帮助</string>
+    <string name="settings_help_centre" context="Settings preference title for help centre">帮助中心</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">发送反馈</string>
     <string name="setting_feedback_subject" context="mail subject">安卓反馈</string>
     <string name="setting_feedback_body" context="mail body">请在这里写下您的反馈：</string>
@@ -1751,7 +1746,15 @@
     <string name="label_set_day" context="title of a Search by date tag">设定日期</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">选定日期无效</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">字符不符合要求</string>
+    <string name="empty_name" context="Error shown when the user left a name empty">文件名无效</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">请先更改您的文件名</string>
+    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">无效的字符</string>
+    <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
+
+    <plurals name="empty_names">
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">请先为您的文件命名</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">请先为您的文件命名</item>
+    </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">音频文件</string>
 
@@ -1913,7 +1916,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上传至聊天</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天视频质量</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">视频质量</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">视频画质</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相机上传需要访问您设备上的照片和其他媒体内容。请转至设置页面开启权限。</string>
     <string-array name="settings_chat_upload_quality_entries">
@@ -2038,8 +2041,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">请输入一个更安全的密码</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">新联系人</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">空间使用量</string>
-
+    
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d 个待接受请求</item>
         <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d 个待接受请求</item>
@@ -2047,12 +2049,12 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">新的联系人请求</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 “%s”&#8230;</string>
     <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无[/B][A]正在传输[/A]的文件</string>
     <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无已完成的[/B][A]传输[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]文件夹[/A]当前为[B]空[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">写信息给 "%s"&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">双重验证</string>
@@ -2065,6 +2067,7 @@
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">请输入验证程序中生成的6位验证码。</string>
     <string name="general_verify" context="Text button">确认</string>
     <string name="general_next" context="Text button">下一步</string>
+    <string name="general_previous" context="Text button">上一个</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成种子或QR码时出错，请再试一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">双重验证已启用</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">您在下次登录账户时，系统会要求您输入验证程序中提供的6位验证码。</string>
@@ -2097,6 +2100,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">预览内容</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">无法执行流式传输，文件未下载</string>
+    <string name="error_fail_to_open_file_general" context="message shown when the user open a file, the file is not been opened due to unknown reason">无法打开此文件。</string>
     <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">由于无网络连接，无法打开此文件。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">文件已存于离线储存</string>
 
@@ -2225,6 +2229,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">信息</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">视频</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">发送链接给&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">发送至&#8230;&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">上传至&#8230;&#8230;</string>
 
@@ -2271,7 +2276,7 @@
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">如果您想要禁用垃圾桶定时清理或设置延长保留期限，您需要订阅PRO计划。</string>
 
-    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">天</string>
+    <string name="hint_days" context="Picker text to choose custom retention time. This option indicates several days">天</string>
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">获得聊天链接</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">管理聊天链接</string>
 
@@ -2380,7 +2385,7 @@
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您的当前帐户是[A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取决于您所达成的奖励挑战。</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">选择付款方式</string>
+    <string name="payment_method" context="Title label for the current payment method during account upgrading">付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]一次性付款(月)[/A] %s</string>
@@ -2392,9 +2397,6 @@
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] （订阅）</string>
     <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A]（订阅）</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]信用卡[/A] （订阅）</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
     <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">如需升级您的当前订阅，请联系支持团队了解[A]自定义方案[/A]。</string>
@@ -2459,7 +2461,6 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">聊天链接已复制到剪贴板</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">%s[A]起[/A] 每位用户/[A]月[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*续订日期到期前随时可取消续订服务。</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通话已开始</string>
 
@@ -2635,7 +2636,7 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%2$d的%1$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">搜索&#8230;&#8230;</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">应答</string>
+    <string name="answer_call_incoming" context="Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason.">应答</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽略</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s 该通话已静音</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">已静音</string>
@@ -2752,9 +2753,6 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA无法访问您的数据，而您的企业帐户管理员有权控制并查看用户帐户中的“相机上传”文件。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**将自动增加，不收取额外费用，并用于真正的商业目的</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]存储空间[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">无限[A]传输流量[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，保存在“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
@@ -2810,6 +2808,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
 
+    <string name="inactive_chat_title_2" context="Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today">聊天创建于%s</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">聊天创建于%s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">选择消息</string>
 
@@ -2877,7 +2876,7 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的凭证</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">文档</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible.">文档</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">文档</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">创建新的聊天对话</string>
@@ -2904,20 +2903,20 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已达到%d个态度的最大上限。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B]将消息清除时间更改为[/B][A] %2$s[/A][B]。[/B]</string>
     <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B]已禁用消息清除。[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">删除此对话中的所有消息和文件。此操作无法撤回。</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">清除聊天记录</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">自动删除超过一定时间的聊天记录。</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">停用</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">一天</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">一周</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">一个月</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">自定义</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">管理聊天记录</string>
     <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">自动删除早于以下时间的信息：</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">是否要清除此对话内的所有聊天记录？</string>
 
     <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">一年</string>
 
@@ -2941,19 +2940,21 @@
         <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">个月</item>
     </plurals>
 
+    <string name="retention_time_picker_year" context="Picker text to choose custom retention time. This option indicates a year">年</string>
+
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1小时</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d小时</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1周</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d周</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
         <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">一个月</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d个月</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">选择传输</string>
 
@@ -2997,11 +2998,19 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">兰紫</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">银灰</string>
 
+    <string name="background_play_hint" context="Text that indicates the audio will still be played in background if the app is backgrounded">将在后台播放</string>
+    <string name="not_background_play_hint" context="Text that indicates the audio will not be played in background">无法在后台播放</string>
+    <string name="audio_player_now_playing" context="Text that indicates the song is now playing">正在播放</string>
+    <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">正在播放（已暂停）</string>
+    <string name="audio_track_info" context="Title of the song info screen">曲目信息</string>
+
     <string name="action_more_information" context="Action to get more information">更多信息</string>
     <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie政策</string>
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie设置</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">我们的Cookie政策</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">我们使用本地存储和类似技术（“ Cookies”）为您提供服务，通过我们的服务增强您的体验，并定制您所看到的广告（包括通过第三方）。从访问开始就接受我们对Cookie的使用，或在Cookie设置中自定义Cookie。您可以在我们的[A]《Cookie政策》[/A]中了解更多信息。</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie设置未保存。</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie设置更改已保存。</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">第三方Cookie</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google广告Cookie</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">分类：广告Cookie</string>
@@ -3020,4 +3029,16 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">隐私政策</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie政策</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">始终开启</string>
+
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">扫描文件</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s不在您的联系人列表中</string>
+
+
+    <string name="theme_light" context="Option of color theme, light mode.">轻度</string>
+    <string name="theme_dark" context="Option of color theme, dark mode.">深色</string>
+    <string name="theme_system_default" context="Option of color theme, follow the system setting.">跟随系统</string>
+    <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">跟随省电模式设置</string>
+
+    <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">请选择SD卡根目录。</string>
 </resources>

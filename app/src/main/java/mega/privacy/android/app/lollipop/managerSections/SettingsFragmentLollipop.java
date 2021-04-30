@@ -4,18 +4,27 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 
@@ -38,6 +47,7 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
@@ -48,19 +58,21 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
+    private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
+
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
     public int numberOfClicksAppVersion = 0;
     private ListPreference colorThemeListPreference;
     private PreferenceCategory securityCategory;
     private Preference recoveryKey;
-    private Preference pinLockPreference;
+    private Preference passcodeLockPreference;
     private Preference changePass;
     private SwitchPreferenceCompat twoFASwitch;
     private SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
     private Preference advancedPreference;
     private RecyclerView listView;
-    private boolean pinLock = false;
+    private boolean passcodeLock = false;
     private boolean setAutoaccept = false;
     private boolean autoAccept = true;
     private Preference cameraUploadsPreference;
@@ -73,12 +85,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory aboutCategory;
     private Preference aboutPrivacy;
     private Preference aboutTOS;
-    private Preference aboutGDPR;
     private Preference codeLink;
     private Preference aboutSDK;
     private Preference aboutKarere;
     private Preference aboutApp;
     private Preference cancelAccount;
+
+    private DisplayMetrics outMetrics;
+    private boolean bEvaluateAppDialogShow = false;
+    private AlertDialog evaluateAppDialog;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -101,8 +116,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         securityCategory = findPreference(CATEGORY_SECURITY);
         recoveryKey = findPreference(KEY_RECOVERY_KEY);
         recoveryKey.setOnPreferenceClickListener(this);
-        pinLockPreference = findPreference(KEY_PIN_LOCK);
-        pinLockPreference.setOnPreferenceClickListener(this);
+        passcodeLockPreference = findPreference(KEY_PASSCODE_LOCK);
+        passcodeLockPreference.setOnPreferenceClickListener(this);
         changePass = findPreference(KEY_CHANGE_PASSWORD);
         changePass.setOnPreferenceClickListener(this);
         twoFASwitch = findPreference(KEY_2FA);
@@ -122,8 +137,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         aboutPrivacy.setOnPreferenceClickListener(this);
         aboutTOS = findPreference(KEY_ABOUT_TOS);
         aboutTOS.setOnPreferenceClickListener(this);
-        aboutGDPR = findPreference(KEY_ABOUT_GDPR);
-        aboutGDPR.setOnPreferenceClickListener(this);
         codeLink = findPreference(KEY_ABOUT_CODE_LINK);
         codeLink.setOnPreferenceClickListener(this);
         aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
@@ -159,17 +172,17 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Method for update the Passcode lock section.
      */
     private void updatePasscodeLock() {
-        if (prefs == null || prefs.getPinLockEnabled() == null) {
-            pinLock = false;
-            dbH.setPinLockEnabled(false);
+        if (prefs == null || prefs.getPasscodeLockEnabled() == null) {
+            passcodeLock = false;
+            dbH.setPasscodeLockEnabled(false);
         } else {
-            pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+            passcodeLock = Boolean.parseBoolean(prefs.getPasscodeLockEnabled());
         }
         updatePasscodeLockSubtitle();
     }
 
     public void updatePasscodeLockSubtitle() {
-        pinLockPreference.setSummary(pinLock ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off);
+        passcodeLockPreference.setSummary(passcodeLock ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off);
     }
 
     /**
@@ -207,6 +220,23 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     checkScroll();
                 }
             });
+        }
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        if (savedInstanceState != null) {
+            bEvaluateAppDialogShow = savedInstanceState.getBoolean(EVALUATE_APP_DIALOG_SHOW);
+        }
+        if (bEvaluateAppDialogShow) {
+            showEvaluatedAppDialog();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (evaluateAppDialog != null && evaluateAppDialog.isShowing()) {
+            outState.putBoolean(EVALUATE_APP_DIALOG_SHOW, bEvaluateAppDialogShow);
         }
     }
 
@@ -262,7 +292,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 ((ManagerActivityLollipop) context).showMKLayout();
                 break;
 
-            case KEY_PIN_LOCK:
+            case KEY_PASSCODE_LOCK:
                 startActivity(new Intent(context, PasscodePreferencesActivity.class));
                 break;
 
@@ -298,7 +328,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 break;
 
             case KEY_HELP_SEND_FEEDBACK:
-                ((ManagerActivityLollipop) context).showEvaluatedAppDialog();
+                showEvaluatedAppDialog();
                 break;
 
             case KEY_ABOUT_PRIVACY_POLICY:
@@ -310,12 +340,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_TOS:
                 viewIntent = new Intent(Intent.ACTION_VIEW);
                 viewIntent.setData(Uri.parse("https://mega.nz/terms"));
-                startActivity(viewIntent);
-                break;
-
-            case KEY_ABOUT_GDPR:
-                viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
                 startActivity(viewIntent);
                 break;
 
@@ -427,7 +451,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     /**
      * Scroll to the beginning of Settings page.
      * In this case, the beginning is category KEY_FEATURES.
-     *
+     * <p>
      * Note: If the first category changes, this method should be updated with the new one.
      */
     public void goToFirstCategory() {
@@ -479,6 +503,97 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 twoFASwitch.setVisible(false);
             }
         }
+    }
+
+    private void showEvaluatedAppDialog() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
+
+        final CheckedTextView rateAppCheck = (CheckedTextView) dialogLayout.findViewById(R.id.rate_the_app);
+        rateAppCheck.setText(getString(R.string.rate_the_app_panel));
+        rateAppCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
+        ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
+        rateAppMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
+
+        final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialogLayout.findViewById(R.id.send_feedback);
+        sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
+        sendFeedbackCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
+        ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
+        sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this.context);
+        builder.setView(dialogLayout);
+
+        builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
+        evaluateAppDialog = builder.create();
+
+        evaluateAppDialog.show();
+        bEvaluateAppDialogShow = true;
+        rateAppCheck.setOnClickListener(v -> {
+            logDebug("Rate the app");
+            //Rate the app option:
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)));
+
+            if (evaluateAppDialog != null) {
+                evaluateAppDialog.dismiss();
+                bEvaluateAppDialogShow = false;
+            }
+        });
+
+        sendFeedbackCheck.setOnClickListener(v -> {
+            logDebug("Send Feedback");
+
+            //Send feedback option:
+            StringBuilder body = new StringBuilder();
+            body.append(getString(R.string.setting_feedback_body))
+            .append("\n\n\n\n\n\n\n\n\n\n\n")
+            .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
+            .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
+            .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
+
+            MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+            if (myAccountInfo != null) {
+                body.append(" (");
+                switch (myAccountInfo.getAccountType()) {
+                    case FREE:
+                    default:
+                        body.append(getString(R.string.my_account_free));
+                        break;
+                    case PRO_I:
+                        body.append(getString(R.string.my_account_pro1));
+                        break;
+                    case PRO_II:
+                        body.append(getString(R.string.my_account_pro2));
+                        break;
+                    case PRO_III:
+                        body.append(getString(R.string.my_account_pro3));
+                        break;
+                    case PRO_LITE:
+                        body.append(getString(R.string.my_account_prolite_feedback_email));
+                        break;
+                    case BUSINESS:
+                        body.append(getString(R.string.business_label));
+                        break;
+                }
+                body.append(")");
+            }
+
+            String versionApp = (getString(R.string.app_version));
+            String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
+
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setType("text/plain");
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
+            startActivity(Intent.createChooser(emailIntent, " "));
+
+            if (evaluateAppDialog != null) {
+                evaluateAppDialog.dismiss();
+                bEvaluateAppDialogShow = false;
+            }
+        });
+
     }
 
     public void hidePreferencesChat() {

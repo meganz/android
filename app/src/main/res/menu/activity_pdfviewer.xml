@@ -103,8 +103,10 @@
     <item
         android:id="@+id/chat_pdf_viewer_save_for_offline"
         android:orderInCategory="110"
+        android:icon="@drawable/ic_save_offline"
         android:title="@string/save_for_offline"
         android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 
     <item

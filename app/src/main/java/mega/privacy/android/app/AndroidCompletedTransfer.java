@@ -204,7 +204,7 @@ public class AndroidCompletedTransfer implements Parcelable {
                 MegaNode parentNode = app.getMegaApi().getNodeByHandle(transfer.getParentHandle());
 
                 if (parentNode != null) {
-                    return removeLastFileSeparator(getParentFolderPath(parentNode));
+                    return removeLastFileSeparator(getNodeFolderPath(parentNode));
                 }
                 break;
 

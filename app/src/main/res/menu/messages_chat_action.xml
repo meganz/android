@@ -4,57 +4,81 @@
 
     <item
         android:id="@+id/chat_cab_menu_forward"
-        android:icon="@drawable/ic_forward_white"
-        android:orderInCategory="105"
         android:title="@string/forward_menu_item"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_forward_white"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/chat_cab_menu_download"
-        android:icon="@drawable/ic_download_white"
+        android:id="@+id/chat_cab_menu_share"
+        android:title="@string/general_share"
         android:orderInCategory="105"
-        android:title="@string/context_download"
+        android:icon="@drawable/ic_social_share_white"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_import"
-        android:icon="@drawable/ic_import_to_cloud_white"
-        android:orderInCategory="105"
         android:title="@string/add_to_cloud"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_import_to_cloud_white"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/chat_cab_menu_download"
+        android:title="@string/context_download"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_download_white"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/chat_cab_menu_offline"
-        android:icon="@drawable/ic_save_offline"
+        android:id="@+id/chat_cab_menu_download_gallery"
+        android:title="@string/context_download"
         android:orderInCategory="105"
-        android:title="@string/save_for_offline"
+        android:icon="@drawable/ic_save_gallery"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/chat_cab_menu_invite"
+        android:title="@string/contact_invite"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_add_contact_chat"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/chat_cab_menu_start_conversation"
+        android:title="@string/context_send_message"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_send_message_modal"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_edit"
-        android:icon="@drawable/ic_rename"
-        android:orderInCategory="105"
         android:title="@string/title_edit_profile_info"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_rename"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_copy"
-        android:icon="@drawable/ic_copy_white"
-        android:orderInCategory="105"
         android:title="@string/context_copy"
+        android:orderInCategory="105"
+        android:icon="@drawable/ic_copy_white"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_delete"
-        android:icon="@drawable/ic_close_white"
-        android:orderInCategory="110"
         android:title="@string/context_delete"
+        android:orderInCategory="110"
+        android:icon="@drawable/ic_close_white"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 </menu>

@@ -40,6 +40,7 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
+import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -95,19 +96,6 @@ class HomepageFragment : Fragment() {
             post { setBottomSheetMaxHeight() }
         }
     }
-    private val psaVisibilityChangeObserver = androidx.lifecycle.Observer<Int> {
-        if (isResumed) {
-            val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
-            fabMainParams.bottomMargin =
-                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
-            fabMain.layoutParams = fabMainParams
-
-            val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
-            fabMaskMainParams.bottomMargin =
-                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
-            fabMaskMain.layoutParams = fabMaskMainParams
-        }
-    }
 
     var isFabExpanded = false
 
@@ -150,8 +138,6 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .observeForever(homepageVisibilityChangeObserver)
-        LiveEventBus.get(EVENT_PSA_VISIBILITY, Int::class.java)
-            .observeForever(psaVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -211,8 +197,6 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
-        LiveEventBus.get(EVENT_PSA_VISIBILITY, Int::class.java)
-            .removeObserver(psaVisibilityChangeObserver)
     }
 
     /**
@@ -407,6 +391,9 @@ class HomepageFragment : Fragment() {
      */
     @Suppress("UNCHECKED_CAST")
     private fun setupBannerView() {
+        val bannerAdapter = BannerAdapter(viewModel)
+        bannerAdapter.setClickBannerCallback(BannerClickHandler(this))
+
         bannerViewPager =
             viewDataBinding.bannerView as BannerViewPager<MegaBanner>
         bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
@@ -425,7 +412,7 @@ class HomepageFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
-            .setAdapter(BannerAdapter(viewModel))
+            .setAdapter(bannerAdapter)
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {
@@ -646,6 +633,28 @@ class HomepageFragment : Fragment() {
         collapseFab()
     } else {
         expandFab()
+    }
+
+    /**
+     * Update FAB position, considering the visibility of PSA layout and mini audio player.
+     *
+     * @param psaLayoutHeight height of PSA layout
+     * @param miniAudioPlayerHeight height of mini audio player
+     */
+    fun updateFabPosition(psaLayoutHeight: Int, miniAudioPlayerHeight: Int) {
+        if (!this::fabMain.isInitialized) {
+            return
+        }
+
+        val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
+        fabMainParams.bottomMargin =
+            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + psaLayoutHeight + miniAudioPlayerHeight
+        fabMain.layoutParams = fabMainParams
+
+        val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
+        fabMaskMainParams.bottomMargin =
+            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + psaLayoutHeight + miniAudioPlayerHeight
+        fabMaskMain.layoutParams = fabMaskMainParams
     }
 
     fun collapseFab() {

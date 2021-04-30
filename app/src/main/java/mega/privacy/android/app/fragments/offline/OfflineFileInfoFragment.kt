@@ -24,6 +24,8 @@ import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
@@ -42,7 +44,7 @@ class OfflineFileInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentOfflineFileInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -61,6 +63,8 @@ class OfflineFileInfoFragment : Fragment() {
     private fun observeLiveData() {
         viewModel.node.observe(viewLifecycleOwner) {
             if (it == null) {
+                logError("OfflineFileInfoFragment observed null node")
+
                 requireActivity().finish()
             } else {
                 if (Util.isDarkMode(requireActivity())) {

@@ -19,6 +19,13 @@ public class TextUtil {
         return string == null || string.isEmpty() || string.trim().isEmpty();
     }
 
+    public static boolean isTextEmpty(StringBuilder string) {
+        if (string == null)
+            return true;
+
+        return isTextEmpty(string.toString());
+    }
+
     /**
      * Method to remove the format placeholders.
      *
@@ -75,6 +82,90 @@ public class TextUtil {
     }
 
     /**
+     * Formats a String of notification screen.
+     *
+     * @param context Current Context object, to get a resource(for example, color)
+     *                should not use application context, need to pass it from the caller.
+     * @param text    The text to format.
+     * @return The string formatted.
+     */
+    public static Spanned replaceFormatNotificationText(Context context, String text) {
+        try {
+            text = text.replace("[A]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "'>");
+            text = text.replace("[/A]", "</font>");
+            text = text.replace("[B]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                    + "'>");
+
+            text = text.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
+    }
+
+    /**
+     * Gets the latest position of a file name before the .extension in order to set the cursor
+     * or select the entire file name.
+     *
+     * @param isFile True if is file, false otherwise.
+     * @param text   Current text of the input view.
+     * @return The latest position of a file name before the .extension.
+     */
+    public static int getCursorPositionOfName(boolean isFile, String text) {
+        if (isTextEmpty(text)) {
+            return 0;
+        }
+
+        if (isFile) {
+            String[] s = text.split("\\.");
+            if (s != null) {
+                int numParts = s.length;
+                int lastSelectedPos = 0;
+
+                if (numParts > 1) {
+                    for (int i = 0; i < (numParts - 1); i++) {
+                        lastSelectedPos += s[i].length();
+                        lastSelectedPos++;
+                    }
+
+                    //The last point should not be selected)
+                    lastSelectedPos--;
+                    return lastSelectedPos;
+                }
+            }
+        }
+
+        return text.length();
+    }
+
+    /**
+     * Formats a String of an empty screen.
+     *
+     * @param context     Current Context object, to get a resource(for example, color)
+     *                    should not use application context, need to pass it from the caller.
+     * @param emptyString The text to format.
+     * @return The string formatted.
+     */
+    public static String formatEmptyScreenText(Context context, String emptyString) {
+        try {
+            emptyString = emptyString.replace("[A]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
+            emptyString = emptyString.replace("[/A]", "</font>");
+            emptyString = emptyString.replace("[B]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "'>");
+            emptyString = emptyString.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
+        }
+
+        return emptyString;
+    }
+
+    /**
      * Gets the string to show as content of a folder.
      *
      * @param numFolders The number of folders the folder contains.
@@ -95,6 +186,17 @@ public class TextUtil {
         } else {
             return getQuantityString(R.plurals.num_folders_num_files, numFiles, numFolders, numFiles);
         }
+    }
+
+    /**
+     * Gets the string to show as file info details with the next format: "size · date".
+     *
+     * @param size The file size.
+     * @param date The file modification date.
+     * @return The string so show as file info details.
+     */
+    public static String getFileInfo(String size, String date) {
+        return String.format("%s · %s", size, date);
     }
 
     /**
