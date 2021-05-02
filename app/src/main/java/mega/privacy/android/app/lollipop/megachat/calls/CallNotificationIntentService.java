@@ -7,20 +7,14 @@ import org.jetbrains.annotations.Nullable;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
+import mega.privacy.android.app.utils.CallUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
-
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -159,11 +153,7 @@ public class CallNotificationIntentService extends IntentService implements Snac
             return;
 
         logDebug("Incoming call answered.");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.getInstance().openCallService(chatIdIncomingCall);
-        Intent meetingIntent = new Intent(this, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_IN);
-        startActivity(meetingIntent);
+        CallUtil.openMeetingInProgress(this, chatIdIncomingCall);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);

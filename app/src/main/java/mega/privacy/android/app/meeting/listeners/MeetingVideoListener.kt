@@ -6,9 +6,9 @@ import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRenderer
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import java.nio.ByteBuffer
 
@@ -28,8 +28,6 @@ class MeetingVideoListener(
     val renderer: MegaSurfaceRenderer
     private val surfaceHolder: SurfaceHolder
     private var bitmap: Bitmap? = null
-    private var viewWidth = 0
-    private var viewHeight = 0
 
     override fun onChatVideoData(
         api: MegaChatApiJava,
@@ -41,17 +39,16 @@ class MeetingVideoListener(
         if (width == 0 || height == 0) {
             return
         }
-        if (this.width != width || this.height != height
-            || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
+
+        if (this.width != width || this.height != height) {
             this.width = width
             this.height = height
             val holder = surfaceView.holder
             if (holder != null) {
-                viewWidth = surfaceView.width
-                viewHeight = surfaceView.height
-
+                val viewWidth = surfaceView.width
+                val viewHeight = surfaceView.height
                 if (viewWidth != 0 && viewHeight != 0) {
-                    var holderWidth = viewWidth.coerceAtMost(width)
+                    var holderWidth = Math.min(viewWidth, width)
                     var holderHeight = holderWidth * viewHeight / viewWidth
                     if (holderHeight > viewHeight) {
                         holderHeight = viewHeight
@@ -65,7 +62,9 @@ class MeetingVideoListener(
                 }
             }
         }
+
         if (bitmap == null) return
+
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
         if (VideoCaptureUtils.isVideoAllowed()) {
             renderer.drawBitmap(isLocal)
@@ -73,9 +72,16 @@ class MeetingVideoListener(
     }
 
     init {
+        isLocal = clientId == MEGACHAT_INVALID_HANDLE
+
         if (isFloatingWindow && isLocal) {
-            surfaceView.setZOrderMediaOverlay(true)
+            this.surfaceView.setZOrderMediaOverlay(true);
+        } else if (!isFloatingWindow) {
+            if (!isLocal) {
+                this.surfaceView.setZOrderOnTop(false);
+            }
         }
+
         surfaceHolder = surfaceView.holder
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT)
         renderer = MegaSurfaceRenderer(surfaceView, isFloatingWindow, outMetrics)

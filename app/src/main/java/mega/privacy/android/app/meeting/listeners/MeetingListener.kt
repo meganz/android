@@ -31,7 +31,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Local audio/video flags has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
-            logDebug("Changes in local av flags")
+            logDebug("Changes in local av flags:: isAudioEnable? "+call.hasLocalAudio()+", isVideoEnable? "+call.hasLocalVideo())
             sendCallEvent(EVENT_LOCAL_AVFLAGS_CHANGE, call)
         }
 
@@ -83,6 +83,13 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
+        api?.let { megachatapi ->
+            val call:MegaChatCall = megachatapi.getChatCallByCallId(callid)
+            call?.let {
+                sendCallEvent(EVENT_UPDATE_CALL, it)
+            }
+        }
+
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
             logDebug("""Session status changed, current status is ${sessionStatusToString(session.status)}""")
@@ -115,7 +122,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Session is on hold
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD)) {
-            logDebug("Session on hold changed")
+            logDebug("Session on hold changed: isOnHold? "+session.isOnHold)
             sendSessionEvent(EVENT_SESSION_ON_HOLD_CHANGE, session, callid)
         }
 

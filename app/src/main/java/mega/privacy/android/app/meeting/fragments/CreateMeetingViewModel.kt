@@ -10,7 +10,7 @@ class CreateMeetingViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     val result = MutableLiveData<Boolean>()
-    var meetingName: MutableLiveData<String> = MutableLiveData<String>("Joanna's meeting")
+    var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
     fun initMeetingName(meetName: String) {
         meetingName.value = meetName

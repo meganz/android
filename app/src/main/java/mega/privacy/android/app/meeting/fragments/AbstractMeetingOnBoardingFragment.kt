@@ -25,12 +25,9 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.PermissionsRequester
 import mega.privacy.android.app.utils.permission.permissionsBuilder
@@ -55,15 +52,16 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder()
             .setPermissions(permissions.toCollection(ArrayList()))
-            .setOnPermissionDenied { l->onPermissionDenied(l) }
-            .setOnRequiresPermission { l->onRequiresPermission(l) }
-            .setOnShowRationale{l->onShowRationale(l)}
-            .setOnNeverAskAgain{l->onNeverAskAgain(l)}
+            .setOnPermissionDenied { l -> onPermissionDenied(l) }
+            .setOnRequiresPermission { l -> onRequiresPermission(l) }
+            .setOnShowRationale { l -> onShowRationale(l) }
+            .setOnNeverAskAgain { l -> onNeverAskAgain(l) }
             .setPermissionEducation { showPermissionsEducation() }
             .build()
     }
-    private fun onRequiresPermission(permissions:ArrayList<String>) {
-        permissions.forEach(){
+
+    private fun onRequiresPermission(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -87,7 +85,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             sp.edit()
                 .putBoolean(KEY_SHOW_EDUCATION, false).apply()
             showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
-         } else{
+        } else {
             permissionsRequester.launch(false)
         }
     }
@@ -95,8 +93,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Process when the user denies the permissions
      */
-    private fun onPermissionDenied(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onPermissionDenied(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -113,8 +111,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         request.proceed()
     }
 
-    private fun onNeverAskAgain(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -215,9 +213,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 if (it) {
                     permissionsRequester = permissionsBuilder()
                         .setPermissions(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
-                        .setOnRequiresPermission { l->onRequiresCameraPermission(l) }
-                        .setOnShowRationale{l->onShowRationale(l)}
-                        .setOnNeverAskAgain{l->onCameraNeverAskAgain(l)}
+                        .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
                         .build()
                     permissionsRequester.launch(false)
                 }
@@ -225,10 +223,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     permissionsRequester = permissionsBuilder()
-                        .setPermissions(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
-                        .setOnRequiresPermission { l->onRequiresAudioPermission(l) }
-                        .setOnShowRationale{l->onShowRationale(l)}
-                        .setOnNeverAskAgain{l->onAudioNeverAskAgain(l)}
+                        .setPermissions(
+                            arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
+                                ArrayList()
+                            )
+                        )
+                        .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
                         .build()
                     permissionsRequester.launch(false)
                 }
@@ -236,8 +238,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun onRequiresAudioPermission(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onRequiresAudioPermission(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
@@ -247,8 +249,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun onAudioNeverAskAgain(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
@@ -258,8 +260,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun onRequiresCameraPermission(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onRequiresCameraPermission(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -269,8 +271,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun onCameraNeverAskAgain(permissions:ArrayList<String>) {
-        permissions.forEach(){
+    private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -279,6 +281,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
         }
     }
+
     /**
      * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
      */
@@ -354,7 +357,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         when (bOn) {
             true -> {
                 // Always try to start the video using the front camera
-                abstractMeetingOnBoardingViewModel.setChatVideoInDevice(null)
+                sharedModel.setChatVideoInDevice(null)
                 activateVideo()
             }
             false -> {
@@ -379,10 +382,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 MEGACHAT_INVALID_HANDLE,
                 false
             )
-            megaChatApi.addChatLocalVideoListener(
-                MEGACHAT_INVALID_HANDLE,
-                videoListener
-            )
+
+            sharedModel.addLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
         } else {
             videoListener?.let {
                 it.height = 0
@@ -399,7 +400,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * @param bEnable set the view to be enable or not
      * @param bSync execute synchronously or asynchronously
      */
-    private fun setViewEnable(view: View, bEnable: Boolean, bSync: Boolean = true){
+    private fun setViewEnable(view: View, bEnable: Boolean, bSync: Boolean = true) {
         when {
             bEnable && bSync -> (view as OnOffFab).enable = true
             bEnable && !bSync -> {
@@ -443,12 +444,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun removeChatVideoListener() {
         if (videoListener == null) return
         logDebug("Removing remote video listener")
-        megaChatApi.removeChatVideoListener(
-            MEGACHAT_INVALID_HANDLE,
-            MEGACHAT_INVALID_HANDLE,
-            false,
-            videoListener
-        )
+        sharedModel.removeLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener!!)
         videoListener = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        removeChatVideoListener()
+        sharedModel.releaseVideoDevice()
     }
 }

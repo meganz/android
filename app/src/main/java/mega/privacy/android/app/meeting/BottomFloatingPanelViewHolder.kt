@@ -14,6 +14,8 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
@@ -188,9 +190,6 @@ class BottomFloatingPanelViewHolder(
             }
 
             fabHold.setOnOffCallback {
-                // if isHold is off, should disable the camera and mic
-                updateHoldState(it)
-                binding.bottomFloatingPanel.fabHold.isOn = !it
                 listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
             }
 
@@ -209,20 +208,6 @@ class BottomFloatingPanelViewHolder(
             invite.setOnClickListener {
                 listener.onInviteParticipants()
             }
-        }
-    }
-
-    /**
-     * If meeting is hold, disable the cam & mic
-     *
-     * If meeting isn't hold, change to the previous state
-     */
-    private fun updateHoldState(isNotHold: Boolean) {
-        floatingPanelView.fabMic.apply {
-            enable = !isNotHold
-        }
-        floatingPanelView.fabCam.apply {
-            enable = !isNotHold
         }
     }
 
@@ -349,8 +334,20 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.fabMic.isOn = micOn
     }
 
-    fun enableHoldIcon(isEnabled: Boolean) {
+    fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
         floatingPanelView.fabHold.enable = isEnabled
+        updateHoldIcon(isHold)
+    }
+
+    fun updateHoldIcon(isHold: Boolean) {
+        floatingPanelView.fabHold.isOn = !isHold
+
+        floatingPanelView.fabMic.apply {
+            enable = !isHold
+        }
+        floatingPanelView.fabCam.apply {
+            enable = !isHold
+        }
     }
 
     fun updateCamIcon(micOn: Boolean) {

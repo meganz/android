@@ -19,7 +19,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -30,12 +30,6 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_NAME;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -425,7 +419,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
 						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
                     if (request.getMegaHandleList() != null) {
-						goToMeetingActivity(request.getText());
+						goToMeetingActivity(request.getChatHandle(), request.getText());
 					} else {
 						// Normal Chat Link
 						goToChatActivity();
@@ -445,13 +439,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		finish();
 	}
 
-	private void goToMeetingActivity(String meetingName) {
-		Intent intent = new Intent(OpenLinkActivity.this, MeetingActivity.class);
-		intent.setAction(MEETING_ACTION_GUEST);
-		intent.putExtra(MEETING_NAME, meetingName);
-
-		intent.setData(Uri.parse(url));
-		startActivity(intent);
+	private void goToMeetingActivity(long chatId, String meetingName) {
+		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url);
 		finish();
 	}
 

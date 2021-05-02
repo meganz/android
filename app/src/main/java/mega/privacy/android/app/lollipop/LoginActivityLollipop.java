@@ -40,6 +40,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -52,7 +53,6 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_GUEST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -319,12 +319,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         return initResult != MegaChatApi.INIT_ERROR;
     }
 
-    private void startJoinMeeting(String meetingLink) {
-        Intent intent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
-        intent.setData(Uri.parse(meetingLink));
-        intent.setAction(MEETING_ACTION_GUEST);
-
-        startActivity(intent);
+    private void startJoinMeeting(long chatId, String meetingLink) {
+        CallUtil.openMeetingGuestMode(this, null, chatId, meetingLink);
+//        Intent intent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
+//        intent.setData(Uri.parse(meetingLink));
+//        intent.setAction(MEETING_ACTION_GUEST);
+//
+//        startActivity(intent);
     }
 
     @Override

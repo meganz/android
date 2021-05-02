@@ -9,7 +9,8 @@
         android:id="@+id/video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"/>
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent" />
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
@@ -30,9 +31,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_call_hold_big"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

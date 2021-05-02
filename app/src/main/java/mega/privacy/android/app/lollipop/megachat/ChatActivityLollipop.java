@@ -140,7 +140,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
-import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
@@ -193,8 +192,6 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -655,7 +652,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     @Override
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
-        openMeeting(this, chatId);
+        openMeetingInProgress(this, chatId);
     }
 
     @Override
@@ -685,9 +682,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     @Override
-    public void onCallStarted(long chatId) {
+    public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
         if (idChat == chatId) {
-            openMeeting(this, idChat);
+            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
         }
     }
 
@@ -3064,12 +3061,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     addChecksForACall(chatRoom.getChatId(), false);
                     MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                     logDebug("Incoming call, open Meeting to answer the call");
-                    //Open INCOMING CALL ACTIVITY
-//                    MegaApplication.getInstance().openCallService(chatId);
-//                    Intent meetingIntent = new Intent(context, MeetingActivity.class);
-//                    meetingIntent.setAction(MEETING_ACTION_IN);
-//                    meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-//                    context.startActivity(meetingIntent);
+                    openMeetingRinging(this, chatRoom.getChatId());
                     return;
                 }
 
