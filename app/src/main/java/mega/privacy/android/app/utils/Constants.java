@@ -815,6 +815,8 @@ public class Constants {
 
     public static final int MAX_BADGE_NUM = 9;
 
+    public static final int START_CALL_AUDIO_ENABLE = 1;
+
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
@@ -829,7 +831,8 @@ public class Constants {
     public static final String EVENT_NETWORK_CHANGE = "network_change";
     public static final String EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change";
     public static final String EVENT_CHAT_TITLE_CHANGE = "chat_title_change";
-    public static final String EVENT_PUBLIC_CHAT_CREATED = "public_chat_created";
+    public static final String EVENT_MEETING_CREATED = "meeting_created";
+    public static final String EVENT_LINK_RECOVERED = "meeting_link_recovered";
 
     /** Event Keys related to calls*/
     public static final String EVENT_ERROR_STARTING_CALL = "error_starting_call";
@@ -842,6 +845,7 @@ public class Constants {
     public static final String EVENT_CALL_SPEAK_CHANGE = "call_speak_change";
     public static final String EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change";
     public static final String EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change";
+    public static final String EVENT_NOT_OUTGOING_CALL = "not_outgoing_call";
 
     /** Event Keys related to sessions*/
     public static final String EVENT_SESSION_STATUS_CHANGE = "session_status_change";

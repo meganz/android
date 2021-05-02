@@ -39,6 +39,8 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
         const val MEETING_CHAT_ID = "chat_id"
+        const val MEETING_AUDIO_ENABLE = "audio_enable"
+        const val MEETING_VIDEO_ENABLE = "video_enable"
     }
 
     private lateinit var binding: ActivityMeetingBinding
@@ -122,14 +124,30 @@ class MeetingActivity : PasscodeActivity() {
         // The args to be passed to startDestination
         val bundle = Bundle()
 
-        if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
-            bundle.putString(MEETING_LINK, intent.dataString)
-            bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
-        }
         bundle.putLong(
             MEETING_CHAT_ID,
             intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         )
+
+        if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
+            bundle.putString(MEETING_LINK, intent.dataString)
+            bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
+        }
+
+        if(meetingAction == MEETING_ACTION_IN){
+            bundle.putBoolean(
+                MEETING_AUDIO_ENABLE, intent.getBooleanExtra(
+                    MEETING_AUDIO_ENABLE,
+                    false
+                )
+            )
+            bundle.putBoolean(
+                MEETING_VIDEO_ENABLE, intent.getBooleanExtra(
+                    MEETING_VIDEO_ENABLE,
+                    false
+                )
+            )
+        }
 
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
@@ -147,7 +165,7 @@ class MeetingActivity : PasscodeActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                if (meetingViewModel.callLiveData.value == null) {
+                if (!meetingViewModel.isChatCreated()) {
                     MegaApplication.getInstance().removeRTCAudioManager()
                 }
                 onBackPressed()
@@ -182,5 +200,24 @@ class MeetingActivity : PasscodeActivity() {
             LogUtil.logError("Error adding participants")
         }
         super.onActivityResult(requestCode, resultCode, intent)
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val keyCode = event.keyCode
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+                if (app.isAnIncomingCallRinging) {
+                    app.muteOrUnmute(false)
+                }
+                false
+            }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                if (app.isAnIncomingCallRinging) {
+                    app.muteOrUnmute(true)
+                }
+                false
+            }
+            else -> super.dispatchKeyEvent(event)
+        }
     }
 }

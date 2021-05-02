@@ -20,7 +20,7 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
-import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -155,8 +155,7 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                         )
                         return
                     }
-
-                    startJoinMeeting(request.link)
+                    CallUtil.openMeetingGuestMode(requireContext(), null, request.chatHandle, request.link)
                     dismiss()
                 } else if (e.errorCode == MegaChatError.ERROR_NOENT) {
                     Util.showAlert(
@@ -169,14 +168,6 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                 }
             }
         })
-
-    private fun startJoinMeeting(meetingLink: String) {
-        val intent = Intent(requireContext(), MeetingActivity::class.java)
-        intent.data = Uri.parse(meetingLink)
-        intent.action = MeetingActivity.MEETING_ACTION_GUEST
-
-        startActivity(intent)
-    }
 
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)

@@ -181,7 +181,7 @@ public class CallService extends Service{
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
 
-            PendingIntent intentCall = getPendingIntentMeeting(this, currentChatId, notificationId+1);
+            PendingIntent intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId+1);
 
             mBuilderCompatO = new NotificationCompat.Builder(this, notificationChannelId);
             mBuilderCompatO
@@ -231,7 +231,7 @@ public class CallService extends Service{
             mBuilderCompat = new NotificationCompat.Builder(this);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            PendingIntent intentCall = getPendingIntentMeeting(this, currentChatId, notificationId+1);
+            PendingIntent intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId+1);
 
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
@@ -413,7 +413,7 @@ public class CallService extends Service{
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
 
         cancelNotification();
-        MegaApplication.setOpenCallChatId(-1);
+        MegaApplication.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
 
         super.onDestroy();
     }

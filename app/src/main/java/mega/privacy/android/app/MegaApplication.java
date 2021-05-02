@@ -65,7 +65,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
-import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -74,7 +73,6 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
@@ -108,8 +106,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -618,28 +614,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
-		MegaChatSession session = (MegaChatSession) sessionAndCall.second;
-		long callId = (long) sessionAndCall.first;
-		MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
-		if (call == null) {
-			return;
-		}
-
-		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-		if (chatRoom.isGroup()) {
-			return;
-		}
-
-		logDebug("The session on hold change");
-		if (call.hasLocalVideo() && session.isOnHold()) {
-			setWasLocalVideoEnable(true);
-			megaChatApi.disableVideo(call.getChatid(), null);
-		} else {
-			setWasLocalVideoEnable(false);
-		}
-	};
-
 	/**
 	 * Method that performs the necessary actions when there is an incoming call.
 	 *
@@ -828,7 +802,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
 		LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
 		LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE, Pair.class).observeForever(sessionStatusObserver);
-		LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observeForever(sessionOnHoldObserver);
 
 		logoutReceiver = new BroadcastReceiver() {
             @Override
@@ -1552,7 +1525,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return;
 		}
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
+//		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
+		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null) {
 			showGroupCallNotification(chatId);
 			return;
 		}
@@ -1605,7 +1579,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private void removeValues(long chatId) {
 		removeStatusVideoAndSpeaker(chatId);
 
-        if (!existsAnOgoingOrIncomingCall()) {
+        if (!existsAnOngoingOrIncomingCall()) {
             removeRTCAudioManager();
             removeRTCAudioManagerRingIn();
         } else if (participatingInACall()) {
@@ -1626,14 +1600,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
-
-			//if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
+//			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
 				//logDebug("TERM_CODE_ANSWER_TIMEOUT");
 				if (megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-						notificationBuilder.showMissedCallNotification(chatId, callId);
+						//notificationBuilder.showMissedCallNotification(chatId, callId);
 					} catch (Exception e) {
 						logError("EXCEPTION when showing missed call notification", e);
 					}
@@ -1804,8 +1777,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus())+", callId = "+ call.getCallId());
-		openCallService(call.getChatid());
-		openMeeting(this, call.getChatid());
+		openMeetingInProgress(this, call.getChatid());
 	}
 
 	public static boolean isShowRichLinkWarning() {
@@ -1910,12 +1882,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return hashMapOutgoingCall.get(callId);
 		}
 
-		setRequestSentCall(callId, false);
 		return false;
 	}
 
 	public static void setRequestSentCall(long callId, boolean isRequestSent) {
+    	if(isRequestSent(callId) == isRequestSent)
+    		return;
+
 		hashMapOutgoingCall.put(callId, isRequestSent);
+		if(!isRequestSent){
+			LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long.class).post(callId);
+		}
 	}
 
 	public static boolean isSpeakerViewAutomatic(long callId) {
@@ -1972,7 +1949,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return wasLocalVideoEnable;
 	}
 
-	private static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
+	public static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
 		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
 	}
 

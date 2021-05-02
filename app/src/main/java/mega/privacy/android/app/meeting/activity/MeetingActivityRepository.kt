@@ -3,10 +3,10 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
-import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
@@ -62,6 +62,97 @@ class MeetingActivityRepository @Inject constructor(
         }
     }
 
+    fun requestHiResVideo(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.requestHiResVideo(chatId, clientId, listener)
+    }
+
+    fun stopHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.stopHiResVideo(chatId, clientId, listener)
+    }
+
+    fun requestLowResVideo(
+        chatId: Long,
+        clientId: MegaHandleList,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.requestLowResVideo(chatId, clientId, listener)
+
+    }
+
+    fun stopLowResVideo(
+        chatId: Long,
+        clientId: MegaHandleList,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.stopLowResVideo(chatId, clientId, listener)
+
+    }
+
+    /**
+     * Method of obtaining the local video
+     *
+     * @param chatId chatId
+     * @param listener MeetingVideoListener
+     */
+    fun addLocalVideo(chatId: Long, listener: MeetingVideoListener) {
+        megaChatApi.addChatLocalVideoListener(chatId, listener)
+    }
+
+    /**
+     * Method of obtaining the local video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun addRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MeetingVideoListener
+    ) {
+        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of remove the local video
+     *
+     * @param chatId chatId
+     * @param listener MeetingVideoListener
+     */
+    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {
+        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
+    }
+
+    /**
+     * Method of remove the local video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun removeRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MeetingVideoListener
+    ) {
+        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     *  Select the video device to be used in calls
+     */
+    fun setChatVideoInDevice(cameraDevice: String, listener: MegaChatRequestListenerInterface?) {
+        megaChatApi.setChatVideoInDevice(cameraDevice, listener)
+    }
+
     /**
      * Select new output audio
      *
@@ -76,6 +167,22 @@ class MeetingActivityRepository @Inject constructor(
         }
     }
 
+    /**
+     * Method for creating a chat link
+     *
+     * @param chatId chat ID
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.createChatLink(chatId, listener)
+    }
+
+    /**
+     * Get a specific MegaChatRoom
+     *
+     * @param chatId chat ID
+     * @return MegaChatRoom
+     */
     fun getChatRoom(chatId: Long): MegaChatRoom? {
         return when (chatId) {
             MEGACHAT_INVALID_HANDLE -> {
@@ -87,33 +194,13 @@ class MeetingActivityRepository @Inject constructor(
         }
     }
 
-    fun getMeeting(chatId: Long): MegaChatCall? {
-        return when (chatId) {
-            MEGACHAT_INVALID_HANDLE -> {
-                null
-            }
-            else -> {
-                megaChatApi.getChatCall(chatId)
-            }
-        }
-    }
-
-    fun getInitialMeetingName(): String {
-        return StringResourcesUtils.getString(
-            R.string.type_meeting_name, megaChatApi.myFullname
-        )
-    }
-
-    fun setTitleChatRoom(chatId: Long, newTitle: String, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.setChatTitle(chatId, newTitle, listener)
-    }
-
-    fun startMeeting(chatId: Long, audioEnabled:Boolean, videoEnabled:Boolean, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.startChatCall(chatId, audioEnabled, videoEnabled, listener)
-    }
-
-    fun createPublicChat(title: String, listener: MegaChatRequestListenerInterface){
-        val participants = MegaChatPeerList.createInstance()
-        megaChatApi.createPublicChat(participants, title, listener);
+    /**
+     * Create a meeting
+     *
+     * @param meetingName Meeting's name
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.createMeeting(meetingName, listener)
     }
 }

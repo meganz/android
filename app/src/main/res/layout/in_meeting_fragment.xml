@@ -15,7 +15,8 @@
         android:layout_marginBottom="125dp"
         android:elevation="1dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"/>
 
     <include
         android:id="@+id/bottom_floating_panel"

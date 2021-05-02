@@ -43,10 +43,8 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
             logDebug("Call started")
             MegaApplication.setSpeakerStatus(request.chatHandle, request.flag)
             val call: MegaChatCall = api.getChatCall(request.chatHandle)
-            if (call != null) {
-                MegaApplication.setRequestSentCall(call.callId, true)
-            }
-            callback?.onCallStarted(request.chatHandle)
+            MegaApplication.setRequestSentCall(call.callId, true)
+            callback?.onCallStarted(request.chatHandle, request.flag, request.paramType)
         } else {
             logError("Error Starting call")
             snackbarShower?.showSnackbar(getString(R.string.call_error))
@@ -57,6 +55,6 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnCallStartedCallback {
-        fun onCallStarted(chatId: Long)
+        fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int)
     }
 }

@@ -44,7 +44,7 @@ import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
@@ -622,7 +622,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
                 if (megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
                     delaySignalPresence = false;
-                    if (!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()) {
+                    if (!(this instanceof MeetingActivity) && megaChatApi.isSignalActivityRequired()) {
                         logDebug("Send signal presence");
                         megaChatApi.signalPresenceActivity();
                     }

@@ -817,7 +817,7 @@ public final class ChatAdvancedNotificationBuilder {
         boolean shouldVibrate = !participatingInACall();
 
         PendingIntent intentIgnore = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
-        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
+        PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + 1);
 
         boolean hasPermissions = checkPermissionsCall(null, INVALID_TYPE_PERMISSIONS);
 
@@ -1039,7 +1039,7 @@ public final class ChatAdvancedNotificationBuilder {
         int requestCodeAnswer = notificationId + 1;
         PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
+        PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + 1);
 
         /*Customize notification*/
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);

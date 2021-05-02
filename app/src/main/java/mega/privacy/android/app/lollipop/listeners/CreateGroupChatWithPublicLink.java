@@ -29,6 +29,8 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
         this.title = title;
     }
 
+    public CreateGroupChatWithPublicLink() { }
+
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -45,8 +47,13 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
 
         if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Chat created - get link");
-                api.createChatLink(request.getChatHandle(), this);
+                if(request.getNumber() == 1){
+                    logDebug("Meeting created");
+                    LiveEventBus.get(EVENT_MEETING_CREATED, Long.class).post(request.getChatHandle());
+                }else{
+                    logDebug("Chat created - get link");
+                    api.createChatLink(request.getChatHandle(), this);
+                }
             }
             else{
                 if(context instanceof ManagerActivityLollipop){
@@ -64,12 +71,14 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
-            logDebug("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
+                LiveEventBus.get(EVENT_LINK_RECOVERED, Pair.class).post(chatAndLink);
+            }
+
             if (request.getFlag() == false) {
-               if (request.getNumRetry() == 1) {
+              if (request.getNumRetry() == 1) {
                    logDebug("Chat link exported");
-                   Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
-                   LiveEventBus.get(EVENT_PUBLIC_CHAT_CREATED, Pair.class).post(chatAndLink);
 
                    if(context instanceof ManagerActivityLollipop){
                        Intent intent = new Intent(context, ChatActivityLollipop.class);

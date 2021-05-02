@@ -54,6 +54,6 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnCallOnHoldCallback {
-        fun onCallOnHold(chatId: Long, isOnHold : Boolean)
+        fun onCallOnHold(chatId: Long, isOnHold: Boolean)
     }
 }

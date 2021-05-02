@@ -207,7 +207,6 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
-import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -224,6 +223,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
@@ -281,9 +281,6 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_NAME;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -8935,13 +8932,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	private void goToJoinMeeting(String link, String name) {
-		Intent joinMeetingLinkIntent = new Intent(this, MeetingActivity.class);
-		joinMeetingLinkIntent.setData(Uri.parse(link));
-		joinMeetingLinkIntent.setAction(MEETING_ACTION_JOIN);
-		joinMeetingLinkIntent.putExtra(MEETING_NAME, name);
-		startActivity(joinMeetingLinkIntent);
-	}
+
 
 	/**
 	 * Initializes the variables to join chat by default.
@@ -9490,9 +9481,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void onCreateMeeting() {
-		Intent meetingIntent = new Intent(this, MeetingActivity.class);
-		meetingIntent.setAction(MEETING_ACTION_CREATE);
-		startActivity(meetingIntent);
+		openMeetingToCreate(this);
 	}
 
 	public void addContactFromPhone() {
@@ -12185,7 +12174,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				String link = request.getLink();
 				if (request.getMegaHandleList() != null) {
-					goToJoinMeeting(link, request.getText());
+					CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
 				} else {
 					showChatLink(link);
 				}
