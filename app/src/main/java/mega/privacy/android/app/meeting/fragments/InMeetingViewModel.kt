@@ -400,6 +400,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     ) {
         if (chatRoom.value != null && chatRoom.value?.chatId != MEGACHAT_INVALID_HANDLE) {
             //The chat exists
+            MegaApplication.getInstance().openCallService(chatRoom.value!!.chatId)
+
             chatRoom.value?.let {
                 inMeetingRepository.startMeeting(
                     it.chatId,

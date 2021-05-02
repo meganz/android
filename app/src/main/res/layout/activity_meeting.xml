@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:minHeight="36dp"
             android:background="@android:color/transparent"
-            android:visibility="visible"
+            android:visibility="gone"
             android:orientation="horizontal"
             android:gravity="center"
             app:layout_constraintStart_toStartOf="parent"
