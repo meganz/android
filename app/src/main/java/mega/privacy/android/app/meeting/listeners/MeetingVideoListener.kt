@@ -28,6 +28,8 @@ class MeetingVideoListener(
     val renderer: MegaSurfaceRenderer
     private val surfaceHolder: SurfaceHolder
     private var bitmap: Bitmap? = null
+    private var viewWidth = 0
+    private var viewHeight = 0
 
     override fun onChatVideoData(
         api: MegaChatApiJava,
@@ -40,13 +42,20 @@ class MeetingVideoListener(
             return
         }
 
-        if (this.width != width || this.height != height) {
+        /**
+         * viewWidth != surfaceView.width || viewHeight != surfaceView.height
+         * Re-calculate the camera preview ratio when surface view size changed
+         */
+
+        if (this.width != width || this.height != height
+            || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
             this.width = width
             this.height = height
             val holder = surfaceView.holder
             if (holder != null) {
                 val viewWidth = surfaceView.width
                 val viewHeight = surfaceView.height
+
                 if (viewWidth != 0 && viewHeight != 0) {
                     var holderWidth = Math.min(viewWidth, width)
                     var holderHeight = holderWidth * viewHeight / viewWidth
