@@ -17,6 +17,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.permission.PermissionType
+import mega.privacy.android.app.utils.permission.PermissionsRequester
+import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
@@ -26,7 +29,9 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  */
 open class MeetingBaseFragment : BaseFragment() {
 
-    lateinit var meetingActivity : MeetingActivity
+    lateinit var meetingActivity: MeetingActivity
+
+    protected lateinit var permissionsRequester: PermissionsRequester
 
     // The name of the preference to retrieve.
     protected val KEY_SHOW_EDUCATION = "show_education"
@@ -54,7 +59,44 @@ open class MeetingBaseFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        refreshPermissions(permissions)
+//        refreshPermissions(permissions)
+        permissionsRequester =
+            permissionsBuilder(permissions.toCollection(ArrayList()))
+                .setPermissionRequestType(PermissionType.CheckPermission)
+                .setOnRequiresPermission { l ->
+                    onRequiresPermission(l)
+                }.setOnPermissionDenied { l ->
+                    onPermissionDenied(l)
+                }.build()
+        permissionsRequester.launch(false)
+    }
+
+    private fun onRequiresPermission(permissions: ArrayList<String>) {
+        permissions.forEach() {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(true)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(true)
+                }
+            }
+        }
+    }
+
+    private fun onPermissionDenied(permissions: ArrayList<String>) {
+        permissions.forEach() {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(false)
+                }
+            }
+        }
     }
 
     /**

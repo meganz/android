@@ -2,9 +2,11 @@ package mega.privacy.android.app.utils.permission
 
 import android.app.Activity
 import android.content.Context
+import android.util.ArrayMap
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
+import java.util.HashMap
 
 /**
  * Declare singleton PermissionUtils

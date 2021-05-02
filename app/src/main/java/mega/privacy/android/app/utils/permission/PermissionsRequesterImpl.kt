@@ -26,8 +26,10 @@ class PermissionsRequesterImpl private constructor(
     private val permissionRequestType: PermissionType
 ) : PermissionsRequester {
 
-    class Builder(val activity: FragmentActivity) {
-        private lateinit var permissions: ArrayList<String>
+    /**
+     * Build a n instance of PermissionsRequesterImpl
+     */
+    class Builder(val activity: FragmentActivity, val permissions: ArrayList<String>) {
         private var onShowRationale: ((PermissionRequest) -> Unit)? = null
         private var onPermissionDenied: ((ArrayList<String>) -> Unit)? = null
         private lateinit var requiresPermission: (ArrayList<String>) -> Unit
@@ -44,17 +46,6 @@ class PermissionsRequesterImpl private constructor(
          */
         fun setPermissionEducation(permissionEducation: (() -> Unit)?): Builder {
             this.permissionEducation = permissionEducation
-            return this
-        }
-
-        /**
-         * Set the permissions that should be checked
-         *
-         * @param permissions the permissions that the user needs  (Varargs - Variable number of arguments)
-         * @return This Builder object to allow for chaining of calls to set methods
-         */
-        fun setPermissions(permissions: ArrayList<String>): Builder {
-            this.permissions = permissions
             return this
         }
 
@@ -111,6 +102,9 @@ class PermissionsRequesterImpl private constructor(
             return this
         }
 
+        /**
+         * Create the instance of PermissionRequestImpl
+         */
         fun build(): PermissionsRequesterImpl {
             return PermissionsRequesterImpl(
                 permissions,
@@ -126,33 +120,69 @@ class PermissionsRequesterImpl private constructor(
     }
 
     override fun launch(showEducation: Boolean) {
-        if (permissionRequestType.checkPermissions(activity, permissions)) {
-            requiresPermission(permissions)
-        } else {
-            if (showEducation) {
-                permissionEducation?.let { it() }
-            } else {
-                ViewModelProvider(activity).get(PermissionViewModel::class.java).observe(
-                    activity,
-                    requiresPermission,
-                    onPermissionDenied,
-                    onNeverAskAgain
-                )
-                val requestFun: () -> Unit = {
-                    activity.supportFragmentManager
-                        .beginTransaction()
-                        .replace(android.R.id.content, permissionRequestType.fragment(permissions))
-                        .commitAllowingStateLoss()
+        when (permissionRequestType) {
+            PermissionType.CheckPermission -> {
+                for (permission in permissions) {
+                    val arrayList = ArrayList<String>()
+                    arrayList.add(permission)
+                    if (permissionRequestType.checkPermissions(activity, arrayList)) {
+                        requiresPermission(arrayList)
+                    } else {
+                        onPermissionDenied?.let { it(arrayList) }
+                    }
                 }
-                if (PermissionUtils.shouldShowRequestPermissionRationale(activity, permissions)) {
-                    onShowRationale?.invoke(
-                        RationalePermissionRequest.create(
-                            onPermissionDenied,
-                            requestFun
-                        )
-                    )
+            }
+            PermissionType.NormalPermission -> {
+                if (permissionRequestType.checkPermissions(activity, permissions)) {
+                    requiresPermission(permissions)
                 } else {
-                    requestFun.invoke()
+                    if (showEducation) {
+                        permissionEducation?.let { it() }
+                    } else {
+                        ViewModelProvider(activity).get(PermissionViewModel::class.java)
+                            .removeObservers(activity)
+                        ViewModelProvider(activity).get(PermissionViewModel::class.java).permissionRequestResult.observe(
+                            activity
+                        ) { map ->
+                            map.forEach {
+                                when (it.value) {
+                                    PermissionResult.GRANTED -> requiresPermission.invoke(
+                                        arrayListOf(it.key)
+                                    )
+                                    PermissionResult.DENIED -> onPermissionDenied?.invoke(
+                                        arrayListOf(it.key)
+                                    )
+                                    PermissionResult.DENIED_AND_DISABLED -> onNeverAskAgain?.invoke(
+                                        arrayListOf(it.key)
+                                    )
+                                }
+                            }
+                        }
+
+                        val requestFun: () -> Unit = {
+                            activity.supportFragmentManager
+                                .beginTransaction()
+                                .replace(
+                                    android.R.id.content,
+                                    permissionRequestType.fragment(permissions)
+                                )
+                                .commitAllowingStateLoss()
+                        }
+                        if (PermissionUtils.shouldShowRequestPermissionRationale(
+                                activity,
+                                permissions
+                            )
+                        ) {
+                            onShowRationale?.invoke(
+                                RationalePermissionRequest.create(
+                                    onPermissionDenied,
+                                    requestFun
+                                )
+                            )
+                        } else {
+                            requestFun.invoke()
+                        }
+                    }
                 }
             }
         }

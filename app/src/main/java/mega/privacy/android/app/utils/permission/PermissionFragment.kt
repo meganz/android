@@ -49,14 +49,12 @@ sealed class PermissionFragment : Fragment() {
                 var i = 0
                 val map = HashMap<String, PermissionResult>()
                 while (i < grantResults.size) {
-//                    val map = HashMap<String, PermissionResult>()
                     if (verifyPermissions(grantResults[i])) {
                         // All permissions are granted
                         map[permissions[i]] = PermissionResult.GRANTED
                     } else {
                         val arrayListPermission = ArrayList<String>()
                         arrayListPermission.add(permissions[i])
-                        // Check if the user tickets "Never Ask Again"
                         if (!PermissionUtils.shouldShowRequestPermissionRationale(
                                 this,
                                 arrayListPermission
@@ -69,7 +67,6 @@ sealed class PermissionFragment : Fragment() {
                             map[permissions[i]] = PermissionResult.DENIED
                         }
                     }
-//                    viewModel.postPermissionRequestResult(map)
                     i++
                 }
                 viewModel.postPermissionRequestResult(map)
@@ -88,4 +85,18 @@ sealed class PermissionFragment : Fragment() {
                 }
         }
     }
+
+    /**
+     * Subclass of PermissionRequestFragment
+     */
+    internal class CheckRequestFragment : PermissionFragment() {
+
+
+        companion object {
+
+            fun newInstance() =
+                CheckRequestFragment()
+        }
+    }
+
 }

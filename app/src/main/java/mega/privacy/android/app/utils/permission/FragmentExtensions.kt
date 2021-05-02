@@ -7,7 +7,8 @@ import androidx.fragment.app.Fragment
  * Should apply after the activity is ready
  */
 
-fun Fragment.permissionsBuilder(
+fun Fragment.permissionsBuilder(permissions: ArrayList<String>
 ) = PermissionsRequesterImpl.Builder(
-    activity = requireActivity()
+    activity = requireActivity(),
+    permissions
 )

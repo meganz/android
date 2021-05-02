@@ -45,7 +45,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  */
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
-    private lateinit var permissionsRequester: PermissionsRequester
+
     private val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     private var videoListener: MeetingVideoListener? = null
@@ -53,8 +53,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        permissionsRequester = permissionsBuilder()
-            .setPermissions(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
             .setOnPermissionDenied { l->onPermissionDenied(l) }
             .setOnRequiresPermission { l->onRequiresPermission(l) }
             .setOnShowRationale{l->onShowRationale(l)}
@@ -213,8 +212,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             model.cameraPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
-                    permissionsRequester = permissionsBuilder()
-                        .setPermissions(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
+                    permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
                         .setOnRequiresPermission { l->onRequiresCameraPermission(l) }
                         .setOnShowRationale{l->onShowRationale(l)}
                         .setOnNeverAskAgain{l->onCameraNeverAskAgain(l)}
@@ -224,8 +222,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
-                    permissionsRequester = permissionsBuilder()
-                        .setPermissions(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
+                    permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
                         .setOnRequiresPermission { l->onRequiresAudioPermission(l) }
                         .setOnShowRationale{l->onShowRationale(l)}
                         .setOnNeverAskAgain{l->onAudioNeverAskAgain(l)}
@@ -282,7 +279,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
      */
-    fun showSnackBar() {
+    private fun showSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
