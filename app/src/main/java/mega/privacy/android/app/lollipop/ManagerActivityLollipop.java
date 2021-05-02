@@ -14444,6 +14444,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setSearchQuery(String searchQuery) {
 		this.searchQuery = searchQuery;
+		this.searchView.setQuery(searchQuery, false);
 	}
 
 	public long getParentHandleIncoming() {
