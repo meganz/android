@@ -23,7 +23,7 @@ class AssignModeratorActivity : BaseActivity() {
     private lateinit var binding: ActivityAssignModeratorBinding
 
     private var selectedParticipants: MutableList<Participant> = mutableListOf()
-    private var participants: MutableList<Participant> = TestTool.testData().toMutableList()
+    private var participants: MutableList<Participant> = mutableListOf()
 
     private lateinit var participantsAdapter: AssignParticipantsAdapter
     private lateinit var selectedParticipantsAdapter: SelectedParticipantsAdapter

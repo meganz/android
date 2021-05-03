@@ -6,13 +6,15 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.meeting.listeners.GridViewListener
 
 class VideoGridViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int,
-    private val pagePosition: Int
+    private val pagePosition: Int,
+    private val listener: GridViewListener
 ) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
 
     override fun onBindViewHolder(gridHolder: VideoGridViewHolder, position: Int) {
@@ -25,7 +27,8 @@ class VideoGridViewAdapter(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             gridView,
             screenWidth,
-            screenHeight
+            screenHeight,
+            listener
         )
     }
 }

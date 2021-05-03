@@ -2,7 +2,10 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.os.Bundle
 import android.util.Pair
-import android.view.*
+import android.view.LayoutInflater
+import android.view.SurfaceView
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -46,27 +49,29 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private val remoteAVFlagsObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                if (!inMeetingViewModel.isMe(this.peerId)) {
-                    if (callAndSession.second.hasVideo()) {
-                        activateVideo(this.peerId!!, this.clientId!!)
+            if (inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.isSameCall(callAndSession.first)) {
+                    if (!inMeetingViewModel.isMe(this.peerId)) {
+                        if (callAndSession.second.hasVideo()) {
+                            activateVideo(this.peerId!!, this.clientId!!)
+                        } else {
+                            showAvatar(this.peerId!!, this.clientId!!)
+                        }
                     } else {
-                        showAvatar(this.peerId!!, this.clientId!!)
+                        checkItIsOnlyAudio()
                     }
-                } else {
-                    checkItIsOnlyAudio()
                 }
             }
         }
 
     private val localAVFlagsObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && inMeetingViewModel.isOneToOneCall()) {
             checkItIsOnlyAudio()
         }
     }
 
     private val callOnHoldObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && inMeetingViewModel.isOneToOneCall()) {
             checkCallOnHold(it.isOnHold)
         }
     }
@@ -74,9 +79,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private val sessionOnHoldObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             //As the session has been established, I am no longer in the Request sent state
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                logDebug("The session on hold change")
-                checkCallOnHold(callAndSession.second.isOnHold)
+            if (inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.isSameCall(callAndSession.first)) {
+                    logDebug("The session on hold change")
+                    checkCallOnHold(callAndSession.second.isOnHold)
+                }
             }
         }
 
@@ -107,7 +114,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     }
                     else -> initLiveEventBus()
                 }
-
             }
         }
     }
@@ -227,21 +233,20 @@ class IndividualCallFragment : MeetingBaseFragment() {
         when {
             isFloatingWindow -> return
             else -> {
-                vAvatar.isVisible = true
-
-                when {
-                    inMeetingViewModel.isCallOrSessionOnHold() -> {
-                        vOnHold.isVisible = true
-                        vAvatar.alpha = 0.5f
-                    }
-                    else -> {
-                        vOnHold.isVisible = false
-                        vAvatar.alpha = 1f
+                if(inMeetingViewModel.isOneToOneCall()){
+                    when {
+                        inMeetingViewModel.isCallOrSessionOnHold() -> {
+                            vOnHold.isVisible = true
+                            vAvatar.alpha = 0.5f
+                        }
+                        else -> {
+                            vOnHold.isVisible = false
+                            vAvatar.alpha = 1f
+                        }
                     }
                 }
             }
         }
-
     }
 
     /**
@@ -297,7 +302,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Check if is an audio call
      */
     private fun checkItIsOnlyAudio() {
-        if (!isFloatingWindow) {
+        if (!isFloatingWindow || !inMeetingViewModel.isOneToOneCall()) {
             return
         }
 
@@ -354,7 +359,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 sharedModel.addLocalVideo(chatId!!, videoListener)
             } else {
 
-                videoListener = MeetingVideoListener(
+                videoListener  = MeetingVideoListener(
                     vVideo,
                     outMetrics,
                     clientId,
@@ -396,7 +401,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             return
 
         when {
-            inMeetingViewModel.isMe(peerId!!) -> {
+            inMeetingViewModel.isMe(this.peerId) -> {
                 sharedModel.removeLocalVideo(chatId!!, videoListener!!)
             }
             else -> {

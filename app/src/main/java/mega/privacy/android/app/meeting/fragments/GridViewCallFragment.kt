@@ -13,9 +13,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.GridViewListener
+import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.utils.Util
 
-class GridViewCallFragment : MeetingBaseFragment() {
+class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -65,7 +67,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                     (parentFragment as InMeetingFragment).inMeetingViewModel,
                     parentFragment,
                     maxWidth,
-                    maxHeight
+                    maxHeight, this
                 )
             )
             .create()
@@ -109,5 +111,31 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         @JvmStatic
         fun newInstance() = GridViewCallFragment()
+    }
+
+    override fun onCloseVideo(participant: Participant) {
+        if(participant.videoListener == null)
+            return
+
+        sharedModel.chatRoomLiveData.value?.let {
+            sharedModel.stopHiResVideo(
+                it.chatId, participant.clientId, RequestHiResVideoListener(
+                    requireContext()
+                )
+            )
+            sharedModel.removeRemoteVideo(it.chatId, participant.clientId, participant.hasHiRes, participant.videoListener!!)
+        }
+        participant.videoListener = null
+    }
+
+    override fun onActivateVideo(participant: Participant) {
+        sharedModel.chatRoomLiveData.value?.let {
+            sharedModel.addRemoteVideo(it.chatId, participant.clientId, participant.hasHiRes, participant.videoListener!!)
+            sharedModel.requestHiResVideo(
+                it.chatId, participant.clientId, RequestHiResVideoListener(
+                    requireContext()
+                )
+            )
+        }
     }
 }

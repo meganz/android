@@ -19,39 +19,34 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.multidex.MultiDexApplication;
-import androidx.emoji.text.EmojiCompat;
-import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Pair;
 
-import javax.inject.Inject;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.provider.FontRequest;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.lifecycle.Observer;
+import androidx.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import mega.privacy.android.app.di.MegaApi;
-import mega.privacy.android.app.di.MegaApiFolder;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.HiltAndroidApp;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
@@ -59,25 +54,30 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
+import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
+import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
-import mega.privacy.android.app.fcm.KeepAliveService;
-import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
+import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
-
+import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -105,22 +105,22 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
-import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
@@ -569,8 +569,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					incomingCall(listAllCalls, chatId, callStatus);
 				}
 
-				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING) && isOutgoing) {
-					outgoingCall( chatId);
+				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
+					ongoingCall(chatId, isOutgoing ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
@@ -625,22 +625,22 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if(!megaApi.isChatNotifiable(chatId))
 			return;
 
-		logDebug("Controlling incoming call");
 		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 		controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
 	}
 
 	/**
-	 * Method that performs the necessary actions when there is an outgoing call.
+	 * Method that performs the necessary actions when there is an outgoing call or incoming call.
 	 *
 	 * @param chatId       Chat ID
+	 * @param typeAudioManager audio Manager type
 	 */
-	public void outgoingCall(long chatId) {
-		if(rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == AUDIO_MANAGER_CALL_OUTGOING)
+	public void ongoingCall(long chatId, int typeAudioManager) {
+		if(rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
 			return;
 
-		logDebug("Controlling outgoing call");
-		createOrUpdateAudioManager(getSpeakerStatus(chatId), AUDIO_MANAGER_CALL_OUTGOING);
+		logDebug("Controlling outgoing/in progress call");
+		createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
 		clearIncomingCallNotification(chatId);
 	}
 
@@ -686,7 +686,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
 				int type = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_TYPE);
-				if(type != STREAM_RING)
+				if(type != AudioManager.STREAM_RING)
 					return;
 
 				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
@@ -1637,6 +1637,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
 			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+			logDebug("Creating RTC Audio Manager (ringing mode)");
 			rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, AUDIO_MANAGER_CALL_RINGING);
 		}else{
 			if (rtcAudioManager != null) {
@@ -1722,9 +1723,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             logDebug("Starting proximity sensor...");
             rtcAudioManager.startProximitySensor();
             rtcAudioManager.setOnProximitySensorListener(isNear -> {
-                Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-                intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
-                sendBroadcast(intent);
+				LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean.class).post(isNear);
             });
         }
     }

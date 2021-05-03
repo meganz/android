@@ -8,6 +8,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -175,5 +176,16 @@ class InMeetingRepository @Inject constructor(
             return
 
         megaChatApi.hangChatCall(callId, HangChatCallListener(context))
+    }
+
+    fun isMyContact(chat: MegaChatRoom, peerId: Long): Boolean {
+        val userMail = CallUtil.getUserMailCall(chat, peerId)
+        if (!TextUtil.isTextEmpty(userMail)) {
+            val contact: MegaUser = megaApi.getContact(userMail)
+            if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
+                return true
+            }
+        }
+        return false
     }
 }

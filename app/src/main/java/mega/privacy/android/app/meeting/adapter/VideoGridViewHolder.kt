@@ -1,15 +1,20 @@
 package mega.privacy.android.app.meeting.adapter
 
-import android.graphics.Bitmap
 import android.graphics.Rect
 import android.view.SurfaceHolder
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.meeting.listeners.GridViewListener
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiAndroid
+import org.jetbrains.anko.displayMetrics
 import javax.inject.Inject
 
 /**
@@ -20,7 +25,8 @@ class VideoGridViewHolder(
     private val binding: ItemParticipantVideoBinding,
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
-    private val screenHeight: Int
+    private val screenHeight: Int,
+    private val listener: GridViewListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -35,60 +41,60 @@ class VideoGridViewHolder(
     private val srcRect = Rect()
     private val dstRect = Rect()
 
-    // TODO test start
-    var job: Job? = null
+//    // TODO test start
+//    var job: Job? = null
+//
+//    val callback = object : SurfaceHolder.Callback {
+//
+//        override fun surfaceCreated(holder: SurfaceHolder?) {
+//            isDrawing = true
+//
+//            dstRect.top = 0
+//            dstRect.left = 0
+//            dstRect.right = binding.video.width
+//            dstRect.bottom = binding.video.height
 
-    val callback = object : SurfaceHolder.Callback {
+//            inMeetingViewModel.frames.observeForever {
+//                job = GlobalScope.launch(Dispatchers.IO) {
+//                    while (isDrawing) {
+//                        it.forEach {
+//                            delay(50)
+//                            onChatVideoData(it.width, it.height, it)
+//
+//                            if (!isDrawing) return@forEach
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        override fun surfaceChanged(
+//            holder: SurfaceHolder?,
+//            format: Int,
+//            width: Int,
+//            height: Int
+//        ) {
+//        }
+//
+//        override fun surfaceDestroyed(holder: SurfaceHolder?) {
+//            onRecycle()
+//        }
+//    }
 
-        override fun surfaceCreated(holder: SurfaceHolder?) {
-            isDrawing = true
-
-            dstRect.top = 0
-            dstRect.left = 0
-            dstRect.right = binding.video.width
-            dstRect.bottom = binding.video.height
-
-            inMeetingViewModel.frames.observeForever {
-                job = GlobalScope.launch(Dispatchers.IO) {
-                    while (isDrawing) {
-                        it.forEach {
-                            delay(50)
-                            onChatVideoData(it.width, it.height, it)
-
-                            if (!isDrawing) return@forEach
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun surfaceChanged(
-            holder: SurfaceHolder?,
-            format: Int,
-            width: Int,
-            height: Int
-        ) {
-        }
-
-        override fun surfaceDestroyed(holder: SurfaceHolder?) {
-            onRecycle()
-        }
-    }
-
-    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
-        if (bitmap.isRecycled || !holder.surface.isValid) return
-
-        val canvas = holder.lockCanvas() ?: return
-
-        srcRect.top = 0
-        srcRect.left = 0
-        srcRect.right = width
-        srcRect.bottom = height
-
-        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
-        holder.unlockCanvasAndPost(canvas)
-    }
-    // TODO test end
+//    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
+//        if (bitmap.isRecycled || !holder.surface.isValid) return
+//
+//        val canvas = holder.lockCanvas() ?: return
+//
+//        srcRect.top = 0
+//        srcRect.left = 0
+//        srcRect.right = width
+//        srcRect.bottom = height
+//
+//        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
+//        holder.unlockCanvasAndPost(canvas)
+//    }
+//    // TODO test end
 
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
@@ -102,21 +108,85 @@ class VideoGridViewHolder(
 
         binding.name.text = participant.name
 
+        initAvatar(participant)
+        initStatus(participant)
+
         holder = binding.video.holder
-        holder.addCallback(callback)
+        //holder.addCallback(callback)
     }
 
-    fun onRecycle() {
-        isDrawing = false
+    fun initAvatar(participant: Participant) {
+        inMeetingViewModel.getChat()?.let {
+            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
+            if (avatar == null) {
+                avatar = CallUtil.getDefaultAvatarCall(
+                    MegaApplication.getInstance().applicationContext,
+                    participant.peerId
+                )
+            }
 
-        holder.removeCallback(callback)
+            binding.avatar.setImageBitmap(avatar)
+        }
+    }
 
-        if (job != null && job!!.isActive) {
-            GlobalScope.launch(Dispatchers.IO) {
-                job!!.cancelAndJoin()
+    fun initStatus(participant: Participant) {
+        val session = inMeetingViewModel.getSession(participant.peerId)
+        val call = inMeetingViewModel.getCall()
+        call?.let {
+            if (participant.isVideoOn && !it.isOnHold && (session == null || !session.isOnHold)) {
+                activateVideo(participant)
+            } else {
+                showAvatar(participant)
             }
         }
     }
+
+    fun showAvatar(participant: Participant) {
+        binding.avatar.isVisible = true
+        closeVideo(participant)
+    }
+
+    /**
+     * Method for activating the video.
+     */
+    fun activateVideo(participant: Participant) {
+        binding.avatar.isVisible = false
+
+        if (participant.videoListener == null) {
+            var vListener = MeetingVideoListener(
+                binding.video,
+                MegaApplication.getInstance().applicationContext.displayMetrics,
+                participant.clientId,
+                false
+            )
+
+            participant.videoListener = vListener
+            listener.onActivateVideo(participant)
+        }
+
+        binding.video.isVisible = true
+    }
+
+    /**
+     * Method to close Video
+     */
+    private fun closeVideo(participant: Participant) {
+        binding.video.isVisible = false
+
+        listener.onCloseVideo(participant)
+    }
+
+//    fun onRecycle() {
+//        isDrawing = false
+//
+//        holder.removeCallback(callback)
+//
+//        if (job != null && job!!.isActive) {
+//            GlobalScope.launch(Dispatchers.IO) {
+//                job!!.cancelAndJoin()
+//            }
+//        }
+//    }
 
     private fun layout(isFirstPage: Boolean, itemCount: Int) {
         var w = 0
@@ -129,6 +199,11 @@ class VideoGridViewHolder(
 
         if (isFirstPage) {
             when (itemCount) {
+                1 -> {
+                    w = screenWidth
+                    h = screenHeight
+                    layoutParams.setMargins(0, 0, 0, 0)
+                }
                 2 -> {
                     w = screenWidth
                     h = screenHeight / 2

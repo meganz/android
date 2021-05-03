@@ -14,18 +14,17 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.TYPE_JOIN
+import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatRequestListenerInterface
-import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatSession
-import kotlin.random.Random
+import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
@@ -132,6 +131,20 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun getCall(): MegaChatCall? {
         chatRoom.value?.let { return inMeetingRepository.getMeeting(it.chatId) }
         return null
+    }
+
+    fun isOnlyMeOnTheCall(chatId: Long): Boolean {
+        if (isSameChatRoom(chatId)) {
+            _callLiveData.value?.let {
+                if (it.numParticipants == 1) {
+                    val peerIds = it.peeridParticipants
+                    peerIds?.let {
+                        return isMe(peerIds.get(0))
+                    }
+                }
+            }
+        }
+        return false
     }
 
     /**
@@ -289,12 +302,49 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 
+    fun showBannerUserJoinOrLeaveCall(
+        bannerText: TextView?,
+        peerId: Long,
+        type: Int
+    ): Boolean {
+        if (isMe(peerId))
+            return false
+
+        when (type) {
+            TYPE_JOIN -> {
+                bannerText?.let {
+                    it.text = StringResourcesUtils.getString(
+                        R.string.contact_joined_the_call,
+                        CallUtil.getUserNameCall(
+                            MegaApplication.getInstance().applicationContext,
+                            peerId
+                        )
+                    )
+                    return true
+                }
+            }
+            TYPE_LEFT -> {
+                bannerText?.let {
+                    it.text = StringResourcesUtils.getString(
+                        R.string.contact_left_the_call,
+                        CallUtil.getUserNameCall(
+                            MegaApplication.getInstance().applicationContext,
+                            peerId
+                        )
+                    )
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     /**
      * Method for displaying the correct banner: If the call is muted or on hold
      *
      * @return Banner text
      */
-    fun showAppropriateBanner(bannerIcon: ImageView?, bannerText: TextView?): Boolean {
+    fun showAppropriateBannerOneToOneCall(bannerIcon: ImageView?, bannerText: TextView?): Boolean {
         when {
             isCallOrSessionOnHold() -> {
                 bannerIcon?.let {
@@ -320,7 +370,8 @@ class InMeetingViewModel @ViewModelInject constructor(
                                             R.string.muted_contact_micro,
                                             inMeetingRepository.getContactOneToOneCallName(
                                                 session.peerid
-                                            ))
+                                            )
+                                        )
                                         return true
                                     }
 
@@ -419,16 +470,63 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 
-    fun addParticipant(add: Boolean) {
-        if (add) {
-            participants.value!!.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])
-        } else {
-            if (participants.value!!.size > 2) {
-                participants.value!!.removeAt(participants.value!!.size - 1)
-            }
+    fun isParticipantModerator(peerId: Long): Boolean {
+        chatRoom.value?.let {
+            val privileges = it.getPeerPrivilegeByHandle(peerId)
+            if (privileges == MegaChatRoom.PRIV_MODERATOR)
+                return true
         }
-        participants.value = participants.value
+        return false
     }
+
+    fun isMyContact(peerId: Long): Boolean {
+        chatRoom.value?.let {
+            return inMeetingRepository.isMyContact(it, peerId)
+        }
+        return false
+    }
+
+    fun createParticipant(session: MegaChatSession) {
+        if (chatRoom.value != null) {
+            val isModerator = isParticipantModerator(session.peerid)
+            val isContact = isMyContact(session.peerid)
+            val hasHiRes = session.isHiResVideo
+
+            val userPeer = Participant(
+                session.peerid,
+                session.clientid,
+                CallUtil.getUserNameCall(
+                    MegaApplication.getInstance().applicationContext,
+                    session.peerid
+                ),
+                null,
+                "xxxx",
+                false,
+                isModerator,
+                session.hasAudio(),
+                session.hasVideo(),
+                !isModerator,
+                isContact,
+                false,
+                hasHiRes,
+                null
+            )
+
+            participants.value?.add(0, userPeer)
+            participants.value = participants.value
+        }
+    }
+
+//    fun addParticipant(add: Boolean) {
+//        if (add) {
+//           participants.value!!.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])
+//        } else {
+//            if (participants.value!!.size > 2) {
+//                participants.value!!.removeAt(participants.value!!.size - 1)
+//            }
+//        }
+//        participants.value = participants.value
+//    }
     //TODO test code end
 
     /**

@@ -476,6 +476,9 @@ public class Constants {
     public static final int START_CALL_PERMISSIONS = 2;
     public static final int RETURN_CALL_PERMISSIONS = 3;
 
+    public static int TYPE_JOIN = 1;
+    public static int TYPE_LEFT = -1;
+
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
@@ -846,6 +849,7 @@ public class Constants {
     public static final String EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change";
     public static final String EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change";
     public static final String EVENT_NOT_OUTGOING_CALL = "not_outgoing_call";
+    public static final String EVENT_PROXIMITY_SENSOR_CHANGE = "proximity_sensor_change";
 
     /** Event Keys related to sessions*/
     public static final String EVENT_SESSION_STATUS_CHANGE = "session_status_change";

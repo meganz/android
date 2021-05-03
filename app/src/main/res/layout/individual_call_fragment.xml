@@ -14,17 +14,17 @@
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_centerInParent="true"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:scaleType="fitCenter"
+        app:border_width="3dp"
+        app:corner_radius="60dp"
+        app:border_color="@color/grey_700"
+        app:layout_constraintVertical_bias="0.2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        rounded:border_color="@color/white_alpha_030"
-        rounded:border_width="3dp"
-        rounded:corner_radius="60dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/on_hold_icon"

@@ -8,12 +8,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.meeting.listeners.GridViewListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class GridViewPagerAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val fragment: Fragment?,
     private val maxWidth: Int,
     private val maxHeight: Int,
+    private val listener: GridViewListener
 ) : BaseBannerAdapter<List<Participant>>() {
 
     override fun bindData(
@@ -29,8 +32,9 @@ class GridViewPagerAdapter(
         }
 
         if(position == 0) {
-            gridView.setColumnWidth(
+                        gridView.setColumnWidth(
                 when (data.size) {
+                    1 -> maxWidth
                     2 -> maxWidth
                     3 -> (maxWidth * 0.8).toInt()
                     else -> maxWidth / 2
@@ -40,7 +44,7 @@ class GridViewPagerAdapter(
             gridView.setColumnWidth(maxWidth / 2)
         }
 
-        val adapter = VideoGridViewAdapter(inMeetingViewModel, gridView, maxWidth, maxHeight, position)
+        val adapter = VideoGridViewAdapter(inMeetingViewModel, gridView, maxWidth, maxHeight, position, listener)
         adapter.submitList(data)
 
         gridView.adapter = adapter
