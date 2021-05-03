@@ -398,7 +398,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     override fun onVideoDeviceOpened(isEnable: Boolean) {
-        logDebug("onVideoDeviceOpened:: isEnable = " + isEnable)
+        logDebug("onVideoDeviceOpened:: isEnable = $isEnable")
         _cameraLiveData.value = isEnable
         logDebug("open video: $_cameraLiveData.value")
         tips.value = when (isEnable) {
