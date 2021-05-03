@@ -1,8 +1,8 @@
 package mega.privacy.android.app.components.saver
 
 import android.content.Context
-import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.SDCardOperator
 import nz.mega.sdk.MegaApiAndroid
@@ -51,7 +51,8 @@ abstract class Saving : Parcelable {
     ): AutoPlayInfo
 
     companion object {
-        val NOTHING = object : Saving() {
+        @Parcelize
+        object NOTHING  : Saving() {
             override fun totalSize() = 0L
 
             override fun hasUnsupportedFile(context: Context): Boolean = false
@@ -68,13 +69,6 @@ abstract class Saving : Parcelable {
                 sdCardOperator: SDCardOperator?,
                 snackbarShower: SnackbarShower
             ) = AutoPlayInfo.NO_AUTO_PLAY
-
-            override fun describeContents(): Int {
-                return 0
-            }
-
-            override fun writeToParcel(dest: Parcel?, flags: Int) {
-            }
         }
     }
 }
