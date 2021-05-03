@@ -56,6 +56,7 @@ import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED
 import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaUser
 import java.io.File
 
@@ -91,6 +92,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpView()
+        setUpObservers()
     }
 
     private fun setUpView() {
@@ -502,15 +504,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
             }
         }
 
-//        if (retry) {
-//            megaApi.getUserAvatar(
-//                megaApi.myUser,
-//                buildAvatarFile(context, megaApi.myEmail).absolutePath,
-//                mActivity as ManagerActivityLollipop
-//            )
-//        } else {
-        setDefaultAvatar()
-//        }
+        if (retry) viewModel.getAvatar(requireContext()) else setDefaultAvatar()
     }
 
     private fun setDefaultAvatar() {
@@ -522,10 +516,6 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
                 true
             )
         )
-    }
-
-    fun refreshVersionsInfo() {
-
     }
 
     fun setUpContactConnections() {
@@ -622,6 +612,25 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
                     error
                 )
             )
+        }
+    }
+
+    private fun setUpObservers() {
+        viewModel.onUpdateVersionsInfoFinished().observe(viewLifecycleOwner, ::refreshVersionsInfo)
+        viewModel.onGetAvatarFinished().observe(viewLifecycleOwner, ::setAvatar)
+    }
+
+    private fun refreshVersionsInfo(error: MegaError) {
+        if (error.errorCode == MegaError.API_OK) {
+            //Update versions info
+        }
+    }
+
+    private fun setAvatar(error: MegaError) {
+        if (error.errorCode == API_ENOENT) {
+            setDefaultAvatar()
+        } else {
+            setUpAvatar(false)
         }
     }
 }

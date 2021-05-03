@@ -199,13 +199,6 @@
         android:title="@string/context_clear_rubbish"
         android:visible="false"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_menu_cancel_subscriptions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="155"
-        android:title="@string/action_cancel_subscriptions"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_retry_transfers"

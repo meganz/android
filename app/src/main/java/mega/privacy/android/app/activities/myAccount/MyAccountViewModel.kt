@@ -19,6 +19,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -39,14 +40,18 @@ class MyAccountViewModel @ViewModelInject constructor(
     }
 
     private val versionsInfo: MutableLiveData<MegaError> = MutableLiveData()
+    private val avatar: MutableLiveData<MegaError> = MutableLiveData()
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
+    private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
 
     private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
     private var staging = false
 
     fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
+    fun onGetAvatarFinished(): LiveData<MegaError> = avatar
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
+    fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
 
     fun getName(): String = myAccountInfo.fullName
 
@@ -106,6 +111,20 @@ class MyAccountViewModel @ViewModelInject constructor(
                 }
             ))
         }
+    }
+
+    fun getAvatar(context: Context) {
+        megaApi.getUserAvatar(megaApi.myUser,
+            buildAvatarFile(context, megaApi.myEmail).absolutePath,
+            OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (error.errorCode == MegaError.API_EARGS) {
+                        logError("Error getting avatar: " + error.errorString)
+                    } else {
+                        avatar.value = error
+                    }
+                }
+            ))
     }
 
     fun killSessions() {
@@ -208,5 +227,14 @@ class MyAccountViewModel @ViewModelInject constructor(
 
         return isBusinessPaymentAttentionNeeded()
                 || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
+    }
+
+    fun cancelSubscriptions(feedback: String) {
+        megaApi.creditCardCancelSubscriptions(feedback,
+            OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    cancelSubscriptions.value = error
+                }
+            ))
     }
 }

@@ -697,7 +697,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem takePicture;
 	private MenuItem searchByDate;
-	private MenuItem cancelSubscription;
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
@@ -886,12 +885,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					updateAccountDetailsVisibleInfo();
 
-					//Check if myAccount section is visible
-					if (getMyAccountFragment() != null) {
-						logDebug("Update the account fragment");
-						maF.setUpAccountDetails();
-					}
-
 					if (getUpgradeAccountFragment() != null) {
 						if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
 							closeUpgradeAccountFragment();
@@ -903,10 +896,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (megaApi.isBusinessAccount()) {
 						supportInvalidateOptionsMenu();
 					}
-				}
-				else if(actionType == UPDATE_CREDIT_CARD_SUBSCRIPTION){
-					logDebug("BROADCAST TO UPDATE AFTER UPDATE_CREDIT_CARD_SUBSCRIPTION");
-					updateCancelSubscriptions();
 				}
 				else if(actionType == UPDATE_PAYMENT_METHODS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
@@ -6043,15 +6032,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 //		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void updateInfoNumberOfSubscriptions() {
-		if (cancelSubscription == null) {
-			return;
-		}
-
-		cancelSubscription.setVisible(myAccountInfo.getNumberOfSubscriptions() > 0
-				&& drawerItem == DrawerItem.ACCOUNT && getMyAccountFragment() != null);
-	}
-
 	public void showUpAF() {
 		logDebug("showUpAF");
 		accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
@@ -6244,7 +6224,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
 		searchByDate = menu.findItem(R.id.action_search_by_date);
-		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
@@ -6405,10 +6384,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
 						upgradeAccountMenuItem.setVisible(true);
 						logoutMenuItem.setVisible(true);
-
-						if (myAccountInfo.getNumberOfSubscriptions() > 0) {
-							cancelSubscription.setVisible(true);
-						}
 					} else {
 						logoutMenuItem.setVisible(true);
 					}
@@ -7060,14 +7035,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logDebug("Action menu logout pressed");
 				megaApi.shouldShowPasswordReminderDialog(true,
 						new ShouldShowPasswordReminderDialogListener(this, true));
-	        	return true;
-	        }
-	        case R.id.action_menu_cancel_subscriptions:{
-				logDebug("Action menu cancel subscriptions pressed");
-	        	if (megaApi != null){
-	        		//Show the message
-	        		showCancelMessage();
-	        	}
 	        	return true;
 	        }
 			case R.id.action_menu_forgot_pass:{
@@ -8733,53 +8700,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
 	}
 
-	public void showCancelMessage(){
-		logDebug("showCancelMessage");
-		AlertDialog cancelDialog;
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-//		builder.setTitle(getString(R.string.title_cancel_subscriptions));
-
-		LayoutInflater inflater = getLayoutInflater();
-		View dialogLayout = inflater.inflate(R.layout.dialog_cancel_subscriptions, null);
-		TextView message = (TextView) dialogLayout.findViewById(R.id.dialog_cancel_text);
-		final EditText text = (EditText) dialogLayout.findViewById(R.id.dialog_cancel_feedback);
-
-		float density = getResources().getDisplayMetrics().density;
-
-		float scaleW = getScaleW(outMetrics, density);
-
-		message.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-
-		builder.setView(dialogLayout);
-
-		builder.setPositiveButton(getString(R.string.send_cancel_subscriptions), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				feedback = text.getText().toString();
-				if(feedback.matches("")||feedback.isEmpty()){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.reason_cancel_subscriptions), -1);
-				}
-				else{
-					showCancelConfirmation(feedback);
-				}
-			}
-		});
-
-		builder.setNegativeButton(getString(R.string.general_dismiss), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-
-			}
-		});
-
-		cancelDialog = builder.create();
-		cancelDialog.show();
-//		brandAlertDialog(cancelDialog);
-	}
-
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
@@ -8831,33 +8751,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		dialogBuilder.setTitle(getString(R.string.status_label));
 		presenceStatusDialog = dialogBuilder.create();
 		presenceStatusDialog.show();
-	}
-
-	public void showCancelConfirmation(final String feedback){
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-			        case DialogInterface.BUTTON_POSITIVE:
-			        {
-						logDebug("Feedback: " + feedback);
-			        	megaApi.creditCardCancelSubscriptions(feedback, managerActivity);
-			        	break;
-			        }
-			        case DialogInterface.BUTTON_NEGATIVE:
-			        {
-			            //No button clicked
-						logDebug("Feedback: " + feedback);
-			            break;
-			        }
-		        }
-		    }
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
-		    .setNegativeButton(R.string.general_no, dialogClickListener).show();
-
 	}
 
 	@Override
@@ -11294,16 +11187,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	public void updateCancelSubscriptions() {
-		if (cancelSubscription == null) {
-			return;
-		}
-
-		cancelSubscription.setVisible(myAccountInfo.getNumberOfSubscriptions() > 0
-				&& cancelSubscription != null && drawerItem == DrawerItem.ACCOUNT
-				&& getMyAccountFragment() != null);
-	}
-
 	private void refreshOfflineNodes() {
 		logDebug("updateOfflineView");
 		if (fullscreenOfflineFragment != null) {
@@ -11713,16 +11596,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
-		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.cancel_subscription_ok), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.cancel_subscription_error), -1);
-			}
-			((MegaApplication) getApplication()).askForCCSubscriptions();
-		}
-		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
+		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			logDebug("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
 
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -11867,7 +11741,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
 					if (getMyAccountFragment() != null) {
-						maF.refreshVersionsInfo();
+//						maF.refreshVersionsInfo();
 					}
 				} else {
 					logDebug("File versioning attribute changed correctly");
@@ -11952,7 +11826,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				MegaApplication.setDisableFileVersions(request.getFlag());
 
 				if (getMyAccountFragment() != null) {
-					maF.refreshVersionsInfo();
+//					maF.refreshVersionsInfo();
 				}
 			}
 		}
@@ -12485,7 +12359,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			//Refresh My Storage if it is shown
 			if (getMyAccountFragment() != null) {
-				maF.refreshVersionsInfo();
+//				maF.refreshVersionsInfo();
 			}
 		}
 	}

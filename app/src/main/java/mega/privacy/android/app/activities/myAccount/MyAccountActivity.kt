@@ -1,17 +1,25 @@
 package mega.privacy.android.app.activities.myAccount
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.myAccount.fragments.MyAccountFragment
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -23,6 +31,9 @@ class MyAccountActivity : PasscodeActivity() {
 
     companion object {
         private const val KILL_SESSIONS_SHOWN = "KILL_SESSIONS_SHOWN"
+        private const val CANCEL_SUBSCRIPTIONS_SHOWN = "CANCEL_SUBSCRIPTIONS_SHOWN"
+        private const val TYPED_FEEDBACK = "TYPED_FEEDBACK"
+        private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
@@ -30,6 +41,28 @@ class MyAccountActivity : PasscodeActivity() {
     private var menu: Menu? = null
 
     private var killSessionsConfirmationDialog: AlertDialog? = null
+    private var cancelSubscriptionsDialog: AlertDialog? = null
+    private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
+
+    private var cancelSubscriptionsFeedback: String? = null
+
+    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val actionType = intent.getIntExtra(
+                BroadcastConstants.ACTION_TYPE,
+                BroadcastConstants.INVALID_ACTION
+            )
+
+            when (actionType) {
+                UPDATE_ACCOUNT_DETAILS -> {
+                    //Update my account fragment info
+                }
+                UPDATE_CREDIT_CARD_SUBSCRIPTION -> {
+                    refreshMenuOptionsVisibility()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +76,33 @@ class MyAccountActivity : PasscodeActivity() {
                 .add(R.id.container, MyAccountFragment())
                 .commit()
         } else {
-            if (savedInstanceState.getBoolean(KILL_SESSIONS_SHOWN, false)) {
-                showConfirmationKillSessions()
+            when {
+                savedInstanceState.getBoolean(KILL_SESSIONS_SHOWN, false) -> {
+                    showConfirmationKillSessions()
+                }
+                savedInstanceState.getBoolean(CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
+                    cancelSubscriptionsFeedback = savedInstanceState.getString(TYPED_FEEDBACK)
+                    showCancelSubscriptions()
+                }
+                savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
+                    showConfirmationCancelSubscriptions()
+                }
             }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(KILL_SESSIONS_SHOWN, isAlertDialogShown(killSessionsConfirmationDialog))
+
+        if (isAlertDialogShown(cancelSubscriptionsDialog)) {
+            outState.putBoolean(CANCEL_SUBSCRIPTIONS_SHOWN, true)
+            outState.putString(TYPED_FEEDBACK, cancelSubscriptionsFeedback)
+        }
+
+        outState.putBoolean(
+            CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN,
+            isAlertDialogShown(cancelSubscriptionsConfirmationDialog)
+        )
         super.onSaveInstanceState(outState)
     }
 
@@ -65,7 +117,11 @@ class MyAccountActivity : PasscodeActivity() {
     }
 
     override fun onDestroy() {
+        unregisterReceiver(updateMyAccountReceiver)
+
         dismissAlertDialogIfShown(killSessionsConfirmationDialog)
+        dismissAlertDialogIfShown(cancelSubscriptionsDialog)
+        dismissAlertDialogIfShown(cancelSubscriptionsConfirmationDialog)
         super.onDestroy()
     }
 
@@ -84,8 +140,7 @@ class MyAccountActivity : PasscodeActivity() {
             R.id.action_refresh -> viewModel.refresh(this)
             R.id.action_upgrade_account -> {
             }
-            R.id.action_cancel_subscriptions -> {
-            }
+            R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> {
             }
         }
@@ -132,14 +187,14 @@ class MyAccountActivity : PasscodeActivity() {
     }
 
     private fun setUpObservers() {
-        viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
-        viewModel.onKillSessionsFinished().observe(this, ::showKillSessionsResult)
-    }
+        registerReceiver(
+            updateMyAccountReceiver, IntentFilter(
+                BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
+            )
+        )
 
-    private fun refreshVersionsInfo(error: MegaError) {
-        if (error.errorCode == API_OK) {
-            //Update versions info
-        }
+        viewModel.onKillSessionsFinished().observe(this, ::showKillSessionsResult)
+        viewModel.onCancelSubscriptions().observe(this, ::showCancelSubscriptionsResult)
     }
 
     private fun showKillSessionsResult(error: MegaError) {
@@ -149,6 +204,17 @@ class MyAccountActivity : PasscodeActivity() {
                 else R.string.error_kill_all_sessions
             )
         )
+    }
+
+    private fun showCancelSubscriptionsResult(error: MegaError) {
+        showSnackbar(
+            StringResourcesUtils.getString(
+                if (error.errorCode == API_OK) R.string.cancel_subscription_ok
+                else R.string.cancel_subscription_error
+            )
+        )
+
+        app.askForCCSubscriptions()
     }
 
     private fun showConfirmationKillSessions() {
@@ -162,6 +228,59 @@ class MyAccountActivity : PasscodeActivity() {
             .setPositiveButton(StringResourcesUtils.getString(R.string.contact_accept)) { _, _ ->
                 viewModel.killSessions()
             }.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+            .show()
+    }
+
+    private fun showCancelSubscriptions() {
+        if (isAlertDialogShown(cancelSubscriptionsDialog)) {
+            return
+        }
+
+        val builder = MaterialAlertDialogBuilder(this)
+
+        cancelSubscriptionsDialog =
+            builder.setView(R.layout.dialog_cancel_subscriptions)
+                .setPositiveButton(
+                    StringResourcesUtils.getString(R.string.send_cancel_subscriptions),
+                    null
+                )
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+                .create()
+
+        cancelSubscriptionsDialog?.apply {
+            setOnShowListener {
+                val feedbackEditText = findViewById<EditText>(R.id.dialog_cancel_feedback)
+                feedbackEditText?.apply {
+                    setText(cancelSubscriptionsFeedback)
+
+                    doAfterTextChanged {
+                        cancelSubscriptionsFeedback = text.toString()
+                    }
+                }
+
+                this.positive_button.setOnClickListener {
+                    if (cancelSubscriptionsFeedback?.isEmpty() == true) {
+                        showSnackbar(StringResourcesUtils.getString(R.string.reason_cancel_subscriptions))
+                    } else {
+                        showConfirmationCancelSubscriptions()
+                    }
+                }
+            }
+
+            show()
+        }
+    }
+
+    private fun showConfirmationCancelSubscriptions() {
+        if (isAlertDialogShown(cancelSubscriptionsConfirmationDialog)) {
+            return
+        }
+
+        cancelSubscriptionsConfirmationDialog = MaterialAlertDialogBuilder(this)
+            .setMessage(StringResourcesUtils.getString(R.string.confirmation_cancel_subscriptions))
+            .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes)) { _, _ ->
+                viewModel.cancelSubscriptions(cancelSubscriptionsFeedback!!)
+            }.setNegativeButton(StringResourcesUtils.getString(R.string.general_no), null)
             .show()
     }
 
