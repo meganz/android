@@ -587,6 +587,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
+	private LinearLayout microOffLayout;
+	private LinearLayout videoOnLayout;
 
 	boolean firstTimeAfterInstallation = true;
 	SearchView searchView;
@@ -1081,6 +1083,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
 				updateVisibleCallElements(chatIdReceived);
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_LOCAL_AVFLAGS)) {
+				MegaChatCall callInProgress = getCallInProgress();
+				if (callInProgress != null && callInProgress.getChatid() == chatIdReceived) {
+					showHideMicroAndVideoIcons(callInProgress, microOffLayout, videoOnLayout);
+				}
 			}
 		}
 	};
@@ -1784,6 +1793,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
+		filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
 		registerReceiver(chatCallUpdateReceiver, filterCall);
 
 		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
@@ -2165,6 +2175,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		callInProgressLayout.setOnClickListener(this);
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
+		microOffLayout = findViewById(R.id.micro_off_layout);
+		videoOnLayout = findViewById(R.id.video_on_layout);
 		callInProgressLayout.setVisibility(View.GONE);
 
 		if (mElevationCause > 0) {
@@ -14427,6 +14439,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
+		MegaChatCall callInProgress = getCallInProgress();
+		if (callInProgress != null) {
+			showHideMicroAndVideoIcons(callInProgress, microOffLayout, videoOnLayout);
+		}
 	}
 
     public void homepageToSearch() {
