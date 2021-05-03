@@ -97,7 +97,7 @@ class GiphyViewerActivity : PasscodeActivity() {
 
     override fun onBackPressed() {
         if (picking) {
-            setResult(RESULT_CANCELED);
+            setResult(RESULT_CANCELED)
         }
         super.onBackPressed()
     }
