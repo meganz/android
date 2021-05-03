@@ -2,6 +2,7 @@ package mega.privacy.android.app.activities.settingsActivities
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo.*
 import android.view.inputmethod.InputMethodManager
@@ -510,7 +511,7 @@ class PasscodeLockActivity : BaseActivity() {
         initPasscodeScreen()
         clearTypedPasscode()
 
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(
                 currentFocus,
                 InputMethodManager.SHOW_IMPLICIT
