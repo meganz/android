@@ -118,6 +118,9 @@ public class CallService extends Service{
             logDebug("Chat handle to call: " + currentChatId);
         }
 
+        if(currentChatId == MEGACHAT_INVALID_HANDLE)
+            stopSelf();
+
         if (MegaApplication.getOpenCallChatId() != currentChatId) {
             MegaApplication.setOpenCallChatId(currentChatId);
         }

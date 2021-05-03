@@ -108,7 +108,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             call?.let { chatCall ->
                 updateToolbarSubtitle(chatCall)
                 enableOnHoldFab(chatCall.isOnHold)
-                updateChildFragments(chatCall.chatid)
             }
         }
     }
@@ -117,7 +116,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isSameCall(it.callId) && it.status != INVALID_CALL_STATUS) {
             updateToolbarSubtitle(it)
             when (it.status) {
-                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> terminatingCall()
+                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
+            }
+        }
+    }
+
+    private val callCompositionObserver = Observer<MegaChatCall> {
+        if (inMeetingViewModel.isSameCall(it.callId) && it.status != INVALID_CALL_STATUS && (it.callCompositionChange == 1 || it.callCompositionChange == -1)) {
+            if(inMeetingViewModel.isOneToOneCall() && (it.numParticipants == 1 ||it.numParticipants == 2)){
+                updateChildFragments(it.chatid)
             }
         }
     }
@@ -295,6 +302,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(callStatusObserver)
+
+        LiveEventBus.get(Constants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
+            .observeForever(callCompositionObserver)
 
         LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observeForever(callOnHoldObserver)
@@ -491,21 +501,33 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * Show the correct UI in One-to-one call
+     */
+    private fun updateOneToOneUI(){
+        inMeetingViewModel.getCall()?.let {
+            val session = CallUtil.getSessionIndividualCall(it)
+            if(session == null){
+                logDebug("No session")
+                waitingForConnection(it.chatid)
+            }else{
+                logDebug("Session exists")
+                initOneToOneCall()
+            }
+        }
+    }
+
     private fun initChildFragments() {
         val chatId = inMeetingViewModel.getChatId()
         if (chatId == MEGACHAT_INVALID_HANDLE || inMeetingViewModel.getCall() == null)
             return
 
+        updateChildFragments(chatId)
+
         when {
             inMeetingViewModel.isOneToOneCall() -> {
                 logDebug("One to one call")
-                if (inMeetingViewModel.isRequestSent()) {
-                    //Outgoing call
-                    waitingForConnection(chatId)
-                } else {
-                    //In progress call
-                    initOneToOneCall()
-                }
+                updateOneToOneUI()
             }
             else -> {
                 logDebug("Group call")
@@ -516,12 +538,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun updateChildFragments(chatId: Long) {
-        if (inMeetingViewModel.isOneToOneCall()) {
-            logDebug("One To One call")
-            initOneToOneCall()
-        } else {
-            logDebug("Group call")
-            initGroupCall(chatId)
+        when {
+            inMeetingViewModel.isOneToOneCall() -> {
+                logDebug("One to one call")
+                updateOneToOneUI()
+            }
+            else -> {
+                logDebug("Group call")
+                initGroupCall(chatId)
+            }
         }
     }
 
@@ -720,7 +745,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
-            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator, inMeetingViewModel.isOneToOneCall())
+            BottomFloatingPanelViewHolder(
+                binding,
+                this,
+                isGuest,
+                isModerator,
+                inMeetingViewModel.isOneToOneCall()
+            )
 
         /**
          * Observer the participant List
@@ -802,8 +833,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun updateLocalVideo(camOn: Boolean) {
-        logDebug("******* updateLocalVideo:camOn = " + camOn)
-
         bottomFloatingPanelViewHolder.updateCamIcon(camOn)
         swapCameraMenuItem?.isVisible = inMeetingViewModel.isNecessaryToShowSwapCameraOption()
         controlVideoLocalOneToOneCall(camOn)
@@ -836,6 +865,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         when {
             inMeetingViewModel.isOneToOneCall() -> {
                 inMeetingViewModel.leaveMeeting()
+                finishActivity()
             }
             isModerator && inMeetingViewModel.haveOneModerator()  -> {
                 val endMeetingBottomSheetDialogFragment =
@@ -883,17 +913,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun terminatingCall() {
-        val calls: ArrayList<Long>? = CallUtil.getCallsParticipating()
-        if (calls != null && calls.isNotEmpty()) {
-            val iterator = calls.iterator()
-
-            iterator.forEach {
-                CallUtil.openMeetingInProgress(getContext(), it)
-                return
-            }
-        }
-
+    /**
+     * Method to control when call ended
+     */
+    private fun finishActivity() {
         meetingActivity.finish()
     }
 
@@ -983,6 +1006,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .removeObserver(callStatusObserver)
+
+        LiveEventBus.get(Constants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
+            .removeObserver(callCompositionObserver)
 
         LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .removeObserver(callOnHoldObserver)

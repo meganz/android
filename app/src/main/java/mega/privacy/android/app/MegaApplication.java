@@ -570,7 +570,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING) && isOutgoing) {
-					outgoingCall(listAllCalls, chatId, callStatus);
+					outgoingCall( chatId);
 				}
 				break;
 
@@ -633,18 +633,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	/**
 	 * Method that performs the necessary actions when there is an outgoing call.
 	 *
-	 * @param listAllCalls List of all current calls
 	 * @param chatId       Chat ID
-	 * @param callStatus   Call Status
 	 */
-	public void outgoingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
+	public void outgoingCall(long chatId) {
 		if(rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == AUDIO_MANAGER_CALL_OUTGOING)
 			return;
 
 		logDebug("Controlling outgoing call");
 		createOrUpdateAudioManager(getSpeakerStatus(chatId), AUDIO_MANAGER_CALL_OUTGOING);
 		clearIncomingCallNotification(chatId);
-		controlNumberOfCalls(listAllCalls, chatId, callStatus, false);
 	}
 
 	/**
@@ -1755,14 +1752,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public void openCallService(long chatId) {
-        logDebug("Start call Service. Chat iD = " + chatId);
-        Intent intentService = new Intent(this, CallService.class);
-        intentService.putExtra(CHAT_ID, chatId);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intentService);
-        } else {
-            this.startService(intentService);
-        }
+    	if(chatId != MEGACHAT_INVALID_HANDLE){
+			logDebug("Start call Service. Chat iD = " + chatId);
+			Intent intentService = new Intent(this, CallService.class);
+			intentService.putExtra(CHAT_ID, chatId);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				this.startForegroundService(intentService);
+			} else {
+				this.startService(intentService);
+			}
+		}
     }
 
 	public void checkQueuedCalls() {
