@@ -1,16 +1,17 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/tour_fragment_base_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_layout">
 
         <RelativeLayout
             android:id="@+id/tour_fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/loop_container"
@@ -98,9 +99,10 @@
     </ScrollView>
 
     <RelativeLayout
+        android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:background="@color/grey_020_grey_800">
 
         <TextView
@@ -117,12 +119,13 @@
             android:id="@+id/join_meeting_as_guest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/no_account"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="8dp"
-            android:paddingVertical="8dp"
             android:paddingHorizontal="8dp"
-            android:layout_below="@id/no_account"
+            android:paddingVertical="8dp"
             android:text="@string/join_meeting_as_guest"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AccentColor" />
     </RelativeLayout>
-</FrameLayout>
+
+</RelativeLayout>
