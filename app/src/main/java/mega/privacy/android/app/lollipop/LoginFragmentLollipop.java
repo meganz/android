@@ -753,7 +753,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if ((intentReceived != null) && (action != null)){
                 if (action.equals(ACTION_REFRESH)){
                     MegaApplication.setLoggingIn(true);
-                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
                 }
@@ -1975,6 +1974,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
+
                     if (shareInfos != null && shareInfos.size() > 0) {
                         boolean canRead = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
                         if (canRead) {
@@ -1982,6 +1982,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         } else {
                             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
                         }
+                        return;
+                    } else if (ACTION_REFRESH.equals(action) && getActivity() != null) {
+                        getActivity().setResult(RESULT_OK);
+                        getActivity().finish();
                         return;
                     }
                 }
