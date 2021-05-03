@@ -17,6 +17,9 @@ import nz.mega.sdk.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * TODO Has been migrated to MeetingActivityRepository, can be deleted.
+ */
 @Singleton
 class AbstractMeetingOnBoardingRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,

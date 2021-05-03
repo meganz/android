@@ -1,11 +1,19 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -18,6 +26,38 @@ class MeetingActivityRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
+
+    /**
+     * Retrieve the color determined for an avatar.
+     *
+     * @return The default avatar color.
+     */
+    suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
+        AvatarUtil.getDefaultAvatar(
+            AvatarUtil.getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+        )
+    }
+
+    /**
+     * Get the round actual avatar
+     *
+     * @return Pair<Boolean, Bitmap> <true, bitmap> if succeed, or <false, null>
+     */
+    suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(Dispatchers.IO) {
+        AvatarUtil.getCircleAvatar(context, megaApi.myEmail)
+    }
+
+    /**
+     * Get the actual avatar from the server and save it to the cache folder
+     */
+    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
+        megaApi.getUserAvatar(
+            megaApi.myUser,
+            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
+            listener
+        )
+    }
+
     /**
      * Enable or disable Mic
      *

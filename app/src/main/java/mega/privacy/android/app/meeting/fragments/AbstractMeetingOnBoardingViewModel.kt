@@ -13,6 +13,9 @@ import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.*
 
+/**
+ * TODO Has been migrated to MeetingActivityViewModel, can be deleted.
+ */
 class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository
 ) : ViewModel() {

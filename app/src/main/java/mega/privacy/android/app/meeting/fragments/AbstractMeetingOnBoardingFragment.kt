@@ -45,11 +45,8 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  */
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
-
-    private val abstractMeetingOnBoardingViewModel: AbstractMeetingOnBoardingViewModel by viewModels()
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     private var videoListener: MeetingVideoListener? = null
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -336,7 +333,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun setProfileAvatar() {
         logDebug("setProfileAvatar")
-        abstractMeetingOnBoardingViewModel.avatarLiveData.observe(viewLifecycleOwner) {
+        sharedModel.avatarLiveData.observe(viewLifecycleOwner) {
             meeting_thumbnail.setImageBitmap(it)
         }
     }
