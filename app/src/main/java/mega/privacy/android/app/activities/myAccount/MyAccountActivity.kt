@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.fragments.managerFragments.myAccount.MyAccountFragment
+import mega.privacy.android.app.activities.myAccount.fragments.MyAccountFragment
 import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
@@ -35,6 +35,7 @@ class MyAccountActivity : PasscodeActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_account)
 
+        updateInfo()
         setUpObservers()
 
         if (savedInstanceState == null) {
@@ -56,6 +57,11 @@ class MyAccountActivity : PasscodeActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.manageActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        app.refreshAccountInfo()
     }
 
     override fun onDestroy() {
@@ -120,8 +126,20 @@ class MyAccountActivity : PasscodeActivity() {
         }
     }
 
+    private fun updateInfo() {
+        viewModel.checkVersions()
+        app.refreshAccountInfo()
+    }
+
     private fun setUpObservers() {
+        viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
         viewModel.onKillSessionsFinished().observe(this, ::showKillSessionsResult)
+    }
+
+    private fun refreshVersionsInfo(error: MegaError) {
+        if (error.errorCode == API_OK) {
+            //Update versions info
+        }
     }
 
     private fun showKillSessionsResult(error: MegaError) {

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.myAccount
+package mega.privacy.android.app.activities.myAccount.fragments
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -14,11 +14,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
+import mega.privacy.android.app.activities.myAccount.MyAccountViewModel
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -67,7 +68,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
         private const val PHONE_NUMBER_CHANGE_DELAY = 3000L
     }
 
-    private val viewModel by viewModels<MyAccountFragmentViewModel>()
+    private val viewModel: MyAccountViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMyAccountBinding
 

@@ -8,6 +8,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -17,23 +18,68 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
 
 class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val dbH: DatabaseHandler
 ) : BaseRxViewModel() {
 
+    companion object {
+        private const val CLICKS_TO_STAGING = 5
+        private const val STAGING_URL = "https://staging.api.mega.co.nz/"
+        private const val PRODUCTION_URL = "https://g.api.mega.co.nz/"
+        private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
+    }
+
+    private val versionsInfo: MutableLiveData<MegaError> = MutableLiveData()
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
 
     private var fragment = MY_ACCOUNT_FRAGMENT
+    private var numOfClicksLastSession = 0
+    private var staging = false
 
+    fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
+
+    fun getName(): String = myAccountInfo.fullName
+
+    fun getEmail(): String = megaApi.myEmail
+
+    fun getAccountType(): Int = myAccountInfo.accountType
+
+    fun isFreeAccount(): Boolean = getAccountType() == FREE
+
+    fun getUsedStorage(): String = myAccountInfo.usedFormatted
+
+    fun getUsedStoragePercentage(): Int = myAccountInfo.usedPercentage
+
+    fun getTotalStorage(): String = myAccountInfo.totalFormatted
+
+    fun getUsedTransfer(): String = myAccountInfo.usedTransferFormatted
+
+    fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
+
+    fun getTotalTransfer(): String = myAccountInfo.totalTransferFormatted
+
+    fun getRenewTime(): Long = myAccountInfo.subscriptionRenewTime
+
+    fun hasRenewableSubscription(): Boolean {
+        return myAccountInfo.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+                && myAccountInfo.subscriptionRenewTime > 0
+    }
+
+    fun getExpirationTime(): Long = myAccountInfo.proExpirationTime
+
+    fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
+
+    fun getLastSession(): String = myAccountInfo.lastSessionFormattedDate ?: ""
 
     fun setFragment(fragment: Int) {
         this.fragment = fragment
@@ -42,6 +88,25 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun isMyAccountFragment(): Boolean = fragment == MY_ACCOUNT_FRAGMENT
 
     fun thereIsNoSubscription(): Boolean = myAccountInfo.numberOfSubscriptions <= 0
+
+    fun checkVersions() {
+        if (myAccountInfo.numVersions == -1) {
+            megaApi.getFolderInfo(megaApi.rootNode, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        val info: MegaFolderInfo = request.megaFolderInfo
+
+                        myAccountInfo.numVersions = info.numVersions
+                        myAccountInfo.previousVersionsSize = info.versionsSize
+                    } else {
+                        logError("Error refreshing info: " + error.errorString)
+                    }
+
+                    versionsInfo.value = error
+                }
+            ))
+        }
+    }
 
     fun killSessions() {
         megaApi.killSession(INVALID_HANDLE, OptionalMegaRequestListenerInterface(
@@ -85,5 +150,63 @@ class MyAccountViewModel @ViewModelInject constructor(
             app.askForExtendedAccountDetails()
             LiveEventBus.get(EVENT_REFRESH).post(true)
         }
+    }
+
+    fun incrementLastSessionClick(context: Context): Boolean {
+        numOfClicksLastSession++
+
+        if (numOfClicksLastSession < CLICKS_TO_STAGING)
+            return false
+
+        numOfClicksLastSession = 0
+        staging = false
+
+        val attrs = dbH.attributes
+
+        if (attrs != null && attrs.staging != null) {
+            staging = try {
+                java.lang.Boolean.parseBoolean(attrs.staging)
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        if (staging) {
+            setStaging(context, false)
+            return false
+        }
+
+        return true
+    }
+
+    fun setStaging(context: Context, set: Boolean) {
+        staging = set
+        megaApi.changeApiUrl(if (set) STAGING_URL else PRODUCTION_URL)
+        dbH.setStaging(set)
+
+        val intent = Intent(context, LoginActivityLollipop::class.java)
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+        intent.action = ACTION_REFRESH_STAGING
+        (context as ManagerActivityLollipop)
+            .startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING)
+    }
+
+    private fun isBusinessPaymentAttentionNeeded(): Boolean {
+        val status = megaApi.businessStatus
+
+        return megaApi.isBusinessAccount && megaApi.isMasterBusinessAccount
+                && (status == MegaApiJava.BUSINESS_STATUS_EXPIRED
+                || status == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD)
+    }
+
+    fun shouldShowPaymentInfo(): Boolean {
+        val timeToCheck =
+            if (hasRenewableSubscription()) myAccountInfo.subscriptionRenewTime
+            else myAccountInfo.proExpirationTime
+
+        val currentTime = System.currentTimeMillis() / 1000
+
+        return isBusinessPaymentAttentionNeeded()
+                || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
     }
 }

@@ -155,7 +155,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
-import mega.privacy.android.app.fragments.managerFragments.myAccount.MyAccountFragment;
+import mega.privacy.android.app.activities.myAccount.fragments.MyAccountFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -3278,10 +3278,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
         checkScrollElevation();
-
-		if (drawerItem == DrawerItem.ACCOUNT ) {
-			app.refreshAccountInfo();
-		}
 
 		checkTransferOverQuotaOnResume();
 
