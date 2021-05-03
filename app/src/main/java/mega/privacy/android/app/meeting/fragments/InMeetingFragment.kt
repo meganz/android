@@ -2,6 +2,8 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Pair
@@ -256,6 +258,32 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Set on page tapping listener.
         setPageOnClickListener(view)
         setSystemUIVisibility()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Set parent activity can receive the orientation changes
+        meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+    }
+
+    /**
+     * Observe the Orientation changes
+     *
+     * @param newConfig
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateLayout(newConfig.orientation)
+    }
+
+    /**
+     * Update the layout for landscape and portrait screen
+     *
+     * @param orientation the flag of the orientation
+     */
+    private fun updateLayout(orientation: Int){
+        // Add the Changes for the in-meeting-fragment
+        bottomFloatingPanelViewHolder.updateWidth(orientation)
     }
 
     private fun initLiveEventBus() {
@@ -692,7 +720,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
-            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator)
+            BottomFloatingPanelViewHolder(binding, this, isGuest, isModerator, inMeetingViewModel.isOneToOneCall())
 
         /**
          * Observer the participant List
@@ -809,7 +837,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.isOneToOneCall() -> {
                 inMeetingViewModel.leaveMeeting()
             }
-            isModerator -> {
+            isModerator && inMeetingViewModel.haveOneModerator()  -> {
                 val endMeetingBottomSheetDialogFragment =
                     EndMeetingBottomSheetDialogFragment.newInstance()
                 endMeetingBottomSheetDialogFragment.show(

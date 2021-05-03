@@ -1,8 +1,10 @@
 package mega.privacy.android.app.meeting
 
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +35,7 @@ class BottomFloatingPanelViewHolder(
     private val listener: BottomFloatingPanelListener,
     private var isGuest: Boolean,
     private var isModerator: Boolean,
-    private var isGroup: Boolean = false
+    private var isGroup: Boolean = true
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -372,6 +374,19 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
             }
         }
+    }
+
+    /**
+     * Change the panel's width for landscape and portrait screen
+     *
+     */
+    fun updateWidth(orientation: Int) {
+        val params = floatingPanelView.root.layoutParams
+        params.width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            context.resources.getDimension(R.dimen.bottom_sheet_landscape_width)
+                .toInt()
+        } else FrameLayout.LayoutParams.MATCH_PARENT
+        floatingPanelView.root.layoutParams = params
     }
 
     companion object {

@@ -478,4 +478,15 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
     }
+
+    /**
+     * Determine the chat room has only one moderator
+     *
+     * @return
+     */
+    fun haveOneModerator(): Boolean {
+        return participants.value?.toList()?.filter { it.isModerator }?.size?.let {
+            it > 1
+        } == true
+    }
 }
