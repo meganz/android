@@ -75,7 +75,7 @@ public class IncomingCallNotification {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         createChannel(notificationManager);
         @NoMeaning int i = 0;
-        PendingIntent pendingIntent = CallUtil.getPendingIntentMeetingInProgress(context, callToLaunch.getChatid(), i);
+        PendingIntent pendingIntent = CallUtil.getPendingIntentMeetingRinging(context, callToLaunch.getChatid(), i);
         NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
         mBuilderCompat
                 .setSmallIcon(R.drawable.ic_stat_notify)

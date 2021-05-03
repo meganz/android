@@ -523,18 +523,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
 
         updateChildFragments(chatId)
-
-        when {
-            inMeetingViewModel.isOneToOneCall() -> {
-                logDebug("One to one call")
-                updateOneToOneUI()
-            }
-            else -> {
-                logDebug("Group call")
-                //Group call
-                initGroupCall(chatId)
-            }
-        }
     }
 
     private fun updateChildFragments(chatId: Long) {
