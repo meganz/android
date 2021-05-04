@@ -151,7 +151,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                     && getAdapterType() != ZIP_ADAPTER
                     && getAdapterType() != FROM_CHAT
                     && getAdapterType() != INVALID_VALUE
-                    && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
+                    && getNodeAccess() >= MegaShare.ACCESS_READWRITE
     }
 
     /**
