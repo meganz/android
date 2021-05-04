@@ -478,6 +478,9 @@ public class Constants {
 
     public static int TYPE_JOIN = 1;
     public static int TYPE_LEFT = -1;
+    public static int TYPE_NETWORK_QUALITY = 2;
+    public static int TYPE_AUDIO = 3;
+    public static int TYPE_VIDEO = 4;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
@@ -836,6 +839,8 @@ public class Constants {
     public static final String EVENT_CHAT_TITLE_CHANGE = "chat_title_change";
     public static final String EVENT_MEETING_CREATED = "meeting_created";
     public static final String EVENT_LINK_RECOVERED = "meeting_link_recovered";
+    public static final String EVENT_CONTACT_NAME_CHANGE = "proximity_sensor_change";
+
 
     /** Event Keys related to calls*/
     public static final String EVENT_ERROR_STARTING_CALL = "error_starting_call";
@@ -859,6 +864,8 @@ public class Constants {
     public static final String EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change";
     public static final String EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change";
     public static final String EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change";
+
+    public static final String EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";

@@ -3109,6 +3109,7 @@
     <string name="paste_meeting_link_dialog_title">Please paste your meeting link to join </string>
     <string name="paste_meeting_link_guest_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
     <string name="paste_meeting_link_guest_instruction" context="Tell the guest to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
+    <string name="slow_connection_meeting" context="Banner text to indicate poor network quality">You are in slow connection</string>
 
     <string name="invalid_meeting_link" context="error message shown when a meeting link is invalid">This meeting has ended</string>
     <string name="invalid_meeting_link_args" context="error message shown when a meeting link is not well formed">Invalid meeting link</string>

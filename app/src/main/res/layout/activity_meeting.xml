@@ -59,13 +59,13 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <LinearLayout
-        android:id="@+id/banner_info_layout"
+        android:id="@+id/banner_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="1dp"
         android:gravity="center"
         android:minHeight="36dp"
         android:orientation="horizontal"
-        android:elevation="1dp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
@@ -78,7 +78,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/banner_info"
+            android:id="@+id/banner_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -91,6 +91,23 @@
             android:textSize="14sp"
             android:textStyle="normal" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/banner_participant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minHeight="36dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"

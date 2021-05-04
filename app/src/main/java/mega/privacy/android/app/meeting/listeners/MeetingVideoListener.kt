@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRenderer
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -38,6 +39,7 @@ class MeetingVideoListener(
         height: Int,
         byteBuffer: ByteArray
     ) {
+
         if (width == 0 || height == 0) {
             return
         }

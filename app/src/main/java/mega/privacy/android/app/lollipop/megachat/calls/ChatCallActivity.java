@@ -1047,35 +1047,35 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for hidding the reconnect call bar.
      */
     public void hideReconnecting() {
-        if (!reconnectingLayout.isShown()) return;
-        logDebug("Hidding Reconnecting bar and showing You are back bar");
-        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_300));
-        reconnectingText.setText(getString(R.string.connected_message));
-        reconnectingLayout.setAlpha(1);
-        reconnectingLayout.setVisibility(View.VISIBLE);
-        reconnectingLayout.animate()
-                .alpha(0f)
-                .setDuration(INFO_ANIMATION)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        reconnectingLayout.setVisibility(View.GONE);
-                    }
-                });
+//        if (!reconnectingLayout.isShown()) return;
+//        logDebug("Hidding Reconnecting bar and showing You are back bar");
+//        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_300));
+//        reconnectingText.setText(getString(R.string.connected_message));
+//        reconnectingLayout.setAlpha(1);
+//        reconnectingLayout.setVisibility(View.VISIBLE);
+//        reconnectingLayout.animate()
+//                .alpha(0f)
+//                .setDuration(INFO_ANIMATION)
+//                .setListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        reconnectingLayout.setVisibility(View.GONE);
+//                    }
+//                });
     }
 
     /**
      * Method for displaying the reconnect call bar.
      */
     private void showReconnecting() {
-        reconnectingLayout.clearAnimation();
-        if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
-            return;
-
-        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
-        reconnectingText.setText(getString(R.string.reconnecting_message));
-        reconnectingLayout.setVisibility(View.VISIBLE);
-        reconnectingLayout.setAlpha(1);
+//        reconnectingLayout.clearAnimation();
+//        if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
+//            return;
+//
+//        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
+//        reconnectingText.setText(getString(R.string.reconnecting_message));
+//        reconnectingLayout.setVisibility(View.VISIBLE);
+//        reconnectingLayout.setAlpha(1);
     }
 
     private void connectingOrOutgoingCall(boolean isConnecting) {
@@ -1876,6 +1876,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
         updateUI();
     }
+
+
 
     /**
      * Method to update the group call UI if there are changes in a participant's video.

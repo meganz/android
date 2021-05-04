@@ -471,18 +471,6 @@ public class CallUtil {
     }
 
     /**
-     * Retrieve if the call was in a reconnecting state or not
-     *
-     * @param context          from which the action is done.
-     * @param layout           Type RelativeLayout.
-     * @param reconnectingText Type TextView.
-     * @return True If the previous status of the call was reconnecting. Otherwise false.
-     */
-    public static boolean isAfterReconnecting(Context context, RelativeLayout layout, final TextView reconnectingText) {
-        return layout != null && layout.getVisibility() == View.VISIBLE && reconnectingText.getText().toString().equals(context.getString(R.string.reconnecting_message));
-    }
-
-    /**
      * Know if a call in a specific chat is established.
      *
      * @param chatId Id of a chat room that has a call.
@@ -760,7 +748,7 @@ public class CallUtil {
             return nickname;
         }
 
-        return new ChatController(context).getParticipantFirstName(peerId);
+        return new ChatController(context).getParticipantFullName(peerId);
     }
 
     /**

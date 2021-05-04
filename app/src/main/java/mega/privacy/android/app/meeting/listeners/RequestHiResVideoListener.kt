@@ -1,8 +1,10 @@
 package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
+import android.util.Log
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 
 class RequestHiResVideoListener(context: Context?) : ChatBaseListener(context) {

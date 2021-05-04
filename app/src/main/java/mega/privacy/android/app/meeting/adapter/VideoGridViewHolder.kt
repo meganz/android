@@ -36,66 +36,6 @@ class VideoGridViewHolder(
 
     lateinit var holder: SurfaceHolder
 
-    var isDrawing = true
-
-    private val srcRect = Rect()
-    private val dstRect = Rect()
-
-//    // TODO test start
-//    var job: Job? = null
-//
-//    val callback = object : SurfaceHolder.Callback {
-//
-//        override fun surfaceCreated(holder: SurfaceHolder?) {
-//            isDrawing = true
-//
-//            dstRect.top = 0
-//            dstRect.left = 0
-//            dstRect.right = binding.video.width
-//            dstRect.bottom = binding.video.height
-
-//            inMeetingViewModel.frames.observeForever {
-//                job = GlobalScope.launch(Dispatchers.IO) {
-//                    while (isDrawing) {
-//                        it.forEach {
-//                            delay(50)
-//                            onChatVideoData(it.width, it.height, it)
-//
-//                            if (!isDrawing) return@forEach
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        override fun surfaceChanged(
-//            holder: SurfaceHolder?,
-//            format: Int,
-//            width: Int,
-//            height: Int
-//        ) {
-//        }
-//
-//        override fun surfaceDestroyed(holder: SurfaceHolder?) {
-//            onRecycle()
-//        }
-//    }
-
-//    val onChatVideoData = fun(width: Int, height: Int, bitmap: Bitmap) {
-//        if (bitmap.isRecycled || !holder.surface.isValid) return
-//
-//        val canvas = holder.lockCanvas() ?: return
-//
-//        srcRect.top = 0
-//        srcRect.left = 0
-//        srcRect.right = width
-//        srcRect.bottom = height
-//
-//        canvas.drawBitmap(bitmap, srcRect, dstRect, null)
-//        holder.unlockCanvasAndPost(canvas)
-//    }
-//    // TODO test end
-
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
         participant: Participant,
@@ -110,12 +50,49 @@ class VideoGridViewHolder(
 
         initAvatar(participant)
         initStatus(participant)
-
         holder = binding.video.holder
-        //holder.addCallback(callback)
     }
 
-    fun initAvatar(participant: Participant) {
+    fun updateName(participant: Participant) {
+        binding.name.text = participant.name
+    }
+
+    fun updatePrivilegeIcon(participant: Participant) {
+        binding.moderatorIcon.isVisible = participant.isModerator
+    }
+
+    fun updateAudioIcon(participant: Participant) {
+        binding.muteIcon.isVisible = !participant.isAudioOn
+    }
+
+    fun updateOnHold(participant: Participant, isOnHold: Boolean) {
+        if (isOnHold) {
+            binding.onHoldIcon.isVisible = true
+            binding.avatar.alpha = 0.5f
+            showAvatar(participant)
+        } else {
+            binding.onHoldIcon.isVisible = false
+            binding.avatar.alpha = 1f
+            if(participant.isVideoOn){
+                activateVideo(participant)
+            }else{
+                showAvatar(participant)
+            }
+        }
+    }
+
+    fun updateVideo(participant: Participant) {
+        when {
+            participant.isVideoOn -> {
+                activateVideo(participant)
+            }
+            else -> {
+                showAvatar(participant)
+            }
+        }
+    }
+
+    private fun initAvatar(participant: Participant) {
         inMeetingViewModel.getChat()?.let {
             var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
             if (avatar == null) {
@@ -129,7 +106,7 @@ class VideoGridViewHolder(
         }
     }
 
-    fun initStatus(participant: Participant) {
+    private fun initStatus(participant: Participant) {
         val session = inMeetingViewModel.getSession(participant.peerId)
         val call = inMeetingViewModel.getCall()
         call?.let {
@@ -138,10 +115,13 @@ class VideoGridViewHolder(
             } else {
                 showAvatar(participant)
             }
+
+            updateAudioIcon(participant)
+            updatePrivilegeIcon(participant)
         }
     }
 
-    fun showAvatar(participant: Participant) {
+    private fun showAvatar(participant: Participant) {
         binding.avatar.isVisible = true
         closeVideo(participant)
     }
@@ -149,7 +129,7 @@ class VideoGridViewHolder(
     /**
      * Method for activating the video.
      */
-    fun activateVideo(participant: Participant) {
+    private fun activateVideo(participant: Participant) {
         binding.avatar.isVisible = false
 
         if (participant.videoListener == null) {
@@ -161,7 +141,11 @@ class VideoGridViewHolder(
             )
 
             participant.videoListener = vListener
-            listener.onActivateVideo(participant)
+
+            listener.onActivateVideo(
+                inMeetingViewModel.getSession(participant.clientId),
+                participant
+            )
         }
 
         binding.video.isVisible = true
@@ -172,21 +156,8 @@ class VideoGridViewHolder(
      */
     private fun closeVideo(participant: Participant) {
         binding.video.isVisible = false
-
-        listener.onCloseVideo(participant)
+        listener.onCloseVideo(inMeetingViewModel.getSession(participant.clientId), participant)
     }
-
-//    fun onRecycle() {
-//        isDrawing = false
-//
-//        holder.removeCallback(callback)
-//
-//        if (job != null && job!!.isActive) {
-//            GlobalScope.launch(Dispatchers.IO) {
-//                job!!.cancelAndJoin()
-//            }
-//        }
-//    }
 
     private fun layout(isFirstPage: Boolean, itemCount: Int) {
         var w = 0

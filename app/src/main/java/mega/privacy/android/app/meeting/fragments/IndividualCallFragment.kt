@@ -7,12 +7,17 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.individual_call_fragment.view.*
+import kotlinx.android.synthetic.main.individual_call_fragment.view.avatar
+import kotlinx.android.synthetic.main.individual_call_fragment.view.on_hold_icon
+import kotlinx.android.synthetic.main.individual_call_fragment.view.video
+import kotlinx.android.synthetic.main.self_feed_floating_window_fragment.view.*
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
@@ -38,6 +43,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     // Views
     private lateinit var vVideo: SurfaceView
+    private var vAvatarLayout: RelativeLayout? = null
     private lateinit var vAvatar: RoundedImageView
     private lateinit var vOnHold: ImageView
 
@@ -71,7 +77,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private val callOnHoldObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId) && inMeetingViewModel.isOneToOneCall()) {
+        if (inMeetingViewModel.isSameCall(it.callId)) {
             checkCallOnHold(it.isOnHold)
         }
     }
@@ -132,50 +138,41 @@ class IndividualCallFragment : MeetingBaseFragment() {
             .observeForever(sessionOnHoldObserver as Observer<Any>)
     }
 
-    private fun removeLiveEventBus() {
-        LiveEventBus.get(Constants.EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
-            .removeObserver(localAVFlagsObserver)
-
-        LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callOnHoldObserver)
-
-        LiveEventBus.get(Constants.EVENT_REMOTE_AVFLAGS_CHANGE)
-            .removeObserver(remoteAVFlagsObserver as Observer<Any>)
-
-        LiveEventBus.get(Constants.EVENT_SESSION_ON_HOLD_CHANGE)
-            .removeObserver(sessionOnHoldObserver as Observer<Any>)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = if (!isFloatingWindow) IndividualCallFragmentBinding.inflate(
-            inflater,
-            container,
-            false
-        ) else SelfFeedFloatingWindowFragmentBinding.inflate(
-            inflater,
-            container,
-            false
-        )
+        when {
+            isFloatingWindow -> {
+                val binding = SelfFeedFloatingWindowFragmentBinding.inflate(
+                    inflater,
+                    container,
+                    false
+                )
 
-        binding.root.let {
-            vVideo = it.video
-            vAvatar = it.avatar
-            vOnHold = it.on_hold_icon
-        }
-        return binding.root
-    }
-
-    private fun initAvatar() {
-        inMeetingViewModel.getChat()?.let {
-            var avatar = getImageAvatarCall(it, peerId!!)
-            if (avatar == null) {
-                avatar = CallUtil.getDefaultAvatarCall(context, peerId!!)
+                binding.root.let {
+                    vVideo = it.video
+                    vAvatar = it.avatar
+                    vAvatarLayout = it.avatar_layout
+                    vOnHold = it.on_hold_icon
+                }
+                return binding.root
             }
+            else -> {
+                val binding = IndividualCallFragmentBinding.inflate(
+                    inflater,
+                    container,
+                    false
+                )
 
-            vAvatar.setImageBitmap(avatar)
+                binding.root.let {
+                    vVideo = it.video
+                    vAvatar = it.avatar
+                    vAvatarLayout = null
+                    vOnHold = it.on_hold_icon
+                }
+                return binding.root
+            }
         }
     }
 
@@ -198,6 +195,23 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Initialising the avatar
+     */
+    private fun initAvatar() {
+        inMeetingViewModel.getChat()?.let {
+            var avatar = getImageAvatarCall(it, peerId!!)
+            if (avatar == null) {
+                avatar = CallUtil.getDefaultAvatarCall(context, peerId!!)
+            }
+
+            vAvatar.setImageBitmap(avatar)
+        }
+    }
+
+    /**
+     * Initialising the local video
+     */
     private fun initLocalVideo() {
         if (inMeetingViewModel.isMe(this.peerId)) {
             inMeetingViewModel.getCall()?.let {
@@ -221,6 +235,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 vOnHold.isVisible = false
                 vAvatar.alpha = 1f
                 vAvatar.isVisible = false
+                vAvatarLayout?.let {
+                    it.isVisible = false
+                }
             }
         }
 
@@ -230,21 +247,24 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        when {
-            isFloatingWindow -> return
-            else -> {
-                if(inMeetingViewModel.isOneToOneCall()){
-                    when {
-                        inMeetingViewModel.isCallOrSessionOnHold() -> {
-                            vOnHold.isVisible = true
-                            vAvatar.alpha = 0.5f
-                        }
-                        else -> {
-                            vOnHold.isVisible = false
-                            vAvatar.alpha = 1f
-                        }
-                    }
+        if (inMeetingViewModel.isOneToOneCall()) {
+            when {
+                inMeetingViewModel.isCallOrSessionOnHold() && !isFloatingWindow -> {
+                    vOnHold.isVisible = true
+                    vAvatar.alpha = 0.5f
                 }
+                else -> {
+                    vOnHold.isVisible = false
+                    vAvatar.alpha = 1f
+                }
+            }
+        } else {
+            if (inMeetingViewModel.isCallOnHold()) {
+                vOnHold.isVisible = true
+                vAvatar.alpha = 0.5f
+            } else {
+                vOnHold.isVisible = false
+                vAvatar.alpha = 1f
             }
         }
     }
@@ -253,8 +273,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to check if there is a call or session on hold
      */
     private fun checkCallOnHold(isOnHold: Boolean) {
-        when {
-            inMeetingViewModel.isMe(this.peerId) -> {
+        if (inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isMe(this.peerId)) {
                 if (isOnHold) {
                     closeVideo(this.peerId!!, this.clientId!!)
                     hideAvatar(this.peerId!!, this.clientId!!)
@@ -274,27 +294,43 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 }
                 return
             }
-            else -> when {
-                isOnHold -> {
-                    showAvatar(this.peerId!!, this.clientId!!)
-                    return
-                }
-                else -> {
-                    val session = inMeetingViewModel.getSession(this.clientId!!)
-                    session?.let {
-                        when {
-                            it.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold() -> {
-                                activateVideo(this.peerId!!, this.clientId!!)
-                                return
-                            }
-                            else -> {
-                                showAvatar(this.peerId!!, this.clientId!!)
-                                return
-                            }
+
+            if (isOnHold) {
+                showAvatar(this.peerId!!, this.clientId!!)
+                return
+            } else {
+                val session = inMeetingViewModel.getSession(this.clientId!!)
+                session?.let {
+                    when {
+                        it.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold() -> {
+                            activateVideo(this.peerId!!, this.clientId!!)
+                            return
+                        }
+                        else -> {
+                            showAvatar(this.peerId!!, this.clientId!!)
+                            return
                         }
                     }
                 }
             }
+        } else if (inMeetingViewModel.isMe(this.peerId)) {
+            if (isOnHold) {
+                showAvatar(this.peerId!!, this.clientId!!)
+                return
+            }
+
+            val call = inMeetingViewModel.getCall()
+            call?.let {
+                if (it.hasLocalVideo() && !inMeetingViewModel.isCallOrSessionOnHold()) {
+                    activateVideo(this.peerId!!, this.clientId!!)
+                    return
+                }
+
+                showAvatar(this.peerId!!, this.clientId!!)
+                checkItIsOnlyAudio()
+                return
+            }
+            return
         }
     }
 
@@ -311,10 +347,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 this.peerId?.let { this.clientId?.let { it1 -> hideAvatar(it, it1) } }
             }
             else -> {
-                inMeetingViewModel.getCall()?.let {
-                    when {
-                        !it.hasLocalVideo() -> {
-                            vAvatar.isVisible = true
+                inMeetingViewModel.getCall()?.let { call ->
+                    if (!call.hasLocalVideo()) {
+                        vAvatar.isVisible = true
+                        vAvatarLayout?.let {
+                            it.isVisible = true
                         }
                     }
                 }
@@ -330,6 +367,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
             return
 
         vAvatar.isVisible = true
+        vAvatarLayout?.let {
+            it.isVisible = true
+        }
+
         checkItIsOnlyAudio()
 
         closeVideo(peerId, clientId)
@@ -359,24 +400,26 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 sharedModel.addLocalVideo(chatId!!, videoListener)
             } else {
 
-                videoListener  = MeetingVideoListener(
+                videoListener = MeetingVideoListener(
                     vVideo,
                     outMetrics,
                     clientId,
                     false
                 )
-
                 sharedModel.addRemoteVideo(chatId!!, clientId, true, videoListener!!)
-                sharedModel.requestHiResVideo(
-                    chatId!!, clientId, RequestHiResVideoListener(
-                        requireContext()
-                    )
-                )
+                inMeetingViewModel.getSession(clientId)?.let {
+                    if (!it.canRecvVideoHiRes()) {
+                        sharedModel.requestHiResVideo(
+                            chatId!!, clientId, RequestHiResVideoListener(
+                                requireContext()
+                            )
+                        )
+                    }
+                }
             }
         }
 
         vVideo.isVisible = true
-
     }
 
     /**
@@ -396,6 +439,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
         removeChatVideoListener()
     }
 
+    /**
+     * Remove chat video listener
+     */
     private fun removeChatVideoListener() {
         if (videoListener == null)
             return
@@ -405,13 +451,18 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 sharedModel.removeLocalVideo(chatId!!, videoListener!!)
             }
             else -> {
-                sharedModel.stopHiResVideo(
-                    chatId!!, clientId!!, RequestHiResVideoListener(
-                        requireContext()
-                    )
-                )
-                sharedModel.removeRemoteVideo(chatId!!, clientId!!, true, videoListener!!)
+                val session = inMeetingViewModel.getSession(clientId!!)
+                session?.let {
+                    if (it.canRecvVideoHiRes()) {
+                        sharedModel.stopHiResVideo(
+                            chatId!!, clientId!!, RequestHiResVideoListener(
+                                requireContext()
+                            )
+                        )
+                    }
+                }
 
+                sharedModel.removeRemoteVideo(chatId!!, clientId!!, true, videoListener!!)
             }
         }
 
@@ -424,7 +475,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun removeSurfaceView() {
         vVideo.let { surfaceView ->
             if (surfaceView.parent != null && surfaceView.parent.parent != null) {
-                logDebug("Removing suface view")
+                logDebug("Removing surface view")
                 (surfaceView.parent as ViewGroup).removeView(surfaceView)
             }
             surfaceView.isVisible = false
@@ -473,6 +524,20 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     putLong(Constants.CLIENT_ID, clientId)
                 }
             }
+    }
+
+    private fun removeLiveEventBus() {
+        LiveEventBus.get(Constants.EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
+            .removeObserver(localAVFlagsObserver)
+
+        LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
+            .removeObserver(callOnHoldObserver)
+
+        LiveEventBus.get(Constants.EVENT_REMOTE_AVFLAGS_CHANGE)
+            .removeObserver(remoteAVFlagsObserver as Observer<Any>)
+
+        LiveEventBus.get(Constants.EVENT_SESSION_ON_HOLD_CHANGE)
+            .removeObserver(sessionOnHoldObserver as Observer<Any>)
     }
 
     override fun onResume() {

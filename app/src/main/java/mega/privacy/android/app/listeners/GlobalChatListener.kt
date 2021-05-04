@@ -5,14 +5,16 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
+import mega.privacy.android.app.utils.Constants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.utils.LogUtil
-import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatListenerInterface
-import nz.mega.sdk.MegaChatPresenceConfig
+import nz.mega.sdk.*
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
+        LiveEventBus.get(
+            EVENT_PRIVILEGES_CHANGE,
+            MegaChatListItem::class.java
+        ).post(item)
         application.onChatListItemUpdate(api, item)
     }
 

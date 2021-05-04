@@ -19,37 +19,65 @@ class GridViewPagerAdapter(
     private val listener: GridViewListener
 ) : BaseBannerAdapter<List<Participant>>() {
 
+    var adapter: VideoGridViewAdapter? = null
+    var gridView:CustomizedGridCallRecyclerView? = null
     override fun bindData(
         holder: BaseViewHolder<List<Participant>>,
         data: List<Participant>,
         position: Int,
         pageSize: Int
     ) {
-        val gridView = holder.findViewById<CustomizedGridCallRecyclerView>(R.id.grid_view)
-        gridView.itemAnimator = DefaultItemAnimator()
-        gridView.setOnTouchCallback {
-            (fragment as InMeetingFragment).onPageClick()
-        }
+        gridView = holder.findViewById(R.id.grid_view)
+        gridView?.let { recyclerView ->
+            recyclerView.itemAnimator = DefaultItemAnimator()
+            recyclerView.setOnTouchCallback {
+                (fragment as InMeetingFragment).onPageClick()
+            }
 
-        if(position == 0) {
-                        gridView.setColumnWidth(
-                when (data.size) {
-                    1 -> maxWidth
-                    2 -> maxWidth
-                    3 -> (maxWidth * 0.8).toInt()
-                    else -> maxWidth / 2
-                }
+            if(position == 0) {
+                recyclerView.setColumnWidth(
+                    when (data.size) {
+                        1 -> maxWidth
+                        2 -> maxWidth
+                        3 -> (maxWidth * 0.8).toInt()
+                        else -> maxWidth / 2
+                    }
+                )
+            } else {
+                recyclerView.setColumnWidth(maxWidth / 2)
+            }
+
+            adapter = VideoGridViewAdapter(
+                inMeetingViewModel,
+                recyclerView,
+                maxWidth,
+                maxHeight,
+                position,
+                listener
             )
-        } else {
-            gridView.setColumnWidth(maxWidth / 2)
+
+            adapter?.let {
+                it.submitList(data)
+                recyclerView.adapter = it
+                it.notifyDataSetChanged()
+            }
         }
+    }
 
-        val adapter = VideoGridViewAdapter(inMeetingViewModel, gridView, maxWidth, maxHeight, position, listener)
-        adapter.submitList(data)
+    fun updateParticipantPrivileges(participant: Participant){
+        adapter?.updateParticipantPrivileges(participant)
+    }
 
-        gridView.adapter = adapter
+    fun updateParticipantName(participant: Participant){
+        adapter?.updateParticipantName(participant)
+    }
 
-        adapter.notifyDataSetChanged()
+    fun updateOnHold(participant: Participant, isOnHold:Boolean){
+        adapter?.updateOnHoldSession(participant, isOnHold)
+    }
+
+    fun updateParticipantAudioVideo(typeChange:Int, participant: Participant) {
+        adapter?.updateParticipantAudioVideo(typeChange, participant)
     }
 
     override fun getLayoutId(viewType: Int): Int {
