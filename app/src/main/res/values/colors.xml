@@ -417,7 +417,15 @@
     <!-- QR code page background color -->
     <color name="white_grey_700">@color/white</color>
 
-
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/grey_alpha_087</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/white_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_200</color>
 </resources>
