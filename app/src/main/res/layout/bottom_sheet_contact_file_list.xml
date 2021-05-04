@@ -121,6 +121,13 @@
                     tools:text="Folder info" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/edit_file_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/title_edit_profile_info"
+                app:drawableStartCompat="@drawable/ic_rename"
+                android:visibility="gone"/>
+
             <LinearLayout
                 android:id="@+id/separator_info"
                 android:layout_width="match_parent"

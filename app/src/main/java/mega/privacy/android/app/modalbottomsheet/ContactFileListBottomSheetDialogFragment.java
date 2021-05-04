@@ -27,6 +27,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -145,6 +146,12 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             nodeIconLayout.setVisibility(View.GONE);
             setNodeThumbnail(context, node, nodeThumb);
             optionLeave.setVisibility(View.GONE);
+
+            if (accessLevel >= MegaShare.ACCESS_READWRITE) {
+                TextView editOption = contentView.findViewById(R.id.edit_file_option);
+                editOption.setVisibility(View.VISIBLE);
+                editOption.setOnClickListener(this);
+            }
         }
 
         switch (accessLevel) {
@@ -260,6 +267,10 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 } else if (context instanceof ContactInfoActivityLollipop) {
                     contactInfoActivity.askConfirmationMoveToRubbish(handleList);
                 }
+                break;
+
+            case R.id.edit_file_option:
+                manageEditTextFileIntent(context, node, CONTACT_FILE_ADAPTER);
                 break;
         }
 
