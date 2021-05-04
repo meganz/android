@@ -219,7 +219,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
             @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.hide(WindowInsets.Type.statusBars())
+                window?.setDecorFitsSystemWindows(false)
             } else {
                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -850,9 +850,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!isAudioPlayer() && hideStatusBar) {
-                window.insetsController?.hide(WindowInsets.Type.statusBars())
+                window?.setDecorFitsSystemWindows(false)
             } else {
-                window.insetsController?.show(WindowInsets.Type.statusBars())
+                window?.setDecorFitsSystemWindows(true)
             }
         } else {
             @Suppress("DEPRECATION")
@@ -877,7 +877,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         if (!isAudioPlayer()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.hide(WindowInsets.Type.statusBars())
+                window?.setDecorFitsSystemWindows(false)
             } else {
                 @Suppress("DEPRECATION")
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
