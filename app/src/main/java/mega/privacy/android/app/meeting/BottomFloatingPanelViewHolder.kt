@@ -64,10 +64,15 @@ class BottomFloatingPanelViewHolder(
         setupRecyclerView()
         initShareAndInviteButton()
 
-        /**
-         * Expanded bottom sheet when the meeting is group chat
-         * If the meeting is one-to-one chat, just show the control button, and would not let user drag the bottom panel
-         */
+
+        updatePanel()
+    }
+
+    /**
+     * Expanded bottom sheet when the meeting is group chat
+     * If the meeting is one-to-one chat, just show the control button, and would not let user drag the bottom panel
+     */
+    private fun updatePanel() {
         if (isGroup) {
             expand()
         } else {
@@ -211,6 +216,16 @@ class BottomFloatingPanelViewHolder(
                 listener.onInviteParticipants()
             }
         }
+    }
+
+    /**
+     * When the meeting change, will update the panel
+     *
+     * @param group The flag that determine if this meeting is group call
+     */
+    fun updateMeetingType(group: Boolean) {
+        isGroup = group
+        updatePanel()
     }
 
     /**
