@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -37,6 +38,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
+import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 
 object MegaNodeDialogUtil {
@@ -47,6 +50,9 @@ object MegaNodeDialogUtil {
     private const val TYPE_NEW_TXT_FILE = 4
     const val IS_NEW_TEXT_FILE_SHOWN = "IS_NEW_TEXT_FILE_SHOWN"
     const val NEW_TEXT_FILE_TEXT = "NEW_TEXT_FILE_TEXT"
+    private const val ERROR_EMPTY_EXTENSION = "ERROR_EMPTY_EXTENSION"
+    private const val ERROR_DIFFERENT_EXTENSION = "ERROR_DIFFERENT_EXTENSION"
+    private const val NO_ERROR = "NO_ERROR"
 
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -353,19 +359,57 @@ object MegaNodeDialogUtil {
                                 return
                             }
 
-                            val megaApi = MegaApplication.getInstance().megaApi
+                            val oldMimeType = MimeTypeList.typeForName(node.name)
+                            var newExtension = MimeTypeList.typeForName(typedString).extension
+                            if (newExtension == typedString) newExtension = ""
 
-                            megaApi.renameNode(
-                                node, typedString,
-                                RenameListener(
-                                    snackbarShower, context,
-                                    showSnackbar = true,
-                                    isMyChatFilesFolder = false,
-                                    actionNodeCallback = actionNodeCallback
-                                )
-                            )
+                            when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(
+                                oldMimeType,
+                                newExtension
+                            )) {
+                                ERROR_EMPTY_EXTENSION -> {
+                                    typeText?.hideKeyboard()
 
-                            actionNodeCallback?.actionConfirmed()
+                                    showDialogError(
+                                        typeText,
+                                        errorText,
+                                        getString(
+                                            R.string.file_without_extension,
+                                            oldMimeType.extension
+                                        )
+                                    )
+
+                                    snackbarShower?.showSnackbar(
+                                        SNACKBAR_TYPE,
+                                        getString(R.string.file_without_extension_warning),
+                                        MEGACHAT_INVALID_HANDLE
+                                    )
+
+                                    return
+                                }
+                                ERROR_DIFFERENT_EXTENSION -> {
+                                    typeText?.hideKeyboard()
+
+                                    showFileExtensionWarning(
+                                        context,
+                                        node,
+                                        typedString,
+                                        oldMimeType.extension,
+                                        newExtension,
+                                        snackbarShower,
+                                        actionNodeCallback
+                                    )
+                                }
+                                NO_ERROR -> {
+                                    confirmRenameAction(
+                                        context,
+                                        node,
+                                        typedString,
+                                        snackbarShower,
+                                        actionNodeCallback
+                                    )
+                                }
+                            }
                         }
                     }
                     TYPE_NEW_FOLDER -> {
@@ -395,6 +439,120 @@ object MegaNodeDialogUtil {
                 dialog.dismiss()
             }
         }
+    }
+
+    /**
+     * Confirms the rename action.
+     *
+     * @param context            Current context.
+     * @param node               A valid node if needed to confirm the action, null otherwise.
+     * @param typedString        Typed name.
+     * @param snackbarShower     Interface to show snackbar.
+     * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+     */
+    private fun confirmRenameAction(
+        context: Context,
+        node: MegaNode,
+        typedString: String,
+        snackbarShower: SnackbarShower?,
+        actionNodeCallback: ActionNodeCallback?
+    ) {
+        val megaApi = MegaApplication.getInstance().megaApi
+
+        megaApi.renameNode(
+            node,
+            typedString,
+            RenameListener(
+                snackbarShower,
+                context,
+                showSnackbar = true,
+                isMyChatFilesFolder = false,
+                actionNodeCallback = actionNodeCallback
+            )
+        )
+
+        actionNodeCallback?.actionConfirmed()
+    }
+
+    /**
+     * Checks if should allow the rename action:
+     * - Should allow it if the new file name has the same extension than the old one.
+     * - Should not allow it and show the corresponding error if the new file name has:
+     *      * An empty extension and is not a text file.
+     *      * A different extension than the old name.
+     *
+     * @param oldMimeType   Current mimeType of the file.
+     * @param newExtension  New typed extension name for the file.
+     * @return The corresponding error to show or not the corresponding warning.
+     */
+    private fun isValidRenameDialogValue(oldMimeType: MimeTypeList, newExtension: String): String {
+        return when {
+            newExtension.isEmpty() && !oldMimeType.isValidTextFileType -> ERROR_EMPTY_EXTENSION
+            oldMimeType.extension != newExtension -> ERROR_DIFFERENT_EXTENSION
+            else -> NO_ERROR
+        }
+    }
+
+    /**
+     * Shows a warning dialog informing the file extension changed after rename a file.
+     *
+     * @param context            Current context.
+     * @param node               A valid node if needed to confirm the action, null otherwise.
+     * @param typedString        Typed name.
+     * @param oldExtension       Current file extension.
+     * @param newExtension       New file extension.
+     * @param snackbarShower     Interface to show snackbar.
+     * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+     */
+    private fun showFileExtensionWarning(
+        context: Context,
+        node: MegaNode,
+        typedString: String,
+        oldExtension: String,
+        newExtension: String,
+        snackbarShower: SnackbarShower?,
+        actionNodeCallback: ActionNodeCallback?
+    ) {
+        val keepExtension = if (oldExtension == node.name) "" else oldExtension
+
+        val typedOldExt =
+            if (keepExtension.isEmpty()) typedString.substring(0, typedString.lastIndexOf("."))
+            else typedString.substring(0, typedString.lastIndexOf(".") + 1) + oldExtension
+
+        val message = if (keepExtension.isEmpty() && newExtension.isNotEmpty()) {
+            getString(R.string.file_extension_change_warning_old_empty, newExtension)
+        } else if (keepExtension.isNotEmpty() && newExtension.isEmpty()) {
+            getString(R.string.file_extension_change_warning_new_empty, keepExtension)
+        } else {
+            getString(R.string.file_extension_change_warning, keepExtension, newExtension)
+        }
+
+        val useButton = if (newExtension.isEmpty()) {
+            getString(R.string.action_use_empty_new_extension)
+        } else {
+            getString(R.string.action_use_new_extension, newExtension)
+        }
+
+        val keepButton = if (keepExtension.isEmpty()) {
+            getString(R.string.action_keep_empty_old_extension)
+        } else {
+            getString(R.string.action_keep_old_extension, keepExtension)
+        }
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.file_extension_change_title))
+            .setMessage(message)
+            .setPositiveButton(keepButton) { _, _ ->
+                if (typedOldExt == node.name) {
+                    return@setPositiveButton
+                }
+
+                confirmRenameAction(context, node, typedOldExt, snackbarShower, actionNodeCallback)
+            }
+            .setNegativeButton(useButton) { _, _ ->
+                confirmRenameAction(context, node, typedString, snackbarShower, actionNodeCallback)
+            }
+            .show()
     }
 
     /**

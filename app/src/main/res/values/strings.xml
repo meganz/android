@@ -1751,6 +1751,16 @@
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Please correct your filenames before proceeding</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Invalid characters</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="file_without_extension" context="Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)">File without extension (.%1$s)</string>
+    <string name="file_without_extension_warning" context="Error shown when the user writes a file name without extension">To proceed you need to type a file extension</string>
+    <string name="file_extension_change_title" context="Title of the warning dialog indicating the renamed name file extension is not the same">File extension change</string>
+    <string name="file_extension_change_warning" context="Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ''.jpg'' to ''.txt''">You may not be able to access this file if you change it from ".%1$s" to ".%2$s"</string>
+    <string name="file_extension_change_warning_old_empty" context="Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ''.txt''">You may not be able to access this file if you change it from empty to ".%2$s"</string>
+    <string name="file_extension_change_warning_new_empty" context="Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ''.jpg'' to empty">You may not be able to access this file if you change it from ".%1$s" to empty</string>
+    <string name="action_use_empty_new_extension" context="Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension.">Use empty</string>
+    <string name="action_use_new_extension" context="Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt">Use .%1$s</string>
+    <string name="action_keep_empty_old_extension" context="Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension.">Keep empty</string>
+    <string name="action_keep_old_extension" context="Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg">Keep .%1$s</string>
 
     <plurals name="empty_names">
         <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Please name your file before proceeding</item>
