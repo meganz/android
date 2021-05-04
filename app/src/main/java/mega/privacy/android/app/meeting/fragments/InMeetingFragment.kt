@@ -60,7 +60,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var toolbarSubtitle: TextView? = null
     private var meetingChrono: Chronometer? = null
 
-    private var bannerInfoLayout: LinearLayout? = null
+    private lateinit var bannerInfoLayout: View
     private var bannerText: TextView? = null
     private var bannerIcon: ImageView? = null
 
@@ -94,6 +94,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var previousY = -1f
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
+    private var bannerShouldBeShown = false
 
     private lateinit var binding: InMeetingFragmentBinding
 
@@ -289,15 +290,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         initStartMeeting()
         // Set on page tapping listener.
         setPageOnClickListener(view)
-        setSystemUIVisibility()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Set parent activity can receive the orientation changes
         meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+
         pauseAudioPlayer(meetingActivity)
 
+        // Keep screen on
+        meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     /**
@@ -454,7 +457,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 override fun onDragStart(view: View?) {
                     if (toolbar.isVisible) {
-                        dragTouchListener.setToolbarHeight(toolbar.bottom)
+                        val maxTop = if(bannerInfoLayout.isVisible) bannerInfoLayout.bottom else toolbar.bottom
+                        dragTouchListener.setToolbarHeight(maxTop)
                         dragTouchListener.setBottomSheetHeight(floatingBottomSheet.top)
                     } else {
                         dragTouchListener.setToolbarHeight(0)
@@ -472,13 +476,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         floatingWindowContainer.setOnTouchListener(dragTouchListener)
     }
 
-    private fun setSystemUIVisibility() {
-        // Set system UI color to make them visible.
-        // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        meetingActivity.window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
-    }
-
     private fun setPageOnClickListener(view: View) = view.setOnClickListener {
         onPageClick()
     }
@@ -488,6 +485,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (System.currentTimeMillis() - lastTouch < TAP_THRESHOLD) return
 
         toolbar.fadeInOut(dy = TOOLBAR_DY, toTop = true)
+
+        if (bannerShouldBeShown) {
+            bannerInfoLayout.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = true)
+        }
+
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
 
         if (toolbar.isVisible) {
@@ -503,12 +505,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun checkRelativePositionWithToolbar() {
-        val isIntersect = (toolbar.bottom - floatingWindowContainer.y) > 0
+        val maxTop = if(bannerInfoLayout.isVisible) bannerInfoLayout.bottom else toolbar.bottom
+
+        val isIntersect = (maxTop - floatingWindowContainer.y) > 0
         if (toolbar.isVisible && isIntersect) {
-            floatingWindowContainer.moveY(toolbar.bottom.toFloat())
+            floatingWindowContainer.moveY(maxTop.toFloat())
         }
 
-        val isIntersectPreviously = (toolbar.bottom - previousY) > 0
+        val isIntersectPreviously = (maxTop - previousY) > 0
         if (!toolbar.isVisible && isIntersectPreviously && previousY >= 0) {
             floatingWindowContainer.moveY(previousY)
         }
@@ -834,21 +838,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun userJoinOrLeaveTheMeeting(peerId: Long, type: Int) {
-        bannerInfoLayout?.let {
-            var shouldBeShown =
-                inMeetingViewModel.showBannerUserJoinOrLeaveCall(bannerText, peerId, type)
-            if (shouldBeShown == true) {
-                bannerInfoLayout?.setBackgroundColor(
+        bannerInfoLayout.let {
+            bannerShouldBeShown = inMeetingViewModel.showBannerUserJoinOrLeaveCall(bannerText, peerId, type)
+            if (bannerShouldBeShown && toolbar.isVisible) {
+                bannerInfoLayout.setBackgroundColor(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.teal_300
                     )
                 )
-                bannerInfoLayout?.alpha = 1f
-                bannerInfoLayout?.isVisible = true
-                bannerInfoLayout?.animate()?.alpha(0f)?.setDuration(INFO_ANIMATION.toLong())
+                bannerInfoLayout.alpha = 1f
+                bannerInfoLayout.isVisible = true
+                bannerInfoLayout.animate()?.alpha(0f)?.setDuration(INFO_ANIMATION.toLong())
             } else {
-                bannerInfoLayout?.isVisible = false
+                bannerInfoLayout.isVisible = false
+            }
+
+            // Delay a bit to wait for 'bannerInfoLayout' finish layouting, otherwise, its bottom is 0.
+            RunOnUIThreadUtils.runDelay(10) {
+                checkRelativePositionWithToolbar()
             }
         }
     }
@@ -858,10 +866,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        bannerInfoLayout?.let {
-            bannerInfoLayout?.isVisible =
-                inMeetingViewModel.showAppropriateBannerOneToOneCall(bannerIcon, bannerText)
-        }
+        bannerInfoLayout.isVisible =
+            inMeetingViewModel.showAppropriateBannerOneToOneCall(bannerIcon, bannerText)
     }
 
     /**
