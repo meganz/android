@@ -108,6 +108,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun isViewMode(): Boolean = mode.value == VIEW_MODE
 
+    private fun isEditMode(): Boolean = mode.value == EDIT_MODE
+
     fun isCreateMode(): Boolean = mode.value == CREATE_MODE
 
     private fun setViewMode() {
@@ -225,7 +227,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
 
-        if (isViewMode()) {
+        if (isViewMode() || isEditMode()) {
             needsReadContent = true
         }
 

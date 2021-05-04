@@ -163,6 +163,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
         LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
+        optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);

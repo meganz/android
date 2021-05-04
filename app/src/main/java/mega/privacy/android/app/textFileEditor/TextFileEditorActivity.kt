@@ -347,17 +347,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private fun showMode(mode: String) {
         refreshMenuOptionsVisibility()
 
-        if (mode == VIEW_MODE) {
-            if (viewModel.needsReadContent()) {
-                val mi = ActivityManager.MemoryInfo()
-                (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
-                readingContent = true
-                viewModel.readFileContent(mi)
-                binding.fileEditorScrollView.isVisible = false
-                binding.loadingImage.isVisible = true
-                binding.loadingProgressBar.isVisible = true
-            }
+        if (viewModel.needsReadContent()) {
+            val mi = ActivityManager.MemoryInfo()
+            (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+            readingContent = true
+            viewModel.readFileContent(mi)
+            binding.fileEditorScrollView.isVisible = false
+            binding.loadingImage.isVisible = true
+            binding.loadingProgressBar.isVisible = true
+        }
 
+        if (mode == VIEW_MODE) {
             supportActionBar?.title = null
             binding.nameText.isVisible = true
 
