@@ -583,9 +583,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
-				//boolean isLocalTermCode = call.isLocalTermCode();
-				boolean isLocalTermCode = true;
-				checkCallDestroyed(chatId, callId, termCode, isIgnored, isLocalTermCode);
+				checkCallDestroyed(chatId, callId, termCode, isIgnored);
 				setRequestSentCall(callId, false);
 				break;
 		}
@@ -1584,7 +1582,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
 	}
 
-	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored, boolean isLocalTermCode) {
+	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored) {
 		removeValues(chatId);
 		if (shouldNotify(this)) {
 			toSystemSettingNotification(this);
@@ -1597,18 +1595,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
-//			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
-				//logDebug("TERM_CODE_ANSWER_TIMEOUT");
+			if(termCode == MegaChatCall.TERM_CODE_ERROR && !isIgnored){
 				if (megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-						//notificationBuilder.showMissedCallNotification(chatId, callId);
+						notificationBuilder.showMissedCallNotification(chatId, callId);
 					} catch (Exception e) {
 						logError("EXCEPTION when showing missed call notification", e);
 					}
 				}
-			//}
+			}
 		} catch (Exception e) {
 			logError("EXCEPTION when showing missed call notification", e);
 		}

@@ -377,6 +377,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.chatRoomLiveData.observe(viewLifecycleOwner) {
             it?.let {
                 inMeetingViewModel.setChat(it.chatId)
+                bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
             }
         }
 
@@ -808,7 +809,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 this,
                 isGuest,
                 isModerator,
-                inMeetingViewModel.isOneToOneCall()
+                !inMeetingViewModel.isOneToOneCall()
             )
 
         /**
