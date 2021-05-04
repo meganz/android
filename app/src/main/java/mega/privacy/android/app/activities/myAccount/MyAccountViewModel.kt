@@ -11,11 +11,13 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -236,5 +238,16 @@ class MyAccountViewModel @ViewModelInject constructor(
                     cancelSubscriptions.value = error
                 }
             ))
+    }
+
+    fun upgradeAccount(context: Context) {
+        context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+    }
+
+    fun logout(context: Context) {
+        megaApi.shouldShowPasswordReminderDialog(
+            true,
+            ShouldShowPasswordReminderDialogListener(context, true)
+        )
     }
 }

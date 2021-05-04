@@ -138,11 +138,9 @@ class MyAccountActivity : PasscodeActivity() {
             R.id.action_change_pass -> viewModel.changePassword(this)
             R.id.action_export_MK -> viewModel.exportMK(this)
             R.id.action_refresh -> viewModel.refresh(this)
-            R.id.action_upgrade_account -> {
-            }
+            R.id.action_upgrade_account -> viewModel.upgradeAccount(this)
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
-            R.id.action_logout -> {
-            }
+            R.id.action_logout -> viewModel.logout(this)
         }
 
         return super.onOptionsItemSelected(item)
@@ -173,6 +171,10 @@ class MyAccountActivity : PasscodeActivity() {
 
             if (viewModel.thereIsNoSubscription()) {
                 menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+            }
+
+            if (megaApi.isBusinessAccount) {
+                menu.findItem(R.id.action_upgrade_account).isVisible = false
             }
         } else {
             menu.toggleAllMenuItemsVisibility(false)

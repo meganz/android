@@ -700,7 +700,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
-	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
 	private MenuItem inviteMenuItem;
 	private MenuItem retryTransfers;
@@ -6224,7 +6223,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
 		searchByDate = menu.findItem(R.id.action_search_by_date);
-		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
@@ -6362,7 +6360,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 					} else if (getTabItemContacts() == SENT_REQUESTS_TAB) {
 						addContactMenuItem.setVisible(true);
-						upgradeAccountMenuItem.setVisible(true);
 						scanQRcodeMenuItem.setVisible(true);
 					}
 					break;
@@ -6377,15 +6374,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 						setGridListIcon();
-					}
-					break;
-
-				case ACCOUNT:
-					if (accountFragment == MY_ACCOUNT_FRAGMENT) {
-						upgradeAccountMenuItem.setVisible(true);
-						logoutMenuItem.setVisible(true);
-					} else {
-						logoutMenuItem.setVisible(true);
 					}
 					break;
 
@@ -7031,12 +7019,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				selectDrawerItemLollipop(drawerItem);
 				return true;
 	        }
-	        case R.id.action_menu_logout:{
-				logDebug("Action menu logout pressed");
-				megaApi.shouldShowPasswordReminderDialog(true,
-						new ShouldShowPasswordReminderDialogListener(this, true));
-	        	return true;
-	        }
 			case R.id.action_menu_forgot_pass:{
 				logDebug("Action menu forgot pass pressed");
 				if (getMyAccountFragment() != null) {
@@ -7090,7 +7072,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             takePicture.setVisible(false);
             helpMenuItem.setVisible(false);
             gridSmallLargeMenuItem.setVisible(false);
-            logoutMenuItem.setVisible(false);
             forgotPassMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);

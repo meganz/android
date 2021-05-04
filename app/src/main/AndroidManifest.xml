@@ -640,6 +640,14 @@
             android:name=".activities.exportMK.ExportRecoveryKeyActivity"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name=".activities.upgradeAccount.UpgradeAccountActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".activities.upgradeAccount.ChooseAccountActivity"
+            android:launchMode="singleTop" />
+
     </application>
 
 </manifest>
