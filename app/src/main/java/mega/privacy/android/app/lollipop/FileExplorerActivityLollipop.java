@@ -693,7 +693,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logDebug("action = SAVE to Cloud Drive");
 				mode = SAVE;
 				selectFile = false;
-				parentHandleCloud = intent.getLongExtra(EXTRA_PARENT_HANDLE, -1);
+				parentHandleCloud = intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE);
 
 				aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
 				aB.setSubtitle(StringResourcesUtils.getString(R.string.cloud_drive_select_destination));
