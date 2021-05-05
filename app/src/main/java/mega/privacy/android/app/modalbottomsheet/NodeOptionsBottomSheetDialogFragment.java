@@ -127,9 +127,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         ImageView nodeIcon = contentView.findViewById(R.id.node_icon);
         ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
+        LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_layout);
+
         LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
-        TextView optionEdit = contentView.findViewById(R.id.edit_file_option);
 //      optionFavourite
         LinearLayout optionFavourite = contentView.findViewById(R.id.option_favourite_layout);
         ImageView imageFavourite = contentView.findViewById(R.id.option_favourite_image);
@@ -163,7 +164,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
         LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
-        optionEdit.setOnClickListener(this);
+        contentView.findViewById(R.id.edit_file_option).setOnClickListener(this);
         optionLabel.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);

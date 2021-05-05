@@ -122,6 +122,27 @@
             android:orientation="vertical"
             android:id="@+id/items_layout_bottom_sheet_node">
 
+            <LinearLayout
+                android:id="@+id/edit_file_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/edit_file_option"
+                    style="@style/BottomSheetOption"
+                    android:text="@string/title_edit_profile_info"
+                    app:drawableStartCompat="@drawable/ic_file_edit"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
+                    android:background="@color/grey_012_white_012" />
+
+            </LinearLayout>
+
             <!-- Options -->
             <LinearLayout
                 android:id="@+id/option_properties_layout"
@@ -151,13 +172,6 @@
                     android:layout_marginStart="18dp"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/edit_file_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/title_edit_profile_info"
-                app:drawableStartCompat="@drawable/ic_rename"
-                android:visibility="gone"/>
 
             <LinearLayout
                 android:id="@+id/view_in_folder_layout"
