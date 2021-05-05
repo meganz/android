@@ -3072,6 +3072,7 @@
     <string name="btn_join_meeting_as_guest" context="Button that join a meeting as guest">Join as a guest</string>
     <string name="type_meeting_name" context="Hint shown to guide user on meeting name">%s\'s meeting</string>
 
+    <string name="general_reject" context="General label for reject the call.">Hang up</string>
     <string name="general_mic" context="General label for microphone">Mic</string>
     <string name="general_mic_mute" context="General label for microphone unmuted/muted">Your microphone is %s</string>
     <string name="general_camera" context="General label for camera">Camera</string>

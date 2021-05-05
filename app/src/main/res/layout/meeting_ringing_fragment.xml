@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="ringingViewModel"
+            type="mega.privacy.android.app.meeting.fragments.RingingMeetingViewModel" />
+
+        <variable
+            name="sharedViewModel"
+            type="mega.privacy.android.app.meeting.activity.MeetingActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#abcdef"
+        tools:context=".meeting.fragments.RingingMeetingFragment">
+
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter"
+            app:border_color="@color/grey_700"
+            app:border_width="3dp"
+            app:corner_radius="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guideline_top" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/answer_audio_fab"
+            android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:src="@drawable/ic_phone_white"
+            app:backgroundTint="@color/teal_300"
+            app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_bottom"
+            app:layout_constraintEnd_toStartOf="@+id/answer_video_fab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
+            app:pressedTranslationZ="12dp"
+            app:tint="@null"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/upload_to_audio"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+            app:layout_constraintEnd_toEndOf="@id/answer_audio_fab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@id/answer_audio_fab"
+            app:layout_constraintTop_toBottomOf="@id/answer_audio_fab" />
+
+        <ImageView
+            android:id="@+id/first_arrow_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_expand"
+            app:layout_constraintBottom_toTopOf="@id/second_arrow_call"
+            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
+            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/second_arrow_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/ic_expand"
+            app:layout_constraintBottom_toTopOf="@id/third_arrow_call"
+            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
+            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/third_arrow_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/ic_expand"
+            app:layout_constraintBottom_toTopOf="@id/fourth_arrow_call"
+            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
+            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/fourth_arrow_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/ic_expand"
+            app:layout_constraintBottom_toTopOf="@id/answer_video_fab"
+            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
+            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
+            tools:ignore="ContentDescription" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/answer_video_fab"
+            android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:src="@drawable/ic_videocam_white"
+            app:backgroundTint="@color/teal_300"
+            app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+            app:layout_constraintEnd_toStartOf="@+id/reject_fab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@id/answer_audio_fab"
+            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
+            app:pressedTranslationZ="12dp"
+            app:tint="@null"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/upload_to_video"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
+            app:layout_constraintTop_toBottomOf="@id/answer_video_fab" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/reject_fab"
+            android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
+            android:src="@drawable/ic_end_call"
+            app:backgroundTint="@color/red_600"
+            app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@id/answer_video_fab"
+            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
+            app:pressedTranslationZ="12dp"
+            app:tint="@null"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/general_reject"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
+            app:layout_constraintEnd_toEndOf="@id/reject_fab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@id/reject_fab"
+            app:layout_constraintTop_toBottomOf="@id/reject_fab" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_top"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.9" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

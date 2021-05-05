@@ -56,4 +56,9 @@
             app:argType="string"
             android:defaultValue=""/>
     </fragment>
+    <fragment
+        android:id="@+id/ringingMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.RingingMeetingFragment"
+        android:label="fragment_ringing_meeting">
+    </fragment>
 </navigation>

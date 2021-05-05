@@ -34,6 +34,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
         const val MEETING_ACTION_IN = "in_meeting"
+        const val MEETING_ACTION_RINGING = "ringing_meeting"
 
         /** The names of the Extra data being passed to the initial fragment */
         const val MEETING_NAME = "meeting_name"
@@ -156,6 +157,7 @@ class MeetingActivity : PasscodeActivity() {
             MEETING_ACTION_JOIN -> R.id.joinMeetingFragment
             MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
             MEETING_ACTION_IN -> R.id.inMeetingFragment
+            MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
             else -> R.id.createMeetingFragment
         }
 
