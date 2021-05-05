@@ -103,10 +103,10 @@ public class CallUtil {
     public static void openMeetingRinging(Context context, long chatId) {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
-//        Intent meetingIntent = new Intent(context, MeetingActivity.class);
-//        meetingIntent.setAction(MEETING_ACTION_IN);
-//        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-//        context.startActivity(meetingIntent);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_RINGING);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        context.startActivity(meetingIntent);
     }
 
     /**
@@ -502,7 +502,7 @@ public class CallUtil {
 
         if (call != null) {
             chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
+            chronometer.setBase(call.getDuration() * 1000);
             chronometer.start();
             chronometer.setFormat(" %s");
         }
@@ -898,7 +898,7 @@ public class CallUtil {
 
     public static PendingIntent getPendingIntentMeetingRinging(Context context, long chatIdCallToAnswer, int requestCode) {
         Intent intentMeeting = new Intent(context, MeetingActivity.class);
-        intentMeeting.setAction(MEETING_ACTION_IN);
+        intentMeeting.setAction(MEETING_ACTION_RINGING);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
         return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
     }

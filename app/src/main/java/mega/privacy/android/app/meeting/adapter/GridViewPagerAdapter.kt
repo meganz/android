@@ -61,12 +61,20 @@ class GridViewPagerAdapter(
         adapter?.updateParticipantPrivileges(participant)
     }
 
+    fun updateParticipantRes(participant: Participant){
+        adapter?.updateParticipantRes(participant)
+    }
+
     fun updateParticipantName(participant: Participant){
         adapter?.updateParticipantName(participant)
     }
 
+    fun updateCallOnHold(participant: Participant, isOnHold:Boolean){
+        adapter?.updateCallOnHold(participant, isOnHold)
+    }
+
     fun updateOnHold(participant: Participant, isOnHold:Boolean){
-        adapter?.updateOnHoldSession(participant, isOnHold)
+        adapter?.updateSessionOnHold(participant, isOnHold)
     }
 
     fun updateParticipantAudioVideo(typeChange:Int, participant: Participant) {

@@ -15,7 +15,6 @@ import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.GridViewListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
@@ -90,9 +89,9 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
         // TODO test code end
     }
 
-    private fun getParticipant(session: MegaChatSession): Participant? {
+    private fun getParticipant(peerId: Long, clientId: Long): Participant? {
         val participant = participants.filter {
-            it.peerId == session.peerid && it.clientId == session.clientid
+            it.peerId == peerId && it.clientId == clientId
         }
         if (participant.isNotEmpty()) {
             return participant.get(0)
@@ -100,42 +99,49 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
         return null
     }
 
-    private fun getParticipant(listPeers: MutableSet<Participant>): Participant? {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            val peerId = peer.peerId
-            val clientId = peer.clientId
-            val participant = participants.filter {
-                it.peerId == peerId && it.clientId == clientId
-            }
-            if (participant.isNotEmpty()) {
-                return participant.get(0)
-            }
-        }
-        return null
-    }
-
-    fun updateName(listPeers: MutableSet<Participant>) {
-        getParticipant(listPeers)?.let {
-            adapterPager?.updateParticipantName(it)
+    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
+        getParticipant(session.peerid, session.clientid)?.let {
+            adapterPager?.updateParticipantAudioVideo(type, it)
         }
     }
 
-    fun updateOnHold(session: MegaChatSession) {
-        getParticipant(session)?.let {
+    fun updateSessionOnHold(session: MegaChatSession) {
+        getParticipant(session.peerid, session.clientid)?.let {
             adapterPager?.updateOnHold(it, session.isOnHold)
         }
     }
 
-    fun updatePrivileges(listPeers: MutableSet<Participant>) {
-        getParticipant(listPeers)?.let {
-            adapterPager?.updateParticipantPrivileges(it)
+    fun updateRes(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantRes(it)
+            }
         }
     }
 
-    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
-        getParticipant(session)?.let {
-            adapterPager?.updateParticipantAudioVideo(type, it)
+    fun updateName(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantName(it)
+            }
+        }
+    }
+
+    fun updateCallOnHold(isCallOnHold: Boolean) {
+        val iterator = participants.iterator()
+        iterator.forEach {
+            adapterPager?.updateCallOnHold(it, isCallOnHold)
+        }
+    }
+
+    fun updatePrivileges(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantPrivileges(it)
+            }
         }
     }
 
@@ -185,21 +191,44 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
     }
 
     /**
-     * Close Video
-     *
-     * @param Participant
+     * Add High Resolution
      */
-    override fun onCloseVideo(session: MegaChatSession?, participant: Participant) {
-        if (participant.videoListener == null)
-            return
+    private fun addHiRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
+        logDebug("Add HiRes")
+        session?.let { sessionParticipant ->
+            sharedModel.addRemoteVideo(
+                chatId,
+                participant.clientId,
+                true,
+                participant.videoListener!!
+            )
 
-        sharedModel.chatRoomLiveData.value?.let {
-            session?.let { sessionParticipant ->
-                if (sessionParticipant.canRecvVideoLowRes()) {
-                    val list: MegaHandleList = MegaHandleList.createInstance()
-                    list.addMegaHandle(participant.clientId)
-                    sharedModel.stopLowResVideo(
-                        it.chatId, list, RequestLowResVideoListener(
+            when {
+                !sessionParticipant.canRecvVideoHiRes() -> {
+                    sharedModel.requestHiResVideo(
+                        chatId,
+                        sessionParticipant.clientid,
+                        RequestLowResVideoListener(
+                            requireContext()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove High Resolution
+     */
+    private fun removeHiRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
+        logDebug("Remove HiRes")
+        session?.let { sessionParticipant ->
+            when {
+                sessionParticipant.canRecvVideoHiRes() -> {
+                    sharedModel.stopHiResVideo(
+                        chatId,
+                        sessionParticipant.clientid,
+                        RequestLowResVideoListener(
                             requireContext()
                         )
                     )
@@ -207,40 +236,125 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
             }
 
             sharedModel.removeRemoteVideo(
-                it.chatId,
+                chatId,
                 participant.clientId,
-                participant.hasHiRes,
+                true,
                 participant.videoListener!!
             )
         }
-        participant.videoListener = null
     }
 
     /**
-     * Active Video
-     *
-     * @param Participant
+     * Add Low Resolution
      */
-    override fun onActivateVideo(session: MegaChatSession?, participant: Participant) {
-        sharedModel.chatRoomLiveData.value?.let {
+    private fun addLowRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
+        logDebug("Add LowRes")
+        session?.let { sessionParticipant ->
             sharedModel.addRemoteVideo(
-                it.chatId,
+                chatId,
                 participant.clientId,
-                participant.hasHiRes,
+                false,
                 participant.videoListener!!
             )
-
-            session?.let { sessionParticipant ->
-                if (!sessionParticipant.canRecvVideoLowRes()) {
+            when {
+                !sessionParticipant.canRecvVideoLowRes() -> {
                     val list: MegaHandleList = MegaHandleList.createInstance()
                     list.addMegaHandle(participant.clientId)
                     sharedModel.requestLowResVideo(
-                        it.chatId, list, RequestLowResVideoListener(
+                        chatId, list, RequestLowResVideoListener(
                             requireContext()
                         )
                     )
                 }
             }
         }
+    }
+
+    /**
+     * Remove Low Resolution
+     */
+    private fun removeLowRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
+        logDebug("Remove LowRes")
+        session?.let { sessionParticipant ->
+            when {
+                sessionParticipant.canRecvVideoLowRes() -> {
+                    val list: MegaHandleList = MegaHandleList.createInstance()
+                    list.addMegaHandle(participant.clientId)
+                    sharedModel.stopLowResVideo(
+                        chatId, list, RequestLowResVideoListener(
+                            requireContext()
+                        )
+                    )
+                }
+            }
+
+            sharedModel.removeRemoteVideo(
+                chatId,
+                participant.clientId,
+                false,
+                participant.videoListener!!
+            )
+        }
+    }
+
+    /**
+     * Close Video
+     *
+     * @param session
+     * @param participant
+     */
+    override fun onCloseVideo(session: MegaChatSession?, participant: Participant) {
+        if (participant.videoListener == null)
+            return
+
+        sharedModel.chatRoomLiveData.value?.let {
+            when {
+                participant.hasHiRes -> removeHiRes(participant, session, it.chatId)
+                else -> removeLowRes(participant, session, it.chatId)
+            }
+        }
+
+        participant.videoListener = null
+    }
+
+    /**
+     * Active Video
+     *
+     * @param session
+     * @param participant
+     */
+    override fun onActivateVideo(session: MegaChatSession?, participant: Participant) {
+        sharedModel.chatRoomLiveData.value?.let {
+            when {
+                participant.hasHiRes -> addHiRes(participant, session, it.chatId)
+                else -> addLowRes(participant, session, it.chatId)
+            }
+        }
+    }
+
+    /**
+     * Change video resolution
+     *
+     * @param session
+     * @param participant
+     */
+    override fun onChangeResolution(session: MegaChatSession?, participant: Participant) {
+        if (participant.videoListener == null)
+            return
+
+        sharedModel.chatRoomLiveData.value?.let {
+            if (participant.hasHiRes) {
+                //Change LowRes to HiRes
+                removeLowRes(participant, session, it.chatId)
+                addHiRes(participant, session, it.chatId)
+
+            } else {
+                //Change HiRes to LowRes
+                removeHiRes(participant, session, it.chatId)
+                addLowRes(participant, session, it.chatId)
+            }
+        }
+
+        participant.videoListener = null
     }
 }

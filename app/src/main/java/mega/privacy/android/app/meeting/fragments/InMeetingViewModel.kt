@@ -67,7 +67,8 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     private val callStatusObserver = Observer<MegaChatCall> {
         if (it.status == CALL_STATUS_USER_NO_PRESENT
-            && it.chatid == chatId) {
+            && it.chatid == chatId
+        ) {
             _joinPublicChat.value = Event(Unit)
         }
     }
@@ -623,20 +624,28 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for adding a participant
      */
-    fun createParticipant(session: MegaChatSession) {
+    fun createParticipant(session: MegaChatSession): Boolean {
         chatRoom.value?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter {
                     it.peerId == session.peerid && it.clientId == session.clientid
                 }
                 if (!peer.isNullOrEmpty()) {
-                    return
+                    return false
                 }
             }
 
             val isModerator = isParticipantModerator(session.peerid)
             val isContact = isMyContact(session.peerid)
-            val hasHiRes = session.isHiResVideo
+            var hasHiRes = false
+            participants.value?.let {
+                when {
+                    it.size < 4 -> {
+                        hasHiRes = true
+                    }
+                }
+            }
+
             val userPeer = Participant(
                 session.peerid,
                 session.clientid,
@@ -655,24 +664,72 @@ class InMeetingViewModel @ViewModelInject constructor(
 
             participants.value?.add(userPeer)
             logDebug("Num of participants:" + participants.value?.size)
+            return true
         }
+        return false
+    }
+
+    /**
+     * Method for checking which participants need to change their resolution
+     */
+    fun checkParticipantsResolution(isAdded: Boolean): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        participants.value?.let { listParticipants ->
+
+            val iterator = listParticipants.iterator()
+            iterator.forEach {
+                when {
+                    isAdded && listParticipants.size >= 5 -> {
+                        when {
+                            it.hasHiRes -> {
+                                it.hasHiRes = false
+                                when {
+                                    it.isVideoOn -> {
+                                        listWithChanges.add(it)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                when {
+                    !isAdded && listParticipants.size < 5 -> {
+                        when {
+                            !it.hasHiRes -> {
+                                it.hasHiRes = true
+                                when {
+                                    it.isVideoOn -> {
+                                        listWithChanges.add(it)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return listWithChanges
     }
 
     /**
      * Method for removing a participant
      */
-    fun removeParticipant(session: MegaChatSession) {
+    fun removeParticipant(session: MegaChatSession): Boolean {
         chatRoom.value?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { participant ->
                 participant.forEach {
-                    if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                        participant.remove()
+                    when {
+                        it.peerId == session.peerid && it.clientId == session.clientid -> {
+                            participant.remove()
+                            logDebug("Num of participants:" + participants.value?.size)
+                            return true
+                        }
                     }
                 }
             }
-            logDebug("Num of participants:" + participants.value?.size)
         }
+        return false
     }
 
     /**
@@ -710,18 +767,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
         return false
     }
-
-//    fun addParticipant(add: Boolean) {
-//        if (add) {
-//           participants.value!!.add(TestTool.testData()[Random.nextInt(TestTool.testData().size)])
-//        } else {
-//            if (participants.value!!.size > 2) {
-//                participants.value!!.removeAt(participants.value!!.size - 1)
-//            }
-//        }
-//        participants.value = participants.value
-//    }
-    //TODO test code end
 
     /**
      * Method for leave the meeting

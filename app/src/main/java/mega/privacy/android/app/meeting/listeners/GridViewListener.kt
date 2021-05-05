@@ -7,4 +7,6 @@ interface GridViewListener {
     fun onCloseVideo(session: MegaChatSession?, participant: Participant)
 
     fun onActivateVideo(session: MegaChatSession?, participant: Participant)
+
+    fun onChangeResolution(session: MegaChatSession?, participant: Participant)
 }

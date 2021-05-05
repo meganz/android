@@ -46,36 +46,37 @@ class VideoGridViewAdapter(
     /**
      * Update participant privileges
      *
-     * @param Participant
+     * @param participant
      */
     fun updateParticipantPrivileges(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position).let {
-            it.updatePrivilegeIcon(participant)
-        }
+        getHolder(position).updatePrivilegeIcon(participant)
     }
 
     /**
      * Update participant name
      *
-     * @param Participant
+     * @param participant
      */
     fun updateParticipantName(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position).let {
-            it.updateName(participant)
-        }
+        getHolder(position).updateName(participant)
+    }
+
+    fun updateParticipantRes(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updateRes(participant)
     }
 
     /**
      * Update participant audio or video flags
      *
-     * @param Participant
+     * @param participant
      */
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).let {
-            if(typeChange ==  TYPE_VIDEO){
+            if(typeChange == TYPE_VIDEO){
                 it.updateVideo(participant)
             }else if(typeChange ==  TYPE_AUDIO){
                 it.updateAudioIcon(participant)
@@ -87,14 +88,23 @@ class VideoGridViewAdapter(
     /**
      * Update participant on hold session
      *
-     * @param Participant
+     * @param participant
      * @param isOnHold True, it it's. False, otherwise.
      */
-    fun updateOnHoldSession(participant: Participant, isOnHold: Boolean) {
+    fun updateSessionOnHold(participant: Participant, isOnHold: Boolean) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position).let {
-            it.updateOnHold(participant, isOnHold)
-        }
+        getHolder(position).updateSessionOnHold(participant, isOnHold)
+    }
+
+    /**
+     * Update participant when call is on hold
+     *
+     * @param participant
+     * @param isOnHold True, it it's. False, otherwise.
+     */
+    fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updateCallOnHold(participant, isOnHold)
     }
 }
 

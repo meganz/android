@@ -147,11 +147,13 @@ public class CallService extends Service{
 
         Notification notif;
         String contentText = null;
-
+        PendingIntent intentCall = null;
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging()) {
             contentText = getString(R.string.title_notification_incoming_call);
+            intentCall = getPendingIntentMeetingRinging(this, currentChatId, notificationId + 1);
         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             contentText = getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress);
+            intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -159,10 +161,17 @@ public class CallService extends Service{
                 mBuilderCompatO.setContentText(contentText);
             }
 
+            if (intentCall != null) {
+                mBuilderCompatO.setContentIntent(intentCall);
+            }
             notif = mBuilderCompatO.build();
         } else {
             if (!isTextEmpty(contentText)) {
                 mBuilderCompat.setContentText(contentText);
+            }
+
+            if (intentCall != null) {
+                mBuilderCompatO.setContentIntent(intentCall);
             }
 
             notif = mBuilderCompat.build();

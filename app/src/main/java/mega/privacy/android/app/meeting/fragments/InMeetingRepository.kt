@@ -60,11 +60,11 @@ class InMeetingRepository @Inject constructor(
      */
     fun startMeeting(
         chatId: Long,
-        audioEnabled: Boolean,
-        videoEnabled: Boolean,
+        enableAudio: Boolean,
+        enableVideo: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
-        megaChatApi.startChatCall(chatId, audioEnabled, videoEnabled, listener)
+        megaChatApi.startChatCall(chatId, enableVideo, enableAudio, listener)
     }
 
     /**

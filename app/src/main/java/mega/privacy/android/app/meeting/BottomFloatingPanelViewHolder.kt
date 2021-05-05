@@ -336,6 +336,13 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
+     * Get current state
+     */
+    fun getState():Int{
+        return bottomSheetBehavior.state
+    }
+
+    /**
      * Expand the bottom sheet
      *
      */

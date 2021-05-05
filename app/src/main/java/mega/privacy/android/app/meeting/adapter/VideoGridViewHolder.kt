@@ -63,6 +63,15 @@ class VideoGridViewHolder(
         binding.name.text = participant.name
     }
 
+    fun updateRes(participant: Participant) {
+        if (participant.isVideoOn) {
+            listener.onChangeResolution(
+                inMeetingViewModel.getSession(participant.clientId),
+                participant
+            )
+        }
+    }
+
     fun updatePrivilegeIcon(participant: Participant) {
         binding.moderatorIcon.isVisible = participant.isModerator
     }
@@ -71,17 +80,31 @@ class VideoGridViewHolder(
         binding.muteIcon.isVisible = !participant.isAudioOn
     }
 
-    fun updateOnHold(participant: Participant, isOnHold: Boolean) {
-        if (isOnHold) {
+    fun updateCallOnHold(participant: Participant, isCallOnHold: Boolean) {
+        if (isCallOnHold) {
+            binding.avatar.alpha = 0.5f
+            showAvatar(participant)
+        } else {
+            binding.avatar.alpha = 1f
+            if (participant.isVideoOn) {
+                activateVideo(participant)
+            } else {
+                showAvatar(participant)
+            }
+        }
+    }
+
+    fun updateSessionOnHold(participant: Participant, isSessionOnHold: Boolean) {
+        if (isSessionOnHold) {
             binding.onHoldIcon.isVisible = true
             binding.avatar.alpha = 0.5f
             showAvatar(participant)
         } else {
             binding.onHoldIcon.isVisible = false
             binding.avatar.alpha = 1f
-            if(participant.isVideoOn){
+            if (participant.isVideoOn) {
                 activateVideo(participant)
-            }else{
+            } else {
                 showAvatar(participant)
             }
         }
