@@ -109,7 +109,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 return
             }
             else -> {
-                chatId?.let { inMeetingViewModel.setChat(it) }
+                chatId?.let { inMeetingViewModel.setChatId(it) }
                 when {
                     inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE -> {
                         logError("Error. Call doesn't exist")
@@ -293,7 +293,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                         closeVideo(this.peerId!!, this.clientId!!)
                         hideAvatar(this.peerId!!, this.clientId!!)
                     }
-                    else ->{
+                    else -> {
                         showAvatar(this.peerId!!, this.clientId!!)
                     }
                 }
@@ -413,15 +413,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
                             false
                         )
 
-                        sharedModel.addRemoteVideo(chatId!!, clientId, true, videoListener!!)
                         inMeetingViewModel.getSession(clientId)?.let {
-                            if (!it.canRecvVideoHiRes()) {
-                                sharedModel.requestHiResVideo(
-                                    chatId!!, clientId, RequestHiResVideoListener(
-                                        requireContext()
-                                    )
-                                )
-                            }
+                            inMeetingViewModel.addHiRes(videoListener!!, it, chatId!!)
                         }
                     }
                 }
@@ -455,18 +448,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
                         sharedModel.removeLocalVideo(chatId!!, videoListener!!)
                     }
                     else -> {
-                        val session = inMeetingViewModel.getSession(clientId!!)
-                        session?.let {
-                            if (it.canRecvVideoHiRes()) {
-                                sharedModel.stopHiResVideo(
-                                    chatId!!, clientId!!, RequestHiResVideoListener(
-                                        requireContext()
-                                    )
-                                )
-                            }
+                        inMeetingViewModel.getSession(clientId!!)?.let {
+                            inMeetingViewModel.removeHiRes(videoListener!!, it, chatId!!)
                         }
-
-                        sharedModel.removeRemoteVideo(chatId!!, clientId!!, true, videoListener!!)
                     }
                 }
 

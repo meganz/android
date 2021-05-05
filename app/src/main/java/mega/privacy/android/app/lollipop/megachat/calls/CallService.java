@@ -146,7 +146,7 @@ public class CallService extends Service{
         int notificationId = getCallNotificationId(call.getCallId());
 
         Notification notif;
-        String contentText = null;
+        String contentText = "";
         PendingIntent intentCall = null;
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging()) {
             contentText = getString(R.string.title_notification_incoming_call);

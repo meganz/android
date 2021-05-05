@@ -8,6 +8,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -188,6 +189,71 @@ class InMeetingRepository @Inject constructor(
         }
         return false
     }
+
+    /**
+     * Method of obtaining the local video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun addRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MeetingVideoListener
+    ) {
+        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of remove the local video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun removeRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MeetingVideoListener
+    ) {
+        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    fun requestHiResVideo(
+        chatId: Long,
+        clientId: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.requestHiResVideo(chatId, clientId, listener)
+    }
+
+    fun stopHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.stopHiResVideo(chatId, clientId, listener)
+    }
+
+    fun requestLowResVideo(
+        chatId: Long,
+        clientId: MegaHandleList,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.requestLowResVideo(chatId, clientId, listener)
+
+    }
+
+    fun stopLowResVideo(
+        chatId: Long,
+        clientId: MegaHandleList,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.stopLowResVideo(chatId, clientId, listener)
+
+    }
+
 
     fun joinPublicChat(chatId: Long, listener: ChatBaseListener) =
         megaChatApi.autojoinPublicChat(chatId, listener)

@@ -73,9 +73,8 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         _notificationNetworkState.value = it
     }
 
-    // ChatRoom
-    private val _chatRoomLiveData: MutableLiveData<MegaChatRoom?> = MutableLiveData<MegaChatRoom?>()
-    val chatRoomLiveData: LiveData<MegaChatRoom?> = _chatRoomLiveData
+    private val _currentChatId: MutableLiveData<Long> = MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)
+    val currentChatId: LiveData<Long> = _currentChatId
 
     // Name of meeting
     private val _meetingNameLiveData: MutableLiveData<String> = MutableLiveData<String>()
@@ -105,23 +104,23 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     private val meetingCreatedObserver =
         Observer<Long> {
-            updateChatRoom(it)
+            updateChatRoomId(it)
             createChatLink(it)
         }
 
     private val linkRecoveredObserver =
-        Observer<android.util.Pair<Long, String>> { chatAndLink ->
-            _chatRoomLiveData.value?.let {
-                if (chatAndLink.first == it.chatId) {
+    Observer<android.util.Pair<Long, String>> { chatAndLink ->
+        _currentChatId.value?.let {
+                if (chatAndLink.first == it) {
                     _meetingLinkLiveData.value = chatAndLink.second
                 }
             }
         }
 
     private val titleMeetingChangeObserver =
-        Observer<MegaChatRoom> {
-            _chatRoomLiveData.value?.let {
-                if (_chatRoomLiveData.value?.chatId == it.chatId) {
+        Observer<MegaChatRoom> { chatRoom ->
+            meetingActivityRepository.getChatRoom(_currentChatId.value!!)?.let {
+                if (it.chatId == chatRoom.chatId) {
                     _meetingNameLiveData.value = getTitleChat(it)
                 }
             }
@@ -201,12 +200,12 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method for update the chatRoomLiveData
+     * Method for update the chatRoom ID
      *
      * @param chatId chat ID
      */
-    fun updateChatRoom(chatId: Long) {
-        _chatRoomLiveData.value = meetingActivityRepository.getChatRoom(chatId)
+    fun updateChatRoomId(chatId: Long) {
+        _currentChatId.value = chatId
     }
 
     /**
@@ -215,8 +214,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @return True, if it exists. False, otherwise
      */
     fun isChatCreated(): Boolean {
-        _chatRoomLiveData.value?.let {
-            return true
+        _currentChatId.value?.let {
+            if(it != MEGACHAT_INVALID_HANDLE)
+                return true
         }
         return false
     }
@@ -268,29 +268,29 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        when {
-            _chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE -> {
+        _currentChatId.value?.let {
+            if(it != MEGACHAT_INVALID_HANDLE){
                 meetingActivityRepository.switchMic(
-                    _chatRoomLiveData.value!!.chatId,
+                    it,
                     bOn,
                     DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
                 )
+                return
             }
-            else -> {
-                //The chat is not yet created or the call is not yet established
-                _micLiveData.value = bOn
-                logDebug("open Mic: $_micLiveData.value")
-                tips.value = when (bOn) {
-                    true -> getString(
-                        R.string.general_mic_mute,
-                        "unmute"
-                    )
-                    false -> getString(
-                        R.string.general_mic_mute,
-                        "mute"
-                    )
-                }
-            }
+        }
+
+        //The chat is not yet created or the call is not yet established
+        _micLiveData.value = bOn
+        logDebug("open Mic: $_micLiveData.value")
+        tips.value = when (bOn) {
+            true -> getString(
+                R.string.general_mic_mute,
+                "unmute"
+            )
+            false -> getString(
+                R.string.general_mic_mute,
+                "mute"
+            )
         }
     }
 
@@ -309,19 +309,22 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        if (_chatRoomLiveData.value != null && _chatRoomLiveData.value!!.chatId != MEGACHAT_INVALID_HANDLE) {
-            meetingActivityRepository.switchCamera(
-                _chatRoomLiveData.value!!.chatId,
-                bOn,
-                DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
-            )
-        } else {
-            //The chat is not yet created or the call is not yet established
-            meetingActivityRepository.switchCameraBeforeStartMeeting(
-                bOn,
-                OpenVideoDeviceListener(MegaApplication.getInstance(), this)
-            )
+        _currentChatId.value?.let {
+            if(it != MEGACHAT_INVALID_HANDLE){
+                meetingActivityRepository.switchCamera(
+                    it,
+                    bOn,
+                    DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
+                )
+                return
+            }
         }
+
+        //The chat is not yet created or the call is not yet established
+        meetingActivityRepository.switchCameraBeforeStartMeeting(
+            bOn,
+            OpenVideoDeviceListener(MegaApplication.getInstance(), this)
+        )
     }
 
     /**
@@ -370,55 +373,16 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method of obtaining the local video
-     *
-     * @param chatId chatId
-     * @param clientId client ID
-     * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
-     */
-    fun addRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: MeetingVideoListener
-    ) {
-        meetingActivityRepository.addRemoteVideo(chatId, clientId, hiRes, listener)
-    }
-
-    /**
      * Method of remove the local video
      *
      * @param chatId chatId
      * @param listener MeetingVideoListener
      */
-    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {
+    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
+        if (listener == null)
+            return
+
         meetingActivityRepository.removeLocalVideo(chatId, listener)
-    }
-
-    fun removeRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: MeetingVideoListener
-    ) {
-        meetingActivityRepository.removeRemoteVideo(chatId, clientId, hiRes, listener)
-    }
-
-    fun requestHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface){
-        meetingActivityRepository.requestHiResVideo(chatId, clientId, listener)
-    }
-
-    fun stopHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface){
-        meetingActivityRepository.stopHiResVideo(chatId, clientId, listener)
-    }
-
-    fun requestLowResVideo(chatId: Long, clientId: MegaHandleList, listener: MegaChatRequestListenerInterface){
-        meetingActivityRepository.requestLowResVideo(chatId, clientId, listener)
-    }
-
-    fun stopLowResVideo(chatId: Long, clientId: MegaHandleList, listener: MegaChatRequestListenerInterface){
-        meetingActivityRepository.stopLowResVideo(chatId, clientId, listener)
     }
 
     /**
@@ -510,6 +474,4 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_LINK_RECOVERED)
             .removeObserver(linkRecoveredObserver as Observer<Any>)
     }
-
-    private fun isValidChatRoom(chatRoom: MegaChatRoom?) = chatRoom?.chatId != MEGACHAT_INVALID_HANDLE
 }

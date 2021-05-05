@@ -13,14 +13,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.GridViewListener
-import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
-import nz.mega.sdk.MegaHandleList
 
-class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
+class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -30,7 +27,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
     private var participants: MutableList<Participant> = mutableListOf()
 
     private var adapterPager: GridViewPagerAdapter? = null
-
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
@@ -47,7 +43,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val display = meetingActivity.windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
@@ -58,7 +53,7 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
             (parentFragment as InMeetingFragment).inMeetingViewModel,
             parentFragment,
             maxWidth,
-            maxHeight, this
+            maxHeight
         )
 
         viewDataBinding.gridViewPager
@@ -94,7 +89,7 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
             it.peerId == peerId && it.clientId == clientId
         }
         if (participant.isNotEmpty()) {
-            return participant.get(0)
+            return participant[0]
         }
         return null
     }
@@ -188,173 +183,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
 
         @JvmStatic
         fun newInstance() = GridViewCallFragment()
-    }
 
-    /**
-     * Add High Resolution
-     */
-    private fun addHiRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
-        logDebug("Add HiRes")
-        session?.let { sessionParticipant ->
-            sharedModel.addRemoteVideo(
-                chatId,
-                participant.clientId,
-                true,
-                participant.videoListener!!
-            )
-
-            when {
-                !sessionParticipant.canRecvVideoHiRes() -> {
-                    sharedModel.requestHiResVideo(
-                        chatId,
-                        sessionParticipant.clientid,
-                        RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove High Resolution
-     */
-    private fun removeHiRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
-        logDebug("Remove HiRes")
-        session?.let { sessionParticipant ->
-            when {
-                sessionParticipant.canRecvVideoHiRes() -> {
-                    sharedModel.stopHiResVideo(
-                        chatId,
-                        sessionParticipant.clientid,
-                        RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-
-            sharedModel.removeRemoteVideo(
-                chatId,
-                participant.clientId,
-                true,
-                participant.videoListener!!
-            )
-        }
-    }
-
-    /**
-     * Add Low Resolution
-     */
-    private fun addLowRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
-        logDebug("Add LowRes")
-        session?.let { sessionParticipant ->
-            sharedModel.addRemoteVideo(
-                chatId,
-                participant.clientId,
-                false,
-                participant.videoListener!!
-            )
-            when {
-                !sessionParticipant.canRecvVideoLowRes() -> {
-                    val list: MegaHandleList = MegaHandleList.createInstance()
-                    list.addMegaHandle(participant.clientId)
-                    sharedModel.requestLowResVideo(
-                        chatId, list, RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove Low Resolution
-     */
-    private fun removeLowRes(participant: Participant, session: MegaChatSession?, chatId: Long) {
-        logDebug("Remove LowRes")
-        session?.let { sessionParticipant ->
-            when {
-                sessionParticipant.canRecvVideoLowRes() -> {
-                    val list: MegaHandleList = MegaHandleList.createInstance()
-                    list.addMegaHandle(participant.clientId)
-                    sharedModel.stopLowResVideo(
-                        chatId, list, RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-
-            sharedModel.removeRemoteVideo(
-                chatId,
-                participant.clientId,
-                false,
-                participant.videoListener!!
-            )
-        }
-    }
-
-    /**
-     * Close Video
-     *
-     * @param session
-     * @param participant
-     */
-    override fun onCloseVideo(session: MegaChatSession?, participant: Participant) {
-        if (participant.videoListener == null)
-            return
-
-        sharedModel.chatRoomLiveData.value?.let {
-            when {
-                participant.hasHiRes -> removeHiRes(participant, session, it.chatId)
-                else -> removeLowRes(participant, session, it.chatId)
-            }
-        }
-
-        participant.videoListener = null
-    }
-
-    /**
-     * Active Video
-     *
-     * @param session
-     * @param participant
-     */
-    override fun onActivateVideo(session: MegaChatSession?, participant: Participant) {
-        sharedModel.chatRoomLiveData.value?.let {
-            when {
-                participant.hasHiRes -> addHiRes(participant, session, it.chatId)
-                else -> addLowRes(participant, session, it.chatId)
-            }
-        }
-    }
-
-    /**
-     * Change video resolution
-     *
-     * @param session
-     * @param participant
-     */
-    override fun onChangeResolution(session: MegaChatSession?, participant: Participant) {
-        if (participant.videoListener == null)
-            return
-
-        sharedModel.chatRoomLiveData.value?.let {
-            if (participant.hasHiRes) {
-                //Change LowRes to HiRes
-                removeLowRes(participant, session, it.chatId)
-                addHiRes(participant, session, it.chatId)
-
-            } else {
-                //Change HiRes to LowRes
-                removeHiRes(participant, session, it.chatId)
-                addLowRes(participant, session, it.chatId)
-            }
-        }
-
-        participant.videoListener = null
     }
 }

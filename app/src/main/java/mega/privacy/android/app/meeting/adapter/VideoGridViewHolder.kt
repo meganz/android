@@ -1,16 +1,13 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.view.SurfaceHolder
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.meeting.listeners.GridViewListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -24,10 +21,8 @@ import javax.inject.Inject
  */
 class VideoGridViewHolder(
     private val binding: ItemParticipantVideoBinding,
-    private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int,
-    private val listener: GridViewListener,
     private val orientation: Int
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -65,10 +60,7 @@ class VideoGridViewHolder(
 
     fun updateRes(participant: Participant) {
         if (participant.isVideoOn) {
-            listener.onChangeResolution(
-                inMeetingViewModel.getSession(participant.clientId),
-                participant
-            )
+            inMeetingViewModel.onChangeResolution(participant)
         }
     }
 
@@ -171,10 +163,7 @@ class VideoGridViewHolder(
 
             participant.videoListener = vListener
 
-            listener.onActivateVideo(
-                inMeetingViewModel.getSession(participant.clientId),
-                participant
-            )
+            inMeetingViewModel.onActivateVideo(participant)
         }
 
         binding.video.isVisible = true
@@ -185,7 +174,7 @@ class VideoGridViewHolder(
      */
     private fun closeVideo(participant: Participant) {
         binding.video.isVisible = false
-        listener.onCloseVideo(inMeetingViewModel.getSession(participant.clientId), participant)
+        inMeetingViewModel.onCloseVideo(participant)
     }
 
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {

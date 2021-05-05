@@ -6,10 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.meeting.listeners.GridViewListener
 import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
 import mega.privacy.android.app.utils.Constants.TYPE_VIDEO
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil
 
 class VideoGridViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -17,7 +16,6 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val pagePosition: Int,
-    private val listener: GridViewListener,
     private val orientation: Int
 ) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
 
@@ -32,10 +30,9 @@ class VideoGridViewAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return VideoGridViewHolder(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
-            gridView,
             screenWidth,
             screenHeight,
-            listener, orientation
+            orientation
         )
     }
 

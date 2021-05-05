@@ -5,7 +5,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,8 +17,10 @@ import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
+import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants
@@ -35,8 +36,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
 
-    //private var chatRoom: MegaChatRoom? = null
-    var chatRoom: MutableLiveData<MegaChatRoom> = MutableLiveData<MegaChatRoom>()
+    var currentChatId: Long = MEGACHAT_INVALID_HANDLE
 
     var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
@@ -56,8 +56,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     private var _joinPublicChat: MutableLiveData<Event<Unit>> = MutableLiveData()
     var joinPublicChat: LiveData<Event<Unit>> = _joinPublicChat
 
-    private var chatId = MEGACHAT_INVALID_HANDLE
-
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -67,7 +65,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     private val callStatusObserver = Observer<MegaChatCall> {
         if (it.status == CALL_STATUS_USER_NO_PRESENT
-            && it.chatid == chatId
+            && it.chatid == currentChatId
         ) {
             _joinPublicChat.value = Event(Unit)
         }
@@ -92,7 +90,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return True, if it's public. False, otherwise
      */
     fun isChatRoomPublic(): Boolean {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             if (it.isPublic)
                 return true
         }
@@ -106,10 +104,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return True, if it is the same. False, otherwise
      */
     fun isSameChatRoom(chatId: Long): Boolean {
-        chatRoom.value?.let {
-            if (it.chatId == chatId)
-                return true
+        if (chatId != MEGACHAT_INVALID_HANDLE && currentChatId == chatId) {
+            return true
         }
+
         return false
     }
 
@@ -145,7 +143,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatCall
      */
     fun getCall(): MegaChatCall? {
-        chatRoom.value?.let { return inMeetingRepository.getMeeting(it.chatId) }
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            return inMeetingRepository.getMeeting(it.chatId)
+        }
+
         return null
     }
 
@@ -175,7 +176,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatRoom
      */
     fun getChat(): MegaChatRoom? {
-        return chatRoom.value
+        return inMeetingRepository.getChatRoom(currentChatId)
     }
 
     /**
@@ -183,13 +184,14 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param chatId chat ID
      */
-    fun setChat(chatId: Long) {
+    fun setChatId(chatId: Long) {
         if (chatId == MEGACHAT_INVALID_HANDLE)
             return
 
-        inMeetingRepository.getChatRoom(chatId).also { chatRoom.value = it }
-        chatRoom.value?.let {
-            setCall(chatId)
+        currentChatId = chatId
+
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            setCall(it.chatId)
             _chatTitle.value = getTitleChat(it)
         }
     }
@@ -200,10 +202,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return chat ID
      */
     fun getChatId(): Long {
-        chatRoom.value?.let {
-            return it.chatId
-        }
-        return MEGACHAT_INVALID_HANDLE
+        return currentChatId
     }
 
     /**
@@ -275,7 +274,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *  @return True, if it is a one-to-one chat call. False, otherwise
      */
     fun isOneToOneCall(): Boolean {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             if (!it.isGroup)
                 return true
         }
@@ -334,13 +333,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return The name
      */
     fun getParticipantFullName(peerId: Long): String {
-        chatRoom.value?.let { chat ->
-            return CallUtil.getUserNameCall(
-                MegaApplication.getInstance().applicationContext,
-                peerId
-            )
-        }
-        return ""
+        return CallUtil.getUserNameCall(
+            MegaApplication.getInstance().applicationContext,
+            peerId
+        )
     }
 
     /**
@@ -351,8 +347,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun existsParticipants(peerId: Long): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
-
-        chatRoom.value?.let { chat ->
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val iterator = listParticipants.iterator()
 
@@ -366,6 +361,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 }
             }
         }
+
         return listWithChanges
     }
 
@@ -375,7 +371,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param isOn True, if I am going to put it on hold. False, otherwise
      */
     fun setCallOnHold(isOn: Boolean) {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             inMeetingRepository.setCallOnHold(it.chatId, isOn)
         }
     }
@@ -440,7 +436,20 @@ class InMeetingViewModel @ViewModelInject constructor(
                     }
                 }
             }
-
+            TYPE_OWN_PRIVILEGE -> {
+                bannerText?.let {
+                    it.setBackgroundColor(
+                        ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            R.color.teal_300
+                        )
+                    )
+                    it.text = StringResourcesUtils.getString(
+                        R.string.your_are_moderator
+                    )
+                    return true
+                }
+            }
         }
         return false
     }
@@ -554,32 +563,36 @@ class InMeetingViewModel @ViewModelInject constructor(
         videoEnable: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
-        if (chatRoom.value != null && chatRoom.value?.chatId != MEGACHAT_INVALID_HANDLE) {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             //The chat exists
-            MegaApplication.getInstance().openCallService(chatRoom.value!!.chatId)
-
-            chatRoom.value?.let {
-                inMeetingRepository.startMeeting(
-                    it.chatId,
-                    audioEnable,
-                    videoEnable,
-                    listener
-                )
-            }
-        } else {
-            //The chat doesn't exist
-            inMeetingRepository.createMeeting(
-                _chatTitle.value!!,
-                CreateGroupChatWithPublicLink()
+            inMeetingRepository.startMeeting(
+                it.chatId,
+                audioEnable,
+                videoEnable,
+                listener
             )
+            return
         }
+
+        //The chat doesn't exist
+        inMeetingRepository.createMeeting(
+            _chatTitle.value!!,
+            CreateGroupChatWithPublicLink()
+        )
+    }
+
+    fun getOwnPrivileges(): Int {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            return it.ownPrivilege
+        }
+        return -1
     }
 
     /**
      * Method to know if the participant is a moderator.
      */
-    private fun isParticipantModerator(peerId: Long): Boolean {
-        chatRoom.value?.let {
+    fun isParticipantModerator(peerId: Long): Boolean {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             val privileges = it.getPeerPrivilegeByHandle(peerId)
             if (privileges == MegaChatRoom.PRIV_MODERATOR)
                 return true
@@ -591,7 +604,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method to know if the participant is my contact
      */
     private fun isMyContact(peerId: Long): Boolean {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             return inMeetingRepository.isMyContact(it, peerId)
         }
         return false
@@ -603,7 +616,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun updateParticipantsPrivileges(): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
 
-        chatRoom.value?.let { chat ->
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val iterator = listParticipants.iterator()
 
@@ -625,7 +638,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method for adding a participant
      */
     fun createParticipant(session: MegaChatSession): Boolean {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter {
                     it.peerId == session.peerid && it.clientId == session.clientid
@@ -715,7 +728,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method for removing a participant
      */
     fun removeParticipant(session: MegaChatSession): Boolean {
-        chatRoom.value?.let {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { participant ->
                 participant.forEach {
@@ -783,17 +796,200 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param newTitle the chat title
      */
     fun setTitleChat(newTitle: String) {
-        if (chatRoom.value == null) {
+        if (currentChatId == MEGACHAT_INVALID_HANDLE) {
             _chatTitle.value = newTitle
         } else {
-            chatRoom.value?.chatId?.let {
+            inMeetingRepository.getChatRoom(currentChatId)?.let {
                 inMeetingRepository.setTitleChatRoom(
-                    it,
+                    it.chatId,
                     newTitle,
                     EditChatRoomNameListener(MegaApplication.getInstance(), this)
                 )
             }
         }
+    }
+
+    /**
+     * Add High Resolution
+     */
+    fun addHiRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        logDebug("Add HiRes")
+        session?.let { sessionParticipant ->
+            inMeetingRepository.addRemoteVideo(
+                chatId,
+                sessionParticipant.clientid,
+                true,
+                listener
+            )
+
+            when {
+                !sessionParticipant.canRecvVideoHiRes() -> {
+                    inMeetingRepository.requestHiResVideo(
+                        chatId,
+                        sessionParticipant.clientid,
+                        RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove High Resolution
+     */
+    fun removeHiRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        logDebug("Add HiRes")
+        session?.let { sessionParticipant ->
+            when {
+                sessionParticipant.canRecvVideoHiRes() -> {
+                    inMeetingRepository.stopHiResVideo(
+                        chatId,
+                        sessionParticipant.clientid,
+                        RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
+                    )
+                }
+            }
+
+            inMeetingRepository.removeRemoteVideo(
+                chatId,
+                sessionParticipant.clientid,
+                true,
+                listener
+            )
+        }
+    }
+
+    /**
+     * Add Low Resolution
+     */
+    fun addLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        logDebug("Add LowRes")
+        session?.let { sessionParticipant ->
+            inMeetingRepository.addRemoteVideo(
+                chatId,
+                sessionParticipant.clientid,
+                false,
+                listener
+            )
+            when {
+                !sessionParticipant.canRecvVideoLowRes() -> {
+                    val list: MegaHandleList = MegaHandleList.createInstance()
+                    list.addMegaHandle(sessionParticipant.clientid)
+                    inMeetingRepository.requestLowResVideo(
+                        chatId,
+                        list,
+                        RequestLowResVideoListener(MegaApplication.getInstance().applicationContext)
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove Low Resolution
+     */
+    fun removeLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        logDebug("Remove LowRes")
+        session?.let { sessionParticipant ->
+            when {
+                sessionParticipant.canRecvVideoLowRes() -> {
+                    val list: MegaHandleList = MegaHandleList.createInstance()
+                    list.addMegaHandle(sessionParticipant.clientid)
+                    inMeetingRepository.stopLowResVideo(
+                        chatId,
+                        list,
+                        RequestLowResVideoListener(MegaApplication.getInstance().applicationContext)
+                    )
+                }
+            }
+
+            inMeetingRepository.removeRemoteVideo(
+                chatId,
+                sessionParticipant.clientid,
+                false,
+                listener
+            )
+        }
+    }
+
+    /**
+     * Close Video
+     *
+     * @param participant
+     */
+    fun onCloseVideo(participant: Participant) {
+        if (participant.videoListener == null)
+            return
+
+        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
+            getSession(participant.clientId)?.let {
+                when {
+                    participant.hasHiRes -> removeHiRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
+                    else -> removeLowRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
+                }
+            }
+        }
+
+        participant.videoListener = null
+    }
+
+    /**
+     * Active Video
+     *
+     * @param participant
+     */
+    fun onActivateVideo(participant: Participant) {
+        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
+            getSession(participant.clientId)?.let {
+                when {
+                    participant.hasHiRes -> addHiRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
+                    else -> addLowRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Change video resolution
+     *
+     * @param participant
+     */
+    fun onChangeResolution(participant: Participant) {
+        if (participant.videoListener == null)
+            return
+
+        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
+            getSession(participant.clientId)?.let {
+                if (participant.hasHiRes) {
+                    //Change LowRes to HiRes
+                    removeLowRes(participant.videoListener!!, it, chat.chatId)
+                    addHiRes(participant.videoListener!!, it, chat.chatId)
+
+                } else {
+                    //Change HiRes to LowRes
+                    removeHiRes(participant.videoListener!!, it, chat.chatId)
+                    addLowRes(participant.videoListener!!, it, chat.chatId)
+                }
+            }
+        }
+
+        participant.videoListener = null
     }
 
     override fun onCleared() {
@@ -809,10 +1005,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
-        chatRoom.value?.let {
-            if (it.chatId == chatId) {
-                _chatTitle.value = name
-            }
+        if (currentChatId == chatId) {
+            _chatTitle.value = name
         }
     }
 
@@ -828,7 +1022,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     fun joinPublicChat(chatId: Long) {
-        this.chatId = chatId
+        this.currentChatId = chatId
 
         inMeetingRepository.joinPublicChat(
             chatId,
@@ -847,7 +1041,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     fun answerChatCall(enableVideo: Boolean, enableAudio: Boolean) =
         inMeetingRepository.answerChatCall(
-            chatId,
+            currentChatId,
             enableVideo,
             enableAudio,
             object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
