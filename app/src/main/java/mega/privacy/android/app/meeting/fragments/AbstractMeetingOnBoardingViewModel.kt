@@ -19,6 +19,7 @@ import nz.mega.sdk.*
 class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
     private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository
 ) : ViewModel() {
+
     // Avatar
     private val _avatarLiveData = MutableLiveData<Bitmap>()
     val avatarLiveData: LiveData<Bitmap> = _avatarLiveData

@@ -207,6 +207,7 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -8797,7 +8798,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 switch (linkType) {
                     case CHAT_LINK: {
 						logDebug("Open chat link: correct chat link");
-//                        showChatLink(link);
+//                        showChatLink(link)
+						// Identify the link is a meeting or normal chat link
 						megaChatApi.checkChatLink(link, managerActivity);
                         dismissOpenLinkDialog();
                         break;
@@ -12175,6 +12177,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				String link = request.getLink();
 				if (request.getMegaHandleList() != null) {
 					CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
+				} else if (request.getFlag()) {
+					new MeetingHasEndedDialogFragment().show(getSupportFragmentManager(),
+							MeetingHasEndedDialogFragment.TAG);
 				} else {
 					showChatLink(link);
 				}

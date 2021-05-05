@@ -48,6 +48,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     private var videoListener: MeetingVideoListener? = null
 
+    protected var meetingName = ""
+    protected var chatId: Long = MEGACHAT_INVALID_HANDLE
+    protected var meetingLink = ""
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
@@ -129,7 +133,20 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         initBinding()
+        initMetaData()
         return binding.root
+    }
+
+    private fun initMetaData() {
+        arguments?.let { args ->
+            args.getString(MeetingActivity.MEETING_NAME)?.let {
+                meetingName = it
+            }
+            args.getString(MeetingActivity.MEETING_LINK)?.let {
+                meetingLink = it
+            }
+            chatId = args.getLong(MeetingActivity.MEETING_CHAT_ID)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -142,8 +159,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         )
 
         (activity as AppCompatActivity).supportActionBar?.apply {
-            title = arguments?.getString(MeetingActivity.MEETING_NAME)
-            subtitle = arguments?.getString(MeetingActivity.MEETING_LINK)
+            title = meetingName
+            subtitle = meetingLink
         }
     }
 

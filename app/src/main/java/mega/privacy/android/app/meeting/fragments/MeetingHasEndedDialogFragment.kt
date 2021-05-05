@@ -1,0 +1,38 @@
+package mega.privacy.android.app.meeting.fragments
+
+import android.app.Dialog
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.R
+
+class MeetingHasEndedDialogFragment : DialogFragment() {
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+
+        builder.setMessage(getString(R.string.meeting_has_ended))
+            .setPositiveButton(R.string.general_leave, null)
+            .setNegativeButton(R.string.view_meeting_chat, null)
+
+        val dialog = builder.create()
+        dialog.show()
+        dialog.setCanceledOnTouchOutside(false)
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            Log.i("Alex", "pos click")
+        }
+
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+            Log.i("Alex", "neg click")
+        }
+
+        return dialog
+    }
+
+    companion object {
+        const val TAG = "MeetingHasEndedDialog"
+    }
+}

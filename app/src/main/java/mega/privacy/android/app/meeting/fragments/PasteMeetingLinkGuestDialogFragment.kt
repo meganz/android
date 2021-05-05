@@ -31,7 +31,7 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 
-class PasteMeetingLinkGuestFragment : DialogFragment() {
+class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     private lateinit var linkEdit: EditText
     private lateinit var errorLayout: ViewGroup
@@ -160,7 +160,7 @@ class PasteMeetingLinkGuestFragment : DialogFragment() {
                 } else if (e.errorCode == MegaChatError.ERROR_NOENT) {
                     Util.showAlert(
                         requireContext(),
-                        getString(R.string.invalid_meeting_link),
+                        getString(R.string.invalid_link),
                         getString(R.string.meeting_link)
                     )
                 } else {

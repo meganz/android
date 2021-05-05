@@ -27,5 +27,6 @@ class CreateMeetingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
+    public fun getMyFullName(): String? = megaChatApi.myFullname
 
 }

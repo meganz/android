@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -420,6 +421,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
                     if (request.getMegaHandleList() != null) {
 						goToMeetingActivity(request.getChatHandle(), request.getText());
+					} else if (request.getFlag()) { // Meeting has ended
+						new MeetingHasEndedDialogFragment().show(getSupportFragmentManager(),
+								MeetingHasEndedDialogFragment.TAG);
 					} else {
 						// Normal Chat Link
 						goToChatActivity();

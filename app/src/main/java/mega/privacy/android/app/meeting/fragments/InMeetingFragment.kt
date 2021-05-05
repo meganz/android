@@ -17,6 +17,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.NavAction
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -40,6 +44,9 @@ import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.*
@@ -55,6 +62,8 @@ import nz.mega.sdk.MegaChatSession
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.OnCallStartedCallback {
+
+    val args: InMeetingFragmentArgs by navArgs()
 
     // Views
     lateinit var toolbar: MaterialToolbar
@@ -317,9 +326,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         initViewModel()
         initFloatingWindowContainerDragListener(view)
         initChildFragments()
-        initStartMeeting()
+
+        takeActionByArgs()
+
         // Set on page tapping listener.
         setPageOnClickListener(view)
+    }
+
+    private fun takeActionByArgs() {
+        when (args.action) {
+            MEETING_ACTION_CREATE -> initStartMeeting()
+            MEETING_ACTION_JOIN -> {}
+            MEETING_ACTION_GUEST -> {}
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

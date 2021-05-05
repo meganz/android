@@ -2,7 +2,7 @@
 buildscript {
     ext.gradleVersion = '4.1.1'
     ext.kotlinVersion = '1.4.10'
-    ext.navigationVersion = '2.3.0'
+    ext.navigationVersion = '2.3.5'
     ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.29.1-alpha"
     ext.huaweiServicesVersion = "1.4.1.300"

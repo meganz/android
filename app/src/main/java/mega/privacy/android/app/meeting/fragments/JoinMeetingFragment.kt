@@ -2,17 +2,26 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
+import mega.privacy.android.app.utils.LogUtil.logError
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
-    private val viewModel: JoinMeetingViewModel by viewModels()
-
     override fun onMeetingButtonClick() {
+        if (chatId == MEGACHAT_INVALID_HANDLE) {
+            logError("Chat Id is invalid when join meeting")
+            return
+        }
+
+        val action = JoinMeetingFragmentDirections
+            .actionGlobalInMeeting(MEETING_ACTION_JOIN, chatId, meetingName, meetingLink)
+        findNavController().navigate(action)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

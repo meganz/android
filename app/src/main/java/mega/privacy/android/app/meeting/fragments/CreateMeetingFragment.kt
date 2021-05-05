@@ -9,10 +9,8 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.utils.ChatUtil.*
-
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.utils.ChatUtil.isAllowedTitle
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.hideKeyboardView
@@ -25,25 +23,24 @@ import java.util.*
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     private val viewModel: CreateMeetingViewModel by viewModels()
-    private var meetingName: String? = null
 
     //Create first the chat
     var chats = ArrayList<MegaChatRoom>()
 
     override fun onMeetingButtonClick() {
-        meetingName = viewModel.meetingName.value
-        if (meetingName.isNullOrEmpty() || !isAllowedTitle(meetingName)) {
+        if (meetingName.isEmpty() || !isAllowedTitle(meetingName)) {
             type_meeting_edit_text.error =
                 StringResourcesUtils.getString(R.string.error_meeting_name_error)
             return
         }
 
         logDebug("Meeting Name: $meetingName")
-        meetingName?.let {
-            hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
-            sharedModel.setMeetingsName(it)
-            findNavController().navigate(CreateMeetingFragmentDirections.actionCreateMeetingFragmentToInMeeting())
-        }
+        hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+        // TODO: better to pass meeting name via fragment args in Navigation
+        sharedModel.setMeetingsName(meetingName)
+
+        val action = InMeetingFragmentDirections.actionGlobalInMeeting(MEETING_ACTION_CREATE)
+        findNavController().navigate(action)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,14 +71,12 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
         binding.typeMeetingEditText.let {
             it.visibility = View.VISIBLE
-            it.hint = StringResourcesUtils.getString(
-                R.string.type_meeting_name, megaChatApi.myFullname
-            )
+            it.hint = meetingName
             showKeyboardDelayed(type_meeting_edit_text)
             it.setOnFocusChangeListener { v, hasFocus ->
                 run {
                     if (hasFocus) {
-                        type_meeting_edit_text.setSelection(type_meeting_edit_text.text.length);
+                        type_meeting_edit_text.setSelection(type_meeting_edit_text.text.length)
                     } else {
                         hideKeyboardView(v.context, type_meeting_edit_text, 0)
                     }
@@ -96,12 +91,11 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     private fun initViewModel() {
         binding.createviewmodel = viewModel
         // Set default meeting name
-        viewModel.initMeetingName(
-            StringResourcesUtils.getString(
-                R.string.type_meeting_name, megaChatApi.myFullname
-            )
-        )
-
+        viewModel.initMeetingName()
         viewModel.initRTCAudioManager()
+
+        viewModel.meetingName.observe(viewLifecycleOwner) {
+            meetingName = it
+        }
     }
 }
