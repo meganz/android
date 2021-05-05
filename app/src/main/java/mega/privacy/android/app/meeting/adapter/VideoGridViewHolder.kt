@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.view.SurfaceHolder
 import androidx.core.view.isVisible
@@ -26,7 +27,8 @@ class VideoGridViewHolder(
     private val gridView: CustomizedGridCallRecyclerView,
     private val screenWidth: Int,
     private val screenHeight: Int,
-    private val listener: GridViewListener
+    private val listener: GridViewListener,
+    private val orientation: Int
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -44,7 +46,11 @@ class VideoGridViewHolder(
     ) {
         this.inMeetingViewModel = inMeetingViewModel
 
-        layout(isFirstPage, itemCount)
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            portraitLayout(isFirstPage, itemCount)
+        } else {
+            landscapeLayout(isFirstPage, itemCount)
+        }
 
         binding.name.text = participant.name
 
@@ -159,7 +165,53 @@ class VideoGridViewHolder(
         listener.onCloseVideo(inMeetingViewModel.getSession(participant.clientId), participant)
     }
 
-    private fun layout(isFirstPage: Boolean, itemCount: Int) {
+    private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
+        var w = 0
+        var h = 0
+
+        val layoutParams: GridLayoutManager.LayoutParams =
+            binding.root.layoutParams as GridLayoutManager.LayoutParams
+
+        if (isFirstPage) {
+            when (itemCount) {
+                1 -> {
+                    w = screenWidth / 2
+                    h = screenHeight
+                    layoutParams.setMargins(w / 2, 0, w / 2, 0)
+                }
+                2 -> {
+                    w = screenWidth / 2
+                    h = screenHeight
+                    layoutParams.setMargins(0, 0, 0, 0)
+                }
+                3 -> {
+                    w = (screenWidth / 3)
+                    h = (screenHeight * 0.6).toInt()
+                    layoutParams.setMargins(0, 0, 0, screenHeight - h)
+                }
+                5 -> {
+                    w = screenWidth / 4
+                    h = screenHeight / 2
+
+                    when (adapterPosition) {
+                        3, 4 -> layoutParams.setMargins(w / 2, 0, 0, 0)
+                    }
+                }
+                4, 6 -> {
+                    w = (screenWidth / 4)
+                    h = (screenHeight / 2)
+                }
+            }
+        } else {
+            w = (screenWidth / 4)
+            h = (screenHeight / 2)
+        }
+
+        layoutParams.width = w
+        layoutParams.height = h
+    }
+
+    private fun portraitLayout(isFirstPage: Boolean, itemCount: Int) {
         var w = 0
         var h = 0
 

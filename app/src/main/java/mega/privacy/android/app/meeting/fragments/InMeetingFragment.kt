@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Pair
 import android.view.*
 import android.widget.Chronometer
@@ -17,9 +18,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.NavAction
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -353,23 +351,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Observe the Orientation changes
+     * Observe the Orientation changes and Update the layout for landscape and portrait screen
      *
      * @param newConfig
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        updateLayout(newConfig.orientation)
-    }
-
-    /**
-     * Update the layout for landscape and portrait screen
-     *
-     * @param orientation the flag of the orientation
-     */
-    private fun updateLayout(orientation: Int) {
-        // Add the Changes for the in-meeting-fragment
-        bottomFloatingPanelViewHolder.updateWidth(orientation)
+        val display = meetingActivity.windowManager.defaultDisplay
+        val outMetrics = DisplayMetrics()
+        display.getMetrics(outMetrics)
+        bottomFloatingPanelViewHolder.updateWidth(newConfig.orientation, outMetrics.widthPixels)
+        gridViewCallFragment?.updateLayout(
+            newConfig.orientation,
+            outMetrics.widthPixels,
+            outMetrics.heightPixels
+        )
     }
 
     private fun initLiveEventBus() {

@@ -139,6 +139,17 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
         }
     }
 
+    /**
+     * Update layout base on the new orientation
+     *
+     * @param newOrientation
+     * @param widthPixels
+     * @param heightPixels
+     */
+    fun updateLayout(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
+        adapterPager?.updateOrientation(newOrientation, widthPixels, heightPixels)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(

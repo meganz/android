@@ -17,7 +17,8 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val pagePosition: Int,
-    private val listener: GridViewListener
+    private val listener: GridViewListener,
+    private val orientation: Int
 ) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
@@ -34,7 +35,7 @@ class VideoGridViewAdapter(
             gridView,
             screenWidth,
             screenHeight,
-            listener
+            listener, orientation
         )
     }
 

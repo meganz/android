@@ -16,8 +16,6 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
@@ -395,12 +393,12 @@ class BottomFloatingPanelViewHolder(
      * Change the panel's width for landscape and portrait screen
      *
      */
-    fun updateWidth(orientation: Int) {
+    fun updateWidth(orientation: Int, widthPixels: Int) {
         val params = floatingPanelView.root.layoutParams
         params.width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            context.resources.getDimension(R.dimen.bottom_sheet_landscape_width)
-                .toInt()
+            widthPixels / 2
         } else FrameLayout.LayoutParams.MATCH_PARENT
+
         floatingPanelView.root.layoutParams = params
     }
 
