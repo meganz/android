@@ -3,21 +3,17 @@ package mega.privacy.android.app.meeting.activity
 import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import androidx.work.Operation
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
-import mega.privacy.android.app.lollipop.megachat.calls.IndividualCallListener
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -146,9 +142,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
         LiveEventBus.get(EVENT_LINK_RECOVERED)
             .observeForever(linkRecoveredObserver as Observer<Any>)
-    }
 
-    init {
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
@@ -389,9 +383,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         hiRes: Boolean,
         listener: MeetingVideoListener
     ) {
-        if (listener == null)
-            return
-
         meetingActivityRepository.addRemoteVideo(chatId, clientId, hiRes, listener)
     }
 
@@ -437,7 +428,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun setChatVideoInDevice(listener: MegaChatRequestListenerInterface?) {
         // Always try to start the video using the front camera
-        var cameraDevice = VideoCaptureUtils.getFrontCamera()
+        val cameraDevice = VideoCaptureUtils.getFrontCamera()
         if (cameraDevice != null) {
             meetingActivityRepository.setChatVideoInDevice(cameraDevice, listener)
         }
@@ -450,11 +441,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         )
     }
 
-    override fun onVideoDeviceOpened(isEnable: Boolean) {
-        logDebug("onVideoDeviceOpened:: isEnable = $isEnable")
-        _cameraLiveData.value = isEnable
+    override fun onVideoDeviceOpened(isVideoOn: Boolean) {
+        logDebug("onVideoDeviceOpened:: isEnable = $isVideoOn")
+        _cameraLiveData.value = isVideoOn
         logDebug("open video: $_cameraLiveData.value")
-        tips.value = when (isEnable) {
+        tips.value = when (isVideoOn) {
             true -> getString(
                 R.string.general_camera_disable,
                 "enable"
