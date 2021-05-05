@@ -132,6 +132,7 @@ class MeetingActivity : PasscodeActivity() {
             intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         )
 
+        // Pass the meeting data to Join Meeting screen
         if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))

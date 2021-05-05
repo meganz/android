@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,8 +14,11 @@ import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
@@ -24,7 +28,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import java.lang.reflect.Method
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
 import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
@@ -49,6 +53,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     //TODO test code start
     val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
 
+    private var _joinPublicChat: MutableLiveData<Event<Unit>> = MutableLiveData()
+    var joinPublicChat: LiveData<Event<Unit>> = _joinPublicChat
+
+    private var chatId = MEGACHAT_INVALID_HANDLE
+
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -56,9 +65,12 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
 
-    private val callStatusObserver =
-        androidx.lifecycle.Observer<MegaChatCall> {
+    private val callStatusObserver = Observer<MegaChatCall> {
+        if (it.status == CALL_STATUS_USER_NO_PRESENT
+            && it.chatid == chatId) {
+            _joinPublicChat.value = Event(Unit)
         }
+    }
 
     init {
         LiveEventBus.get(
@@ -66,8 +78,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             MegaChatCall::class.java
         ).observeForever(callStatusObserver)
 
-        LiveEventBus.get(Constants.EVENT_UPDATE_CALL, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
+
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .observeForever(callStatusObserver)
     }
 
     /**
@@ -740,7 +755,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         super.onCleared()
 
         LiveEventBus.get(
-            Constants.EVENT_CALL_STATUS_CHANGE,
+            EVENT_CALL_STATUS_CHANGE,
             MegaChatCall::class.java
         ).removeObserver(callStatusObserver)
 
@@ -766,4 +781,40 @@ class InMeetingViewModel @ViewModelInject constructor(
             it > 1
         } == true
     }
+
+    fun joinPublicChat(chatId: Long) {
+        this.chatId = chatId
+
+        inMeetingRepository.joinPublicChat(
+            chatId,
+            object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
+                override fun onRequestFinish(
+                    api: MegaChatApiJava,
+                    request: MegaChatRequest,
+                    e: MegaChatError
+                ) {
+                    if (e.errorCode != MegaChatError.ERROR_OK) {
+                        // TODO: notify the UI to show "Join meeting failed"
+                    }
+                }
+            })
+    }
+
+    fun answerChatCall(enableVideo: Boolean, enableAudio: Boolean) =
+        inMeetingRepository.answerChatCall(
+            chatId,
+            enableVideo,
+            enableAudio,
+            object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
+                override fun onRequestFinish(
+                    api: MegaChatApiJava,
+                    request: MegaChatRequest,
+                    e: MegaChatError
+                ) {
+                    if (e.errorCode != MegaChatError.ERROR_OK) {
+                        // TODO: notify the UI to show "Join meeting failed(and the cause? e.g. too many participants)"
+                    }
+                }
+            }
+        )
 }

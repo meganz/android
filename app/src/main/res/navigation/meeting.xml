@@ -34,7 +34,8 @@
 
         <argument
             android:name="action"
-            app:argType="string"/>
+            app:argType="string"
+            android:defaultValue="in_meeting"/>
         <argument
             android:name="chatId"
             app:argType="long"

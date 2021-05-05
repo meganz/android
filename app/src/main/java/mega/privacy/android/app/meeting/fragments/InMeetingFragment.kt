@@ -334,7 +334,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun takeActionByArgs() {
         when (args.action) {
             MEETING_ACTION_CREATE -> initStartMeeting()
-            MEETING_ACTION_JOIN -> {}
+            MEETING_ACTION_JOIN -> {
+                inMeetingViewModel.joinPublicChat(args.chatId)
+            }
             MEETING_ACTION_GUEST -> {}
         }
     }
@@ -370,42 +372,42 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean::class.java)
-            .observeForever(proximitySensorChangeObserver)
+            .observeSticky(this, proximitySensorChangeObserver)
 
         LiveEventBus.get(EVENT_ERROR_STARTING_CALL, Long::class.java)
-            .observeForever(errorStatingCallObserver)
+            .observeSticky(this, errorStatingCallObserver)
 
         LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .observeForever(noOutgoingCallObserver)
+            .observeSticky(this, noOutgoingCallObserver)
 
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
-            .observeForever(nameChangeObserver)
+            .observeSticky(this, nameChangeObserver)
 
         LiveEventBus.get(EVENT_PRIVILEGES_CHANGE, MegaChatListItem::class.java)
-            .observeForever(privilegesChangeObserver)
+            .observeSticky(this, privilegesChangeObserver)
 
         //Calls level
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeForever(callStatusObserver)
+            .observeSticky(this, callStatusObserver)
 
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-            .observeForever(callCompositionObserver)
+            .observeSticky(this, callCompositionObserver)
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observeForever(callOnHoldObserver)
+            .observeSticky(this, callOnHoldObserver)
 
         LiveEventBus.get(EVENT_LOCAL_NETWORK_QUALITY_CHANGE, MegaChatCall::class.java)
-            .observeForever(localNetworkQualityObserver)
+            .observeSticky(this, localNetworkQualityObserver)
 
         //Sessions Level
         LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE)
-            .observeForever(sessionStatusObserver as Observer<Any>)
+            .observeSticky(this, sessionStatusObserver as Observer<Any>)
 
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observeForever(sessionOnHoldObserver as Observer<Any>)
+            .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
 
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .observeForever(remoteAVFlagsObserver as Observer<Any>)
+            .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -500,6 +502,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     arrayOf(Manifest.permission.RECORD_AUDIO),
                 ) { showRequestPermissionSnackBar() }
             }
+        }
+
+        inMeetingViewModel.joinPublicChat.observe(viewLifecycleOwner) {
+            inMeetingViewModel.answerChatCall(camIsEnable, micIsEnable)
         }
     }
 
@@ -1202,44 +1208,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onDestroy() {
         super.onDestroy()
-
-        LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean::class.java)
-            .removeObserver(proximitySensorChangeObserver)
-
-        LiveEventBus.get(EVENT_ERROR_STARTING_CALL, Long::class.java)
-            .removeObserver(errorStatingCallObserver)
-
-        LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .removeObserver(noOutgoingCallObserver)
-
-        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
-            .removeObserver(nameChangeObserver)
-
-        LiveEventBus.get(EVENT_PRIVILEGES_CHANGE, MegaChatListItem::class.java)
-            .removeObserver(privilegesChangeObserver)
-
-        //Calls level
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callStatusObserver)
-
-        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callCompositionObserver)
-
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callOnHoldObserver)
-
-        LiveEventBus.get(EVENT_LOCAL_NETWORK_QUALITY_CHANGE, MegaChatCall::class.java)
-            .removeObserver(localNetworkQualityObserver)
-
-        //Sessions level
-        LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE)
-            .removeObserver(sessionStatusObserver as Observer<Any>)
-
-        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .removeObserver(sessionOnHoldObserver as Observer<Any>)
-
-        LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .removeObserver(remoteAVFlagsObserver as Observer<Any>)
 
         CallUtil.activateChrono(false, meetingChrono, null)
         inMeetingViewModel.isSpeakerViewAutomatic()

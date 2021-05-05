@@ -5,11 +5,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
@@ -182,10 +182,17 @@ class InMeetingRepository @Inject constructor(
         val userMail = CallUtil.getUserMailCall(chat, peerId)
         if (!TextUtil.isTextEmpty(userMail)) {
             val contact: MegaUser = megaApi.getContact(userMail)
-            if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
+            if (contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
                 return true
             }
         }
         return false
     }
+
+    fun joinPublicChat(chatId: Long, listener: ChatBaseListener) =
+        megaChatApi.autojoinPublicChat(chatId, listener)
+
+    fun answerChatCall(chatId: Long, enableVideo: Boolean, enableAudio: Boolean,
+                       listener: ChatBaseListener) =
+        megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
 }
