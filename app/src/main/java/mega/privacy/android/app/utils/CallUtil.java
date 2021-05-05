@@ -119,7 +119,7 @@ public class CallUtil {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.setAction(MEETING_ACTION_RINGING);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
