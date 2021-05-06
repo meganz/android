@@ -236,9 +236,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         // Call it only once at the first launch of the post-installation
         // So the user would always not login at this moment
-//        if (Util.readAppLaunchedTime(this) <= 1) {
+        if (Util.readAppLaunchedTime(this) <= 1) {
             checkClipboardMeetingLink();
-//        }
+        }
     }
 
     /**

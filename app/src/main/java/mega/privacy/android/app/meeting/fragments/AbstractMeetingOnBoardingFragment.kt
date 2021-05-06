@@ -54,6 +54,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        // Do not share the instance with other permission check process, because the callback functions are different.
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
             .setOnPermissionDenied { l -> onPermissionDenied(l) }
             .setOnRequiresPermission { l -> onRequiresPermission(l) }

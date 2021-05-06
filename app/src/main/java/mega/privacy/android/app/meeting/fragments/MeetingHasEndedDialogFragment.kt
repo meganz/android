@@ -8,7 +8,13 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 
-class MeetingHasEndedDialogFragment : DialogFragment() {
+class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback) :
+    DialogFragment() {
+
+    interface ClickCallback {
+        fun onViewMeetingChat()
+        fun onLeave()
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
@@ -22,11 +28,13 @@ class MeetingHasEndedDialogFragment : DialogFragment() {
         dialog.setCanceledOnTouchOutside(false)
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            Log.i("Alex", "pos click")
+            clickCallback.onLeave()
+            dismiss()
         }
 
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
-            Log.i("Alex", "neg click")
+            clickCallback.onViewMeetingChat()
+            dismiss()
         }
 
         return dialog

@@ -8,6 +8,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ConnectListener;
@@ -19,6 +21,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
@@ -29,12 +32,14 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener {
 
@@ -416,18 +421,30 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		megaChatApi.checkChatLink(url, new ChatBaseListener(
 				OpenLinkActivity.this) {
 			@Override
-			public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+			public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
 				if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
-						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MegaChatApiJava.MEGACHAT_INVALID_HANDLE)) {
-                    if (request.getMegaHandleList() != null) {
+						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE)) {
+
+					MegaHandleList list = request.getMegaHandleList();
+					if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
 						goToMeetingActivity(request.getChatHandle(), request.getText());
 					} else if (request.getFlag()) { // Meeting has ended
-						new MeetingHasEndedDialogFragment().show(getSupportFragmentManager(),
+						new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+							@Override
+							public void onViewMeetingChat() {
+								goToChatActivity();
+							}
+
+							@Override
+							public void onLeave() {
+								goToGuestLeaveMeetingActivity();
+							}
+						}).show(getSupportFragmentManager(),
 								MeetingHasEndedDialogFragment.TAG);
 					} else {
 						// Normal Chat Link
 						goToChatActivity();
-					}
+					} ;
 				} else {
 					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
 				}
@@ -439,6 +456,12 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		Intent intent = new Intent(this, ChatActivityLollipop.class);
 		intent.setAction(ACTION_OPEN_CHAT_LINK);
 		intent.setData(Uri.parse(url));
+		startActivity(intent);
+		finish();
+	}
+
+	private void goToGuestLeaveMeetingActivity() {
+		Intent intent = new Intent(this, LeftMeetingActivity.class);
 		startActivity(intent);
 		finish();
 	}
