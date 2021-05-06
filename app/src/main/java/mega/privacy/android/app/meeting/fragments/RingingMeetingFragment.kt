@@ -111,8 +111,8 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
         chatId?.let {
             if (it != MEGACHAT_INVALID_HANDLE) {
-                sharedModel.updateChatRoom(it)
-                viewModel.setChat(it)
+                sharedModel.updateChatRoomId(it)
+                viewModel.setChatId(it)
             }
         }
 
