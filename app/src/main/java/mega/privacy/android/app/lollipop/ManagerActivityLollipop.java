@@ -12175,27 +12175,44 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					return;
 				}
 
-				String link = request.getLink();
-				MegaHandleList list = request.getMegaHandleList();
-				long callId = list.get(0);
-				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-					CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
-				} else if (request.getFlag()) {
-					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-						@Override
-						public void onViewMeetingChat() {
-							showChatLink(link);
-						}
+                String link = request.getLink();
 
-						@Override
-						public void onLeave() { }
-					}).show(getSupportFragmentManager(),
-							MeetingHasEndedDialogFragment.TAG);
-				} else {
-					showChatLink(link);
-				}
+                if (request.getParamType() == 1) {
+                    logDebug("It's a meeting");
 
-				dismissOpenLinkDialog();
+                    if (request.getFlag()) {
+                        MegaHandleList list = request.getMegaHandleList();
+
+                        if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+                            logDebug("It's a meeting, open join call");
+
+                            CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
+                        } else {
+                            logDebug("It's a meeting, open dialog: Meeting has ended");
+
+                            new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+                                @Override
+                                public void onViewMeetingChat() {
+                                    showChatLink(link);
+                                }
+
+                                @Override
+                                public void onLeave() {
+                                }
+                            }).show(getSupportFragmentManager(),
+                                    MeetingHasEndedDialogFragment.TAG);
+                        }
+                    } else {
+                        logDebug("It's a meeting, open chat preview");
+                        api.openChatPreview(link, this);
+                    }
+
+                } else {
+                    logDebug("It's a chat");
+                    showChatLink(link);
+                }
+
+                dismissOpenLinkDialog();
 			}
 			else {
 				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){

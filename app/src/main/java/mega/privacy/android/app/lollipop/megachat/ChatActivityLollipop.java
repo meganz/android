@@ -3056,17 +3056,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             if (canNotJoinCall(this, callInThisChat, chatRoom)) return;
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                if (callInThisChat.isRinging()) {
-                    logDebug("The call in this chat is Ring in");
-                    addChecksForACall(chatRoom.getChatId(), false);
-                    MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-                    logDebug("Incoming call, open Meeting to answer the call");
-                    openMeetingRinging(this, chatRoom.getChatId());
-                    return;
-                }
-
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 megaChatApi.startChatCall(idChat, startVideo, true, new StartChatCallListener(this, this, this));
             }
             return;
@@ -3779,6 +3771,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     break;
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
+
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                     startVideo = false;
                     if (checkPermissionsCall()) {
@@ -5256,7 +5249,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                 }
                             }
                             else if (m.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                                logDebug("TYPE_CONTAINS_META");
                                 MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                                 if (meta == null || meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID)
                                     return;
@@ -5293,7 +5285,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                     showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available_location), MEGACHAT_INVALID_HANDLE);
                                 }
                             } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL ){
-                                logDebug("TYPE_NORMAL");
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
 
                                 if(richLinkMessage != null){
@@ -5316,7 +5307,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     public void loadChatLink(String link){
-        logDebug("loadChatLink: ");
         Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
         intentOpenChat.setAction(ACTION_OPEN_CHAT_LINK);
         intentOpenChat.setData(Uri.parse(link));
@@ -5754,7 +5744,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     public int checkMegaLink(MegaChatMessage msg){
-        logDebug("checkMegaLink");
 
         //Check if it is a MEGA link
         if (msg.getType() != MegaChatMessage.TYPE_NORMAL || msg.getContent() == null) return -1;
@@ -5762,7 +5751,6 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         String link = extractMegaLink(msg.getContent());
 
         if (isChatLink(link)) {
-            logDebug("isChatLink");
             ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
             megaChatApi.checkChatLink(link, listener);
 

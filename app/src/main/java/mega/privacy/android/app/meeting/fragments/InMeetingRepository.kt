@@ -12,6 +12,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
@@ -56,17 +57,34 @@ class InMeetingRepository @Inject constructor(
      * Method for starting a meeting
      *
      * @param chatId chat ID
-     * @param audioEnabled if Audio is enabled
-     * @param videoEnabled if Video is enabled
+     * @param enableAudio if Audio is enabled
+     * @param enableVideo if Video is enabled
      * @param listener MegaChatRequestListenerInterface
      */
-    fun startMeeting(
+    fun startCall(
         chatId: Long,
         enableAudio: Boolean,
         enableVideo: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         megaChatApi.startChatCall(chatId, enableVideo, enableAudio, listener)
+    }
+
+    /**
+     * Method for starting a meeting
+     *
+     * @param chatId chat ID
+     * @param enableAudio if Audio is enabled
+     * @param enableVideo if Video is enabled
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun answerCall(
+        chatId: Long,
+        enableAudio: Boolean,
+        enableVideo: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
     }
 
     /**
@@ -255,25 +273,37 @@ class InMeetingRepository @Inject constructor(
 
     }
 
+    fun getOwnPrivileges(chatId: Long): Int {
+        getChatRoom(chatId)?.let {
+            return it.ownPrivilege
+        }
+        return -1
+    }
 
-    fun joinPublicChat(chatId: Long, listener: ChatBaseListener) =
+    fun openChatPreview(link:String, listener: MegaChatRequestListenerInterface) =
+        megaChatApi.openChatPreview(link, listener)
+
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         megaChatApi.autojoinPublicChat(chatId, listener)
 
-    fun answerChatCall(chatId: Long, enableVideo: Boolean, enableAudio: Boolean,
-                       listener: ChatBaseListener) =
-        megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
 
     fun createEphemeralAccountPlusPlus(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
         megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
     }
 
-
     fun getMyInfo(chatId: Long): Participant {
+        val isModerator = getOwnPrivileges(chatId) == MegaChatRoom.PRIV_MODERATOR
+        var isAudioOn = true
+        var isVideoOn = true
+        getMeeting(chatId)?.let {
+            isAudioOn = it.hasLocalAudio()
+            isVideoOn = it.hasLocalVideo()
+        }
         return Participant(
             megaChatApi.myUserHandle,
-            megaChatApi.getMyClientidHandle(chatId),
+            MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
-            null, "XXX", true, false, true, true
+            null, "XXX", true, isModerator, isAudioOn, isVideoOn
         )
     }
 }

@@ -15,6 +15,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
@@ -60,9 +61,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     //TODO test code start
     val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
 
-    private var _joinPublicChat: MutableLiveData<Event<Unit>> = MutableLiveData()
-    var joinPublicChat: LiveData<Event<Unit>> = _joinPublicChat
-
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -70,25 +68,9 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
 
-    private val callStatusObserver = Observer<MegaChatCall> {
-        if (it.status == CALL_STATUS_USER_NO_PRESENT
-            && it.chatid == currentChatId
-        ) {
-            _joinPublicChat.value = Event(Unit)
-        }
-    }
-
     init {
-        LiveEventBus.get(
-            EVENT_CALL_STATUS_CHANGE,
-            MegaChatCall::class.java
-        ).observeForever(callStatusObserver)
-
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
-
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeForever(callStatusObserver)
     }
 
     /**
@@ -572,7 +554,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             //The chat exists
-            inMeetingRepository.startMeeting(
+            inMeetingRepository.startCall(
                 it.chatId,
                 audioEnable,
                 videoEnable,
@@ -589,10 +571,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     fun getOwnPrivileges(): Int {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return it.ownPrivilege
-        }
-        return -1
+        return inMeetingRepository.getOwnPrivileges(currentChatId)
     }
 
     /**
@@ -1002,12 +981,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        LiveEventBus.get(
-            EVENT_CALL_STATUS_CHANGE,
-            MegaChatCall::class.java
-        ).removeObserver(callStatusObserver)
-
-        LiveEventBus.get(Constants.EVENT_UPDATE_CALL, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .removeObserver(updateCallObserver)
     }
 
@@ -1028,23 +1002,9 @@ class InMeetingViewModel @ViewModelInject constructor(
         } == true
     }
 
-    fun joinPublicChat(chatId: Long) {
-        this.currentChatId = chatId
 
-        inMeetingRepository.joinPublicChat(
-            chatId,
-            object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
-                override fun onRequestFinish(
-                    api: MegaChatApiJava,
-                    request: MegaChatRequest,
-                    e: MegaChatError
-                ) {
-                    if (e.errorCode != MegaChatError.ERROR_OK) {
-                        // TODO: notify the UI to show "Join meeting failed"
-                        Log.i("Alex", "joinPublicChat failed:${e.errorCode}")
-                    }
-                }
-            })
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface){
+        inMeetingRepository.joinPublicChat(chatId, listener)
     }
 
     fun createEphemeralAccountAndJoinChat(chatId: Long, firstName: String, lastName: String) {
@@ -1058,28 +1018,27 @@ class InMeetingViewModel @ViewModelInject constructor(
 
                     }
 
-                    joinPublicChat(chatId)
+                    joinPublicChat(chatId, AutoJoinPublicChatListener(context))
                 }
             })
     }
 
-    fun answerChatCall(enableVideo: Boolean, enableAudio: Boolean) =
-        inMeetingRepository.answerChatCall(
-            currentChatId,
-            enableVideo,
-            enableAudio,
-            AnswerChatCallListener(MegaApplication.getInstance().applicationContext,
-                object : AnswerChatCallListener.OnCallAnsweredCallback {
-                    override fun onCallAnswered(chatId: Long, flag: Boolean) {
-                        Log.i("Alex", "onCallAnswered:$chatId")
-                    }
-
-                    override fun onErrorAnsweredCall(errorCode: Int) {
-                        // TODO: notify the UI to show "Join meeting failed"
-                        Log.i("Alex", "onErrorAnsweredCall:$errorCode")
-                    }
-                })
-        )
+    fun answerChatCall(
+        audioEnable: Boolean,
+        videoEnable: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            //The chat exists
+            inMeetingRepository.answerCall(
+                it.chatId,
+                audioEnable,
+                videoEnable,
+                listener
+            )
+            return
+        }
+    }
 
     fun answerChatCall(
         enableVideo: Boolean,

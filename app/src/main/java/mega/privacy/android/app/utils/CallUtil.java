@@ -85,7 +85,7 @@ public class CallUtil {
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.getInstance().openCallService(chatId);
+        MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_JOIN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -119,7 +119,7 @@ public class CallUtil {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_RINGING);
+        meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);

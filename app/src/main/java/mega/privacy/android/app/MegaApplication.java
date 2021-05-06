@@ -180,6 +180,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapOutgoingCall = new HashMap<>();
 	private static HashMap<Long, Boolean> hashSpeakerViewAutomatic = new HashMap<>();
+	private static HashMap<Long, Boolean> isOpeningMeetingLink = new HashMap<>();
 
 	private static long openCallChatId = -1;
 
@@ -638,8 +639,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return;
 
 		logDebug("Controlling outgoing/in progress call");
+		if(typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && isOpeningMeetingLink(chatId)){
+			clearIncomingCallNotification(chatId);
+			return;
+		}
 		createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
-		clearIncomingCallNotification(chatId);
+
 	}
 
 	/**
@@ -1365,8 +1370,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					MegaChatCall call = api.getChatCall(item.getChatId());
 					if (call != null && call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
 						if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-							notificationShown.add(item.getChatId());
-							showGroupCallNotification(item.getChatId());
+							if(!isOpeningMeetingLink(item.getChatId())){
+								notificationShown.add(item.getChatId());
+								showGroupCallNotification(item.getChatId());
+							}
 						}
 						return;
 
@@ -1521,7 +1528,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
-			showGroupCallNotification(chatId);
+			if(!isOpeningMeetingLink(chatId)){
+				showGroupCallNotification(chatId);
+			}
 			return;
 		}
 
@@ -1536,7 +1545,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 			toIncomingCall(this, callToLaunch, megaChatApi);
 		} else {
-            launchCallActivity(callToLaunch);
+			if(!isOpeningMeetingLink(chatId)){
+				launchCallActivity(callToLaunch);
+			}
 		}
 	}
 
@@ -1870,10 +1881,23 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.put(chatId, videoStatus);
 	}
 
-	public static boolean isRequestSent(long callId) {
-		boolean entryExists = hashMapOutgoingCall.containsKey(callId);
+	public static boolean isOpeningMeetingLink(long chatId) {
+		boolean entryExists = hashMapOutgoingCall.containsKey(chatId);
 		if (entryExists) {
-			return hashMapOutgoingCall.get(callId);
+			return hashMapOutgoingCall.get(chatId);
+		}
+
+		return false;
+	}
+
+	public static void setOpeningMeetingLink(long chatId, boolean isOpeningMeetingLink) {
+		hashSpeakerViewAutomatic.put(chatId, isOpeningMeetingLink);
+	}
+
+	public static boolean isRequestSent(long chatId) {
+		boolean entryExists = hashMapOutgoingCall.containsKey(chatId);
+		if (entryExists) {
+			return hashMapOutgoingCall.get(chatId);
 		}
 
 		return false;

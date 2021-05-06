@@ -360,7 +360,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateMicIcon(micOn: Boolean) {
         floatingPanelView.fabMic.isOn = micOn
-        participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
+        //participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
     }
 
     /**
@@ -370,7 +370,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateCamIcon(camOn: Boolean) {
         floatingPanelView.fabCam.isOn = camOn
-        participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
+        //participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
 
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {

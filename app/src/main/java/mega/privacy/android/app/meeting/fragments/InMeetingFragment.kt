@@ -31,6 +31,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
@@ -47,6 +48,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -58,7 +60,8 @@ import nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OWN_PRIV
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
-    StartChatCallListener.OnCallStartedCallback {
+    StartChatCallListener.OnCallStartedCallback, AnswerChatCallListener.OnCallAnsweredCallback,
+    AutoJoinPublicChatListener.OnJoinedChatCallback {
 
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -402,7 +405,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         when (args.action) {
             MEETING_ACTION_CREATE -> initStartMeeting()
             MEETING_ACTION_JOIN -> {
-                inMeetingViewModel.joinPublicChat(args.chatId)
+                inMeetingViewModel.joinPublicChat(
+                    args.chatId,
+                    AutoJoinPublicChatListener(requireContext(), this)
+                )
             }
             MEETING_ACTION_GUEST -> {
                 inMeetingViewModel.createEphemeralAccountAndJoinChat(
@@ -577,11 +583,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 ) { showRequestPermissionSnackBar() }
             }
         }
-
-        inMeetingViewModel.joinPublicChat.observe(viewLifecycleOwner) {
-            // Pass the up-to-date view status: camera and mic to the viewModel to answer the chat call
-            inMeetingViewModel.answerChatCall(camIsEnable, micIsEnable)
-        }
     }
 
     private fun initFloatingWindowContainerDragListener(view: View) {
@@ -701,11 +702,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     waitingForConnection(call.chatid)
                 }
                 else -> {
-                    val session = CallUtil.getSessionIndividualCall(call)
-                    session?.let {
-                        logDebug("Session exists")
-                        initGroupCall(call.chatid)
-                    }
+                    initGroupCall(call.chatid)
                 }
             }
         }
@@ -885,6 +882,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                     }
                 }
+
                 inMeetingViewModel.startMeeting(
                     micIsEnable,
                     camIsEnable,
@@ -1014,10 +1012,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
          * Observer the participant List
          */
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
-            participants.let {
-                bottomFloatingPanelViewHolder
-                    .setParticipants(it, inMeetingViewModel.getMyOwnInfo(sharedModel.currentChatId.value!!))
-            }
+//            participants.let {
+//                bottomFloatingPanelViewHolder
+//                    .setParticipants(
+//                        it,
+//                        inMeetingViewModel.getMyOwnInfo(sharedModel.currentChatId.value!!)
+//                    )
+//            }
         }
 
         bottomFloatingPanelViewHolder.propertyUpdaters.add {
@@ -1443,11 +1444,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
     }
 
-    override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
+    private fun checkCallStarted(chatId: Long) {
         MegaApplication.getInstance().openCallService(chatId)
         inMeetingViewModel.setCall(chatId)
         checkChildFragments()
         showBannerInfo()
+    }
+
+    override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
+        checkCallStarted(chatId)
     }
 
     override fun onDestroy() {
@@ -1457,5 +1462,39 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.isSpeakerViewAutomatic()
 
         resumeAudioPlayerIfNotInCall(meetingActivity)
+    }
+
+    override fun onCallAnswered(chatId: Long, flag: Boolean) {
+        if (chatId == inMeetingViewModel.getChatId()) {
+            MegaApplication.setOpeningMeetingLink(args.chatId, false)
+            checkCallStarted(chatId)
+        }
+    }
+
+    override fun onErrorAnsweredCall(errorCode: Int) {
+        logDebug("Error answering the meeting so close it")
+        MegaApplication.setOpeningMeetingLink(args.chatId, false)
+        finishActivity()
+    }
+
+    override fun onJoinedChat(chatId: Long, userHandle: Long) {
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
+            sharedModel.updateChatRoomId(chatId)
+            inMeetingViewModel.setChatId(chatId)
+        }
+
+        inMeetingViewModel.getCall()?.let {
+            inMeetingViewModel.answerChatCall(
+                camIsEnable,
+                micIsEnable,
+                AnswerChatCallListener(requireContext(), this)
+            )
+        }
+    }
+
+    override fun onErrorJoinedChat(chatId: Long) {
+        logDebug("Error joining the meeting so close it")
+        MegaApplication.setOpeningMeetingLink(args.chatId, false)
+        finishActivity()
     }
 }

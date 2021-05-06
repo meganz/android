@@ -5,6 +5,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -28,5 +29,10 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         btn_start_join_meeting.setText(R.string.btn_join_meeting)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MegaApplication.setOpeningMeetingLink(chatId, false)
     }
 }

@@ -19,17 +19,3 @@ data class Participant(
     var hasHiRes: Boolean = false,
     var videoListener: MeetingVideoListener? = null
 ) : Serializable
-
-//data class Participant(
-//    val name: String,
-//    val avatar: File?,
-//    val avatarBackground: String,
-//    val isMe: Boolean,
-//    val isModerator: Boolean,
-//    val isAudioOn: Boolean,
-//    val isVideoOn: Boolean,
-//    val isGuest:Boolean = false,
-//    val isContact: Boolean = true,
-//    var isSelected: Boolean = false
-//) : Serializable {
-//}

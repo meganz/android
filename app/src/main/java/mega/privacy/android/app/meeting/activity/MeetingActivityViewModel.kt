@@ -198,16 +198,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param chatId chat ID
      */
     fun createChatLink(chatId: Long) {
-        meetingActivityRepository.createChatLink(chatId, object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
-            override fun onRequestFinish(
-                api: MegaChatApiJava,
-                request: MegaChatRequest,
-                e: MegaChatError
-            ) {
-                val link = request.text
-                Log.i("Alex", "$link")
-            }
-        })
+        //The chat doesn't exist
+        meetingActivityRepository.createChatLink(
+            chatId,
+            CreateGroupChatWithPublicLink()
+        )
     }
 
     /**
