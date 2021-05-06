@@ -261,4 +261,8 @@ class InMeetingRepository @Inject constructor(
     fun answerChatCall(chatId: Long, enableVideo: Boolean, enableAudio: Boolean,
                        listener: ChatBaseListener) =
         megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
+
+    fun createEphemeralAccountPlusPlus(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
+        megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+    }
 }

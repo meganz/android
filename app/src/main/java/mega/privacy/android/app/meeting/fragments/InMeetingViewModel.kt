@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -14,10 +15,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
@@ -30,6 +33,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
+import nz.mega.sdk.MegaChatError.ERROR_OK
 import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
@@ -1034,7 +1038,24 @@ class InMeetingViewModel @ViewModelInject constructor(
                 ) {
                     if (e.errorCode != MegaChatError.ERROR_OK) {
                         // TODO: notify the UI to show "Join meeting failed"
+                        Log.i("Alex", "joinPublicChat failed:${e.errorCode}")
                     }
+                }
+            })
+    }
+
+    fun createEphemeralAccountAndJoinChat(chatId: Long, firstName: String, lastName: String) {
+        inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName,
+            object : BaseListener(MegaApplication.getInstance().applicationContext) {
+                override fun onRequestFinish(
+                    api: MegaApiJava, request: MegaRequest,
+                    e: MegaError
+                ) {
+                    if (e.errorCode != MegaError.API_OK) {
+
+                    }
+
+                    joinPublicChat(chatId)
                 }
             })
     }
@@ -1044,16 +1065,16 @@ class InMeetingViewModel @ViewModelInject constructor(
             currentChatId,
             enableVideo,
             enableAudio,
-            object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
-                override fun onRequestFinish(
-                    api: MegaChatApiJava,
-                    request: MegaChatRequest,
-                    e: MegaChatError
-                ) {
-                    if (e.errorCode != MegaChatError.ERROR_OK) {
-                        // TODO: notify the UI to show "Join meeting failed(and the cause? e.g. too many participants)"
+            AnswerChatCallListener(MegaApplication.getInstance().applicationContext,
+                object : AnswerChatCallListener.OnCallAnsweredCallback {
+                    override fun onCallAnswered(chatId: Long, flag: Boolean) {
+                        Log.i("Alex", "onCallAnswered:$chatId")
                     }
-                }
-            }
+
+                    override fun onErrorAnsweredCall(errorCode: Int) {
+                        // TODO: notify the UI to show "Join meeting failed"
+                        Log.i("Alex", "onErrorAnsweredCall:$errorCode")
+                    }
+                })
         )
 }

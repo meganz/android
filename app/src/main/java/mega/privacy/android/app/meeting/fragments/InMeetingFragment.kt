@@ -403,6 +403,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.joinPublicChat(args.chatId)
             }
             MEETING_ACTION_GUEST -> {
+                inMeetingViewModel.createEphemeralAccountAndJoinChat(
+                    args.chatId,
+                    args.firstName,
+                    args.lastName
+                )
             }
         }
     }
@@ -572,6 +577,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         inMeetingViewModel.joinPublicChat.observe(viewLifecycleOwner) {
+            // Pass the up-to-date view status: camera and mic to the viewModel to answer the chat call
             inMeetingViewModel.answerChatCall(camIsEnable, micIsEnable)
         }
     }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -8,6 +9,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -196,7 +198,16 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param chatId chat ID
      */
     fun createChatLink(chatId: Long) {
-        meetingActivityRepository.createChatLink(chatId, CreateGroupChatWithPublicLink())
+        meetingActivityRepository.createChatLink(chatId, object : ChatBaseListener(MegaApplication.getInstance().applicationContext) {
+            override fun onRequestFinish(
+                api: MegaChatApiJava,
+                request: MegaChatRequest,
+                e: MegaChatError
+            ) {
+                val link = request.text
+                Log.i("Alex", "$link")
+            }
+        })
     }
 
     /**
