@@ -7,6 +7,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
@@ -264,5 +265,15 @@ class InMeetingRepository @Inject constructor(
 
     fun createEphemeralAccountPlusPlus(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
         megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+    }
+
+
+    fun getMyInfo(chatId: Long): Participant {
+        return Participant(
+            megaChatApi.myUserHandle,
+            megaChatApi.getMyClientidHandle(chatId),
+            megaChatApi.myFullname,
+            null, "XXX", true, false, true, true
+        )
     }
 }

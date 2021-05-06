@@ -7,20 +7,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.controllers.ContactController
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import nz.mega.sdk.*
 
 /**
  * Can use the SDK api from BaseFragment
  */
-class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
+    MegaChatRequestListenerInterface {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
+    private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
+    private val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
     // Get from activity
     private var isModerator = true
@@ -110,59 +122,66 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onAddContact() {
-        Toast.makeText(requireContext(), "onAddContact", Toast.LENGTH_SHORT).show()
-//        ContactController(this).inviteContact(email)
+        ContactController(requireContext()).inviteContact(
+            ChatController(context).getParticipantEmail(
+                participantItem.peerId
+            )
+        )
     }
 
     private fun onContactInfoOrEditProfile() {
         if (!bottomViewModel.showEditProfile()) {
-            Toast.makeText(requireContext(), "onContactInfo", Toast.LENGTH_SHORT).show()
-//        ContactUtil.openContactInfoActivity(context, chatC.getParticipantEmail(participantHandle))
+            ContactUtil.openContactInfoActivity(
+                context,
+                ChatController(context).getParticipantEmail(participantItem.peerId)
+            )
         } else {
-            Toast.makeText(requireContext(), "onEditProfile", Toast.LENGTH_SHORT).show()
             editProfile()
         }
 
     }
 
     private fun onSendMessage() {
-//        startConversation()
-
-        Toast.makeText(requireContext(), "onSendMessage", Toast.LENGTH_SHORT).show()
+        startConversation(participantItem.peerId)
     }
 
     /**
      * Start Conversation
      */
     fun startConversation(handle: Long) {
-//        LogUtil.logDebug("Handle: $handle")
-//        val chat = megaChatApi.getChatRoomByUser(handle)
-//        val peers = MegaChatPeerList.createInstance()
-//        if (chat == null) {
-//            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD)
-//            megaChatApi.createChat(false, peers, this)
-//        } else {
-//            val intentOpenChat = Intent(this, ChatActivityLollipop::class.java)
-//            intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-//            intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-//            this.startActivity(intentOpenChat)
-//        }
+        logDebug("Handle: $handle")
+        val chat = megaChatApi.getChatRoomByUser(handle)
+        val peers = MegaChatPeerList.createInstance()
+        if (chat == null) {
+            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD)
+            megaChatApi.createChat(false, peers, this)
+        } else {
+            val intentOpenChat = Intent(requireActivity(), ChatActivityLollipop::class.java)
+            intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
+            requireActivity().startActivity(intentOpenChat)
+        }
     }
 
+    /**
+     * Pin to speaker
+     *
+     */
     private fun onPingToSpeakerView() {
-        Toast.makeText(requireContext(), "onPingToSpeakerView", Toast.LENGTH_SHORT).show()
-        // Notify the `in-meeting-fragment` to update the background
+        inMeetingViewModel.onItemClick(participantItem)
     }
 
     private fun onMakeModerator() {
         Toast.makeText(requireContext(), "onMakeModerator", Toast.LENGTH_SHORT).show()
 
-//        megaChatApi.updateChatPermissions(
-//            chatid,
-//            handler,
-//            privilege,
-//            context as GroupChatInfoActivityLollipop
-//        )
+        sharedViewModel.currentChatId.value?.let {
+            megaChatApi.updateChatPermissions(
+                it,
+                participantItem.peerId,
+                MegaChatRoom.PRIV_MODERATOR,
+                this
+            )
+        }
     }
 
     /**
@@ -187,7 +206,11 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun removeParticipant() {
-//        chatC.removeParticipant(chatHandle, selectedHandleParticipant)
+        sharedViewModel.currentChatId.value?.let {
+            if (it != MegaChatApiJava.MEGACHAT_INVALID_HANDLE){
+                megaChatApi.removeFromChat(it, participantItem.peerId, this)
+            }
+        }
     }
 
     /**
@@ -225,5 +248,27 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             fragment.arguments = args
             return fragment
         }
+    }
+
+    override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
+    }
+
+    override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
+    }
+
+    override fun onRequestFinish(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+
+    }
+
+    override fun onRequestTemporaryError(
+        api: MegaChatApiJava?,
+        request: MegaChatRequest?,
+        e: MegaChatError?
+    ) {
+
     }
 }

@@ -5,8 +5,11 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -17,6 +20,7 @@ import java.util.*
  * extra top offset. Not use DataBinding could avoid this bug.
  */
 class ParticipantViewHolder(
+    private val inMeetingViewModel: InMeetingViewModel,
     private val binding: ItemMeetingParticipantBinding,
     private val onParticipantOption: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -31,7 +35,7 @@ class ParticipantViewHolder(
         if (isFileAvailable(participant.avatar)) {
             binding.avatar.setImageURI(Uri.fromFile(participant.avatar))
         } else {
-            binding.avatar.setImageURI(null as Uri?)
+            initAvatar(participant)
         }
 
         binding.name.text = participant.name
@@ -78,6 +82,20 @@ class ParticipantViewHolder(
         } else {
             binding.videoStatus.setImageResource(R.drawable.ic_video_off_grey_red)
             binding.videoStatus.colorFilter = null
+        }
+    }
+
+    private fun initAvatar(participant: Participant) {
+        inMeetingViewModel.getChat()?.let {
+            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
+            if (avatar == null) {
+                avatar = CallUtil.getDefaultAvatarCall(
+                    MegaApplication.getInstance().applicationContext,
+                    participant.peerId
+                )
+            }
+
+            binding.avatar.setImageBitmap(avatar)
         }
     }
 }

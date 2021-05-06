@@ -41,6 +41,12 @@ class InMeetingViewModel @ViewModelInject constructor(
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
+    private val _pinItemEvent = MutableLiveData<Event<Participant>>()
+    val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
+
+    fun onItemClick(item: Participant) {
+        _pinItemEvent.value = Event(item)
+    }
 
     var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
@@ -1077,4 +1083,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                     }
                 })
         )
+
+    fun getMyOwnInfo(chatId: Long): Participant = inMeetingRepository.getMyInfo(chatId)
 }

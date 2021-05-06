@@ -1001,10 +1001,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(
+                inMeetingViewModel,
                 binding,
                 this,
                 isGuest,
-                isModerator,
                 !inMeetingViewModel.isOneToOneCall()
             )
 
@@ -1013,7 +1013,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
          */
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants.let {
-                bottomFloatingPanelViewHolder.setParticipants(it)
+                bottomFloatingPanelViewHolder
+                    .setParticipants(it, inMeetingViewModel.getMyOwnInfo(sharedModel.currentChatId.value!!))
             }
         }
 
