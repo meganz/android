@@ -12178,10 +12178,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				String link = request.getLink();
 				MegaHandleList list = request.getMegaHandleList();
 				long callId = list.get(0);
-				if (request.getMegaHandleList() != null) {
+				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
 					CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
 				} else if (request.getFlag()) {
-					new MeetingHasEndedDialogFragment().show(getSupportFragmentManager(),
+					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+						@Override
+						public void onViewMeetingChat() {
+							showChatLink(link);
+						}
+
+						@Override
+						public void onLeave() { }
+					}).show(getSupportFragmentManager(),
 							MeetingHasEndedDialogFragment.TAG);
 				} else {
 					showChatLink(link);
