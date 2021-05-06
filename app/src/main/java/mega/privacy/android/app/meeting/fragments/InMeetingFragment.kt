@@ -342,14 +342,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        val meetingName: String? =
-            arguments?.getString(MeetingActivity.MEETING_NAME)
+        val meetingName: String = args.meetingName
 
-        meetingName?.let {
+        meetingName.let {
             if (!TextUtil.isTextEmpty(it)) {
                 sharedModel.setMeetingsName(it)
             }
         }
+
+        // Get meeting link from the arguments supplied when the fragment was instantiated
+        meetinglink = args.meetingLink
 
         val isAudioEnable: Boolean? =
             arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false)
