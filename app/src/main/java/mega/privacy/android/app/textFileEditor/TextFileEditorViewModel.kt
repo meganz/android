@@ -72,6 +72,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     private var needsReadContent = false
+    private var errorSettingContent = false
 
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
@@ -136,7 +137,14 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun needsReadContent(): Boolean = needsReadContent
 
-    fun canShowEditFab(): Boolean = isViewMode() && isEditableAdapter() && !isSaving()
+    fun errorSettingContent() {
+        errorSettingContent = true
+    }
+
+    fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
+
+    fun canShowEditFab(): Boolean =
+        isViewMode() && isEditableAdapter() && !isSaving() && thereIsNoErrorSettingContent()
 
     /**
      * Checks if the file can be editable depending on the current adapter.
@@ -301,8 +309,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 var line: String?
 
                 while (br.readLine().also { line = it } != null) {
-                    sb.append(line)
-                    sb.append('\n')
+                    sb.appendLine(line)
                 }
 
                 br.close()
@@ -313,6 +320,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             needsReadContent = false
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
+            sb.clear()
         }
     }
 

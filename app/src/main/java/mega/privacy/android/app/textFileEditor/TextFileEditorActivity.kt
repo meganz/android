@@ -3,10 +3,8 @@ package mega.privacy.android.app.textFileEditor
 import android.app.ActivityManager
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
-import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -32,6 +30,7 @@ import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -52,6 +51,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         const val RENAME_SHOWN = "RENAME_SHOWN"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
+        const val ERROR_READING_CONTENT_SHOWN = "ERROR_READING_CONTENT_SHOWN"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -64,6 +64,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
+    private var errorReadingContentDialog: AlertDialog? = null
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -109,6 +110,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             if (savedInstanceState.getBoolean(RENAME_SHOWN, false)) {
                 renameNode()
             }
+
+            if (savedInstanceState.getBoolean(ERROR_READING_CONTENT_SHOWN, false)) {
+                showErrorReadingContentDialog()
+            }
         }
     }
 
@@ -116,6 +121,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
+        outState.putBoolean(ERROR_READING_CONTENT_SHOWN, isErrorReadingContentDialogShown())
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
@@ -138,6 +144,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (isRenameDialogShown()) {
             renameDialog?.dismiss()
+        }
+
+        if (isErrorReadingContentDialogShown()) {
+            errorReadingContentDialog?.dismiss()
         }
 
         LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
@@ -316,7 +326,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.setEditedText(editable?.toString())
             }
 
-            if (savedInstanceState != null) {
+            if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()) {
                 setText(viewModel.getEditedText())
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
@@ -415,12 +425,29 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
+        if (!readingContent) {
+            return
+        }
+
         readingContent = false
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
-        binding.contentText.text = contentRead
-        binding.contentEditText.setText(contentRead)
+
+        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
+        for (line in lines) {
+            try {
+                binding.contentText.append(line)
+                binding.contentEditText.append(line)
+            } catch (t: Throwable) {
+                viewModel.errorSettingContent()
+                binding.contentText.text = null
+                binding.contentEditText.text = null
+                showErrorReadingContentDialog()
+                logError("Error setting content.", t)
+                break
+            }
+        }
 
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
@@ -472,20 +499,20 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * Shows a confirmation dialog before discard text changes.
      */
     private fun showDiscardChangesConfirmationDialog() {
-        val builder =
+        if (isDiscardChangesConfirmationDialogShown()) {
+            return
+        }
+
+        discardChangesDialog =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-
-        builder.setTitle(R.string.discard_changes_warning)
-            .setCancelable(false)
-            .setPositiveButton(R.string.discard_close_action) { _, _ ->
-                finish()
-            }
-            .setNegativeButton(R.string.button_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        discardChangesDialog = builder.create()
-        discardChangesDialog!!.show()
+                .setTitle(R.string.discard_changes_warning)
+                .setCancelable(false)
+                .setPositiveButton(R.string.discard_close_action) { _, _ ->
+                    finish()
+                }
+                .setNegativeButton(R.string.button_cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }.show()
     }
 
     /**
@@ -500,6 +527,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * Manages the rename action.
      */
     private fun renameNode() {
+        if (isRenameDialogShown()) {
+            return
+        }
+
         renameDialog =
             showRenameNodeDialog(this, viewModel.getNode()!!, this, object : ActionNodeCallback {
                 override fun finishRenameActionWithSuccess(newName: String) {
@@ -523,6 +554,32 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
     }
+
+    /**
+     * Shows a warning due to an error reading content.
+     */
+    private fun showErrorReadingContentDialog() {
+        if (isErrorReadingContentDialogShown()) {
+            return
+        }
+
+        errorReadingContentDialog =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                .setMessage(StringResourcesUtils.getString(R.string.error_opening_file))
+                .setCancelable(false)
+                .setPositiveButton(R.string.general_ok) { _, _ ->
+                    finish()
+                }.show()
+
+    }
+
+    /**
+     * Checks if the warning due to an error reading content is shown.
+     *
+     * @return True if it is shown, false otherwise.
+     */
+    private fun isErrorReadingContentDialogShown(): Boolean =
+        errorReadingContentDialog?.isShowing ?: false
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.textFileEditorContainer, content, chatId)
