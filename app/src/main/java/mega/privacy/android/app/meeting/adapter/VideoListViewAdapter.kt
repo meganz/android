@@ -10,7 +10,6 @@ import mega.privacy.android.app.utils.Constants
 
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
-    private val itemClickViewModel: ItemClickViewModel,
     private val listView: RecyclerView
 ) : ListAdapter<Participant, VideoListViewHolder>(ParticipantDiffCallback()) {
 
@@ -23,7 +22,7 @@ class VideoListViewAdapter(
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(listHolder: VideoListViewHolder, position: Int) {
-        listHolder.bind(inMeetingViewModel, itemClickViewModel, getItem(position))
+        listHolder.bind(inMeetingViewModel, getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoListViewHolder {

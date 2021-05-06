@@ -763,7 +763,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		boolean staging = false;
+		boolean staging = true;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null && attrs.getStaging() != null) {
@@ -1520,8 +1520,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return;
 		}
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-//		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null) {
+		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
 			showGroupCallNotification(chatId);
 			return;
 		}

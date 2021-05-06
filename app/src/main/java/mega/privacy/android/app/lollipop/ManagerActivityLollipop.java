@@ -266,6 +266,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -12175,6 +12176,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				String link = request.getLink();
+				MegaHandleList list = request.getMegaHandleList();
+				long callId = list.get(0);
 				if (request.getMegaHandleList() != null) {
 					CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
 				} else if (request.getFlag()) {

@@ -403,6 +403,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.joinPublicChat(args.chatId)
             }
             MEETING_ACTION_GUEST -> {
+                inMeetingViewModel.createEphemeralAccountAndJoinChat(
+                    args.chatId,
+                    args.firstName,
+                    args.lastName
+                )
             }
         }
     }
@@ -572,6 +577,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         inMeetingViewModel.joinPublicChat.observe(viewLifecycleOwner) {
+            // Pass the up-to-date view status: camera and mic to the viewModel to answer the chat call
             inMeetingViewModel.answerChatCall(camIsEnable, micIsEnable)
         }
     }
@@ -995,10 +1001,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initFloatingPanel() {
         bottomFloatingPanelViewHolder =
             BottomFloatingPanelViewHolder(
+                inMeetingViewModel,
                 binding,
                 this,
                 isGuest,
-                isModerator,
                 !inMeetingViewModel.isOneToOneCall()
             )
 
@@ -1007,7 +1013,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
          */
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants.let {
-                bottomFloatingPanelViewHolder.setParticipants(it)
+                bottomFloatingPanelViewHolder
+                    .setParticipants(it, inMeetingViewModel.getMyOwnInfo(sharedModel.currentChatId.value!!))
             }
         }
 

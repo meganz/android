@@ -33,7 +33,6 @@ class VideoListViewHolder(
 
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
-        itemClickViewModel: ItemClickViewModel,
         participant: Participant
     ) {
         this.inMeetingViewModel = inMeetingViewModel
@@ -45,7 +44,7 @@ class VideoListViewHolder(
         binding.name.isVisible = false
 
         binding.root.setOnClickListener {
-            itemClickViewModel.onItemClick(participant)
+            inMeetingViewModel.onItemClick(participant)
             binding.selectedForeground.showHide()
         }
 

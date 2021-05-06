@@ -16,6 +16,7 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
@@ -29,10 +30,10 @@ import mega.privacy.android.app.utils.Util
  * @property isModerator the flag for determining if the current user is moderator
  */
 class BottomFloatingPanelViewHolder(
+    inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
     private var isGuest: Boolean,
-    private var isModerator: Boolean,
     private var isGroup: Boolean = true
 ) {
     private val context = binding.root.context
@@ -53,7 +54,7 @@ class BottomFloatingPanelViewHolder(
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
-    private val participantsAdapter = ParticipantsAdapter(listener)
+    private val participantsAdapter = ParticipantsAdapter(inMeetingViewModel, listener)
 
     init {
         initButtonsState()
@@ -105,9 +106,9 @@ class BottomFloatingPanelViewHolder(
      *
      * @param participants newest participant list
      */
-    fun setParticipants(participants: List<Participant>) {
+    fun setParticipants(participants: MutableList<Participant>, myOwnInfo: Participant) {
+        participants.add(myOwnInfo)
         participantsAdapter.submitList(participants.toMutableList())
-
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
         )
@@ -352,8 +353,24 @@ class BottomFloatingPanelViewHolder(
         onBottomFloatingPanelSlide(1F)
     }
 
+    /**
+     * Update the mic icon, also update the own item's mic icon
+     *
+     * @param micOn
+     */
     fun updateMicIcon(micOn: Boolean) {
         floatingPanelView.fabMic.isOn = micOn
+        participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
+    }
+
+    /**
+     * Update the cam icon, also update the own item's cam icon
+     *
+     * @param micOn
+     */
+    fun updateCamIcon(camOn: Boolean) {
+        floatingPanelView.fabCam.isOn = camOn
+        participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
 
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
@@ -370,10 +387,6 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.fabCam.apply {
             enable = !isHold
         }
-    }
-
-    fun updateCamIcon(micOn: Boolean) {
-        floatingPanelView.fabCam.isOn = micOn
     }
 
     fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
