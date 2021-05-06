@@ -59,16 +59,15 @@ open class MeetingBaseFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-//        refreshPermissions(permissions)
-        permissionsRequester =
-            permissionsBuilder(permissions.toCollection(ArrayList()))
-                .setPermissionRequestType(PermissionType.CheckPermission)
-                .setOnRequiresPermission { l ->
-                    onRequiresPermission(l)
-                }.setOnPermissionDenied { l ->
-                    onPermissionDenied(l)
-                }.build()
-        permissionsRequester.launch(false)
+        // Use A New Instance to Check Permissions
+        // Do not share the instance with other permission check process, because the callback functions are different.
+        permissionsBuilder(permissions.toCollection(ArrayList()))
+            .setPermissionRequestType(PermissionType.CheckPermission)
+            .setOnRequiresPermission { l ->
+                onRequiresPermission(l)
+            }.setOnPermissionDenied { l ->
+                onPermissionDenied(l)
+            }.build().launch(false)
     }
 
     private fun onRequiresPermission(permissions: ArrayList<String>) {
