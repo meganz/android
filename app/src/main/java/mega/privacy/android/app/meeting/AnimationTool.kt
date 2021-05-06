@@ -29,5 +29,9 @@ object AnimationTool {
     fun View.moveY(dy: Float, duration: Long = InMeetingFragment.ANIMATION_DURATION) {
         animate().y(dy).setDuration(duration).start()
     }
+
+    fun View.clearAnimationAndGone() {
+        clearAnimation().also { isVisible = false }
+    }
 }
 

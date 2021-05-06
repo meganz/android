@@ -6,17 +6,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.view.animation.*
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.OnSwipeTouchListener
+import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
+import mega.privacy.android.app.meeting.AnimationTool.clearAnimationAndGone
+import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
+import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
+import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
+import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -30,11 +40,16 @@ import java.util.*
 @AndroidEntryPoint
 class RingingMeetingFragment : MeetingBaseFragment() {
 
-    private val viewModel by viewModels<InMeetingViewModel>()
+    private val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
     private lateinit var binding: MeetingRingingFragmentBinding
 
-    private var chatId: Long? = MEGACHAT_INVALID_HANDLE
+    private lateinit var toolbarTitle: EmojiTextView
+    private lateinit var toolbarSubtitle: TextView
+
+    private var chatId: Long = MEGACHAT_INVALID_HANDLE
+
+    private var peerId: Long? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -45,10 +60,9 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        chatId = arguments?.getLong(
-            MEETING_CHAT_ID,
-            MEGACHAT_INVALID_HANDLE
-        )
+        arguments?.let { args ->
+            chatId = args.getLong(MEETING_CHAT_ID)
+        }
     }
 
     override fun onCreateView(
@@ -56,6 +70,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        (requireActivity() as MeetingActivity).let {
+            toolbarTitle = it.title_toolbar
+            toolbarSubtitle = it.subtitle_toolbar
+        }
+
         binding = MeetingRingingFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -70,12 +89,32 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      */
     private fun initComponent() {
 
+        // Always be 'calling'.
+        toolbarSubtitle.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
+
         answer_video_fab.startAnimation(
             AnimationUtils.loadAnimation(
                 meetingActivity,
                 R.anim.shake
             )
         )
+
+        answer_audio_fab.setOnClickListener {
+            answerCall(enableVideo = false)
+        }
+
+        answer_video_fab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
+
+            override fun onSwipeTop() {
+                answer_video_fab.clearAnimation()
+                animationButtons()
+            }
+        })
+
+        reject_fab.setOnClickListener {
+            inMeetingViewModel.leaveMeeting()
+            requireActivity().finish()
+        }
 
         animationAlphaArrows(fourth_arrow_call)
         runDelay(ALPHA_ANIMATION_DELAY) {
@@ -88,6 +127,71 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             }
         }
     }
+
+    private fun animationButtons() {
+        val translateAnim = TranslateAnimation(0f, 0f, 0f, -380f).apply {
+            duration = 500L
+            fillAfter = true
+            fillBefore = true
+            repeatCount = 0
+            setAnimationListener(object : Animation.AnimationListener {
+
+                override fun onAnimationStart(animation: Animation) {
+                    reject_fab.isEnabled = false
+                }
+
+                override fun onAnimationRepeat(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    video_label.isVisible = false
+                    answer_video_fab.hide()
+
+                    answerCall(enableVideo = true)
+                }
+            })
+        }
+
+        val alphaAnim = AlphaAnimation(1.0f, 0.0f).apply {
+            duration = 600L
+            fillAfter = true
+            fillBefore = true
+            repeatCount = 0
+        }
+
+        //false means don't share interpolator
+        val s = AnimationSet(false)
+        s.addAnimation(translateAnim)
+        s.addAnimation(alphaAnim)
+
+        answer_video_fab.startAnimation(s)
+
+        first_arrow_call.clearAnimationAndGone()
+        second_arrow_call.clearAnimationAndGone()
+        third_arrow_call.clearAnimationAndGone()
+        fourth_arrow_call.clearAnimationAndGone()
+    }
+
+    private fun answerCall(
+        enableVideo: Boolean,
+        enableAudio: Boolean = true
+    ) = inMeetingViewModel.answerChatCall(
+        enableVideo,
+        enableAudio,
+        object : AnswerChatCallListener.OnCallAnsweredCallback {
+
+            override fun onCallAnswered(chatId: Long, flag: Boolean) {
+                // To in-meeting
+                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                    MEETING_ACTION_RINGING,
+                    chatId
+                )
+                findNavController().navigate(action)
+            }
+
+            override fun onErrorAnsweredCall(errorCode: Int) {
+                showSnackBar("Answer call failed, error code: $errorCode")
+            }
+        })
 
     private fun animationAlphaArrows(arrow: ImageView) {
         logDebug("animationAlphaArrows")
@@ -105,20 +209,37 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        sharedModel.avatarLiveData.observe(viewLifecycleOwner) {
-            avatar.setImageBitmap(it)
+        inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) {
+            toolbarTitle.text = it
         }
 
-        chatId?.let {
-            if (it != MEGACHAT_INVALID_HANDLE) {
-                sharedModel.updateChatRoomId(it)
-                viewModel.setChatId(it)
+//        if (chatId != MEGACHAT_INVALID_HANDLE) {
+//            sharedModel.updateChatRoomId(chatId)
+//            inMeetingViewModel.setChatId(chatId)
+//        }
+//
+//        inMeetingViewModel.getCall()?.let {
+//            val session = getSessionIndividualCall(it)
+//            peerId = session?.peerid
+//            TL.log("peer id is: $peerId")
+//        }
+
+        inMeetingViewModel.getChat()?.let {
+            var bitmap = getImageAvatarCall(it, peerId!!)
+            if (bitmap == null) {
+                bitmap = getDefaultAvatarCall(context, peerId!!)
             }
+
+            avatar.setImageBitmap(bitmap)
         }
 
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
-                permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
+                permissionsRequester = permissionsBuilder(
+                    arrayOf(Manifest.permission.CAMERA).toCollection(
+                        ArrayList()
+                    )
+                )
                     .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
                     .setOnShowRationale { l -> onShowRationale(l) }
                     .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
@@ -129,7 +250,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
-                permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
+                permissionsRequester = permissionsBuilder(
+                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
+                        ArrayList()
+                    )
+                )
                     .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
                     .setOnShowRationale { l -> onShowRationale(l) }
                     .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
@@ -138,7 +263,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             }
         }
 
-        binding.inMeetingViewModel = viewModel
         binding.sharedViewModel = sharedModel
     }
 
@@ -208,15 +332,13 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun showSnackBar() {
-        val warningText =
-            StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
+    private fun showSnackBar(message: String) =
         (activity as BaseActivity).showSnackbar(
             Constants.PERMISSIONS_TYPE,
             binding.root,
-            warningText
+            message
         )
-    }
+
 
     private fun onShowRationale(request: PermissionRequest) {
         request.proceed()
@@ -238,7 +360,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
-                    showSnackBar()
+                    showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
                 }
             }
         }
@@ -260,7 +382,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
-                    showSnackBar()
+                    showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
                 }
             }
         }

@@ -20,10 +20,7 @@ import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
-import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants
@@ -1083,6 +1080,20 @@ class InMeetingViewModel @ViewModelInject constructor(
                     }
                 })
         )
+
+    fun answerChatCall(
+        enableVideo: Boolean,
+        enableAudio: Boolean,
+        callback: AnswerChatCallListener.OnCallAnsweredCallback
+    ) = inMeetingRepository.answerChatCall(
+        currentChatId,
+        enableVideo,
+        enableAudio,
+        AnswerChatCallListener(
+            MegaApplication.getInstance().applicationContext,
+            callback
+        )
+    )
 
     fun getMyOwnInfo(chatId: Long): Participant = inMeetingRepository.getMyInfo(chatId)
 }
