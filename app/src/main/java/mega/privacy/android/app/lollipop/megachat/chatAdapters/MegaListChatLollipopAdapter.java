@@ -215,7 +215,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
 				if (isItemChecked(position)) {
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 				} else {
 					holder.itemLayout.setBackground(null);
 					setUserAvatar(holder, userHandleEncoded);
@@ -245,7 +245,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 
 				if (isItemChecked(position)) {
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 				} else {
 					holder.itemLayout.setBackground(null);
 					createGroupChatAvatar(holder, getTitleChat(chat));

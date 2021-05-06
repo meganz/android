@@ -118,7 +118,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			logDebug("Multiselect ON");
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_folder);
+				holder.imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 			}
 			else{
 				logDebug("NOT selected");

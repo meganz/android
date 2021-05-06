@@ -3053,4 +3053,5 @@
     <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
     <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
     <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
+    <string name="error_opening_file" context="Warning which alerts the user a file cannot be opened">File is too large and can\'t be opened or previewed.</string>
 </resources>
