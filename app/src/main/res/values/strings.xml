@@ -2627,6 +2627,7 @@
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
     <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
+    <string name="join_meeting_layout_in_group_call" context="Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting">%s started a meeting. Tap to join.</string>
 
     <string name="message_joined_public_chat_autoinvitation" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime." formatted="false">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
@@ -3111,6 +3112,7 @@
     <string name="paste_meeting_link_guest_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
     <string name="paste_meeting_link_guest_instruction" context="Tell the guest to paste the meeting link in the edit box">Back to the link and tap it again or paste your meeting link to join</string>
     <string name="slow_connection_meeting" context="Banner text to indicate poor network quality">You are in slow connection</string>
+    <string name="your_are_moderator" context="Banner text to indicate you are moderator">You are chosen to be moderator</string>
 
     <string name="meeting_has_ended" context="the message in the alert dialog for notifying the meeting has ended">Meeting has ended</string>
     <string name="invalid_meeting_link_args" context="error message shown when a meeting link is not well formed">Invalid meeting link</string>

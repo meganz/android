@@ -13,15 +13,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.GridViewListener
-import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
-import nz.mega.sdk.MegaHandleList
 
-class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
+class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -31,7 +27,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
     private var participants: MutableList<Participant> = mutableListOf()
 
     private var adapterPager: GridViewPagerAdapter? = null
-
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
@@ -48,7 +43,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val display = meetingActivity.windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
@@ -59,7 +53,7 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
             (parentFragment as InMeetingFragment).inMeetingViewModel,
             parentFragment,
             maxWidth,
-            maxHeight, this
+            maxHeight
         )
 
         viewDataBinding.gridViewPager
@@ -90,52 +84,59 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
         // TODO test code end
     }
 
-    private fun getParticipant(session: MegaChatSession): Participant? {
+    private fun getParticipant(peerId: Long, clientId: Long): Participant? {
         val participant = participants.filter {
-            it.peerId == session.peerid && it.clientId == session.clientid
+            it.peerId == peerId && it.clientId == clientId
         }
         if (participant.isNotEmpty()) {
-            return participant.get(0)
+            return participant[0]
         }
         return null
     }
 
-    private fun getParticipant(listPeers: MutableSet<Participant>): Participant? {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            val peerId = peer.peerId
-            val clientId = peer.clientId
-            val participant = participants.filter {
-                it.peerId == peerId && it.clientId == clientId
-            }
-            if (participant.isNotEmpty()) {
-                return participant.get(0)
-            }
-        }
-        return null
-    }
-
-    fun updateName(listPeers: MutableSet<Participant>) {
-        getParticipant(listPeers)?.let {
-            adapterPager?.updateParticipantName(it)
+    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
+        getParticipant(session.peerid, session.clientid)?.let {
+            adapterPager?.updateParticipantAudioVideo(type, it)
         }
     }
 
-    fun updateOnHold(session: MegaChatSession) {
-        getParticipant(session)?.let {
+    fun updateSessionOnHold(session: MegaChatSession) {
+        getParticipant(session.peerid, session.clientid)?.let {
             adapterPager?.updateOnHold(it, session.isOnHold)
         }
     }
 
-    fun updatePrivileges(listPeers: MutableSet<Participant>) {
-        getParticipant(listPeers)?.let {
-            adapterPager?.updateParticipantPrivileges(it)
+    fun updateRes(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantRes(it)
+            }
         }
     }
 
-    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
-        getParticipant(session)?.let {
-            adapterPager?.updateParticipantAudioVideo(type, it)
+    fun updateName(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantName(it)
+            }
+        }
+    }
+
+    fun updateCallOnHold(isCallOnHold: Boolean) {
+        val iterator = participants.iterator()
+        iterator.forEach {
+            adapterPager?.updateCallOnHold(it, isCallOnHold)
+        }
+    }
+
+    fun updatePrivileges(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            getParticipant(peer.peerId, peer.clientId)?.let {
+                adapterPager?.updateParticipantPrivileges(it)
+            }
         }
     }
 
@@ -182,65 +183,6 @@ class GridViewCallFragment : MeetingBaseFragment(), GridViewListener {
 
         @JvmStatic
         fun newInstance() = GridViewCallFragment()
-    }
 
-    /**
-     * Close Video
-     *
-     * @param Participant
-     */
-    override fun onCloseVideo(session: MegaChatSession?, participant: Participant) {
-        if (participant.videoListener == null)
-            return
-
-        sharedModel.chatRoomLiveData.value?.let {
-            session?.let { sessionParticipant ->
-                if (sessionParticipant.canRecvVideoLowRes()) {
-                    val list: MegaHandleList = MegaHandleList.createInstance()
-                    list.addMegaHandle(participant.clientId)
-                    sharedModel.stopLowResVideo(
-                        it.chatId, list, RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-
-            sharedModel.removeRemoteVideo(
-                it.chatId,
-                participant.clientId,
-                participant.hasHiRes,
-                participant.videoListener!!
-            )
-        }
-        participant.videoListener = null
-    }
-
-    /**
-     * Active Video
-     *
-     * @param Participant
-     */
-    override fun onActivateVideo(session: MegaChatSession?, participant: Participant) {
-        sharedModel.chatRoomLiveData.value?.let {
-            sharedModel.addRemoteVideo(
-                it.chatId,
-                participant.clientId,
-                participant.hasHiRes,
-                participant.videoListener!!
-            )
-
-            session?.let { sessionParticipant ->
-                if (!sessionParticipant.canRecvVideoLowRes()) {
-                    val list: MegaHandleList = MegaHandleList.createInstance()
-                    list.addMegaHandle(participant.clientId)
-                    sharedModel.requestLowResVideo(
-                        it.chatId, list, RequestLowResVideoListener(
-                            requireContext()
-                        )
-                    )
-                }
-            }
-        }
     }
 }

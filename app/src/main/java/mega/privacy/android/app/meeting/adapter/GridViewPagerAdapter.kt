@@ -10,20 +10,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.meeting.listeners.GridViewListener
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil
 
 class GridViewPagerAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val fragment: Fragment?,
     private var maxWidth: Int,
     private var maxHeight: Int,
-    private val listener: GridViewListener
 ) : BaseBannerAdapter<List<Participant>>() {
     private var orientation = Configuration.ORIENTATION_PORTRAIT
 
     var adapter: VideoGridViewAdapter? = null
-    var gridView:CustomizedGridCallRecyclerView? = null
+    var gridView: CustomizedGridCallRecyclerView? = null
     override fun bindData(
         holder: BaseViewHolder<List<Participant>>,
         data: List<Participant>,
@@ -46,7 +44,7 @@ class GridViewPagerAdapter(
                 maxWidth,
                 maxHeight,
                 position,
-                listener,orientation
+                orientation
             )
 
             adapter?.let {
@@ -57,19 +55,27 @@ class GridViewPagerAdapter(
         }
     }
 
-    fun updateParticipantPrivileges(participant: Participant){
+    fun updateParticipantPrivileges(participant: Participant) {
         adapter?.updateParticipantPrivileges(participant)
     }
 
-    fun updateParticipantName(participant: Participant){
+    fun updateParticipantRes(participant: Participant) {
+        adapter?.updateParticipantRes(participant)
+    }
+
+    fun updateParticipantName(participant: Participant) {
         adapter?.updateParticipantName(participant)
     }
 
-    fun updateOnHold(participant: Participant, isOnHold:Boolean){
-        adapter?.updateOnHoldSession(participant, isOnHold)
+    fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
+        adapter?.updateCallOnHold(participant, isOnHold)
     }
 
-    fun updateParticipantAudioVideo(typeChange:Int, participant: Participant) {
+    fun updateOnHold(participant: Participant, isOnHold: Boolean) {
+        adapter?.updateSessionOnHold(participant, isOnHold)
+    }
+
+    fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         adapter?.updateParticipantAudioVideo(typeChange, participant)
     }
 
@@ -90,7 +96,7 @@ class GridViewPagerAdapter(
         recyclerView: CustomizedGridCallRecyclerView
     ) {
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
-        when(orientation){
+        when (orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 if (position == 0) {
                     if (data.size == 4) {
@@ -116,7 +122,7 @@ class GridViewPagerAdapter(
         orientation: Int
     ) {
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if(position == 0) {
+            if (position == 0) {
                 gridView.setColumnWidth(
                     when (size) {
                         1 -> maxWidth

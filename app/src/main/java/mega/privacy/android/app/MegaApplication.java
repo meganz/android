@@ -1771,7 +1771,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus())+", callId = "+ call.getCallId());
-		openMeetingInProgress(this, call.getChatid());
+		openMeetingRinging(this, call.getChatid());
 	}
 
 	public static boolean isShowRichLinkWarning() {

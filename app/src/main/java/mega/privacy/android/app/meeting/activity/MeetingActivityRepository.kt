@@ -102,36 +102,6 @@ class MeetingActivityRepository @Inject constructor(
         }
     }
 
-    fun requestHiResVideo(
-        chatId: Long,
-        clientId: Long,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        megaChatApi.requestHiResVideo(chatId, clientId, listener)
-    }
-
-    fun stopHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.stopHiResVideo(chatId, clientId, listener)
-    }
-
-    fun requestLowResVideo(
-        chatId: Long,
-        clientId: MegaHandleList,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        megaChatApi.requestLowResVideo(chatId, clientId, listener)
-
-    }
-
-    fun stopLowResVideo(
-        chatId: Long,
-        clientId: MegaHandleList,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        megaChatApi.stopLowResVideo(chatId, clientId, listener)
-
-    }
-
     /**
      * Method of obtaining the local video
      *
@@ -143,23 +113,6 @@ class MeetingActivityRepository @Inject constructor(
     }
 
     /**
-     * Method of obtaining the local video
-     *
-     * @param chatId chatId
-     * @param clientId client ID
-     * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
-     */
-    fun addRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: MeetingVideoListener
-    ) {
-        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
      * Method of remove the local video
      *
      * @param chatId chatId
@@ -167,23 +120,6 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {
         megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
-    }
-
-    /**
-     * Method of remove the local video
-     *
-     * @param chatId chatId
-     * @param clientId client ID
-     * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
-     */
-    fun removeRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: MeetingVideoListener
-    ) {
-        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
 
     /**
