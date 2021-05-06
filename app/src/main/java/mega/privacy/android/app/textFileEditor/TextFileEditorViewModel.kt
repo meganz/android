@@ -146,7 +146,13 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
 
     fun canShowEditFab(): Boolean =
-        isViewMode() && isEditableAdapter() && !isSaving() && thereIsNoErrorSettingContent()
+        isViewMode() && isEditableAdapter() && !isSaving()
+                && !needsReadContent() && thereIsNoErrorSettingContent()
+
+    init {
+        contentText.value = ""
+        editedText.value = ""
+    }
 
     /**
      * Checks if the file can be editable depending on the current adapter.
@@ -393,9 +399,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     /**
      * Stops the http server if has been started before.
      */
-    private fun checkIfNeedsStopHttpServer() {
+    fun checkIfNeedsStopHttpServer() {
         if (textFileEditorData.value?.needStopHttpServer == true) {
             textFileEditorData.value?.api?.httpServerStop()
+            textFileEditorData.value?.needStopHttpServer = false
         }
     }
 

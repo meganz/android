@@ -52,6 +52,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         const val RENAME_SHOWN = "RENAME_SHOWN"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
         const val ERROR_READING_CONTENT_SHOWN = "ERROR_READING_CONTENT_SHOWN"
+        const val READING_CONTENT = "READING_CONTENT"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -96,6 +97,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
             viewModel.setValuesFromIntent(intent, mi)
+        } else {
+            readingContent = savedInstanceState.getBoolean(READING_CONTENT, false)
         }
 
         setUpObservers()
@@ -124,6 +127,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
         outState.putBoolean(ERROR_READING_CONTENT_SHOWN, isErrorReadingContentDialogShown())
+        outState.putBoolean(READING_CONTENT, readingContent)
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
@@ -162,6 +166,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             if (viewModel.isCreateMode()) {
                 viewModel.saveFile(this)
+            } else if (viewModel.needsReadContent()) {
+                viewModel.checkIfNeedsStopHttpServer()
             }
 
             super.onBackPressed()
@@ -327,6 +333,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             }
 
             if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()) {
+                if (readingContent) {
+                    showLoadingView()
+                    return@apply
+                }
+
                 setText(viewModel.getEditedText())
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
@@ -358,12 +369,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         refreshMenuOptionsVisibility()
 
         if (mode == VIEW_MODE) {
-            if (viewModel.needsReadContent()) {
+            if (!readingContent && viewModel.needsReadContent()) {
                 readingContent = true
                 viewModel.readFileContent()
-                binding.fileEditorScrollView.isVisible = false
-                binding.loadingImage.isVisible = true
-                binding.loadingProgressBar.isVisible = true
+                showLoadingView()
             }
 
             supportActionBar?.title = null
@@ -397,6 +406,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
+     * Shows the loading view.
+     */
+    private fun showLoadingView() {
+        binding.fileEditorScrollView.isVisible = false
+        binding.loadingImage.isVisible = true
+        binding.loadingProgressBar.isVisible = true
+    }
+
+    /**
      * Updates the UI by setting the saving mode.
      *
      * @param savingMode The pre-saving mode.
@@ -423,14 +441,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
-        if (!readingContent) {
+        if (viewModel.needsReadContent() || !readingContent) {
             return
         }
-
-        readingContent = false
-        binding.fileEditorScrollView.isVisible = true
-        binding.loadingImage.isVisible = false
-        binding.loadingProgressBar.isVisible = false
 
         val lines = contentRead.chunked(500)
         for (line in lines) {
@@ -447,9 +460,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
+        binding.fileEditorScrollView.isVisible = true
+        binding.loadingImage.isVisible = false
+        binding.loadingProgressBar.isVisible = false
+
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
         }
+
+        readingContent = false
     }
 
     /**
