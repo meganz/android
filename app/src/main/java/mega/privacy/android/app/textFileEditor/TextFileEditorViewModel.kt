@@ -72,6 +72,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     private var needsReadContent = false
+    private var localFileUri: String? = null
+    private var streamingFileURL: URL? = null
 
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
@@ -158,8 +160,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Gets all necessary values from intent if available.
      *
      * @param intent Received intent.
+     * @param mi     Current phone memory info in case is needed to read the file on streaming.
      */
-    fun setValuesFromIntent(intent: Intent) {
+    fun setValuesFromIntent(intent: Intent, mi: ActivityManager.MemoryInfo) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         textFileEditorData.value?.adapterType = adapterType
 
@@ -227,6 +230,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         if (isViewMode()) {
             needsReadContent = true
+            initializeReadParams(mi)
         }
 
         setEditableAdapter()
@@ -235,36 +239,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Starts the read action to get the content of the file.
+     * Initializes the necessary params to read the file content.
+     * If file is available locally, the local uri. If not, the streaming URL.
      *
      * @param mi Current phone memory info in case is needed to read the file on streaming.
      */
-    fun readFileContent(mi: ActivityManager.MemoryInfo) {
-        viewModelScope.launch { readFile(mi) }
-    }
+    private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
+        localFileUri =
+            if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
+            else getLocalFile(null, getNode()?.name, getNode()?.size!!)
 
-    /**
-     * Continues the read action to get the content of the file.
-     * Checks if the file is available to read locally. If not, it's read by streaming.
-     *
-     * @param mi Current phone memory info in case is needed to read the file on streaming.
-     */
-    private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
-        withContext(Dispatchers.IO) {
-            val localFileUri =
-                if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-                else getLocalFile(null, getNode()?.name, getNode()?.size!!)
-
-            if (!isTextEmpty(localFileUri)) {
-                val localFile = File(localFileUri)
-
-                if (isFileAvailable(localFile)) {
-                    readFile(BufferedReader(FileReader(localFile)))
-                    return@withContext
-                }
-            }
-
-            val api = textFileEditorData.value?.api ?: return@withContext
+        if (isTextEmpty(localFileUri)) {
+            val api = textFileEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
                 api.httpServerStart()
@@ -277,13 +263,42 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             )
 
             val uri = api.httpServerGetLocalLink(getNode())
-            if (uri == null) {
-                logError("Error getting the file uri.")
+
+            if (!isTextEmpty(uri)) {
+                streamingFileURL = URL(uri)
+            }
+        }
+    }
+
+    /**
+     * Starts the read action to get the content of the file.
+     */
+    fun readFileContent() {
+        viewModelScope.launch { readFile() }
+    }
+
+    /**
+     * Continues the read action to get the content of the file.
+     * Checks if the file is available to read locally. If not, it's read by streaming.
+     */
+    private suspend fun readFile() {
+        withContext(Dispatchers.IO) {
+            if (!isTextEmpty(localFileUri)) {
+                val localFile = File(localFileUri!!)
+
+                if (isFileAvailable(localFile)) {
+                    readFile(BufferedReader(FileReader(localFile)))
+                    return@withContext
+                }
+            }
+
+            if (streamingFileURL == null) {
+                logError("Error getting the file URL.")
                 return@withContext
             }
 
-            val url = URL(uri)
-            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            val connection: HttpURLConnection =
+                streamingFileURL?.openConnection() as HttpURLConnection
             readFile(BufferedReader(InputStreamReader(connection.inputStream)))
         }
     }
@@ -310,6 +325,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 logError("Exception while reading text file.", e)
             }
 
+            checkIfNeedsStopHttpServer()
             needsReadContent = false
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
@@ -369,7 +385,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     /**
      * Stops the http server if has been started before.
      */
-    fun checkIfNeedsStopHttpServer() {
+    private fun checkIfNeedsStopHttpServer() {
         if (textFileEditorData.value?.needStopHttpServer == true) {
             textFileEditorData.value?.api?.httpServerStop()
         }

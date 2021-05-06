@@ -92,7 +92,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
-            viewModel.setValuesFromIntent(intent)
+            val mi = ActivityManager.MemoryInfo()
+            (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+            viewModel.setValuesFromIntent(intent, mi)
         }
 
         setUpObservers()
@@ -130,8 +132,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onDestroy() {
-        viewModel.checkIfNeedsStopHttpServer()
-
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
         }
@@ -349,10 +349,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (mode == VIEW_MODE) {
             if (viewModel.needsReadContent()) {
-                val mi = ActivityManager.MemoryInfo()
-                (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
                 readingContent = true
-                viewModel.readFileContent(mi)
+                viewModel.readFileContent()
                 binding.fileEditorScrollView.isVisible = false
                 binding.loadingImage.isVisible = true
                 binding.loadingProgressBar.isVisible = true
