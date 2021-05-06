@@ -108,7 +108,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun setParticipants(participants: MutableList<Participant>, myOwnInfo: Participant) {
         participants.add(myOwnInfo)
-        participantsAdapter.submitList(participants.toMutableList())
+        participantsAdapter.submitList(participants.sortedWith(compareBy({ !it.isModerator }, { !it.isMe }, { it.name })).toMutableList())
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
         )
