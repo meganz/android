@@ -432,7 +432,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
 
-        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
+        val lines = contentRead.chunked(500)
         for (line in lines) {
             try {
                 binding.contentText.append(line)
