@@ -78,6 +78,7 @@ class NodeSaver(
      * @param handle handle of the offline node to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNode(
         handle: Long,
         fromMediaViewer: Boolean = false
@@ -92,6 +93,7 @@ class NodeSaver(
      * @param node the offline node to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNode(
         node: MegaOffline,
         fromMediaViewer: Boolean = false
@@ -105,6 +107,7 @@ class NodeSaver(
      * @param nodes the offline nodes to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNodes(
         nodes: List<MegaOffline>,
         fromMediaViewer: Boolean = false
@@ -127,6 +130,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveHandle(
         handle: Long,
         highPriority: Boolean = false,
@@ -146,6 +150,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveHandles(
         handles: List<Long>,
         highPriority: Boolean = false,
@@ -182,6 +187,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveNode(
         node: MegaNode,
         highPriority: Boolean = false,
@@ -202,13 +208,14 @@ class NodeSaver(
      * @param needSerialize whether this download need serialize
      * @param downloadToGallery whether nodes should be downloaded into gallery
      */
+    @JvmOverloads
     fun saveNodeLists(
         nodeLists: List<MegaNodeList>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -235,17 +242,19 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveNodes(
         nodes: List<MegaNode>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
         save {
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize
+                needSerialize, downloadToGallery = downloadToGallery
             )
         }
     }
@@ -328,6 +337,7 @@ class NodeSaver(
      * @param size size of this uri content
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveUri(
         uri: Uri,
         name: String,

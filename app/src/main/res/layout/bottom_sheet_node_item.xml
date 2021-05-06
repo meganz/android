@@ -364,6 +364,38 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/option_gallery_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/option_gallery_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_save_gallery"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
+
+                <TextView
+                    android:id="@+id/option_gallery_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/general_save_to_gallery"
+                    android:layout_marginStart="18dp"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/option_offline_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

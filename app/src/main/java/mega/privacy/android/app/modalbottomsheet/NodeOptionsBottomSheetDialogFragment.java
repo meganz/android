@@ -133,6 +133,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      optionLabel
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
+//      optionGallery
+        LinearLayout galleryLabel = contentView.findViewById(R.id.option_gallery_layout);
 //      counterSave
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -160,6 +162,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
         optionLabel.setOnClickListener(this);
+        galleryLabel.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -210,8 +213,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (node == null) return;
 
-        if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isVideo() || MimeTypeList.typeForName(node.getName()).isAudio()
-                || MimeTypeList.typeForName(node.getName()).isImage() || MimeTypeList.typeForName(node.getName()).isPdf()) {
+        MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+        if (nodeMime.isVideoReproducible() || nodeMime.isVideo() || nodeMime.isAudio()
+                || nodeMime.isImage() || nodeMime.isPdf()) {
             optionOpenWith.setVisibility(View.VISIBLE);
         } else {
             counterOpen--;
@@ -301,6 +305,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
+
+                if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
+                    galleryLabel.setVisibility(View.VISIBLE);
+                }
 
                 //Hide
                 optionRemove.setVisibility(View.GONE);
@@ -978,6 +986,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_label_layout:
                 ((ManagerActivityLollipop) context).showNodeLabelsPanel(node);
+                break;
+
+            case R.id.option_gallery_layout:
+                ((ManagerActivityLollipop) context).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.file_properties_switch:
