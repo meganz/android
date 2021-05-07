@@ -174,7 +174,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if (chat != null && chat.isGroup()) {
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.avatarImage.setImageResource(R.drawable.ic_select_folder);
+                holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
             }
             else{
                 createGroupChatAvatar(holder);
@@ -208,7 +208,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.avatarImage.setImageResource(R.drawable.ic_select_folder);
+                holder.avatarImage.setImageResource(R.drawable.ic_chat_avatar_select);
             }
             else{
                 setUserAvatar(holder, userHandleEncoded);

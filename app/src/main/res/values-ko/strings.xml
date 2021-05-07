@@ -98,6 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">로그아웃</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">업로드</string>
     <string name="action_create_folder" context="Menu item">새 폴더 생성</string>
+    <string name="action_create_txt" context="Option which allows create a new text file">Create new text file</string>
     <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">링크 열기</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
@@ -850,7 +851,6 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
     -->
 
-    <string name="sortby_owner_mail" context="category in sort by action">소유주의 이메일</string>
     <string name="sortby_name" context="category in sort by action">이름</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">오름차순</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">내림차순</string>
@@ -1718,6 +1718,7 @@
     <string name="settings_feedback_body_device_model" context="mail body">기기 모델</string>
     <string name="settings_feedback_body_android_version" context="mail body">안드로이드 버전</string>
 
+    <string name="dialog_title_new_text_file" context="Title of the dialog to create a new text file by inserting the name">New text file</string>
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">새 파일</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">파일 이름</string>
 
@@ -1748,7 +1749,7 @@
 
     <string name="empty_name" context="Error shown when the user left a name empty">잘못된 이름</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">진행하기 전에 파일 이름을 고치세요</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">잘못된 글자</string>
+    <string name="invalid_characters" context="Error text for invalid characters">잘못된 글자</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
@@ -3034,11 +3035,22 @@
 
     <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s님이 당신의 연락처 목록에 없습니다</string>
 
-
     <string name="theme_light" context="Option of color theme, light mode.">가벼움</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">어두움</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">시스템 기본값</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">배터리 세이버 설정에 따름</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">SD 카드 최상위를 선택하세요.</string>
+
+    <string name="cloud_drive_select_destination" context="Cloud Drive screen subtitle indicating a destination is required to be selected">목적지 선택</string>
+    
+    <string name="discard_changes_warning" context="Warning which alerts the user before discard changes">Discard changes and close the editor?</string>
+    <string name="discard_close_action" context="Action discard">Discard and close</string>
+    <string name="saving_file" context="Label indicating saving a file is in progress">Saving file&#8230;</string>
+    <string name="file_created" context="Label indicating a file was created successfully">File created</string>
+    <string name="file_creation_failed" context="Warning indicating a file was not created successfully">File creation failed. Try again.</string>
+    <string name="file_saved_to" context="Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive">File saved to %1$s</string>
+    <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
+    <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
+    <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
 </resources>
