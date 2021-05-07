@@ -2,6 +2,7 @@ package mega.privacy.android.app.textFileEditor
 
 import android.app.ActivityManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -51,7 +52,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         const val RENAME_SHOWN = "RENAME_SHOWN"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
-        const val ERROR_READING_CONTENT_SHOWN = "ERROR_READING_CONTENT_SHOWN"
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -59,8 +59,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private lateinit var binding: ActivityTextFileEditorBinding
 
     private var menu: Menu? = null
-
-    private var readingContent = false
 
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
@@ -96,6 +94,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
             viewModel.setValuesFromIntent(intent, mi)
+        } else if (viewModel.thereIsErrorSettingContent()) {
+            binding.editFab.hide()
+            showErrorReadingContentDialog()
+            return
         }
 
         setUpObservers()
@@ -112,10 +114,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             if (savedInstanceState.getBoolean(RENAME_SHOWN, false)) {
                 renameNode()
             }
-
-            if (savedInstanceState.getBoolean(ERROR_READING_CONTENT_SHOWN, false)) {
-                showErrorReadingContentDialog()
-            }
         }
     }
 
@@ -123,7 +121,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
-        outState.putBoolean(ERROR_READING_CONTENT_SHOWN, isErrorReadingContentDialogShown())
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
@@ -162,6 +159,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             if (viewModel.isCreateMode()) {
                 viewModel.saveFile(this)
+            } else if (viewModel.isReadingContent()) {
+                viewModel.checkIfNeedsStopHttpServer()
             }
 
             super.onBackPressed()
@@ -327,6 +326,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             }
 
             if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()) {
+                if (viewModel.needsReadOrIsReadingContent()) {
+                    return@apply
+                }
+
                 setText(viewModel.getEditedText())
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
@@ -359,11 +362,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (mode == VIEW_MODE) {
             if (viewModel.needsReadContent()) {
-                readingContent = true
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
                 viewModel.readFileContent()
-                binding.fileEditorScrollView.isVisible = false
-                binding.loadingImage.isVisible = true
-                binding.loadingProgressBar.isVisible = true
+            }
+
+            if (viewModel.needsReadOrIsReadingContent()) {
+                showLoadingView()
             }
 
             supportActionBar?.title = null
@@ -379,7 +383,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 text = binding.contentEditText.text
             }
 
-            if (!readingContent && viewModel.canShowEditFab()) {
+            if (viewModel.canShowEditFab()) {
                 binding.editFab.show()
             }
         } else {
@@ -394,6 +398,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             binding.editFab.hide()
         }
+    }
+
+    /**
+     * Shows the loading view.
+     */
+    private fun showLoadingView() {
+        binding.fileEditorScrollView.isVisible = false
+        binding.loadingImage.isVisible = true
+        binding.loadingProgressBar.isVisible = true
     }
 
     /**
@@ -423,16 +436,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
-        if (!readingContent) {
+        if (viewModel.needsReadOrIsReadingContent()) {
             return
         }
 
-        readingContent = false
-        binding.fileEditorScrollView.isVisible = true
-        binding.loadingImage.isVisible = false
-        binding.loadingProgressBar.isVisible = false
-
-        val lines = contentRead.chunked(500)
+        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
         for (line in lines) {
             try {
                 binding.contentText.append(line)
@@ -446,6 +454,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 break
             }
         }
+
+        binding.fileEditorScrollView.isVisible = true
+        binding.loadingImage.isVisible = false
+        binding.loadingProgressBar.isVisible = false
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
