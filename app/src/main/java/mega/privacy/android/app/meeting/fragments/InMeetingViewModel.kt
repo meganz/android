@@ -1044,7 +1044,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         enableVideo: Boolean,
         enableAudio: Boolean,
         callback: AnswerChatCallListener.OnCallAnsweredCallback
-    ) = inMeetingRepository.answerChatCall(
+    ) = inMeetingRepository.answerCall(
         currentChatId,
         enableVideo,
         enableAudio,
@@ -1054,5 +1054,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         )
     )
 
-    fun getMyOwnInfo(chatId: Long): Participant = inMeetingRepository.getMyInfo(chatId)
+    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
+        inMeetingRepository.getMyInfo(getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR, audio, video)
 }

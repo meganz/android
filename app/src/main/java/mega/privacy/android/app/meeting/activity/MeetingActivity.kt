@@ -14,6 +14,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.utils.Constants
@@ -189,21 +190,7 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        logDebug("Result Code: $resultCode")
-        if (intent == null) {
-            LogUtil.logWarning("Intent is null")
-            return
-        }
-        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            logDebug("Participants successfully added")
-            val contactsData: List<String>? =
-                intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
-            if (contactsData != null) {
-//                InviteToChatRoomListener(this).inviteToChat(chatHandle, contactsData)
-            }
-        } else {
-            LogUtil.logError("Error adding participants")
-        }
+        meetingViewModel.inviteToChat(this, requestCode, resultCode,intent)
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
