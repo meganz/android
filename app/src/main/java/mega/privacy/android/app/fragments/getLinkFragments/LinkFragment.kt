@@ -342,7 +342,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = MaterialStyledDatePickerDialog(context,
-            R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Picker_Date_Calendar,
+            R.style.Widget_Mega_DatePickerDialog,
             this, year, month, day)
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
         datePickerDialog.show()
