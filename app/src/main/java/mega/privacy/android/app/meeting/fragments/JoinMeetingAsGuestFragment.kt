@@ -32,6 +32,8 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             return
         }
 
+        // Hide Keyboard when click the butn
+        Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
                 MeetingActivity.MEETING_ACTION_GUEST,
