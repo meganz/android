@@ -291,19 +291,12 @@ class InMeetingRepository @Inject constructor(
         megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
     }
 
-    fun getMyInfo(chatId: Long): Participant {
-        val isModerator = getOwnPrivileges(chatId) == MegaChatRoom.PRIV_MODERATOR
-        var isAudioOn = true
-        var isVideoOn = true
-        getMeeting(chatId)?.let {
-            isAudioOn = it.hasLocalAudio()
-            isVideoOn = it.hasLocalVideo()
-        }
+    fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
         return Participant(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
-            null, "XXX", true, isModerator, isAudioOn, isVideoOn
+            null, "XXX", true, moderator, audio, video
         )
     }
 }

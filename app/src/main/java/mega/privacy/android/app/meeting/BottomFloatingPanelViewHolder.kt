@@ -20,6 +20,7 @@ import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaChatRoom
 
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
@@ -360,7 +361,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateMicIcon(micOn: Boolean) {
         floatingPanelView.fabMic.isOn = micOn
-        //participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
+        participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
     }
 
     /**
@@ -370,7 +371,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateCamIcon(camOn: Boolean) {
         floatingPanelView.fabCam.isOn = camOn
-        //participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
+        participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
 
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
@@ -421,6 +422,11 @@ class BottomFloatingPanelViewHolder(
 
         floatingPanelView.root.layoutParams = params
     }
+
+    fun updatePrivilege(ownPrivileges: Int) {
+        participantsAdapter.updateIcon(ParticipantsAdapter.MODERATOR, ownPrivileges == MegaChatRoom.PRIV_MODERATOR)
+    }
+
 
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F

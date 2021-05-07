@@ -1,22 +1,29 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatBaseListener
+import mega.privacy.android.app.listeners.InviteToChatRoomListener
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.ChatUtil.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
@@ -479,5 +486,26 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
         LiveEventBus.get(EVENT_LINK_RECOVERED)
             .removeObserver(linkRecoveredObserver as Observer<Any>)
+    }
+
+    fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
+        logDebug("Result Code: $resultCode")
+        if (intent == null) {
+            LogUtil.logWarning("Intent is null")
+            return
+        }
+        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
+            logDebug("Participants successfully added")
+            val contactsData: List<String>? =
+                intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+            if (contactsData != null) {
+                currentChatId.value?.let {
+                    InviteToChatRoomListener(context).inviteToChat(it, contactsData)
+                }
+            }
+        } else {
+            LogUtil.logError("Error adding participants")
+        }
+
     }
 }
