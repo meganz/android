@@ -484,13 +484,25 @@ public class CallUtil {
     }
 
     /**
+     * Method to activate or deactivate the chronometer of a call without displaying the chronometer separator.
+     *
+     * @param activateChrono True, if it must be activated. False, if it must be deactivated
+     * @param chronometer    The chronometer
+     * @param call           The MegaChatCall
+     */
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
+        activateChrono(activateChrono, chronometer, call, false);
+    }
+
+    /**
      * Method to activate or deactivate the chronometer of a call.
      *
      * @param activateChrono True, if it must be activated. False, if it must be deactivated.
-     * @param chronometer    The cronometer.
-     * @param call           The call.
+     * @param chronometer  The chronometer
+     * @param call The MegaChatCall
+     * @param isNecessaryToShowChronoSeparator True, if the chronometer separator needs to be shown. False, otherwise
      */
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call, boolean isNecessaryToShowChronoSeparator) {
         if (chronometer == null)
             return;
 
@@ -504,7 +516,7 @@ public class CallUtil {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(call.getDuration() * 1000);
             chronometer.start();
-            chronometer.setFormat(" %s");
+            chronometer.setFormat(isNecessaryToShowChronoSeparator ? "· %s" : "%s");
         }
     }
 

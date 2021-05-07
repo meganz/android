@@ -230,9 +230,6 @@
     <!-- Meeting bottom floating panel background -->
     <color name="white_grey_900">@color/grey_900</color>
 
-    <!-- My QR code fragment background color -->
-    <color name="white_grey_700">@color/grey_700</color>
-
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
 
@@ -256,6 +253,9 @@
 
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_500</color>
+
+    <!-- QR code page background color -->
+    <color name="white_grey_700">@color/grey_700</color>
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/grey_alpha_080</color>

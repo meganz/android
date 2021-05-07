@@ -8789,7 +8789,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             return;
         }
 
-        activateChrono(true, callInProgressChrono, call);
+        activateChrono(true, callInProgressChrono, call, true);
         callInProgressChrono.setOnChronometerTickListener(chronometer -> {
             if (subtitleChronoCall == null) {
                 return;

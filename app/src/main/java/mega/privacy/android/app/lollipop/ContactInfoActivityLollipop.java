@@ -266,6 +266,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
+	private LinearLayout microOffLayout;
+	private LinearLayout videoOnLayout;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -489,6 +491,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			callInProgressLayout.setOnClickListener(this);
 			callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 			callInProgressText = findViewById(R.id.call_in_progress_text);
+			microOffLayout = findViewById(R.id.micro_off_layout);
+			videoOnLayout = findViewById(R.id.video_on_layout);
 			callInProgressLayout.setVisibility(View.GONE);
 
 			//OPTIONS LAYOUT

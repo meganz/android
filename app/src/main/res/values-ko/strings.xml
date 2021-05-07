@@ -683,8 +683,8 @@
     <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
-    <string name="settings_passcode_lock" context="Settings of the Passcode">암호 잠금</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">비밀번호 잠금</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">비밀번호 옵션</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">암호 잠금</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">암호 변경</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">패스코드 변경</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">비밀번호 잠금 변경</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">비밀번호 필요</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">즉시</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">입력</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10번의 실패 이후 모든 로컬 파일이 삭제되고 로그아웃 됩니다</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">암호 시도 1회 실패</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">비밀번호 %1$d회 틀림</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">당신은 로그아웃 되고 오프라인 파일은 10번의 실패 후에 삭제됩니다</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">잘못된 코드</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">암호를 틀렸습니다, 다시 시도하세요. 1번의 기회가 남았습니다</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">암호를 틀렸습니다, 다시 시도하세요. %2d번 남았습니다.</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">암호가 일치하지 않습니다</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">암호를 입력하세요</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">암호를 다시 입력하세요</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">새 암호를 입력하세요</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">새 암호를 다시 입력하세요</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">암호가 일치하지 않습니다. 다시 시도하십시오.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">암호 입력</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">암호 재입력</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">새로운 암호 입력</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">새로운 암호 재입력</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
@@ -869,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">작은 파일 순</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">암호 유형</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">네 자리 암호</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">여섯 자리 암호</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">영숫자 암호</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">네 자리</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">여섯 자리</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">영숫자</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
@@ -2347,11 +2354,11 @@
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">계정 삭제됨</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]계정이[/B] [B]삭제되었습니다.[/B]</string>
 
-    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 게시 중단 되었습니다.[/C]</string>
-    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]공개적으로 공유한 폴더 [/A][B]%s[/B][C] 이/가 게시 중단 되었습니다.[/C]</string>
+    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 게시중단 되었습니다.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]공개적으로 공유한 폴더 [/A][B]%s[/B][C] 이/가 게시중단 되었습니다.[/C]</string>
 
-    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">이 파일은 게시 중단 통보 대상입니다.</string>
-    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">이 폴더는 게시 중단 통보 대상입니다.</string>
+    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">이 파일은 게시중단 통보 대상입니다.</string>
+    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">이 폴더는 게시중단 통보 대상입니다.</string>
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">게시중단 이의제기</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">이용 약관 위반으로 인하여 접근 불가</string>
     <plurals name="alert_taken_down_files">
@@ -3002,8 +3009,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">쿠키 설정</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">진행하기 전에</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키\')를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">쿠키 설정이 저장되지 않았습니다</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">쿠키 설정 변경점이 저장되었습니다.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">쿠키 설정이 저장되지 않았습니다.</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">쿠키 설정 변경 사항이 저장되었습니다</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">제3자 쿠키</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">구글 광고 쿠키</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">분류: 광고 쿠키</string>

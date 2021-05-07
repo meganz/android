@@ -11,8 +11,6 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -92,7 +90,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -284,8 +281,8 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -324,7 +321,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaChatListenerInterface,
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-		View.OnFocusChangeListener, View.OnLongClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		BillingUpdatesListener, ChatManagementCallback, ActionNodeCallback, SnackbarShower,
 		MeetingBottomSheetDialogActionListener {
@@ -604,6 +600,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
+	private LinearLayout microOffLayout;
+	private LinearLayout videoOnLayout;
 
 	boolean firstTimeAfterInstallation = true;
 	SearchView searchView;
@@ -746,27 +744,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	boolean isEnable2FADialogShown = false;
 	Button enable2FAButton;
 	Button skip2FAButton;
-	AlertDialog verify2FADialog;
-	boolean verify2FADialogIsShown = false;
-	int verifyPin2FADialogType;
-	private boolean is2FAEnabled = false;
-	InputMethodManager imm;
-	private EditTextPIN firstPin;
-	private EditTextPIN secondPin;
-	private EditTextPIN thirdPin;
-	private EditTextPIN fourthPin;
-	private EditTextPIN fifthPin;
-	private EditTextPIN sixthPin;
-	private StringBuilder sb = new StringBuilder();
-	private String pin = null;
-	private String newMail = null;
-	private TextView pinError;
-	private ProgressBar verify2faProgressBar;
-	private RelativeLayout lostYourDeviceButton;
 
-	private boolean isFirstTime2fa = true;
-	private boolean isErrorShown = false;
-	private boolean pinLongClick = false;
+	private boolean is2FAEnabled = false;
+
 	public boolean comesFromNotifications = false;
 	public int comesFromNotificationsLevel = 0;
 	public long comesFromNotificationHandle = -1;
@@ -969,7 +949,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
-				boolean enabled = intent.getBooleanExtra("enabled", false);
+				boolean enabled = intent.getBooleanExtra(INTENT_EXTRA_KEY_ENABLED, false);
 				is2FAEnabled = enabled;
 				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(enabled);
@@ -1577,8 +1557,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		outState.putInt("orientationSaved", orientationSaved);
-		outState.putBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
-		outState.putInt("verifyPin2FADialogType", verifyPin2FADialogType);
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
@@ -1699,8 +1677,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
-			verify2FADialogIsShown = savedInstanceState.getBoolean("verify2FADialogIsShown", false);
-			verifyPin2FADialogType = savedInstanceState.getInt("verifyPin2FADialogType");
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
@@ -1840,15 +1816,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
-
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
 
 	    if (dbH.getEphemeral() != null){
             Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -2182,6 +2149,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		callInProgressLayout.setOnClickListener(this);
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
+		microOffLayout = findViewById(R.id.micro_off_layout);
+		videoOnLayout = findViewById(R.id.video_on_layout);
 		callInProgressLayout.setVisibility(View.GONE);
 
 		if (mElevationCause > 0) {
@@ -2946,10 +2915,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		megaApi.shouldShowPasswordReminderDialog(false, this);
-
-		if (verify2FADialogIsShown){
-			showVerifyPin2FA(verifyPin2FADialogType);
-		}
 
 		updateAccountDetailsVisibleInfo();
 
@@ -8208,522 +8173,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		builder.show();
 	}
 
-	void verify2FA(int type) {
-		if (type == CANCEL_ACCOUNT_2FA) {
-			megaApi.multiFactorAuthCancelAccount(pin, this);
-		}
-		else if (type == CHANGE_MAIL_2FA){
-			megaApi.multiFactorAuthChangeEmail(newMail, pin, this);
-		}
-		else if (type ==  DISABLE_2FA) {
-			megaApi.multiFactorAuthDisable(pin, this);
-		}
-	}
-
-	@Override
-	public void onFocusChange(View v, boolean hasFocus) {
-		switch (v.getId()) {
-			case R.id.pin_first_verify:{
-				if (hasFocus) {
-					firstPin.setText("");
-				}
-				break;
-			}
-			case R.id.pin_second_verify:{
-				if (hasFocus) {
-					secondPin.setText("");
-				}
-				break;
-			}
-			case R.id.pin_third_verify:{
-				if (hasFocus) {
-					thirdPin.setText("");
-				}
-				break;
-			}
-			case R.id.pin_fouth_verify:{
-				if (hasFocus) {
-					fourthPin.setText("");
-				}
-				break;
-			}
-			case R.id.pin_fifth_verify:{
-				if (hasFocus) {
-					fifthPin.setText("");
-				}
-				break;
-			}
-			case R.id.pin_sixth_verify:{
-				if (hasFocus) {
-					sixthPin.setText("");
-				}
-				break;
-			}
-		}
-	}
-
-	@Override
-	public boolean onLongClick(View v) {
-		switch (v.getId()){
-			case R.id.pin_first_verify:
-			case R.id.pin_second_verify:
-			case R.id.pin_third_verify:
-			case R.id.pin_fouth_verify:
-			case R.id.pin_fifth_verify:
-			case R.id.pin_sixth_verify: {
-				pinLongClick = true;
-				v.requestFocus();
-			}
-		}
-		return false;
-	}
-
-	void pasteClipboard() {
-		logDebug("pasteClipboard");
-		pinLongClick = false;
-		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-		ClipData clipData = clipboard.getPrimaryClip();
-		if (clipData != null) {
-			String code = clipData.getItemAt(0).getText().toString();
-			if (code != null && code.length() == 6) {
-				boolean areDigits = true;
-				for (int i=0; i<6; i++) {
-					if (!Character.isDigit(code.charAt(i))) {
-						areDigits = false;
-						break;
-					}
-				}
-				if (areDigits) {
-					firstPin.setText(""+code.charAt(0));
-					secondPin.setText(""+code.charAt(1));
-					thirdPin.setText(""+code.charAt(2));
-					fourthPin.setText(""+code.charAt(3));
-					fifthPin.setText(""+code.charAt(4));
-					sixthPin.setText(""+code.charAt(5));
-				}
-				else {
-					firstPin.setText("");
-					secondPin.setText("");
-					thirdPin.setText("");
-					fourthPin.setText("");
-					fifthPin.setText("");
-					sixthPin.setText("");
-				}
-			}
-		}
-	}
-
-	public void showVerifyPin2FA(final int type){
-		verifyPin2FADialogType = type;
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_verify_2fa, null);
-		builder.setView(v);
-
-		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
-		if (type == CANCEL_ACCOUNT_2FA){
-			titleDialog.setText(getString(R.string.cancel_account_verification));
-		}
-		else if (type == CHANGE_MAIL_2FA){
-			titleDialog.setText(getString(R.string.change_mail_verification));
-		}
-		else if (type == DISABLE_2FA) {
-			titleDialog.setText(getString(R.string.disable_2fa_verification));
-		}
-		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
-		lostYourDeviceButton.setOnClickListener(this);
-		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
-
-		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
-		pinError.setVisibility(View.GONE);
-
-		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-
-		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
-		firstPin.setOnLongClickListener(this);
-		firstPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
-		firstPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if(firstPin.length() != 0){
-					secondPin.requestFocus();
-					secondPin.setCursorVisible(true);
-
-					if (isFirstTime2fa && !pinLongClick){
-						secondPin.setText("");
-						thirdPin.setText("");
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else if (pinLongClick) {
-						pasteClipboard();
-					}
-					else  {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
-		secondPin.setOnLongClickListener(this);
-		secondPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
-		secondPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (secondPin.length() != 0){
-					thirdPin.requestFocus();
-					thirdPin.setCursorVisible(true);
-
-					if (isFirstTime2fa && !pinLongClick) {
-						thirdPin.setText("");
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else if (pinLongClick) {
-						pasteClipboard();
-					}
-					else  {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
-		thirdPin.setOnLongClickListener(this);
-		thirdPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
-		thirdPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (thirdPin.length()!= 0){
-					fourthPin.requestFocus();
-					fourthPin.setCursorVisible(true);
-
-					if (isFirstTime2fa && !pinLongClick) {
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else if (pinLongClick) {
-						pasteClipboard();
-					}
-					else  {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
-		fourthPin.setOnLongClickListener(this);
-		fourthPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
-		fourthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (fourthPin.length()!=0){
-					fifthPin.requestFocus();
-					fifthPin.setCursorVisible(true);
-
-					if (isFirstTime2fa && !pinLongClick) {
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else if (pinLongClick) {
-						pasteClipboard();
-					}
-					else  {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
-		fifthPin.setOnLongClickListener(this);
-		fifthPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
-		fifthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (fifthPin.length()!=0){
-					sixthPin.requestFocus();
-					sixthPin.setCursorVisible(true);
-
-					if (isFirstTime2fa && !pinLongClick) {
-						sixthPin.setText("");
-					}
-					else if (pinLongClick) {
-						pasteClipboard();
-					}
-					else  {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
-		sixthPin.setOnLongClickListener(this);
-		sixthPin.setOnFocusChangeListener(this);
-		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
-		sixthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (sixthPin.length()!=0){
-					sixthPin.setCursorVisible(true);
-					hideKeyboard(managerActivity, 0);
-
-					if (pinLongClick) {
-						pasteClipboard();
-					}
-					else {
-						permitVerify(type);
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-				}
-			}
-		});
-
-		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb1.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb1.width = scaleWidthPx(25, outMetrics);
-		}
-		firstPin.setLayoutParams(paramsb1);
-		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		firstPin.setLayoutParams(textParams);
-
-		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb2.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb2.width = scaleWidthPx(25, outMetrics);
-		}
-		secondPin.setLayoutParams(paramsb2);
-		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		secondPin.setLayoutParams(textParams);
-		secondPin.setEt(firstPin);
-
-		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb3.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb3.width = scaleWidthPx(25, outMetrics);
-		}
-		thirdPin.setLayoutParams(paramsb3);
-		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-		thirdPin.setLayoutParams(textParams);
-		thirdPin.setEt(secondPin);
-
-		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb4.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb4.width = scaleWidthPx(25, outMetrics);
-		}
-		fourthPin.setLayoutParams(paramsb4);
-		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		fourthPin.setLayoutParams(textParams);
-		fourthPin.setEt(thirdPin);
-
-		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb5.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb5.width = scaleWidthPx(25, outMetrics);
-		}
-		fifthPin.setLayoutParams(paramsb5);
-		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		fifthPin.setLayoutParams(textParams);
-		fifthPin.setEt(fourthPin);
-
-		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb6.width = scaleWidthPx(42, outMetrics);
-		}
-		else {
-			paramsb6.width = scaleWidthPx(25, outMetrics);
-		}
-		sixthPin.setLayoutParams(paramsb6);
-		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-		textParams.setMargins(0, 0, 0, 0);
-		sixthPin.setLayoutParams(textParams);
-		sixthPin.setEt(fifthPin);
-
-		verify2FADialog = builder.create();
-		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				verify2FADialogIsShown = false;
-			}
-		});
-
-        Window window = verify2FADialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-		verify2FADialog.show();
-		verify2FADialogIsShown = true;
-	}
-
-	void verifyQuitError(){
-		isErrorShown = false;
-		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-	}
-
-	void verifyShowError(){
-		logWarning("Pin not correct verifyShowError");
-		isFirstTime2fa = false;
-		isErrorShown = true;
-		pinError.setVisibility(View.VISIBLE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-	}
-
-	void permitVerify(int type){
-		logDebug("permitVerify");
-		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard(managerActivity, 0);
-			if (sb.length()>0) {
-				sb.delete(0, sb.length());
-			}
-			sb.append(firstPin.getText());
-			sb.append(secondPin.getText());
-			sb.append(thirdPin.getText());
-			sb.append(fourthPin.getText());
-			sb.append(fifthPin.getText());
-			sb.append(sixthPin.getText());
-			pin = sb.toString();
-			if (!isErrorShown && pin != null) {
-				verify2faProgressBar.setVisibility(View.VISIBLE);
-				verify2FA(type);
-			}
-		}
-	}
-
-	private void showOpenLinkError(boolean show, int linkType) {
+	private void showOpenLinkError(boolean show, int error) {
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
@@ -8734,7 +8184,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						openLinkErrorText.setText(R.string.invalid_file_folder_link_empty);
 						return;
 					}
-                    switch (linkType) {
+                    switch (error) {
                         case CHAT_LINK: {
 							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
@@ -10403,15 +9853,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case R.id.lost_authentication_device: {
 				try {
-					String url = "https://mega.nz/recovery";
 					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openTermsIntent.setData(Uri.parse(url));
+					openTermsIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(openTermsIntent);
 				}
 				catch (Exception e){
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					viewIntent.setData(Uri.parse(RECOVERY_URL));
 					startActivity(viewIntent);
 				}
 				break;
@@ -12548,53 +11997,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					mStorageFLol.refreshVersionsInfo();
 				}
 			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
-			logDebug("TYPE_GET_CHANGE_EMAIL_LINK: " + request.getEmail());
-			if (verify2faProgressBar != null) {
-				verify2faProgressBar.setVisibility(View.GONE);
-			}
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("The change link has been sent");
+        } else if (request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+            logDebug("TYPE_GET_CHANGE_EMAIL_LINK: " + request.getEmail());
+            hideKeyboard(managerActivity, 0);
 
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()) {
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
-			}
-			else if(e.getErrorCode() == MegaError.API_EACCESS){
-				logWarning("The new mail already exists");
-
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()) {
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
-			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
-				logWarning("Email change already requested (confirmation link already sent).");
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()) {
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
-			}
-			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
-				if (is2FAEnabled()){
-					verifyShowError();
-				}
-			}
-			else{
-				logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
-
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()) {
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
-			}
-		}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("The change link has been sent");
+                showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
+            } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+                logWarning("The new mail already exists");
+                showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+            } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+                logWarning("Email change already requested (confirmation link already sent).");
+                showAlert(this, getString(R.string.mail_changed_confirm_requested), getString(R.string.email_verification_title));
+            } else {
+                logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
+                showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+            }
+        }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
 			logDebug("CONFIRM_CHANGE_EMAIL_LINK: " + request.getEmail());
 			if(e.getErrorCode() == MegaError.API_OK){
@@ -12643,35 +12063,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logError("Error when asking for recovery pass link: " + e.getErrorString() + "___" + e.getErrorCode());
 				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
-			logDebug("TYPE_GET_CANCEL_LINK");
-			if (verify2faProgressBar != null) {
-				verify2faProgressBar.setVisibility(View.GONE);
-			}
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Cancelation link received!");
+        } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
+            logDebug("TYPE_GET_CANCEL_LINK");
+            hideKeyboard(managerActivity, 0);
 
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()) {
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
-			}
-			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
-				if (is2FAEnabled()){
-					verifyShowError();
-				}
-			}
-			else{
-				logError("Error when asking for the cancelation link: " + e.getErrorString() + "___" + e.getErrorCode());
-
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null && verify2FADialog.isShowing()){
-					verify2FADialog.dismiss();
-				}
-				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
-			}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Cancelation link received!");
+                showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+            } else {
+                logError("Error when asking for the cancelation link: " + e.getErrorString() + "___" + e.getErrorCode());
+                showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
+            }
         }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -13029,48 +12431,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
+			// Re-enable 2fa switch first.
+			if (getSettingsFragment() != null) {
+				sttFLol.reEnable2faSwitch();
+			}
+
 			if (e.getErrorCode() == MegaError.API_OK) {
-				if (request.getFlag()) {
-					is2FAEnabled = true;
-				} else {
-					is2FAEnabled = false;
-				}
+				is2FAEnabled = request.getFlag();
+
 				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(is2FAEnabled);
 				}
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
-			logDebug("TYPE_MULTI_FACTOR_AUTH_SET: " + e.getErrorCode());
-			if (verify2faProgressBar != null) {
-				verify2faProgressBar.setVisibility(View.GONE);
-			}
-			if (!request.getFlag() && e.getErrorCode() == MegaError.API_OK){
-				logDebug("Pin correct: Two-Factor Authentication disabled");
-				is2FAEnabled = false;
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(false);
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.label_2fa_disabled), -1);
-				}
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null) {
-					verify2FADialog.dismiss();
-				}
-			}
-			else if (e.getErrorCode() == MegaError.API_EFAILED){
-				logWarning("Pin not correct");
-				verifyShowError();
-			}
-			else {
-				hideKeyboard(managerActivity, 0);
-				if (verify2FADialog != null) {
-					verify2FADialog.dismiss();
-				}
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_disable_2fa), -1);
-				logError("An error ocurred trying to disable Two-Factor Authentication");
-			}
-
-			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -14408,103 +13780,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		callBadge.setVisibility(View.VISIBLE);
 	}
 
-	public void showEvaluatedAppDialog(){
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
-
-		final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
-		rateAppCheck.setText(getString(R.string.rate_the_app_panel));
-		rateAppCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		rateAppCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
-		rateAppMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
-		sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
-		sendFeedbackCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		sendFeedbackCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
-		sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setView(dialoglayout);
-
-		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
-		evaluateAppDialog = builder.create();
-
-		evaluateAppDialog.show();
-
-		rateAppCheck.setOnClickListener(v -> {
-			logDebug("Rate the app");
-			//Rate the app option:
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL) ) );
-
-			if (evaluateAppDialog!= null){
-				evaluateAppDialog.dismiss();
-			}
-		});
-
-		sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				logDebug("Send Feedback");
-
-				//Send feedback option:
-				StringBuilder body = new StringBuilder();
-				body.append(getString(R.string.setting_feedback_body));
-				body.append("\n\n\n\n\n\n\n\n\n\n\n");
-				body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
-				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
-				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
-						body.append(" ("+getString(R.string.my_account_free)+")");
-					}
-					else{
-						switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
-							case 0:{
-								body.append(" ("+getString(R.string.my_account_free)+")");
-								break;
-							}
-							case 1:{
-								body.append(" ("+getString(R.string.my_account_pro1)+")");
-								break;
-							}
-							case 2:{
-								body.append(" ("+getString(R.string.my_account_pro2)+")");
-								break;
-							}
-							case 3:{
-								body.append(" ("+getString(R.string.my_account_pro3)+")");
-								break;
-							}
-							case 4:{
-								body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-								break;
-							}
-						}
-					}
-				}
-
-				String emailAndroid = MAIL_ANDROID;
-				String versionApp = (getString(R.string.app_version));
-				String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
-
-				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-				emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-				startActivity(Intent.createChooser(emailIntent, " "));
-
-				if (evaluateAppDialog != null){
-					evaluateAppDialog.dismiss();
-				}
-			}
-		});
-
-	}
-
 	public String getDeviceName() {
 		String manufacturer = Build.MANUFACTURER;
 		String model = Build.MODEL;
@@ -14542,10 +13817,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public boolean is2FAEnabled (){
 		return is2FAEnabled;
-	}
-
-	public void setNewMail (String newMail) {
-		this.newMail = newMail;
 	}
 
 	//need to check image existence before use due to android content provider issue.

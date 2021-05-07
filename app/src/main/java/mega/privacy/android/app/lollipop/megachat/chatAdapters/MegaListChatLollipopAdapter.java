@@ -155,8 +155,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView voiceClipOrLocationText;
 		ImageView voiceClipOrLocationIc;
 		TextView textViewDate;
-		ImageView iconMyVideoOn;
-		ImageView iconMyAudioOff;
 
 		String textFastScroller = "";
 		ImageButton imageButtonThreeDots;
@@ -482,13 +480,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).voiceClipOrLocationIc = v.findViewById(R.id.last_message_voice_clip_or_location_ic);
 
 			((ViewHolderNormalChatList)holder).textViewDate = v.findViewById(R.id.recent_chat_list_date);
-			((ViewHolderNormalChatList)holder).iconMyAudioOff = v.findViewById(R.id.recent_chat_list_micro_off);
-
-			((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
-
-			((ViewHolderNormalChatList)holder).iconMyVideoOn = v.findViewById(R.id.recent_chat_list_video_on);
-			((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
-
 
 			((ViewHolderNormalChatList)holder).imageButtonThreeDots = v.findViewById(R.id.recent_chat_list_three_dots);
 
@@ -1039,8 +1030,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
                 switch (callStatus) {
                     case CALL_STATUS_USER_NO_PRESENT:
                     case CALL_STATUS_DESTROYED:
-                        ((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);
-                        ((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
                         if (call.isRinging()) {
                             ((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
                             ((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.notification_subtitle_incoming));
@@ -1055,8 +1044,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
                         ((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(isRequestSent(call.getCallId()) ?
                                 R.string.outgoing_call_starting :
                                 R.string.call_started_messages));
-                        ((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(call.hasLocalAudio() ? View.GONE : View.VISIBLE);
-                        ((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(call.hasLocalVideo() ? View.VISIBLE : View.GONE);
                         break;
                 }
                 return;
@@ -1065,8 +1052,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
         ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 		((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-		((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);
-		((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
 	}
 
 	public void setLastMessage(int position, ViewHolderChatList holder){

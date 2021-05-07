@@ -12,9 +12,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
-            android:fontFamily="roboto"
+            style="@style/TextAppearance.Mega.Subtitle1.Medium"
             android:text="@string/no_authentication_apps_title"/>
 
         <TextView

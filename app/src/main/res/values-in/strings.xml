@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Belum diatur</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Ubah Passcode</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Ganti passcode</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Change passcode lock</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Membutuhkan kode sandi</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Segera</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Masukkan</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">File lokal Anda akan dihapus dan Anda akan keluar setelah 10 kali gagal</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 upaya kode sandi gagal</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">Anda akan keluar dan file offline anda akan dihapus setelah 10 upaya gagal</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Kode salah</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Passcode salah, silakan coba lagi. Anda memiliki 1 upaya lagi</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Passcode salah, silahkan coba lagi. Anda memiliki %2d upaya yang tersisa</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcode tidak cocok</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Masukkan Passcode anda</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Masukan kembali Passcode anda</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Masukan Passcode anda</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Masukan kembali Passcode baru anda</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcode tidak sama. Coba lagi.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Masukkan passcode</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Masukkan ulang passcode anda</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Masukkan passcode baru anda</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Masukkan kembali passcode baru anda</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Semua data lokal Anda akan dihapus dan Anda akan logout dalam %1d detik</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Tentang</string>
