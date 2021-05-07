@@ -888,4 +888,7 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    /** The param type returned by checkChatLink denoting the link is for a meeting room */
+    public final static int LINK_IS_FOR_MEETING = 1;
 }

@@ -769,12 +769,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		TransfersManagement.checkResumedPendingTransfers();
 
 		boolean staging = true;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null && attrs.getStaging() != null) {
-				staging = Boolean.parseBoolean(attrs.getStaging());
-			}
-		}
+//		if (dbH != null) {
+//			MegaAttributes attrs = dbH.getAttributes();
+//			if (attrs != null && attrs.getStaging() != null) {
+//				staging = Boolean.parseBoolean(attrs.getStaging());
+//			}
+//		}
 
 		if (staging) {
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");

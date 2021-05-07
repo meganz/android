@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -422,31 +423,46 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				OpenLinkActivity.this) {
 			@Override
 			public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
-				if ((e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST)
-						&& !(TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE)) {
+				int errorCode = e.getErrorCode();
+				boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
+				boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
 
-					MegaHandleList list = request.getMegaHandleList();
-					if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-						goToMeetingActivity(request.getChatHandle(), request.getText());
-					} else if (request.getFlag()) { // Meeting has ended
-						new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-							@Override
-							public void onViewMeetingChat() {
-								goToChatActivity();
-							}
-
-							@Override
-							public void onLeave() {
-								goToGuestLeaveMeetingActivity();
-							}
-						}).show(getSupportFragmentManager(),
-								MeetingHasEndedDialogFragment.TAG);
-					} else {
-						// Normal Chat Link
-						goToChatActivity();
-					} ;
-				} else {
+				if (codeError || linkInvalid) {
 					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
+					return;
+				}
+
+				if (request.getParamType() == LINK_IS_FOR_MEETING) {
+					logDebug("It's a meeting");
+
+					if (request.getFlag()) {
+						MegaHandleList list = request.getMegaHandleList();
+
+						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+							logDebug("It's a meeting, open join call");
+							goToMeetingActivity(request.getChatHandle(), request.getText());
+						} else {
+							logDebug("It's a meeting, open dialog: Meeting has ended");
+							new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+								@Override
+								public void onViewMeetingChat() {
+									goToChatActivity();
+								}
+
+								@Override
+								public void onLeave() {
+									goToGuestLeaveMeetingActivity();
+								}
+							}).show(getSupportFragmentManager(),
+									MeetingHasEndedDialogFragment.TAG);
+						}
+					} else {
+						logDebug("It's a meeting, open chat preview");
+						api.openChatPreview(url, this);
+					}
+				} else {
+					// Normal Chat Link
+					goToChatActivity();
 				}
 			}
 		});

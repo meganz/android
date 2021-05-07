@@ -74,6 +74,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
@@ -12177,40 +12178,36 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
                 String link = request.getLink();
 
-                if (request.getParamType() == 1) {
-                    logDebug("It's a meeting");
+				if (request.getParamType() == LINK_IS_FOR_MEETING) {
+					logDebug("It's a meeting");
 
-                    if (request.getFlag()) {
-                        MegaHandleList list = request.getMegaHandleList();
+					if (request.getFlag()) {
+						MegaHandleList list = request.getMegaHandleList();
 
-                        if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                            logDebug("It's a meeting, open join call");
-
-                            CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
-                        } else {
-                            logDebug("It's a meeting, open dialog: Meeting has ended");
-
-                            new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-                                @Override
-                                public void onViewMeetingChat() {
-                                    showChatLink(link);
-                                }
-
-                                @Override
-                                public void onLeave() {
-                                }
-                            }).show(getSupportFragmentManager(),
-                                    MeetingHasEndedDialogFragment.TAG);
-                        }
-                    } else {
-                        logDebug("It's a meeting, open chat preview");
-                        api.openChatPreview(link, this);
-                    }
-
-                } else {
-                    logDebug("It's a chat");
-                    showChatLink(link);
-                }
+						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+							logDebug("It's a meeting, open join call");
+							CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
+						} else {
+							logDebug("It's a meeting, open dialog: Meeting has ended");
+							new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+								@Override
+								public void onViewMeetingChat() {
+									showChatLink(link);
+								}
+								@Override
+								public void onLeave() {
+								}
+							}).show(getSupportFragmentManager(),
+									MeetingHasEndedDialogFragment.TAG);
+						}
+					} else {
+						logDebug("It's a meeting, open chat preview");
+						api.openChatPreview(link, this);
+					}
+				} else {
+					logDebug("It's a chat");
+					showChatLink(link);
+				}
 
                 dismissOpenLinkDialog();
 			}

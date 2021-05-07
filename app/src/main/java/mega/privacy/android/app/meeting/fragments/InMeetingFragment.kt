@@ -172,8 +172,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     when (it.status) {
                         MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                             when {
-                                it.hasChanged(CHANGE_TYPE_OWN_PRIV) && inMeetingViewModel.getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR -> {
-                                    showFixedBanner(megaChatApi.myUserHandle, TYPE_OWN_PRIVILEGE)
+                                it.hasChanged(CHANGE_TYPE_OWN_PRIV)  -> {
+                                    if (inMeetingViewModel.getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR){
+                                        showFixedBanner(megaChatApi.myUserHandle, TYPE_OWN_PRIVILEGE)
+                                    }
+                                    bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
                                 }
                                 it.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
                                     updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
@@ -1008,17 +1011,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 !inMeetingViewModel.isOneToOneCall()
             )
 
+        updatePanelParticipantList()
+
         /**
          * Observer the participant List
          */
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
-//            participants.let {
-//                bottomFloatingPanelViewHolder
-//                    .setParticipants(
-//                        it,
-//                        inMeetingViewModel.getMyOwnInfo(sharedModel.currentChatId.value!!)
-//                    )
-//            }
+            participants?.let {
+                updatePanelParticipantList(it.toMutableList())
+            }
         }
 
         bottomFloatingPanelViewHolder.propertyUpdaters.add {
@@ -1496,5 +1497,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Error joining the meeting so close it")
         MegaApplication.setOpeningMeetingLink(args.chatId, false)
         finishActivity()
+    }
+
+
+    fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
+        bottomFloatingPanelViewHolder
+            .setParticipants(
+                list,
+                inMeetingViewModel.getMyOwnInfo(
+                    sharedModel.micLiveData.value ?: false,
+                    sharedModel.cameraLiveData.value ?: false
+                )
+            )
     }
 }

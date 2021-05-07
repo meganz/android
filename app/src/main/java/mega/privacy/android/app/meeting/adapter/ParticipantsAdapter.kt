@@ -33,24 +33,35 @@ class ParticipantsAdapter(
      * @param state
      */
     fun updateIcon(icon: Int, state: Boolean) {
-//
-//        val myParticipant = this.currentList.filterIndexed { _, participant -> participant.isMe }
-//        val index = myParticipant.lastIndex
-//        val me = myParticipant.last()
-//        if (index < 0 || me == null) {
-//            return
-//        }
-//        if (icon == MIC) {
-//            me.isAudioOn = state
-//        } else {
-//            me.isVideoOn = state
-//        }
-//
-//        notifyItemChanged(index, me)
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+        val myParticipant = this.currentList.filterIndexed { _, participant -> participant.isMe }
+        if (myParticipant.isNullOrEmpty()) {
+            return
+        }
+        val index = myParticipant.lastIndex
+        val me = myParticipant.last()
+        if (index < 0 || me == null) {
+            return
+        }
+        when (icon) {
+            MIC -> {
+                me.isAudioOn = state
+            }
+            CAM -> {
+                me.isVideoOn = state
+            }
+            else -> me.isModerator = state
+        }
+
+        notifyItemChanged(index, me)
     }
 
     companion object {
         const val MIC = 0
         const val CAM = 1
+        const val MODERATOR = 2
     }
 }
