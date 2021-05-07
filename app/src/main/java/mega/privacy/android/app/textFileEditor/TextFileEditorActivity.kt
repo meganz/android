@@ -369,7 +369,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         refreshMenuOptionsVisibility()
 
         if (mode == VIEW_MODE) {
-            if (!readingContent && viewModel.needsReadContent()) {
+            if (viewModel.needsReadContent()) {
                 readingContent = true
                 viewModel.readFileContent()
                 showLoadingView()
@@ -445,7 +445,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        val lines = contentRead.chunked(500)
+        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
         for (line in lines) {
             try {
                 binding.contentText.append(line)
