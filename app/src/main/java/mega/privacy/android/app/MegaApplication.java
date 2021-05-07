@@ -1913,20 +1913,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	public static boolean isSpeakerViewAutomatic(long callId) {
-		boolean entryExists = hashSpeakerViewAutomatic.containsKey(callId);
-		if (entryExists) {
-			return hashSpeakerViewAutomatic.get(callId);
-		}
-
-		setSpeakerViewAutomatic(callId, true);
-		return false;
-	}
-
-	public static void setSpeakerViewAutomatic(long callId, boolean isAutomatic) {
-		hashSpeakerViewAutomatic.put(callId, isAutomatic);
-	}
-
 	public int getStorageState() {
 	    return storageState;
 	}

@@ -514,9 +514,9 @@ public class CallUtil {
 
         if (call != null) {
             chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(call.getDuration() * 1000);
+            chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));
             chronometer.start();
-            chronometer.setFormat(isNecessaryToShowChronoSeparator ? "· %s" : "%s");
+            chronometer.setFormat(isNecessaryToShowChronoSeparator ? "· %s" : " %s");
         }
     }
 

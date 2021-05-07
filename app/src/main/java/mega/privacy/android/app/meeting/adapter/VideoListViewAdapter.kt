@@ -44,6 +44,30 @@ class VideoListViewAdapter(
         getHolder(position).updatePrivilegeIcon(participant)
     }
 
+    /**
+     * Update participant when the name is changed
+     *
+     * @param participant
+     */
+    fun updateName(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updateAvatar(participant)
+    }
+    /**
+     * Update participant that is speaking
+     *
+     * @param participant
+     */
+    fun updatePeerSelected(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updatePeerSelected(participant)
+    }
+
+    /**
+     * Update participant resolution
+     *
+     * @param participant
+     */
     fun updateParticipantRes(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).updateRes(participant)
@@ -87,5 +111,4 @@ class VideoListViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).updateCallOnHold(participant, isOnHold)
     }
-
 }

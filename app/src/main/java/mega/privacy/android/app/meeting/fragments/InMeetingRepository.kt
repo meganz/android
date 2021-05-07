@@ -12,7 +12,6 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
@@ -198,6 +197,37 @@ class InMeetingRepository @Inject constructor(
         megaChatApi.hangChatCall(callId, HangChatCallListener(context))
     }
 
+    /**
+     * Create a participant with my data
+     *
+     * @param chatId chat ID
+     */
+    fun getMeToSpeakerView(chatId: Long): Participant {
+        var isAudioOn = true
+        getMeeting(chatId)?.let {
+            isAudioOn = it.hasLocalAudio()
+        }
+        var isVideoOn = true
+        getMeeting(chatId)?.let {
+            isVideoOn = it.hasLocalVideo()
+        }
+        return Participant(
+            megaChatApi.myUserHandle,
+            MEGACHAT_INVALID_HANDLE,
+            megaChatApi.myFullname,
+            null,
+            "XXX",
+            true,
+            getOwnPrivileges(chatId) == MegaChatRoom.PRIV_MODERATOR,
+            isAudioOn,
+            isVideoOn,
+            false,
+            true,
+            true,
+            null
+        )
+    }
+
     fun isMyContact(chat: MegaChatRoom, peerId: Long): Boolean {
         val userMail = CallUtil.getUserMailCall(chat, peerId)
         if (!TextUtil.isTextEmpty(userMail)) {
@@ -210,7 +240,7 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method of obtaining the local video
+     * Method of obtaining the remote video
      *
      * @param chatId chatId
      * @param clientId client ID
@@ -227,7 +257,7 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method of remove the local video
+     * Method of remove the remote video
      *
      * @param chatId chatId
      * @param clientId client ID
@@ -280,14 +310,18 @@ class InMeetingRepository @Inject constructor(
         return -1
     }
 
-    fun openChatPreview(link:String, listener: MegaChatRequestListenerInterface) =
+    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         megaChatApi.autojoinPublicChat(chatId, listener)
 
 
-    fun createEphemeralAccountPlusPlus(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
+    fun createEphemeralAccountPlusPlus(
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface
+    ) {
         megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
     }
 

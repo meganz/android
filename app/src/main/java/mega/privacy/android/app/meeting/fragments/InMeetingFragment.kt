@@ -84,19 +84,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     lateinit var bottomFloatingPanelViewHolder: BottomFloatingPanelViewHolder
 
     private var swapCameraMenuItem: MenuItem? = null
-    private lateinit var gridViewMenuItem: MenuItem
-    private lateinit var speakerViewMenuItem: MenuItem
+    private var gridViewMenuItem: MenuItem? = null
+    private var speakerViewMenuItem: MenuItem? = null
 
     private var micIsEnable = false
     private var camIsEnable = false
     private var meetinglink: String = ""
     private var inTemporaryState = false
+    private var isManualModeView = false
 
     // Children fragments
     private var individualCallFragment: IndividualCallFragment? = null
     private var floatingWindowFragment: IndividualCallFragment? = null
     private var gridViewCallFragment: GridViewCallFragment? = null
-    //private var speakerViewCallFragment: SpeakerViewCallFragment? = null
+    private var speakerViewCallFragment: SpeakerViewCallFragment? = null
 
     // Flags, should get the value from somewhere
     private var isGuest = false
@@ -165,6 +166,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    private val visibilityChangeObserver = Observer<Long> {
+        inMeetingViewModel.updateParticipantsVisibility(it)
+    }
+
     private val privilegesChangeObserver = Observer<MegaChatListItem> {
         when {
             inMeetingViewModel.isSameChatRoom(it.chatId) -> {
@@ -172,9 +177,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     when (it.status) {
                         MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                             when {
-                                it.hasChanged(CHANGE_TYPE_OWN_PRIV)  -> {
-                                    if (inMeetingViewModel.getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR){
-                                        showFixedBanner(megaChatApi.myUserHandle, TYPE_OWN_PRIVILEGE)
+                                it.hasChanged(CHANGE_TYPE_OWN_PRIV) -> {
+                                    if (inMeetingViewModel.getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR) {
+                                        showFixedBanner(
+                                            megaChatApi.myUserHandle,
+                                            TYPE_OWN_PRIVILEGE
+                                        )
                                     }
                                     bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
                                 }
@@ -277,21 +285,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall() -> {
                     when (callAndSession.second.status) {
                         MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                            if (inMeetingViewModel.createParticipant(callAndSession.second)) {
-                                updateParticipantRes(
-                                    inMeetingViewModel.checkParticipantsResolution(
-                                        true
-                                    )
-                                )
+                            val position =
+                                inMeetingViewModel.createParticipant(callAndSession.second)
+                            position?.let {
+                                if (position != INVALID_POSITION) {
+                                    participantAddedOfLeftMeeting(true, it)
+                                }
                             }
                         }
                         MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                            if (inMeetingViewModel.removeParticipant(callAndSession.second)) {
-                                updateParticipantRes(
-                                    inMeetingViewModel.checkParticipantsResolution(
-                                        false
-                                    )
-                                )
+                            val position =
+                                inMeetingViewModel.removeParticipant(callAndSession.second)
+                            position?.let {
+                                if (position != INVALID_POSITION) {
+                                    participantAddedOfLeftMeeting(false, it)
+                                }
                             }
                         }
                     }
@@ -469,6 +477,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_PRIVILEGES_CHANGE, MegaChatListItem::class.java)
             .observeSticky(this, privilegesChangeObserver)
+
+        LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
+            .observeSticky(this, visibilityChangeObserver)
 
         //Calls level
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
@@ -788,6 +799,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 floatingWindowFragment?.let {
                     removeChildFragment(it)
                 }
+
+                checkGridSpeakerViewMenuItemVisibility()
             }
         }
     }
@@ -819,19 +832,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         status = TYPE_IN_SPEAKER_VIEW
-        logDebug("Group call - Speaker View")
 
-//        if(speakerViewCallFragment == null){
-//            speakerViewCallFragment = SpeakerViewCallFragment().newInstance()
-//        }
-//
-//        speakerViewCallFragment?.let {
-//            loadChildFragment(
-//                R.id.meeting_container,
-//                it,
-//                SpeakerViewCallFragment.TAG
-//            )
-//        }
+        logDebug(" Group call - Speaker View")
+        if (speakerViewCallFragment == null) {
+            speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
+        }
+
+        speakerViewCallFragment?.let {
+            loadChildFragment(
+                R.id.meeting_container,
+                it,
+                SpeakerViewCallFragment.TAG
+            )
+        }
+
+        checkGridSpeakerViewMenuItemVisibility()
     }
 
     private fun initGridViewMode() {
@@ -852,6 +867,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 GridViewCallFragment.TAG
             )
         }
+
+        checkGridSpeakerViewMenuItemVisibility()
     }
 
     /**
@@ -862,11 +879,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             initLocal(chatId)
         }
 
-        inMeetingViewModel.getCall()?.let {
-            if (it.numParticipants > 6) {
-                initSpeakerViewMode()
-            } else {
-                initGridViewMode()
+        if(!isManualModeView){
+            inMeetingViewModel.getCall()?.let {
+                if (it.numParticipants > 6) {
+                    initSpeakerViewMode()
+                } else {
+                    initGridViewMode()
+                }
             }
         }
     }
@@ -946,19 +965,43 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         gridViewMenuItem = menu.findItem(R.id.grid_view)
         swapCameraMenuItem = menu.findItem(R.id.swap_camera)
 
-        if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isRequestSent()) {
-            gridViewMenuItem.isVisible = false
-            speakerViewMenuItem.isVisible = false
-        } else {
-            speakerViewMenuItem.isVisible = false
-            gridViewMenuItem.isVisible = true
-        }
-
+        checkGridSpeakerViewMenuItemVisibility()
         checkSwapCameraMenuItemVisibility()
     }
 
     private fun checkSwapCameraMenuItemVisibility() {
-        swapCameraMenuItem?.isVisible = inMeetingViewModel.isNecessaryToShowSwapCameraOption()
+        swapCameraMenuItem?.let {
+            it.isVisible = inMeetingViewModel.isNecessaryToShowSwapCameraOption()
+        }
+    }
+
+    private fun checkGridSpeakerViewMenuItemVisibility() {
+        when (status) {
+            TYPE_IN_GRID_VIEW -> {
+                gridViewMenuItem?.let {
+                    it.isVisible = false
+                }
+                speakerViewMenuItem?.let {
+                    it.isVisible = true
+                }
+            }
+            TYPE_IN_SPEAKER_VIEW -> {
+                gridViewMenuItem?.let {
+                    it.isVisible = true
+                }
+                speakerViewMenuItem?.let {
+                    it.isVisible = false
+                }
+            }
+            else -> {
+                gridViewMenuItem?.let {
+                    it.isVisible = false
+                }
+                speakerViewMenuItem?.let {
+                    it.isVisible = false
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -971,17 +1014,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             R.id.grid_view -> {
                 logDebug("Change to grid view.")
-                gridViewMenuItem.isVisible = false
-                speakerViewMenuItem.isVisible = true
                 initGridViewMode()
                 true
             }
             R.id.speaker_view -> {
                 logDebug("Change to speaker view.")
-//                inMeetingViewModel.setSpeakerViewManual()
-//                gridViewMenuItem.isVisible = true
-//                speakerViewMenuItem.isVisible = false
-//                initSpeakerViewMode()
+                isManualModeView = true
+                initSpeakerViewMode()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -1133,11 +1172,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updateCallOnHold(isHold)
                 }
             }
-//            speakerViewCallFragment?.let {
-//                if (it.isAdded) {
-//                    it.updateCallOnHold(isHold)
-//                }
-//            }
+            speakerViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateCallOnHold(isHold)
+                }
+            }
         }
     }
 
@@ -1199,11 +1238,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.updateSessionOnHold(session)
             }
         }
-//        speakerViewCallFragment?.let {
-//            if (it.isAdded) {
-//                it.updateSessionOnHold(session)
-//            }
-//        }
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                it.updateSessionOnHold(session)
+            }
+        }
     }
 
     /**
@@ -1225,16 +1264,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-//        speakerViewCallFragment?.let {
-//            if (it.isAdded) {
-//                if (isAudioChange) {
-//                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
-//                }
-//                if (isVideoChange) {
-//                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
-//                }
-//            }
-//        }
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                if (isAudioChange) {
+                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                }
+                if (isVideoChange) {
+                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                }
+            }
+        }
+    }
+
+    private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {
+        updateParticipantRes(
+            inMeetingViewModel.checkParticipantsResolution(
+                isAdded
+            )
+        )
+
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                it.peerAddedOrRemoved(isAdded, position)
+            }
+        }
     }
 
     /**
@@ -1247,11 +1300,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updateRes(listParticipants)
                 }
             }
-//            speakerViewCallFragment?.let {
-//                if (it.isAdded) {
-//                    it.updateRes(listParticipants)
-//                }
-//            }
+            speakerViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateRes(listParticipants)
+                }
+            }
         }
     }
 
@@ -1259,9 +1312,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that checks if a participant's name has changed and updates the UI
      */
     private fun updateParticipantName(peerId: Long) {
-        var listParticipants = inMeetingViewModel.existsParticipants(peerId)
+        var listParticipants = inMeetingViewModel.updateParticipantsName(peerId)
         if (listParticipants.isNotEmpty()) {
             gridViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateName(listParticipants)
+                }
+            }
+            speakerViewCallFragment?.let {
                 if (it.isAdded) {
                     it.updateName(listParticipants)
                 }
@@ -1279,11 +1337,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updatePrivileges(listParticipants)
                 }
             }
-//            speakerViewCallFragment?.let {
-//                if (it.isAdded) {
-//                    it.updatePrivileges(listParticipants)
-//                }
-//            }
+            speakerViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updatePrivileges(listParticipants)
+                }
+            }
         }
     }
 
@@ -1421,7 +1479,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MeetingParticipantBottomSheetDialogFragment.newInstance(
                 isGuest,
                 isModerator,
-                !speakerViewMenuItem.isVisible,
+                status == TYPE_IN_SPEAKER_VIEW,
                 participant
             )
         participantBottomSheet.show(parentFragmentManager, participantBottomSheet.tag)
@@ -1460,8 +1518,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         CallUtil.activateChrono(false, meetingChrono, null)
-        inMeetingViewModel.isSpeakerViewAutomatic()
-
         resumeAudioPlayerIfNotInCall(meetingActivity)
     }
 

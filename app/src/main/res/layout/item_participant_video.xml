@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grey_alpha_038">
 
     <SurfaceView
         android:id="@+id/video"
@@ -20,7 +21,7 @@
         android:id="@+id/selected_foreground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/selected_participant_foreground"
+        android:background="@drawable/border_green_layer"
         android:visibility="gone" />
 
     <mega.privacy.android.app.components.RoundedImageView

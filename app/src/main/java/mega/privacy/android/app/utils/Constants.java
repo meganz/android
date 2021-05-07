@@ -869,6 +869,7 @@ public class Constants {
     public static final String EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change";
 
     public static final String EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change";
+    public static final String EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";

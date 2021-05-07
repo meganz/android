@@ -39,6 +39,9 @@ class InMeetingViewModel @ViewModelInject constructor(
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
+
+    var isSpeakerSelectionAutomatic: Boolean = true
+
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
@@ -57,6 +60,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     val chatTitle: LiveData<String> = _chatTitle
 
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
+
+    private val _speakerParticipant = MutableLiveData<Participant>(null)
+    val speakerParticipant: LiveData<Participant> = _speakerParticipant
 
     //TODO test code start
     val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
@@ -195,6 +201,15 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Set speaker selection automatic or manual
+     *
+     * @param isAutomatic True, if it's automatic. False, if it's manual
+     */
+    fun setSpeakerSelection(isAutomatic: Boolean) {
+        isSpeakerSelectionAutomatic = isAutomatic
+    }
+
+    /**
      * Method to know if it's me
      *
      * @param peerId The handle
@@ -222,13 +237,35 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatSession
      */
     fun getSession(clientId: Long): MegaChatSession? {
-        if (clientId == MEGACHAT_INVALID_HANDLE)
-            return null
+        when (clientId) {
+            MEGACHAT_INVALID_HANDLE -> return null
+            else -> {
+                _callLiveData.value?.let {
+                    return it.getMegaChatSession(clientId)
+                }
 
-        _callLiveData.value?.let {
-            return it.getMegaChatSession(clientId)
+                return null
+            }
         }
 
+    }
+
+    /**
+     * Get the avatar
+     */
+    fun getAvatarBitmap(peerId: Long): Bitmap? {
+        getChat()?.let {
+            var avatar = CallUtil.getImageAvatarCall(it, peerId)
+            when (avatar) {
+                null -> {
+                    avatar = CallUtil.getDefaultAvatarCall(
+                        MegaApplication.getInstance().applicationContext,
+                        peerId
+                    )
+                }
+            }
+            return avatar
+        }
         return null
     }
 
@@ -248,11 +285,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun isAudioCall(): Boolean {
         _callLiveData.value?.let {
             val session = CallUtil.getSessionIndividualCall(it)
-            if (session != null && session.isOnHold && MegaApplication.wasLocalVideoEnable()) {
-                return false
+            when {
+                session != null && session.isOnHold && MegaApplication.wasLocalVideoEnable() -> {
+                    return false
+                }
+                else -> return session == null || (!it.hasLocalVideo() && !session.hasVideo())
             }
-
-            return session == null || (!it.hasLocalVideo() && !session.hasVideo())
         }
         return true
     }
@@ -264,9 +302,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isOneToOneCall(): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            if (!it.isGroup)
-                return true
+            return !it.isGroup
         }
+
         return false
     }
 
@@ -277,9 +315,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isCallOnHold(): Boolean {
         _callLiveData.value?.let { call ->
-            if (call.isOnHold) {
-                return true
-            }
+            return call.isOnHold
         }
 
         return false
@@ -306,9 +342,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             if (isOneToOneCall()) {
                 val session = inMeetingRepository.getSessionOneToOneCall(call)
                 session?.let { it ->
-                    if (it.isOnHold) {
-                        return true
-                    }
+                    return it.isOnHold
                 }
             }
         }
@@ -334,7 +368,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param peerId Use handle
      * @param list of participants with this user handle
      */
-    fun existsParticipants(peerId: Long): MutableSet<Participant> {
+    fun updateParticipantsName(peerId: Long): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
@@ -450,53 +484,62 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun showAppropriateBanner(bannerIcon: ImageView?, bannerText: TextView?): Boolean {
         //Check call or session on hold
-        if (isCallOnHold() || isSessionOnHoldOfOneToOneCall()) {
-            bannerIcon?.let {
-                it.isVisible = false
-            }
-            bannerText?.let {
-                it.text = StringResourcesUtils.getString(R.string.call_on_hold)
-            }
-            return true
-        }
-
-        //Check mute call or session
-        _callLiveData.value?.let { call ->
-            if (isOneToOneCall()) {
-                val session = inMeetingRepository.getSessionOneToOneCall(call)
-                when {
-                    session != null -> {
-                        if (!session.hasAudio() && session.peerid != MEGACHAT_INVALID_HANDLE) {
-                            bannerIcon?.let {
-                                it.isVisible = true
-                            }
-                            bannerText?.let {
-                                it.text = StringResourcesUtils.getString(
-                                    R.string.muted_contact_micro,
-                                    inMeetingRepository.getContactOneToOneCallName(
-                                        session.peerid
-                                    )
-                                )
-                                return true
-                            }
-
-                        }
-                    }
-                }
-            }
-            if (!call.hasLocalAudio()) {
+        when {
+            isCallOnHold() || isSessionOnHoldOfOneToOneCall() -> {
                 bannerIcon?.let {
                     it.isVisible = false
                 }
                 bannerText?.let {
-                    it.text =
-                        StringResourcesUtils.getString(R.string.muted_own_micro)
+                    it.text = StringResourcesUtils.getString(R.string.call_on_hold)
                 }
                 return true
             }
+
+            //Check mute call or session
+            else -> {
+                _callLiveData.value?.let { call ->
+                    when {
+                        isOneToOneCall() -> {
+                            val session = inMeetingRepository.getSessionOneToOneCall(call)
+                            when {
+                                session != null -> {
+                                    when {
+                                        !session.hasAudio() && session.peerid != MEGACHAT_INVALID_HANDLE -> {
+                                            bannerIcon?.let {
+                                                it.isVisible = true
+                                            }
+                                            bannerText?.let {
+                                                it.text = StringResourcesUtils.getString(
+                                                    R.string.muted_contact_micro,
+                                                    inMeetingRepository.getContactOneToOneCallName(
+                                                        session.peerid
+                                                    )
+                                                )
+                                                return true
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!call.hasLocalAudio()) {
+                        bannerIcon?.let {
+                            it.isVisible = false
+                        }
+                        bannerText?.let {
+                            it.text =
+                                StringResourcesUtils.getString(R.string.muted_own_micro)
+                        }
+                        return true
+                    }
+                }
+
+                return false
+            }
         }
 
-        return false
     }
 
     /**
@@ -511,32 +554,15 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Set view change to manual mode
-     */
-    fun setSpeakerViewManual() {
-        _callLiveData.value?.let { MegaApplication.setSpeakerViewAutomatic(it.callId, false) }
-    }
-
-    /**
-     * Method to know if the automatic view change mode is on
-     *
-     *  @return True, if it's automatic. False, otherwise
-     */
-    fun isSpeakerViewAutomatic(): Boolean {
-        return _callLiveData.value?.let { MegaApplication.isSpeakerViewAutomatic(it.callId) } == true
-    }
-
-    /**
      * Method for determining whether to display the camera switching icon.
      *
      * @return True, if it is. False, if not.
      */
     fun isNecessaryToShowSwapCameraOption(): Boolean {
         _callLiveData.value?.let {
-            if (it.hasLocalVideo() && !it.isOnHold) {
-                return true
-            }
+            return it.hasLocalVideo() && !it.isOnHold
         }
+
         return false
     }
 
@@ -577,12 +603,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to know if the participant is a moderator.
      */
-    fun isParticipantModerator(peerId: Long): Boolean {
+    private fun isParticipantModerator(peerId: Long): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val privileges = it.getPeerPrivilegeByHandle(peerId)
-            if (privileges == MegaChatRoom.PRIV_MODERATOR)
-                return true
+            return privileges == MegaChatRoom.PRIV_MODERATOR
         }
+
         return false
     }
 
@@ -594,6 +620,27 @@ class InMeetingViewModel @ViewModelInject constructor(
             return inMeetingRepository.isMyContact(it, peerId)
         }
         return false
+    }
+
+    /**
+     * Method to update whether a user is my contact or not
+     *
+     * @param peerId User handle
+     */
+    fun updateParticipantsVisibility(peerId: Long) {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value?.let { listParticipants ->
+                val iterator = listParticipants.iterator()
+
+                iterator.forEach {
+                    when (it.peerId) {
+                        peerId -> {
+                            it.isContact = isMyContact(peerId)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -621,16 +668,54 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method for adding a participant
+     * Method for updating the speaking participant
+     *
+     * @param session MegaChatSession
+     * @return list of participants with changes
      */
-    fun createParticipant(session: MegaChatSession): Boolean {
+    fun updatePeerSelected(peerId: Long, clientId: Long): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value?.let { listParticipants ->
+                val iterator = listParticipants.iterator()
+                iterator.forEach {
+                    when {
+                        it.peerId != peerId || it.clientId != clientId -> {
+                            when {
+                                it.isSelected -> {
+                                    it.isSelected = false
+                                    onCloseVideo(it)
+                                    listWithChanges.add(it)
+                                }
+                            }
+                        }
+                        else -> {
+                            it.isSelected = true
+                            _speakerParticipant.value = it
+                            _speakerParticipant.value!!.hasHiRes = true
+                            listWithChanges.add(it)
+                        }
+                    }
+                }
+            }
+        }
+        return listWithChanges
+    }
+
+    /**
+     * Method for adding a participant
+     *
+     * @param session MegaChatSession
+     * @return the position of the participant
+     */
+    fun createParticipant(session: MegaChatSession): Int? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter {
                     it.peerId == session.peerid && it.clientId == session.clientid
                 }
                 if (!peer.isNullOrEmpty()) {
-                    return false
+                    return INVALID_POSITION
                 }
             }
 
@@ -662,10 +747,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             )
 
             participants.value?.add(userPeer)
+            participants.value = participants.value
             logDebug("Num of participants:" + participants.value?.size)
-            return true
+            return participants.value?.indexOf(userPeer)
         }
-        return false
+        return INVALID_POSITION
     }
 
     /**
@@ -712,23 +798,56 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     /**
      * Method for removing a participant
+     *
+     * @param session MegaChatSession
+     * @return the position of the participant
      */
-    fun removeParticipant(session: MegaChatSession): Boolean {
+    fun removeParticipant(session: MegaChatSession): Int? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { participant ->
                 participant.forEach {
                     when {
                         it.peerId == session.peerid && it.clientId == session.clientid -> {
+                            when {
+                                it.isSelected -> {
+                                    assignMeAsSpeaker()
+                                }
+                            }
+                            val position = participants.value?.indexOf(it)
                             participant.remove()
+                            participants.value = participants.value
                             logDebug("Num of participants:" + participants.value?.size)
-                            return true
+                            return position
                         }
                     }
                 }
             }
         }
-        return false
+        return INVALID_POSITION
+    }
+
+    fun assignMeAsSpeaker() {
+        _speakerParticipant.value = inMeetingRepository.getMeToSpeakerView(currentChatId)
+    }
+
+    /**
+     * Get participant from peerId and clientId
+     *
+     * @param peerId peer ID
+     * @param clientId client ID
+     */
+    fun getParticipant(peerId: Long, clientId: Long): Participant? {
+        participants.value?.let { list ->
+            val participant = list.filter {
+                it.peerId == peerId && it.clientId == clientId
+            }
+            if (participant.isNotEmpty()) {
+                return participant[0]
+            }
+        }
+
+        return null
     }
 
     /**
@@ -738,10 +857,14 @@ class InMeetingViewModel @ViewModelInject constructor(
         val iterator = participants.value?.iterator()
         iterator?.let { participant ->
             participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                    if (it.isVideoOn != session.hasVideo()) {
-                        it.isVideoOn = session.hasVideo()
-                        return true
+                when {
+                    it.peerId == session.peerid && it.clientId == session.clientid -> {
+                        when {
+                            it.isVideoOn != session.hasVideo() -> {
+                                it.isVideoOn = session.hasVideo()
+                                return true
+                            }
+                        }
                     }
                 }
             }
@@ -756,10 +879,14 @@ class InMeetingViewModel @ViewModelInject constructor(
         val iterator = participants.value?.iterator()
         iterator?.let { participant ->
             participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                    if (it.isAudioOn != session.hasAudio()) {
-                        it.isAudioOn = session.hasAudio()
-                        return true
+                when {
+                    it.peerId == session.peerid && it.clientId == session.clientid -> {
+                        when {
+                            it.isAudioOn != session.hasAudio() -> {
+                                it.isAudioOn = session.hasAudio()
+                                return true
+                            }
+                        }
                     }
                 }
             }
@@ -782,15 +909,18 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param newTitle the chat title
      */
     fun setTitleChat(newTitle: String) {
-        if (currentChatId == MEGACHAT_INVALID_HANDLE) {
-            _chatTitle.value = newTitle
-        } else {
-            inMeetingRepository.getChatRoom(currentChatId)?.let {
-                inMeetingRepository.setTitleChatRoom(
-                    it.chatId,
-                    newTitle,
-                    EditChatRoomNameListener(MegaApplication.getInstance(), this)
-                )
+        when (currentChatId) {
+            MEGACHAT_INVALID_HANDLE -> {
+                _chatTitle.value = newTitle
+            }
+            else -> {
+                inMeetingRepository.getChatRoom(currentChatId)?.let {
+                    inMeetingRepository.setTitleChatRoom(
+                        it.chatId,
+                        newTitle,
+                        EditChatRoomNameListener(MegaApplication.getInstance(), this)
+                    )
+                }
             }
         }
     }
@@ -848,7 +978,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Add Low Resolution
      */
-    fun addLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun addLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
         logDebug("Add LowRes")
         session?.let { sessionParticipant ->
             inMeetingRepository.addRemoteVideo(
@@ -874,7 +1004,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove Low Resolution
      */
-    fun removeLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun removeLowRes(
+        listener: MeetingVideoListener,
+        session: MegaChatSession?,
+        chatId: Long
+    ) {
         logDebug("Remove LowRes")
         session?.let { sessionParticipant ->
             when {
@@ -904,27 +1038,29 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param participant
      */
     fun onCloseVideo(participant: Participant) {
-        if (participant.videoListener == null)
-            return
-
-        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
-            getSession(participant.clientId)?.let {
-                when {
-                    participant.hasHiRes -> removeHiRes(
-                        participant.videoListener!!,
-                        it,
-                        chat.chatId
-                    )
-                    else -> removeLowRes(
-                        participant.videoListener!!,
-                        it,
-                        chat.chatId
-                    )
+        when (participant.videoListener) {
+            null -> return
+            else -> {
+                inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
+                    getSession(participant.clientId)?.let {
+                        when {
+                            participant.hasHiRes -> removeHiRes(
+                                participant.videoListener!!,
+                                it,
+                                chat.chatId
+                            )
+                            else -> removeLowRes(
+                                participant.videoListener!!,
+                                it,
+                                chat.chatId
+                            )
+                        }
+                    }
                 }
+
+                participant.videoListener = null
             }
         }
-
-        participant.videoListener = null
     }
 
     /**
@@ -956,26 +1092,33 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param participant
      */
-    fun onChangeResolution(participant: Participant) {
-        if (participant.videoListener == null)
-            return
+    fun onChangeResolution(participant: Participant) {//Change HiRes to LowRes
+        //Change LowRes to HiRes
+        when (participant.videoListener) {
+            null -> return
+            else -> {
+                inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
+                    getSession(participant.clientId)?.let {
+                        when {
+                            participant.hasHiRes -> {
+                                //Change LowRes to HiRes
+                                removeLowRes(participant.videoListener!!, it, chat.chatId)
+                                addHiRes(participant.videoListener!!, it, chat.chatId)
 
-        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
-            getSession(participant.clientId)?.let {
-                if (participant.hasHiRes) {
-                    //Change LowRes to HiRes
-                    removeLowRes(participant.videoListener!!, it, chat.chatId)
-                    addHiRes(participant.videoListener!!, it, chat.chatId)
-
-                } else {
-                    //Change HiRes to LowRes
-                    removeHiRes(participant.videoListener!!, it, chat.chatId)
-                    addLowRes(participant.videoListener!!, it, chat.chatId)
+                            }
+                            else -> {
+                                //Change HiRes to LowRes
+                                removeHiRes(participant.videoListener!!, it, chat.chatId)
+                                addLowRes(participant.videoListener!!, it, chat.chatId)
+                            }
+                        }
+                    }
                 }
+
+                participant.videoListener = null
             }
         }
 
-        participant.videoListener = null
     }
 
     override fun onCleared() {
@@ -986,8 +1129,10 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
-        if (currentChatId == chatId) {
-            _chatTitle.value = name
+        when (currentChatId) {
+            chatId -> {
+                _chatTitle.value = name
+            }
         }
     }
 
@@ -1003,7 +1148,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
 
-    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface){
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
         inMeetingRepository.joinPublicChat(chatId, listener)
     }
 
@@ -1055,5 +1200,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     )
 
     fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
-        inMeetingRepository.getMyInfo(getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR, audio, video)
+        inMeetingRepository.getMyInfo(
+            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
+            audio,
+            video
+        )
 }

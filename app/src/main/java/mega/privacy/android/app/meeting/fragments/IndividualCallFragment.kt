@@ -204,15 +204,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Initialising the avatar
      */
     private fun initAvatar() {
-        inMeetingViewModel.getChat()?.let {
-            var avatar = getImageAvatarCall(it, peerId!!)
-            when (avatar) {
-                null -> {
-                    avatar = CallUtil.getDefaultAvatarCall(context, peerId!!)
-                }
-            }
-
-            vAvatar.setImageBitmap(avatar)
+        inMeetingViewModel.getAvatarBitmap(peerId!!)?.let {
+            vAvatar.setImageBitmap(it)
         }
     }
 

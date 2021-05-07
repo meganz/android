@@ -9,8 +9,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaApiAndroid
 import org.jetbrains.anko.displayMetrics
 import javax.inject.Inject
@@ -33,6 +32,8 @@ class VideoGridViewHolder(
 
     lateinit var holder: SurfaceHolder
 
+    private val SIZE_AVATAR = 88
+
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
         participant: Participant,
@@ -54,24 +55,99 @@ class VideoGridViewHolder(
         holder = binding.video.holder
     }
 
-    fun updateName(participant: Participant) {
-        binding.name.text = participant.name
+    /**
+     * Initialising the avatar
+     *
+     * @param participant
+     */
+    private fun initAvatar(participant: Participant) {
+        val paramsAvatar = binding.avatar.layoutParams
+        paramsAvatar.width =
+            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+        paramsAvatar.height =
+            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+        binding.avatar.layoutParams = paramsAvatar
+
+        val paramsOnHoldIcon = binding.onHoldIcon.layoutParams
+        paramsOnHoldIcon.width =
+            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+        paramsOnHoldIcon.height =
+            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+        binding.onHoldIcon.layoutParams = paramsOnHoldIcon
+
+
+        inMeetingViewModel.getAvatarBitmap(participant.peerId)?.let {
+            binding.avatar.setImageBitmap(it)
+        }
     }
 
+    /**
+     * Check the initial UI
+     *
+     * @param participant
+     */
+    private fun initStatus(participant: Participant) {
+        val session = inMeetingViewModel.getSession(participant.peerId)
+        val call = inMeetingViewModel.getCall()
+        call?.let {
+            if (participant.isVideoOn && !it.isOnHold && (session == null || !session.isOnHold)) {
+                activateVideo(participant)
+            } else {
+                showAvatar(participant)
+            }
+
+            updateAudioIcon(participant)
+            updatePrivilegeIcon(participant)
+        }
+    }
+
+    /**
+     * Update resolution
+     *
+     * @param participant
+     */
     fun updateRes(participant: Participant) {
         if (participant.isVideoOn) {
             inMeetingViewModel.onChangeResolution(participant)
         }
     }
 
+    /**
+     * Update name and avatar
+     *
+     * @param participant
+     */
+    fun updateName(participant: Participant) {
+        binding.name.text = participant.name
+
+        inMeetingViewModel.getAvatarBitmap(participant.peerId)?.let {
+            binding.avatar.setImageBitmap(it)
+        }
+    }
+
+    /**
+     * Update privileges
+     *
+     * @param participant
+     */
     fun updatePrivilegeIcon(participant: Participant) {
         binding.moderatorIcon.isVisible = participant.isModerator
     }
 
+    /**
+     * Check if mute icon should be visible
+     *
+     * @param participant
+     */
     fun updateAudioIcon(participant: Participant) {
         binding.muteIcon.isVisible = !participant.isAudioOn
     }
 
+    /**
+     * Check when the call is on hold or not
+     *
+     * @param participant
+     */
     fun updateCallOnHold(participant: Participant, isCallOnHold: Boolean) {
         if (isCallOnHold) {
             binding.avatar.alpha = 0.5f
@@ -86,6 +162,11 @@ class VideoGridViewHolder(
         }
     }
 
+    /**
+     * Check when the session is on hold or not
+     *
+     * @param participant
+     */
     fun updateSessionOnHold(participant: Participant, isSessionOnHold: Boolean) {
         if (isSessionOnHold) {
             binding.onHoldIcon.isVisible = true
@@ -102,6 +183,11 @@ class VideoGridViewHolder(
         }
     }
 
+    /**
+     * Check whether video should be activated or closed.
+     *
+     * @param participant
+     */
     fun updateVideo(participant: Participant) {
         when {
             participant.isVideoOn -> {
@@ -113,35 +199,11 @@ class VideoGridViewHolder(
         }
     }
 
-    private fun initAvatar(participant: Participant) {
-        inMeetingViewModel.getChat()?.let {
-            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
-            if (avatar == null) {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    participant.peerId
-                )
-            }
-
-            binding.avatar.setImageBitmap(avatar)
-        }
-    }
-
-    private fun initStatus(participant: Participant) {
-        val session = inMeetingViewModel.getSession(participant.peerId)
-        val call = inMeetingViewModel.getCall()
-        call?.let {
-            if (participant.isVideoOn && !it.isOnHold && (session == null || !session.isOnHold)) {
-                activateVideo(participant)
-            } else {
-                showAvatar(participant)
-            }
-
-            updateAudioIcon(participant)
-            updatePrivilegeIcon(participant)
-        }
-    }
-
+    /**
+     * Show avatar and close video
+     *
+     * @param participant
+     */
     private fun showAvatar(participant: Participant) {
         binding.avatar.isVisible = true
         closeVideo(participant)
