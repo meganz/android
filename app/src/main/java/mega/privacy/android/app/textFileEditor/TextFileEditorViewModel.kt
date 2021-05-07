@@ -72,6 +72,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     private var needsReadContent = false
+    private var isReadingContent = false
     private var errorSettingContent = false
     private var localFileUri: String? = null
     private var streamingFileURL: URL? = null
@@ -139,15 +140,21 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun needsReadContent(): Boolean = needsReadContent
 
+    fun isReadingContent(): Boolean = isReadingContent
+
+    fun needsReadOrIsReadingContent(): Boolean = needsReadContent || isReadingContent
+
     fun errorSettingContent() {
         errorSettingContent = true
     }
+
+    fun thereIsErrorSettingContent(): Boolean = errorSettingContent
 
     fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
 
     fun canShowEditFab(): Boolean =
         isViewMode() && isEditableAdapter() && !isSaving()
-                && !needsReadContent() && thereIsNoErrorSettingContent()
+                && !needsReadOrIsReadingContent() && thereIsNoErrorSettingContent()
 
     init {
         contentText.value = ""
@@ -297,6 +304,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      */
     private suspend fun readFile() {
         withContext(Dispatchers.IO) {
+            isReadingContent = true
+            needsReadContent = false
+
             if (!isTextEmpty(localFileUri)) {
                 val localFile = File(localFileUri!!)
 
@@ -339,7 +349,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             }
 
             checkIfNeedsStopHttpServer()
-            needsReadContent = false
+            isReadingContent = false
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
             sb.clear()
