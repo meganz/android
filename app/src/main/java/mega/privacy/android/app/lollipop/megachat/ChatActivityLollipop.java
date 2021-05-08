@@ -652,7 +652,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     @Override
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
-        openMeetingInProgress(this, chatId);
+        openMeetingInProgress(this, chatId, true);
     }
 
     @Override

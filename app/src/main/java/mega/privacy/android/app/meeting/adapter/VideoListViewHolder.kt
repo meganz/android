@@ -88,7 +88,8 @@ class VideoListViewHolder(
      * @param participant
      */
     private fun initStatus(participant: Participant) {
-        val session = inMeetingViewModel.getSession(participant.peerId)
+        logDebug("Initial status")
+        val session = inMeetingViewModel.getSession(participant.clientId)
         val call = inMeetingViewModel.getCall()
         call?.let {
             when {
@@ -97,12 +98,29 @@ class VideoListViewHolder(
                 }
                 else -> {
                     showAvatar(participant)
+                    session?.let { session ->
+                        checkOnHold(it.isOnHold, session.isOnHold)
+                    }
                 }
             }
 
             updateAudioIcon(participant)
             updatePrivilegeIcon(participant)
         }
+    }
+    private fun checkOnHold(isCallOnHold: Boolean, isSessionOnHold: Boolean){
+        if(isSessionOnHold){
+            binding.onHoldIcon.isVisible = true
+            binding.avatar.alpha = 0.5f
+        }else{
+            binding.onHoldIcon.isVisible = false
+            if(isCallOnHold){
+                binding.avatar.alpha = 0.5f
+            }else{
+                binding.avatar.alpha = 1f
+            }
+        }
+
     }
 
     /**

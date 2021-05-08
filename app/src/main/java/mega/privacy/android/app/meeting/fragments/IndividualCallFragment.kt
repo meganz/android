@@ -180,7 +180,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initAvatar()
-        initLocalVideo()
+        initStatus()
 
         when {
             isFloatingWindow -> {
@@ -212,13 +212,25 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Initialising the local video
      */
-    private fun initLocalVideo() {
-        when {
-            inMeetingViewModel.isMe(this.peerId) -> {
-                inMeetingViewModel.getCall()?.let {
+    private fun initStatus() {
+        inMeetingViewModel.getCall()?.let {
+            when {
+                inMeetingViewModel.isMe(this.peerId) -> {
                     when {
                         it.hasLocalVideo() -> activateVideo(this.peerId!!, this.clientId!!)
                         else -> showAvatar(this.peerId!!, this.clientId!!)
+                    }
+                }
+                else -> {
+                    val session = inMeetingViewModel.getSession(this.clientId!!)
+                    session?.let {
+                        when {
+                            it.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold() -> activateVideo(
+                                this.peerId!!,
+                                this.clientId!!
+                            )
+                            else -> showAvatar(this.peerId!!, this.clientId!!)
+                        }
                     }
                 }
             }
@@ -247,29 +259,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     private fun showCallOnHoldIcon() {
         when {
-            inMeetingViewModel.isOneToOneCall() -> {
-                when {
-                    inMeetingViewModel.isCallOrSessionOnHold() && !isFloatingWindow -> {
-                        vOnHold.isVisible = true
-                        vAvatar.alpha = 0.5f
-                    }
-                    else -> {
-                        vOnHold.isVisible = false
-                        vAvatar.alpha = 1f
-                    }
-                }
+            inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHold() && !isFloatingWindow ||
+                    !inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold() -> {
+                vOnHold.isVisible = true
+                vAvatar.alpha = 0.5f
             }
             else -> {
-                when {
-                    inMeetingViewModel.isCallOnHold() -> {
-                        vOnHold.isVisible = true
-                        vAvatar.alpha = 0.5f
-                    }
-                    else -> {
-                        vOnHold.isVisible = false
-                        vAvatar.alpha = 1f
-                    }
-                }
+                vOnHold.isVisible = false
+                vAvatar.alpha = 1f
             }
         }
     }

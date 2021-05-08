@@ -31,6 +31,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -104,6 +105,7 @@ public class CallUtil {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.setAction(MEETING_ACTION_RINGING);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         context.startActivity(meetingIntent);
@@ -115,13 +117,20 @@ public class CallUtil {
      * @param context Context
      * @param chatId  chat ID
      */
-    public static void openMeetingInProgress(Context context, long chatId) {
+    public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask) {
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.getInstance().openCallService(chatId);
+        if(isNewTask){
+            MegaApplication.getInstance().openCallService(chatId);
+        }
+
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if(isNewTask){
+            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }else{
+            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
         context.startActivity(meetingIntent);
     }
 
@@ -227,6 +236,35 @@ public class CallUtil {
     }
 
     /**
+     * Retrieve the id of a chat that has a call in progress different that current one
+     *
+     * @param currentChatId the chat ID of the current call
+     * @return A long data type. It's the id of chat
+     */
+    public static long getAnotherCallParticipating(Long currentChatId) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
+        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
+            for (int i = 0; i < listCallsInProgress.size(); i++) {
+                if(listCallsInProgress.get(i) != currentChatId){
+                    return listCallsInProgress.get(i);
+                }
+            }
+        }
+
+        MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
+        if (listCallsJoining != null && listCallsJoining.size() > 0) {
+            for (int i = 0; i < listCallsJoining.size(); i++) {
+                if(listCallsJoining.get(i) != currentChatId){
+                    return listCallsJoining.get(i);
+                }
+            }
+        }
+
+        return MEGACHAT_INVALID_HANDLE;
+    }
+
+    /**
      * Open the call that is in progress
      *
      * @param context from which the action is done
@@ -237,7 +275,7 @@ public class CallUtil {
             for (Long chatIdCall : currentCalls) {
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
                 if (call != null) {
-                    openMeetingInProgress(context, chatIdCall);
+                    openMeetingInProgress(context, chatIdCall, false);
                     break;
                 }
             }
@@ -257,7 +295,7 @@ public class CallUtil {
 
         for (Long chatIdCall : currentCalls) {
             if (chatIdCall == chatId) {
-                openMeetingInProgress(context, chatId);
+                openMeetingInProgress(context, chatId, false);
                 return;
             }
         }
@@ -629,13 +667,15 @@ public class CallUtil {
     public static void disableLocalCamera() {
         long idCall = isNecessaryDisableLocalCamera();
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (idCall == -1) return;
-
-        megaChatApi.disableVideo(idCall, null);
+        if (idCall == MEGACHAT_INVALID_HANDLE) {
+            megaChatApi.releaseVideoDevice(null);
+        } else {
+            megaChatApi.disableVideo(idCall, null);
+        }
     }
 
     public static long isNecessaryDisableLocalCamera() {
-        long noVideo = -1;
+        long noVideo = MEGACHAT_INVALID_HANDLE;
 
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         long chatIdCallInProgress = getChatCallInProgress();
@@ -903,6 +943,7 @@ public class CallUtil {
 
     public static PendingIntent getPendingIntentMeetingInProgress(Context context, long chatIdCallToAnswer, int requestCode) {
         Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_IN);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
         return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -910,6 +951,7 @@ public class CallUtil {
 
     public static PendingIntent getPendingIntentMeetingRinging(Context context, long chatIdCallToAnswer, int requestCode) {
         Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_RINGING);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
         return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -950,7 +992,7 @@ public class CallUtil {
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, listener);
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
-            openMeetingInProgress(activity, chat.getChatId());
+            openMeetingInProgress(activity, chat.getChatId(), true);
         } else if (isStatusConnected(activity, chat.getChatId())) {
             MegaApplication.setUserWaitingForCall(user.getHandle());
             startCallWithChatOnline(activity, chat);

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -17,21 +16,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
-import nz.mega.sdk.MegaChatError.ERROR_OK
 import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
@@ -284,7 +279,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isAudioCall(): Boolean {
         _callLiveData.value?.let {
-            val session = CallUtil.getSessionIndividualCall(it)
+            val session = getSessionOneToOneCall(it)
             when {
                 session != null && session.isOnHold && MegaApplication.wasLocalVideoEnable() -> {
                     return false
@@ -337,7 +332,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if is on hold. False, otherwise
      */
-    private fun isSessionOnHoldOfOneToOneCall(): Boolean {
+    fun isSessionOnHoldOfOneToOneCall(): Boolean {
         _callLiveData.value?.let { call ->
             if (isOneToOneCall()) {
                 val session = inMeetingRepository.getSessionOneToOneCall(call)
@@ -347,6 +342,57 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
         return false
+    }
+
+    fun isAnotherCallOneToOneCall(anotherCallChatId: Long): Boolean {
+        inMeetingRepository.getChatRoom(anotherCallChatId)?.let {
+            return !it.isGroup
+        }
+        return false
+    }
+
+    fun isSessionOnHoldAnotherOneToOneCall(anotherCall: MegaChatCall): Boolean {
+        anotherCall.let {
+            val session = inMeetingRepository.getSessionOneToOneCall(anotherCall)
+            session?.let { it ->
+                return it.isOnHold
+            }
+        }
+        return false
+    }
+
+    /**
+     * Method to know if exists another call in progress or on hold.
+     *
+     * @return MegaChatCall
+     */
+    fun getAnotherCall(): MegaChatCall? {
+        val anotherCallChatId = CallUtil.getAnotherCallParticipating(currentChatId)
+        if (anotherCallChatId != MEGACHAT_INVALID_HANDLE) {
+            val anotherCall = inMeetingRepository.getMeeting(anotherCallChatId)
+            anotherCall?.let {
+                if (isCallOnHold() && !it.isOnHold) {
+                    logDebug("This call in on hold, another call in progress")
+                    return anotherCall
+                } else if (!isCallOnHold() && it.isOnHold) {
+                    logDebug("This call in progress, another call on hold")
+                    return anotherCall
+                }
+            }
+
+        }
+
+        logDebug("No other calls in progress or on hold")
+        return null
+    }
+
+    /**
+     * Get session of a contact in a one-to-one call
+     *
+     * @param callChat MegaChatCall
+     */
+    fun getSessionOneToOneCall(callChat: MegaChatCall?): MegaChatSession? {
+        return callChat?.getMegaChatSession(callChat.sessionsClientid[0])
     }
 
     /**
@@ -395,6 +441,17 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun setCallOnHold(isOn: Boolean) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
+            inMeetingRepository.setCallOnHold(it.chatId, isOn)
+        }
+    }
+
+    /**
+     * Method to switch another call on hold
+     *
+     * @param isOn True, if I am going to put it on hold. False, otherwise
+     */
+    fun setAnotherCallOnHold(chatId: Long, isOn: Boolean) {
+        inMeetingRepository.getChatRoom(chatId)?.let {
             inMeetingRepository.setCallOnHold(it.chatId, isOn)
         }
     }

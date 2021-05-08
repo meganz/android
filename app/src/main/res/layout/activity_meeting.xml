@@ -59,6 +59,52 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <LinearLayout
+        android:id="@+id/banner_another_call"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondaryColor"
+        android:elevation="1dp"
+        android:gravity="center"
+        android:minHeight="36dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
+            android:id="@+id/banner_another_call_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@null"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start"
+            android:maxLines="1"
+            android:text="@string/call_on_hold"
+            android:textAlignment="gravity"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:emojiSize="18sp" />
+
+        <TextView
+            android:id="@+id/banner_another_call_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start"
+            android:maxLines="1"
+            android:text="@string/call_on_hold"
+            android:textAlignment="gravity"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+
+    <LinearLayout
         android:id="@+id/banner_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,7 +113,7 @@
         android:minHeight="36dp"
         android:orientation="horizontal"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/banner_another_call">
 
         <ImageView
             android:id="@+id/banner_icon"

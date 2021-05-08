@@ -992,7 +992,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			logDebug("Chat exists");
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				logDebug("There is a call, open it");
-				openMeetingInProgress(this, chatRoomTo.getChatId());
+				openMeetingInProgress(this, chatRoomTo.getChatId(), true);
 			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				logDebug("There is no call, start it");
 				startCallWithChatOnline(chatRoomTo);
