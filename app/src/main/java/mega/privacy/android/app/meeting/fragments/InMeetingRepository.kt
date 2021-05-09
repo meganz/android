@@ -254,6 +254,12 @@ class InMeetingRepository @Inject constructor(
         )
     }
 
+    /**
+     * Method to know if a user is my contact
+     *
+     * @param peerId
+     * @return True, if it's. False, otherwise.
+     */
     fun isMyContact(peerId: Long): Boolean {
         val email: String = ChatController(context).getParticipantEmail(peerId)
         val contact = megaApi.getContact(email)
@@ -264,6 +270,12 @@ class InMeetingRepository @Inject constructor(
         return false
     }
 
+    /**
+     * Method to get the participant's name
+     *
+     * @param peerId
+     * @return The name
+     */
     fun participantName(peerId: Long): String {
         return ChatController(context).getParticipantFullName(peerId)
     }
@@ -332,6 +344,12 @@ class InMeetingRepository @Inject constructor(
 
     }
 
+    /**
+     * Method to get own privileges in a chat
+     *
+     * @param chatId
+     * @return the privileges
+     */
     fun getOwnPrivileges(chatId: Long): Int {
         getChatRoom(chatId)?.let {
             return it.ownPrivilege
