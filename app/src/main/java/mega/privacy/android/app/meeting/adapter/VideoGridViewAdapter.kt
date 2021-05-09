@@ -17,27 +17,28 @@ class VideoGridViewAdapter(
     private val screenHeight: Int,
     private val pagePosition: Int,
     private val orientation: Int
-) : ListAdapter<Participant, VideoGridViewHolder>(ParticipantDiffCallback()) {
+) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
-    override fun onBindViewHolder(gridHolder: VideoGridViewHolder, position: Int) {
+    override fun onBindViewHolder(gridHolder: VideoMeetingViewHolder, position: Int) {
         gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoGridViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return VideoGridViewHolder(
+        return VideoMeetingViewHolder(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             screenWidth,
             screenHeight,
-            orientation
+            orientation,
+            true
         )
     }
 
-    fun getHolder(position: Int): VideoGridViewHolder {
-        return gridView.findViewHolderForAdapterPosition(position) as VideoGridViewHolder
+    fun getHolder(position: Int): VideoMeetingViewHolder {
+        return gridView.findViewHolderForAdapterPosition(position) as VideoMeetingViewHolder
     }
 
     /**
@@ -60,6 +61,11 @@ class VideoGridViewAdapter(
         getHolder(position).updateName(participant)
     }
 
+    /**
+     * Update participant resolution
+     *
+     * @param participant
+     */
     fun updateParticipantRes(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).updateRes(participant)
@@ -74,7 +80,7 @@ class VideoGridViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).let {
             if(typeChange == TYPE_VIDEO){
-                it.updateVideo(participant)
+                it.checkVideOn(participant)
             }else if(typeChange ==  TYPE_AUDIO){
                 it.updateAudioIcon(participant)
             }

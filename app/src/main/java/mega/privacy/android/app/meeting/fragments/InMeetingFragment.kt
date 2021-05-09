@@ -110,6 +110,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var isModerator = true
 
     private var status = NOT_TYPE
+    private val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
 
     // For internal UI/UX use
     private var previousY = -1f
@@ -225,6 +226,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.isSameCall(it.callId) &&
                     it.status != INVALID_CALL_STATUS &&
                     (it.callCompositionChange == 1 || it.callCompositionChange == -1) -> {
+
                 when {
                     inMeetingViewModel.isOneToOneCall() -> {
                         if (it.numParticipants == 1 || it.numParticipants == 2) {
@@ -305,6 +307,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         !inMeetingViewModel.isOneToOneCall() -> {
                             when (callAndSession.second.status) {
                                 MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                    logDebug("Session in progress")
+
                                     val position =
                                         inMeetingViewModel.createParticipant(callAndSession.second)
                                     position?.let {
@@ -314,12 +318,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     }
                                 }
                                 MegaChatSession.SESSION_STATUS_DESTROYED -> {
+                                    logDebug("Session destroyed")
                                     val position =
                                         inMeetingViewModel.removeParticipant(callAndSession.second)
                                     position?.let {
                                         if (position != INVALID_POSITION) {
                                             participantAddedOfLeftMeeting(false, it)
                                         }
+                                    }
+                                    if (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.amIAloneOnTheCall(
+                                            inMeetingViewModel.getChatId()
+                                        )
+                                    ) {
+                                        checkChildFragments()
                                     }
                                 }
                             }
@@ -440,6 +451,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Set on page tapping listener.
         setPageOnClickListener(view)
         checkChildFragments()
+        checkCurrentParticipants()
         checkAnotherCall()
         inMeetingViewModel.getCall()?.let {
             isCallOnHold(inMeetingViewModel.isCallOnHold())
@@ -750,13 +762,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateOneToOneUI() {
         inMeetingViewModel.getCall()?.let {
             when {
-                inMeetingViewModel.isOnlyMeOnTheCall(it.chatid) -> {
+                inMeetingViewModel.amIAloneOnTheCall(it.chatid) -> {
+                    logDebug("One to one call. Waiting for connection")
                     waitingForConnection(it.chatid)
                 }
                 else -> {
                     val session = inMeetingViewModel.getSessionOneToOneCall(it)
                     session?.let {
-                        logDebug("Session exists")
+                        logDebug("One to one call. Session exists")
                         initOneToOneCall()
                     }
                 }
@@ -852,9 +865,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show the correct UI in a meeting
      */
     private fun updateGroupUI() {
+        logDebug("Update group UI")
         inMeetingViewModel.getCall()?.let { call ->
             when {
-                inMeetingViewModel.isOnlyMeOnTheCall(call.chatid) -> {
+                inMeetingViewModel.amIAloneOnTheCall(call.chatid) -> {
                     waitingForConnection(call.chatid)
                 }
                 else -> {
@@ -864,10 +878,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    private fun checkCurrentParticipants() {
+        inMeetingViewModel.getCall()?.let {
+            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid)
+        }
+    }
+
     /**
      * Control the UI of the call, whether one-to-one or meeting
      */
     private fun checkChildFragments() {
+        logDebug("Check child fragments")
+
         when {
             inMeetingViewModel.isOneToOneCall() -> {
                 logDebug("One to one call")
@@ -979,6 +1001,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 status = TYPE_IN_SPEAKER_VIEW
 
                 logDebug("Group call - Speaker View")
+
+                gridViewCallFragment?.let {
+                    removeChildFragment(it)
+                }
+                
                 if (speakerViewCallFragment == null) {
                     speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
                 }
@@ -994,7 +1021,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 checkGridSpeakerViewMenuItemVisibility()
             }
         }
-
     }
 
     private fun initGridViewMode() {
@@ -1004,6 +1030,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         status = TYPE_IN_GRID_VIEW
         logDebug("Group call - Grid View")
+
+        speakerViewCallFragment?.let {
+            removeChildFragment(it)
+        }
 
         if (gridViewCallFragment == null) {
             gridViewCallFragment = GridViewCallFragment.newInstance()
@@ -1030,10 +1060,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         if (!isManualModeView) {
             inMeetingViewModel.getCall()?.let {
-                if (it.numParticipants > 6) {
-                    initSpeakerViewMode()
-                } else {
+                if (it.numParticipants <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC) {
                     initGridViewMode()
+                } else {
+                    initSpeakerViewMode()
                 }
             }
         }
@@ -1323,15 +1353,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         showBannerInfo()
-        if (!inMeetingViewModel.isOneToOneCall()) {
-            gridViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateCallOnHold(isHold)
+        when {
+            !inMeetingViewModel.isOneToOneCall() -> {
+                gridViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateCallOnHold(isHold)
+                    }
                 }
-            }
-            speakerViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateCallOnHold(isHold)
+                speakerViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateCallOnHold(isHold)
+                    }
                 }
             }
         }
@@ -1350,20 +1382,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun controlVideoLocalOneToOneCall(camOn: Boolean) {
         individualCallFragment?.let {
             if (it.isAdded) {
-                if (camOn) {
-                    it.activateVideo(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
-                } else {
-                    it.showAvatar(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                when {
+                    camOn -> {
+                        it.checkVideoOn(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                    }
+                    else -> {
+                        it.videoOffUI(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                    }
                 }
             }
         }
 
         floatingWindowFragment?.let {
             if (it.isAdded) {
-                if (camOn) {
-                    it.activateVideo(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
-                } else {
-                    it.showAvatar(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                when {
+                    camOn -> {
+                        it.checkVideoOn(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                    }
+                    else -> {
+                        it.videoOffUI(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                    }
                 }
             }
         }
@@ -1376,8 +1414,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateLocalVideo(camOn: Boolean) {
         inMeetingViewModel.getCall()?.let {
             val isVideoOn: Boolean = it.hasLocalVideo()
-            if (!inTemporaryState) {
-                MegaApplication.setVideoStatus(it.chatid, isVideoOn)
+            when {
+                !inTemporaryState -> {
+                    MegaApplication.setVideoStatus(it.chatid, isVideoOn)
+                }
             }
         }
 
@@ -1412,22 +1452,31 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     ) {
         gridViewCallFragment?.let {
             if (it.isAdded) {
-                if (isAudioChange) {
-                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                when {
+                    isAudioChange -> {
+                        it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                    }
                 }
-                if (isVideoChange) {
-                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                when {
+                    isVideoChange -> {
+                        it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                    }
                 }
             }
         }
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                if (isAudioChange) {
-                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                when {
+                    isAudioChange -> {
+                        it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                    }
                 }
-                if (isVideoChange) {
-                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                when {
+                    isVideoChange -> {
+
+                        it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                    }
                 }
             }
         }
@@ -1435,14 +1484,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {
         updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(
-                isAdded
-            )
+            inMeetingViewModel.checkParticipantsResolution(isAdded)
         )
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                it.peerAddedOrRemoved(isAdded, position)
+                it.peerAddedOrRemoved(isAdded, position, inMeetingViewModel.participants.value!!)
             }
         }
     }
@@ -1757,6 +1804,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             finishActivity()
         } else {
             CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
+            finishActivity()
         }
     }
 }

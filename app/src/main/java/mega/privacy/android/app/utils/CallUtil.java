@@ -147,6 +147,7 @@ public class CallUtil {
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_AUDIO_ENABLE, isAudioEnable);
         meetingIntent.putExtra(MEETING_VIDEO_ENABLE, isVideoEnable);

@@ -13,8 +13,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
 

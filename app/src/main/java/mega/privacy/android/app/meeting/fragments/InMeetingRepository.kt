@@ -1,17 +1,19 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
+import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
@@ -198,27 +200,51 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
+     * Get the avatar
+     *
+     * @param chat
+     * @param peerId
+     * @return the avatar
+     */
+    fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
+        var avatar = CallUtil.getImageAvatarCall(chat, peerId)
+        when (avatar) {
+            null -> {
+                avatar = CallUtil.getDefaultAvatarCall(
+                    MegaApplication.getInstance().applicationContext,
+                    peerId
+                )
+            }
+        }
+
+        return avatar
+    }
+
+    /**
      * Create a participant with my data
      *
-     * @param chatId chat ID
+     * @param chat MegaChatRoom
+     * @return me as a participant
      */
-    fun getMeToSpeakerView(chatId: Long): Participant {
+    fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
         var isAudioOn = true
-        getMeeting(chatId)?.let {
+        getMeeting(chat.chatId)?.let {
             isAudioOn = it.hasLocalAudio()
         }
         var isVideoOn = true
-        getMeeting(chatId)?.let {
+        getMeeting(chat.chatId)?.let {
             isVideoOn = it.hasLocalVideo()
         }
+
+        val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
+
         return Participant(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
-            null,
-            "XXX",
+            avatar,
             true,
-            getOwnPrivileges(chatId) == MegaChatRoom.PRIV_MODERATOR,
+            getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
             isAudioOn,
             isVideoOn,
             false,
@@ -228,15 +254,18 @@ class InMeetingRepository @Inject constructor(
         )
     }
 
-    fun isMyContact(chat: MegaChatRoom, peerId: Long): Boolean {
-        val userMail = CallUtil.getUserMailCall(chat, peerId)
-        if (!TextUtil.isTextEmpty(userMail)) {
-            val contact: MegaUser = megaApi.getContact(userMail)
-            if (contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                return true
-            }
+    fun isMyContact(peerId: Long): Boolean {
+        val email: String = ChatController(context).getParticipantEmail(peerId)
+        val contact = megaApi.getContact(email)
+        if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
+            return true
         }
+
         return false
+    }
+
+    fun participantName(peerId: Long): String {
+        return ChatController(context).getParticipantFullName(peerId)
     }
 
     /**
@@ -330,7 +359,7 @@ class InMeetingRepository @Inject constructor(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
-            null, "XXX", true, moderator, audio, video
+            null, true, moderator, audio, video
         )
     }
 }

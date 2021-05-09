@@ -382,6 +382,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         if (listener == null)
             return
 
+        logDebug("Adding local video")
         meetingActivityRepository.addLocalVideo(chatId, listener)
     }
 
@@ -395,6 +396,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         if (listener == null)
             return
 
+        logDebug("Removing local video")
         meetingActivityRepository.removeLocalVideo(chatId, listener)
     }
 

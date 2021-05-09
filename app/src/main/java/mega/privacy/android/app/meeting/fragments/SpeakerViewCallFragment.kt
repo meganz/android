@@ -17,8 +17,8 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
@@ -26,10 +26,7 @@ import org.jetbrains.anko.displayMetrics
 class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     lateinit var adapter: VideoListViewAdapter
-
-
     private var participants: MutableList<Participant> = mutableListOf()
-
     private var speakerUser: Participant? = null
 
     private val localAudioLevelObserver = Observer<MegaChatCall> {
@@ -82,8 +79,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
+        adapter.submitList(null)
         adapter.submitList(it)
-        adapter.notifyDataSetChanged()
     }
 
     override fun onCreateView(
@@ -104,6 +101,17 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             clipToPadding = true
             setHasFixedSize(true)
         }
+
+        participants_horizontal_list.recycledViewPool.clear()
+        participants_horizontal_list.adapter = null
+        adapter = VideoListViewAdapter(
+            (parentFragment as InMeetingFragment).inMeetingViewModel,
+            participants_horizontal_list
+        )
+
+        adapter.submitList(null)
+        adapter.submitList(participants)
+        participants_horizontal_list.adapter = adapter
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.pinItemEvent.observe(
             viewLifecycleOwner,
@@ -131,17 +139,11 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         //Init Speaker participant: Me
         (parentFragment as InMeetingFragment).inMeetingViewModel.assignMeAsSpeaker()
 
-        adapter = VideoListViewAdapter(
-            (parentFragment as InMeetingFragment).inMeetingViewModel,
-            participants_horizontal_list
-        )
-        participants_horizontal_list.adapter = adapter
-
-        // TODO test code start
+//        // TODO test code start
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
             participantsObserver
         )
-        // TODO test code end
+//        // TODO test code end
 
         init()
     }
@@ -157,7 +159,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             viewLifecycleOwner
         ) {
             it?.let {
-                speakerUser = it
+                speakerUser =
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.createSpeakerParticipant(
+                        it
+                    )
                 updateSpeakerUser(it)
             }
         }
@@ -166,13 +171,15 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             speakerUser?.let { speakerParticipant ->
                 when {
                     speakerParticipant.isMe -> {
+                        if (speakerParticipant.isMe) {
+                            speakerParticipant.isVideoOn = it
+                        }
                         when {
                             it -> {
-                                activateLocalVideo(speakerParticipant)
+                                checkVideoOn(speakerParticipant)
                             }
                             else -> {
-                                showAvatar(speakerParticipant)
-                                checkCallOnHold(speakerParticipant)
+                                videoOffUI(speakerParticipant)
                             }
                         }
                     }
@@ -182,10 +189,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             speakerUser?.let { speakerParticipant ->
-                when {
-                    speakerParticipant.isMe -> {
-                        speaker_mute_icon.isVisible = !it
-                    }
+                if (speakerParticipant.isMe) {
+                    speakerParticipant.isAudioOn = it
+                    updateAudioIcon(speakerParticipant)
                 }
             }
         }
@@ -195,12 +201,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * Method for selecting a new speaker
      *
      * @param peerId
-     * @param clienId
+     * @param clientId
      */
-    private fun selectSpeaker(peerId: Long, clienId: Long) {
+    private fun selectSpeaker(peerId: Long, clientId: Long) {
         val listParticipants =
             (parentFragment as InMeetingFragment).inMeetingViewModel.updatePeerSelected(
-                peerId, clienId
+                peerId, clientId
             )
 
         when {
@@ -216,105 +222,100 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param participant
      */
     private fun updateSpeakerUser(participant: Participant) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getAvatarBitmap(participant.peerId)
-            ?.let {
+        speakerUser?.let {
+            it.avatar?.let {
                 speaker_avatar_image.setImageBitmap(it)
             }
+            updateAudioIcon(it)
 
-        speaker_mute_icon.isVisible = !participant.isAudioOn
-
-        when {
-            participant.isMe -> {
-                when {
-                    participant.isVideoOn -> {
-                        activateLocalVideo(participant)
-                    }
-                    else -> {
-                        showAvatar(participant)
-                        checkCallOnHold(participant)
-                    }
+            when {
+                participant.isVideoOn -> {
+                    checkVideoOn(it)
                 }
-            }
-            else -> {
-                if (participant.isVideoOn) {
-                    activateRemoteVideo(participant)
-                } else {
-                    showAvatar(participant)
-                    checkSessionOnHold(participant)
+                else -> {
+                    videoOffUI(it)
                 }
             }
         }
+
     }
 
     /**
-     * Method to activate local video
+     * Check if mute icon should be visible
      *
      * @param participant
      */
-    private fun activateLocalVideo(participant: Participant) {
-        speaker_on_hold_icon.isVisible = false
-        speaker_avatar_image.alpha = 1f
-        speaker_avatar_image.isVisible = false
-        speaker_video.isVisible = true
-
-        when (participant.videoListener) {
-            null -> {
-
-                participant.videoListener = MeetingVideoListener(
-                    speaker_video,
-                    outMetrics,
-                    MEGACHAT_INVALID_HANDLE,
-                    false
-                )
-
-                sharedModel.addLocalVideo(
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
-                    participant.videoListener
-                )
+    fun updateAudioIcon(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("Update audio icon")
+                    speaker_mute_icon.isVisible = !it.isAudioOn
+                }
             }
         }
     }
 
     /**
-     * Method for activating the video
+     * Show UI when video is off
      *
      * @param participant
      */
-    private fun activateRemoteVideo(participant: Participant) {
-        speaker_avatar_image.isVisible = false
-        speaker_video.isVisible = true
-
-        when (participant.videoListener) {
-            null -> {
-                val vListener = MeetingVideoListener(
-                    speaker_video,
-                    MegaApplication.getInstance().applicationContext.displayMetrics,
-                    participant.clientId,
-                    false
-                )
-
-                participant.videoListener = vListener
-
-                (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(participant)
+    fun videoOffUI(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("UI video off")
+                    showAvatar(it)
+                    closeVideo(it)
+                    checkOnHold(it)
+                }
             }
         }
     }
 
     /**
-     * Show Avatar and close the video
+     * Method to show the Avatar
      *
-     * @param participant The Speaker
+     * @param participant
      */
     private fun showAvatar(participant: Participant) {
-        speaker_avatar_image.isVisible = true
-        speaker_video.isVisible = false
-
-        when {
-            participant.isMe -> {
-                closeLocalVideo(participant)
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("Show avatar")
+                    speaker_avatar_image.isVisible = true
+                }
             }
-            else -> {
-                (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(participant)
+        }
+    }
+
+    /**
+     * Method to close Video
+     *
+     * @param participant
+     */
+    private fun closeVideo(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("Close video")
+                    speaker_video.isVisible = false
+                    when {
+                        it.isMe -> {
+                            closeLocalVideo(it)
+                        }
+                        else -> {
+                            (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
+                                it
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -325,62 +326,199 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param participant
      */
     private fun closeLocalVideo(participant: Participant) {
-        when (participant.videoListener) {
-            null -> return
-            else -> {
-                sharedModel.removeLocalVideo(
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
-                    participant.videoListener
-                )
-                participant.videoListener = null
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    when (it.videoListener) {
+                        null -> return
+                        else -> {
+                            logDebug("Remove local video listener")
+                            sharedModel.removeLocalVideo(
+                                (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
+                                it.videoListener
+                            )
+
+                            it.videoListener = null
+                        }
+                    }
+                }
             }
         }
     }
 
     /**
-     * Control the UI when the call is on hold
+     * Method to control the Call/Session on hold icon visibility
      *
-     * @param participant The Speaker
+     * @param participant
      */
-    private fun checkCallOnHold(participant: Participant) {
-        when {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.isCallOnHold() -> {
-                if (participant.isMe) {
-                    speaker_on_hold_icon.isVisible = true
+    private fun checkOnHold(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    val isCallOnHold =
+                        (parentFragment as InMeetingFragment).inMeetingViewModel.isCallOnHold()
+                    when {
+                        it.isMe -> {
+                            when {
+                                isCallOnHold -> {
+                                    speaker_on_hold_icon.isVisible = true
+                                    speaker_avatar_image.alpha = 0.5f
+                                }
+                                else -> {
+                                    speaker_on_hold_icon.isVisible = false
+                                    speaker_avatar_image.alpha = 1f
+                                }
+                            }
+                        }
+                        else -> {
+                            val isSessionOnHold =
+                                (parentFragment as InMeetingFragment).inMeetingViewModel.isSessionOnHold(
+                                    it.clientId
+                                )
+                            when {
+                                isSessionOnHold -> {
+                                    logDebug("Show on hold icon participant ")
+                                    speaker_on_hold_icon.isVisible = true
+                                    speaker_avatar_image.alpha = 0.5f
+                                }
+                                else -> {
+                                    logDebug("Hide on hold icon")
+                                    speaker_on_hold_icon.isVisible = false
+                                    when {
+                                        isCallOnHold -> {
+                                            speaker_avatar_image.alpha = 0.5f
+                                        }
+                                        else -> {
+                                            speaker_avatar_image.alpha = 1f
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                speaker_avatar_image.alpha = 0.5f
             }
-            else -> {
-                if (participant.isMe) {
+        }
+    }
+
+    /**
+     * Control when a change is received in the video flag
+     *
+     * @param participant
+     */
+    fun checkVideoOn(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    when {
+                        it.isVideoOn && ((it.isMe && !(parentFragment as InMeetingFragment).inMeetingViewModel.isCallOnHold()) ||
+                                (!it.isMe && !(parentFragment as InMeetingFragment).inMeetingViewModel.isCallOrSessionOnHold(
+                                    it.clientId
+                                ))) -> {
+                            logDebug("Video should be on")
+                            videoOnUI(it)
+                        }
+                        else -> {
+                            logDebug("Video should be off")
+                            videoOffUI(it)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Show UI when video is on
+     *
+     * @param participant
+     */
+    private fun videoOnUI(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("UI video on")
+                    hideAvatar(it)
+                    activateVideo(it)
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to hide the Avatar
+     *
+     * @param participant
+     */
+    private fun hideAvatar(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    logDebug("Hide Avatar")
                     speaker_on_hold_icon.isVisible = false
+                    speaker_avatar_image.alpha = 1f
+                    speaker_avatar_image.isVisible = false
                 }
-                speaker_avatar_image.alpha = 1f
             }
         }
     }
 
     /**
-     * Control the UI when the session is on hold
+     * Method for activating the video
      *
-     * @param participant The Speaker
+     * @param participant
      */
-    private fun checkSessionOnHold(participant: Participant) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getSession(participant.clientId)
-            ?.let { session ->
-                when {
-                    session.isOnHold -> {
-                        speaker_on_hold_icon.isVisible = true
-                        speaker_avatar_image.alpha = 0.5f
+    private fun activateVideo(participant: Participant) {
+        speakerUser?.let {
+            when {
+                participant.peerId != it.peerId || participant.clientId != it.clientId -> return
+                else -> {
+                    closeVideo(it)
+
+                    when (it.videoListener) {
+                        null -> {
+                            logDebug("Video Listener is null ")
+                            val vListener = MeetingVideoListener(
+                                speaker_video,
+                                MegaApplication.getInstance().applicationContext.displayMetrics,
+                                it.clientId,
+                                false
+                            )
+
+                            it.videoListener = vListener
+                            when {
+                                participant.isMe -> {
+                                    sharedModel.addLocalVideo(
+                                        (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
+                                        vListener
+                                    )
+
+                                }
+                                else -> {
+                                    (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
+                                        it
+                                    )
+                                }
+                            }
+
+                        }
+                        else -> {
+                            logDebug("Video Listener is not null ")
+                            participant.videoListener!!.height = 0
+                            participant.videoListener!!.width = 0
+                        }
                     }
-                    else -> {
-                        speaker_on_hold_icon.isVisible = false
-                        speaker_avatar_image.alpha = 1f
-                    }
+
+                    speaker_video.isVisible = true
                 }
             }
-        checkCallOnHold(participant)
+        }
     }
-
 
     /**
      * Update the adapter if a participant joins or leaves the call
@@ -388,12 +526,27 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param isAdded if is aader or removed
      * @param position
      */
-    fun peerAddedOrRemoved(isAdded: Boolean, position: Int) {
+    fun peerAddedOrRemoved(
+        isAdded: Boolean,
+        position: Int,
+        participantList: MutableList<Participant>
+    ) {
+        adapter.submitList(participantList)
         when {
             isAdded -> {
-                adapter.notifyItemInserted(position)
+                when (position) {
+                    0 -> {
+                        logDebug("Participant added - notify data set changed")
+                        adapter.notifyDataSetChanged()
+                    }
+                    else -> {
+                        logDebug("Participant added - notify item inserted in $position")
+                        adapter.notifyItemInserted(position)
+                    }
+                }
             }
             else -> {
+                logDebug("Participant added - notify item removed in $position")
                 adapter.notifyItemRemoved(position)
                 adapter.notifyItemRangeChanged(position, participants.size)
             }
@@ -424,34 +577,33 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param session MegaChatSession
      */
     fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
-        speakerUser?.let {
+        //Speaker
+        speakerUser?.let { speaker ->
             when {
-                it.peerId == session.peerid && it.clientId == session.clientid -> {
+                session.peerid == speaker.peerId && session.clientid == speaker.clientId && !speaker.isMe -> {
+                    speaker.isAudioOn = session.hasAudio()
+                    speaker.isVideoOn = session.hasVideo()
                     when (type) {
                         Constants.TYPE_VIDEO -> {
-                            when {
-                                it.isVideoOn -> {
-                                    activateRemoteVideo(it)
-                                }
-                                else -> {
-                                    showAvatar(it)
-                                    checkSessionOnHold(it)
-                                }
-                            }
+                            checkVideoOn(speaker)
                         }
                         Constants.TYPE_AUDIO -> {
-                            speaker_mute_icon.isVisible = !it.isAudioOn
+                            updateAudioIcon(speaker)
                         }
                     }
                 }
             }
         }
+
+        //Participant in list
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
             session.peerid,
             session.clientid
         )?.let {
             adapter.updateParticipantAudioVideo(type, it)
         }
+
+
     }
 
     /**
@@ -460,9 +612,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param isCallOnHold True, if the call is on hold. False, otherwise
      */
     fun updateCallOnHold(isCallOnHold: Boolean) {
+        //Speaker
         speakerUser?.let {
-            checkCallOnHold(it)
+            logDebug("Session is on hold")
+            videoOffUI(it)
         }
+
+        //Participant in list
         val iterator = participants.iterator()
         iterator.forEach {
             adapter.updateCallOnHold(it, isCallOnHold)
@@ -475,11 +631,17 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param session MegaChatSession
      */
     fun updateSessionOnHold(session: MegaChatSession) {
+        //Speaker
         speakerUser?.let {
-            if (it.peerId == session.peerid && it.clientId == session.peerid) {
-                checkSessionOnHold(it)
+            when {
+                it.peerId == session.peerid && it.clientId == session.clientid -> {
+                    logDebug("Session is on hold")
+                    videoOffUI(it)
+                }
             }
         }
+
+        //Participant in list
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
             session.peerid,
             session.clientid
@@ -517,6 +679,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                 peer.peerId,
                 peer.clientId
             )?.let {
+
                 adapter.updateName(it)
             }
         }
@@ -537,13 +700,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                 adapter.updateParticipantPrivileges(it)
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
-            participantsObserver
-        )
     }
 
     companion object {
