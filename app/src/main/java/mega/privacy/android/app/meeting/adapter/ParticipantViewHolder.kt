@@ -32,10 +32,10 @@ class ParticipantViewHolder(
     }
 
     fun bind(participant: Participant) {
-        if (isFileAvailable(participant.avatar)) {
-            binding.avatar.setImageURI(Uri.fromFile(participant.avatar))
-        } else {
+        if(participant.avatar == null){
             initAvatar(participant)
+        }else{
+            binding.avatar.setImageBitmap(participant.avatar)
         }
 
         binding.name.text = participant.name

@@ -11,9 +11,9 @@ import mega.privacy.android.app.utils.Constants
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val listView: RecyclerView
-) : ListAdapter<Participant, VideoListViewHolder>(ParticipantDiffCallback()) {
+) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
-    override fun onViewRecycled(holder: VideoListViewHolder) {
+    override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
         holder.onRecycle()
     }
@@ -21,17 +21,23 @@ class VideoListViewAdapter(
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
-    override fun onBindViewHolder(listHolder: VideoListViewHolder, position: Int) {
-        listHolder.bind(inMeetingViewModel, getItem(position))
+    override fun onBindViewHolder(listHolder: VideoMeetingViewHolder, position: Int) {
+        listHolder.bind(inMeetingViewModel, getItem(position), itemCount, true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return VideoListViewHolder(ItemParticipantVideoBinding.inflate(inflater, parent, false))
+        return VideoMeetingViewHolder(
+            ItemParticipantVideoBinding.inflate(inflater, parent, false),
+            0,
+            0,
+            1,
+            false
+        )
     }
 
-    fun getHolder(position: Int): VideoListViewHolder {
-        return listView.findViewHolderForAdapterPosition(position) as VideoListViewHolder
+    fun getHolder(position: Int): VideoMeetingViewHolder {
+        return listView.findViewHolderForAdapterPosition(position) as VideoMeetingViewHolder
     }
 
     /**
@@ -44,6 +50,31 @@ class VideoListViewAdapter(
         getHolder(position).updatePrivilegeIcon(participant)
     }
 
+    /**
+     * Update participant when the name is changed
+     *
+     * @param participant
+     */
+    fun updateName(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updateName(participant)
+    }
+
+    /**
+     * Update participant that is speaking
+     *
+     * @param participant
+     */
+    fun updatePeerSelected(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position).updatePeerSelected(participant)
+    }
+
+    /**
+     * Update participant resolution
+     *
+     * @param participant
+     */
     fun updateParticipantRes(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).updateRes(participant)
@@ -57,12 +88,12 @@ class VideoListViewAdapter(
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).let {
-            if(typeChange == Constants.TYPE_VIDEO){
-                it.updateVideo(participant)
-            }else if(typeChange == Constants.TYPE_AUDIO){
+            if (typeChange == Constants.TYPE_VIDEO) {
+                it.checkVideOn(participant)
+            }
+            if (typeChange == Constants.TYPE_AUDIO) {
                 it.updateAudioIcon(participant)
             }
-
         }
     }
 
@@ -87,5 +118,4 @@ class VideoListViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position).updateCallOnHold(participant, isOnHold)
     }
-
 }

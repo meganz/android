@@ -5,13 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextureView
-        android:id="@+id/speaker_video"
+    <RelativeLayout
+        android:id="@+id/layer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent=".7"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/grey_alpha_087" >
+        <SurfaceView
+            android:id="@+id/speaker_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
 
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/speaker_avatar_image"
@@ -19,11 +25,10 @@
         android:layout_height="128dp"
         android:layout_centerInParent="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_call"
-        app:layout_constraintBottom_toBottomOf="@id/speaker_video"
+        app:layout_constraintBottom_toBottomOf="@id/layer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/speaker_video"
+        app:layout_constraintTop_toTopOf="@id/layer"
         rounded:border_color="@color/white_alpha_030"
         rounded:border_width="3dp"
         rounded:corner_radius="60dp" />
@@ -33,27 +38,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_call_hold_big"
-        app:layout_constraintBottom_toBottomOf="@id/speaker_video"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/layer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/speaker_video" />
+        app:layout_constraintTop_toTopOf="@id/layer" />
 
     <ImageView
         android:id="@+id/speaker_mute_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_mic_off_contact"
-        app:layout_constraintBottom_toBottomOf="@id/speaker_video"
+        app:layout_constraintBottom_toBottomOf="@id/layer"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/quality_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_bad_connection"
-        android:layout_marginStart="4dp"
-        app:layout_constraintBottom_toBottomOf="@id/speaker_video"
-        app:layout_constraintStart_toEndOf="@id/speaker_mute_icon" />
 
 <!--    <com.zhpan.bannerview.BannerViewPager-->
 <!--        android:id="@+id/list_view_pager"-->
@@ -67,5 +64,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/speaker_video" />
+        app:layout_constraintTop_toBottomOf="@id/layer" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,6 +44,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
+            if(user.getChanges() == 0 && !isMyChange){
+                LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(user.getHandle());
+            }
+
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
                 MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
             }
@@ -127,7 +131,6 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         if (requests == null) return;
 
         megaApplication.updateAppBadge();
-
         notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
@@ -143,13 +146,16 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
                     logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
                 } else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
-
                     ContactsAdvancedNotificationBuilder notificationBuilder;
                     notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApplication.getMegaApi());
 
                     notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 
                     logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+                }
+
+                if(cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED){
+                    LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(cr.getHandle());
                 }
             }
         }

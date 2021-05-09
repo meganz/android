@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.graphics.Bitmap
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import java.io.File
 import java.io.Serializable
@@ -8,8 +9,7 @@ data class Participant(
     val peerId: Long,
     val clientId: Long,
     var name: String,
-    val avatar: File?,
-    val avatarBackground: String,
+    val avatar: Bitmap?,
     val isMe: Boolean,
     var isModerator: Boolean,
     var isAudioOn: Boolean,

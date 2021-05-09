@@ -641,18 +641,14 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
             return;
 
-        if (call.isRinging()) {
-            addChecksForACall(chatRoom.getChatId(), false);
-            megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
-        } else {
-            megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
-        }
+        addChecksForACall(chatRoom.getChatId(), false);
+        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
     }
 
     @Override
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
-        openMeetingInProgress(this, chatId);
+        openMeetingInProgress(this, chatId, true);
     }
 
     @Override
@@ -672,12 +668,8 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 return;
 
             logDebug("Active call on hold. Joinning in the group chat.");
-            if (call.isRinging()) {
-                addChecksForACall(chatRoom.getChatId(), false);
-                megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
-            } else {
-                megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
-            }
+            addChecksForACall(chatRoom.getChatId(), false);
+            megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
         }
     }
 
@@ -3052,14 +3044,12 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 }
                 return;
             }
-
             if (canNotJoinCall(this, callInThisChat, chatRoom)) return;
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-                megaChatApi.startChatCall(idChat, startVideo, true, new StartChatCallListener(this, this, this));
+                megaChatApi.answerChatCall(idChat, startVideo, true, new AnswerChatCallListener(this, this));
             }
             return;
         }
@@ -3678,12 +3668,8 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     if(anotherCall.isOnHold()){
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                            if (callInChat.isRinging()) {
-                                addChecksForACall(callInThisChat, false);
-                                megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
-                            } else {
-                                megaChatApi.startChatCall(idChat, false, true, new StartChatCallListener(this, this, this));
-                            }
+                            addChecksForACall(callInThisChat, false);
+                            megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
@@ -8789,7 +8775,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             return;
         }
 
-        activateChrono(true, callInProgressChrono, call);
+        activateChrono(true, callInProgressChrono, call, true);
         callInProgressChrono.setOnChronometerTickListener(chronometer -> {
             if (subtitleChronoCall == null) {
                 return;
@@ -8974,13 +8960,12 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                         returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
                     }
                 }else{
-                    if(anotherActiveCall == null && anotherOnHoldCall == null) {
-                        if(callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)){
-                            tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
-                            break;
-                        }
-                        hideCallBar(callInThisChat);
-                    }else{
+                    if (anotherActiveCall == null && anotherOnHoldCall == null) {
+                        String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
+                                R.string.call_in_progress_layout :
+                                R.string.join_call_layout);
+                        tapToReturnLayout(callInThisChat, textLayout);
+                    } else {
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
                                 getString(R.string.call_in_progress_layout));
                     }

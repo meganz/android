@@ -153,7 +153,7 @@ public class CallNotificationIntentService extends IntentService implements Snac
             return;
 
         logDebug("Incoming call answered.");
-        CallUtil.openMeetingInProgress(this, chatIdIncomingCall);
+        CallUtil.openMeetingInProgress(this, chatIdIncomingCall, true);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);

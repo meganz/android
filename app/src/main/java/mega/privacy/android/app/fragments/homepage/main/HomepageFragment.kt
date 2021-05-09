@@ -40,6 +40,7 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
+import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -390,6 +391,9 @@ class HomepageFragment : Fragment() {
      */
     @Suppress("UNCHECKED_CAST")
     private fun setupBannerView() {
+        val bannerAdapter = BannerAdapter(viewModel)
+        bannerAdapter.setClickBannerCallback(BannerClickHandler(this))
+
         bannerViewPager =
             viewDataBinding.bannerView as BannerViewPager<MegaBanner>
         bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
@@ -408,7 +412,7 @@ class HomepageFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
-            .setAdapter(BannerAdapter(viewModel))
+            .setAdapter(bannerAdapter)
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {

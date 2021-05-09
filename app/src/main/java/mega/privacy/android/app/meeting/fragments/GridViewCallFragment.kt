@@ -13,7 +13,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
 
@@ -84,46 +83,11 @@ class GridViewCallFragment : MeetingBaseFragment() {
         // TODO test code end
     }
 
-    private fun getParticipant(peerId: Long, clientId: Long): Participant? {
-        val participant = participants.filter {
-            it.peerId == peerId && it.clientId == clientId
-        }
-        if (participant.isNotEmpty()) {
-            return participant[0]
-        }
-        return null
-    }
-
-    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
-        getParticipant(session.peerid, session.clientid)?.let {
-            adapterPager?.updateParticipantAudioVideo(type, it)
-        }
-    }
-
-    fun updateSessionOnHold(session: MegaChatSession) {
-        getParticipant(session.peerid, session.clientid)?.let {
-            adapterPager?.updateOnHold(it, session.isOnHold)
-        }
-    }
-
-    fun updateRes(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            getParticipant(peer.peerId, peer.clientId)?.let {
-                adapterPager?.updateParticipantRes(it)
-            }
-        }
-    }
-
-    fun updateName(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            getParticipant(peer.peerId, peer.clientId)?.let {
-                adapterPager?.updateParticipantName(it)
-            }
-        }
-    }
-
+    /**
+     * Check changes call on hold
+     *
+     * @param isCallOnHold True, if the call is on hold. False, otherwise
+     */
     fun updateCallOnHold(isCallOnHold: Boolean) {
         val iterator = participants.iterator()
         iterator.forEach {
@@ -131,10 +95,81 @@ class GridViewCallFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Check changes session on hold
+     *
+     * @param session MegaChatSession
+     */
+    fun updateSessionOnHold(session: MegaChatSession) {
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            session.peerid,
+            session.clientid
+        )?.let {
+            adapterPager?.updateOnHold(it, session.isOnHold)
+        }
+    }
+
+    /**
+     * Check changes in remote A/V flags
+     *
+     * @param type type of change, Audio or Video
+     * @param session MegaChatSession
+     */
+    fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            session.peerid,
+            session.clientid
+        )?.let {
+            adapterPager?.updateParticipantAudioVideo(type, it)
+        }
+    }
+
+    /**
+     * Check changes in resolution
+     *
+     * @param listPeers List of participants with changes
+     */
+    fun updateRes(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                peer.peerId,
+                peer.clientId
+            )?.let {
+                adapterPager?.updateParticipantRes(it)
+            }
+        }
+    }
+
+    /**
+     * Check changes in name
+     *
+     * @param listPeers List of participants with changes
+     */
+    fun updateName(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                peer.peerId,
+                peer.clientId
+            )?.let {
+                adapterPager?.updateParticipantName(it)
+            }
+        }
+    }
+
+    /**
+     * Check changes in privileges
+     *
+     * @param listPeers List of participants with changes
+     */
     fun updatePrivileges(listPeers: MutableSet<Participant>) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
-            getParticipant(peer.peerId, peer.clientId)?.let {
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                peer.peerId,
+                peer.clientId
+            )?.let {
                 adapterPager?.updateParticipantPrivileges(it)
             }
         }

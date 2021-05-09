@@ -1,18 +1,19 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
+import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
@@ -198,19 +199,89 @@ class InMeetingRepository @Inject constructor(
         megaChatApi.hangChatCall(callId, HangChatCallListener(context))
     }
 
-    fun isMyContact(chat: MegaChatRoom, peerId: Long): Boolean {
-        val userMail = CallUtil.getUserMailCall(chat, peerId)
-        if (!TextUtil.isTextEmpty(userMail)) {
-            val contact: MegaUser = megaApi.getContact(userMail)
-            if (contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                return true
+    /**
+     * Get the avatar
+     *
+     * @param chat
+     * @param peerId
+     * @return the avatar
+     */
+    fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
+        var avatar = CallUtil.getImageAvatarCall(chat, peerId)
+        when (avatar) {
+            null -> {
+                avatar = CallUtil.getDefaultAvatarCall(
+                    MegaApplication.getInstance().applicationContext,
+                    peerId
+                )
             }
         }
+
+        return avatar
+    }
+
+    /**
+     * Create a participant with my data
+     *
+     * @param chat MegaChatRoom
+     * @return me as a participant
+     */
+    fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
+        var isAudioOn = true
+        getMeeting(chat.chatId)?.let {
+            isAudioOn = it.hasLocalAudio()
+        }
+        var isVideoOn = true
+        getMeeting(chat.chatId)?.let {
+            isVideoOn = it.hasLocalVideo()
+        }
+
+        val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
+
+        return Participant(
+            megaChatApi.myUserHandle,
+            MEGACHAT_INVALID_HANDLE,
+            megaChatApi.myFullname,
+            avatar,
+            true,
+            getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
+            isAudioOn,
+            isVideoOn,
+            false,
+            true,
+            true,
+            null
+        )
+    }
+
+    /**
+     * Method to know if a user is my contact
+     *
+     * @param peerId
+     * @return True, if it's. False, otherwise.
+     */
+    fun isMyContact(peerId: Long): Boolean {
+        val email: String = ChatController(context).getParticipantEmail(peerId)
+        val contact = megaApi.getContact(email)
+        if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
+            return true
+        }
+
         return false
     }
 
     /**
-     * Method of obtaining the local video
+     * Method to get the participant's name
+     *
+     * @param peerId
+     * @return The name
+     */
+    fun participantName(peerId: Long): String {
+        return ChatController(context).getParticipantFullName(peerId)
+    }
+
+    /**
+     * Method of obtaining the remote video
      *
      * @param chatId chatId
      * @param clientId client ID
@@ -227,7 +298,7 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method of remove the local video
+     * Method of remove the remote video
      *
      * @param chatId chatId
      * @param clientId client ID
@@ -273,6 +344,12 @@ class InMeetingRepository @Inject constructor(
 
     }
 
+    /**
+     * Method to get own privileges in a chat
+     *
+     * @param chatId
+     * @return the privileges
+     */
     fun getOwnPrivileges(chatId: Long): Int {
         getChatRoom(chatId)?.let {
             return it.ownPrivilege
@@ -280,14 +357,18 @@ class InMeetingRepository @Inject constructor(
         return -1
     }
 
-    fun openChatPreview(link:String, listener: MegaChatRequestListenerInterface) =
+    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         megaChatApi.autojoinPublicChat(chatId, listener)
 
 
-    fun createEphemeralAccountPlusPlus(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
+    fun createEphemeralAccountPlusPlus(
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface
+    ) {
         megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
     }
 
@@ -296,7 +377,7 @@ class InMeetingRepository @Inject constructor(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
-            null, "XXX", true, moderator, audio, video
+            null, true, moderator, audio, video
         )
     }
 }

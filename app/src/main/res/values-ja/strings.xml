@@ -684,7 +684,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ストレージ</string>
     <string name="settings_passcode_lock" context="Settings of the Passcode">パスコードロック</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">パスコードオプション</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は多くの電力を消費します。 MEGAはあなたに、圧縮する動画が%sより大きい場合、あなたの端末を積極的に充電することを求めます。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">有効にすると、あなたの写真が撮影された場所に関する情報をアップロードするため、それらを共有する際にご注意ください。</string>
 
@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">パスコードロック</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">パスコードの変更</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">パスコードを変更して下さい</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">パスコードロックの変更</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">パスコードが必要です</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">即座に</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">入力</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">試行が10回失敗後、あなたのローカルファイルが削除され、あなたはログアウトされます。</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">パスコード試行に1回失敗</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">パスコード試行に%1$d回失敗</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">10回失敗するとログアウトされ、オフラインファイルが削除されます。</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">コードの間違い</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">パスコードが間違っています。もう一度お試しください。残りの試行回数は1回です</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">パスコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">パスコードが一致しません</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">パスコードを入力してください</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">パスコードを再入力してください</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">新しいパスコードを入力してください</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">新しいパスコードを再入力してください</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">パスコードが一致しません。\nもう一度入力してください。</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">パスコードを入力</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">パスコードを再入力</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">新しいパスコードを入力</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">新しいパスコードを再入力</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">概要</string>
@@ -869,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">最小サイズ</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">パスコードタイプ</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4桁のパスコード</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6桁のパスコード</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">英数字のパスコード</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4桁</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6桁</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">英数字</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">ロギングが有効にしました。</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">ロギングが無効にしました。</string>
@@ -3003,7 +3010,7 @@
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">続行する前に</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">当社は、ローカルストレージおよび同様のテクノロジー（「クッキー」）を使用して、お客様にサービスをご提供し、当社サービスのエクスペリエンスを向上させ、サードパーティを介して表示される広告を含め、お客様がご覧になる広告をカスタマイズいたします。ご訪問の最初から当社によるクッキーの使用を受け入れるか、クッキーの設定でクッキーをカスタマイズしてください。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
     <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">保存されていないクッキーの設定</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">クッキー設定の変更が保存されました。</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">クッキー設定の変更が保存されました</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">サードパーティのクッキー</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google広告クッキー</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">カテゴリ：広告クッキー</string>

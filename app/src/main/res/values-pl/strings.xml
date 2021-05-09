@@ -683,8 +683,8 @@
     <string name="settings_features" context="settings of the Features section">Możliwości</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Pojemności</string>
-    <string name="settings_passcode_lock" context="Settings of the Passcode">Blokada PIN</string>
-    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Blokada kodem dostępu</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Opcje kodu dostępu</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Kompresja wideo zużywa dużo energii; MEGA będzie wymagać aktywnego ładowania urządzenia, jeśli filmy do skompresowania są większe niż %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Jeśli ta opcja jest włączona, prześlesz informacje o tym, gdzie zostały zrobione Twoje zdjęcia, więc zachowaj ostrożność, udostępniając je.</string>
 
@@ -777,22 +777,29 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nie ustawiono</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blokada PIN</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Zmień kod</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Zmień kod</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Zmiana blokady kodem dostępu</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Wymagany kod</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Natychmiast</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Dalej</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Twoje lokalne pliki zostaną usunięte i zostaniesz wylogowany po 10 nieudanych próbach logowania</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 nieudana próba podania hasła</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d nieudanych prób wprowadzenia kodu</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">Zostaniesz wylogowany, a Twoje pliki offline zostaną usunięte po 10 nieudanych próbach.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Niepoprawny kod</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Błędny kod dostępu, spróbuj ponownie. Pozostała Ci 1 próba</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Błędny kod dostępu, spróbuj ponownie. Pozostało Ci %2d prób</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Kody dostępu nie pasują</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Wprowadź kod</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Ponów kod</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Wprowadź nowy kod</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Ponów kod</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Pin jest nie poprawny. Spróbuj ponownie.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Wprowadź pin</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Wprowadź ponownie pin</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Wprowadź nowy pin</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Wprowadź ponownie pin</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Wszystkie dane zostaną usunięte i zostaniesz wylogowany za %1d sekund.</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">O Nas</string>
@@ -869,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">Najmniejszy rozmiar</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Rodzaj kodu</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4 cyfrowy PIN</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6 cyfrowy PIN</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Alfanumeryczny PIN</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 cyfry</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 cyfr</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alfanumeryczny</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logowanie jest uruchomione</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logowanie jest zablokowane</string>
@@ -1518,7 +1525,7 @@
 
     <string name="general_view_contacts" context="Menu option">Pokaż kontakty</string>
 
-    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Dodano do dysku</string>
+    <string name="import_success_message" context="Message displayed when a file has been successfully imported to Cloud Drive">Pomyślnie dodano do usługi Cloud Drive</string>
     <string name="import_success_error" context="Menu option">Błąd. Nie dodano do dysku</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Trwa łączenie&#8230;</string>
@@ -1740,13 +1747,13 @@
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Data nie jest prawidłowa</string>
 
     <string name="empty_name" context="Error shown when the user left a name empty">Nieprawidłowa nazwa</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Przed kontynuacją popraw nazwy plików.</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Proszę poprawić nazwy plików przed kontynuowaniem</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Nieprawidłowe znaki</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">Następujące znaki są niedozwolone: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Nazwij swój plik przed kontynuowaniem</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Nadaj nazwy swoim plikom przed kontynuacją</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Proszę nazwać swój plik przed kontynuowaniem</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Proszę nazwać swoje pliki przed kontynuowaniem</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Plik audio</string>
@@ -3002,8 +3009,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Ustawienia ciasteczek</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Zanim przejdziesz dalej</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Korzystamy z lokalnej pamięci masowej i podobnych technologii (“pliki cookie”), aby świadczyć nasze usługi na rzecz użytkownika, poprawić jakość korzystania z naszych usług i dostosować reklamy, które użytkownik widzi, w tym za pośrednictwem stron trzecich. Zaakceptuj wykorzystanie przez nas plików cookie od początku wizyty lub dostosuj pliki cookie w Ustawieniach plików cookie. Przeczytaj więcej w naszej [A]Polityce plików cookie[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Ustawienia plików cookie nie zapisane</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Zmiany w ustawieniach plików cookie zostały zapisane.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Ustawienia ciasteczek nie zapisane.</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Zmiany w ustawieniach plików cookie zostały zapisane</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Pliki cookie stron trzecich</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookies reklamowe Google</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Kategoria: Cookies reklamowe</string>

@@ -33,7 +33,7 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnCallAnsweredCallback {
-        fun onCallAnswered(chatId : Long, flag : Boolean)
+        fun onCallAnswered(chatId: Long, flag: Boolean)
         fun onErrorAnsweredCall(errorCode: Int)
     }
 }

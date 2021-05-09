@@ -379,6 +379,24 @@ class BottomFloatingPanelViewHolder(
         updateHoldIcon(isHold)
     }
 
+    fun changeOnHoldIcon(isAnotherCallOnHold: Boolean) {
+        if(isAnotherCallOnHold){
+            changeOnHoldIconDrawable(true)
+            floatingPanelView.fabHold.isOn = true
+        }else{
+            floatingPanelView.fabHold.isOn = false
+            changeOnHoldIconDrawable(false)
+        }
+    }
+
+    fun changeOnHoldIconDrawable(existsAnotherCallOnHold:Boolean){
+        if(existsAnotherCallOnHold){
+            floatingPanelView.fabHold.setOnIcon(R.drawable.ic_call_swap)
+        }else{
+            floatingPanelView.fabHold.setOnIcon(R.drawable.ic_transfers_pause)
+        }
+    }
+
     fun updateHoldIcon(isHold: Boolean) {
         floatingPanelView.fabHold.isOn = !isHold
 

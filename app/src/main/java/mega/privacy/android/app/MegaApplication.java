@@ -571,7 +571,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
-					ongoingCall(chatId, isOutgoing ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
+						ongoingCall(chatId, (isOutgoing && isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING :AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
@@ -1894,37 +1894,23 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashSpeakerViewAutomatic.put(chatId, isOpeningMeetingLink);
 	}
 
-	public static boolean isRequestSent(long chatId) {
-		boolean entryExists = hashMapOutgoingCall.containsKey(chatId);
+	public static boolean isRequestSent(long callId) {
+		boolean entryExists = hashMapOutgoingCall.containsKey(callId);
 		if (entryExists) {
-			return hashMapOutgoingCall.get(chatId);
+			return hashMapOutgoingCall.get(callId);
 		}
 
 		return false;
 	}
 
 	public static void setRequestSentCall(long callId, boolean isRequestSent) {
-    	if(isRequestSent(callId) == isRequestSent)
+		if(isRequestSent(callId) == isRequestSent)
     		return;
 
 		hashMapOutgoingCall.put(callId, isRequestSent);
 		if(!isRequestSent){
 			LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long.class).post(callId);
 		}
-	}
-
-	public static boolean isSpeakerViewAutomatic(long callId) {
-		boolean entryExists = hashSpeakerViewAutomatic.containsKey(callId);
-		if (entryExists) {
-			return hashSpeakerViewAutomatic.get(callId);
-		}
-
-		setSpeakerViewAutomatic(callId, true);
-		return false;
-	}
-
-	public static void setSpeakerViewAutomatic(long callId, boolean isAutomatic) {
-		hashSpeakerViewAutomatic.put(callId, isAutomatic);
 	}
 
 	public int getStorageState() {
