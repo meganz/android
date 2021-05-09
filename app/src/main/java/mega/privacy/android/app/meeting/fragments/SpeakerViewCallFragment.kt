@@ -29,6 +29,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     private var participants: MutableList<Participant> = mutableListOf()
     private var speakerUser: Participant? = null
 
+    private var isFirsTime = true
+
     private val localAudioLevelObserver = Observer<MegaChatCall> {
         when {
             (parentFragment as InMeetingFragment).inMeetingViewModel.isSameCall(it.callId) -> {
@@ -79,8 +81,11 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
-        adapter.submitList(null)
-        adapter.submitList(it)
+        if(isFirsTime){
+            isFirsTime = false
+            adapter.submitList(null)
+            adapter.submitList(it)
+        }
     }
 
     override fun onCreateView(
