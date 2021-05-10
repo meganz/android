@@ -624,6 +624,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if(!megaApi.isChatNotifiable(chatId))
 			return;
 
+		logDebug("Incoming call");
 		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 		controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
 	}

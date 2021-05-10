@@ -25,6 +25,8 @@ import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.AnimationTool.clearAnimationAndGone
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
@@ -105,7 +107,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         )
 
         binding.answerAudioFab.setOnClickListener {
-            answerCall(enableVideo = false)
+            answerCall(true, false)
         }
 
         binding.answerVideoFab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
@@ -117,7 +119,14 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         })
 
         binding.rejectFab.setOnClickListener {
-            inMeetingViewModel.leaveMeeting()
+            when {
+                inMeetingViewModel.isOneToOneCall() -> {
+                    inMeetingViewModel.leaveMeeting()
+                }
+                else -> {
+                    inMeetingViewModel.ignoreCall()
+                }
+            }
             requireActivity().finish()
         }
 
@@ -186,11 +195,21 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
             override fun onCallAnswered(chatId: Long, flag: Boolean) {
                 // To in-meeting
-                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                    MEETING_ACTION_RINGING,
-                    chatId
-                )
-                findNavController().navigate(action)
+                if(flag){
+                    logDebug("Call answered with video ON and audio ON")
+                    val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                        MEETING_ACTION_RINGING_VIDEO_ON,
+                        chatId
+                    )
+                    findNavController().navigate(action)
+                }else{
+                    logDebug("Call answered with video OFF and audio ON")
+                    val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                        MEETING_ACTION_RINGING_VIDEO_OFF,
+                        chatId
+                    )
+                    findNavController().navigate(action)
+                }
             }
 
             override fun onErrorAnsweredCall(errorCode: Int) {

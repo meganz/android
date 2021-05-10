@@ -202,9 +202,9 @@ class VideoMeetingViewHolder(
 
                         inMeetingViewModel.onActivateVideo(participant)
 
-                            participant.videoListener!!.getLocalRenderer()?.let {
-                                it.addListener(listener)
-                            }
+                        participant.videoListener!!.getLocalRenderer()?.let {
+                            it.addListener(listener)
+                        }
 
                     }
                     else -> {
@@ -297,6 +297,23 @@ class VideoMeetingViewHolder(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Method that controls when we have lost the video in the resolution we were receiving it.
+     * Need to close video and activate it again
+     *
+     * @param participant
+     */
+    fun updateResolution(participant: Participant) {
+        when {
+            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
+            else -> {
+                logDebug("Update resolution")
+                closeVideo(participant)
+                checkVideOn(participant)
             }
         }
     }

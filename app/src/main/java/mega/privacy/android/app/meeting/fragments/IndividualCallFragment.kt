@@ -518,6 +518,35 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Method that controls when we have lost the video in the resolution we were receiving it.
+     * Need to close video and activate it again
+     *
+     * @param peerId
+     * @param clientId
+     */
+    fun updateResolution(peerId: Long, clientId: Long) {
+        when {
+            peerId != this.peerId || clientId != this.clientId -> return
+        }
+
+        when {
+            !isFloatingWindow && inMeetingViewModel.isOneToOneCall() && !inMeetingViewModel.isMe(
+                peerId
+            ) -> {
+                inMeetingViewModel.getSession(clientId)?.let {
+                    when {
+                        it.hasVideo() -> {
+                            logDebug("Update resolution")
+                            closeVideo(peerId, clientId)
+                            checkVideoOn(peerId, clientId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Method to check if there is a call or session on hold
      *
      * @param isOnHold

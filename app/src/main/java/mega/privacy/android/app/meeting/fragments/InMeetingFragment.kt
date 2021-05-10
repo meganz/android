@@ -46,6 +46,8 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
@@ -195,7 +197,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 }
                                 it.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
                                     updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
-                                    bottomFloatingPanelViewHolder.updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
+                                    bottomFloatingPanelViewHolder.updateRemotePrivileges(
+                                        inMeetingViewModel.updateParticipantsPrivileges()
+                                    )
                                 }
                             }
                         }
@@ -305,7 +309,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     logDebug("Session in progress")
 
                                     val position =
-                                        inMeetingViewModel.createParticipant(callAndSession.second, status)
+                                        inMeetingViewModel.createParticipant(
+                                            callAndSession.second,
+                                            status
+                                        )
                                     position?.let {
                                         if (position != INVALID_POSITION) {
                                             participantAddedOfLeftMeeting(true, it)
@@ -352,6 +359,49 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             val isVideoChange =
                                 inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
                             updateRemoteAVFlags(callAndSession.second, isAudioChange, isVideoChange)
+                        }
+                    }
+                }
+            }
+        }
+
+    private val sessionLowResObserver =
+        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
+            when {
+                inMeetingViewModel.isSameCall(callAndSession.first) -> {
+                    if (callAndSession.second.canRecvVideoLowRes()) {
+                        logDebug("Can receive low-resolution video")
+                    } else {
+                        logDebug("Can not receive low-resolution video")
+                        if (inMeetingViewModel.changesInLowRes(callAndSession.second)) {
+                            updateLowOrHiResolution(false, callAndSession.second)
+                        }
+                    }
+                }
+            }
+        }
+
+    private val sessionHiResObserver =
+        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
+            when {
+                inMeetingViewModel.isSameCall(callAndSession.first) -> {
+                    if (callAndSession.second.canRecvVideoHiRes()) {
+                        logDebug("Can receive high-resolution video")
+                    } else {
+                        logDebug("Can not receive high-resolution video")
+                        //Check individual call
+                        individualCallFragment?.let {
+                            if (it.isAdded) {
+                                it.updateResolution(
+                                    callAndSession.second.peerid,
+                                    callAndSession.second.clientid
+                                )
+                            }
+                        }
+
+                        //Check list of participants
+                        if (inMeetingViewModel.changesInHiRes(callAndSession.second)) {
+                            updateLowOrHiResolution(true, callAndSession.second)
                         }
                     }
                 }
@@ -469,6 +519,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     args.lastName
                 )
             }
+            MEETING_ACTION_RINGING_VIDEO_ON -> {
+                sharedModel.micInitiallyOn()
+                sharedModel.camInitiallyOn()
+
+            }
+            MEETING_ACTION_RINGING_VIDEO_OFF -> {
+                sharedModel.micInitiallyOn()
+            }
         }
     }
 
@@ -544,6 +602,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
+
+        LiveEventBus.get(EVENT_SESSION_ON_HIRES_CHANGE)
+            .observeSticky(this, sessionHiResObserver as Observer<Any>)
+
+        LiveEventBus.get(EVENT_SESSION_ON_LOWRES_CHANGE)
+            .observeSticky(this, sessionLowResObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -1001,7 +1065,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 gridViewCallFragment?.let {
                     removeChildFragment(it)
                 }
-                
+
                 if (speakerViewCallFragment == null) {
                     speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
                 }
@@ -1120,7 +1184,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 when {
-                    inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(inMeetingViewModel.getChatId())-> {
+                    inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(
+                        inMeetingViewModel.getChatId()
+                    ) -> {
                         CallUtil.activateChrono(false, meetingChrono, null)
                         toolbarSubtitle?.let {
                             toolbarSubtitle?.text =
@@ -1433,6 +1499,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     /**
      * Method that checks if the session's on hold state has changed and updates the UI
+     *
+     * @param session
      */
     private fun updateOnHoldRemote(session: MegaChatSession) {
         gridViewCallFragment?.let {
@@ -1443,6 +1511,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         speakerViewCallFragment?.let {
             if (it.isAdded) {
                 it.updateSessionOnHold(session)
+            }
+        }
+    }
+
+    private fun updateLowOrHiResolution(isHiRes: Boolean, session: MegaChatSession) {
+        gridViewCallFragment?.let {
+            if (it.isAdded) {
+                it.updateRemoteResolution(session)
+            }
+        }
+
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                it.updateRemoteResolution(isHiRes, session)
             }
         }
     }
@@ -1486,7 +1568,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        bottomFloatingPanelViewHolder?.let {
+        bottomFloatingPanelViewHolder.let {
             it.updateRemoteAudioVideo(session)
         }
     }

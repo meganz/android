@@ -11,6 +11,7 @@ import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil
+import nz.mega.sdk.MegaChatSession
 
 class GridViewPagerAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -77,6 +78,10 @@ class GridViewPagerAdapter(
 
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         adapter?.updateParticipantAudioVideo(typeChange, participant)
+    }
+
+    fun updateRemoteResolution(participant: Participant) {
+        adapter?.updateRemoteResolution(participant)
     }
 
     override fun getLayoutId(viewType: Int): Int {

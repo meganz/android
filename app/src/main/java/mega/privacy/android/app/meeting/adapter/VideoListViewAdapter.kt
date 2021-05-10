@@ -79,6 +79,21 @@ class VideoListViewAdapter(
     }
 
     /**
+     * Update participant video resolution
+     *
+     * @param participant
+     */
+    fun updateRemoteResolution(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.updateResolution(participant)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant that is speaking
      *
      * @param participant

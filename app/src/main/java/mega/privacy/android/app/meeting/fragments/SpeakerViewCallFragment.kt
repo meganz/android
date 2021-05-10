@@ -585,6 +585,36 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Check changes in resolution
+     *
+     * @param isHiRes
+     * @param session MegaChatSession
+     */
+    fun updateRemoteResolution(isHiRes:Boolean, session: MegaChatSession) {
+        //Speaker
+        if(isHiRes){
+            speakerUser?.let { speaker ->
+                when {
+                    session.peerid == speaker.peerId && session.clientid == speaker.clientId && !speaker.isMe -> {
+                        if(speaker.isVideoOn){
+                            closeVideo(speaker)
+                            checkVideoOn(speaker)
+                        }
+                    }
+                }
+            }
+        }
+
+        //List
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            session.peerid,
+            session.clientid
+        )?.let {
+            adapter.updateRemoteResolution(it)
+        }
+    }
+
+    /**
      * Check changes in remote A/V flags
      *
      * @param type type of change, Audio or Video

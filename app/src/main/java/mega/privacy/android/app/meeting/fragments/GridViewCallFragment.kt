@@ -127,6 +127,21 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Check changes in resolution
      *
+     * @param isHiRes
+     * @param session MegaChatSession
+     */
+    fun updateRemoteResolution(session: MegaChatSession) {
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            session.peerid,
+            session.clientid
+        )?.let {
+            adapterPager?.updateRemoteResolution(it)
+        }
+    }
+
+    /**
+     * Check changes in resolution
+     *
      * @param listPeers List of participants with changes
      */
     fun updateRes(listPeers: MutableSet<Participant>) {

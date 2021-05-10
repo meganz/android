@@ -1072,6 +1072,52 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Method for updating low resolution
+     *
+     * @param session
+     * @return True, if there have been changes. False, otherwise
+     */
+    fun changesInLowRes(session: MegaChatSession): Boolean {
+        val iterator = participants.value?.iterator()
+        iterator?.let { participant ->
+            participant.forEach {
+                when {
+                    it.peerId == session.peerid && it.clientId == session.clientid -> {
+                        if(!it.hasHiRes && it.isVideoOn){
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Method for updating high resolution
+     *
+     * @param session
+     * @return True, if there have been changes. False, otherwise
+     */
+    fun changesInHiRes(session: MegaChatSession): Boolean {
+        val iterator = participants.value?.iterator()
+        iterator?.let { participant ->
+            participant.forEach {
+                when {
+                    it.peerId == session.peerid && it.clientId == session.clientid -> {
+                        if(it.hasHiRes && it.isVideoOn){
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        return false
+    }
+
+    /**
      * Method for updating participant audio
      *
      * @param session
@@ -1095,6 +1141,15 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return false
+    }
+
+    /**
+     * Method for leave the meeting
+     */
+    fun ignoreCall() {
+        _callLiveData.value?.let {
+            inMeetingRepository.ignoreCall(it.chatid)
+        }
     }
 
     /**

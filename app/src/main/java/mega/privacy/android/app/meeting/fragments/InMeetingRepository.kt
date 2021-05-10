@@ -184,6 +184,20 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
+     * Method for ignore a call
+     *
+     * @param chatId chat ID
+     */
+    fun ignoreCall(chatId: Long) {
+        if (chatId == MEGACHAT_INVALID_HANDLE)
+            return
+
+        megaChatApi.setIgnoredCall(chatId)
+        MegaApplication.getInstance().stopSounds()
+        CallUtil.clearIncomingCallNotification(chatId)
+    }
+
+    /**
      * Method for leave a meeting
      *
      * @param chatId chat ID
@@ -233,18 +247,19 @@ class InMeetingRepository @Inject constructor(
         }
 
         val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
-        val me = Participant(megaChatApi.myUserHandle,
-        MEGACHAT_INVALID_HANDLE,
-        megaChatApi.myFullname,
-        avatar,
-        true,
-        getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
-        isAudioOn,
-        isVideoOn,
-        false,
-        true,
-        true,
-        null
+        val me = Participant(
+            megaChatApi.myUserHandle,
+            MEGACHAT_INVALID_HANDLE,
+            megaChatApi.myFullname,
+            avatar,
+            true,
+            getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
+            isAudioOn,
+            isVideoOn,
+            false,
+            true,
+            true,
+            null
         )
 
         return me

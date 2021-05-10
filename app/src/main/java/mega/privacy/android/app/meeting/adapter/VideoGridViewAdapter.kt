@@ -93,6 +93,21 @@ class VideoGridViewAdapter(
     }
 
     /**
+     * Update participant video resolution
+     *
+     * @param participant
+     */
+    fun updateRemoteResolution(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.updateResolution(participant)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant audio or video flags
      *
      * @param participant

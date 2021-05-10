@@ -18,13 +18,12 @@
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="fitCenter"
-            app:border_color="@color/grey_700"
             app:border_width="3dp"
             app:corner_radius="60dp"
+            app:border_color="@color/grey_700"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/guideline_top" />
