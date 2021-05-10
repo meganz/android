@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
@@ -34,6 +35,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
 import java.util.*
 
 
@@ -49,8 +51,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
     private var chatId: Long = MEGACHAT_INVALID_HANDLE
 
-    private var peerId: Long? = null
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initViewModel()
@@ -60,8 +60,8 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let { args ->
-            chatId = args.getLong(MEETING_CHAT_ID)
+        arguments?.let {
+            chatId = it.getLong(MEETING_CHAT_ID)
         }
     }
 
@@ -92,37 +92,37 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         // Always be 'calling'.
         toolbarSubtitle.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
 
-        answer_video_fab.startAnimation(
+        binding.answerVideoFab.startAnimation(
             AnimationUtils.loadAnimation(
                 meetingActivity,
                 R.anim.shake
             )
         )
 
-        answer_audio_fab.setOnClickListener {
+        binding.answerAudioFab.setOnClickListener {
             answerCall(enableVideo = false)
         }
 
-        answer_video_fab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
+        binding.answerVideoFab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
 
             override fun onSwipeTop() {
-                answer_video_fab.clearAnimation()
+                binding.answerVideoFab.clearAnimation()
                 animationButtons()
             }
         })
 
-        reject_fab.setOnClickListener {
+        binding.rejectFab.setOnClickListener {
             inMeetingViewModel.leaveMeeting()
             requireActivity().finish()
         }
 
-        animationAlphaArrows(fourth_arrow_call)
+        animationAlphaArrows(binding.fourthArrowCall)
         runDelay(ALPHA_ANIMATION_DELAY) {
-            animationAlphaArrows(third_arrow_call)
+            animationAlphaArrows(binding.thirdArrowCall)
             runDelay(ALPHA_ANIMATION_DELAY) {
-                animationAlphaArrows(second_arrow_call)
+                animationAlphaArrows(binding.secondArrowCall)
                 runDelay(ALPHA_ANIMATION_DELAY) {
-                    animationAlphaArrows(first_arrow_call)
+                    animationAlphaArrows(binding.firstArrowCall)
                 }
             }
         }
@@ -137,14 +137,14 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             setAnimationListener(object : Animation.AnimationListener {
 
                 override fun onAnimationStart(animation: Animation) {
-                    reject_fab.isEnabled = false
+                    binding.rejectFab.isEnabled = false
                 }
 
                 override fun onAnimationRepeat(animation: Animation) {}
 
                 override fun onAnimationEnd(animation: Animation) {
-                    video_label.isVisible = false
-                    answer_video_fab.hide()
+                    binding.videoLabel.isVisible = false
+                    binding.answerVideoFab.hide()
 
                     answerCall(enableVideo = true)
                 }
@@ -163,12 +163,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         s.addAnimation(translateAnim)
         s.addAnimation(alphaAnim)
 
-        answer_video_fab.startAnimation(s)
+        binding.answerVideoFab.startAnimation(s)
 
-        first_arrow_call.clearAnimationAndGone()
-        second_arrow_call.clearAnimationAndGone()
-        third_arrow_call.clearAnimationAndGone()
-        fourth_arrow_call.clearAnimationAndGone()
+        binding.firstArrowCall.clearAnimationAndGone()
+        binding.secondArrowCall.clearAnimationAndGone()
+        binding.thirdArrowCall.clearAnimationAndGone()
+        binding.fourthArrowCall.clearAnimationAndGone()
     }
 
     private fun answerCall(
@@ -209,29 +209,38 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      * Initialize ViewModel
      */
     private fun initViewModel() {
-        inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) {
-            toolbarTitle.text = it
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
+            sharedModel.updateChatRoomId(chatId)
+            inMeetingViewModel.setChatId(chatId)
         }
 
-//        if (chatId != MEGACHAT_INVALID_HANDLE) {
-//            sharedModel.updateChatRoomId(chatId)
-//            inMeetingViewModel.setChatId(chatId)
-//        }
-//
-//        inMeetingViewModel.getCall()?.let {
-//            val session = getSessionIndividualCall(it)
-//            peerId = session?.peerid
-//            TL.log("peer id is: $peerId")
-//        }
+        inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) { title ->
+            toolbarTitle.text = title
+        }
 
+        // Set caller's name and avatar
         inMeetingViewModel.getChat()?.let {
-            var bitmap = getImageAvatarCall(it, peerId!!)
+            val peerId = it.getPeerHandle(0)
+
+            var bitmap = getImageAvatarCall(it, peerId)
             if (bitmap == null) {
-                bitmap = getDefaultAvatarCall(context, peerId!!)
+                bitmap = getDefaultAvatarCall(context, peerId)
             }
 
             avatar.setImageBitmap(bitmap)
+
+            if(inMeetingViewModel.isOneToOneCall()) {
+                toolbarTitle.text = inMeetingViewModel.getParticipantFullName(peerId)
+            }
         }
+
+        // Caller cancelled the call.
+        LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .observeSticky(this) {
+                if (it.status == MegaChatCall.CALL_STATUS_DESTROYED) {
+                    requireActivity().finish()
+                }
+            }
 
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
@@ -262,8 +271,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 permissionsRequester.launch(false)
             }
         }
-
-        binding.sharedViewModel = sharedModel
     }
 
     //TODO start: copy from AbstractMeetingOnBoardingFragment

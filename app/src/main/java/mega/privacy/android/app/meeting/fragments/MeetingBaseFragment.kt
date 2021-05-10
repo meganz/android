@@ -122,12 +122,6 @@ open class MeetingBaseFragment : BaseFragment() {
         permissionsWarningDialogBuilder.setTitle(StringResourcesUtils.getString(R.string.meeting_permission_info))
             .setMessage(StringResourcesUtils.getString(R.string.meeting_permission_info_message))
             .setCancelable(false)
-            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel)) { dialog, _ ->
-                run {
-                    dialog.dismiss()
-                    requireActivity().finish()
-                }
-            }
             .setPositiveButton(StringResourcesUtils.getString(R.string.button_permission_info)) { dialog, _ ->
                 run {
                     dialog.dismiss()
