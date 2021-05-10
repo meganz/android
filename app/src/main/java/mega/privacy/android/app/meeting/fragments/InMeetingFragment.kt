@@ -25,7 +25,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.sortby_dialog.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.setWasLocalVideoEnable
 import mega.privacy.android.app.R
@@ -1607,7 +1606,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.leaveMeeting()
                 checkIfAnotherCallShouldBeShown()
             }
-            isModerator && inMeetingViewModel.haveOneModerator() -> {
+            isModerator && inMeetingViewModel.shouldAssignModerator() -> {
                 val endMeetingBottomSheetDialogFragment =
                     EndMeetingBottomSheetDialogFragment.newInstance()
                 endMeetingBottomSheetDialogFragment.show(
