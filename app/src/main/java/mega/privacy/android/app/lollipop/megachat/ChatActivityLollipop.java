@@ -648,11 +648,14 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     @Override
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
+        callInProgressLayout.setEnabled(true);
         openMeetingInProgress(this, chatId, true);
     }
 
     @Override
     public void onErrorAnsweredCall(int errorCode) {
+        callInProgressLayout.setEnabled(true);
+
         if (errorCode == MegaChatError.ERROR_TOOMANY) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
         } else {
@@ -3049,6 +3052,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
+                callInProgressLayout.setEnabled(false);
                 megaChatApi.answerChatCall(idChat, startVideo, true, new AnswerChatCallListener(this, this));
             }
             return;
