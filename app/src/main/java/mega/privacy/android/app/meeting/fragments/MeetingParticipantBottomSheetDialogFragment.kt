@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -20,6 +21,8 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -35,7 +38,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     private val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
     // Get from activity
-    private var isModerator = true
+    private var isModerator = false
     private var isGuest = false
     private var isSpeakerMode = false
 
@@ -44,6 +47,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     private var isMe = false
 
     private lateinit var participantItem: Participant
+    private lateinit var binding: BottomSheetMeetingParticipantBinding
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
@@ -67,7 +71,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             participantItem
         )
 
-        val binding =
+        binding =
             BottomSheetMeetingParticipantBinding.inflate(LayoutInflater.from(context), null, false)
                 .apply {
                     lifecycleOwner = this@MeetingParticipantBottomSheetDialogFragment
@@ -79,24 +83,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
 
-        initHost()
         initItemAction(binding)
-    }
-
-    private fun initGuest() {
-        isGuest = true
-        isModerator = false
-    }
-
-
-    private fun initHost() {
-        isGuest = false
-        isModerator = true
-    }
-
-    private fun initUser() {
-        isGuest = false
-        isModerator = false
+        initAvatar(participantItem)
     }
 
     /**
@@ -108,7 +96,11 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         listenAction(binding.sendMessage) { onSendMessage() }
         listenAction(binding.pingToSpeaker) { onPingToSpeakerView() }
         listenAction(binding.makeModerator) { onMakeModerator() }
-        listenAction(binding.removeParticipant) { onRemoveParticipant() }
+        listenAction(binding.removeParticipant) {
+            sharedViewModel.currentChatId.value?.let {
+                onRemoveParticipant(it)
+            }
+        }
     }
 
     /**
@@ -172,8 +164,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onMakeModerator() {
-        Toast.makeText(requireContext(), "onMakeModerator", Toast.LENGTH_SHORT).show()
-
         sharedViewModel.currentChatId.value?.let {
             megaChatApi.updateChatPermissions(
                 it,
@@ -188,7 +178,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * Shows an alert dialog to confirm the deletion of a participant.
      *
      */
-    private fun onRemoveParticipant() {
+    private fun onRemoveParticipant(chatId: Long) {
         MaterialAlertDialogBuilder(
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
@@ -199,17 +189,17 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
                     participantItem.name
                 )
             )
-            setPositiveButton(R.string.general_remove) { _, _ -> removeParticipant() }
+            setPositiveButton(R.string.general_remove) { _, _ ->
+               removeParticipant(chatId)
+            }
             setNegativeButton(R.string.general_cancel, null)
             show()
         }
     }
 
-    private fun removeParticipant() {
-        sharedViewModel.currentChatId.value?.let {
-            if (it != MegaChatApiJava.MEGACHAT_INVALID_HANDLE){
-                megaChatApi.removeFromChat(it, participantItem.peerId, this)
-            }
+    private fun removeParticipant(chatId: Long) {
+        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+            megaChatApi.removeFromChat(chatId, participantItem.peerId, this)
         }
     }
 
@@ -221,6 +211,18 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
         startActivity(editProfile)
         dismissAllowingStateLoss()
+    }
+
+    private fun initAvatar(participant: Participant) {
+        var avatar = bottomViewModel.getImageAvatarCall(participantItem.peerId)
+        if (avatar == null) {
+            avatar = CallUtil.getDefaultAvatarCall(
+                MegaApplication.getInstance().applicationContext,
+                participant.peerId
+            )
+        }
+
+        binding.avatar.setImageBitmap(avatar)
     }
 
     companion object {

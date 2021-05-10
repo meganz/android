@@ -8,7 +8,6 @@
     app:behavior_fitToContents="false"
     app:behavior_skipCollapsed="true"
     app:behavior_expandedOffset="36dp"
-    android:elevation="2dp"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/meeting_bottom_floating_panel_peek_height"
     app:layout_behavior="@string/bottom_sheet_behavior">

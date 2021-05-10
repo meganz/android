@@ -4,6 +4,7 @@ import android.graphics.PorterDuff
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -32,9 +33,10 @@ class ParticipantViewHolder(
     }
 
     fun bind(participant: Participant) {
-        if(participant.avatar == null){
+
+        if (participant.avatar == null) {
             initAvatar(participant)
-        }else{
+        } else {
             binding.avatar.setImageBitmap(participant.avatar)
         }
 
@@ -86,7 +88,7 @@ class ParticipantViewHolder(
     }
 
     private fun initAvatar(participant: Participant) {
-        inMeetingViewModel.getChat()?.let {
+        inMeetingViewModel.getChat().let {
             var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
             if (avatar == null) {
                 avatar = CallUtil.getDefaultAvatarCall(

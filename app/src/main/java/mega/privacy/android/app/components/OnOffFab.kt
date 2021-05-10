@@ -44,6 +44,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     @ColorInt
     private val offBackgroundTint: Int
 
+    private var onChangeCallback: (() -> Unit)? = null
 
     private var onOffCallback: ((Boolean) -> Unit)? = null
 
@@ -91,6 +92,10 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         onOffCallback = callback
     }
 
+    fun setOnChangeCallback(callback: () -> Unit) {
+        onChangeCallback = callback
+    }
+
     fun setOnIcon(@DrawableRes icon: Int) {
         onIcon = ContextCompat.getDrawable(context, icon)
         updateAppearance()
@@ -106,5 +111,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 
         backgroundTintList =
             ColorStateList.valueOf(if (!enable) onBackgroundTint else if (isOn) onBackgroundTint else offBackgroundTint)
+
+        onChangeCallback?.invoke()
     }
 }

@@ -1325,7 +1325,11 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun haveOneModerator(): Boolean {
         return participants.value?.toList()?.filter { it.isModerator }?.size?.let {
-            it > 1
+            when {
+                it > 1 -> true
+                it == 1 -> getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
+                else -> getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+            }
         } == true
     }
 

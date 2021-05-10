@@ -1483,6 +1483,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        bottomFloatingPanelViewHolder?.let {
+            it.updateRemoteAudioVideo(session)
+        }
     }
 
     private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
@@ -19,6 +20,7 @@ import mega.privacy.android.app.utils.LogUtil
 class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
     private val viewModel: EndMeetingBottomSheetDialogViewModel by viewModels()
+    private val sharedViewModel:InMeetingViewModel by activityViewModels()
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
@@ -43,12 +45,13 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun assignModerator() {
-        Toast.makeText(requireContext(), "Assign Moderator", Toast.LENGTH_SHORT).show()
-        activity?.startActivity(Intent(requireActivity(), AssignModeratorActivity::class.java))
+        activity?.startActivity(Intent(requireActivity(), AssignModeratorActivity::class.java).apply {
+
+        })
     }
 
     private fun leaveAnyway() {
-        Toast.makeText(requireContext(), "Leave anyway", Toast.LENGTH_SHORT).show()
+        sharedViewModel.leaveMeeting()
         requireActivity().finish()
     }
 

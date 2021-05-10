@@ -37,26 +37,41 @@ class ParticipantsAdapter(
         if (localList.isNullOrEmpty()) {
             return
         }
-        val myParticipant = this.currentList.filterIndexed { _, participant -> participant.isMe }
+        val myParticipant = this.currentList.filter { it.isMe }
         if (myParticipant.isNullOrEmpty()) {
             return
         }
-        val index = myParticipant.lastIndex
+
         val me = myParticipant.last()
+        val index = localList.indexOf(me)
         if (index < 0 || me == null) {
             return
         }
         when (icon) {
-            MIC -> {
-                me.isAudioOn = state
-            }
-            CAM -> {
-                me.isVideoOn = state
-            }
+            MIC -> me.isAudioOn = state
+            CAM -> me.isVideoOn = state
             else -> me.isModerator = state
         }
 
         notifyItemChanged(index, me)
+    }
+
+
+    fun updateParticipantAudioVideo(peerId: Long, clientId: Long) {
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+        val participants =
+            this.currentList.filter { participant -> participant.peerId == peerId && participant.clientId == clientId }
+        if (participants.isNullOrEmpty()) {
+            return
+        }
+
+        val participant = participants.last()
+        val index = localList.indexOf(participant)
+
+        notifyItemChanged(index, participant)
     }
 
     companion object {

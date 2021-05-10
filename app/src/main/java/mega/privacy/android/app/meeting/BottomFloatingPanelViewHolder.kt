@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatSession
 
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
@@ -63,7 +64,6 @@ class BottomFloatingPanelViewHolder(
         listenButtons()
         setupRecyclerView()
         initShareAndInviteButton()
-
 
         updatePanel()
     }
@@ -186,18 +186,33 @@ class BottomFloatingPanelViewHolder(
                 savedMicState = it
                 listener.onChangeMicState(binding.bottomFloatingPanel.fabMic.isOn)
             }
+            fabMic.setOnChangeCallback {
+                updateBottomFloatingPanelIfNeeded()
+            }
 
             fabCam.setOnOffCallback {
                 savedCamState = it
                 listener.onChangeCamState(binding.bottomFloatingPanel.fabCam.isOn)
             }
 
+            fabCam.setOnChangeCallback {
+                updateBottomFloatingPanelIfNeeded()
+            }
+
             fabSpeaker.setOnClickListener {
                 listener.onChangeSpeakerState()
             }
 
+            fabSpeaker.setOnChangeCallback {
+                updateBottomFloatingPanelIfNeeded()
+            }
+
             fabHold.setOnOffCallback {
                 listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
+            }
+
+            fabHold.setOnChangeCallback {
+                updateBottomFloatingPanelIfNeeded()
             }
 
             fabEnd.setOnClickListener {
@@ -443,6 +458,15 @@ class BottomFloatingPanelViewHolder(
 
     fun updatePrivilege(ownPrivileges: Int) {
         participantsAdapter.updateIcon(ParticipantsAdapter.MODERATOR, ownPrivileges == MegaChatRoom.PRIV_MODERATOR)
+    }
+
+    /**
+     * Check changes in remote A/V flags
+     *
+     * @param session MegaChatSession
+     */
+    fun updateRemoteAudioVideo(session: MegaChatSession) {
+        participantsAdapter.updateParticipantAudioVideo(session.peerid, session.clientid)
     }
 
 

@@ -1,9 +1,17 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatRoom
 
 /**
  * ViewModel for [MeetingParticipantBottomSheetDialogFragment]
@@ -20,12 +28,37 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
     /**
      * Init value for View Model
      */
-    fun initValue(con: Context, moderator: Boolean, guest: Boolean, speakerMode:Boolean, info: Participant) {
+    fun initValue(
+        con: Context,
+        moderator: Boolean,
+        guest: Boolean,
+        speakerMode: Boolean,
+        info: Participant
+    ) {
         isModerator = moderator
         isGuest = guest
         participant = info
         context = con
         isSpeakerMode = speakerMode
+    }
+
+    fun getEmail(): String = participant?.peerId?.let {
+        ChatController(context).getParticipantEmail(it)
+    } ?: ""
+
+
+    fun getImageAvatarCall(peerId: Long): Bitmap? {
+        val mail = getEmail()
+        val megaChatApi = MegaApplication.getInstance().megaChatApi
+        val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
+        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
+        if (userHandleString == myUserHandleEncoded) {
+            return AvatarUtil.getAvatarBitmap(mail)
+        }
+        return if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+            userHandleString,
+            mail
+        )
     }
 
     /**
@@ -81,8 +114,6 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
             context?.getString(R.string.contact_properties_activity)
         }
     }
-
-
 
     /**
      * Determine if show the `Make Moderator` item
