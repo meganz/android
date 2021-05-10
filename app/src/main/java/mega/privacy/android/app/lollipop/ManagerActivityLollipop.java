@@ -10285,6 +10285,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
                 } else {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_SAVE_TO_CLOUD);
+                    fileIntent.putExtra(FileExplorerActivityLollipop.EXTRA_PARENT_HANDLE, getCurrentParentHandle());
                 }
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
