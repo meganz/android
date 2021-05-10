@@ -74,6 +74,23 @@ class ParticipantsAdapter(
         notifyItemChanged(index, participant)
     }
 
+    fun updateParticipantPermission(peerId: Long, clientId: Long){
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+        val participants =
+            this.currentList.filter { participant -> participant.peerId == peerId && participant.clientId == clientId }
+        if (participants.isNullOrEmpty()) {
+            return
+        }
+
+        val participant = participants.last()
+        participant.isModerator = true
+        val index = localList.indexOf(participant)
+        notifyItemChanged(index, participant)
+    }
+
     companion object {
         const val MIC = 0
         const val CAM = 1

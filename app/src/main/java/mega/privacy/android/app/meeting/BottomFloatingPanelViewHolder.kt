@@ -469,6 +469,12 @@ class BottomFloatingPanelViewHolder(
         participantsAdapter.updateParticipantAudioVideo(session.peerid, session.clientid)
     }
 
+    fun updateRemotePrivileges(updateParticipantsPrivileges: MutableSet<Participant>) {
+        updateParticipantsPrivileges.forEach { participant ->
+            participantsAdapter.updateParticipantPermission(participant.peerId, participant.clientId)
+        }
+    }
+
 
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F

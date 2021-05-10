@@ -196,6 +196,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 }
                                 it.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
                                     updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
+                                    bottomFloatingPanelViewHolder.updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
                                 }
                             }
                         }
