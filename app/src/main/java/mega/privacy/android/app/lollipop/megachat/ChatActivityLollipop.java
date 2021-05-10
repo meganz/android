@@ -1621,7 +1621,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void updateUserNameInChat() {
-        if (chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
