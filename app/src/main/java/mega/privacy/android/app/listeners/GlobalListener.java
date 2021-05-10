@@ -192,7 +192,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 break;
 
             case MegaEvent.EVENT_BUSINESS_STATUS:
-                megaApplication.updateBusinessStatus();
+                megaApplication.sendBroadcastUpdateAccountDetails();
 
                 break;
 

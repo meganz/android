@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -1660,5 +1661,27 @@ public class ChatUtil {
                 })
                 .setNegativeButton(getString(R.string.general_cancel), null)
                 .show();
+    }
+
+    /**
+     * Method to remove SharePreferences related to emojis and reactions when logging out.
+     */
+    public static void removeEmojisSharedPreferences() {
+        Context context = MegaApplication.getInstance().getBaseContext();
+        removeSharedPreference(context.getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE));
+        removeSharedPreference(context.getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE));
+        removeSharedPreference(context.getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE));
+        removeSharedPreference(context.getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE));
+    }
+
+    /**
+     * Delete a specific SharePreferences.
+     *
+     * @param preferences The SharedPreferences.
+     */
+    private static void removeSharedPreference(SharedPreferences preferences) {
+        if (preferences != null) {
+            preferences.edit().clear().apply();
+        }
     }
 }

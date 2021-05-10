@@ -683,7 +683,8 @@
     <string name="settings_features" context="settings of the Features section">المميزات</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">التخزين</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">قفل رمز المرور</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تتطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">في حالة التمكين، ستقوم بترفيع معلومات حول مكان التقاط الصو، لذا كن حذراً عند مشاركتها.</string>
 
@@ -775,21 +776,30 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">الصور والفيديوهات</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">لم يتم التعيين</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">قفل رمز المرور</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">قفل رمز المرور</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">تغيير رمز المرور</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Change passcode lock</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">يتطلب رمز المرور</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">فوراً</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">دخول</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 محاولة رمز المرور فاشلة</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">سيتم تسجيل خروجك وسيتم حذف ملفاتك غير المتصلة بالانترنت بعد 10 محاولات فاشلة</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">رمز غير صحيح</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">رمز المرور خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز مرور خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">رمز المرورغير متطابق</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز المرور الخاص بك</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز المرور</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">رموز المرور غير متطابقة. حاول مرة أخرى.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">إدخال رمز المرور الخاص</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">إعادة إدخال رمز المرور الخاص</string>
     <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز المرور الجديد</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز المرور الجديد</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">إعادة إدخال رمز المرور الجديد</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">سيتم حذف جميع بياناتك المحلية وسيتم تسجيل خروجك خلال %1d ثانية</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">حول</string>

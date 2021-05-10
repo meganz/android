@@ -683,7 +683,8 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -775,17 +776,26 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotografii și videoclipuri</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Modifică codul de acces</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Change passcode lock</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Necesită cod de acces</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Imediat</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 încercare eșuată pentru codul de acces</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Cod incorect</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Cod de acces greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Codurile de acces nu coincid</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Codurile de acces nu coincid. Încearcă din nou.</string>
     <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu codul de acces</string>
     <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu codul de acces</string>
     <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu noul cod de acces</string>
@@ -1737,13 +1747,13 @@
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Data cerută nu este validă</string>
 
     <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
-    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Correct your filenames before proceeding</string>
+    <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Please correct your filenames before proceeding</string>
     <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Caractere nevalide</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Name your file before proceeding</item>
-        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Name your files before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Singular. When only one file name has this error." quantity="one">Please name your file before proceeding</item>
+        <item context="Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error." quantity="other">Please name your files before proceeding</item>
     </plurals>
 
     <string name="audio_play" context="Label shown when audio file is playing">Fișier audio</string>
@@ -2999,8 +3009,8 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved</string>
-    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved.</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Cookie Settings unsaved.</string>
+    <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Cookie Settings changes have been saved</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>

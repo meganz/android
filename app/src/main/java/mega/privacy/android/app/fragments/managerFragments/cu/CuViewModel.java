@@ -74,13 +74,13 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context, int type) {
+                       MegaNodeRepo repo, Context context, int type, long[] cuSearchDate) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mAppContext = context.getApplicationContext();
         mType = type;
-
+        mSearchDate = cuSearchDate;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
@@ -270,8 +270,8 @@ class CuViewModel extends BaseRxViewModel {
 
                     mDbHandler.setStorageDownloadLocation(
                             defaultDownloadLocation.getAbsolutePath());
-                    mDbHandler.setPinLockEnabled(false);
-                    mDbHandler.setPinLockCode("");
+                    mDbHandler.setPasscodeLockEnabled(false);
+                    mDbHandler.setPasscodeLockCode("");
 
                     ArrayList<MegaNode> nodeLinks = mMegaApi.getPublicLinks();
                     if (nodeLinks == null || nodeLinks.size() == 0) {

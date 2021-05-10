@@ -33,6 +33,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.io.File;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -42,6 +45,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -85,11 +89,15 @@ import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
     public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
     public static final int TYPE_MEDIA = MegaNodeRepo.CU_TYPE_MEDIA;
 
     private static final String ARG_TYPE = "type";
+
+    @Inject
+    SortOrderManagement sortOrderManagement;
 
     // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
     private static final int SPAN_LARGE_GRID = 3;
@@ -107,6 +115,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private CuViewModel mViewModel;
 
     private static final String AD_SLOT = "and3";
+    private static long[] cuSearchDate = null;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -126,8 +135,16 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         reloadNodes(orderBy);
     }
 
+    /**
+     * Search the media of camera
+     * @param searchDate the date or date range for searching
+     * @param orderBy The order of sort
+     */
     public void setSearchDate(long[] searchDate, int orderBy) {
-        mViewModel.setSearchDate(searchDate, orderBy);
+        cuSearchDate = searchDate;
+        if (mViewModel != null) {
+            mViewModel.setSearchDate(searchDate, orderBy);
+        }
     }
 
     public void reloadNodes(int orderBy) {
@@ -160,7 +177,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(mManagerActivity.orderCamera);
+            reloadNodes(sortOrderManagement.getOrderCamera());
+
+            // When press back, reload all files.
+            setSearchDate(null, sortOrderManagement.getOrderCamera());
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
@@ -315,17 +335,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mManagerActivity = (ManagerActivityLollipop) context;
 
+        CuViewModelFactory viewModelFactory =
+                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
+        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+
         initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-
-        CuViewModelFactory viewModelFactory =
-                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
-        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
             return createCameraUploadsViewForFirstLogin(inflater, container);
@@ -578,7 +598,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onResume() {
         super.onResume();
 
-        reloadNodes(mManagerActivity.orderCamera);
+        reloadNodes(sortOrderManagement.getOrderCamera());
     }
 
     private void openNode(int position, CuNode cuNode) {
@@ -635,7 +655,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void putExtras(Intent intent, int indexForViewer, int position, MegaNode node) {
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera());
 
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
 

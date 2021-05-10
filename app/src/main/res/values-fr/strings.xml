@@ -683,7 +683,8 @@
     <string name="settings_features" context="settings of the Features section">Fonctions</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Code d\'accès</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Verrouillage par code d\'accès</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Options du code d\'accès</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compression vidéo demande beaucoup d\'énergie. MEGA exigera que vous rechargiez activement votre appareil si les vidéos à compresser dépassent %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si cette option est activée, vous téléverserez des renseignements sur le lieu où vos photos ont été prises. Veuillez donc faire preuve de prudence en les partageant.</string>
 
@@ -775,17 +776,26 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos et vidéos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">N\'a pas été défini</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Code d\'accès</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Code d\'accès</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Changer le code d\'accès</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Changer le code d\'accès</string>
+    <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Exiger le code d\'accès</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Immédiatement</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Valider</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Vos fichiers locaux seront supprimés et vous serez déconnecté après dix tentatives infructueuses.</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 tentative d\'accès infructueuse</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d tentatives d\'accès infructueuses</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">Vous serez déconnecté et vos fichiers Hors ligne seront supprimés après dix tentatives infructueuses.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Le code est erroné</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Le code d\'accès est erroné, veuillez réessayer. Il vous reste un essai</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Le code d\'accès est erroné, veuillez réessayer. Il vous reste %2d tentatives</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Les codes d\'accès ne correspondent pas</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Les codes d\'accès ne correspondent pas. Réessayez.</string>
     <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Saisissez votre code d\'accès</string>
     <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Saisissez votre code d\'accès de nouveau</string>
     <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Saisissez votre nouveau code d\'accès</string>
@@ -866,9 +876,9 @@
     <string name="sort_by_smallest_size" context="sort files by smallest size">Du plus petit</string>
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Type de code d\'accès</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">Code d\'accès à quatre chiffres</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">Code d\'accès à six chiffres</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Code d\'accès alphanumérique</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 chiffres</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 chiffres</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumérique</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">La journalisation est maintenant activée</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Les journaux sont maintenant désactivés</string>
@@ -2999,7 +3009,7 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Paramètres des Témoins de navigation</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Avant que vous ne poursuiviez</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Nous utilisons la mémoire locale et des technologies semblables (« cookies ») pour vous fournir nos services, améliorer votre expérience d\'utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de navigation. Apprenez-en davantage dans notre [A]Politique sur les Témoins de navigation[/A].</string>
-    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Des paramètres de témoins ne sont pas enregistrés</string>
+    <string name="dialog_cookie_alert_unsaved" context="Cookie dialog message showed when there are unsaved settings.">Des paramètres de témoins ne sont pas enregistrés.</string>
     <string name="dialog_cookie_snackbar_saved" context="Snackbar message showed when there settings has been saved successfully.">Les modifications des paramètres des témoins ont été enregistrées.</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Témoins tiers</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Témoins publicitaires de Google</string>
