@@ -19,6 +19,7 @@ import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
@@ -660,7 +661,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method to start a meeting
+     * Method to start a meeting from create meeting
      *
      * @param audioEnable if the audio is enable
      * @param videoEnable if the video is enable
@@ -672,7 +673,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            //The chat exists
+            logDebug("The chat exists")
             inMeetingRepository.startCall(
                 it.chatId,
                 audioEnable,
@@ -682,7 +683,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             return
         }
 
-        //The chat doesn't exist
+        logDebug("The chat doesn't exists")
         inMeetingRepository.createMeeting(
             _chatTitle.value!!,
             CreateGroupChatWithPublicLink()
@@ -780,14 +781,14 @@ class InMeetingViewModel @ViewModelInject constructor(
                             when {
                                 it.isSelected -> {
                                     it.isSelected = false
-                                    onCloseVideo(it)
                                     listWithChanges.add(it)
                                 }
                             }
                         }
                         else -> {
                             it.isSelected = true
-                            _speakerParticipant.value = it
+                            logDebug("New speaker selected")
+                            _speakerParticipant.value = createSpeakerParticipant(it)
                             _speakerParticipant.value!!.hasHiRes = true
                             listWithChanges.add(it)
                         }
@@ -822,10 +823,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param list list of participants
      */
-    fun createCurrentParticipants(list: MegaHandleList) {
+    fun createCurrentParticipants(list: MegaHandleList, status: String) {
         for (i in 0 until list.size()) {
             getSession(list[i])?.let {
-                createParticipant(it)
+                createParticipant(it, status)
             }
         }
     }
@@ -835,9 +836,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if should be high. False, otherwise
      */
-    private fun needHiRes(): Boolean {
+    private fun needHiRes(status:String): Boolean {
         participants.value?.let {
-            if (it.size < 4) {
+            if (status != TYPE_IN_SPEAKER_VIEW && it.size < 4) {
                 return true
             }
         }
@@ -860,20 +861,23 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession
      * @return the position of the participant
      */
-    fun createParticipant(session: MegaChatSession): Int? {
+    fun createParticipant(session: MegaChatSession, status: String): Int? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter { participant ->
                     participant.peerId == session.peerid && participant.clientId == session.clientid
                 }
                 if (!peer.isNullOrEmpty()) {
+                    logDebug("Participants exists")
+
                     return INVALID_POSITION
                 }
             }
 
             val isModerator = isParticipantModerator(session.peerid)
             val isContact = isMyContact(session.peerid)
-            val hasHiRes = needHiRes()
+            val hasHiRes = needHiRes(status)
+
             val name = getParticipantName(session.peerid)
             val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
 
@@ -891,6 +895,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 hasHiRes,
                 null
             )
+            logDebug("Created participant")
 
             participants.value?.add(userPeer)
             participants.value = participants.value
@@ -904,36 +909,53 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for checking which participants need to change their resolution
      *
-     * @param isAdded If the participant has been added
+     * In Speaker view, the list of participants should have low res
+     * In Grid view, if there is more than 4, low res. Hi res in the opposite case
+     *
+     * @param status if it's Speaker view or Grid view
      * @return the participants list with changes
      */
-    fun checkParticipantsResolution(isAdded: Boolean): MutableSet<Participant> {
+    fun checkParticipantsResolution(status:String): MutableSet<Participant> {
+        logDebug("Check participants resolution")
         val listWithChanges = mutableSetOf<Participant>()
         participants.value?.let { listParticipants ->
             val iterator = listParticipants.iterator()
             iterator.forEach {
-                when {
-                    (isAdded && listParticipants.size >= 5) -> {
-                        when {
-                            it.hasHiRes -> {
-                                it.hasHiRes = false
-                                when {
-                                    it.isVideoOn -> {
-                                        listWithChanges.add(it)
+                if(status == TYPE_IN_SPEAKER_VIEW){
+                    when {
+                        it.hasHiRes -> {
+                            it.hasHiRes = false
+                            when {
+                                it.isVideoOn -> {
+                                    listWithChanges.add(it)
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    when {
+                        (listParticipants.size >= 5) -> {
+                            when {
+                                it.hasHiRes -> {
+                                    it.hasHiRes = false
+                                    when {
+                                        it.isVideoOn -> {
+                                            listWithChanges.add(it)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                when {
-                    !isAdded && listParticipants.size < 5 -> {
-                        when {
-                            !it.hasHiRes -> {
-                                it.hasHiRes = true
-                                when {
-                                    it.isVideoOn -> {
-                                        listWithChanges.add(it)
+                    when {
+                        listParticipants.size < 5 -> {
+                            when {
+                                !it.hasHiRes -> {
+                                    it.hasHiRes = true
+                                    when {
+                                        it.isVideoOn -> {
+                                            listWithChanges.add(it)
+                                        }
                                     }
                                 }
                             }
@@ -960,6 +982,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                         it.peerId == session.peerid && it.clientId == session.clientid -> {
                             when {
                                 it.isSelected -> {
+
                                     assignMeAsSpeaker()
                                 }
                             }
@@ -993,6 +1016,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     fun assignMeAsSpeaker() {
+        logDebug("Assign me as speaker")
+        _speakerParticipant.value?.let { currentSpeaker ->
+            onCloseVideo(currentSpeaker)
+        }
+
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             _speakerParticipant.value = inMeetingRepository.getMeToSpeakerView(it)
         }

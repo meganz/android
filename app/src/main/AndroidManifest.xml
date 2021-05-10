@@ -522,7 +522,7 @@
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallService"
+            android:name="mega.privacy.android.app.meeting.CallService"
             android:exported="false" >
         </service>
 
@@ -532,7 +532,7 @@
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:name="mega.privacy.android.app.meeting.CallNotificationIntentService"
             android:exported="false" >
         </service>
 

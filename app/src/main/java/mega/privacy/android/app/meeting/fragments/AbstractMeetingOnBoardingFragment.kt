@@ -390,6 +390,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             videoListener = MeetingVideoListener(
                 localSurfaceView,
                 outMetrics,
+                megaChatApi.myUserHandle,
                 MEGACHAT_INVALID_HANDLE,
                 false
             )

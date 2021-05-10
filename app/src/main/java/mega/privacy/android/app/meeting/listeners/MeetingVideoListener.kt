@@ -5,8 +5,7 @@ import android.graphics.PixelFormat
 import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRenderer
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -19,6 +18,7 @@ import java.nio.ByteBuffer
 class MeetingVideoListener(
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
+    peerId: Long,
     clientId: Long,
     isFloatingWindow: Boolean = true
 ) : MegaChatVideoListenerInterface {
@@ -40,7 +40,7 @@ class MeetingVideoListener(
         byteBuffer: ByteArray
     ) {
 
-        if (width == 0 || height == 0) {
+        if (width == 0 || height == 0 || byteBuffer == null) {
             return
         }
 
@@ -95,6 +95,16 @@ class MeetingVideoListener(
 
         surfaceHolder = surfaceView.holder
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT)
-        renderer = MegaSurfaceRenderer(surfaceView, isFloatingWindow, outMetrics)
+        renderer = MegaSurfaceRenderer(
+            surfaceView,
+            peerId,
+            clientId,
+            isFloatingWindow,
+            outMetrics
+        )
+    }
+
+    fun getLocalRenderer(): MegaSurfaceRenderer? {
+        return renderer
     }
 }

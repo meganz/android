@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.meeting;
 
 // The following four imports are needed saveBitmapToJPEG which
 // is for debug only
@@ -26,6 +26,9 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import org.webrtc.Logging;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
@@ -49,19 +52,27 @@ public class MegaSurfaceRenderer implements Callback {
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private boolean isSmallCamera;
+    private long peerId;
+    private long clientId;
     private DisplayMetrics outMetrics;
+    private List<MegaSurfaceRenderer.MegaSurfaceRendererGroupListener> listeners;
 
-    public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
+
+    public MegaSurfaceRenderer(SurfaceView view, long peerId, long clientId, boolean isSmallCamera, DisplayMetrics outMetrics) {
         logDebug("MegaSurfaceRenderer() ");
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
             return;
         surfaceHolder.addCallback(this);
         paint = new Paint();
+        this.peerId = peerId;
+        this.clientId = clientId;
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.isSmallCamera = isSmallCamera;
         this.outMetrics = outMetrics;
+
+        listeners = new ArrayList<>();
     }
 
     // surfaceChanged and surfaceCreated share this function
@@ -149,6 +160,8 @@ public class MegaSurfaceRenderer implements Callback {
         }
         surfaceHolder.unlockCanvasAndPost(canvas);
 
+        notifyStateToAll();
+
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
@@ -169,12 +182,31 @@ public class MegaSurfaceRenderer implements Callback {
                 " dstRect.bottom:" + dstRect.bottom);
     }
 
+    private void notifyStateToAll() {
+        for (MegaSurfaceRenderer.MegaSurfaceRendererGroupListener listener : listeners)
+            notifyState(listener);
+    }
+
+    public void addListener(MegaSurfaceRenderer.MegaSurfaceRendererGroupListener l) {
+        listeners.add(l);
+        notifyState(l);
+    }
+
+    private void notifyState(MegaSurfaceRenderer.MegaSurfaceRendererGroupListener listener) {
+        if (listener == null)
+            return;
+
+        listener.resetSize(peerId, clientId);
+    }
+
     public void surfaceDestroyed(SurfaceHolder holder) {
         logDebug("surfaceDestroyed()");
 
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
         byteBuffer = null;
+        surfaceWidth = 0;
+        surfaceHeight = 0;
     }
 
     public Bitmap createBitmap(int width, int height) {
@@ -217,5 +249,9 @@ public class MegaSurfaceRenderer implements Callback {
         }
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
         surfaceHolder.unlockCanvasAndPost(canvas);
+    }
+
+    public interface MegaSurfaceRendererGroupListener {
+        void resetSize(long peerId, long clientId);
     }
 }

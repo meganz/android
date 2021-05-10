@@ -34,17 +34,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     private val localAudioLevelObserver = Observer<MegaChatCall> {
         when {
             (parentFragment as InMeetingFragment).inMeetingViewModel.isSameCall(it.callId) -> {
-                speakerUser?.let { speaker ->
+                speakerUser?.let { currentSpeaker ->
                     when {
                         (parentFragment as InMeetingFragment).inMeetingViewModel.isSpeakerSelectionAutomatic -> {
-                            when {
-                                !speaker.isMe -> {
-                                    (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
-                                        speaker
-                                    )
-                                    (parentFragment as InMeetingFragment).inMeetingViewModel.assignMeAsSpeaker()
-                                }
-                            }
+                            closeVideo(currentSpeaker)
                         }
                     }
                 }
@@ -56,16 +49,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             when {
                 (parentFragment as InMeetingFragment).inMeetingViewModel.isSameCall(callAndSession.first) -> {
-                    speakerUser?.let { speaker ->
+                    speakerUser?.let { currentSpeaker ->
                         when {
                             (parentFragment as InMeetingFragment).inMeetingViewModel.isSpeakerSelectionAutomatic &&
-                                    (speaker.peerId != callAndSession.second.peerid ||
-                                            speaker.clientId != callAndSession.second.clientid) -> {
-                                when {
-                                    speaker.isMe -> {
-                                        closeLocalVideo(speaker)
-                                    }
-                                }
+                                    (currentSpeaker.peerId != callAndSession.second.peerid ||
+                                            currentSpeaker.clientId != callAndSession.second.clientid) -> {
+
+                               closeVideo(currentSpeaker)
 
                                 selectSpeaker(
                                     callAndSession.second.peerid,
@@ -81,7 +71,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
-        if(isFirsTime){
+        if (isFirsTime) {
             isFirsTime = false
             adapter.submitList(null)
             adapter.submitList(it)
@@ -107,7 +97,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             setHasFixedSize(true)
         }
 
-        participants_horizontal_list.recycledViewPool.clear()
         participants_horizontal_list.adapter = null
         adapter = VideoListViewAdapter(
             (parentFragment as InMeetingFragment).inMeetingViewModel,
@@ -120,7 +109,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.pinItemEvent.observe(
             viewLifecycleOwner,
-            EventObserver {
+            EventObserver { participantClicked ->
+                logDebug("Clicked participant")
                 when {
                     (parentFragment as InMeetingFragment).inMeetingViewModel.isSpeakerSelectionAutomatic -> {
                         (parentFragment as InMeetingFragment).inMeetingViewModel.setSpeakerSelection(
@@ -129,7 +119,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                     }
                     else -> {
                         speakerUser?.let { currentSpeaker ->
-                            if (currentSpeaker.peerId == it.peerId && currentSpeaker.clientId == it.clientId) {
+                            if (currentSpeaker.peerId == participantClicked.peerId && currentSpeaker.clientId == participantClicked.clientId) {
                                 (parentFragment as InMeetingFragment).inMeetingViewModel.setSpeakerSelection(
                                     true
                                 )
@@ -137,8 +127,21 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                         }
                     }
                 }
-
-                selectSpeaker(it.peerId, it.clientId)
+                speakerUser?.let { currentSpeaker ->
+                    if (currentSpeaker.peerId == participantClicked.peerId && currentSpeaker.clientId == participantClicked.clientId) {
+                        logDebug("Same participant")
+                        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                            participantClicked.peerId,
+                            participantClicked.clientId
+                        )?.let {
+                            adapter.updatePeerSelected(participantClicked)
+                        }
+                    } else {
+                        logDebug("New speaker selected")
+                        closeVideo(currentSpeaker)
+                        selectSpeaker(participantClicked.peerId, participantClicked.clientId)
+                    }
+                }
             })
 
         //Init Speaker participant: Me
@@ -162,13 +165,18 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.speakerParticipant.observe(
             viewLifecycleOwner
-        ) {
-            it?.let {
-                speakerUser =
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.createSpeakerParticipant(
-                        it
-                    )
-                updateSpeakerUser(it)
+        ) { participant ->
+            participant?.let {newSpeaker ->
+                speakerUser?.let {
+                    if(it.isVideoOn){
+                        closeVideo(it)
+                    }
+                }
+                speakerUser = newSpeaker
+
+                speakerUser?.let {
+                    updateSpeakerUser(it)
+                }
             }
         }
 
@@ -312,9 +320,11 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                     speaker_video.isVisible = false
                     when {
                         it.isMe -> {
+                            logDebug("Close local video")
                             closeLocalVideo(it)
                         }
                         else -> {
+                            logDebug("Close remote video")
                             (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
                                 it
                             )
@@ -483,14 +493,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             when {
                 participant.peerId != it.peerId || participant.clientId != it.clientId -> return
                 else -> {
-                    closeVideo(it)
-
                     when (it.videoListener) {
                         null -> {
                             logDebug("Video Listener is null ")
                             val vListener = MeetingVideoListener(
                                 speaker_video,
                                 MegaApplication.getInstance().applicationContext.displayMetrics,
+                                it.peerId,
                                 it.clientId,
                                 false
                             )
@@ -619,8 +628,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     fun updateCallOnHold(isCallOnHold: Boolean) {
         //Speaker
         speakerUser?.let {
-            logDebug("Session is on hold")
-            videoOffUI(it)
+            if(isCallOnHold){
+                logDebug("Call on hold")
+                videoOffUI(it)
+            }else{
+                logDebug("Call in progress")
+                checkVideoOn(it)
+            }
+
         }
 
         //Participant in list
@@ -640,8 +655,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         speakerUser?.let {
             when {
                 it.peerId == session.peerid && it.clientId == session.clientid -> {
-                    logDebug("Session is on hold")
-                    videoOffUI(it)
+                    if(session.isOnHold){
+                        logDebug("Session is on hold")
+                        videoOffUI(it)
+                    }else{
+                        logDebug("Session is in progress")
+                        checkVideoOn(it)
+                    }
                 }
             }
         }

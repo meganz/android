@@ -31,7 +31,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;

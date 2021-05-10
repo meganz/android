@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -25,6 +26,7 @@ import javax.inject.Inject
  * extra top offset. Not use DataBinding could avoid this bug.
  */
 class VideoMeetingViewHolder(
+    private val listener: MegaSurfaceRenderer.MegaSurfaceRendererGroupListener,
     private val binding: ItemParticipantVideoBinding,
     private val screenWidth: Int,
     private val screenHeight: Int,
@@ -76,8 +78,8 @@ class VideoMeetingViewHolder(
                 } else {
                     SIZE_AVATAR = 60
                     val layoutParams = binding.root.layoutParams
-                    layoutParams.width = dp2px(VideoMeetingViewHolder.ITEM_WIDTH)
-                    layoutParams.height = dp2px(VideoMeetingViewHolder.ITEM_HEIGHT)
+                    layoutParams.width = dp2px(ITEM_WIDTH)
+                    layoutParams.height = dp2px(ITEM_HEIGHT)
                     binding.root.setOnClickListener {
                         inMeetingViewModel.onItemClick(participant)
                     }
@@ -138,6 +140,7 @@ class VideoMeetingViewHolder(
 
             updateAudioIcon(participant)
             updatePrivilegeIcon(participant)
+            updatePeerSelected(participant)
         }
     }
 
@@ -184,13 +187,13 @@ class VideoMeetingViewHolder(
         when {
             participant.peerId != this.peerId || participant.clientId != this.clientId -> return
             else -> {
-                closeVideo(participant)
+                //closeVideo(participant)
                 when (participant.videoListener) {
                     null -> {
-                        logDebug("Video Listener is null ")
                         val vListener = MeetingVideoListener(
                             binding.video,
                             MegaApplication.getInstance().applicationContext.displayMetrics,
+                            participant.peerId,
                             participant.clientId,
                             false
                         )
@@ -198,6 +201,11 @@ class VideoMeetingViewHolder(
                         participant.videoListener = vListener
 
                         inMeetingViewModel.onActivateVideo(participant)
+
+                            participant.videoListener!!.getLocalRenderer()?.let {
+                                it.addListener(listener)
+                            }
+
                     }
                     else -> {
                         logDebug("Video Listener is not null ")

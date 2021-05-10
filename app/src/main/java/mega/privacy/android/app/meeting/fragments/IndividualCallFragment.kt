@@ -485,6 +485,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                         videoListener = MeetingVideoListener(
                             vVideo,
                             outMetrics,
+                            megaChatApi.myUserHandle,
                             MEGACHAT_INVALID_HANDLE,
                             isFloatingWindow
                         )
@@ -495,6 +496,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                         videoListener = MeetingVideoListener(
                             vVideo,
                             outMetrics,
+                            peerId,
                             clientId,
                             false
                         )

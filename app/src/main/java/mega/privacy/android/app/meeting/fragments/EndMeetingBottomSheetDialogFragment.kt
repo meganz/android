@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
@@ -15,16 +16,43 @@ import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogVie
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.END_MEETING_FOR_ALL
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.LEAVE_ANYWAY
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
+import nz.mega.sdk.MegaChatApiJava
 
-class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class EndMeetingBottomSheetDialogFragment (): BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
     private val viewModel: EndMeetingBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel:InMeetingViewModel by activityViewModels()
+    private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            chatId = it.getLong(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+        }
+
+        when (chatId) {
+            MegaChatApiJava.MEGACHAT_INVALID_HANDLE -> {
+                LogUtil.logError("Error. Chat doesn't exist")
+                return
+            }
+            else -> {
+                chatId?.let { sharedViewModel.setChatId(it) }
+                when {
+                    sharedViewModel.getCall() == null -> {
+                        LogUtil.logError("Error. Call doesn't exist")
+                        return
+                    }
+                }
+            }
+        }
+    }
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
+
 
         viewModel.clickEvent.observe(this, {
             when (it) {
@@ -77,8 +105,12 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(): EndMeetingBottomSheetDialogFragment {
-            return EndMeetingBottomSheetDialogFragment()
+        fun newInstance(chatId: Long): EndMeetingBottomSheetDialogFragment {
+            return EndMeetingBottomSheetDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putLong(Constants.CHAT_ID, chatId)
+                }
+            }
         }
     }
 }

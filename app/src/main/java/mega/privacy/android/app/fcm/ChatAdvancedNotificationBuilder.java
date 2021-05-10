@@ -34,10 +34,9 @@ import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
+import mega.privacy.android.app.meeting.CallNotificationIntentService;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -49,15 +48,11 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
 
 import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -827,12 +822,12 @@ public final class ChatAdvancedNotificationBuilder {
         String titleCall;
         Bitmap statusIcon = null;
 
+        titleChat = getTitleChat(chatToAnswer);
+
         if (chatToAnswer.isGroup()) {
-            titleChat = getTitleChat(chatToAnswer);
             titleCall = context.getString(R.string.title_notification_incoming_group_call);
         } else {
             statusIcon = getStatusBitmap(megaChatApi.getUserOnlineStatus(chatToAnswer.getPeerHandle(0)));
-            titleChat = chatC.getParticipantFullName(chatToAnswer.getPeerHandle(0));
             titleCall = context.getString(R.string.title_notification_incoming_individual_audio_call);
         }
 

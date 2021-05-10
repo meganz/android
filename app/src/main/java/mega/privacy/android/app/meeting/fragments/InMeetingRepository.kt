@@ -7,15 +7,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
@@ -237,21 +233,21 @@ class InMeetingRepository @Inject constructor(
         }
 
         val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
-
-        return Participant(
-            megaChatApi.myUserHandle,
-            MEGACHAT_INVALID_HANDLE,
-            megaChatApi.myFullname,
-            avatar,
-            true,
-            getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
-            isAudioOn,
-            isVideoOn,
-            false,
-            true,
-            true,
-            null
+        val me = Participant(megaChatApi.myUserHandle,
+        MEGACHAT_INVALID_HANDLE,
+        megaChatApi.myFullname,
+        avatar,
+        true,
+        getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
+        isAudioOn,
+        isVideoOn,
+        false,
+        true,
+        true,
+        null
         )
+
+        return me
     }
 
     /**

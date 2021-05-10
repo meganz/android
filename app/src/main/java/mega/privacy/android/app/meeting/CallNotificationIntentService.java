@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.meeting;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -84,11 +84,7 @@ public class CallNotificationIntentService extends IntentService implements Snac
                     if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                         logDebug("Answering incoming call with status " + callStatusToString(call.getStatus()));
                         addChecksForACall(chatIdIncomingCall, false);
-                        if (call.isRinging()) {
-                            megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
-                        } else {
-                            megaChatApi.startChatCall(chatIdIncomingCall, false, true, new StartChatCallListener(this));
-                        }
+                        megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
                     }
 
                 } else {

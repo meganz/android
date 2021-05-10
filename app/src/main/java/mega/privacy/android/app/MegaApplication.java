@@ -72,7 +72,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.CallService;
+import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
@@ -179,8 +179,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapOutgoingCall = new HashMap<>();
-	private static HashMap<Long, Boolean> hashSpeakerViewAutomatic = new HashMap<>();
-	private static HashMap<Long, Boolean> isOpeningMeetingLink = new HashMap<>();
+	private static HashMap<Long, Boolean> hashOpeningMeetingLink = new HashMap<>();
+	private static HashMap<Long, Boolean> hashCreatingMeeting = new HashMap<>();
 
 	private static long openCallChatId = -1;
 
@@ -643,8 +643,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			clearIncomingCallNotification(chatId);
 			return;
 		}
-		createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
 
+		if(!isCreatingMeeting(chatId)){
+			createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
+		}
 	}
 
 	/**
@@ -1881,17 +1883,30 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.put(chatId, videoStatus);
 	}
 
-	public static boolean isOpeningMeetingLink(long chatId) {
-		boolean entryExists = hashMapOutgoingCall.containsKey(chatId);
+	public static boolean isCreatingMeeting(long chatId) {
+		boolean entryExists = hashCreatingMeeting.containsKey(chatId);
 		if (entryExists) {
-			return hashMapOutgoingCall.get(chatId);
+			return hashCreatingMeeting.get(chatId);
+		}
+
+		return false;
+	}
+
+	public static void setCreatingMeeting(long chatId, boolean isCreatingMeeting) {
+		hashCreatingMeeting.put(chatId, isCreatingMeeting);
+	}
+
+	public static boolean isOpeningMeetingLink(long chatId) {
+		boolean entryExists = hashOpeningMeetingLink.containsKey(chatId);
+		if (entryExists) {
+			return hashOpeningMeetingLink.get(chatId);
 		}
 
 		return false;
 	}
 
 	public static void setOpeningMeetingLink(long chatId, boolean isOpeningMeetingLink) {
-		hashSpeakerViewAutomatic.put(chatId, isOpeningMeetingLink);
+		hashOpeningMeetingLink.put(chatId, isOpeningMeetingLink);
 	}
 
 	public static boolean isRequestSent(long callId) {
@@ -1947,14 +1962,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public boolean isLoggingRunning() {
 		return isLoggingRunning;
-	}
-
-	public static boolean wasLocalVideoEnable() {
-		return wasLocalVideoEnable;
-	}
-
-	public static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
-		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
 	}
 
     public static PushNotificationSettingManagement getPushNotificationSettingManagement() {

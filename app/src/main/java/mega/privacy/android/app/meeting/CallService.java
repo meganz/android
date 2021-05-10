@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.meeting;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

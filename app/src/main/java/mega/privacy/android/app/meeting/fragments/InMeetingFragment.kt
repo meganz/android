@@ -26,7 +26,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.setWasLocalVideoEnable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
@@ -35,7 +34,7 @@ import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
-import mega.privacy.android.app.lollipop.megachat.calls.OnDragTouchListener
+import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
@@ -279,11 +278,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             inMeetingViewModel.isOneToOneCall() -> {
                                 when {
                                     it.hasLocalVideo() && callAndSession.second.isOnHold -> {
-                                        setWasLocalVideoEnable(true)
                                         sharedModel.clickCamera(false)
-                                    }
-                                    else -> {
-                                        setWasLocalVideoEnable(false)
                                     }
                                 }
                             }
@@ -310,7 +305,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     logDebug("Session in progress")
 
                                     val position =
-                                        inMeetingViewModel.createParticipant(callAndSession.second)
+                                        inMeetingViewModel.createParticipant(callAndSession.second, status)
                                     position?.let {
                                         if (position != INVALID_POSITION) {
                                             participantAddedOfLeftMeeting(true, it)
@@ -673,7 +668,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dragTouchListener = OnDragTouchListener(
             floatingWindowContainer,
             view,
-            object : OnDragTouchListener.OnDragActionListener {
+            object :
+                OnDragTouchListener.OnDragActionListener {
 
                 override fun onDragStart(view: View?) {
                     if (toolbar.isVisible) {
@@ -880,7 +876,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun checkCurrentParticipants() {
         inMeetingViewModel.getCall()?.let {
-            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid)
+            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid, status)
         }
     }
 
@@ -1018,6 +1014,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
 
+                updateParticipantRes(
+                    inMeetingViewModel.checkParticipantsResolution(status)
+                )
+
                 checkGridSpeakerViewMenuItemVisibility()
             }
         }
@@ -1046,7 +1046,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 GridViewCallFragment.TAG
             )
         }
-
+        updateParticipantRes(
+            inMeetingViewModel.checkParticipantsResolution(status)
+        )
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1118,7 +1120,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 when {
-                    inMeetingViewModel.isRequestSent() -> {
+                    inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(inMeetingViewModel.getChatId())-> {
                         CallUtil.activateChrono(false, meetingChrono, null)
                         toolbarSubtitle?.let {
                             toolbarSubtitle?.text =
@@ -1491,7 +1493,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {
         updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(isAdded)
+            inMeetingViewModel.checkParticipantsResolution(status)
         )
 
         speakerViewCallFragment?.let {
@@ -1609,7 +1611,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             isModerator && inMeetingViewModel.shouldAssignModerator() -> {
                 val endMeetingBottomSheetDialogFragment =
-                    EndMeetingBottomSheetDialogFragment.newInstance()
+                    EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
                 endMeetingBottomSheetDialogFragment.show(
                     parentFragmentManager,
                     endMeetingBottomSheetDialogFragment.tag
@@ -1656,6 +1658,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to control when call ended
      */
     private fun finishActivity() {
+        MegaApplication.setCreatingMeeting(inMeetingViewModel.getChatId(), false)
         meetingActivity.finish()
     }
 
@@ -1745,6 +1748,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
+        MegaApplication.setCreatingMeeting(chatId, true)
         checkCallStarted(chatId)
     }
 
