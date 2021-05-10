@@ -1577,7 +1577,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						logDebug("NOT video!");
 					}
 
-					sendBroadcastToUpdateGallery(this, new File(path));
+					if (!isTextEmpty(path)) {
+						sendBroadcastToUpdateGallery(this, new File(path));
+					}
 
 					if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
 						logDebug("Now copy the file to the SD Card");
