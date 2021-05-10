@@ -1242,6 +1242,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         bottomFloatingPanelViewHolder.propertyUpdaters.add {
             toolbar.alpha = 1 - it
+            // When the bottom on the top, will set the toolbar invisible, otherwise will cover the scroll event of the panel
+            toolbar.isVisible = it != 1.0f
+
             when {
                 bannerInfoLayout.isVisible -> {
                     bannerInfoLayout.alpha = 1 - it

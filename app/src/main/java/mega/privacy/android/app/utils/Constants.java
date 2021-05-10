@@ -842,7 +842,7 @@ public class Constants {
     public static final String EVENT_CHAT_TITLE_CHANGE = "chat_title_change";
     public static final String EVENT_MEETING_CREATED = "meeting_created";
     public static final String EVENT_LINK_RECOVERED = "meeting_link_recovered";
-    public static final String EVENT_CONTACT_NAME_CHANGE = "proximity_sensor_change";
+    public static final String EVENT_CONTACT_NAME_CHANGE = "contact_name_change";
 
 
     /** Event Keys related to calls*/
