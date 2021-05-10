@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,9 +27,13 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
+import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
+import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
 import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -218,20 +223,28 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             toolbarTitle.text = title
         }
 
+        var bitmap: Bitmap?
+
         // Set caller's name and avatar
         inMeetingViewModel.getChat()?.let {
-            val peerId = it.getPeerHandle(0)
+            if (inMeetingViewModel.isOneToOneCall()) {
+                val callerId = it.getPeerHandle(0)
 
-            var bitmap = getImageAvatarCall(it, peerId)
-            if (bitmap == null) {
-                bitmap = getDefaultAvatarCall(context, peerId)
+                bitmap = getImageAvatarCall(it, callerId)
+                if (bitmap == null) {
+                    bitmap = getDefaultAvatarCall(context, callerId)
+                }
+            } else {
+                bitmap = getDefaultAvatar(
+                    getSpecificAvatarColor(Constants.AVATAR_GROUP_CHAT_COLOR),
+                    getTitleChat(it),
+                    AVATAR_SIZE,
+                    true,
+                    true
+                )
             }
 
             avatar.setImageBitmap(bitmap)
-
-            if(inMeetingViewModel.isOneToOneCall()) {
-                toolbarTitle.text = inMeetingViewModel.getParticipantFullName(peerId)
-            }
         }
 
         // Caller cancelled the call.
