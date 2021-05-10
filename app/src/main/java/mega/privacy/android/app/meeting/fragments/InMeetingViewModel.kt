@@ -1319,19 +1319,22 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Determine the chat room has only one moderator
+     * Determine the chat room has only one moderator and the list is not empty
      *
      * @return
      */
-    fun haveOneModerator(): Boolean {
-        return participants.value?.toList()?.filter { it.isModerator }?.size?.let {
+    fun shouldAssignModerator(): Boolean {
+        val hasOneModerator =  participants.value?.toList()?.filter { it.isModerator }?.size?.let {
             when {
                 it > 1 -> true
                 it == 1 -> getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
                 else -> getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
             }
         } == true
+
+        return hasOneModerator && participants.value?.isNotEmpty() == true
     }
+
 
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
