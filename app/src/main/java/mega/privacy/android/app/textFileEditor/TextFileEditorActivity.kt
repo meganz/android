@@ -435,7 +435,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      * @param contentRead Read content.
      */
     private fun showContentRead(contentRead: String) {
-        if (viewModel.needsReadOrIsReadingContent()) {
+        if (viewModel.needsReadOrIsReadingContent()
+            || (contentRead.isNotEmpty() && contentRead == binding.contentText.text.toString())
+        ) {
             return
         }
 

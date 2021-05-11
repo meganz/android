@@ -96,6 +96,10 @@
 
         <item name="checkedTextViewStyle">@style/Widget.Mega.CheckedTextView</item>
 
+        <!-- SnackBar -->
+        <item name="snackbarStyle">@style/Widget.Mega.SnackBar</item>
+        <item name="snackbarButtonStyle">@style/Widget.Mega.SnackbarButton</item>
+
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
         <!-- In material design, typically for the title of the action bar -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
