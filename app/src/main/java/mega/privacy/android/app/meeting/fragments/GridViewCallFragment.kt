@@ -31,7 +31,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
-        logDebug("********** Participantes actualizados : se repinta todo");
         viewDataBinding.gridViewPager.refreshData(sliceBy6(it))
     }
 
@@ -207,15 +206,20 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Method to destroy the surfaceView.
      */
-    private fun removeAllSurfaceView() {
+    private fun closeAllVideos() {
         val iterator = participants.iterator()
         iterator.forEach {
-            adapterPager?.removeSurfaceView(it)
+            adapterPager?.closeAllVideos(it)
         }
     }
 
+    override fun onDestroyView() {
+        logDebug("onDestroyView")
+        closeAllVideos()
+        super.onDestroyView()
+    }
+
     override fun onDestroy() {
-        removeAllSurfaceView()
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
             participantsObserver
         )

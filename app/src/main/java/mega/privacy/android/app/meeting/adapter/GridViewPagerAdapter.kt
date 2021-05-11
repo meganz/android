@@ -88,8 +88,8 @@ class GridViewPagerAdapter(
     /**
      * Method to destroy the surfaceView.
      */
-    fun removeSurfaceView(participant: Participant) {
-        adapter?.removeSurfaceView(participant)
+    fun closeAllVideos(participant: Participant) {
+        adapter?.closeAllVideos(participant)
     }
 
     override fun getLayoutId(viewType: Int): Int {
