@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
 import android.view.SurfaceHolder
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
@@ -26,7 +27,6 @@ import javax.inject.Inject
  * extra top offset. Not use DataBinding could avoid this bug.
  */
 class VideoMeetingViewHolder(
-    private val listener: MegaSurfaceRenderer.MegaSurfaceRendererGroupListener,
     private val binding: ItemParticipantVideoBinding,
     private val screenWidth: Int,
     private val screenHeight: Int,
@@ -58,41 +58,40 @@ class VideoMeetingViewHolder(
         this.isGrid = isTypeGridViewHolder
         this.inMeetingViewModel = inMeetingViewModel
 
+        if (participant.peerId == MEGACHAT_INVALID_HANDLE || participant.clientId == MEGACHAT_INVALID_HANDLE) {
+            logError("Error. Peer id or client id invalid")
+            return
+        }
+
+        this.peerId = participant.peerId
+        this.clientId = participant.clientId
         when {
-            participant.peerId == MEGACHAT_INVALID_HANDLE || participant.clientId == MEGACHAT_INVALID_HANDLE -> {
-                logError("Error. Peer id or client id invalid")
-                return
-            }
-            else -> {
-                this.peerId = participant.peerId
-                this.clientId = participant.clientId
-                if (isGrid) {
-                    SIZE_AVATAR = 88
-                    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        portraitLayout(isFirstPage, itemCount)
-                    } else {
-                        landscapeLayout(isFirstPage, itemCount)
-                    }
-
-                    binding.name.text = participant.name
+            isGrid -> {
+                SIZE_AVATAR = 88
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    portraitLayout(isFirstPage, itemCount)
                 } else {
-                    SIZE_AVATAR = 60
-                    val layoutParams = binding.root.layoutParams
-                    layoutParams.width = dp2px(ITEM_WIDTH)
-                    layoutParams.height = dp2px(ITEM_HEIGHT)
-                    binding.root.setOnClickListener {
-                        inMeetingViewModel.onItemClick(participant)
-                    }
-
-                    binding.name.isVisible = false
+                    landscapeLayout(isFirstPage, itemCount)
                 }
 
-                initAvatar(participant)
-                checkUI(participant)
-                holder = binding.video.holder
+                binding.name.text = participant.name
+            }
+            else -> {
+                SIZE_AVATAR = 60
+                val layoutParams = binding.root.layoutParams
+                layoutParams.width = dp2px(ITEM_WIDTH)
+                layoutParams.height = dp2px(ITEM_HEIGHT)
+                binding.root.setOnClickListener {
+                    inMeetingViewModel.onItemClick(participant)
+                }
+
+                binding.name.isVisible = false
             }
         }
 
+        initAvatar(participant)
+        checkUI(participant)
+        holder = binding.video.holder
     }
 
     /**
@@ -101,8 +100,6 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun initAvatar(participant: Participant) {
-        logDebug("initAvatar")
-
         val paramsAvatar = binding.avatar.layoutParams
         paramsAvatar.width =
             dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
@@ -151,14 +148,11 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun videoOnUI(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("UI video on")
-                hideAvatar(participant)
-                activateVideo(participant)
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("UI video on")
+        hideAvatar(participant)
+        activateVideo(participant)
     }
 
     /**
@@ -167,15 +161,12 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun hideAvatar(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Hide Avatar")
-                binding.onHoldIcon.isVisible = false
-                binding.avatar.alpha = 1f
-                binding.avatar.isVisible = false
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Hide Avatar")
+        binding.onHoldIcon.isVisible = false
+        binding.avatar.alpha = 1f
+        binding.avatar.isVisible = false
     }
 
     /**
@@ -184,39 +175,29 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun activateVideo(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                //closeVideo(participant)
-                when (participant.videoListener) {
-                    null -> {
-                        val vListener = MeetingVideoListener(
-                            binding.video,
-                            MegaApplication.getInstance().applicationContext.displayMetrics,
-                            participant.peerId,
-                            participant.clientId,
-                            false
-                        )
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-                        participant.videoListener = vListener
+        closeVideo(participant)
+        if (participant.videoListener != null) {
+            logDebug("Video Listener is not null ")
+            participant.videoListener!!.height = 0
+            participant.videoListener!!.width = 0
+        } else {
+            logDebug("Video Listener  null ")
 
-                        inMeetingViewModel.onActivateVideo(participant)
+            val vListener = MeetingVideoListener(
+                binding.video,
+                MegaApplication.getInstance().applicationContext.displayMetrics,
+                participant.clientId,
+                false
+            )
 
-                        participant.videoListener!!.getLocalRenderer()?.let {
-                            it.addListener(listener)
-                        }
+            participant.videoListener = vListener
 
-                    }
-                    else -> {
-                        logDebug("Video Listener is not null ")
-                        participant.videoListener!!.height = 0
-                        participant.videoListener!!.width = 0
-                    }
-                }
-
-                binding.video.isVisible = true
-            }
+            inMeetingViewModel.onActivateVideo(participant)
         }
+
+        binding.video.isVisible = true
     }
 
     /**
@@ -225,15 +206,12 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun videoOffUI(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("UI video off")
-                showAvatar(participant)
-                closeVideo(participant)
-                checkOnHold(participant)
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("UI video off")
+        showAvatar(participant)
+        closeVideo(participant)
+        checkOnHold(participant)
     }
 
     /**
@@ -242,13 +220,10 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun showAvatar(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Show avatar")
-                binding.avatar.isVisible = true
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Show avatar")
+        binding.avatar.isVisible = true
     }
 
     /**
@@ -257,14 +232,11 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun closeVideo(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Close video")
-                binding.video.isVisible = false
-                inMeetingViewModel.onCloseVideo(participant)
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Close video")
+        binding.video.isVisible = false
+        inMeetingViewModel.onCloseVideo(participant)
     }
 
     /**
@@ -273,28 +245,25 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun checkOnHold(participant: Participant) {
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        val isCallOnHold = inMeetingViewModel.isCallOnHold()
+        val isSessionOnHold = inMeetingViewModel.isSessionOnHold(participant.clientId)
         when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
+            isSessionOnHold -> {
+                logDebug("Show on hold icon participant Name = " + participant.name)
+                binding.onHoldIcon.isVisible = true
+                binding.avatar.alpha = 0.5f
+            }
             else -> {
-                val isCallOnHold = inMeetingViewModel.isCallOnHold()
-                val isSessionOnHold = inMeetingViewModel.isSessionOnHold(participant.clientId)
+                logDebug("Hide on hold icon")
+                binding.onHoldIcon.isVisible = false
                 when {
-                    isSessionOnHold -> {
-                        logDebug("Show on hold icon participant Name = " + participant.name)
-                        binding.onHoldIcon.isVisible = true
+                    isCallOnHold -> {
                         binding.avatar.alpha = 0.5f
                     }
                     else -> {
-                        logDebug("Hide on hold icon")
-                        binding.onHoldIcon.isVisible = false
-                        when {
-                            isCallOnHold -> {
-                                binding.avatar.alpha = 0.5f
-                            }
-                            else -> {
-                                binding.avatar.alpha = 1f
-                            }
-                        }
+                        binding.avatar.alpha = 1f
                     }
                 }
             }
@@ -308,14 +277,11 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updateResolution(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Update resolution")
-                closeVideo(participant)
-                checkVideOn(participant)
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Update resolution")
+        closeVideo(participant)
+        checkVideOn(participant)
     }
 
     /**
@@ -324,13 +290,10 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updateAudioIcon(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Update audio icon")
-                binding.muteIcon.isVisible = !participant.isAudioOn
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Update audio icon")
+        binding.muteIcon.isVisible = !participant.isAudioOn
     }
 
     /**
@@ -339,21 +302,17 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun checkVideOn(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                when {
-                    participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId) -> {
-                        logDebug("Video should be on")
-                        videoOnUI(participant)
-                    }
-                    else -> {
-                        logDebug("Video should be off")
-                        videoOffUI(participant)
-                    }
-                }
-            }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+
+        if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
+            logDebug("Video should be on")
+            videoOnUI(participant)
+            return
         }
+
+        logDebug("Video should be off")
+        videoOffUI(participant)
     }
 
     /**
@@ -362,13 +321,10 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updatePrivilegeIcon(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Update privilege icon")
-                binding.moderatorIcon.isVisible = participant.isModerator
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        logDebug("Update privilege icon")
+        binding.moderatorIcon.isVisible = participant.isModerator
     }
 
     /**
@@ -377,17 +333,10 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updateRes(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Update resolution")
-                when {
-                    participant.isVideoOn -> {
-                        inMeetingViewModel.onChangeResolution(participant)
-                    }
-                }
-            }
-        }
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId || !participant.isVideoOn) return
+
+        logDebug("Update resolution")
+        inMeetingViewModel.onChangeResolution(participant)
     }
 
     /**
@@ -396,13 +345,21 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updateName(participant: Participant) {
-        when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
-            else -> {
-                logDebug("Update name")
-                binding.avatar.setImageBitmap(participant.avatar)
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
+        logDebug("Update name")
+        binding.avatar.setImageBitmap(participant.avatar)
+    }
+
+    fun removeSurfaceView(participant: Participant){
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        binding.video.let { surfaceView ->
+            if (surfaceView.parent != null && surfaceView.parent.parent != null) {
+                (surfaceView.parent as ViewGroup).removeView(surfaceView)
             }
+
+            surfaceView.isVisible = false
         }
     }
 
@@ -413,19 +370,16 @@ class VideoMeetingViewHolder(
      * @param isCallOnHold
      */
     fun updateCallOnHold(participant: Participant, isCallOnHold: Boolean) {
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
         when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
+            isCallOnHold -> {
+                logDebug("Call is on hold")
+                videoOffUI(participant)
+            }
             else -> {
-                when {
-                    isCallOnHold -> {
-                        logDebug("Call is on hold")
-                        videoOffUI(participant)
-                    }
-                    else -> {
-                        logDebug("Call is not on hold")
-                        checkVideOn(participant)
-                    }
-                }
+                logDebug("Call is not on hold")
+                checkVideOn(participant)
             }
         }
     }
@@ -437,16 +391,16 @@ class VideoMeetingViewHolder(
      * @param isSessionOnHold
      */
     fun updateSessionOnHold(participant: Participant, isSessionOnHold: Boolean) {
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
         when {
-            participant.peerId != this.peerId || participant.clientId != this.clientId -> return
+            isSessionOnHold -> {
+                logDebug("Session is on hold")
+                videoOffUI(participant)
+            }
             else -> {
-                if (isSessionOnHold) {
-                    logDebug("Session is on hold")
-                    videoOffUI(participant)
-                } else {
-                    logDebug("Session is not on hold")
-                    checkVideOn(participant)
-                }
+                logDebug("Session is not on hold")
+                checkVideOn(participant)
             }
         }
     }
@@ -457,26 +411,21 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     fun updatePeerSelected(participant: Participant) {
+        if (isGrid || participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
         when {
-            isGrid || participant.peerId != this.peerId || participant.clientId != this.clientId -> return
+            participant.isSelected -> {
+                logDebug("Participant is selected")
+                binding.selectedForeground.background = ContextCompat.getDrawable(
+                    binding.root.context,
+                    if (inMeetingViewModel.isSpeakerSelectionAutomatic) R.drawable.border_green_layer
+                    else R.drawable.border_green_layer_selected
+                )
+                binding.selectedForeground.isVisible = true
+            }
             else -> {
-                when {
-                    participant.isSelected -> {
-                        logDebug("Participant is selected")
-                        binding.selectedForeground.background = ContextCompat.getDrawable(
-                            binding.root.context,
-                            when {
-                                inMeetingViewModel.isSpeakerSelectionAutomatic -> R.drawable.border_green_layer
-                                else -> R.drawable.border_green_layer_selected
-                            }
-                        )
-                        binding.selectedForeground.isVisible = true
-                    }
-                    else -> {
-                        logDebug("Participant is not selected")
-                        binding.selectedForeground.isVisible = false
-                    }
-                }
+                logDebug("Participant is not selected")
+                binding.selectedForeground.isVisible = false
             }
         }
     }

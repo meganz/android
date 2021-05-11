@@ -23,6 +23,7 @@ class GridViewPagerAdapter(
 
     var adapter: VideoGridViewAdapter? = null
     var gridView: CustomizedGridCallRecyclerView? = null
+
     override fun bindData(
         holder: BaseViewHolder<List<Participant>>,
         data: List<Participant>,
@@ -84,6 +85,13 @@ class GridViewPagerAdapter(
         adapter?.updateRemoteResolution(participant)
     }
 
+    /**
+     * Method to destroy the surfaceView.
+     */
+    fun removeSurfaceView(participant: Participant) {
+        adapter?.removeSurfaceView(participant)
+    }
+
     override fun getLayoutId(viewType: Int): Int {
         return R.layout.grid_view_call_item
     }
@@ -116,7 +124,6 @@ class GridViewPagerAdapter(
             else -> {
                 layoutParams.setMargins(0, 0, 0, 0)
             }
-
         }
     }
 

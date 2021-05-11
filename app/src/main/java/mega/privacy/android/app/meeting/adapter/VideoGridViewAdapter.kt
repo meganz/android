@@ -9,6 +9,7 @@ import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
 import mega.privacy.android.app.utils.Constants.TYPE_VIDEO
+import mega.privacy.android.app.utils.LogUtil
 
 class VideoGridViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -17,7 +18,7 @@ class VideoGridViewAdapter(
     private val screenHeight: Int,
     private val pagePosition: Int,
     private val orientation: Int
-) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()), MegaSurfaceRenderer.MegaSurfaceRendererGroupListener {
+) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()){
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
@@ -29,7 +30,6 @@ class VideoGridViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return VideoMeetingViewHolder(
-            this,
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             screenWidth,
             screenHeight,
@@ -44,6 +44,7 @@ class VideoGridViewAdapter(
                 return it as VideoMeetingViewHolder
             }
         }
+
         return null
     }
 
@@ -115,11 +116,15 @@ class VideoGridViewAdapter(
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
-            if(typeChange == TYPE_VIDEO){
-                it.checkVideOn(participant)
-            }else if(typeChange ==  TYPE_AUDIO){
-                it.updateAudioIcon(participant)
+            when (typeChange) {
+                TYPE_VIDEO -> {
+                    it.checkVideOn(participant)
+                }
+                TYPE_AUDIO -> {
+                    it.updateAudioIcon(participant)
+                }
             }
+
             return
         }
 
@@ -161,18 +166,18 @@ class VideoGridViewAdapter(
     /**
      * Resets the parameters of the participant video.
      *
-     * @param peerId   Participant peer ID.
-     * @param clientId Participant client ID.
+     * @param participant
      */
-    override fun resetSize(peerId: Long, clientId: Long) {
+    fun removeSurfaceView(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.removeSurfaceView(participant)
+            return
+        }
+
         val iterator = currentList.iterator()
         iterator.forEach { participant ->
-            if(participant.peerId == peerId && participant.clientId == clientId){
-                participant.videoListener?.let {
-                    it.width = 0
-                    it.height = 0
-                }
-            }
+            inMeetingViewModel.onCloseVideo(participant)
         }
     }
 }

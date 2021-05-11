@@ -24,10 +24,10 @@ class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) 
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            LogUtil.logDebug("AutoJoinPublicChatListener:: Joined chat correctly")
+            LogUtil.logDebug("Joined chat correctly")
             callback?.onJoinedChat(request.chatHandle, request.userHandle)
         } else {
-            LogUtil.logError("AutoJoinPublicChatListener:: Error Joining the chat = e.errorCode " + e.errorCode)
+            LogUtil.logError("Error Joining the chat = e.errorCode " + e.errorCode)
             callback?.onErrorJoinedChat(request.chatHandle)
         }
     }

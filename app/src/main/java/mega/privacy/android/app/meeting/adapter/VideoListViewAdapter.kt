@@ -5,15 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants
 
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val listView: RecyclerView
-) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()),
-    MegaSurfaceRenderer.MegaSurfaceRendererGroupListener {
+) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
@@ -30,7 +28,6 @@ class VideoListViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return VideoMeetingViewHolder(
-            this,
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             0,
             0,
@@ -40,12 +37,13 @@ class VideoListViewAdapter(
     }
 
     fun getHolder(position: Int): VideoMeetingViewHolder? {
-        listView?.let { recyclerview ->
+        listView.let { recyclerview ->
             recyclerview.findViewHolderForAdapterPosition(position)?.let {
                 return it as VideoMeetingViewHolder
             }
         }
-       return null
+
+        return null
     }
 
     /**
@@ -182,19 +180,18 @@ class VideoListViewAdapter(
     /**
      * Resets the parameters of the participant video.
      *
-     * @param peerId   Participant peer ID.
-     * @param clientId Participant client ID.
+     * @param participant   Participant
      */
-    override fun resetSize(peerId: Long, clientId: Long) {
+    fun removeSurfaceView(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.removeSurfaceView(participant)
+            return
+        }
+
         val iterator = currentList.iterator()
         iterator.forEach { participant ->
-            if(participant.peerId == peerId && participant.clientId == clientId){
-                participant.videoListener?.let {
-                    it.width = 0
-                    it.height = 0
-                }
-
-            }
+            inMeetingViewModel.onCloseVideo(participant)
         }
     }
 }

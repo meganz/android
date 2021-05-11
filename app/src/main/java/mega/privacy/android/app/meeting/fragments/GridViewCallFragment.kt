@@ -9,10 +9,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.indicator.enums.IndicatorStyle
+import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
 
@@ -29,6 +31,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
+        logDebug("********** Participantes actualizados : se repinta todo");
         viewDataBinding.gridViewPager.refreshData(sliceBy6(it))
     }
 
@@ -201,11 +204,22 @@ class GridViewCallFragment : MeetingBaseFragment() {
         adapterPager?.updateOrientation(newOrientation, widthPixels, heightPixels)
     }
 
+    /**
+     * Method to destroy the surfaceView.
+     */
+    private fun removeAllSurfaceView() {
+        val iterator = participants.iterator()
+        iterator.forEach {
+            adapterPager?.removeSurfaceView(it)
+        }
+    }
+
     override fun onDestroy() {
-        super.onDestroy()
+        removeAllSurfaceView()
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
             participantsObserver
         )
+        super.onDestroy()
     }
 
     private fun sliceBy6(data: MutableList<Participant>): MutableList<List<Participant>> {

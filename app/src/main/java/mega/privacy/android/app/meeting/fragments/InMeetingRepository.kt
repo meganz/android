@@ -91,14 +91,10 @@ class InMeetingRepository @Inject constructor(
      * @return MegaChatCall
      */
     fun getMeeting(chatId: Long): MegaChatCall? {
-        return when (chatId) {
-            MEGACHAT_INVALID_HANDLE -> {
-                null
-            }
-            else -> {
-                megaChatApi.getChatCall(chatId)
-            }
-        }
+        if (chatId == MEGACHAT_INVALID_HANDLE)
+            return null
+
+        return megaChatApi.getChatCall(chatId)
     }
 
     /**
@@ -123,6 +119,7 @@ class InMeetingRepository @Inject constructor(
         clientId?.let {
             return call.getMegaChatSession(it)
         }
+
         return null
     }
 
@@ -133,14 +130,10 @@ class InMeetingRepository @Inject constructor(
      * @return MegaChatRoom
      */
     fun getChatRoom(chatId: Long): MegaChatRoom? {
-        return when (chatId) {
-            MEGACHAT_INVALID_HANDLE -> {
-                null
-            }
-            else -> {
-                megaChatApi.getChatRoom(chatId)
-            }
-        }
+        if (chatId == MEGACHAT_INVALID_HANDLE)
+            return null
+
+        return megaChatApi.getChatRoom(chatId)
     }
 
     /**
@@ -157,8 +150,8 @@ class InMeetingRepository @Inject constructor(
         if (TextUtil.isTextEmpty(name)) {
             return megaChatApi.getContactEmail(peerId)
         }
-        return name
 
+        return name
     }
 
     /**
@@ -209,6 +202,19 @@ class InMeetingRepository @Inject constructor(
         megaChatApi.hangChatCall(callId, HangChatCallListener(context))
     }
 
+    fun getMyAvatar(chat: MegaChatRoom): Bitmap? {
+        var avatar = CallUtil.getImageAvatarCall(chat, megaChatApi.myUserHandle)
+        when (avatar) {
+            null -> {
+                avatar = CallUtil.getDefaultAvatarCall(
+                    MegaApplication.getInstance().applicationContext,
+                    megaChatApi.myUserHandle
+                )
+            }
+        }
+        return avatar
+    }
+
     /**
      * Get the avatar
      *
@@ -218,13 +224,11 @@ class InMeetingRepository @Inject constructor(
      */
     fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(chat, peerId)
-        when (avatar) {
-            null -> {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    peerId
-                )
-            }
+        if (avatar == null) {
+            avatar = CallUtil.getDefaultAvatarCall(
+                MegaApplication.getInstance().applicationContext,
+                peerId
+            )
         }
 
         return avatar
@@ -238,16 +242,15 @@ class InMeetingRepository @Inject constructor(
      */
     fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
         var isAudioOn = true
+        var isVideoOn = true
+
         getMeeting(chat.chatId)?.let {
             isAudioOn = it.hasLocalAudio()
-        }
-        var isVideoOn = true
-        getMeeting(chat.chatId)?.let {
             isVideoOn = it.hasLocalVideo()
         }
 
         val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
-        val me = Participant(
+        return Participant(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
@@ -261,8 +264,6 @@ class InMeetingRepository @Inject constructor(
             true,
             null
         )
-
-        return me
     }
 
     /**
@@ -274,11 +275,8 @@ class InMeetingRepository @Inject constructor(
     fun isMyContact(peerId: Long): Boolean {
         val email: String = ChatController(context).getParticipantEmail(peerId)
         val contact = megaApi.getContact(email)
-        if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
-            return true
-        }
 
-        return false
+        return contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE
     }
 
     /**
@@ -365,6 +363,7 @@ class InMeetingRepository @Inject constructor(
         getChatRoom(chatId)?.let {
             return it.ownPrivilege
         }
+
         return -1
     }
 
@@ -373,7 +372,6 @@ class InMeetingRepository @Inject constructor(
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         megaChatApi.autojoinPublicChat(chatId, listener)
-
 
     fun createEphemeralAccountPlusPlus(
         firstName: String,

@@ -52,58 +52,44 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private val remoteAVFlagsObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            when {
-                inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callAndSession.first) -> {
-                    logDebug("Check changes in remote AVFlags")
-                    when {
-                        isFloatingWindow -> checkItIsOnlyAudio()
-                        else -> {
-                            when {
-                                callAndSession.second.hasVideo() -> {
-                                    logDebug("Check if video should be on")
-                                    checkVideoOn(
-                                        callAndSession.second.peerid,
-                                        callAndSession.second.clientid
-                                    )
-                                }
-                                else -> {
-                                    logDebug("Video should be off")
-                                    videoOffUI(this.peerId!!, this.clientId!!)
-                                }
-                            }
-                        }
-                    }
+            if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callAndSession.first)) {
+                logDebug("Check changes in remote AVFlags")
+                if (isFloatingWindow) {
+                    checkItIsOnlyAudio()
+                } else if (callAndSession.second.hasVideo()) {
+                    logDebug("Check if video should be on")
+                    checkVideoOn(
+                        callAndSession.second.peerid,
+                        callAndSession.second.clientid
+                    )
+                } else {
+                    logDebug("Video should be off")
+                    videoOffUI(this.peerId!!, this.clientId!!)
                 }
             }
         }
 
     private val localAVFlagsObserver = Observer<MegaChatCall> {
-        when {
-            inMeetingViewModel.isSameCall(it.callId) -> {
-                logDebug("Check changes in local AVFlags")
-                checkItIsOnlyAudio()
-            }
+        if (inMeetingViewModel.isSameCall(it.callId)) {
+            logDebug("Check changes in local AVFlags")
+            checkItIsOnlyAudio()
         }
     }
 
     private val callOnHoldObserver = Observer<MegaChatCall> {
-        when {
-            inMeetingViewModel.isSameCall(it.callId) -> {
-                logDebug("Check changes in call on hold")
-                checkChangesInOnHold(it.isOnHold)
-            }
+        if (inMeetingViewModel.isSameCall(it.callId)) {
+            logDebug("Check changes in call on hold")
+            checkChangesInOnHold(it.isOnHold)
         }
     }
 
     private val sessionOnHoldObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            when {
-                inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callAndSession.first) -> {
-                    logDebug("Check changes in session on hold")
-                    checkChangesInOnHold(
-                        callAndSession.second.isOnHold
-                    )
-                }
+            if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callAndSession.first)) {
+                logDebug("Check changes in session on hold")
+                checkChangesInOnHold(
+                    callAndSession.second.isOnHold
+                )
             }
         }
 
@@ -116,27 +102,24 @@ class IndividualCallFragment : MeetingBaseFragment() {
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW, false)
         }
 
-        when (chatId) {
-            MEGACHAT_INVALID_HANDLE -> {
-                logError("Error. Chat doesn't exist")
-                return
-            }
-            else -> {
-                chatId?.let { inMeetingViewModel.setChatId(it) }
-                when {
-                    inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE -> {
-                        logError("Error. Call doesn't exist")
-                        return
-                    }
-
-                    !inMeetingViewModel.isMe(peerId) && clientId == MEGACHAT_INVALID_HANDLE -> {
-                        logError("Error. Client id invalid")
-                        return
-                    }
-                    else -> initLiveEventBus()
-                }
-            }
+        if (chatId == MEGACHAT_INVALID_HANDLE) {
+            logError("Error. Chat doesn't exist")
+            return
         }
+
+        chatId?.let { inMeetingViewModel.setChatId(it) }
+
+        if (inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE) {
+            logError("Error. Call doesn't exist")
+            return
+        }
+
+        if (!inMeetingViewModel.isMe(peerId) && clientId == MEGACHAT_INVALID_HANDLE) {
+            logError("Error. Client id invalid")
+            return
+        }
+
+        initLiveEventBus()
     }
 
     private fun initLiveEventBus() {
@@ -157,38 +140,35 @@ class IndividualCallFragment : MeetingBaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        when {
-            isFloatingWindow -> {
-                val binding = SelfFeedFloatingWindowFragmentBinding.inflate(
-                    inflater,
-                    container,
-                    false
-                )
+        if (isFloatingWindow) {
+            val binding = SelfFeedFloatingWindowFragmentBinding.inflate(
+                inflater,
+                container,
+                false
+            )
 
-                binding.root.let {
-                    vVideo = it.video
-                    vAvatar = it.avatar
-                    vAvatarLayout = it.avatar_layout
-                    vOnHold = it.on_hold_icon
-                }
-                return binding.root
+            binding.root.let {
+                vVideo = it.video
+                vAvatar = it.avatar
+                vAvatarLayout = it.avatar_layout
+                vOnHold = it.on_hold_icon
             }
-            else -> {
-                val binding = IndividualCallFragmentBinding.inflate(
-                    inflater,
-                    container,
-                    false
-                )
-
-                binding.root.let {
-                    vVideo = it.video
-                    vAvatar = it.avatar
-                    vAvatarLayout = null
-                    vOnHold = it.on_hold_icon
-                }
-                return binding.root
-            }
+            return binding.root
         }
+
+        val binding = IndividualCallFragmentBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        binding.root.let {
+            vVideo = it.video
+            vAvatar = it.avatar
+            vAvatarLayout = null
+            vOnHold = it.on_hold_icon
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -226,39 +206,36 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun checkUI() {
         logDebug("Check the current UI status")
         inMeetingViewModel.getCall()?.let {
-            when {
-                inMeetingViewModel.isMe(this.peerId) -> {
-                    when {
-                        it.hasLocalVideo() -> {
-                            logDebug("Check if video should be on")
-                            checkVideoOn(
-                                this.peerId!!,
-                                this.clientId!!
-                            )
-                        }
-                        else -> {
-                            logDebug("Video should be off")
-                            videoOffUI(this.peerId!!, this.clientId!!)
-                        }
+            if (inMeetingViewModel.isMe(this.peerId)) {
+                when {
+                    it.hasLocalVideo() -> {
+                        logDebug("Check if local video should be on")
+                        checkVideoOn(
+                            this.peerId!!,
+                            this.clientId!!
+                        )
                     }
-
+                    else -> {
+                        logDebug("Local video should be off")
+                        videoOffUI(this.peerId!!, this.clientId!!)
+                    }
                 }
-                else -> {
-                    val session = inMeetingViewModel.getSession(this.clientId!!)
-                    session?.let {
-                        when {
-                            it.hasVideo() -> {
-                                logDebug("Check if video should be on")
-                                checkVideoOn(
-                                    this.peerId!!,
-                                    this.clientId!!
-                                )
-                            }
-                            else -> {
-                                logDebug("Video should be off")
-                                videoOffUI(this.peerId!!, this.clientId!!)
-                            }
-                        }
+                return
+            }
+
+            val session = inMeetingViewModel.getSession(this.clientId!!)
+            session?.let {
+                when {
+                    it.hasVideo() -> {
+                        logDebug("Check if remote video should be on")
+                        checkVideoOn(
+                            this.peerId!!,
+                            this.clientId!!
+                        )
+                    }
+                    else -> {
+                        logDebug("Remote video should be off")
+                        videoOffUI(this.peerId!!, this.clientId!!)
                     }
                 }
             }
@@ -272,16 +249,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     fun videoOffUI(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-            else -> {
-                logDebug("UI video off")
-                showAvatar(peerId, clientId)
-                checkItIsOnlyAudio()
-                closeVideo(peerId, clientId)
-                showCallOnHoldIcon()
-            }
-        }
+        if (peerId != this.peerId || clientId != this.clientId) return
+
+        logDebug("UI video off")
+        showAvatar(peerId, clientId)
+        checkItIsOnlyAudio()
+        closeVideo(peerId, clientId)
+        showCallOnHoldIcon()
     }
 
     /**
@@ -291,15 +265,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun showAvatar(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-            else -> {
-                logDebug("Show avatar")
-                vAvatar.isVisible = true
-                vAvatarLayout?.let {
-                    it.isVisible = true
-                }
-            }
+        if (peerId != this.peerId || clientId != this.clientId) return
+
+        logDebug("Show avatar")
+        vAvatar.isVisible = true
+        vAvatarLayout?.let {
+            it.isVisible = true
         }
     }
 
@@ -307,26 +278,24 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Check if is an audio call
      */
     private fun checkItIsOnlyAudio() {
-        when {
-            !isFloatingWindow || !inMeetingViewModel.isOneToOneCall() -> return
-            else -> when {
-                inMeetingViewModel.isAudioCall() -> this.peerId?.let {
-                    logDebug("Is only audio call, hide avatar")
-                    this.clientId?.let { it1 ->
-                        hideAvatar(
-                            it,
-                            it1
-                        )
-                    }
+        if (!isFloatingWindow || !inMeetingViewModel.isOneToOneCall()) return
+
+        if (inMeetingViewModel.isAudioCall()) {
+            this.peerId?.let {
+                logDebug("Is only audio call, hide avatar")
+                this.clientId?.let { it1 ->
+                    hideAvatar(
+                        it,
+                        it1
+                    )
                 }
-                else -> {
-                    inMeetingViewModel.getCall()?.let { call ->
-                        when {
-                            !call.hasLocalVideo() -> {
-                                logDebug("Not only audio call, show avatar")
-                                showAvatar(this.peerId!!, this.clientId!!)
-                            }
-                        }
+            }
+        } else {
+            inMeetingViewModel.getCall()?.let { call ->
+                when {
+                    !call.hasLocalVideo() -> {
+                        logDebug("Not only audio call, show avatar")
+                        showAvatar(this.peerId!!, this.clientId!!)
                     }
                 }
             }
@@ -340,9 +309,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun closeVideo(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-        }
+        if (peerId != this.peerId || clientId != this.clientId) return
 
         logDebug("Close video")
         vVideo.isVisible = false
@@ -356,47 +323,37 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun removeChatVideoListener(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-        }
+        if (peerId != this.peerId || clientId != this.clientId || videoListener == null) return
 
-        when (videoListener) {
-            null -> return
-            else -> {
-                logDebug("Remove local video listener")
-                when {
-                    inMeetingViewModel.isMe(this.peerId) -> {
-                        sharedModel.removeLocalVideo(chatId!!, videoListener!!)
-                    }
-                    else -> {
-                        inMeetingViewModel.getSession(clientId)?.let {
-                            inMeetingViewModel.removeHiRes(videoListener!!, it, chatId!!)
-                        }
-                    }
-                }
-
-                videoListener = null
+        logDebug("Remove local video listener")
+        if (inMeetingViewModel.isMe(this.peerId)) {
+            sharedModel.removeLocalVideo(chatId!!, videoListener!!)
+        } else {
+            inMeetingViewModel.getSession(clientId)?.let {
+                inMeetingViewModel.removeHiRes(videoListener!!, it, chatId!!)
             }
         }
+
+        videoListener = null
     }
 
     /**
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        when {
-            inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall() && !isFloatingWindow ||
-                    !inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold() -> {
-                logDebug("Show on hold icon")
-                vOnHold.isVisible = true
-                vAvatar.alpha = 0.5f
-            }
-            else -> {
-                logDebug("Hide on hold icon")
-                vOnHold.isVisible = false
-                vAvatar.alpha = 1f
-            }
+        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall() && !isFloatingWindow ||
+            !inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()
+        ) {
+            logDebug("Show on hold icon")
+            vOnHold.isVisible = true
+            vAvatar.alpha = 0.5f
+            return
         }
+
+        logDebug("Hide on hold icon")
+        vOnHold.isVisible = false
+        vAvatar.alpha = 1f
+
     }
 
     /**
@@ -406,14 +363,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun videoOnUI(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-            else -> {
-                logDebug("UI video on")
-                hideAvatar(peerId, clientId)
-                activateVideo(peerId, clientId)
-            }
-        }
+        if (peerId != this.peerId || clientId != this.clientId) return
+
+        logDebug("UI video on")
+        hideAvatar(peerId, clientId)
+        activateVideo(peerId, clientId)
     }
 
     /**
@@ -423,26 +377,20 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     fun checkVideoOn(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-            else -> {
-                when {
-                    (!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) || (inMeetingViewModel.isMe(
-                        peerId
-                    ) &&
-                            ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
-                                    (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()))) -> {
-                        logDebug("The video should not be turned on")
-                        return
-                    }
-                    else -> {
-                        logDebug("The video should be turned on")
-                        videoOnUI(peerId, clientId)
-                    }
-                }
+        if (peerId != this.peerId || clientId != this.clientId) return
 
-            }
+        if ((!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) || (inMeetingViewModel.isMe(
+                peerId
+            ) &&
+                    ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
+                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
+        ) {
+            logDebug("The video should not be turned on")
+            return
         }
+
+        logDebug("The video should be turned on")
+        videoOnUI(peerId, clientId)
     }
 
     /**
@@ -452,17 +400,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun hideAvatar(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-            else -> {
-                logDebug("Hide Avatar")
-                vOnHold.isVisible = false
-                vAvatar.alpha = 1f
-                vAvatar.isVisible = false
-                vAvatarLayout?.let {
-                    it.isVisible = false
-                }
-            }
+        if (peerId != this.peerId || clientId != this.clientId) return
+
+        logDebug("Hide Avatar")
+        vOnHold.isVisible = false
+        vAvatar.alpha = 1f
+        vAvatar.isVisible = false
+        vAvatarLayout?.let {
+            it.isVisible = false
         }
     }
 
@@ -473,44 +418,34 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     private fun activateVideo(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-        }
+        if (peerId != this.peerId || clientId != this.clientId) return
 
-        when (videoListener) {
-            null -> {
-                logDebug("Video Listener is null ")
-                when {
-                    inMeetingViewModel.isMe(peerId) -> {
-                        videoListener = MeetingVideoListener(
-                            vVideo,
-                            outMetrics,
-                            megaChatApi.myUserHandle,
-                            MEGACHAT_INVALID_HANDLE,
-                            isFloatingWindow
-                        )
+        if (videoListener != null) {
+            logDebug("Video Listener is not null ")
+            videoListener!!.height = 0
+            videoListener!!.width = 0
+        } else {
+            logDebug("Video Listener is null ")
+            if (inMeetingViewModel.isMe(peerId)) {
+                videoListener = MeetingVideoListener(
+                    vVideo,
+                    outMetrics,
+                    MEGACHAT_INVALID_HANDLE,
+                    isFloatingWindow
+                )
 
-                        sharedModel.addLocalVideo(chatId!!, videoListener)
-                    }
-                    else -> {
-                        videoListener = MeetingVideoListener(
-                            vVideo,
-                            outMetrics,
-                            peerId,
-                            clientId,
-                            false
-                        )
+                sharedModel.addLocalVideo(chatId!!, videoListener)
+            } else {
+                videoListener = MeetingVideoListener(
+                    vVideo,
+                    outMetrics,
+                    clientId,
+                    false
+                )
 
-                        inMeetingViewModel.getSession(clientId)?.let {
-                            inMeetingViewModel.addHiRes(videoListener!!, it, chatId!!)
-                        }
-                    }
+                inMeetingViewModel.getSession(clientId)?.let {
+                    inMeetingViewModel.addHiRes(videoListener!!, it, chatId!!)
                 }
-            }
-            else -> {
-                logDebug("Video Listener is not null ")
-                videoListener!!.height = 0
-                videoListener!!.width = 0
             }
         }
 
@@ -525,22 +460,17 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId
      */
     fun updateResolution(peerId: Long, clientId: Long) {
-        when {
-            peerId != this.peerId || clientId != this.clientId -> return
-        }
+        if (peerId != this.peerId || clientId != this.clientId) return
 
-        when {
-            !isFloatingWindow && inMeetingViewModel.isOneToOneCall() && !inMeetingViewModel.isMe(
+        if (!isFloatingWindow && inMeetingViewModel.isOneToOneCall() && !inMeetingViewModel.isMe(
                 peerId
-            ) -> {
-                inMeetingViewModel.getSession(clientId)?.let {
-                    when {
-                        it.hasVideo() -> {
-                            logDebug("Update resolution")
-                            closeVideo(peerId, clientId)
-                            checkVideoOn(peerId, clientId)
-                        }
-                    }
+            )
+        ) {
+            inMeetingViewModel.getSession(clientId)?.let {
+                if (it.hasVideo()) {
+                    logDebug("Update resolution")
+                    closeVideo(peerId, clientId)
+                    checkVideoOn(peerId, clientId)
                 }
             }
         }
@@ -556,15 +486,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
             isOnHold -> {
                 logDebug("Call or session on hold")
                 //It's on hold
-                when {
-                    inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow -> {
-                        closeVideo(this.peerId!!, this.clientId!!)
-                        checkItIsOnlyAudio()
-                    }
-                    else -> {
-                        videoOffUI(this.peerId!!, this.clientId!!)
-                    }
+                if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow) {
+                    closeVideo(this.peerId!!, this.clientId!!)
+                    checkItIsOnlyAudio()
+                    return
                 }
+
+                videoOffUI(this.peerId!!, this.clientId!!)
             }
             else -> {
                 //It is not on hold
@@ -579,12 +507,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     private fun removeSurfaceView() {
         vVideo.let { surfaceView ->
-            when {
-                surfaceView.parent != null && surfaceView.parent.parent != null -> {
-                    logDebug("Removing surface view")
-                    (surfaceView.parent as ViewGroup).removeView(surfaceView)
-                }
+            if (surfaceView.parent != null && surfaceView.parent.parent != null) {
+                logDebug("Removing surface view")
+                (surfaceView.parent as ViewGroup).removeView(surfaceView)
             }
+
             surfaceView.isVisible = false
         }
 

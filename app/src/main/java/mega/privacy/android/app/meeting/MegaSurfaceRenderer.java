@@ -52,32 +52,22 @@ public class MegaSurfaceRenderer implements Callback {
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private boolean isSmallCamera;
-    private long peerId;
-    private long clientId;
     private DisplayMetrics outMetrics;
-    private List<MegaSurfaceRenderer.MegaSurfaceRendererGroupListener> listeners;
 
-
-    public MegaSurfaceRenderer(SurfaceView view, long peerId, long clientId, boolean isSmallCamera, DisplayMetrics outMetrics) {
-        logDebug("MegaSurfaceRenderer() ");
+    public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
             return;
         surfaceHolder.addCallback(this);
         paint = new Paint();
-        this.peerId = peerId;
-        this.clientId = clientId;
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.isSmallCamera = isSmallCamera;
         this.outMetrics = outMetrics;
-
-        listeners = new ArrayList<>();
     }
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        logDebug("dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -90,8 +80,6 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     private void adjustAspectRatio() {
-        logDebug("adjustAspectRatio()");
-
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
             dstRect.left = 0;
@@ -137,8 +125,6 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        logDebug("surfaceCreated()");
-
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas == null) return;
         Rect dst = surfaceHolder.getSurfaceFrame();
@@ -158,15 +144,11 @@ public class MegaSurfaceRenderer implements Callback {
                     " dstRect.right:" + dstRect.right +
                     " dstRect.bottom:" + dstRect.bottom);
         }
+
         surfaceHolder.unlockCanvasAndPost(canvas);
-
-        notifyStateToAll();
-
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        logDebug("in_width = " + in_width + ", in_height = " + in_height);
-
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
 
@@ -180,23 +162,6 @@ public class MegaSurfaceRenderer implements Callback {
                 " dstRect.top:" + dstRect.top +
                 " dstRect.right:" + dstRect.right +
                 " dstRect.bottom:" + dstRect.bottom);
-    }
-
-    private void notifyStateToAll() {
-        for (MegaSurfaceRenderer.MegaSurfaceRendererGroupListener listener : listeners)
-            notifyState(listener);
-    }
-
-    public void addListener(MegaSurfaceRenderer.MegaSurfaceRendererGroupListener l) {
-        listeners.add(l);
-        notifyState(l);
-    }
-
-    private void notifyState(MegaSurfaceRenderer.MegaSurfaceRendererGroupListener listener) {
-        if (listener == null)
-            return;
-
-        listener.resetSize(peerId, clientId);
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -249,9 +214,5 @@ public class MegaSurfaceRenderer implements Callback {
         }
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
         surfaceHolder.unlockCanvasAndPost(canvas);
-    }
-
-    public interface MegaSurfaceRendererGroupListener {
-        void resetSize(long peerId, long clientId);
     }
 }

@@ -18,7 +18,6 @@ import java.nio.ByteBuffer
 class MeetingVideoListener(
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
-    peerId: Long,
     clientId: Long,
     isFloatingWindow: Boolean = true
 ) : MegaChatVideoListenerInterface {
@@ -97,8 +96,6 @@ class MeetingVideoListener(
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT)
         renderer = MegaSurfaceRenderer(
             surfaceView,
-            peerId,
-            clientId,
             isFloatingWindow,
             outMetrics
         )

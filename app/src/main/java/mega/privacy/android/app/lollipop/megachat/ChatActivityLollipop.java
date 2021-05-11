@@ -1767,13 +1767,27 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         if (isJoinCallDialogShown) {
             MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
             if (callInThisChat != null && !callInThisChat.isOnHold() && chatRoom.isGroup()) {
-                MegaChatCall anotherCallActive = getAnotherActiveCall(chatRoom.getChatId());
-                if (anotherCallActive != null ) {
-                    showJoinCallDialog(callInThisChat.getChatid(), anotherCallActive);
-                }else{
+                ArrayList<Long> numCallsParticipating = getCallsParticipating();
+                if (numCallsParticipating == null || numCallsParticipating.isEmpty())
+                    return;
+
+                if(numCallsParticipating.size() == 1){
+                    MegaChatCall anotherCallActive = getAnotherActiveCall(chatRoom.getChatId());
+                    if (anotherCallActive != null) {
+                        showJoinCallDialog(callInThisChat.getChatid(), anotherCallActive, false);
+                        return;
+                    }
+
                     MegaChatCall anotherCallOnHold = getAnotherCallOnHold(chatRoom.getChatId());
-                    if(anotherCallOnHold != null){
-                        showJoinCallDialog(callInThisChat.getChatid(), anotherCallOnHold);
+                    if (anotherCallOnHold != null) {
+                        showJoinCallDialog(callInThisChat.getChatid(), anotherCallOnHold, false);
+                    }
+                } else {
+                    for (int i = 0; i < numCallsParticipating.size(); i++) {
+                        MegaChatCall call = megaChatApi.getChatCall(numCallsParticipating.get(i));
+                        if (call != null && !call.isOnHold()) {
+                            showJoinCallDialog(callInThisChat.getChatid(), call, true);
+                        }
                     }
                 }
             }
@@ -3041,10 +3055,24 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 }
 
                 logDebug("I'm participating in another call from another chat");
-                MegaChatCall anotherOnHoldCall = getAnotherOnHoldCall(chatRoom.getChatId());
-                if(anotherOnHoldCall != null) {
-                    showJoinCallDialog(chatRoom.getChatId(), anotherOnHoldCall);
+                ArrayList<Long> numCallsParticipating = getCallsParticipating();
+                if (numCallsParticipating == null || numCallsParticipating.isEmpty())
+                    return;
+
+                if (numCallsParticipating.size() == 1) {
+                    MegaChatCall anotherOnHoldCall = getAnotherOnHoldCall(chatRoom.getChatId());
+                    if (anotherOnHoldCall != null) {
+                        showJoinCallDialog(chatRoom.getChatId(), anotherOnHoldCall, false);
+                    }
+                } else {
+                    for (int i = 0; i < numCallsParticipating.size(); i++) {
+                        MegaChatCall call = megaChatApi.getChatCall(numCallsParticipating.get(i));
+                        if (call != null && !call.isOnHold()) {
+                            showJoinCallDialog(callInThisChat.getChatid(), call, true);
+                        }
+                    }
                 }
+
                 return;
             }
             if (canNotJoinCall(this, callInThisChat, chatRoom)) return;
@@ -3652,13 +3680,16 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
      *
      * @param callInThisChat  The chat ID of the group call.
      * @param anotherCall The in progress call.
+     * @param  existsMoreThanOneCall If
      */
-    public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall) {
+    public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall, boolean existsMoreThanOneCall) {
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.join_call_dialog, null);
         final Button holdJoinButton = dialoglayout.findViewById(R.id.hold_join_button);
         final Button endJoinButton = dialoglayout.findViewById(R.id.end_join_button);
         final Button cancelButton = dialoglayout.findViewById(R.id.cancel_button);
+
+        holdJoinButton.setVisibility(existsMoreThanOneCall ? View.GONE : View.VISIBLE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialoglayout);
@@ -3746,12 +3777,25 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     }
 
                 } else if (chatRoom.isGroup()) {
-                    MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
-                    if (anotherCall == null) {
-                        anotherCall = getAnotherOnHoldCall(chatRoom.getChatId());
-                    }
-                    if (anotherCall != null) {
-                        showJoinCallDialog(callInThisChat.getChatid(), anotherCall);
+                    ArrayList<Long> numCallsParticipating = getCallsParticipating();
+                    if (numCallsParticipating == null || numCallsParticipating.isEmpty())
+                        return;
+
+                    if (numCallsParticipating.size() == 1) {
+                        MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
+                        if (anotherCall == null) {
+                            anotherCall = getAnotherOnHoldCall(chatRoom.getChatId());
+                        }
+                        if (anotherCall != null) {
+                            showJoinCallDialog(callInThisChat.getChatid(), anotherCall, false);
+                        }
+                    } else {
+                        for (int i = 0; i < numCallsParticipating.size(); i++) {
+                            MegaChatCall call = megaChatApi.getChatCall(numCallsParticipating.get(i));
+                            if (call != null && !call.isOnHold()) {
+                                showJoinCallDialog(callInThisChat.getChatid(), call, true);
+                            }
+                        }
                     }
                 }
                 break;
