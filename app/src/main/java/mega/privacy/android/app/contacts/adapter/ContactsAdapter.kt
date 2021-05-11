@@ -11,6 +11,7 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 class ContactsAdapter constructor(
     private val itemCallback: (Long) -> Unit,
     private val itemInfoCallback: (Long) -> Unit,
+    private val enableHeaders: Boolean = true
 ) : ListAdapter<ContactItem, ContactsViewHolder>(ContactItem.DiffCallback()) {
 
     companion object {
@@ -49,9 +50,12 @@ class ContactsAdapter constructor(
 
     override fun getItemViewType(position: Int): Int =
         when {
+            !enableHeaders ->
+                VIEW_TYPE_ITEM
             position == 0 ->
                 VIEW_TYPE_ITEM_WITH_HEADER
-            getItem(position - 1).name?.firstOrNull() != getItem(position).name?.firstOrNull() ->
+            getItem(position).name?.firstOrNull()?.isLetter() == true &&
+                getItem(position - 1).name?.firstOrNull() != getItem(position).name?.firstOrNull() ->
                 VIEW_TYPE_ITEM_WITH_HEADER
             else ->
                 VIEW_TYPE_ITEM

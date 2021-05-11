@@ -117,6 +117,19 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <!-- Chip -->
+    <style name="Widget.Mega.Chip.New" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">?colorSecondary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Caption.Medium</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:checkable">false</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="chipMinTouchTargetSize">0dp</item>
+        <item name="chipStartPadding">0dp</item>
+        <item name="chipEndPadding">0dp</item>
+        <item name="chipMinHeight">20dp</item>
+    </style>
+
     <!--  For ListPreference  -->
     <style name="ThemeOverlay.Mega.MaterialAlertDialog.ListPreference">
         <item name="colorControlNormal">@color/grey_054_white_054</item>

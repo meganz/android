@@ -31,6 +31,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
+import kotlin.random.Random
 
 class GetContactsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -40,7 +41,7 @@ class GetContactsUseCase @Inject constructor(
 
     companion object {
         private const val NOT_FOUND = -1
-        private const val RECENTLY_ADDED_HOURS = 24
+        private const val RECENTLY_ADDED_MIN_HOURS = 24
     }
 
     fun get(): Flowable<List<ContactItem>> =
@@ -49,7 +50,7 @@ class GetContactsUseCase @Inject constructor(
                 val userName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
                 val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
                 val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                val userImageFile = getUserImageFile(megaUser.email)
+                val userImageFile = megaUser.email.getUserImageFile()
                 val userImageUri = if (userImageFile.exists()) {
                     userImageFile.toUri()
                 } else {
@@ -61,10 +62,11 @@ class GetContactsUseCase @Inject constructor(
                     email = megaUser.email,
                     name = userName,
                     status = userStatus,
-                    statusColor = getUserStatusColor(userStatus),
+                    statusColor = userStatus.getStatusColor(),
                     imageUri = userImageUri,
                     imageColor = userImageColor,
-                    isNew = megaUser.wasRecentlyAdded()
+                    isNew = Random.nextBoolean()
+//                    isNew = megaUser.wasRecentlyAdded()
                 )
             }.toMutableList()
 
@@ -102,7 +104,7 @@ class GetContactsUseCase @Inject constructor(
             )
 
             contacts.forEach { contact ->
-                val userImageFile = getUserImageFile(contact.email).absolutePath
+                val userImageFile = contact.email.getUserImageFile().absolutePath
                 megaApi.getUserAvatar(contact.email, userImageFile, userAttrsListener)
                 megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
 
@@ -120,7 +122,7 @@ class GetContactsUseCase @Inject constructor(
                         val currentContact = contacts[index]
                         contacts[index] = currentContact.copy(
                             status = status,
-                            statusColor = getUserStatusColor(status),
+                            statusColor = status.getStatusColor(),
                             lastSeen = if (status == STATUS_ONLINE) {
                                 context.getString(R.string.online_status)
                             } else {
@@ -155,22 +157,22 @@ class GetContactsUseCase @Inject constructor(
         }, BackpressureStrategy.BUFFER)
 
     @ColorRes
-    private fun getUserStatusColor(status: Int): Int =
-        when (status) {
+    private fun Int.getStatusColor(): Int =
+        when (this) {
             STATUS_AWAY -> R.color.orange_400
             STATUS_ONLINE -> R.color.lime_green_500
             STATUS_BUSY -> R.color.salmon_700
             else -> R.color.grey_700
         }
 
-    private fun getUserImageFile(userEmail: String): File =
-        CacheFolderManager.buildAvatarFile(context, "$userEmail.jpg")
+    private fun String.getUserImageFile(): File =
+        CacheFolderManager.buildAvatarFile(context, "$this.jpg")
 
     private fun MegaUser.wasRecentlyAdded(): Boolean {
         val now = LocalDateTime.now()
         val addedTime = Instant.ofEpochSecond(timestamp)
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime()
-        return Duration.between(addedTime, now).toHours() < RECENTLY_ADDED_HOURS
+        return Duration.between(addedTime, now).toHours() < RECENTLY_ADDED_MIN_HOURS
     }
 }

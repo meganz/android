@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -19,8 +21,11 @@ class ContactsActivity : PasscodeActivity() {
     private lateinit var binding: ActivityContactsBinding
 
     private val viewModel by viewModels<ContactsViewModel>()
-    private val adapter: ContactsAdapter by lazy {
-        ContactsAdapter(::onContactClick, ::onContactMoreInfoClick)
+    private val recentlyAddedAdapter: ContactsAdapter by lazy {
+        ContactsAdapter(::onContactClick, ::onContactMoreInfoClick, false)
+    }
+    private val contactsAdapter: ContactsAdapter by lazy {
+        ContactsAdapter(::onContactClick, ::onContactMoreInfoClick, true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +42,10 @@ class ContactsActivity : PasscodeActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.btnAddContact.setOnClickListener { openAddContactScreen() }
-        binding.listContacts.adapter = adapter
+
+        val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
+        binding.listContacts.adapter = ConcatAdapter(adapterConfig, recentlyAddedAdapter, contactsAdapter)
+        binding.listContacts.setHasFixedSize(true)
         binding.listContacts.addItemDecoration(
             DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
@@ -47,10 +55,16 @@ class ContactsActivity : PasscodeActivity() {
 
     private fun setupObservers() {
         viewModel.getContacts().observe(this, ::showContacts)
+        viewModel.getRecentlyAddedContacts().observe(this, ::showRecentlyAddedContacts)
     }
 
     private fun showContacts(items: List<ContactItem>) {
-        adapter.submitList(items)
+        contactsAdapter.submitList(items)
+    }
+
+    private fun showRecentlyAddedContacts(items: List<ContactItem>) {
+        binding.txtContacts.isVisible = items.isNotEmpty()
+        recentlyAddedAdapter.submitList(items)
     }
 
     private fun onContactClick(userHandle: Long) {

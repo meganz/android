@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.Mega.Body2"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +32,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txt_header"
         app:roundAsCircle="true"
-        tools:src="@android:drawable/ic_menu_camera" />
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_name"
@@ -80,17 +80,13 @@
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chip_new"
+        style="@style/Widget.Mega.Chip.New"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NEW"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
+        android:text="@string/new_label_notification_item"
         android:visibility="gone"
-        app:chipBackgroundColor="?colorSecondary"
-        app:chipEndPadding="0dp"
-        app:chipStartPadding="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/txt_last_seen"
         app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintTop_toTopOf="@id/txt_name"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

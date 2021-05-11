@@ -434,15 +434,16 @@
     </style>
 
     <!-- Medium, Accent -->
-    <style name="TextAppearance.Mega.Caption.Accent">
-        <item name="android:textColor">?attr/colorSecondary</item>
+    <style name="TextAppearance.Mega.Caption.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="TextAppearance.Mega.Caption.Secondary.Medium">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="fontFamily">sans-serif-medium</item>
+    <style name="TextAppearance.Mega.Caption.Accent" parent="TextAppearance.Mega.Caption.Medium">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Secondary.Medium" parent="TextAppearance.Mega.Caption.Medium">
         <item name="android:letterSpacing">0.035833333</item>
     </style>
 

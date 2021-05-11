@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -27,6 +28,9 @@ class ContactsViewModel @ViewModelInject constructor(
     }
 
     fun getContacts(): LiveData<List<ContactItem>> = contacts
+
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> = contacts
+        .map { contact -> contact.filter { it.isNew } }
 
     private fun updateContacts() {
         getContactsUseCase.get()
