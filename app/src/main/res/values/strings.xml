@@ -1749,7 +1749,7 @@
 
     <string name="empty_name" context="Error shown when the user left a name empty">Invalid name</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">Please correct your filenames before proceeding</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">Invalid characters</string>
+    <string name="invalid_characters" context="Error text for invalid characters">Invalid characters</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
@@ -3053,4 +3053,5 @@
     <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
     <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
     <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
+    <string name="error_opening_file" context="Warning which alerts the user a file cannot be opened">File is too large and can\'t be opened or previewed.</string>
 </resources>
