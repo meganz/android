@@ -694,7 +694,6 @@
     <string name="upgrade_select_pricing">Select membership</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Monthly or annually recurring</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">At this moment, no method of payment is available for this plan</string>
     <!-- button to decide monthly payment. The asterisk is needed -->

@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">회원권 선택</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">월간 또는 연간 재구독</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">지금 이 요금제를 결제할 수 있는 수단이 없습니다</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
