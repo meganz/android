@@ -254,4 +254,13 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/grey_alpha_080</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/white</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/grey_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_300</color>
 </resources>
