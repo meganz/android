@@ -182,10 +182,10 @@ class VideoListViewAdapter(
      *
      * @param participant   Participant
      */
-    fun removeSurfaceView(participant: Participant) {
+    fun closeAllVideos(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
-            it.removeSurfaceView(participant)
+            it.closeAllVideos(participant)
             return
         }
 

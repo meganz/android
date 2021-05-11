@@ -14,11 +14,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.listeners.InviteToChatRoomListener
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -192,8 +188,13 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        meetingViewModel.inviteToChat(this, requestCode, resultCode,intent)
+        meetingViewModel.inviteToChat(this, requestCode, resultCode, intent)
         super.onActivityResult(requestCode, resultCode, intent)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {

@@ -178,6 +178,7 @@ class VideoMeetingViewHolder(
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
         closeVideo(participant)
+
         if (participant.videoListener != null) {
             logDebug("Video Listener is not null ")
             participant.videoListener!!.height = 0
@@ -193,7 +194,6 @@ class VideoMeetingViewHolder(
             )
 
             participant.videoListener = vListener
-
             inMeetingViewModel.onActivateVideo(participant)
         }
 
@@ -234,7 +234,6 @@ class VideoMeetingViewHolder(
     private fun closeVideo(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        logDebug("Close video")
         binding.video.isVisible = false
         inMeetingViewModel.onCloseVideo(participant)
     }
@@ -351,16 +350,10 @@ class VideoMeetingViewHolder(
         binding.avatar.setImageBitmap(participant.avatar)
     }
 
-    fun removeSurfaceView(participant: Participant){
+    fun closeAllVideos(participant: Participant){
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        binding.video.let { surfaceView ->
-            if (surfaceView.parent != null && surfaceView.parent.parent != null) {
-                (surfaceView.parent as ViewGroup).removeView(surfaceView)
-            }
-
-            surfaceView.isVisible = false
-        }
+        binding.video.isVisible = false
     }
 
     /**

@@ -717,15 +717,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
     /**
      * Method to destroy the surfaceView.
      */
-    private fun removeAllSurfaceView() {
+    private fun closeAllVideos() {
         speakerUser?.let {
-            speaker_video.let { surfaceView ->
-                if (surfaceView.parent != null && surfaceView.parent.parent != null) {
-                    (surfaceView.parent as ViewGroup).removeView(surfaceView)
-                }
-
+            speaker_video?.let { surfaceView ->
                 surfaceView.isVisible = false
             }
+
             when {
                 it.isMe -> {
                     logDebug("Close local video")
@@ -742,12 +739,17 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
         val iterator = participants.iterator()
         iterator.forEach {
-            adapter.removeSurfaceView(it)
+            adapter.closeAllVideos(it)
         }
     }
 
+    override fun onDestroyView() {
+        logDebug("onDestroyView")
+        closeAllVideos()
+        super.onDestroyView()
+    }
+
     override fun onDestroy() {
-        removeAllSurfaceView()
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
             participantsObserver
         )
