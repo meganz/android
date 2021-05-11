@@ -914,7 +914,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             val iterator = listParticipants.iterator()
             iterator.forEach {
                 if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > 4) {
-                    logDebug("Speaker View or Grid view with more than 4 participants")
+                    logDebug("Speaker View or Grid view with more than 4 participants -> high resolution")
                     if (it.hasHiRes) {
                         it.hasHiRes = false
                         if (it.isVideoOn) {
@@ -922,7 +922,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                         }
                     }
                 } else {
-                    logDebug("Grid View with less than 5 participants")
+                    logDebug("Grid View with less than 5 participants -> low resolution")
                     if (!it.hasHiRes) {
                         it.hasHiRes = true
                         if (it.isVideoOn) {
@@ -950,6 +950,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 participant.forEach {
                     if (it.peerId == session.peerid && it.clientId == session.clientid) {
                         if (it.isSelected) {
+                            it.isSelected = false
                             assignMeAsSpeaker()
                         }
 
@@ -965,6 +966,19 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return INVALID_POSITION
+    }
+
+    fun removeSelected(peerId: Long, clientId: Long){
+        val iterator = participants.value?.iterator()
+        iterator?.let { participant ->
+            participant.forEach {
+                if (it.peerId == peerId && it.clientId == clientId) {
+                    if (it.isSelected) {
+                        it.isSelected = false
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1343,7 +1357,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun onChangeResolution(participant: Participant) {
         if (participant.videoListener == null)
             return
-
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
                 if (participant.hasHiRes) {
@@ -1357,9 +1370,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                 }
             }
         }
-
-        participant.videoListener = null
-
     }
 
     override fun onCleared() {

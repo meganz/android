@@ -745,6 +745,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
 
     override fun onDestroyView() {
         logDebug("onDestroyView")
+        speakerUser?.let {
+            (parentFragment as InMeetingFragment).inMeetingViewModel.removeSelected(it.peerId, it.clientId)
+        }
+
         closeAllVideos()
         super.onDestroyView()
     }

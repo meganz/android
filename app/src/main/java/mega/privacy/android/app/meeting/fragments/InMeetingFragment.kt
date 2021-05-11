@@ -1599,15 +1599,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun participantAddedOfLeftMeeting(isAdded: Boolean, position: Int) {
-        updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(status)
-        )
-
         speakerViewCallFragment?.let {
             if (it.isAdded) {
                 it.peerAddedOrRemoved(isAdded, position, inMeetingViewModel.participants.value!!)
             }
         }
+
+        updateParticipantRes(
+            inMeetingViewModel.checkParticipantsResolution(status)
+        )
     }
 
     /**
