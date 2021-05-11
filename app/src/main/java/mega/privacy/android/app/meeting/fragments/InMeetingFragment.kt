@@ -59,6 +59,7 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OWN_PRIV
 import mega.privacy.android.app.utils.ChatUtil.*
+import mega.privacy.android.app.utils.permission.permissionsBuilder
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
@@ -705,24 +706,49 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updateSpeaker(it)
         }
 
-        /**
-         * Will Change after Andy modify the permission structure
-         */
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             when {
                 it -> {
-                    checkMeetingPermissions(
-                        arrayOf(Manifest.permission.CAMERA),
-                    ) { showRequestPermissionSnackBar() }
+                    permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
+                        .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
+                        .build().launch(false)
                 }
             }
         }
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             when {
                 it -> {
-                    checkMeetingPermissions(
-                        arrayOf(Manifest.permission.RECORD_AUDIO),
-                    ) { showRequestPermissionSnackBar() }
+                    permissionsBuilder(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
+                        .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
+                        .setOnShowRationale { l -> onShowRationale(l) }
+                        .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
+                        .build().launch(false)
+                }
+            }
+        }
+    }
+
+
+
+    private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.RECORD_AUDIO -> {
+                    showRequestPermissionSnackBar()
+                }
+            }
+        }
+    }
+
+    private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    showRequestPermissionSnackBar()
                 }
             }
         }

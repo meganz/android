@@ -317,60 +317,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             .build()
     }
 
-    private fun onRequiresPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
-        }
-    }
-
-    private fun showPermissionsEducation() {
-        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
-        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
-        if (showEducation) {
-            sp.edit()
-                .putBoolean(KEY_SHOW_EDUCATION, false).apply()
-            showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
-        } else {
-            permissionsRequester.launch(false)
-        }
-    }
-
-    private fun onNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(false)
-                }
-            }
-        }
-    }
-
-    private fun onPermissionDenied(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(false)
-                }
-            }
-        }
-    }
-
     private fun showSnackBar(message: String) =
         (activity as BaseActivity).showSnackbar(
             Constants.PERMISSIONS_TYPE,
@@ -378,39 +324,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             message
         )
 
-
-    private fun onShowRationale(request: PermissionRequest) {
-        request.proceed()
-    }
-
-    private fun onRequiresAudioPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
-        }
-    }
-
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
-                }
-            }
-        }
-    }
-
-    private fun onRequiresCameraPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
                 }
             }
         }

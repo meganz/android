@@ -64,71 +64,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             .build()
     }
 
-    private fun onRequiresPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
-        }
-    }
-
-    /**
-     * Check the condition of display of permission education dialog
-     * Then continue permission check without education dialog
-     */
-    private fun showPermissionsEducation() {
-        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
-        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
-        if (showEducation) {
-            sp.edit()
-                .putBoolean(KEY_SHOW_EDUCATION, false).apply()
-            showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
-         } else {
-            permissionsRequester.launch(false)
-        }
-    }
-
-    /**
-     * Process when the user denies the permissions
-     */
-    private fun onPermissionDenied(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(false)
-                }
-            }
-        }
-    }
-
-    private fun onShowRationale(request: PermissionRequest) {
-        request.proceed()
-    }
-
-    private fun onNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(false)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(false)
-                }
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -249,34 +184,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    private fun onRequiresAudioPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
-        }
-    }
-
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     showSnackBar()
-                }
-            }
-        }
-    }
-
-    private fun onRequiresCameraPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
                 }
             }
         }
