@@ -352,6 +352,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
             checkIfNeedsStopHttpServer()
             isReadingContent = false
+            //Remove latest line break since it's not part of the file content
+            sb.deleteRange(sb.length - 2, sb.length)
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
             sb.clear()

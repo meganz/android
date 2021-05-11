@@ -92,14 +92,13 @@
             android:id="@+id/item_list_bottom_sheet_contact_file">
 
             <LinearLayout
-                android:id="@+id/edit_file_layout"
+                android:id="@+id/edit_file_option"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/edit_file_option"
                     style="@style/BottomSheetOption"
                     android:text="@string/title_edit_profile_info"
                     app:drawableStartCompat="@drawable/ic_file_edit"/>

@@ -147,8 +147,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             optionLeave.setVisibility(View.GONE);
 
             if (accessLevel >= MegaShare.ACCESS_READWRITE) {
-                contentView.findViewById(R.id.edit_file_layout).setVisibility(View.VISIBLE);
-                contentView.findViewById(R.id.edit_file_option).setOnClickListener(this);
+                LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
+                optionEdit.setVisibility(View.VISIBLE);
+                optionEdit.setOnClickListener(this);
             }
         }
 

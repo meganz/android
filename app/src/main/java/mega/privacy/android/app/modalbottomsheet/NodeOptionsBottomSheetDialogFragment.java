@@ -127,7 +127,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         ImageView nodeIcon = contentView.findViewById(R.id.node_icon);
         ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
-        LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_layout);
+        LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
 
         TextView optionInfo = contentView.findViewById(R.id.properties_option);
 //      optionFavourite
