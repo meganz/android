@@ -523,7 +523,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 sharedModel.micInitiallyOn()
                 sharedModel.camInitiallyOn()
-
             }
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
                 sharedModel.micInitiallyOn()

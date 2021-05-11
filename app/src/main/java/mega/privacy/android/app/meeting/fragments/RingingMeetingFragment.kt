@@ -119,14 +119,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         })
 
         binding.rejectFab.setOnClickListener {
-            when {
-                inMeetingViewModel.isOneToOneCall() -> {
-                    inMeetingViewModel.leaveMeeting()
-                }
-                else -> {
-                    inMeetingViewModel.ignoreCall()
-                }
+            if (inMeetingViewModel.isOneToOneCall()) {
+                inMeetingViewModel.leaveMeeting()
+            } else {
+                inMeetingViewModel.ignoreCall()
             }
+
             requireActivity().finish()
         }
 
@@ -194,22 +192,19 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         object : AnswerChatCallListener.OnCallAnsweredCallback {
 
             override fun onCallAnswered(chatId: Long, flag: Boolean) {
-                // To in-meeting
-                if(flag){
+                val actionString = if (flag) {
                     logDebug("Call answered with video ON and audio ON")
-                    val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                        MEETING_ACTION_RINGING_VIDEO_ON,
-                        chatId
-                    )
-                    findNavController().navigate(action)
-                }else{
+                    MEETING_ACTION_RINGING_VIDEO_ON
+                } else {
                     logDebug("Call answered with video OFF and audio ON")
-                    val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                        MEETING_ACTION_RINGING_VIDEO_OFF,
-                        chatId
-                    )
-                    findNavController().navigate(action)
+                    MEETING_ACTION_RINGING_VIDEO_OFF
                 }
+
+                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                    actionString,
+                    chatId
+                )
+                findNavController().navigate(action)
             }
 
             override fun onErrorAnsweredCall(errorCode: Int) {
@@ -319,7 +314,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
     private fun showSnackBar(message: String) =
         (activity as BaseActivity).showSnackbar(
-            Constants.PERMISSIONS_TYPE,
+            Constants.SNACKBAR_TYPE,
             binding.root,
             message
         )
