@@ -34,7 +34,7 @@
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="100dp"
+                android:paddingBottom="120dp"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:textIsSelectable="true" />
 
@@ -46,7 +46,7 @@
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
                 android:inputType="textMultiLine"
-                android:paddingBottom="100dp"
+                android:paddingBottom="120dp"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:theme="@style/TransparentEditText.Transparent"
                 tools:ignore="Autofill,LabelFor" />

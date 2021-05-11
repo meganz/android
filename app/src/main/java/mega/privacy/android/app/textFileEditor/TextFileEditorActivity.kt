@@ -31,15 +31,13 @@ import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
@@ -155,6 +153,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     override fun onBackPressed() {
         if (viewModel.isFileEdited()) {
+            binding.contentEditText.hideKeyboard()
             showDiscardChangesConfirmationDialog()
         } else {
             if (viewModel.isCreateMode()) {
@@ -440,21 +439,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
-        for (line in lines) {
-            try {
-                binding.contentText.append(line)
-                binding.contentEditText.append(line)
-            } catch (t: Throwable) {
-                viewModel.errorSettingContent()
-                binding.contentText.text = null
-                binding.contentEditText.text = null
-                showErrorReadingContentDialog()
-                logError("Error setting content.", t)
-                break
-            }
-        }
-
+        val currentText = Pagination(contentRead).getCurrentPageText()
+        binding.contentText.text = currentText
+        binding.contentEditText.setText(currentText)
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
