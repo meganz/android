@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"/>
+        android:minHeight="?attr/actionBarSize" />
 
     <ScrollView
         android:id="@+id/scroll_view"
@@ -68,25 +68,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginEnd="15dp"
                     android:layout_toEndOf="@+id/my_account_thumbnail">
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/name_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:drawableEnd="@drawable/ic_view_edit_profile"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
+                        app:drawableTint="@color/secondaryColor"
                         tools:text="Daphne Oram" />
-
-                    <ImageView
-                        android:id="@+id/view_and_edit_profile_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/name_text"
-                        android:src="@drawable/ic_view_edit_profile"
-                        app:tint="@color/secondaryColor"
-                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:id="@+id/email_text"

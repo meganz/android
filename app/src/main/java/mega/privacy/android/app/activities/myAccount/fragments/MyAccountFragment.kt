@@ -160,7 +160,12 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
     }
 
     private fun setupEditProfile(editable: Boolean) {
-        binding.viewAndEditProfileIcon.isVisible = editable
+        binding.nameText.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            if (editable) R.drawable.ic_view_edit_profile else 0,
+            0
+        )
 
         binding.myAccountTextInfoLayout.setOnClickListener {
             if (editable) {
@@ -185,7 +190,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
-            setOnClickListener { (mActivity as ManagerActivityLollipop).showUpAF() }
+            setOnClickListener { viewModel.upgradeAccount(context) }
         }
 
         binding.accountTypeText.isVisible = true
