@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -93,7 +94,10 @@ public class AccountController {
     public void deleteAccount(){
         logDebug("deleteAccount");
         if (((ManagerActivityLollipop) context).is2FAEnabled()){
-            ((ManagerActivityLollipop) context).showVerifyPin2FA(CANCEL_ACCOUNT_2FA);
+            Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
+            intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CANCEL_ACCOUNT_2FA);
+
+            context.startActivity(intent);
         }
         else {
             megaApi.cancelAccount((ManagerActivityLollipop) context);
@@ -503,8 +507,11 @@ public class AccountController {
         if(!oldMail.equals(newMail)){
             logDebug("Changes in mail, new mail: " + newMail);
             if (((ManagerActivityLollipop) context).is2FAEnabled()){
-                ((ManagerActivityLollipop) context).setNewMail(newMail);
-                ((ManagerActivityLollipop) context).showVerifyPin2FA(CHANGE_MAIL_2FA);
+                Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
+                intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_MAIL_2FA);
+                intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newMail);
+
+                context.startActivity(intent);
             }
             else {
                 megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);

@@ -86,6 +86,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -495,7 +496,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_login);
+        fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fourth_login);
         fourthPin.setOnLongClickListener(this);
         fourthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
@@ -611,87 +612,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         ((LoginActivityLollipop) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb1.width = scaleWidthPx(25, outMetrics);
-        }
-        firstPin.setLayoutParams(paramsb1);
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        firstPin.setLayoutParams(textParams);
-
-        secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb2.width = scaleWidthPx(25, outMetrics);
-        }
-        secondPin.setLayoutParams(paramsb2);
-        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
-        thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb3.width = scaleWidthPx(25, outMetrics);
-        }
-        thirdPin.setLayoutParams(paramsb3);
-        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-        thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
-        fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb4.width = scaleWidthPx(25, outMetrics);
-        }
-        fourthPin.setLayoutParams(paramsb4);
-        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
-        fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb5.width = scaleWidthPx(25, outMetrics);
-        }
-        fifthPin.setLayoutParams(paramsb5);
-        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
-        sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb6.width = scaleWidthPx(25, outMetrics);
-        }
-        sixthPin.setLayoutParams(paramsb6);
-        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-        textParams.setMargins(0, 0, 0, 0);
-        sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
 
         intentReceived = ((LoginActivityLollipop) context).getIntent();
@@ -995,7 +923,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 break;
             }
-            case R.id.pin_fouth_login:{
+            case R.id.pin_fourth_login:{
                 if (hasFocus) {
                     fourthPin.setText("");
                 }
@@ -1442,15 +1370,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.button_forgot_pass:{
                 logDebug("Click on button_forgot_pass");
                 try {
-                    String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
+                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
                 }
                 break;
@@ -1491,15 +1418,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
             case R.id.lost_authentication_device: {
                 try {
-                    String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
+                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
                 }
                 break;
@@ -2543,7 +2469,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.pin_first_login:
             case R.id.pin_second_login:
             case R.id.pin_third_login:
-            case R.id.pin_fouth_login:
+            case R.id.pin_fourth_login:
             case R.id.pin_fifth_login:
             case R.id.pin_sixth_login: {
                 pinLongClick = true;

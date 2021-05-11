@@ -200,13 +200,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="40dp"
-                    android:fontFamily="roboto"
                     android:gravity="center"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:text="@string/explain_confirm_2fa"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    style="@style/TextAppearance.Mega.Subtitle1.Secondary"/>
 
                 <LinearLayout
                     android:id="@+id/six_pin_login_layout"
@@ -219,10 +217,11 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_first_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -231,10 +230,11 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -243,10 +243,11 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="25dp"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -254,11 +255,12 @@
                         android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
-                        android:id="@+id/pin_fouth_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:id="@+id/pin_fourth_login"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -267,10 +269,11 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -279,10 +282,10 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="start"
-                        android:imeOptions="actionNext"
+                        android:layout_width="32sp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
+                        android:imeOptions="actionNext|flagNoExtractUi"
                         android:inputType="number"
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
@@ -301,7 +304,7 @@
                     android:layout_marginBottom="40dp"
                     android:fontFamily="roboto"
                     android:text="@string/pin_error_2fa"
-                    android:textColor="?attr/colorError"
+                    android:textColor="@color/red_600_red_300"
                     android:textSize="12sp" />
 
                 <RelativeLayout

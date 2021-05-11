@@ -23,5 +23,5 @@
     <string name="scan_invalid_characters" context="Error text for invalid characters">Invalid characters</string>
     <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Correct your filename before proceeding</string>
     <string name="scan_snackbar_invalid_characters" context="Snackbar text for invalid characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
-    <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait…</string>
+    <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait&#8230;</string>
 </resources>

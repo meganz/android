@@ -191,6 +191,17 @@ public class TextUtil {
     }
 
     /**
+     * Gets the string to show as file info details with the next format: "size · date".
+     *
+     * @param size The file size.
+     * @param date The file modification date.
+     * @return The string so show as file info details.
+     */
+    public static String getFileInfo(String size, String date) {
+        return String.format("%s · %s", size, date);
+    }
+
+    /**
      * If the string received is not null, neither empty, adds a STRING_SEPARATOR at the end.
      *
      * @param text Initial text without separator.

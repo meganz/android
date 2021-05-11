@@ -21,18 +21,37 @@
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
 
-        <EditText
-            android:id="@+id/content_text"
+        <LinearLayout
+            android:id="@+id/content_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:inputType="textMultiLine"
-            android:paddingBottom="100dp"
-            android:textAppearance="@style/TextAppearance.Mega.Body2"
-            android:theme="@style/TransparentEditText.Transparent"
-            tools:ignore="Autofill,LabelFor" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/content_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="100dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
+                android:textIsSelectable="true" />
+
+            <EditText
+                android:id="@+id/content_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:inputType="textMultiLine"
+                android:paddingBottom="100dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2"
+                android:theme="@style/TransparentEditText.Transparent"
+                tools:ignore="Autofill,LabelFor" />
+
+        </LinearLayout>
 
     </ScrollView>
 

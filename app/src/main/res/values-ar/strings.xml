@@ -98,6 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">الخروج</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">رفع</string>
     <string name="action_create_folder" context="Menu item">إنشاء مجلد جديد</string>
+    <string name="action_create_txt" context="Option which allows create a new text file">Create new text file</string>
     <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">فتح الرابط</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
@@ -683,7 +684,7 @@
     <string name="settings_features" context="settings of the Features section">المميزات</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">التخزين</string>
-    <string name="settings_passcode_lock" context="Settings of the Passcode">قفل رمز المرور</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
     <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تتطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">في حالة التمكين، ستقوم بترفيع معلومات حول مكان التقاط الصو، لذا كن حذراً عند مشاركتها.</string>
@@ -778,21 +779,28 @@
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">لم يتم التعيين</string>
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">قفل رمز المرور</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">تغيير رمز المرور</string>
+    <string name="title_change_passcode" context="Settings option screen to change Passcode.">Change passcode lock</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">يتطلب رمز المرور</string>
     <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">فوراً</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">دخول</string>
-    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
+
+    <plurals name="passcode_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 محاولة رمز المرور فاشلة</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
+    <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">سيتم تسجيل خروجك وسيتم حذف ملفاتك غير المتصلة بالانترنت بعد 10 محاولات فاشلة</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">رمز غير صحيح</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">رمز المرور خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز مرور خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">رمز المرورغير متطابق</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز المرور الخاص بك</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز المرور</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">رموز المرور غير متطابقة. حاول مرة أخرى.</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">إدخال رمز المرور الخاص</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">إعادة إدخال رمز المرور الخاص</string>
     <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز المرور الجديد</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز المرور الجديد</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">إعادة إدخال رمز المرور الجديد</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">سيتم حذف جميع بياناتك المحلية وسيتم تسجيل خروجك خلال %1d ثانية</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">حول</string>
@@ -843,7 +851,6 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
     -->
 
-    <string name="sortby_owner_mail" context="category in sort by action">رسائل بريد المالك</string>
     <string name="sortby_name" context="category in sort by action">الإسم</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">ترتيب تصاعدي</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">تنازلي</string>
@@ -1711,6 +1718,7 @@
     <string name="settings_feedback_body_device_model" context="mail body">موديل الجهاز</string>
     <string name="settings_feedback_body_android_version" context="mail body">نسخة الأندرويد</string>
 
+    <string name="dialog_title_new_text_file" context="Title of the dialog to create a new text file by inserting the name">New text file</string>
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">ملف جديد</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">اسم الملف</string>
 
@@ -1741,7 +1749,7 @@
 
     <string name="empty_name" context="Error shown when the user left a name empty">اسم غير صالح</string>
     <string name="general_incorrect_names" context="Error shown when the user left names empty and names typed with not allowed characters">صحح أسماء الملفات قبل المتابعة</string>
-    <string name="invalid_characters" context="Error shown when the user writes a character not allowed">عناصر غير صالحة</string>
+    <string name="invalid_characters" context="Error text for invalid characters">عناصر غير صالحة</string>
     <string name="invalid_characters_defined" context="Error shown when the user writes a character not allowed">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
 
     <plurals name="empty_names">
@@ -3027,11 +3035,22 @@
 
     <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s ليس في قائمة جهات الاتصال الخاصة بك</string>
 
-
     <string name="theme_light" context="Option of color theme, light mode.">خفيف</string>
     <string name="theme_dark" context="Option of color theme, dark mode.">داكن</string>
     <string name="theme_system_default" context="Option of color theme, follow the system setting.">افتراضي النظام</string>
     <string name="theme_battery_saver" context="Option of color theme, follow the system battery saver settings.">اضبط حسب موفر البطارية</string>
 
     <string name="ask_for_select_sdcard_root" context="Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app).">الرجاء تحديد جذر بطاقة الذاكرة SD.</string>
+
+    <string name="cloud_drive_select_destination" context="Cloud Drive screen subtitle indicating a destination is required to be selected">اختر الوجهة</string>
+    
+    <string name="discard_changes_warning" context="Warning which alerts the user before discard changes">Discard changes and close the editor?</string>
+    <string name="discard_close_action" context="Action discard">Discard and close</string>
+    <string name="saving_file" context="Label indicating saving a file is in progress">Saving file&#8230;</string>
+    <string name="file_created" context="Label indicating a file was created successfully">File created</string>
+    <string name="file_creation_failed" context="Warning indicating a file was not created successfully">File creation failed. Try again.</string>
+    <string name="file_saved_to" context="Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive">File saved to %1$s</string>
+    <string name="file_saved_to_failed" context="Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again">File not saved to %1$s. Try again.</string>
+    <string name="file_updated" context="Label indicating a file was updated successfully">File updated</string>
+    <string name="file_update_failed" context="Warning indicating a file was not updated successfully">File update failed. Try again.</string>
 </resources>

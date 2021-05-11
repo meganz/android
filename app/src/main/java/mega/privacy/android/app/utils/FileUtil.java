@@ -56,6 +56,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -931,6 +933,16 @@ public class FileUtil {
         }
 
         return storageDir;
+    }
+
+    /**
+     * Gets the string to show as file info details with the next format: "size · modification date".
+     *
+     * @param file The file  from which to get the details.
+     * @return The string so show as file info details.
+     */
+    public static String getFileInfo(File file) {
+        return TextUtil.getFileInfo(getSizeString(file.length()), formatLongDateTime(file.lastModified() / 1000));
     }
 
     /**

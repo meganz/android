@@ -60,7 +60,7 @@ class OfflineSaving(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
-        snackbarShower: SnackbarShower,
+        snackbarShower: SnackbarShower?,
     ): AutoPlayInfo {
         val context = MegaApplication.getInstance()
 
@@ -88,7 +88,7 @@ class OfflineSaving(
             } else {
                 getQuantityString(R.plurals.download_finish, totalFiles, totalFiles)
             }
-            snackbarShower.showSnackbar(message)
+            snackbarShower?.showSnackbar(message)
         }
 
         if (nodes.size != 1 || nodes[0].isFolder) {

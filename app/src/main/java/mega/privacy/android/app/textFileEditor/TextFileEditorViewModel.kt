@@ -71,6 +71,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val contentText: MutableLiveData<String> = MutableLiveData()
     private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
+    private var needsReadContent = false
+    private var isReadingContent = false
+    private var errorSettingContent = false
+    private var localFileUri: String? = null
+    private var streamingFileURL: URL? = null
+
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
     fun onSavingMode(): LiveData<String> = savingMode
@@ -116,6 +122,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode.value = EDIT_MODE
     }
 
+    private fun isSaving(): Boolean = savingMode.value != null
+
     fun isSavingModeEdit(): Boolean = savingMode.value == EDIT_MODE
 
     fun resetSavingMode() {
@@ -130,29 +138,54 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getNameOfFile(): String = fileName.value ?: ""
 
+    fun needsReadContent(): Boolean = needsReadContent
+
+    fun isReadingContent(): Boolean = isReadingContent
+
+    fun needsReadOrIsReadingContent(): Boolean = needsReadContent || isReadingContent
+
+    fun errorSettingContent() {
+        errorSettingContent = true
+    }
+
+    fun thereIsErrorSettingContent(): Boolean = errorSettingContent
+
+    fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
+
+    fun canShowEditFab(): Boolean =
+        isViewMode() && isEditableAdapter() && !isSaving()
+                && !needsReadOrIsReadingContent() && thereIsNoErrorSettingContent()
+
+    init {
+        contentText.value = ""
+        editedText.value = ""
+    }
+
     /**
      * Checks if the file can be editable depending on the current adapter.
      */
     private fun setEditableAdapter() {
-        textFileEditorData.value?.editableAdapter = getAdapterType() != OFFLINE_ADAPTER
-                && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
-                && getAdapterType() != FILE_LINK_ADAPTER
-                && getAdapterType() != FOLDER_LINK_ADAPTER
-                && getAdapterType() != ZIP_ADAPTER
-                && getAdapterType() != FROM_CHAT
-                && getAdapterType() != INVALID_VALUE
-                && (getNodeAccess() == MegaShare.ACCESS_OWNER || getNodeAccess() == MegaShare.ACCESS_READWRITE)
+        textFileEditorData.value?.editableAdapter =
+            if (isCreateMode()) true
+            else getAdapterType() != OFFLINE_ADAPTER
+                    && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
+                    && getAdapterType() != FILE_LINK_ADAPTER
+                    && getAdapterType() != FOLDER_LINK_ADAPTER
+                    && getAdapterType() != ZIP_ADAPTER
+                    && getAdapterType() != FROM_CHAT
+                    && getAdapterType() != INVALID_VALUE
+                    && getNodeAccess() >= MegaShare.ACCESS_READWRITE
     }
 
     /**
      * Gets all necessary values from intent if available.
      *
      * @param intent Received intent.
+     * @param mi     Current phone memory info in case is needed to read the file on streaming.
      */
-    fun setValuesFromIntent(intent: Intent) {
+    fun setValuesFromIntent(intent: Intent, mi: ActivityManager.MemoryInfo) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         textFileEditorData.value?.adapterType = adapterType
-        setEditableAdapter()
 
         when (adapterType) {
             FROM_CHAT -> {
@@ -216,40 +249,29 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
 
+        if (isViewMode()) {
+            needsReadContent = true
+            initializeReadParams(mi)
+        }
+
+        setEditableAdapter()
+
         fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name!!
     }
 
     /**
-     * Starts the read action to get the content of the file.
+     * Initializes the necessary params to read the file content.
+     * If file is available locally, the local uri. If not, the streaming URL.
      *
      * @param mi Current phone memory info in case is needed to read the file on streaming.
      */
-    fun readFileContent(mi: ActivityManager.MemoryInfo) {
-        viewModelScope.launch { readFile(mi) }
-    }
+    private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
+        localFileUri =
+            if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
+            else getLocalFile(null, getNode()?.name, getNode()?.size!!)
 
-    /**
-     * Continues the read action to get the content of the file.
-     * Checks if the file is available to read locally. If not, it's read by streaming.
-     *
-     * @param mi Current phone memory info in case is needed to read the file on streaming.
-     */
-    private suspend fun readFile(mi: ActivityManager.MemoryInfo) {
-        withContext(Dispatchers.IO) {
-            val localFileUri =
-                if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-                else getLocalFile(null, getNode()?.name, getNode()?.size!!)
-
-            if (!isTextEmpty(localFileUri)) {
-                val localFile = File(localFileUri)
-
-                if (isFileAvailable(localFile)) {
-                    readFile(BufferedReader(FileReader(localFile)))
-                    return@withContext
-                }
-            }
-
-            val api = textFileEditorData.value?.api ?: return@withContext
+        if (isTextEmpty(localFileUri)) {
+            val api = textFileEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
                 api.httpServerStart()
@@ -262,13 +284,45 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             )
 
             val uri = api.httpServerGetLocalLink(getNode())
-            if (uri == null) {
-                logError("Error getting the file uri.")
+
+            if (!isTextEmpty(uri)) {
+                streamingFileURL = URL(uri)
+            }
+        }
+    }
+
+    /**
+     * Starts the read action to get the content of the file.
+     */
+    fun readFileContent() {
+        viewModelScope.launch { readFile() }
+    }
+
+    /**
+     * Continues the read action to get the content of the file.
+     * Checks if the file is available to read locally. If not, it's read by streaming.
+     */
+    private suspend fun readFile() {
+        withContext(Dispatchers.IO) {
+            isReadingContent = true
+            needsReadContent = false
+
+            if (!isTextEmpty(localFileUri)) {
+                val localFile = File(localFileUri!!)
+
+                if (isFileAvailable(localFile)) {
+                    readFile(BufferedReader(FileReader(localFile)))
+                    return@withContext
+                }
+            }
+
+            if (streamingFileURL == null) {
+                logError("Error getting the file URL.")
                 return@withContext
             }
 
-            val url = URL(uri)
-            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            val connection: HttpURLConnection =
+                streamingFileURL?.openConnection() as HttpURLConnection
             readFile(BufferedReader(InputStreamReader(connection.inputStream)))
         }
     }
@@ -286,8 +340,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 var line: String?
 
                 while (br.readLine().also { line = it } != null) {
-                    sb.append(line)
-                    sb.append('\n')
+                    sb.appendLine(line)
                 }
 
                 br.close()
@@ -295,8 +348,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 logError("Exception while reading text file.", e)
             }
 
+            checkIfNeedsStopHttpServer()
+            isReadingContent = false
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
+            sb.clear()
         }
     }
 
@@ -347,7 +403,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         context.startService(uploadIntent)
         savingMode.value = mode.value
-        mode.value = VIEW_MODE
+        setViewMode()
     }
 
     /**
@@ -356,6 +412,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun checkIfNeedsStopHttpServer() {
         if (textFileEditorData.value?.needStopHttpServer == true) {
             textFileEditorData.value?.api?.httpServerStop()
+            textFileEditorData.value?.needStopHttpServer = false
         }
     }
 
@@ -461,7 +518,13 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return ERROR_FINISH_ACTION
         }
 
-        contentText.value = editedText.value ?: ""
+        if (editedText.value == null) {
+            contentText.value = ""
+            editedText.value = ""
+        } else {
+            contentText.value = editedText.value
+        }
+
         textFileEditorData.value?.node =
             megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
 

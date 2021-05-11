@@ -48,7 +48,9 @@ import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getMediaIntent
+import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
@@ -1478,6 +1480,20 @@ object MegaNodeUtil {
         } else {
             snackbarShower.showSnackbar(getString(R.string.intent_not_available))
         }
+    }
+
+    /**
+     * Gets the string to show as file info details with the next format: "size · modification date".
+     *
+     * @param node The file node from which to get the details.
+     * @return The string so show as file info details.
+     */
+    @JvmStatic
+    fun getFileInfo(node: MegaNode): String? {
+        return TextUtil.getFileInfo(
+            getSizeString(node.size),
+            formatLongDateTime(node.modificationTime)
+        )
     }
 
     /**
