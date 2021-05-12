@@ -542,4 +542,10 @@
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
+
+    <style name="BottomSheetOption.Red">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
+        <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
 </resources>
