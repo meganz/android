@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -146,7 +147,8 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             setNodeThumbnail(context, node, nodeThumb);
             optionLeave.setVisibility(View.GONE);
 
-            if (accessLevel >= MegaShare.ACCESS_READWRITE) {
+            if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                    && accessLevel >= MegaShare.ACCESS_READWRITE) {
                 LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
                 optionEdit.setVisibility(View.VISIBLE);
                 optionEdit.setOnClickListener(this);

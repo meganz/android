@@ -276,8 +276,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionClearShares.setVisibility(View.GONE);
                     }
                 } else {
+                    if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                        optionEdit.setVisibility(View.VISIBLE);
+                    }
+
                     optionInfo.setText(R.string.general_file_info);
-                    optionEdit.setVisibility(View.VISIBLE);
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
                     counterShares--;
@@ -377,10 +380,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 if (node.isFolder()) {
                     optionInfo.setText(R.string.general_folder_info);
-
                 } else {
+                    if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                        optionEdit.setVisibility(View.VISIBLE);
+                    }
+
                     optionInfo.setText(R.string.general_file_info);
-                    optionEdit.setVisibility(View.VISIBLE);
                 }
 
                 if (node.isExported()) {
@@ -430,12 +435,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         counterShares--;
                         optionSendChat.setVisibility(View.GONE);
                     } else {
-                        optionInfo.setText(R.string.general_file_info);
-                        optionSendChat.setVisibility(View.VISIBLE);
-
-                        if (accessLevel >= MegaShare.ACCESS_READWRITE) {
+                        if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                                && accessLevel >= MegaShare.ACCESS_READWRITE) {
                             optionEdit.setVisibility(View.VISIBLE);
                         }
+
+                        optionInfo.setText(R.string.general_file_info);
+                        optionSendChat.setVisibility(View.VISIBLE);
                     }
 
                     nodeIconLayout.setVisibility(View.GONE);
@@ -543,8 +549,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionShareFolder.setVisibility(View.VISIBLE);
                         optionShareFolder.setText(R.string.manage_share);
                     } else {
+                        if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                            optionEdit.setVisibility(View.VISIBLE);
+                        }
+
                         optionInfo.setText(R.string.general_file_info);
-                        optionEdit.setVisibility(View.VISIBLE);
                         counterShares--;
                         optionShareFolder.setVisibility(View.GONE);
                     }
@@ -602,8 +611,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionShareFolder.setText(R.string.context_share_folder);
                         }
                     } else {
+                        if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                            optionEdit.setVisibility(View.VISIBLE);
+                        }
+
                         optionInfo.setText(R.string.general_file_info);
-                        optionEdit.setVisibility(View.VISIBLE);
                         counterShares--;
                         optionShareFolder.setVisibility(View.GONE);
                     }
@@ -709,12 +721,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionInfo.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
                 } else {
-                    optionInfo.setText(R.string.general_file_info);
-
-                    if (accessLevel >= MegaShare.ACCESS_READWRITE) {
+                    if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                            && accessLevel >= MegaShare.ACCESS_READWRITE) {
                         optionEdit.setVisibility(View.VISIBLE);
                     }
 
+                    optionInfo.setText(R.string.general_file_info);
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
                 }
@@ -870,12 +882,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
                 break;
             case MODE6:
-                optionInfo.setText(R.string.general_file_info);
-
-                if (accessLevel >= MegaShare.ACCESS_READWRITE) {
+                if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                        && accessLevel >= MegaShare.ACCESS_READWRITE) {
                     optionEdit.setVisibility(View.VISIBLE);
                 }
 
+                optionInfo.setText(R.string.general_file_info);
                 counterShares--;
                 optionShareFolder.setVisibility(View.GONE);
                 nodeIconLayout.setVisibility(View.GONE);
