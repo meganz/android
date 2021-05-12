@@ -360,16 +360,16 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private fun showMode(mode: String) {
         refreshMenuOptionsVisibility()
 
+        if (viewModel.needsReadContent()) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            viewModel.readFileContent()
+        }
+
+        if (viewModel.needsReadOrIsReadingContent()) {
+            showLoadingView()
+        }
+        
         if (mode == VIEW_MODE) {
-            if (viewModel.needsReadContent()) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
-                viewModel.readFileContent()
-            }
-
-            if (viewModel.needsReadOrIsReadingContent()) {
-                showLoadingView()
-            }
-
             supportActionBar?.title = null
             binding.nameText.isVisible = true
 
