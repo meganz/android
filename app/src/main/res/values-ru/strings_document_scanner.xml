@@ -1,27 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Обрезать</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Сохранить скан</string>
-    <string name="scan_action_add" context="button">Добавить</string>
-    <string name="scan_action_save" context="Action of a button to save something">Сохранить</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Переснять</string>
-    <string name="scan_file_name" context="Document scanner file name">Имя файла</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Тип файла</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Качество</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Расположение</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">Высокое</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">Среднее</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">Низкое</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Отменить сканирование?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Текущее сканирование будет потеряно</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Отменить все сканирования?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Текущий документ будет потерян</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Не сохранять</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Удалить текущее сканирование?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Для сканирования документов нужно разрешить доступ к камере.</string>
-    <string name="scan_incorrect_name" context="Error text for incorrect name">Incorrect name</string>
-    <string name="scan_invalid_characters" context="Error text for invalid characters">Недопустимые символы</string>
-    <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Correct your filename before proceeding</string>
-    <string name="scan_snackbar_invalid_characters" context="Snackbar text for invalid characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
-    <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait&#8230;</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop">Обрезать</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan">Сохранить скан</string>
+  <!-- button -->
+  <string name="scan_action_add">Добавить</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save">Сохранить</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake">Переснять</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name">Имя файла</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type">Тип файла</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality">Качество</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination">Расположение</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high">Высокое</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium">Среднее</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low">Низкое</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title">Отменить сканирование?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body">Текущее сканирование будет потеряно</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title">Отменить все сканирования?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body">Текущий документ будет потерян</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action">Не сохранять</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body">Удалить текущее сканирование?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission">Для сканирования документов нужно разрешить доступ к камере.</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name">Неправильное имя</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters">Недопустимые символы</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name">Исправьте имя файла, прежде чем продолжить</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress">Подготавливаем %1$s. Пожалуйста, подождите&#x2026;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
 </resources>

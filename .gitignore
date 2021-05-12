@@ -46,3 +46,6 @@ captures
 ## Google API key files
 /app/src/debug/res/values/google_maps_api.xml
 /app/src/release/res/values/google_maps_api.xml
+
+## Transifex script project
+/transifex/
