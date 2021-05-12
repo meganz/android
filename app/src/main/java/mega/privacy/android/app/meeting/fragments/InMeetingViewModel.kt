@@ -35,6 +35,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
 
+    private var MAX_PARTICIPANTS_HIRES_GRID_VIEW = 4
+
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
 
     var isSpeakerSelectionAutomatic: Boolean = true
@@ -833,7 +835,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     private fun needHiRes(status: String): Boolean {
         participants.value?.let {
-            return status != TYPE_IN_SPEAKER_VIEW && it.size < 4
+            return status != TYPE_IN_SPEAKER_VIEW && it.size < MAX_PARTICIPANTS_HIRES_GRID_VIEW
         }
 
         return false
@@ -914,7 +916,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         participants.value?.let { listParticipants ->
             val iterator = listParticipants.iterator()
             iterator.forEach {
-                if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > 4) {
+                if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > MAX_PARTICIPANTS_HIRES_GRID_VIEW) {
                     logDebug("Speaker View or Grid view with more than 4 participants -> high resolution")
                     if (it.hasHiRes) {
                         if(it.isVideoOn){
