@@ -14,6 +14,8 @@ import mega.privacy.android.app.contacts.adapter.ContactsAdapter
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.utils.StringUtils.formatColorTag
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 @AndroidEntryPoint
 class ContactsActivity : PasscodeActivity() {
@@ -41,8 +43,6 @@ class ContactsActivity : PasscodeActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.btnAddContact.setOnClickListener { openAddContactScreen() }
-
         val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
         binding.listContacts.adapter = ConcatAdapter(adapterConfig, recentlyAddedAdapter, contactsAdapter)
         binding.listContacts.setHasFixedSize(true)
@@ -51,6 +51,12 @@ class ContactsActivity : PasscodeActivity() {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
             }
         )
+
+        binding.btnAddContact.setOnClickListener { openAddContactScreen() }
+        binding.viewEmpty.text = binding.viewEmpty.text.toString()
+            .formatColorTag(this, 'A', R.color.black)
+            .formatColorTag(this, 'B', R.color.grey_300)
+            .toSpannedHtmlText()
     }
 
     private fun setupObservers() {
@@ -59,6 +65,8 @@ class ContactsActivity : PasscodeActivity() {
     }
 
     private fun showContacts(items: List<ContactItem>) {
+        binding.txtContacts.isVisible = items.isNotEmpty()
+        binding.viewEmpty.isVisible = items.isNullOrEmpty()
         contactsAdapter.submitList(items)
     }
 
