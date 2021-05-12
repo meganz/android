@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.Util.*
 import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import java.util.*
 
 object MegaNodeDialogUtil {
     private const val TYPE_RENAME = 0
@@ -361,7 +362,7 @@ object MegaNodeDialogUtil {
 
                             val oldMimeType = MimeTypeList.typeForName(node.name)
                             var newExtension = MimeTypeList.typeForName(typedString).extension
-                            if (newExtension == typedString) newExtension = ""
+                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension = ""
 
                             when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(
                                 oldMimeType,
