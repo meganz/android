@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">Chọn hạng tài khoản</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Chọn hằng tháng hoặc hằng năm</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Hiện tại, chưa có phương thức thanh toán cho gói này</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -2454,22 +2453,22 @@
     <string name="title_2fa_enabled">Xác Minh 2-Bước được Bật</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;Sao lưu dự phòng Mã Khóa Phục Hồi&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Xác Thực Đăng Nhập</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">Xác Minh 2-Bước\nĐổi mật khẩu</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">Xác Minh 2-Bước\nXóa bỏ tài khoản</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">Xác Minh 2-Bước\nĐổi email</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">Tắt Xác Minh 2-Bước</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">Đổi mật khẩu</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">Đổi email</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">Xoá tài khoản</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2489,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Xuất ra Mã Phục Hồi để hoàn tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">App Lập Xác Minh</string>
+    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Bạn có muốn được chuyển tới CH Play để cài đặt App Lập Xác Minh không?</string>
+    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3834,4 +3833,6 @@
     <string name="file_updated">Tệp tin đã được cập nhật</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Tệp tin chưa được cập nhật. Xin thử lại.</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
 </resources>

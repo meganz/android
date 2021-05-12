@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
   <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Bijsnijden</string>
+  <string name="scan_title_crop">Bijsnijden</string>
   <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Scan opslaan</string>
+  <string name="scan_title_save_scan">Scan opslaan</string>
   <!-- button -->
-  <string name="scan_action_add" context="button">Toevoegen</string>
+  <string name="scan_action_add">Toevoegen</string>
   <!-- Action of a button to save something -->
-  <string name="scan_action_save" context="Action of a button to save something">Opslaan</string>
+  <string name="scan_action_save">Opslaan</string>
   <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Opnieuw scannen</string>
+  <string name="scan_action_retake">Opnieuw scannen</string>
   <!-- Document scanner file name -->
-  <string name="scan_file_name" context="Document scanner file name">Bestandsnaam</string>
+  <string name="scan_file_name">Bestandsnaam</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Bestandstype</string>
+  <string name="scan_file_type">Bestandstype</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Kwaliteit</string>
+  <string name="scan_quality">Kwaliteit</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Bestemming</string>
+  <string name="scan_destination">Bestemming</string>
   <!-- Document scanner high quality option -->
-  <string name="scan_quality_high" context="Document scanner high quality option">Hoog</string>
+  <string name="scan_quality_high">Hoog</string>
   <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium" context="Document scanner medium quality option">Medium</string>
+  <string name="scan_quality_medium">Medium</string>
   <!-- Document scanner low quality option -->
-  <string name="scan_quality_low" context="Document scanner low quality option">Laag</string>
+  <string name="scan_quality_low">Laag</string>
   <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Scan weggooien?</string>
+  <string name="scan_dialog_discard_title">Scan weggooien?</string>
   <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">De huidige scan gaat verloren</string>
+  <string name="scan_dialog_discard_body">De huidige scan gaat verloren</string>
   <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Alle scans weggooien</string>
+  <string name="scan_dialog_discard_all_title">Alle scans weggooien</string>
   <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Het huidige document gaat verloren</string>
+  <string name="scan_dialog_discard_all_body">Het huidige document gaat verloren</string>
   <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Weggooien</string>
+  <string name="scan_dialog_discard_action">Weggooien</string>
   <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Huidige scan verwijderen?</string>
+  <string name="scan_dialog_delete_body">Huidige scan verwijderen?</string>
   <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">De Camera toestemming is nodig om documenten te scannen</string>
+  <string name="scan_requires_permission">De Camera toestemming is nodig om documenten te scannen</string>
   <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name" context="Error text for incorrect name">Onjuiste naam</string>
+  <string name="scan_incorrect_name">Onjuiste naam</string>
   <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters" context="Error text for invalid characters">Ongeldige tekens</string>
+  <string name="scan_invalid_characters">Ongeldige tekens</string>
   <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Corrigeer uw bestandsnaam voordat u verder gaat</string>
+  <string name="scan_snackbar_incorrect_name">Corrigeer uw bestandsnaam voordat u verder gaat</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress" context="Dialog message showing file progress">%1$sVoorbereiden. Wacht alstublieft&#8230;</string>
+  <string name="scan_dialog_progress">%1$sVoorbereiden. Wacht alstublieft&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters" context="Error shown when the user writes a character not allowed">De volgende tekens zijn niet toegestaan: ”* /: &lt;&gt;?​\ |</string>
+  <string name="scan_snackbar_invalid_characters">De volgende tekens zijn niet toegestaan: ”* /: &lt;&gt;?​\ |</string>
 </resources>

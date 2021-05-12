@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">選擇會員方案</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">按月或按年度自動訂閱</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">這個方案暫時無適用的付款方式</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -2454,22 +2453,22 @@
     <string name="title_2fa_enabled">已啟用雙重驗證</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;備份您的還原金鑰&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">無效的條碼</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">您的驗證設備不見了？</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">登入驗證</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">雙重驗證\n更改密碼</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">雙重驗證\n取消帳戶</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">雙重驗證\n更改電子郵件地址</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">停用雙重驗證</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">更改密碼</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">更改電子信箱</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">刪除帳戶</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">您的驗證設備不見了？</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2489,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">匯出你的還原金鑰後就完成了</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">身份驗證應用程式</string>
+    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">您想開啟Google Play來安裝身份驗證程式嗎？</string>
+    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">應用商店</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3834,4 +3833,6 @@
     <string name="file_updated">檔案已更新</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">檔案更新失敗。再試一次。</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
 </resources>

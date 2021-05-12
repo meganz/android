@@ -21,8 +21,8 @@
                 android:layout_width="90dp"
                 android:layout_height="90dp"
                 android:layout_marginTop="50dp"
-                android:layout_marginLeft="-8dp"
-                android:src="@drawable/mega_ic"/>
+                app:tint="@color/red_600_white_087"
+                android:src="@drawable/logo_loading_ic"/>
 
             <TextView
                 android:layout_width="wrap_content"
