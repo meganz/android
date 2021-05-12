@@ -1,27 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Cắt hình</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Lưu hình quét</string>
-    <string name="scan_action_add" context="button">Thêm</string>
-    <string name="scan_action_save" context="Action of a button to save something">Lưu</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Quét lại</string>
-    <string name="scan_file_name" context="Document scanner file name">Tên tệp</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Dạng tệp</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Chất lượng</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Vị trí lưu</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">Cao</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">Thường</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">Thấp</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Bỏ hình quét?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Hình quét này sẽ bj mất</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Bỏ tất cả hình quét?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Tài liệu này sẽ bị mất</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Bỏ đi</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Xóa hình quét hiện tại?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Cần quyền hạn sử dụng Camera để quét tài liệu</string>
-    <string name="scan_incorrect_name" context="Error text for incorrect name">Incorrect name</string>
-    <string name="scan_invalid_characters" context="Error text for invalid characters">Ký tự không hợp lệ</string>
-    <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Correct your filename before proceeding</string>
-    <string name="scan_snackbar_invalid_characters" context="Snackbar text for invalid characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
-    <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait&#8230;</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop">Cắt hình</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan">Lưu hình quét</string>
+  <!-- button -->
+  <string name="scan_action_add">Thêm</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save">Lưu</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake">Quét lại</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name">Tên tệp</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type">Dạng tệp</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality">Chất lượng</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination">Vị trí lưu</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high">Cao</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium">Thường</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low">Thấp</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title">Bỏ hình quét?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body">Hình quét này sẽ bị mất</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title">Bỏ tất cả hình quét?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body">Tài liệu này sẽ bị mất</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action">Loại bỏ</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body">Xóa hình quét hiện tại?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission">Cần quyền hạn sử dụng Camera để quét tài liệu</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name">Tên không phù hợp</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters">Ký tự không hợp lệ</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name">Sửa lại tên tệp cho phù hợp trước khi tiến hành</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress">Đang chuẩn bị %1$s. Xin chờ&#8230;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
 </resources>

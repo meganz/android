@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
   <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop">Crop</string>
+  <string name="scan_title_crop">Cortar</string>
   <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan">Save scan</string>
+  <string name="scan_title_save_scan">Salvar documento escaneado</string>
   <!-- button -->
-  <string name="scan_action_add">Adaugă</string>
+  <string name="scan_action_add">Adicionar</string>
   <!-- Action of a button to save something -->
-  <string name="scan_action_save">Salvează</string>
+  <string name="scan_action_save">Salvar</string>
   <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake">Retake</string>
+  <string name="scan_action_retake">Escanear novamente</string>
   <!-- Document scanner file name -->
-  <string name="scan_file_name">File name</string>
+  <string name="scan_file_name">Nome do arquivo</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type">File type</string>
+  <string name="scan_file_type">Tipo de arquivo</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality">Calitate</string>
+  <string name="scan_quality">Qualidade</string>
   <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination">Destination</string>
+  <string name="scan_destination">Destino</string>
   <!-- Document scanner high quality option -->
-  <string name="scan_quality_high">High</string>
+  <string name="scan_quality_high">Alta</string>
   <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium">Medie</string>
+  <string name="scan_quality_medium">Média</string>
   <!-- Document scanner low quality option -->
-  <string name="scan_quality_low">Low</string>
+  <string name="scan_quality_low">Baixa</string>
   <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title">Discard scan?</string>
+  <string name="scan_dialog_discard_title">Descartar este documento escaneado?</string>
   <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body">The current scan will be lost</string>
+  <string name="scan_dialog_discard_body">Este documento escaneado será eliminado</string>
   <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title">Discard all scans?</string>
+  <string name="scan_dialog_discard_all_title">Descartar todos os documentos escaneados?</string>
   <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body">The current document will be lost</string>
+  <string name="scan_dialog_discard_all_body">O documento atual será eliminado</string>
   <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action">Discard</string>
+  <string name="scan_dialog_discard_action">Descartar</string>
   <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body">Delete current scan?</string>
+  <string name="scan_dialog_delete_body">Deletar esta digitalização?</string>
   <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">The Camera permission is needed to scan documents</string>
+  <string name="scan_requires_permission">Permita o acesso à sua câmera para escanear documentos.</string>
   <!-- Error text for incorrect name -->
   <string name="scan_incorrect_name">Incorrect name</string>
   <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters">Caractere nevalide</string>
+  <string name="scan_invalid_characters">Caracteres inválidos</string>
   <!-- Snackbar text for incorrect name -->
   <string name="scan_snackbar_incorrect_name">Correct your filename before proceeding</string>
   <!-- Dialog message showing file progress -->
   <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+  <string name="scan_snackbar_invalid_characters">Os seguintes caracteres não são permitidos: ” * / : &lt; &gt; ? \ |</string>
 </resources>
