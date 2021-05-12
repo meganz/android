@@ -55,7 +55,7 @@ class MegaNodeDialogUtil {
          *
          * @param context            Current context.
          * @param node               A valid node.
-         * @param snackbarShower interface to show snackbar.
+         * @param snackbarShower     Interface to show snackbar.
          * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
          * @return The rename dialog.
          */
@@ -205,16 +205,16 @@ class MegaNodeDialogUtil {
          * @param context            Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
-         * @param snackbarShower interface to show snackbar.
+         * @param snackbarShower     Interface to show snackbar.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
          * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param builder            The AlertDialog.Builder to create and show the final dialog.
          * @param dialogType         Indicates the type of dialog. It can be:
-         *                            - TYPE_RENAME:       Rename action.
-         *                            - TYPE_NEW_FOLDER:   Create new folder action.
-         *                            - TYPE_NEW_FILE:     Create new file action.
-         *                            - TYPE_NEW_URL_FILE: Create new URL file action.
+         *                              - TYPE_RENAME:       Rename action.
+         *                              - TYPE_NEW_FOLDER:   Create new folder action.
+         *                              - TYPE_NEW_FILE:     Create new file action.
+         *                              - TYPE_NEW_URL_FILE: Create new URL file action.
          * @return The created dialog.
          */
         private fun setFinalValuesAndShowDialog(
@@ -303,20 +303,20 @@ class MegaNodeDialogUtil {
          * - If so, confirms the action.
          * - If not, shows the error in question.
          *
-         * @param context           Current context.
+         * @param context            Current context.
          * @param node               A valid node if needed to confirm the action, null otherwise.
          * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
-         * @param snackbarShower interface to show snackbar.
+         * @param snackbarShower     Interface to show snackbar.
          * @param typeText           The input text field.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param errorText          The text field to show the error.
          * @param fromHome           True if the text file will be created from Homepage, false otherwise.
          * @param dialog             The AlertDialog to check.
          * @param dialogType         Indicates the type of dialog. It can be:
-         *                           - TYPE_RENAME:       Rename action.
-         *                            - TYPE_NEW_FOLDER:   Create new folder action.
-         *                           - TYPE_NEW_FILE:     Create new file action.
-         *                           - TYPE_NEW_URL_FILE: Create new URL file action.
+         *                              - TYPE_RENAME:       Rename action.
+         *                              - TYPE_NEW_FOLDER:   Create new folder action.
+         *                              - TYPE_NEW_FILE:     Create new file action.
+         *                              - TYPE_NEW_URL_FILE: Create new URL file action.
          */
         private fun checkActionDialogValue(
             context: Context,
@@ -347,11 +347,21 @@ class MegaNodeDialogUtil {
                         getString(R.string.invalid_characters_defined)
                     )
                 }
+                nameAlreadyExists(typedString, dialogType, node) -> {
+                    showDialogError(
+                        typeText,
+                        errorText,
+                        getString(
+                            if (dialogType == TYPE_RENAME) R.string.invalid_characters
+                            else R.string.invalid_characters_defined
+                        )
+                    )
+                }
                 else -> {
                     when (dialogType) {
                         TYPE_RENAME -> {
                             if (node != null && typedString != node.name) {
-                                if (Util.isOffline(context)) {
+                                if (isOffline(context)) {
                                     return
                                 }
 
@@ -526,6 +536,35 @@ class MegaNodeDialogUtil {
                     .setNegativeButton(getString(R.string.general_cancel), null)
                     .show()
             }
+        }
+
+        /**
+         *
+         * @param typedString Typed text.
+         * @param dialogType  Indicates the type of dialog. It can be:
+         *                      - TYPE_RENAME:       Rename action.
+         *                      - TYPE_NEW_FOLDER:   Create new folder action.
+         *                      - TYPE_NEW_FILE:     Create new file action.
+         *                      - TYPE_NEW_URL_FILE: Create new URL file action.
+         * @param node        Node to rename or parent where new file should be created.
+         */
+        @JvmStatic
+        fun nameAlreadyExists(typedString: String, dialogType: Int, node: MegaNode?): Boolean {
+            val megaApi = MegaApplication.getInstance().megaApi
+
+            val parent = when {
+                dialogType == TYPE_RENAME -> megaApi.getParentNode(node)
+                node == null -> megaApi.rootNode
+                else -> node
+            } ?: return false
+
+            val children = megaApi.getChildren(parent) ?: return false
+
+            for (child in children) {
+                if (child.name == typedString) return true
+            }
+
+            return false
         }
     }
 }
