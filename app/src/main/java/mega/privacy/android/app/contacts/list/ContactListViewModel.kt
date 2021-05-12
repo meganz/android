@@ -1,4 +1,4 @@
-package mega.privacy.android.app.contacts
+package mega.privacy.android.app.contacts.list
 
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
@@ -13,7 +13,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 
-class ContactsViewModel @ViewModelInject constructor(
+class ContactListViewModel @ViewModelInject constructor(
     private val getContactsUseCase: GetContactsUseCase
 ) : BaseRxViewModel() {
 
@@ -38,7 +38,7 @@ class ContactsViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-                    contacts.value = items.toList()
+                    contacts.value = items
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())

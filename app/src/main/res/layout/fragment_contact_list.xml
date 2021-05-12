@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="mega.privacy.android.app.contacts.ContactsActivity">
+
+    <Button
+        android:id="@+id/btn_requests"
+        style="@style/Widget.Mega.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingTop="12dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp"
+        android:text="Requests"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_groups"
+        style="@style/Widget.Mega.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingTop="12dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="12dp"
+        android:text="Groups"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_requests" />
+
+    <TextView
+        android:id="@+id/txt_contacts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:text="@string/section_contacts"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_groups"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_contacts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_contacts"
+        tools:listitem="@layout/item_contact" />
+
+    <TextView
+        android:id="@+id/view_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_zero_contacts"
+        android:drawablePadding="12dp"
+        android:gravity="center"
+        android:text="@string/context_empty_contacts"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.Mega.Body2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_add_white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

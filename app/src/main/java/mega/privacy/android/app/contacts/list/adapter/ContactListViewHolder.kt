@@ -1,4 +1,4 @@
-package mega.privacy.android.app.contacts.adapter
+package mega.privacy.android.app.contacts.list.adapter
 
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -7,7 +7,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactBinding
 
-class ContactsViewHolder(
+class ContactListViewHolder(
     private val binding: ItemContactBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 

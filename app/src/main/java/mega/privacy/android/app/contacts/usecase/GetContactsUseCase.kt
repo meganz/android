@@ -65,8 +65,7 @@ class GetContactsUseCase @Inject constructor(
                     statusColor = userStatus.getStatusColor(),
                     imageUri = userImageUri,
                     imageColor = userImageColor,
-                    isNew = Random.nextBoolean()
-//                    isNew = megaUser.wasRecentlyAdded()
+                    isNew = megaUser.wasRecentlyAdded()
                 )
             }.toMutableList()
 

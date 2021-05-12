@@ -1,4 +1,4 @@
-package mega.privacy.android.app.contacts.adapter
+package mega.privacy.android.app.contacts.list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,11 +8,11 @@ import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
-class ContactsAdapter constructor(
+class ContactListAdapter constructor(
     private val itemCallback: (Long) -> Unit,
     private val itemInfoCallback: (Long) -> Unit,
     private val enableHeaders: Boolean = true
-) : ListAdapter<ContactItem, ContactsViewHolder>(ContactItem.DiffCallback()) {
+) : ListAdapter<ContactItem, ContactListViewHolder>(ContactItem.DiffCallback()) {
 
     companion object {
         private const val VIEW_TYPE_ITEM_WITH_HEADER = 0
@@ -23,10 +23,10 @@ class ContactsAdapter constructor(
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemContactBinding.inflate(layoutInflater, parent, false)
-        return ContactsViewHolder(binding).apply {
+        return ContactListViewHolder(binding).apply {
             binding.txtHeader.isVisible = viewType == VIEW_TYPE_ITEM_WITH_HEADER
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
@@ -41,7 +41,7 @@ class ContactsAdapter constructor(
         }
     }
 
-    override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ContactListViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
