@@ -8,6 +8,7 @@ import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil
@@ -18,6 +19,7 @@ class GridViewPagerAdapter(
     private val fragment: Fragment?,
     private var maxWidth: Int,
     private var maxHeight: Int,
+    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
 ) : BaseBannerAdapter<List<Participant>>() {
     private var orientation = Configuration.ORIENTATION_PORTRAIT
 
@@ -46,7 +48,8 @@ class GridViewPagerAdapter(
                 maxWidth,
                 maxHeight,
                 position,
-                orientation
+                orientation,
+                listenerRenderer
             )
 
             adapter?.let {
@@ -88,8 +91,8 @@ class GridViewPagerAdapter(
     /**
      * Method to destroy the surfaceView.
      */
-    fun closeAllVideos(participant: Participant) {
-        adapter?.closeAllVideos(participant)
+    fun removeSurfaceView(participant: Participant) {
+        adapter?.removeSurfaceView(participant)
     }
 
     override fun getLayoutId(viewType: Int): Int {

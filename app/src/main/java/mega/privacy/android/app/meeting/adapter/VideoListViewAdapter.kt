@@ -1,16 +1,20 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
-    private val listView: RecyclerView
+    private val listView: RecyclerView,
+    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
@@ -22,6 +26,7 @@ class VideoListViewAdapter(
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(listHolder: VideoMeetingViewHolder, position: Int) {
+        logDebug("Bind view holder position $position")
         listHolder.bind(inMeetingViewModel, getItem(position), itemCount, true)
     }
 
@@ -32,7 +37,7 @@ class VideoListViewAdapter(
             0,
             0,
             1,
-            false
+            false, listenerRenderer
         )
     }
 
@@ -129,11 +134,9 @@ class VideoListViewAdapter(
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
-            if (typeChange == Constants.TYPE_VIDEO) {
-                it.checkVideOn(participant)
-            }
-            if (typeChange == Constants.TYPE_AUDIO) {
-                it.updateAudioIcon(participant)
+            when (typeChange) {
+                Constants.TYPE_VIDEO -> it.checkVideOn(participant)
+                Constants.TYPE_AUDIO -> it.updateAudioIcon(participant)
             }
             return
         }
@@ -182,16 +185,11 @@ class VideoListViewAdapter(
      *
      * @param participant   Participant
      */
-    fun closeAllVideos(participant: Participant) {
+    fun removeSurfaceView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let {
-            it.closeAllVideos(participant)
+        getHolder(position)?.let { holder ->
+            holder.removeSurfaceView(participant)
             return
-        }
-
-        val iterator = currentList.iterator()
-        iterator.forEach { participant ->
-            inMeetingViewModel.onCloseVideo(participant)
         }
     }
 }

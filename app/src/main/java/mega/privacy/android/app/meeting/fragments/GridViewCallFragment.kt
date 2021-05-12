@@ -12,13 +12,14 @@ import com.zhpan.indicator.enums.IndicatorStyle
 import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
 
-class GridViewCallFragment : MeetingBaseFragment() {
+class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener  {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -54,7 +55,8 @@ class GridViewCallFragment : MeetingBaseFragment() {
             (parentFragment as InMeetingFragment).inMeetingViewModel,
             parentFragment,
             maxWidth,
-            maxHeight
+            maxHeight,
+            this
         )
 
         viewDataBinding.gridViewPager
@@ -203,19 +205,43 @@ class GridViewCallFragment : MeetingBaseFragment() {
         adapterPager?.updateOrientation(newOrientation, widthPixels, heightPixels)
     }
 
+    override fun resetSize(peerId: Long, clientId: Long) {
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            peerId,
+            clientId
+        )?.let {
+            if (it.isVideoOn) {
+                it.videoListener?.let {
+                    it.height = 0
+                    it.width = 0
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        val iterator = participants.iterator()
+        iterator.forEach { participant ->
+            participant.videoListener?.let {
+                it.height = 0
+                it.width = 0
+            }
+        }
+        super.onResume()
+    }
+
     /**
      * Method to destroy the surfaceView.
      */
-    private fun closeAllVideos() {
+    private fun removeSurfaceView() {
         val iterator = participants.iterator()
         iterator.forEach {
-            adapterPager?.closeAllVideos(it)
+            adapterPager?.removeSurfaceView(it)
         }
     }
 
     override fun onDestroyView() {
-        logDebug("onDestroyView")
-        closeAllVideos()
+       removeSurfaceView()
         super.onDestroyView()
     }
 
@@ -251,6 +277,5 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         @JvmStatic
         fun newInstance() = GridViewCallFragment()
-
     }
 }

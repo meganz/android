@@ -1,8 +1,10 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
-import android.view.SurfaceHolder
+import android.view.TextureView
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRenderer
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -31,7 +33,8 @@ class VideoMeetingViewHolder(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val orientation: Int,
-    private val isTypeGridViewHolder: Boolean
+    private val isTypeGridViewHolder: Boolean,
+    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -40,8 +43,6 @@ class VideoMeetingViewHolder(
     lateinit var inMeetingViewModel: InMeetingViewModel
 
     private var isGrid: Boolean = true
-
-    lateinit var holder: SurfaceHolder
 
     private var SIZE_AVATAR = 88
     private var peerId: Long? = MEGACHAT_INVALID_HANDLE
@@ -65,6 +66,7 @@ class VideoMeetingViewHolder(
 
         this.peerId = participant.peerId
         this.clientId = participant.clientId
+
         when {
             isGrid -> {
                 SIZE_AVATAR = 88
@@ -91,7 +93,6 @@ class VideoMeetingViewHolder(
 
         initAvatar(participant)
         checkUI(participant)
-        holder = binding.video.holder
     }
 
     /**
@@ -114,8 +115,11 @@ class VideoMeetingViewHolder(
             dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
+        removeSurfaceView(participant)
+
         logDebug("Init avatar")
         binding.avatar.setImageBitmap(participant.avatar)
+        binding.avatar.isVisible = true
     }
 
     /**
@@ -140,7 +144,6 @@ class VideoMeetingViewHolder(
             updatePeerSelected(participant)
         }
     }
-
 
     /**
      * Show UI when video is on
@@ -179,25 +182,30 @@ class VideoMeetingViewHolder(
 
         closeVideo(participant)
 
-        if (participant.videoListener != null) {
-            logDebug("Video Listener is not null ")
-            participant.videoListener!!.height = 0
-            participant.videoListener!!.width = 0
-        } else {
-            logDebug("Video Listener  null ")
+        binding.parentSurfaceView.removeAllViews()
+        val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
+        myTexture.layoutParams = RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        myTexture.alpha = 1.0f
+        myTexture.rotation = 0f
 
-            val vListener = MeetingVideoListener(
-                binding.video,
-                MegaApplication.getInstance().applicationContext.displayMetrics,
-                participant.clientId,
-                false
-            )
+        val vListener = GroupVideoListener(
+            myTexture,
+            participant.peerId,
+            participant.clientId,
+            false
+        )
 
-            participant.videoListener = vListener
-            inMeetingViewModel.onActivateVideo(participant)
+        participant.videoListener = vListener
+
+        binding.parentSurfaceView.addView(participant.videoListener!!.surfaceTexture)
+
+        participant.videoListener!!.localRenderer?.let {
+            it.addListener(listenerRenderer)
         }
 
-        binding.video.isVisible = true
+        inMeetingViewModel.onActivateVideo(participant)
+
+        binding.parentSurfaceView.isVisible = true
     }
 
     /**
@@ -234,8 +242,51 @@ class VideoMeetingViewHolder(
     private fun closeVideo(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        binding.video.isVisible = false
+        binding.parentSurfaceView.isVisible = false
         inMeetingViewModel.onCloseVideo(participant)
+
+        participant.videoListener?.let { listener ->
+            listener.localRenderer?.let {
+                it.addListener(null)
+            }
+
+            if (binding.parentSurfaceView.childCount > 0) {
+                binding.parentSurfaceView.removeAllViews()
+            }
+
+            listener.surfaceTexture?.let { surfaceview ->
+                surfaceview.parent?.let { surfaceParent ->
+                    surfaceParent.parent?.let { surfaceParentParent ->
+                        (surfaceParent as ViewGroup).removeView(surfaceview)
+                    }
+                }
+            }
+
+            participant.videoListener = null
+        }
+    }
+
+    fun removeSurfaceView(participant: Participant) {
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        inMeetingViewModel.onCloseVideo(participant)
+        if (binding.parentSurfaceView.childCount > 0) {
+            binding.parentSurfaceView.removeAllViews()
+            binding.parentSurfaceView.removeAllViewsInLayout()
+        }
+
+        participant.videoListener?.let { listener ->
+            listener.surfaceTexture?.let { surfaceview ->
+                surfaceview.parent?.let { surfaceParent ->
+                    surfaceParent.parent?.let { surfaceParentParent ->
+                        (surfaceParent as ViewGroup).removeView(surfaceview)
+                    }
+                }
+                surfaceview.isVisible = false
+            }
+
+            participant.videoListener = null
+        }
     }
 
     /**
@@ -250,7 +301,7 @@ class VideoMeetingViewHolder(
         val isSessionOnHold = inMeetingViewModel.isSessionOnHold(participant.clientId)
         when {
             isSessionOnHold -> {
-                logDebug("Show on hold icon participant Name = " + participant.name)
+                logDebug("Show on hold icon participant")
                 binding.onHoldIcon.isVisible = true
                 binding.avatar.alpha = 0.5f
             }
@@ -322,7 +373,7 @@ class VideoMeetingViewHolder(
     fun updatePrivilegeIcon(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        logDebug("Update privilege icon")
+        logDebug("Update privilege icon participant")
         binding.moderatorIcon.isVisible = participant.isModerator
     }
 
@@ -348,12 +399,6 @@ class VideoMeetingViewHolder(
 
         logDebug("Update name")
         binding.avatar.setImageBitmap(participant.avatar)
-    }
-
-    fun closeAllVideos(participant: Participant){
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
-
-        binding.video.isVisible = false
     }
 
     /**

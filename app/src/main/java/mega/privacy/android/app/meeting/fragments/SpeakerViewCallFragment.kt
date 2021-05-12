@@ -3,8 +3,10 @@ package mega.privacy.android.app.meeting.fragments
 import android.os.Bundle
 import android.util.Pair
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,18 +15,18 @@ import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
-import org.jetbrains.anko.displayMetrics
 
-class SpeakerViewCallFragment : MeetingBaseFragment() {
+class SpeakerViewCallFragment : MeetingBaseFragment(),
+    MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
     lateinit var adapter: VideoListViewAdapter
     private var participants: MutableList<Participant> = mutableListOf()
@@ -64,7 +66,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             }
         }
 
-
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
         if (isFirsTime) {
@@ -96,7 +97,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         participants_horizontal_list.adapter = null
         adapter = VideoListViewAdapter(
             (parentFragment as InMeetingFragment).inMeetingViewModel,
-            participants_horizontal_list
+            participants_horizontal_list,
+            this
         )
 
         adapter.submitList(null)
@@ -227,7 +229,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param participant
      */
     private fun updateSpeakerUser(participant: Participant) {
-        speakerUser?.let {currentSpeaker ->
+        speakerUser?.let { currentSpeaker ->
             if (participant.peerId != currentSpeaker.peerId || participant.clientId != currentSpeaker.clientId) return
 
             logDebug("Update participant selected")
@@ -303,7 +305,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         speakerUser?.let {
             if (participant.peerId != it.peerId || participant.clientId != it.clientId) return
 
-            speaker_video.isVisible = false
+            parent_surface_view.isVisible = false
             when {
                 it.isMe -> {
                     closeLocalVideo(it)
@@ -314,6 +316,22 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                     )
                 }
             }
+
+            participant.videoListener?.let { listener ->
+                if (parent_surface_view.childCount > 0) {
+                    parent_surface_view.removeAllViews()
+                }
+
+                listener.surfaceTexture?.let { surfaceview ->
+                    surfaceview.parent?.let { surfaceParent ->
+                        surfaceParent.parent?.let { surfaceParentParent ->
+                            (surfaceParent as ViewGroup).removeView(surfaceview)
+                        }
+                    }
+                }
+            }
+
+            it.videoListener = null
         }
     }
 
@@ -327,7 +345,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             if (participant.peerId != it.peerId || participant.clientId != it.clientId || it.videoListener == null) return
 
             logDebug("Remove local video listener")
-            sharedModel.removeLocalVideo(
+            (parentFragment as InMeetingFragment).inMeetingViewModel.removeLocalVideoSpeaker(
                 (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
                 it.videoListener
             )
@@ -453,33 +471,39 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
             if (participant.peerId != currentSpeaker.peerId || participant.clientId != currentSpeaker.clientId) return
 
             closeVideo(participant)
-            if (currentSpeaker.videoListener != null) {
-                logDebug("Video listener is not null participant")
-                currentSpeaker.videoListener!!.height = 0
-                currentSpeaker.videoListener!!.width = 0
-            } else {
-                logDebug("Video listener is null")
-                val vListener = MeetingVideoListener(
-                    speaker_video,
-                    MegaApplication.getInstance().applicationContext.displayMetrics,
-                    currentSpeaker.clientId,
-                    false
-                )
 
-                currentSpeaker.videoListener = vListener
-                if (currentSpeaker.isMe) {
-                    sharedModel.addLocalVideo(
-                        (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
-                        vListener
-                    )
-                } else {
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
-                        currentSpeaker
-                    )
-                }
+            parent_surface_view.removeAllViews()
+
+            val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
+            myTexture.layoutParams = RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            myTexture.alpha = 1.0f
+            myTexture.rotation = 0f
+
+            val vListener = GroupVideoListener(
+                myTexture,
+                participant.peerId,
+                participant.clientId,
+                currentSpeaker.isMe
+            )
+
+            currentSpeaker.videoListener = vListener
+            parent_surface_view.addView(participant.videoListener!!.surfaceTexture)
+
+            if (currentSpeaker.isMe) {
+                (parentFragment as InMeetingFragment).inMeetingViewModel.addLocalVideoSpeaker(
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
+                    vListener
+                )
+            } else {
+                (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
+                    currentSpeaker
+                )
             }
 
-            speaker_video.isVisible = true
+            parent_surface_view.isVisible = true
         }
     }
 
@@ -491,11 +515,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
      * @param participantList
      */
     fun peerAddedOrRemoved(
-        isAdded:Boolean,
+        isAdded: Boolean,
         position: Int,
-        participantList: MutableList<Participant>){
+        participantList: MutableList<Participant>
+    ) {
         adapter.submitList(participantList)
-        if(isAdded){
+        if (isAdded) {
             when (position) {
                 0 -> {
                     logDebug("Participant added - notify data set changed")
@@ -506,13 +531,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
                     adapter.notifyItemInserted(position)
                 }
             }
-        }else{
+        } else {
             //Participant in list
-//            for (i in position until participants.size) {
-//                (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(participants[i])
-//            }
-
-            logDebug("Participant Removed - notify item removed")
+            logDebug("Participant Removed - notify item removed in $position")
             adapter.notifyItemRemoved(position)
             adapter.notifyItemRangeChanged(position, participants.size)
         }
@@ -714,42 +735,102 @@ class SpeakerViewCallFragment : MeetingBaseFragment() {
         fun newInstance() = SpeakerViewCallFragment()
     }
 
+    override fun onResume() {
+        speakerUser?.let {
+            if (it.isVideoOn) {
+                it.videoListener?.let {
+                    it.height = 0
+                    it.width = 0
+                }
+            }
+        }
+        val iterator = participants.iterator()
+        iterator.forEach { participant ->
+            if (participant.isVideoOn) {
+                participant.videoListener?.let {
+                    it.height = 0
+                    it.width = 0
+                }
+            }
+
+        }
+        super.onResume()
+    }
+
+    override fun resetSize(peerId: Long, clientId: Long) {
+        //Speaker
+        speakerUser?.let { currentSpeaker ->
+            if (currentSpeaker.peerId == peerId && currentSpeaker.clientId == clientId) {
+                if (currentSpeaker.isVideoOn) {
+                    currentSpeaker.videoListener?.let { listener ->
+                        listener.height = 0
+                        listener.width = 0
+                    }
+                }
+            }
+        }
+
+        //Participant in list
+        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+            peerId,
+            clientId
+        )?.let {
+            if (it.isVideoOn) {
+                it.videoListener?.let {
+                    it.height = 0
+                    it.width = 0
+                }
+            }
+        }
+    }
+
     /**
      * Method to destroy the surfaceView.
      */
-    private fun closeAllVideos() {
+    private fun removeSurfaceView() {
         speakerUser?.let {
-            speaker_video?.let { surfaceView ->
-                surfaceView.isVisible = false
+            (parentFragment as InMeetingFragment).inMeetingViewModel.removeSelected(
+                it.peerId,
+                it.clientId
+            )
+
+            if (it.isMe) {
+                logDebug("Close local video")
+                closeLocalVideo(it)
+            } else {
+                logDebug("Close remote video")
+                (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
+                    it
+                )
             }
 
-            when {
-                it.isMe -> {
-                    logDebug("Close local video")
-                    closeLocalVideo(it)
+            if (parent_surface_view.childCount > 0) {
+                parent_surface_view.removeAllViews()
+                parent_surface_view.removeAllViewsInLayout()
+            }
+
+            it.videoListener?.let { listener ->
+                listener.surfaceTexture?.let { surfaceview ->
+                    surfaceview.parent?.let { surfaceParent ->
+                        surfaceParent.parent?.let { surfaceParentParent ->
+                            (surfaceParent as ViewGroup).removeView(surfaceview)
+                        }
+                    }
+                    surfaceview.isVisible = false
                 }
-                else -> {
-                    logDebug("Close remote video")
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
-                        it
-                    )
-                }
+
+                it.videoListener = null
             }
         }
 
         val iterator = participants.iterator()
         iterator.forEach {
-            adapter.closeAllVideos(it)
+            adapter.removeSurfaceView(it)
         }
     }
 
     override fun onDestroyView() {
-        logDebug("onDestroyView")
-        speakerUser?.let {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.removeSelected(it.peerId, it.clientId)
-        }
-
-        closeAllVideos()
+        removeSurfaceView()
         super.onDestroyView()
     }
 

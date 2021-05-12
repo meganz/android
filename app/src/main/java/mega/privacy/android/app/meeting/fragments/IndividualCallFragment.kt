@@ -330,7 +330,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             sharedModel.removeLocalVideo(chatId!!, videoListener!!)
         } else {
             inMeetingViewModel.getSession(clientId)?.let {
-                inMeetingViewModel.removeHiRes(videoListener!!, it, chatId!!)
+                inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId!!)
             }
         }
 
@@ -427,11 +427,17 @@ class IndividualCallFragment : MeetingBaseFragment() {
         } else {
             logDebug("Video Listener is null ")
             if (inMeetingViewModel.isMe(peerId)) {
+                var isOneToOneChat = true
+                if (isFloatingWindow && !inMeetingViewModel.isOneToOneCall()) {
+                    isOneToOneChat = false
+                }
+
                 videoListener = MeetingVideoListener(
                     vVideo,
                     outMetrics,
                     MEGACHAT_INVALID_HANDLE,
-                    isFloatingWindow
+                    isFloatingWindow,
+                    isOneToOneChat
                 )
 
                 sharedModel.addLocalVideo(chatId!!, videoListener)
@@ -440,11 +446,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     vVideo,
                     outMetrics,
                     clientId,
-                    false
+                    false,
+                    true
                 )
 
                 inMeetingViewModel.getSession(clientId)?.let {
-                    inMeetingViewModel.addHiRes(videoListener!!, it, chatId!!)
+                    inMeetingViewModel.addHiResOneToOneCall(videoListener!!, it, chatId!!)
                 }
             }
         }

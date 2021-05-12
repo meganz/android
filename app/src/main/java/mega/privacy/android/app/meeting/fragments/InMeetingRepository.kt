@@ -8,9 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -295,9 +293,26 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chatId
      * @param clientId client ID
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener GroupVideoListener
      */
     fun addRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: GroupVideoListener
+    ) {
+        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of obtaining the remote video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun addRemoteVideoOneToOneCall(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
@@ -312,9 +327,26 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chatId
      * @param clientId client ID
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener GroupVideoListener
      */
     fun removeRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: GroupVideoListener
+    ) {
+        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of remove the remote video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun removeRemoteVideoOneToOneCall(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
@@ -351,6 +383,26 @@ class InMeetingRepository @Inject constructor(
     ) {
         megaChatApi.stopLowResVideo(chatId, clientId, listener)
 
+    }
+
+    /**
+     * Method of obtaining the local video
+     *
+     * @param chatId chatId
+     * @param listener GroupVideoListener
+     */
+    fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
+        megaChatApi.addChatLocalVideoListener(chatId, listener)
+    }
+
+    /**
+     * Method of remove the local video
+     *
+     * @param chatId chatId
+     * @param listener GroupVideoListener
+     */
+    fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
+        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
     }
 
     /**

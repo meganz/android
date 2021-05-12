@@ -19,7 +19,8 @@ class MeetingVideoListener(
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
     clientId: Long,
-    isFloatingWindow: Boolean = true
+    isFloatingWindow: Boolean = true,
+    isOneToOneCall:Boolean = true
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
@@ -85,11 +86,15 @@ class MeetingVideoListener(
         isLocal = clientId == MEGACHAT_INVALID_HANDLE
 
         if (isFloatingWindow && isLocal) {
-            this.surfaceView.setZOrderMediaOverlay(true);
+            this.surfaceView.setZOrderMediaOverlay(true)
         } else if (!isFloatingWindow) {
             if (!isLocal) {
-                this.surfaceView.setZOrderOnTop(false);
+                this.surfaceView.setZOrderOnTop(false)
             }
+        }
+
+        if(!isOneToOneCall){
+            this.surfaceView.setZOrderOnTop(true)
         }
 
         surfaceHolder = surfaceView.holder
@@ -99,9 +104,5 @@ class MeetingVideoListener(
             isFloatingWindow,
             outMetrics
         )
-    }
-
-    fun getLocalRenderer(): MegaSurfaceRenderer? {
-        return renderer
     }
 }

@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRenderer
+import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
 import mega.privacy.android.app.utils.Constants.TYPE_VIDEO
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class VideoGridViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -17,13 +17,15 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val pagePosition: Int,
-    private val orientation: Int
+    private val orientation: Int,
+    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()){
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(gridHolder: VideoMeetingViewHolder, position: Int) {
+        logDebug("Bind view holder position $position")
         gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 
@@ -34,7 +36,8 @@ class VideoGridViewAdapter(
             screenWidth,
             screenHeight,
             orientation,
-            true
+            true,
+            listenerRenderer
         )
     }
 
@@ -168,16 +171,11 @@ class VideoGridViewAdapter(
      *
      * @param participant
      */
-    fun closeAllVideos(participant: Participant) {
+    fun removeSurfaceView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let {
-            it.closeAllVideos(participant)
+        getHolder(position)?.let { holder ->
+            holder.removeSurfaceView(participant)
             return
-        }
-
-        val iterator = currentList.iterator()
-        iterator.forEach { participant ->
-            inMeetingViewModel.onCloseVideo(participant)
         }
     }
 }

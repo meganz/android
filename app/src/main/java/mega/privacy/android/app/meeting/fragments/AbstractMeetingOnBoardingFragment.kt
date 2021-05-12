@@ -304,7 +304,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 localSurfaceView,
                 outMetrics,
                 MEGACHAT_INVALID_HANDLE,
-                false
+                false,
+                true
             )
 
             sharedModel.addLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)

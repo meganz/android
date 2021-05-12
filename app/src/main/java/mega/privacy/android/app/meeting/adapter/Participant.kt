@@ -1,8 +1,7 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.Bitmap
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import java.io.File
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import java.io.Serializable
 
 data class Participant(
@@ -17,5 +16,5 @@ data class Participant(
     var isContact: Boolean = true,
     var isSelected: Boolean = false,
     var hasHiRes: Boolean = false,
-    var videoListener: MeetingVideoListener? = null
+    var videoListener: GroupVideoListener? = null
 ) : Serializable

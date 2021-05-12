@@ -6,10 +6,19 @@
     android:layout_height="match_parent"
     android:background="@color/grey_alpha_038">
 
-    <SurfaceView
-        android:id="@+id/video"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <!--Surface view-->
+    <RelativeLayout
+        android:id="@+id/parent_surface_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/last_frame"

@@ -24,6 +24,7 @@ import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
@@ -916,6 +917,10 @@ class InMeetingViewModel @ViewModelInject constructor(
                 if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > 4) {
                     logDebug("Speaker View or Grid view with more than 4 participants -> high resolution")
                     if (it.hasHiRes) {
+                        if(it.isVideoOn){
+                            onCloseVideo(it)
+                            it.videoListener = null
+                        }
                         it.hasHiRes = false
                         if (it.isVideoOn) {
                             listWithChanges.add(it)
@@ -924,6 +929,10 @@ class InMeetingViewModel @ViewModelInject constructor(
                 } else {
                     logDebug("Grid View with less than 5 participants -> low resolution")
                     if (!it.hasHiRes) {
+                        if(it.isVideoOn){
+                            onCloseVideo(it)
+                            it.videoListener = null
+                        }
                         it.hasHiRes = true
                         if (it.isVideoOn) {
                             listWithChanges.add(it)
@@ -955,7 +964,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                         }
 
                         val position = participants.value?.indexOf(it)
-                        onCloseVideo(it)
                         participant.remove()
                         participants.value = participants.value
                         logDebug("Num of participants:" + participants.value?.size)
@@ -1004,6 +1012,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         logDebug("Assign me as speaker")
         _speakerParticipant.value?.let { currentSpeaker ->
             onCloseVideo(currentSpeaker)
+            currentSpeaker.videoListener = null
         }
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
@@ -1188,10 +1197,86 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Method of obtaining the video
+     *
+     * @param chatId chatId
+     * @param listener GroupVideoListener
+     */
+    fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener?) {
+        if (listener == null)
+            return
+
+        logDebug("Adding local video")
+        inMeetingRepository.addLocalVideoSpeaker(chatId, listener)
+    }
+
+    /**
+     * Method of remove the local video
+     *
+     * @param chatId chatId
+     * @param listener GroupVideoListener
+     */
+    fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener?) {
+        if (listener == null)
+            return
+
+        logDebug("Removing local video")
+        inMeetingRepository.removeLocalVideoSpeaker(chatId, listener)
+    }
+
+    /**
      * Add High Resolution
      *
      */
-    fun addHiRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    fun addHiResOneToOneCall(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        session?.let { sessionParticipant ->
+            logDebug("Adding HiRes video")
+            inMeetingRepository.addRemoteVideoOneToOneCall(
+                chatId,
+                sessionParticipant.clientid,
+                true,
+                listener
+            )
+
+            if (!sessionParticipant.canRecvVideoHiRes()) {
+                inMeetingRepository.requestHiResVideo(
+                    chatId,
+                    sessionParticipant.clientid,
+                    RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
+                )
+            }
+        }
+    }
+
+    /**
+     * Remove High Resolution
+     */
+    fun removeHiResOneToOneCall(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+        session?.let { sessionParticipant ->
+            logDebug("Removing HiRes video")
+
+            if (sessionParticipant.canRecvVideoHiRes()) {
+                inMeetingRepository.stopHiResVideo(
+                    chatId,
+                    sessionParticipant.clientid,
+                    RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
+                )
+            }
+
+            inMeetingRepository.removeRemoteVideoOneToOneCall(
+                chatId,
+                sessionParticipant.clientid,
+                true,
+                listener
+            )
+        }
+    }
+
+    /**
+     * Add High Resolution
+     *
+     */
+    fun addHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
             logDebug("Adding HiRes video")
             inMeetingRepository.addRemoteVideo(
@@ -1214,7 +1299,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove High Resolution
      */
-    fun removeHiRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
             logDebug("Removing HiRes video")
 
@@ -1238,7 +1323,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Add Low Resolution
      */
-    private fun addLowRes(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun addLowRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
             logDebug("Adding LowRes video")
             inMeetingRepository.addRemoteVideo(
@@ -1264,7 +1349,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Remove Low Resolution
      */
     private fun removeLowRes(
-        listener: MeetingVideoListener,
+        listener: GroupVideoListener,
         session: MegaChatSession?,
         chatId: Long
     ) {
@@ -1295,8 +1380,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param participant
      */
     fun onCloseVideo(participant: Participant) {
-        if (participant.videoListener == null)
-            return
+        if (participant.videoListener == null) return
 
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
@@ -1318,8 +1402,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                 }
             }
         }
-
-        participant.videoListener = null
     }
 
     /**
@@ -1332,12 +1414,14 @@ class InMeetingViewModel @ViewModelInject constructor(
             getSession(participant.clientId)?.let {
                 if(participant.videoListener != null){
                     if (participant.hasHiRes) {
+                        logDebug("Add high resolution ")
                         addHiRes(
                             participant.videoListener!!,
                             it,
                             chat.chatId
                         )
                     } else {
+                        logDebug("Add low resolution ")
                         addLowRes(
                             participant.videoListener!!,
                             it,
