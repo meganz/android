@@ -2618,8 +2618,8 @@
     <string name="title_2fa_enabled">Двухфакторная аутентификация включена.</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">При следующем входе в аккаунт система запросит 6-значный код из приложения-аутентификатора.</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;Сохраните ключ восстановления&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Недействительный код</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2627,11 +2627,11 @@
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Проверка входа</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
-    <string name="verify_2fa_subtitle_change_password">Change password</string>
+    <string name="verify_2fa_subtitle_change_password">Изменить пароль</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
-    <string name="verify_2fa_subtitle_change_email">Change email</string>
+    <string name="verify_2fa_subtitle_change_email">Смена эл. почты</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
-    <string name="verify_2fa_subtitle_delete_account">Delete account</string>
+    <string name="verify_2fa_subtitle_delete_account">Удалить уч. запись</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2653,7 +2653,7 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Экспортируйте ключ восстановления, чтобы завершить</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Приложение-аутентификатор</string>
+    <string name="no_authentication_apps_title">Приложение для двухфакторной аутентификации</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Открыть Google Play для установки приложения-аутентификатора?</string>
     <!-- Label Play Store -->
@@ -4095,5 +4095,5 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Не удалось обновить файл. Попробуйте ещё раз.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can\’t be opened or previewed.</string>
+    <string name="error_opening_file">Файл слишком большой, его нельзя открыть или просмотреть.</string>
 </resources>
