@@ -3922,4 +3922,8 @@
     <string name="file_update_failed">File update failed. Try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">There is already a file with the same name</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">There is already an item with the same name</string>
 </resources>

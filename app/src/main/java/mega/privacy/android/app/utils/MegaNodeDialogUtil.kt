@@ -352,8 +352,8 @@ class MegaNodeDialogUtil {
                         typeText,
                         errorText,
                         getString(
-                            if (dialogType == TYPE_RENAME) R.string.invalid_characters
-                            else R.string.invalid_characters_defined
+                            if (dialogType == TYPE_RENAME || dialogType == TYPE_NEW_FOLDER) R.string.same_item_name_warning
+                            else R.string.same_file_name_warning
                         )
                     )
                 }
