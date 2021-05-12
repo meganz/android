@@ -112,6 +112,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun isViewMode(): Boolean = mode.value == VIEW_MODE
 
+    private fun isEditMode(): Boolean = mode.value == EDIT_MODE
+
     fun isCreateMode(): Boolean = mode.value == CREATE_MODE
 
     private fun setViewMode() {
@@ -249,7 +251,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
 
-        if (isViewMode()) {
+        if (isViewMode() || isEditMode()) {
             needsReadContent = true
             initializeReadParams(mi)
         }
@@ -352,7 +354,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             isReadingContent = false
             //Remove latest line break since it's not part of the file content
             sb.deleteRange(sb.length - 2, sb.length)
-            val length = sb.length
             contentText.postValue(sb.toString())
             editedText.postValue(sb.toString())
             sb.clear()
