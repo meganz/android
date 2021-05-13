@@ -647,10 +647,12 @@
 
         <activity
             android:name=".activities.upgradeAccount.UpgradeAccountActivity"
+            android:label="@string/action_upgrade_account"
             android:launchMode="singleTop" />
 
         <activity
             android:name=".activities.upgradeAccount.ChooseAccountActivity"
+            android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
 
     </application>

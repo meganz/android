@@ -146,14 +146,12 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
 
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
-        binding.toolbar.apply {
-            setBackgroundColor(
-                if (darkAndElevation) getColorForElevation(
-                    requireContext(),
-                    elevation
-                ) else background
-            )
-        }
+        binding.toolbar.setBackgroundColor(
+            if (darkAndElevation) getColorForElevation(
+                requireContext(),
+                elevation
+            ) else background
+        )
 
         (activity as AppCompatActivity).supportActionBar?.elevation =
             if (withElevation && !isDark) elevation else 0F
