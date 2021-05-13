@@ -297,7 +297,7 @@
     <string name="received_requests_empty">[B]No [/B][A]received requests[/A]</string>
     <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Transfers</string>
-    <!-- Section name for the &ldquo;My Account&rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">My Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Camera Uploads</string>
@@ -307,7 +307,7 @@
     <string name="tab_outgoing_shares">Outgoing</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Links</string>
-    <!-- Label for any &lsquo;Incoming shares&rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Incoming Shares</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Incoming shares with</string>
@@ -534,7 +534,7 @@
     <!-- success message when moving a node -->
     <string name="number_correctly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish"> and %d items were not sent successfully</string>
+    <string name="number_incorrectly_moved_to_rubbish">&#160;and %d items were not sent successfully</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
@@ -968,9 +968,9 @@
     <!-- title of the My Account screen -->
     <string name="my_account_title">Account Type</string>
     <!-- title of the Expiration Date -->
-    <string name="renews_on">Renews on </string>
+    <string name="renews_on">Renews on&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on </string>
+    <string name="expires_on">Expires on&#160;</string>
     <!--  -->
     <string name="free_account">Free</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -3365,8 +3365,8 @@
     <string name="invite_contact_action_button">Invite a friend via&#8230;</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">%d file already downloaded. </item>
-        <item quantity="other">%d files already downloaded. </item>
+        <item quantity="one">%d file already downloaded.&#160;</item>
+        <item quantity="other">%d files already downloaded.&#160;</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <plurals name="file_pending_download">
@@ -3933,7 +3933,7 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Add your phone number</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA can\’t reset your password if you forget it.</string>
+    <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
     <!-- Action to change name -->
     <string name="change_name_action">Change name</string>
     <!-- Action to add photo -->
