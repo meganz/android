@@ -44,6 +44,7 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
@@ -303,7 +304,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_2FA:
                 if (((ManagerActivityLollipop) context).is2FAEnabled()) {
                     twoFASwitch.setChecked(true);
-                    ((ManagerActivityLollipop) context).showVerifyPin2FA(DISABLE_2FA);
+                    Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
+                    intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, DISABLE_2FA);
+
+                    context.startActivity(intent);
                 } else {
                     twoFASwitch.setChecked(false);
                     Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
@@ -497,6 +501,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         if (megaApi != null) {
             if (megaApi.multiFactorAuthAvailable()) {
+                twoFASwitch.setEnabled(false);
                 twoFASwitch.setVisible(true);
                 megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
             } else {
@@ -594,6 +599,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             }
         });
 
+    }
+
+    /**
+     * Re-enable 'twoFASwitch' after 'multiFactorAuthCheck' finished.
+     */
+    public void reEnable2faSwitch() {
+        twoFASwitch.setEnabled(true);
     }
 
     public void hidePreferencesChat() {

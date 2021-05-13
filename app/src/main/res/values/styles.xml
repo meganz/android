@@ -175,6 +175,18 @@
         <item name="android:minHeight">0dp</item>
     </style>
 
+    <!--- SnackBar -->
+    <style name="Widget.Mega.SnackBar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="actionTextColorAlpha">1</item>
+        <item name="backgroundTintMode">add</item>
+        <item name="backgroundTint">@color/grey_alpha_087_white</item>
+        <item name="textColor">@color/white_alpha_087_grey_alpha_087</item>
+    </style>
+
+    <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/teal_200_teal_300</item>
+    </style>
+
     <!--- SeekBar white, chat room own voice clip -->
     <style name="Widget.Mega.SeekBar.White" parent="Widget.AppCompat.SeekBar">
         <item name="android:progressBackgroundTint">@color/white_alpha_038</item>
@@ -543,4 +555,10 @@
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
+
+    <style name="BottomSheetOption.Red">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
+        <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
 </resources>

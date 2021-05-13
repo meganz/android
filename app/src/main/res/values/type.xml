@@ -175,7 +175,7 @@
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.DateDisabled">
-        <item name="android:textColor">@color/grey_012_white_012</item>
+        <item name="android:textColor">@color/grey_012_white_038</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.DateEnabled">
