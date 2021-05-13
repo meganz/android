@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaChatListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface

@@ -1,13 +1,14 @@
 package mega.privacy.android.app.contacts.usecase
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
-import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -17,6 +18,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import java.io.File
 import java.util.*
@@ -32,36 +34,35 @@ class GetContactRequestsUseCase @Inject constructor(
         private const val NOT_FOUND = -1
     }
 
-    fun getIncomingRequests(): Flowable<List<ContactItem>> =
-        getContactRequest(true)
-
-    fun getOutgoingRequests(): Flowable<List<ContactItem>> =
-        getContactRequest(false)
-
-    private fun getContactRequest(isIncoming: Boolean): Flowable<List<ContactItem>> =
-        Flowable.create({ emitter: FlowableEmitter<List<ContactItem>> ->
-            val contactRequests = if (isIncoming) {
-                megaApi.incomingContactRequests
-            } else {
-                megaApi.outgoingContactRequests
+    fun get(): Flowable<List<ContactRequestItem>> =
+        Flowable.create({ emitter: FlowableEmitter<List<ContactRequestItem>> ->
+            val contactRequests = arrayListOf<MegaContactRequest>().apply {
+                addAll(megaApi.incomingContactRequests)
+                addAll(megaApi.outgoingContactRequests)
             }
 
             val contacts = contactRequests.sortedBy { it.modificationTime }.map { request ->
-                val userName = megaChatApi.getUserFirstnameFromCache(request.handle)
+                var userImageUri: Uri? = null
+                var userName: String? = null
+
+                val userEmail = if (request.isOutgoing) request.targetEmail else request.sourceEmail
                 val userImageColor = megaApi.getUserAvatarColor(request.handle.toString()).toColorInt()
-                val userImageFile = getUserImageFile(context, request.sourceEmail)
-                val userImageUri = if (userImageFile.exists()) {
-                    userImageFile.toUri()
-                } else {
-                    null
+                val userImageFile = getUserImageFile(context, userEmail)
+                if (userImageFile.exists()) {
+                    userImageUri = userImageFile.toUri()
                 }
 
-                ContactItem(
+                if (!request.isOutgoing) {
+                    userName = megaChatApi.getUserFirstnameFromCache(request.handle)
+                }
+
+                ContactRequestItem(
                     handle = request.handle,
-                    email = request.sourceEmail,
+                    email = userEmail,
                     name = userName,
                     imageUri = userImageUri,
-                    imageColor = userImageColor
+                    imageColor = userImageColor,
+                    isOutgoing = request.isOutgoing
                 )
             }.toMutableList()
 
@@ -98,10 +99,10 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             )
 
-            contacts.forEach { contact ->
-                val userImageFile = getUserImageFile(context, contact.email).absolutePath
-                megaApi.getUserAvatar(contact.email, userImageFile, userAttrsListener)
-                megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+            contacts.forEach { request ->
+                val userImageFile = getUserImageFile(context, request.email!!).absolutePath
+                megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
+                megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
             }
         }, BackpressureStrategy.BUFFER)
 }

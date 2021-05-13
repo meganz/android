@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 

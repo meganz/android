@@ -96,6 +96,9 @@
 
         <item name="checkedTextViewStyle">@style/Widget.Mega.CheckedTextView</item>
 
+        <!-- Tabs -->
+        <item name="tabStyle">@style/Widget.Mega.TabLayout</item>
+
         <!-- SnackBar -->
         <item name="snackbarStyle">@style/Widget.Mega.SnackBar</item>
         <item name="snackbarButtonStyle">@style/Widget.Mega.SnackbarButton</item>

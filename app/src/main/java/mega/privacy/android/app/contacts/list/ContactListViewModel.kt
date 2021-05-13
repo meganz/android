@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 
 class ContactListViewModel @ViewModelInject constructor(

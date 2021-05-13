@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
+import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -27,10 +27,10 @@ class ContactListFragment : Fragment() {
     private lateinit var binding: FragmentContactListBinding
 
     private val viewModel by viewModels<ContactListViewModel>()
-    private val recentlyAddedAdapter: ContactListAdapter by lazy {
+    private val recentlyAddedAdapter by lazy {
         ContactListAdapter(::onContactClick, ::onContactMoreInfoClick, false)
     }
-    private val contactsAdapter: ContactListAdapter by lazy {
+    private val contactsAdapter by lazy {
         ContactListAdapter(::onContactClick, ::onContactMoreInfoClick, true)
     }
 

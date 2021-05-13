@@ -1,31 +1,28 @@
-package mega.privacy.android.app.contacts.data
+package mega.privacy.android.app.contacts.requests.data
 
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.view.TextDrawable
 
-data class ContactItem constructor(
+data class ContactRequestItem constructor(
     val handle: Long,
-    val email: String,
+    val email: String? = null,
     val name: String? = null,
-    val status: Int? = null,
-    @ColorRes val statusColor: Int? = null,
     var imageUri: Uri? = null,
     @ColorInt val imageColor: Int? = null,
-    val lastSeen: String? = null,
-    val isNew: Boolean = false
+    val createdTime: String? = null,
+    val isOutgoing: Boolean = true
 ) {
 
     fun getFirstCharacter(): String? =
-        name?.firstOrNull()?.toString()
+        name?.firstOrNull()?.toString() ?: email?.firstOrNull()?.toString()
 
     fun getPlaceholderDrawable(resources: Resources): Drawable? =
-        if (imageColor != null && !name.isNullOrBlank()) {
+        if (imageColor != null && getFirstCharacter() != null) {
             TextDrawable.builder()
                 .beginConfig()
                 .fontSize(resources.getDimensionPixelSize(R.dimen.placeholder_contact_text_size))
@@ -37,12 +34,12 @@ data class ContactItem constructor(
             null
         }
 
-    class DiffCallback : DiffUtil.ItemCallback<ContactItem>() {
+    class DiffCallback : DiffUtil.ItemCallback<ContactRequestItem>() {
 
-        override fun areItemsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean =
+        override fun areItemsTheSame(oldItem: ContactRequestItem, newItem: ContactRequestItem): Boolean =
             oldItem.handle == newItem.handle
 
-        override fun areContentsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean =
+        override fun areContentsTheSame(oldItem: ContactRequestItem, newItem: ContactRequestItem): Boolean =
             oldItem == newItem
     }
 }
