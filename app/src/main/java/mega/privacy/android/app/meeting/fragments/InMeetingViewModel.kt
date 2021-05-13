@@ -1545,10 +1545,63 @@ class InMeetingViewModel @ViewModelInject constructor(
         )
     )
 
+    /**
+     * Get my own information
+     *
+     * @param audio local audio
+     * @param video local video
+     * @return
+     */
     fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
         inMeetingRepository.getMyInfo(
             getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
             audio,
             video
         )
+
+    /**
+     * Determine if should hide or show the share link and invite button
+     *
+     * @return
+     */
+    fun isLinkVisible(): Boolean = isChatRoomPublic() ||
+            (!isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR)
+
+    /**
+     * Determine if I am a guest
+     *
+     * @return
+     */
+    fun isGuest(): Boolean {
+        val privilege = getOwnPrivileges()
+        if (privilege == -1){
+            return false
+        }
+        return getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR && getOwnPrivileges() != MegaChatRoom.PRIV_STANDARD
+    }
+
+    fun isNormalUser(peerId: Long): Boolean {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            val privileges = it.getPeerPrivilegeByHandle(peerId)
+            return privileges == MegaChatRoom.PRIV_STANDARD
+        }
+
+        return false
+    }
+
+    /**
+     * Determine if I am a moderator
+     *
+     * @return
+     */
+    fun isModerator(): Boolean =
+        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+
+
+    fun updateChatPermissions(
+        peerId: Long,
+        listener: MegaChatRequestListenerInterface? = null
+    ) {
+        inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
+    }
 }

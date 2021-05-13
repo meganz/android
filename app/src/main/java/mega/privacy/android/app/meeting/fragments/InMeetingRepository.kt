@@ -441,4 +441,14 @@ class InMeetingRepository @Inject constructor(
             null, true, moderator, audio, video
         )
     }
+
+    fun updateChatPermissions(chatId: Long, peerId: Long,
+            listener: MegaChatRequestListenerInterface?){
+        megaChatApi.updateChatPermissions(
+            chatId,
+            peerId,
+            MegaChatRoom.PRIV_MODERATOR,
+            listener
+        )
+    }
 }

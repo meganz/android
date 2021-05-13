@@ -35,7 +35,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     MegaChatRequestListenerInterface {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
-    private val inMeetingViewModel: InMeetingViewModel by activityViewModels()
+    private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
     // Get from activity
     private var isModerator = false
@@ -164,14 +164,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onMakeModerator() {
-        sharedViewModel.currentChatId.value?.let {
-            megaChatApi.updateChatPermissions(
-                it,
-                participantItem.peerId,
-                MegaChatRoom.PRIV_MODERATOR,
-                this
-            )
-        }
+        inMeetingViewModel.updateChatPermissions(participantItem.peerId)
     }
 
     /**

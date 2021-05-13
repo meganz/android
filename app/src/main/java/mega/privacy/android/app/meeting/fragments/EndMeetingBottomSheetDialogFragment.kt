@@ -5,13 +5,12 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
-import mega.privacy.android.app.meeting.activity.AssignModeratorActivity
+import mega.privacy.android.app.meeting.activity.AssignModeratorBottomFragment
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.ASSIGN_MODERATOR
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.END_MEETING_FOR_ALL
 import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogViewModel.Companion.LEAVE_ANYWAY
@@ -20,11 +19,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 
-class EndMeetingBottomSheetDialogFragment (): BaseBottomSheetDialogFragment() {
+class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
     private val viewModel: EndMeetingBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel:InMeetingViewModel by activityViewModels()
     private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+    private var callBack: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +73,8 @@ class EndMeetingBottomSheetDialogFragment (): BaseBottomSheetDialogFragment() {
     }
 
     private fun assignModerator() {
-        activity?.startActivity(Intent(requireActivity(), AssignModeratorActivity::class.java).apply {
-
-        })
+        dismiss()
+        callBack?.invoke()
     }
 
     private fun leaveAnyway() {
@@ -100,8 +99,9 @@ class EndMeetingBottomSheetDialogFragment (): BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun endMeetingForAll() {
-
+    private fun endMeetingForAll() {}
+    fun setAssignCallBack(showAssignModeratorFragment: () -> Unit) {
+        callBack = showAssignModeratorFragment
     }
 
     companion object {

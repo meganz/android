@@ -14,6 +14,8 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
@@ -32,10 +34,9 @@ import nz.mega.sdk.MegaChatSession
  * @property isModerator the flag for determining if the current user is moderator
  */
 class BottomFloatingPanelViewHolder(
-    inMeetingViewModel: InMeetingViewModel,
+    private val inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
-    private var isGuest: Boolean,
     private var isGroup: Boolean = true
 ) {
     private val context = binding.root.context
@@ -63,7 +64,7 @@ class BottomFloatingPanelViewHolder(
         setupBottomSheet()
         listenButtons()
         setupRecyclerView()
-        initShareAndInviteButton()
+        updateShareAndInviteButton()
 
         updatePanel()
     }
@@ -80,16 +81,17 @@ class BottomFloatingPanelViewHolder(
         }
 
         floatingPanelView.indicator.isVisible = isGroup
+        updateShareAndInviteButton()
     }
 
     /**
      * Init the visibility of `ShareLink` & `Invite` Button
      *
      */
-    private fun initShareAndInviteButton() {
-        floatingPanelView.shareLink.isVisible = !isGuest
-        floatingPanelView.invite.isVisible = !isGuest
-        floatingPanelView.guestShareLink.isVisible = isGuest
+    fun updateShareAndInviteButton() {
+        floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
+        floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
+        floatingPanelView.guestShareLink.isVisible = inMeetingViewModel.isGuest()
     }
 
     /**
@@ -456,8 +458,14 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.root.layoutParams = params
     }
 
+    /**
+     * Update UI for privilege changing
+     *
+     * @param ownPrivileges current privilege
+     */
     fun updatePrivilege(ownPrivileges: Int) {
         participantsAdapter.updateIcon(ParticipantsAdapter.MODERATOR, ownPrivileges == MegaChatRoom.PRIV_MODERATOR)
+        updateShareAndInviteButton()
     }
 
     /**
