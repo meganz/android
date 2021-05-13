@@ -132,7 +132,7 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
 
     private fun updateParticipantList(position: Int) {
         val participant = participants[position]
-        participant.isSelected = !participant.isSelected
+        participant.isChosenForAssign = !participant.isChosenForAssign
         participants[position] = participant
 
         participantsAdapter.notifyItemChanged(position)
@@ -145,19 +145,19 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
         val oldSelect = selectedParticipants.map { it.peerId }
         participants.forEach {
             if (oldSelect.contains(it.peerId)) {
-                it.isSelected = true
+                it.isChosenForAssign = true
             }
         }
 
         participantsAdapter.submitList(participants.toMutableList())
 
-        val newSelect = participants.filter { it.isSelected }.map { it.peerId }
+        val newSelect = participants.filter { it.isChosenForAssign }.map { it.peerId }
         selectedParticipants.run {
             removeIf {
                 !newSelect.contains(it.peerId)
             }
             forEach {
-                it.isSelected = true
+                it.isChosenForAssign = true
             }
         }
 

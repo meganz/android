@@ -47,7 +47,7 @@ class AssignParticipantsAdapter(
         fun bind(participant: Participant) {
             binding.name.text = participant.name
 
-            if (participant.isSelected) {
+            if (participant.isChosenForAssign) {
                 binding.avatar.setActualImageResource(R.drawable.ic_select_folder)
             } else {
                 // Set actual avatar
@@ -78,7 +78,7 @@ class AssignParticipantsAdapter(
 
 class AssignParticipantDiffCallback : DiffUtil.ItemCallback<Participant>() {
     override fun areItemsTheSame(oldItem: Participant, newItem: Participant): Boolean =
-        (oldItem.peerId == newItem.peerId) && (oldItem.isSelected == newItem.isSelected)
+        (oldItem.peerId == newItem.peerId) && (oldItem.isChosenForAssign == newItem.isChosenForAssign)
 
     override fun areContentsTheSame(oldItem: Participant, newItem: Participant): Boolean =
         oldItem == newItem

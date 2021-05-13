@@ -1470,7 +1470,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Determine the chat room has only one moderator and the list is not empty
+     * Determine the chat room has only one moderator and the list is not empty and I am moderator
      *
      * @return
      */
@@ -1483,7 +1483,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         } == true
 
-        return hasOneModerator && participants.value?.isNotEmpty() == true
+        return hasOneModerator && participants.value?.isNotEmpty() == true && isModerator()
     }
 
 

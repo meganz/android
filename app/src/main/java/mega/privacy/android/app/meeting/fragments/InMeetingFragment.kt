@@ -1646,8 +1646,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.leaveMeeting()
                 checkIfAnotherCallShouldBeShown()
             }
-            inMeetingViewModel.isModerator() && inMeetingViewModel.shouldAssignModerator()  -> {
-
+            inMeetingViewModel.shouldAssignModerator() -> {
                 EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId()).run {
                     setAssignCallBack(showAssignModeratorFragment)
                     show(
