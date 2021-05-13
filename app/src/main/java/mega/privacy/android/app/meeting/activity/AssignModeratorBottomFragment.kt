@@ -46,8 +46,7 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
         inMeetingViewModel.participants.observe(this){ newData ->
-//            update(newData.filter { inMeetingViewModel.isNormalUser(it.peerId) }.toMutableList())
-            update(TestTool.testData().toMutableList())
+            update(newData.filter { inMeetingViewModel.isNormalUser(it.peerId) }.toMutableList())
         }
 
         dialog.setContentView(binding.root)
