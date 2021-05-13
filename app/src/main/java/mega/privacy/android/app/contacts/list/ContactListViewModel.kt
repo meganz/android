@@ -14,25 +14,16 @@ import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 
 class ContactListViewModel @ViewModelInject constructor(
-    private val getContactsUseCase: GetContactsUseCase
+    getContactsUseCase: GetContactsUseCase
 ) : BaseRxViewModel() {
 
     companion object {
-        private const val TAG = "ContactsViewModel"
+        private const val TAG = "ContactListViewModel"
     }
 
     private val contacts: MutableLiveData<List<ContactItem>> = MutableLiveData()
 
     init {
-        updateContacts()
-    }
-
-    fun getContacts(): LiveData<List<ContactItem>> = contacts
-
-    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> = contacts
-        .map { contact -> contact.filter { it.isNew } }
-
-    private fun updateContacts() {
         getContactsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -46,4 +37,9 @@ class ContactListViewModel @ViewModelInject constructor(
             )
             .addTo(composite)
     }
+
+    fun getContacts(): LiveData<List<ContactItem>> = contacts
+
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> = contacts
+        .map { contact -> contact.filter { it.isNew } }
 }

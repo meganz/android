@@ -9,12 +9,13 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.data.ContactItem
+import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -57,6 +58,9 @@ class ContactListFragment : Fragment() {
             }
         )
 
+        binding.btnRequests.setOnClickListener {
+            findNavController().navigate(ContactListFragmentDirections.actionListToRequests())
+        }
         binding.btnAddContact.setOnClickListener { openAddContactScreen() }
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.black)

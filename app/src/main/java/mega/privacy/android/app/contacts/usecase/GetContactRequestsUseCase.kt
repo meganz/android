@@ -7,18 +7,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
-import io.reactivex.rxjava3.disposables.Disposable
-import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.OptionalMegaChatListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaUserUtils.getUserImageFile
-import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
-import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
-import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
@@ -28,7 +22,7 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 
-class GetContactsUseCase @Inject constructor(
+class GetContactRequestsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
@@ -38,13 +32,24 @@ class GetContactsUseCase @Inject constructor(
         private const val NOT_FOUND = -1
     }
 
-    fun get(): Flowable<List<ContactItem>> =
+    fun getIncomingRequests(): Flowable<List<ContactItem>> =
+        getContactRequest(true)
+
+    fun getOutgoingRequests(): Flowable<List<ContactItem>> =
+        getContactRequest(false)
+
+    private fun getContactRequest(isIncoming: Boolean): Flowable<List<ContactItem>> =
         Flowable.create({ emitter: FlowableEmitter<List<ContactItem>> ->
-            val contacts = megaApi.contacts.map { megaUser ->
-                val userName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
-                val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
-                val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                val userImageFile = getUserImageFile(context, megaUser.email)
+            val contactRequests = if (isIncoming) {
+                megaApi.incomingContactRequests
+            } else {
+                megaApi.outgoingContactRequests
+            }
+
+            val contacts = contactRequests.sortedBy { it.modificationTime }.map { request ->
+                val userName = megaChatApi.getUserFirstnameFromCache(request.handle)
+                val userImageColor = megaApi.getUserAvatarColor(request.handle.toString()).toColorInt()
+                val userImageFile = getUserImageFile(context, request.sourceEmail)
                 val userImageUri = if (userImageFile.exists()) {
                     userImageFile.toUri()
                 } else {
@@ -52,14 +57,11 @@ class GetContactsUseCase @Inject constructor(
                 }
 
                 ContactItem(
-                    handle = megaUser.handle,
-                    email = megaUser.email,
+                    handle = request.handle,
+                    email = request.sourceEmail,
                     name = userName,
-                    status = userStatus,
-                    statusColor = getUserStatusColor(userStatus),
                     imageUri = userImageUri,
-                    imageColor = userImageColor,
-                    isNew = megaUser.wasRecentlyAdded()
+                    imageColor = userImageColor
                 )
             }.toMutableList()
 
@@ -100,52 +102,6 @@ class GetContactsUseCase @Inject constructor(
                 val userImageFile = getUserImageFile(context, contact.email).absolutePath
                 megaApi.getUserAvatar(contact.email, userImageFile, userAttrsListener)
                 megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-
-                if (contact.status != STATUS_ONLINE) {
-                    megaChatApi.requestLastGreen(contact.handle, null)
-                }
             }
-
-            val chatListener = OptionalMegaChatListenerInterface(
-                onChatOnlineStatusUpdate = { userHandle, status, _ ->
-                    if (emitter.isCancelled) return@OptionalMegaChatListenerInterface
-
-                    val index = contacts.indexOfFirst { it.handle == userHandle }
-                    if (index != NOT_FOUND) {
-                        val currentContact = contacts[index]
-                        contacts[index] = currentContact.copy(
-                            status = status,
-                            statusColor = getUserStatusColor(status),
-                            lastSeen = if (status == STATUS_ONLINE) {
-                                context.getString(R.string.online_status)
-                            } else {
-                                megaChatApi.requestLastGreen(userHandle, null)
-                                currentContact.lastSeen
-                            }
-                        )
-
-                        emitter.onNext(contacts)
-                    }
-                },
-                onChatPresenceLastGreen = { userHandle, lastGreen ->
-                    if (emitter.isCancelled) return@OptionalMegaChatListenerInterface
-
-                    val index = contacts.indexOfFirst { it.handle == userHandle }
-                    if (index != NOT_FOUND) {
-                        val currentContact = contacts[index]
-                        contacts[index] = currentContact.copy(
-                            lastSeen = TimeUtils.unformattedLastGreenDate(context, lastGreen)
-                        )
-
-                        emitter.onNext(contacts)
-                    }
-                }
-            )
-
-            megaChatApi.addChatListener(chatListener)
-
-            emitter.setDisposable(Disposable.fromAction {
-                megaChatApi.removeChatListener(chatListener)
-            })
         }, BackpressureStrategy.BUFFER)
 }

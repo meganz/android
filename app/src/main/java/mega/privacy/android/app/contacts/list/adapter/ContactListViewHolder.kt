@@ -18,6 +18,6 @@ class ContactListViewHolder(
         binding.chipNew.isVisible = item.isNew
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(itemView.resources))
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
-        binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, item.statusColor))
+        item.statusColor?.let { binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, it)) }
     }
 }

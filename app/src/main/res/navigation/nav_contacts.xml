@@ -11,6 +11,15 @@
         android:label="@string/section_contacts"
         tools:layout="@layout/fragment_contact_list">
 
+        <action
+            android:id="@+id/action_list_to_requests"
+            app:destination="@id/contact_requests" />
     </fragment>
+
+    <fragment
+        android:id="@+id/contact_requests"
+        android:name="mega.privacy.android.app.contacts.requests.ContactRequestsFragment"
+        android:label="@string/section_requests"
+        tools:layout="@layout/fragment_contact_requests" />
 
 </navigation>

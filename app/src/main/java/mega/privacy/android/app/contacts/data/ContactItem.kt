@@ -13,10 +13,10 @@ data class ContactItem constructor(
     val handle: Long,
     val email: String,
     val name: String? = null,
-    val status: Int,
-    @ColorRes val statusColor: Int,
+    val status: Int? = null,
+    @ColorRes val statusColor: Int? = null,
     var imageUri: Uri? = null,
-    @ColorInt val imageColor: Int,
+    @ColorInt val imageColor: Int? = null,
     val lastSeen: String? = null,
     val isNew: Boolean = false
 ) {
@@ -24,14 +24,18 @@ data class ContactItem constructor(
     fun getFirstCharacter(): String? =
         name?.firstOrNull()?.toString()
 
-    fun getPlaceholderDrawable(resources: Resources): Drawable =
-        TextDrawable.builder()
-            .beginConfig()
-            .fontSize(resources.getDimensionPixelSize(R.dimen.placeholder_contact_text_size))
-            .bold()
-            .toUpperCase()
-            .endConfig()
-            .buildRound(getFirstCharacter(), imageColor)
+    fun getPlaceholderDrawable(resources: Resources): Drawable? =
+        if (imageColor != null && !name.isNullOrBlank()) {
+            TextDrawable.builder()
+                .beginConfig()
+                .fontSize(resources.getDimensionPixelSize(R.dimen.placeholder_contact_text_size))
+                .bold()
+                .toUpperCase()
+                .endConfig()
+                .buildRound(getFirstCharacter(), imageColor)
+        } else {
+            null
+        }
 
     class DiffCallback : DiffUtil.ItemCallback<ContactItem>() {
 
