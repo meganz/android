@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d’espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d’espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d’espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d’espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d’abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait) et cliquez sur l’appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro Léger&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d’abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait) et cliquez sur l’appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
     <!-- PRO Lite account -->
@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">L’accès MEGA</string>
     <!--  -->
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50 Go* d’espace de stockage gratuits</string>
+    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50&#160;Go* d’espace de stockage gratuits</string>
     <!--  -->
     <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec qui vous le souhaitez</string>
     <!--  -->
@@ -255,7 +255,7 @@
     <!-- when creating the account -->
     <string name="error_email_registered">Un compte MEGA a déjà été créé avec cette adresse courriel</string>
     <!--  -->
-    <string name="create_account_creating_account">Connexion au serveur : création du compte</string>
+    <string name="create_account_creating_account">Connexion au serveur&#160;: création du compte</string>
     <!--  -->
     <string name="cancel_transfer_confirmation">Supprimer ce transfert ?</string>
     <!--  -->
@@ -295,9 +295,9 @@
     <string name="sent_requests_empty">[B]Il n’y a aucune [/B][A]demande envoyée[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Il n’y a aucune [/B][A]demande reçue[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Transferts</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Mon compte</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Téléversements de l’appareil photo</string>
@@ -307,7 +307,7 @@
     <string name="tab_outgoing_shares">Sortants</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Liens</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Partages entrants</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Partages entrants avec</string>
@@ -366,7 +366,7 @@
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
         <item quantity="one">Le téléchargement a démarré</item>
-        <item quantity="other">%1$d téléchargements ont démarré</item>
+        <item quantity="other">%1$d&#160;téléchargements ont démarré</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
@@ -376,7 +376,7 @@
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="one">Le téléversement a démarré</item>
-        <item quantity="other">%1$d téléversements ont démarré</item>
+        <item quantity="other">%1$d&#160;téléversements ont démarré</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_finish">
@@ -592,7 +592,7 @@
     <!-- error message when sharing multiple files -->
     <string name="number_no_shared">%d dossiers n’ont pas été partagés</string>
     <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">A été envoyé avec succès à :</string>
+    <string name="context_correctly_copied_contact">A été envoyé avec succès à&#160;:</string>
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Le dossier n’est plus partagé</string>
     <!-- error message when removing all the contacts of a shared folder -->
@@ -1100,7 +1100,7 @@
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">Vous devez être connecté pour effectuer votre changement d’adresse courriel. Veuillez vous connecter de nouveau avec votre adresse courriel actuelle et recliquer ensuite sur le lien de confirmation.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte MEGA est : %1$s</string>
+    <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte MEGA est&#160;: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Erroné</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
@@ -1124,7 +1124,7 @@
     <!-- First paragraph of the screen to park an account -->
     <string name="park_account_first_paragraph">En raison de notre modèle de chiffrement de bout en bout, vous ne pourrez pas accéder à vos données sans votre mot de passe ou une sauvegarde de votre clé de récupération.</string>
     <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">Vous pouvez remiser votre compte existant et en commencer un nouveau avec la même adresse courriel. Vos données seront conservées pendant au moins 60 jours. Au cas où vous vous souviendriez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
+    <string name="park_account_second_paragraph">Vous pouvez remiser votre compte existant et en commencer un nouveau avec la même adresse courriel. Vos données seront conservées pendant au moins 60&#160;jours. Au cas où vous vous souviendriez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
     <!-- Text of the dialog message to ask for the link to park the account -->
     <string name="dialog_park_account">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de remiser votre compte.</string>
     <!-- Text shown in the last alert dialog to park an account -->
@@ -1144,7 +1144,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Améliorez la capacité de votre nuage.[A]Obtenez plus d’espace et un quota de transfert supérieur avec un compte PRO.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">La clé de récupération a été sauvegardée dans : %1s. [A]Tant que le fichier restera dans ce chemin, vous la trouverez dans la section Enregistré Hors ligne.[A]Note : Elle sera supprimée si vous vous déconnectez, veuillez la conserver en lieu sûr.</string>
+    <string name="toast_master_key">La clé de récupération a été sauvegardée dans&#160;: %1s. [A]Tant que le fichier restera dans ce chemin, vous la trouverez dans la section Enregistré Hors ligne.[A]Note&#160;: Elle sera supprimée si vous vous déconnectez, veuillez la conserver en lieu sûr.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Erreur. Cette adresse courriel est déjà utilisée.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1340,7 +1340,7 @@
         <item quantity="other">En sourdine jusqu’à %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_chat_contact_notifications">Notifications </string>
+    <string name="title_properties_chat_contact_notifications">Notifications&#160;</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Son des messages</string>
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
@@ -1362,7 +1362,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Supprimer le participant</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Protège votre conversation avec un chiffrement de bout en bout (contrôlé par l’utilisateur), fournissant des garanties de sécurité essentielles :</string>
+    <string name="mega_info_empty_screen">Protège votre conversation avec un chiffrement de bout en bout (contrôlé par l’utilisateur), fournissant des garanties de sécurité essentielles&#160;:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">Le système garantit que les données reçues proviennent vraiment de l’expéditeur indiqué et que le contenu n’a pas été manipulé pendant le transfert.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1438,7 +1438,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] a été supprimé de la conversation de groupe par [/B][C]%2$s[/C]</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="change_title_messages">[A]%1$s[/A][B] a changé le nom de la conversation de groupe en [/B][C]« %2$s »[/C]</string>
+    <string name="change_title_messages">[A]%1$s[/A][B] a changé le nom de la conversation de groupe en [/B][C]«&#160;%2$s&#160;»[/C]</string>
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s[/A][B] a quitté la conversation de groupe[/B]</string>
     <!-- chat message alert when the message have to been manually -->
@@ -1846,7 +1846,7 @@
     <string name="file_properties_shared_folder_full_access">Accès total</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Lecture seulement</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Lecture et écriture</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Les transferts ont été mis en pause</string>
@@ -1971,7 +1971,7 @@
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">En installant notre appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage supplémentaire et %2$s de quota de transfert, tous deux valides pendant 180 jours.</string>
+    <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage supplémentaire et %2$s de quota de transfert, tous deux valides pendant 180&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Vous avez obtenu %1$s d’espace de stockage et %2$s de quota de transfert pour avoir installé notre appli MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -2003,7 +2003,7 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Rétroaction Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Veuillez rédiger votre commentaire ici :</string>
+    <string name="setting_feedback_body">Veuillez rédiger votre commentaire ici&#160;:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Modèle de l’appareil</string>
     <!-- mail body -->
@@ -2053,7 +2053,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Certains caractères sont invalides</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés : ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Veuillez nommer votre fichier avant de poursuivre</item>
@@ -2172,7 +2172,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée en toute confidentialité et sécurité.[/B]</string>
     <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Il n’y a aucun média dans [/B][A]Téléversements de l’appareil photo[/A]</string>
+    <string name="context_empty_camera_uploads">[B]Il n’y a aucun média dans [/B][A]Téléversements&#160;de&#160;l’appareil&#160;photo[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]La corbeille[/A] [B]est vide[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2204,7 +2204,7 @@
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Le mot de passe du lien est invalide</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
-    <string name="open_link_not_valid_link">Le lien que vous tentez d’ouvrir n’est pas un lien MEGA valide.</string>
+    <string name="open_link_not_valid_link">Le lien que vous tentez d’ouvrir n’est pas un lien&#160;MEGA valide.</string>
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Traitement du lien&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
@@ -2246,23 +2246,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s o</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s Ko</string>
+    <string name="label_file_size_kilo_byte">%s&#160;Ko</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s Mo</string>
+    <string name="label_file_size_mega_byte">%s&#160;Mo</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s Go</string>
+    <string name="label_file_size_giga_byte">%s&#160;Go</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s To</string>
+    <string name="label_file_size_tera_byte">%s&#160;To</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s o/s</string>
+    <string name="label_file_speed_byte">%s&#160;o/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s Ko/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;Ko/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s Mo/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;Mo/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s Go/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;Go/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s To/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;To/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">Mo</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2469,7 +2469,7 @@
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Nouvelle demande de contact</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">Rédigez un message pour « %s »&#8230;</string>
+    <string name="type_message_hint_with_title">Rédigez un message pour «&#160;%s&#160;»&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]Aucun[/B][A] transfert actif[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2477,7 +2477,7 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[A]Le dossier[/A] [B]est vide[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">Rédigez un message pour « %s »&#8230;</string>
+    <string name="type_message_hint_with_customized_title">Rédigez un message pour «&#160;%s&#160;»&#8230;</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Rédigez un message pour %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
@@ -2487,7 +2487,7 @@
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Pourquoi avez-vous besoin de l’authentification à deux facteurs ?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">L’authentification à deux facteurs est un niveau supplémentaire de sécurité pour votre compte. Cela signifie que même si quelqu’un connaissait votre mot de passe, cette personne ne pourrait pas y accéder sans avoir aussi le code à 6 chiffres auquel vous seul pourrez accéder.</string>
+    <string name="two_factor_authentication_explain">L’authentification à deux facteurs est un niveau supplémentaire de sécurité pour votre compte. Cela signifie que même si quelqu’un connaissait votre mot de passe, cette personne ne pourrait pas y accéder sans avoir aussi le code à 6&#160;chiffres auquel vous seul pourrez accéder.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Lancer la configuration</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -2509,7 +2509,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d’authentification vous sera demandé.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Le code est invalide</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2703,15 +2703,15 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Le code est invalide</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Votre disque nuagique est presque plein. Passez à un compte Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_almost_full_warning">Votre disque nuagique est presque plein. Passez à un compte Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s To d’espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_almost_full_warning_pro_account">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Votre disque nuagique est presque plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Votre disque nuagique est plein. Passez à un compte Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_storage_full_warning">Votre disque nuagique est plein. Passez à un compte Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s To d’espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_storage_full_warning_pro_account">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">Votre disque nuagique est plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -2723,9 +2723,9 @@
     <!-- Mail title to upgrade to a custom plan -->
     <string name="title_mail_upgrade_plan">Surclassement vers un abonnement personnalisé</string>
     <!-- Mail subject to upgrade to a custom plan -->
-    <string name="subject_mail_upgrade_plan">Demandez-nous comment passer à un abonnement personnalisé :</string>
+    <string name="subject_mail_upgrade_plan">Demandez-nous comment passer à un abonnement personnalisé&#160;:</string>
     <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
-    <string name="word_me">Moi :</string>
+    <string name="word_me">Moi&#160;:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">Appeler</string>
     <!-- Title of the button in the contact info screen to send a message -->
@@ -2778,7 +2778,7 @@
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">La fréquence minimale est 7 jours.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
-    <string name="settings_rb_scheduler_enable_period_FREE">La fréquence est 7 jours au minimum et 30 jours au maximum.</string>
+    <string name="settings_rb_scheduler_enable_period_FREE">La fréquence est 7&#160;jours au minimum et 30&#160;jours au maximum.</string>
     <!-- Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB. -->
     <string name="settings_compression_queue_subtitle">La taille minimale est %1$s et la taille maximale est %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
@@ -2804,7 +2804,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="make_chat_private_option_text">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">La rotation de clé de chiffrement est désactivée pour les conversations de plus de 100 participants.</string>
+    <string name="make_chat_private_not_available_text">La rotation de clé de chiffrement est désactivée pour les conversations de plus de 100&#160;participants.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Il est impossible de rendre cette conversation privée, car la limite de participants a été dépassée.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2872,7 +2872,7 @@
     <!-- Subtitle of the historic notification for a new shared folder -->
     <string name="notification_new_shared_folder">[B]Nouveau dossier partagé de [/B][A]%s.[/A]</string>
     <!-- Subtitle of the historic notification for a reminder new contact request -->
-    <string name="notification_reminder_contact_request">[A]Rappel : [/A][B]%s [/B][C]vous a envoyé une demande de contact.[/C]</string>
+    <string name="notification_reminder_contact_request">[A]Rappel&#160;: [/A][B]%s [/B][C]vous a envoyé une demande de contact.[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
     <string name="title_contact_request_notification_cancelled">La demande de contact a été annulée</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
@@ -3028,7 +3028,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s et %2$d de plus</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">Avant de pouvoir générer un lien pour cette conversation, vous devez définir une description :</string>
+    <string name="message_error_set_title_get_link">Avant de pouvoir générer un lien pour cette conversation, vous devez définir une description&#160;:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">Le lien de conversation a été copié dans le presse-papiers</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -3072,9 +3072,9 @@
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Le fichier joint a déjà été envoyé</string>
     <!-- Message shown when a group call ends. -->
-    <string name="group_call_ended_message">[A]Fin de l’appel de groupe[/A][C]. Durée : [/C]</string>
+    <string name="group_call_ended_message">[A]Fin de l’appel de groupe[/A][C]. Durée&#160;: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
-    <string name="call_ended_message">[A]Fin de l’appel[/A][C]. Durée : [/C]</string>
+    <string name="call_ended_message">[A]Fin de l’appel[/A][C]. Durée&#160;: [/C]</string>
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="one">[B]%1$s heure[/B]</item>
@@ -3135,7 +3135,7 @@
     <!-- Label layout on maps activity that permits send current location -->
     <string name="current_location_label">Envoyer votre position actuelle</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
-    <string name="current_location_landscape_label">Envoyer votre position actuelle : [A]%1$s[/A]</string>
+    <string name="current_location_landscape_label">Envoyer votre position actuelle&#160;: [A]%1$s[/A]</string>
     <!-- Label layout on maps activity indicating nearby places -->
     <string name="nearby_places_label">Lieux à proximité</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
@@ -3334,7 +3334,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez jusqu’à 50 Go d’espace de stockage gratuits. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez jusqu’à 50&#160;Go d’espace de stockage gratuits. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Aucun lien de conversation n’est disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3432,7 +3432,7 @@
     <!-- Business user role -->
     <string name="user_label">Utilisateur</string>
     <!-- General label to show the status of something or someone -->
-    <string name="status_label">État </string>
+    <string name="status_label">État&#160;</string>
     <!-- State to indicate something is active (business status account for instance) -->
     <string name="active_label">Active</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3449,7 +3449,7 @@
     <string name="overall_usage_label">Utilisation globale</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Transfert</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Vous ne pouvez pas supprimer %1$s de vos contacts, car ce contact fait parti de votre compte d’entreprise.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Un problème est survenu lors de votre dernier paiement. Pour plus de précisions, veuillez accéder à MEGA en utilisant un navigateur pour ordinateur.</string>
@@ -3573,11 +3573,11 @@
     <string name="over_disk_quota_paywall_title">Vos données courent un danger !</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Nous vous avons contacté par courriel à l’adresse %1$s le %2$s, mais vous avez encore %3$s fichiers qui occupent %4$s dans votre compte MEGA, ce qui vous demande d’avoir un abonnement %5$s.</item>
-        <item quantity="other">Nous vous avons contacté par courriel à l’adresse %1$s le %2$s et le %3$s, mais vous avez encore %4$s fichiers qui occupent %5$s dans votre compte MEGA, ce qui vous demande d’avoir un abonnement %6$s.</item>
+        <item quantity="one">Nous vous avons contacté par courriel à l’adresse %1$s le %2$s, mais vous avez encore %3$s fichiers qui occupent %4$s dans votre compte&#160;MEGA, ce qui vous demande d’avoir un abonnement %5$s.</item>
+        <item quantity="other">Nous vous avons contacté par courriel à l’adresse %1$s le %2$s et le %3$s, mais vous avez encore %4$s fichiers qui occupent %5$s dans votre compte&#160;MEGA, ce qui vous demande d’avoir un abonnement %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Nous vous avons contacté par courriel à l’adresse %1$s, mais vous avez encore %2$s fichiers qui occupent %3$s dans votre compte MEGA, ce qui vous demande d’avoir un abonnement %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Nous vous avons contacté par courriel à l’adresse %1$s, mais vous avez encore %2$s fichiers qui occupent %3$s dans votre compte&#160;MEGA, ce qui vous demande d’avoir un abonnement %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Il vous reste [M]%s[/M] pour surclasser votre compte[/B]. Ce délai révolu, vos données pourraient être supprimées.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -3710,7 +3710,7 @@
     <!-- Title of the Manage chat history screen -->
     <string name="title_properties_manage_chat">Gérer l’historique de la conversation</string>
     <!-- Subtitle of the dialogue to select a retention time -->
-    <string name="subtitle_properties_manage_chat">Supprimer automatiquement les messages de plus de :</string>
+    <string name="subtitle_properties_manage_chat">Supprimer automatiquement les messages de plus de&#160;:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
     <string name="confirmation_clear_chat_history">Effacer tout l’historique de cette conversation ?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
@@ -3755,7 +3755,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Sélectionner des transferts</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Échec de changement de priorité du transfert « %1$s »</string>
+    <string name="change_of_transfer_priority_failed">Échec de changement de priorité du transfert «&#160;%1$s&#160;»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envoyer la clé de déchiffrement séparément</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3797,9 +3797,9 @@
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">Partager le mot de passe</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">Lien : %1$s\n\nClé : %2$s</string>
+    <string name="share_link_with_key">Lien&#160;: %1$s\n\nClé&#160;: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
-    <string name="share_link_with_password">Lien : %1$s\n\nMot de passe : %2$s</string>
+    <string name="share_link_with_password">Lien&#160;: %1$s\n\nMot de passe&#160;: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA a besoin de votre autorisation afin de partager des fichiers.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
@@ -3845,7 +3845,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Avant que vous ne poursuiviez</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables (« cookies ») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de navigation. Apprenez-en davantage dans notre [A]Politique sur les Témoins de navigation[/A].</string>
+    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables («&#160;cookies&#160;») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de navigation. Apprenez-en davantage dans notre [A]Politique sur les Témoins de navigation[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3855,9 +3855,9 @@
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Témoins publicitaires de Google</string>
     <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Catégorie : Témoins publicitaires</string>
+    <string name="dialog_cookie_thirdparty_subtitle2">Catégorie&#160;: Témoins publicitaires</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour : \n• Personnaliser les publicités que Google affiche sur nos services et notre site Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer quand vous cliquez sur une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et notre site Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer quand vous cliquez sur une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Accepter les Témoins de navigation</string>
     <!-- Preference screen item title -->
@@ -3879,7 +3879,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">Témoins tiers</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en cliquant sur « Plus de précision » ci-dessous.</string>
+    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en cliquant sur «&#160;Plus de précision&#160;» ci-dessous.</string>
     <!-- Preference screen item action button -->
     <string name="preference_cookies_policies_privacy">Politique de confidentialité</string>
     <!-- Preference screen item action button -->

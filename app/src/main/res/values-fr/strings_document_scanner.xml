@@ -47,5 +47,5 @@
   <!-- Dialog message showing file progress -->
   <string name="scan_dialog_progress">Préparation de %1$s. Veuillez patienter&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">Les caractères suivants ne sont pas autorisés : ” * / : &lt; &gt; ? \ |</string>
+  <string name="scan_snackbar_invalid_characters">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
 </resources>

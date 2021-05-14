@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[B]Chưa có [/B][A]yêu cầu gửi đi nào[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Chưa có [/B][A]yêu cầu được nhận nào[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Các Phiên Truyền Tải</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Trang Tài Khoản</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Camera Uploads</string>
@@ -304,7 +304,7 @@
     <string name="tab_outgoing_shares">Mục Gửi Đi</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Liên Kết</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Mục Chia Sẻ Nhận Được</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Mục chia sẻ nhận được từ</string>
@@ -1804,7 +1804,7 @@
     <string name="file_properties_shared_folder_full_access">Toàn quyền</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Chỉ được xem</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Cho xem và sửa</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng!</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2468,7 +2468,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Xoá tài khoản</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">Tắt</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2488,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Xuất ra Mã Phục Hồi để hoàn tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">App Xác Thực 2-Bước</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một App Lập Xác Thực hay không?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3371,7 +3371,7 @@
     <string name="overall_usage_label">Tổng quan lượng dùng</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Truyền Tải</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Không thể xóa tên %1$s khỏi sổ liên lạc vì đây là nhân viên trong tài khoản Doanh Nghiệp này.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Đã có vấn đề xảy ra với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
@@ -3834,5 +3834,5 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Tệp tin chưa được cập nhật. Xin thử lại.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">Tệp tin quá lớn và không thể mở hoặc xem trước được.</string>
 </resources>
