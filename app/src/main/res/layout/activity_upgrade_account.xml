@@ -3,17 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:background="@android:color/transparent"
+            android:layout_height="?attr/actionBarSize" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
-        android:id="@+id/scroll_view_upgrade"
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@+id/app_bar_layout">
 
         <LinearLayout
             android:id="@+id/linear_layout_upgrade"
@@ -625,7 +632,7 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/available_payment_methods_prolite"
+        android:id="@+id/prolite"
         layout="@layout/available_payment_methods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -637,7 +644,7 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/available_payment_methods_pro_i"
+        android:id="@+id/pro_i"
         layout="@layout/available_payment_methods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -649,7 +656,7 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/available_payment_methods_pro_ii"
+        android:id="@+id/pro_ii"
         layout="@layout/available_payment_methods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -661,7 +668,7 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/available_payment_methods_pro_iii"
+        android:id="@+id/pro_iii"
         layout="@layout/available_payment_methods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
