@@ -31,7 +31,7 @@
         app:emojiSize="14sp"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Alan Ruby" />
+        tools:text="@tools:sample/full_names" />
 
     <mega.privacy.android.app.components.MarqueeTextView
         android:id="@+id/txt_subtitle"

@@ -13,6 +13,7 @@ import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestListAdapter
+import mega.privacy.android.app.contacts.requests.dialog.ContactRequestBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -28,9 +29,7 @@ class ContactRequestsFragment : Fragment() {
     private lateinit var binding: FragmentContactRequestsBinding
 
     private val viewModel by viewModels<ContactRequestsViewModel>()
-    private val adapter by lazy {
-        ContactRequestListAdapter(::onRequestClick, ::onRequestMoreInfoClick)
-    }
+    private val adapter by lazy { ContactRequestListAdapter(::onRequestClick) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,10 +114,7 @@ class ContactRequestsFragment : Fragment() {
     }
 
     private fun onRequestClick(requestHandle: Long) {
-        // Do something
-    }
-
-    private fun onRequestMoreInfoClick(requestHandle: Long) {
-        // Do something
+        ContactRequestBottomSheetDialogFragment.newInstance(requestHandle)
+            .show(childFragmentManager, requestHandle.toString())
     }
 }

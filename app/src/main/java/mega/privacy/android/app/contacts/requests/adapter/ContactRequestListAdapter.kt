@@ -8,8 +8,7 @@ import mega.privacy.android.app.databinding.ItemContactRequestBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class ContactRequestListAdapter constructor(
-    private val itemCallback: (Long) -> Unit,
-    private val itemInfoCallback: (Long) -> Unit
+    private val itemCallback: (Long) -> Unit
 ) : ListAdapter<ContactRequestItem, ContactRequestListViewHolder>(ContactRequestItem.DiffCallback()) {
 
     init {
@@ -30,7 +29,7 @@ class ContactRequestListAdapter constructor(
             }
             binding.btnMore.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
-                    itemInfoCallback.invoke(getItem(bindingAdapterPosition).handle)
+                    itemCallback.invoke(getItem(bindingAdapterPosition).handle)
                 }
             }
         }

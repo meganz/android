@@ -45,7 +45,7 @@
         app:emojiSize="14sp"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail"
         app:layout_constraintTop_toBottomOf="@id/txt_header"
-        tools:text="Alan Ruby" />
+        tools:text="@tools:sample/full_names" />
 
     <ImageView
         android:id="@+id/img_state"
