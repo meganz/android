@@ -41,6 +41,7 @@ import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.activity.AssignModeratorBottomFragment
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -105,10 +106,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var floatingWindowFragment: IndividualCallFragment? = null
     private var gridViewCallFragment: GridViewCallFragment? = null
     private var speakerViewCallFragment: SpeakerViewCallFragment? = null
-
-    // Flags, should get the value from somewhere
-    private var isGuest = false
-    private var isModerator = true
 
     private var status = NOT_TYPE
     private val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
@@ -1268,7 +1265,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel,
                 binding,
                 this,
-                isGuest,
                 !inMeetingViewModel.isOneToOneCall()
             )
 
@@ -1650,16 +1646,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.leaveMeeting()
                 checkIfAnotherCallShouldBeShown()
             }
-            isModerator && inMeetingViewModel.shouldAssignModerator() -> {
-                val endMeetingBottomSheetDialogFragment =
-                    EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
-                endMeetingBottomSheetDialogFragment.show(
-                    parentFragmentManager,
-                    endMeetingBottomSheetDialogFragment.tag
-                )
+            inMeetingViewModel.shouldAssignModerator() -> {
+                EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId()).run {
+                    setAssignCallBack(showAssignModeratorFragment)
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
+                }
             }
             else ->
                 askConfirmationEndMeetingForUser()
+        }
+    }
+
+    val showAssignModeratorFragment = fun (){
+        AssignModeratorBottomFragment.newInstance()?.let {
+            it.show(childFragmentManager, it.tag)
         }
     }
 
@@ -1680,7 +1683,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun leaveMeeting() {
         when {
-            isGuest -> {
+            inMeetingViewModel.isGuest() -> {
                 meetingActivity.startActivity(
                     Intent(
                         meetingActivity,
@@ -1754,12 +1757,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onParticipantOption(participant: Participant) {
         val participantBottomSheet =
             MeetingParticipantBottomSheetDialogFragment.newInstance(
-                isGuest,
-                isModerator,
+                inMeetingViewModel.isGuest(),
+                inMeetingViewModel.isModerator(),
                 status == TYPE_IN_SPEAKER_VIEW,
                 participant
             )
-        participantBottomSheet.show(parentFragmentManager, participantBottomSheet.tag)
+        participantBottomSheet.show(childFragmentManager, participantBottomSheet.tag)
     }
 
     companion object {

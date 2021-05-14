@@ -16,5 +16,7 @@ data class Participant(
     var isContact: Boolean = true,
     var isSelected: Boolean = false,
     var hasHiRes: Boolean = false,
-    var videoListener: GroupVideoListener? = null
+    var videoListener: GroupVideoListener? = null,
+    // Flag for selected for assign moderator
+    var isChosenForAssign: Boolean = false,
 ) : Serializable
