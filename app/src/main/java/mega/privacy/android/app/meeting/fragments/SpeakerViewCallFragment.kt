@@ -39,7 +39,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             speakerUser?.let { currentSpeaker ->
                 if ((parentFragment as InMeetingFragment).inMeetingViewModel.isSpeakerSelectionAutomatic) {
                     logDebug("Received local audio level")
-                    closeVideo(currentSpeaker)
                     (parentFragment as InMeetingFragment).inMeetingViewModel.assignMeAsSpeaker()
                 }
             }
@@ -54,9 +53,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                         (currentSpeaker.peerId != callAndSession.second.peerid ||
                                 currentSpeaker.clientId != callAndSession.second.clientid)
                     ) {
-                        logDebug("Received remote audio level")
-                        closeVideo(currentSpeaker)
 
+                        logDebug("Received remote audio level")
                         selectSpeaker(
                             callAndSession.second.peerid,
                             callAndSession.second.clientid
@@ -127,14 +125,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     if (currentSpeaker.peerId == participantClicked.peerId && currentSpeaker.clientId == participantClicked.clientId) {
                         logDebug("Same participant")
                         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-                            participantClicked.peerId,
-                            participantClicked.clientId
+                            currentSpeaker.peerId,
+                            currentSpeaker.clientId
                         )?.let {
-                            adapter.updatePeerSelected(participantClicked)
+                            adapter.updatePeerSelected(currentSpeaker)
                         }
                     } else {
                         logDebug("New speaker selected")
-                        closeVideo(currentSpeaker)
                         selectSpeaker(participantClicked.peerId, participantClicked.clientId)
                     }
                 }
@@ -162,6 +159,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         (parentFragment as InMeetingFragment).inMeetingViewModel.speakerParticipant.observe(
             viewLifecycleOwner
         ) { participant ->
+
             participant?.let { newSpeaker ->
                 speakerUser?.let {
                     if (it.isVideoOn) {
@@ -217,7 +215,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 peerId, clientId
             )
 
-        logDebug("Select speaker")
         if (listParticipants.isNotEmpty()) {
             updateSpeakerPeers(listParticipants)
         }
@@ -232,7 +229,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         speakerUser?.let { currentSpeaker ->
             if (participant.peerId != currentSpeaker.peerId || participant.clientId != currentSpeaker.clientId) return
 
-            logDebug("Update participant selected")
             currentSpeaker.avatar?.let {
                 speaker_avatar_image.setImageBitmap(it)
             }
@@ -249,7 +245,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
             }
         }
-
     }
 
     /**
@@ -302,36 +297,38 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param participant
      */
     private fun closeVideo(participant: Participant) {
-        speakerUser?.let {
-            if (participant.peerId != it.peerId || participant.clientId != it.clientId) return
+        speakerUser?.let { speaker ->
+            if (participant.peerId != speaker.peerId || participant.clientId != speaker.clientId) return
 
             parent_surface_view.isVisible = false
             when {
-                it.isMe -> {
-                    closeLocalVideo(it)
+                speaker.isMe -> {
+                    closeLocalVideo(speaker)
                 }
                 else -> {
                     (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(
-                        it
+                        speaker
                     )
                 }
             }
 
-            participant.videoListener?.let { listener ->
+            speaker.videoListener?.let { listener ->
+                listener.localRenderer?.let {
+                    it.addListener(null)
+                }
+
                 if (parent_surface_view.childCount > 0) {
                     parent_surface_view.removeAllViews()
                 }
 
-                listener.surfaceTexture?.let { surfaceview ->
+                listener.textureView?.let { surfaceview ->
                     surfaceview.parent?.let { surfaceParent ->
-                        surfaceParent.parent?.let { surfaceParentParent ->
-                            (surfaceParent as ViewGroup).removeView(surfaceview)
-                        }
+                        (surfaceParent as ViewGroup).removeView(surfaceview)
                     }
                 }
-            }
 
-            it.videoListener = null
+                speaker.videoListener = null
+            }
         }
     }
 
@@ -470,37 +467,54 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         speakerUser?.let { currentSpeaker ->
             if (participant.peerId != currentSpeaker.peerId || participant.clientId != currentSpeaker.clientId) return
 
-            closeVideo(participant)
+            /*Video*/
+            if (currentSpeaker.videoListener == null) {
+                parent_surface_view.removeAllViews()
 
-            parent_surface_view.removeAllViews()
-
-            val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
-            myTexture.layoutParams = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            myTexture.alpha = 1.0f
-            myTexture.rotation = 0f
-
-            val vListener = GroupVideoListener(
-                myTexture,
-                participant.peerId,
-                participant.clientId,
-                currentSpeaker.isMe
-            )
-
-            currentSpeaker.videoListener = vListener
-            parent_surface_view.addView(participant.videoListener!!.surfaceTexture)
-
-            if (currentSpeaker.isMe) {
-                (parentFragment as InMeetingFragment).inMeetingViewModel.addLocalVideoSpeaker(
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
-                    vListener
+                val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
+                myTexture.layoutParams = RelativeLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                myTexture.alpha = 1.0f
+                myTexture.rotation = 0f
+
+                val vListener = GroupVideoListener(
+                    myTexture,
+                    currentSpeaker.peerId,
+                    currentSpeaker.clientId,
+                    currentSpeaker.isMe
+                )
+
+                currentSpeaker.videoListener = vListener
+
+                parent_surface_view.addView(currentSpeaker.videoListener!!.textureView)
+
+                if (currentSpeaker.isMe) {
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.addLocalVideoSpeaker(
+                        (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
+                        vListener
+                    )
+                } else {
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
+                        currentSpeaker
+                    )
+                }
             } else {
-                (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
-                    currentSpeaker
-                )
+                if (parent_surface_view.childCount > 0) {
+                    parent_surface_view.removeAllViews()
+                }
+
+                currentSpeaker.videoListener?.textureView?.let { textureView ->
+                    textureView.parent?.let { textureViewParent ->
+                        (textureViewParent as ViewGroup).removeView(textureView)
+                    }
+                }
+
+                parent_surface_view.addView(currentSpeaker.videoListener?.textureView)
+
+                currentSpeaker.videoListener?.height = 0
+                currentSpeaker.videoListener?.width = 0
             }
 
             parent_surface_view.isVisible = true
@@ -567,20 +581,21 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         if (isHiRes) {
             speakerUser?.let { speaker ->
                 if (session.peerid == speaker.peerId && session.clientid == speaker.clientId && !speaker.isMe && speaker.isVideoOn) {
-                    logDebug("Update resolution, close video and checkVideo ON")
-                    closeVideo(speaker)
-                    checkVideoOn(speaker)
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.onActivateVideo(
+                        speaker
+                    )
                 }
+            }
+        } else {
+            //List
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                session.peerid,
+                session.clientid
+            )?.let {
+                adapter.updateRemoteResolution(it)
             }
         }
 
-        //List
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-            session.peerid,
-            session.clientid
-        )?.let {
-            adapter.updateRemoteResolution(it)
-        }
     }
 
     /**
@@ -776,18 +791,15 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             clientId
         )?.let {
             if (it.isVideoOn) {
-                it.videoListener?.let {
-                    it.height = 0
-                    it.width = 0
+                it.videoListener?.let { listener ->
+                    listener.height = 0
+                    listener.width = 0
                 }
             }
         }
     }
 
-    /**
-     * Method to destroy the surfaceView.
-     */
-    private fun removeSurfaceView() {
+    private fun removeTextureView() {
         speakerUser?.let {
             (parentFragment as InMeetingFragment).inMeetingViewModel.removeSelected(
                 it.peerId,
@@ -810,13 +822,11 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
 
             it.videoListener?.let { listener ->
-                listener.surfaceTexture?.let { surfaceview ->
-                    surfaceview.parent?.let { surfaceParent ->
-                        surfaceParent.parent?.let { surfaceParentParent ->
-                            (surfaceParent as ViewGroup).removeView(surfaceview)
-                        }
+                listener.textureView?.let { textureView ->
+                    textureView.parent?.let { surfaceParent ->
+                        (surfaceParent as ViewGroup).removeView(textureView)
                     }
-                    surfaceview.isVisible = false
+                    textureView.isVisible = false
                 }
 
                 it.videoListener = null
@@ -825,12 +835,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         val iterator = participants.iterator()
         iterator.forEach {
-            adapter.removeSurfaceView(it)
+            adapter.removeTextureView(it)
         }
+
     }
 
     override fun onDestroyView() {
-        removeSurfaceView()
+        removeTextureView()
         super.onDestroyView()
     }
 

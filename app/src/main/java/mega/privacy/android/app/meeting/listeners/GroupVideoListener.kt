@@ -18,7 +18,7 @@ class GroupVideoListener(
     var width = 0
     var height = 0
     private var bitmap: Bitmap? = null
-    var surfaceTexture: TextureView? = null
+    var textureView: TextureView? = null
     private var isLocal = false
     var localRenderer: MegaSurfaceRendererGroup? = null
 
@@ -37,8 +37,8 @@ class GroupVideoListener(
         if (this.width != width || this.height != height) {
             this.width = width
             this.height = height
-            val viewWidth = surfaceTexture!!.width
-            val viewHeight = surfaceTexture!!.height
+            val viewWidth = textureView!!.width
+            val viewHeight = textureView!!.height
             if (viewWidth != 0 && viewHeight != 0) {
                 bitmap = localRenderer!!.createBitmap(width, height)
             } else {
@@ -50,7 +50,6 @@ class GroupVideoListener(
         if (bitmap == null) return
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
 
-
         if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
             localRenderer!!.drawBitmap(isLocal)
         }
@@ -59,14 +58,8 @@ class GroupVideoListener(
     init {
         this.width = 0
         this.height = 0
-        this.surfaceTexture = textureView
+        this.textureView = textureView
         this.isLocal = isMe
-        this.localRenderer = MegaSurfaceRendererGroup(surfaceTexture, peerId, clientId)
-    }
-
-    fun getLastFrame(width: Int, height: Int): Bitmap? {
-        return if (surfaceTexture != null) {
-            surfaceTexture!!.getBitmap(width, height)
-        } else null
+        this.localRenderer = MegaSurfaceRendererGroup(textureView, peerId, clientId)
     }
 }

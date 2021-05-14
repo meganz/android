@@ -188,10 +188,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         when {
             isFloatingWindow -> {
-                when (BottomSheetBehavior.STATE_EXPANDED) {
-                    (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.getState() -> {
-                        view.alpha = 0f
-                    }
+                if ((parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    view.alpha = 0f
                 }
 
                 (parentFragment as InMeetingFragment).bottomFloatingPanelViewHolder.propertyUpdaters.apply {

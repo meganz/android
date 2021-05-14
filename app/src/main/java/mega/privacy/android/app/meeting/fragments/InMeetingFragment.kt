@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -521,6 +522,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
         bottomFloatingPanelViewHolder.updateWidth(newConfig.orientation, outMetrics.widthPixels)
+
+        floatingWindowContainer?.let{
+            val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
+            menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
+            it.layoutParams = menuLayoutParams
+        }
+
         floatingWindowFragment?.let {
             it.updateOrientation(
                 newConfig.orientation,
@@ -1238,6 +1246,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             R.id.grid_view -> {
                 logDebug("Change to grid view.")
+                isManualModeView = true
                 initGridViewMode()
                 true
             }

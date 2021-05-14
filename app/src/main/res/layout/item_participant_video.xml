@@ -6,9 +6,8 @@
     android:layout_height="match_parent"
     android:background="@color/grey_alpha_038">
 
-    <!--Surface view-->
     <RelativeLayout
-        android:id="@+id/parent_surface_view"
+        android:id="@+id/parent_texture_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

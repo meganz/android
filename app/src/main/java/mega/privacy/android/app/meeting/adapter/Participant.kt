@@ -14,7 +14,7 @@ data class Participant(
     var isAudioOn: Boolean,
     var isVideoOn: Boolean,
     var isContact: Boolean = true,
-    var isSelected: Boolean = false,
+    var isSpeaker: Boolean = false,
     var hasHiRes: Boolean = false,
     var videoListener: GroupVideoListener? = null,
     // Flag for selected for assign moderator

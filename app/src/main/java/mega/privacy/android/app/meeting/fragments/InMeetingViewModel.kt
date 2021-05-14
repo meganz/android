@@ -770,16 +770,15 @@ class InMeetingViewModel @ViewModelInject constructor(
                 val iterator = listParticipants.iterator()
                 iterator.forEach {
                     if (it.peerId != peerId || it.clientId != clientId) {
-                        if (it.isSelected) {
-                            it.isSelected = false
+                        if (it.isSpeaker) {
+                            it.isSpeaker = false
                             listWithChanges.add(it)
                         }
 
                     } else {
-                        it.isSelected = true
+                        it.isSpeaker = true
                         logDebug("New speaker selected")
                         _speakerParticipant.value = createSpeakerParticipant(it)
-                        _speakerParticipant.value!!.hasHiRes = true
                         listWithChanges.add(it)
                     }
                 }
@@ -796,16 +795,23 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return speaker participant
      */
     private fun createSpeakerParticipant(participant: Participant): Participant {
+        var peerId = participant.peerId
+        var clientId = participant.clientId
+        var name = participant.name
+        var avatar = participant.avatar
+        var isAudioOn = participant.isAudioOn
+        var isVideoOn = participant.isVideoOn
+
         return Participant(
-            participant.peerId,
-            participant.clientId,
-            participant.name,
-            participant.avatar,
+            peerId,
+            clientId,
+            name,
+            avatar,
             false,
-            participant.isModerator,
-            participant.isAudioOn,
-            participant.isVideoOn,
-            participant.isContact,
+            false,
+            isAudioOn,
+            isVideoOn,
+            false,
             true,
             true,
             null
@@ -891,7 +897,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 null
             )
 
-            logDebug("Created participant")
+            logDebug("Created participant ")
             participants.value?.add(userPeer)
             participants.value = participants.value
             logDebug("Num of participants:" + participants.value?.size)
@@ -917,9 +923,9 @@ class InMeetingViewModel @ViewModelInject constructor(
             val iterator = listParticipants.iterator()
             iterator.forEach {
                 if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > MAX_PARTICIPANTS_HIRES_GRID_VIEW) {
-                    logDebug("Speaker View or Grid view with more than 4 participants -> high resolution")
+                    logDebug("Speaker View or Grid view with more than 4 participants -> low resolution")
                     if (it.hasHiRes) {
-                        if(it.isVideoOn){
+                        if (it.isVideoOn) {
                             onCloseVideo(it)
                             it.videoListener = null
                         }
@@ -929,9 +935,9 @@ class InMeetingViewModel @ViewModelInject constructor(
                         }
                     }
                 } else {
-                    logDebug("Grid View with less than 5 participants -> low resolution")
+                    logDebug("Grid View with less than 5 participants -> high resolution")
                     if (!it.hasHiRes) {
-                        if(it.isVideoOn){
+                        if (it.isVideoOn) {
                             onCloseVideo(it)
                             it.videoListener = null
                         }
@@ -940,7 +946,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                             listWithChanges.add(it)
                         }
                     }
-
                 }
             }
         }
@@ -960,12 +965,14 @@ class InMeetingViewModel @ViewModelInject constructor(
             iterator?.let { participant ->
                 participant.forEach {
                     if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                        if (it.isSelected) {
-                            it.isSelected = false
+                        if (it.isSpeaker) {
+                            it.isSpeaker = false
                             assignMeAsSpeaker()
                         }
 
                         val position = participants.value?.indexOf(it)
+                        logDebug("Removed participant ")
+
                         participant.remove()
                         participants.value = participants.value
                         logDebug("Num of participants:" + participants.value?.size)
@@ -978,13 +985,13 @@ class InMeetingViewModel @ViewModelInject constructor(
         return INVALID_POSITION
     }
 
-    fun removeSelected(peerId: Long, clientId: Long){
+    fun removeSelected(peerId: Long, clientId: Long) {
         val iterator = participants.value?.iterator()
         iterator?.let { participant ->
             participant.forEach {
                 if (it.peerId == peerId && it.clientId == clientId) {
-                    if (it.isSelected) {
-                        it.isSelected = false
+                    if (it.isSpeaker) {
+                        it.isSpeaker = false
                     }
                 }
             }
@@ -1230,7 +1237,11 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Add High Resolution
      *
      */
-    fun addHiResOneToOneCall(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    fun addHiResOneToOneCall(
+        listener: MeetingVideoListener,
+        session: MegaChatSession?,
+        chatId: Long
+    ) {
         session?.let { sessionParticipant ->
             logDebug("Adding HiRes video")
             inMeetingRepository.addRemoteVideoOneToOneCall(
@@ -1253,7 +1264,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove High Resolution
      */
-    fun removeHiResOneToOneCall(listener: MeetingVideoListener, session: MegaChatSession?, chatId: Long) {
+    fun removeHiResOneToOneCall(
+        listener: MeetingVideoListener,
+        session: MegaChatSession?,
+        chatId: Long
+    ) {
         session?.let { sessionParticipant ->
             logDebug("Removing HiRes video")
 
@@ -1303,7 +1318,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove High Resolution
      */
-    fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
             logDebug("Removing HiRes video")
 
@@ -1392,6 +1407,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             getSession(participant.clientId)?.let {
                 when {
                     participant.hasHiRes -> {
+                        logDebug("Removing HiRes ")
                         removeHiRes(
                             participant.videoListener!!,
                             it,
@@ -1399,6 +1415,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                         )
                     }
                     else -> {
+                        logDebug("Removing LowRes ")
                         removeLowRes(
                             participant.videoListener!!,
                             it,
@@ -1418,7 +1435,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun onActivateVideo(participant: Participant) {
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
-                if(participant.videoListener != null){
+                if (participant.videoListener != null) {
                     if (participant.hasHiRes) {
                         logDebug("Add high resolution ")
                         addHiRes(
@@ -1580,7 +1597,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isGuest(): Boolean {
         val privilege = getOwnPrivileges()
-        if (privilege == -1){
+        if (privilege == -1) {
             return false
         }
         return getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR && getOwnPrivileges() != MegaChatRoom.PRIV_STANDARD

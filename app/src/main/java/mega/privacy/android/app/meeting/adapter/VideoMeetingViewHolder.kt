@@ -15,7 +15,6 @@ import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util.dp2px
@@ -115,7 +114,7 @@ class VideoMeetingViewHolder(
             dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
-        removeSurfaceView(participant)
+        removeTextureView(participant)
 
         logDebug("Init avatar")
         binding.avatar.setImageBitmap(participant.avatar)
@@ -180,32 +179,51 @@ class VideoMeetingViewHolder(
     private fun activateVideo(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        closeVideo(participant)
+        /*Video*/
+        if (participant.videoListener == null) {
+            logDebug("Active video when listener is null")
+            binding.parentTextureView.removeAllViews()
+            val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
+            myTexture.layoutParams = RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            myTexture.alpha = 1.0f
+            myTexture.rotation = 0f
 
-        binding.parentSurfaceView.removeAllViews()
-        val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
-        myTexture.layoutParams = RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        myTexture.alpha = 1.0f
-        myTexture.rotation = 0f
+            val vListener = GroupVideoListener(
+                myTexture,
+                participant.peerId,
+                participant.clientId,
+                false
+            )
 
-        val vListener = GroupVideoListener(
-            myTexture,
-            participant.peerId,
-            participant.clientId,
-            false
-        )
+            participant.videoListener = vListener
 
-        participant.videoListener = vListener
+            binding.parentTextureView.addView(participant.videoListener!!.textureView)
 
-        binding.parentSurfaceView.addView(participant.videoListener!!.surfaceTexture)
+            participant.videoListener!!.localRenderer?.let {
+                it.addListener(listenerRenderer)
+            }
 
-        participant.videoListener!!.localRenderer?.let {
-            it.addListener(listenerRenderer)
+            inMeetingViewModel.onActivateVideo(participant)
+
+        } else {
+            logDebug("Active video when listener is not null")
+            if (binding.parentTextureView.childCount > 0) {
+                binding.parentTextureView.removeAllViews()
+            }
+
+            participant.videoListener?.textureView?.let { textureView ->
+                textureView.parent?.let { textureViewParent ->
+                    (textureViewParent as ViewGroup).removeView(textureView)
+                }
+            }
+
+            binding.parentTextureView.addView(participant.videoListener?.textureView)
+
+            participant.videoListener?.height = 0
+            participant.videoListener?.width = 0
         }
 
-        inMeetingViewModel.onActivateVideo(participant)
-
-        binding.parentSurfaceView.isVisible = true
+        binding.parentTextureView.isVisible = true
     }
 
     /**
@@ -240,9 +258,10 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun closeVideo(participant: Participant) {
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId || participant.videoListener == null) return
 
-        binding.parentSurfaceView.isVisible = false
+        binding.parentTextureView.isVisible = false
+
         inMeetingViewModel.onCloseVideo(participant)
 
         participant.videoListener?.let { listener ->
@@ -250,39 +269,14 @@ class VideoMeetingViewHolder(
                 it.addListener(null)
             }
 
-            if (binding.parentSurfaceView.childCount > 0) {
-                binding.parentSurfaceView.removeAllViews()
+            if (binding.parentTextureView.childCount > 0) {
+                binding.parentTextureView.removeAllViews()
             }
 
-            listener.surfaceTexture?.let { surfaceview ->
+            listener.textureView?.let { surfaceview ->
                 surfaceview.parent?.let { surfaceParent ->
-                    surfaceParent.parent?.let { surfaceParentParent ->
-                        (surfaceParent as ViewGroup).removeView(surfaceview)
-                    }
+                    (surfaceParent as ViewGroup).removeView(surfaceview)
                 }
-            }
-
-            participant.videoListener = null
-        }
-    }
-
-    fun removeSurfaceView(participant: Participant) {
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
-
-        inMeetingViewModel.onCloseVideo(participant)
-        if (binding.parentSurfaceView.childCount > 0) {
-            binding.parentSurfaceView.removeAllViews()
-            binding.parentSurfaceView.removeAllViewsInLayout()
-        }
-
-        participant.videoListener?.let { listener ->
-            listener.surfaceTexture?.let { surfaceview ->
-                surfaceview.parent?.let { surfaceParent ->
-                    surfaceParent.parent?.let { surfaceParentParent ->
-                        (surfaceParent as ViewGroup).removeView(surfaceview)
-                    }
-                }
-                surfaceview.isVisible = false
             }
 
             participant.videoListener = null
@@ -330,8 +324,7 @@ class VideoMeetingViewHolder(
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
         logDebug("Update resolution")
-        closeVideo(participant)
-        checkVideOn(participant)
+        inMeetingViewModel.onActivateVideo(participant)
     }
 
     /**
@@ -450,10 +443,9 @@ class VideoMeetingViewHolder(
      */
     fun updatePeerSelected(participant: Participant) {
         if (isGrid || participant.peerId != this.peerId || participant.clientId != this.clientId) return
-
         when {
-            participant.isSelected -> {
-                logDebug("Participant is selected")
+            participant.isSpeaker -> {
+                logDebug("Participant is speaker")
                 binding.selectedForeground.background = ContextCompat.getDrawable(
                     binding.root.context,
                     if (inMeetingViewModel.isSpeakerSelectionAutomatic) R.drawable.border_green_layer
@@ -465,6 +457,34 @@ class VideoMeetingViewHolder(
                 logDebug("Participant is not selected")
                 binding.selectedForeground.isVisible = false
             }
+        }
+    }
+
+    /**
+     * Remove Texture view when fragment is destroyed
+     *
+     * @param participant
+     */
+    fun removeTextureView(participant: Participant) {
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
+
+        inMeetingViewModel.onCloseVideo(participant)
+
+        if (binding.parentTextureView.childCount > 0) {
+            binding.parentTextureView.removeAllViews()
+            binding.parentTextureView.removeAllViewsInLayout()
+        }
+
+        participant.videoListener?.let { listener ->
+            listener.textureView?.let { textureView ->
+                textureView.parent?.let { surfaceParent ->
+                    (surfaceParent as ViewGroup).removeView(textureView)
+                }
+
+                textureView.isVisible = false
+            }
+
+            participant.videoListener = null
         }
     }
 

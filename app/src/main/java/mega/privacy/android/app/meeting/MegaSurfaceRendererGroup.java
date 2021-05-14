@@ -52,7 +52,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     private TextureView myTexture = null;
 
     public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId) {
-        logDebug("MegaSurfaceRendererGroup()");
         this.myTexture = view;
         myTexture.setSurfaceTextureListener(this);
         bitmap = myTexture.getBitmap();
@@ -66,7 +65,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        logDebug("dstWidth = " + dstWidth + ", dstHeight = " + dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -106,8 +104,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     public Bitmap createBitmap(int width, int height) {
-        logDebug("width = " + width + ", height = " + height);
-        Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
             try {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
@@ -170,7 +166,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int in_width, int in_height) {
-        logDebug("in_width = " + in_width + ", in_height = " + in_height);
         changeDestRect(in_width, in_height);
     }
 
@@ -186,7 +181,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-        logDebug("TextureView updated");
     }
 
     public interface MegaSurfaceRendererGroupListener {

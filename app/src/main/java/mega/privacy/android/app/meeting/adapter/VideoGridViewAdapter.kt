@@ -174,7 +174,7 @@ class VideoGridViewAdapter(
     fun removeSurfaceView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let { holder ->
-            holder.removeSurfaceView(participant)
+            holder.removeTextureView(participant)
             return
         }
     }

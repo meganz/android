@@ -181,14 +181,14 @@ class VideoListViewAdapter(
     }
 
     /**
-     * Resets the parameters of the participant video.
+     * Remove the texture view of a participant
      *
      * @param participant   Participant
      */
-    fun removeSurfaceView(participant: Participant) {
+    fun removeTextureView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let { holder ->
-            holder.removeSurfaceView(participant)
+            holder.removeTextureView(participant)
             return
         }
     }
