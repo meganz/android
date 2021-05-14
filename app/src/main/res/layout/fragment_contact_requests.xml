@@ -41,17 +41,16 @@
         android:id="@+id/view_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableTop="@drawable/ic_zero_contacts"
         android:drawablePadding="12dp"
         android:gravity="center"
-        android:text="@string/context_empty_contacts"
+        android:text="@string/received_requests_empty"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.Mega.Body2"
         android:visibility="gone"
+        app:drawableTopCompat="@drawable/ic_zero_data_received_requests"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

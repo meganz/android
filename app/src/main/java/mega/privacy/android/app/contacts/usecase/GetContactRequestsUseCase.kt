@@ -2,6 +2,7 @@ package mega.privacy.android.app.contacts.usecase
 
 import android.content.Context
 import android.net.Uri
+import android.text.format.DateUtils.getRelativeTimeSpanString
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,7 +42,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 addAll(megaApi.outgoingContactRequests)
             }
 
-            val contacts = contactRequests.sortedBy { it.modificationTime }.map { request ->
+            val contacts = contactRequests.sortedByDescending { it.modificationTime }.map { request ->
                 var userImageUri: Uri? = null
                 var userName: String? = null
 
@@ -62,7 +63,8 @@ class GetContactRequestsUseCase @Inject constructor(
                     name = userName,
                     imageUri = userImageUri,
                     imageColor = userImageColor,
-                    isOutgoing = request.isOutgoing
+                    isOutgoing = request.isOutgoing,
+                    createdTime = getRelativeTimeSpanString(request.creationTime * 1000).toString()
                 )
             }.toMutableList()
 

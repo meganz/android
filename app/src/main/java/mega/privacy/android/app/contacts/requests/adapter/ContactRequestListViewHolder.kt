@@ -10,8 +10,9 @@ class ContactRequestListViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactRequestItem) {
-        binding.txtTitle.text = if (item.isOutgoing) item.email else item.name
-        binding.txtSubtitle.text = if (item.isOutgoing) item.createdTime else item.email
+        val isOutgoing = item.isOutgoing || item.name.isNullOrBlank()
+        binding.txtTitle.text = if (isOutgoing) item.email else item.name
+        binding.txtSubtitle.text = if (isOutgoing) item.createdTime else item.email
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(itemView.resources))
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
     }
