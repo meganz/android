@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Pair
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -25,6 +27,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
@@ -39,6 +42,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private var isFloatingWindow = false
 
     // Views
+    private lateinit var layout: ConstraintLayout
     private lateinit var vVideo: SurfaceView
     private var vAvatarLayout: RelativeLayout? = null
     private lateinit var vAvatar: RoundedImageView
@@ -48,6 +52,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private var videoListener: MeetingVideoListener? = null
 
+    private var orientation = Configuration.ORIENTATION_PORTRAIT
     var videoAlpha = 255
 
     private val remoteAVFlagsObserver =
@@ -148,6 +153,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             )
 
             binding.root.let {
+                layout = it
                 vVideo = it.video
                 vAvatar = it.avatar
                 vAvatarLayout = it.avatar_layout
@@ -224,9 +230,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
 
             val session = inMeetingViewModel.getSession(this.clientId!!)
-            session?.let {
+            session?.let { participant ->
                 when {
-                    it.hasVideo() -> {
+                    participant.hasVideo() -> {
                         logDebug("Check if remote video should be on")
                         checkVideoOn(
                             this.peerId!!,
@@ -325,11 +331,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun removeChatVideoListener(peerId: Long, clientId: Long) {
         if (peerId != this.peerId || clientId != this.clientId || videoListener == null) return
 
-        logDebug("Remove local video listener")
         if (inMeetingViewModel.isMe(this.peerId)) {
+            logDebug("Remove local video listener")
             sharedModel.removeLocalVideo(chatId!!, videoListener!!)
         } else {
             inMeetingViewModel.getSession(clientId)?.let {
+                logDebug("Remove remove video listener")
                 inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId!!)
             }
         }
@@ -510,19 +517,24 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Method to destroy the surfaceView.
+     * Change the layout when the orientation is changing
+     *
+     * @param newOrientation the new orientation
      */
-    private fun removeSurfaceView() {
-        vVideo.let { surfaceView ->
-            if (surfaceView.parent != null && surfaceView.parent.parent != null) {
-                logDebug("Removing surface view")
-                (surfaceView.parent as ViewGroup).removeView(surfaceView)
-            }
+    fun updateOrientation(newOrientation: Int) {
+        if (!isFloatingWindow) return
 
-            surfaceView.isVisible = false
+        orientation = newOrientation
+
+        val params = layout.layoutParams
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            params.width = Util.dp2px(88f, outMetrics)
+            params.height = Util.dp2px(120f, outMetrics)
+        } else {
+            params.width = Util.dp2px(120f, outMetrics)
+            params.height = Util.dp2px(88f, outMetrics)
         }
-
-        removeChatVideoListener(this.peerId!!, this.clientId!!)
+        layout.layoutParams = params
     }
 
     companion object {
@@ -567,19 +579,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        videoListener?.let {
-            it.height = 0
-            it.width = 0
-        }
-    }
-
     override fun onDestroyView() {
-        super.onDestroyView()
-
-        removeSurfaceView()
+        closeVideo(this.peerId!!, this.clientId!!)
         vAvatar.setImageBitmap(null)
+        super.onDestroyView()
     }
 }

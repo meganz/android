@@ -363,7 +363,7 @@ class InMeetingRepository @Inject constructor(
         megaChatApi.requestHiResVideo(chatId, clientId, listener)
     }
 
-    fun stopHiResVideo(chatId: Long, clientId: Long, listener: MegaChatRequestListenerInterface) {
+    fun stopHiResVideo(chatId: Long, clientId: MegaHandleList, listener: MegaChatRequestListenerInterface) {
         megaChatApi.stopHiResVideo(chatId, clientId, listener)
     }
 

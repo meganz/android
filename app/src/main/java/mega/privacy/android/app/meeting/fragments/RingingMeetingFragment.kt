@@ -24,7 +24,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.AnimationTool.clearAnimationAndGone
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
@@ -37,9 +36,9 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -339,6 +338,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        RunOnUIThreadUtils.stop()
+        super.onDestroy()
     }
     //TODO end
 

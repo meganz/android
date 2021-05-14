@@ -521,6 +521,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
         bottomFloatingPanelViewHolder.updateWidth(newConfig.orientation, outMetrics.widthPixels)
+        floatingWindowFragment?.let {
+            it.updateOrientation(
+                newConfig.orientation,
+            )
+        }
         gridViewCallFragment?.let {
             it.updateLayout(
                 newConfig.orientation,
@@ -1799,6 +1804,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onDestroy() {
         CallUtil.activateChrono(false, meetingChrono, null)
         resumeAudioPlayerIfNotInCall(meetingActivity)
+        RunOnUIThreadUtils.stop()
         super.onDestroy()
     }
 

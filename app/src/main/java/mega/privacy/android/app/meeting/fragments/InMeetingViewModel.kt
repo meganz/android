@@ -1258,9 +1258,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             logDebug("Removing HiRes video")
 
             if (sessionParticipant.canRecvVideoHiRes()) {
+                val list: MegaHandleList = MegaHandleList.createInstance()
+                list.addMegaHandle(sessionParticipant.clientid)
                 inMeetingRepository.stopHiResVideo(
                     chatId,
-                    sessionParticipant.clientid,
+                    list,
                     RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
                 )
             }
@@ -1306,9 +1308,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             logDebug("Removing HiRes video")
 
             if (sessionParticipant.canRecvVideoHiRes()) {
+                val list: MegaHandleList = MegaHandleList.createInstance()
+                list.addMegaHandle(sessionParticipant.clientid)
                 inMeetingRepository.stopHiResVideo(
                     chatId,
-                    sessionParticipant.clientid,
+                    list,
                     RequestHiResVideoListener(MegaApplication.getInstance().applicationContext)
                 )
             }
