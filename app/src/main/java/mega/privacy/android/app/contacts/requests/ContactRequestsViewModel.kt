@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -46,34 +47,31 @@ class ContactRequestsViewModel @ViewModelInject constructor(
     fun getOutgoingRequest(): LiveData<List<ContactRequestItem>> =
         contactRequests.map { it.filter { item -> item.isOutgoing } }
 
-    fun getContactRequest(requestHandle: Long) =
+    fun getContactRequest(requestHandle: Long): LiveData<ContactRequestItem?> =
         contactRequests.map { it.find { item -> item.handle == requestHandle } }
 
     fun acceptRequest(requestHandle: Long) {
-        replyContactRequestUseCase.acceptReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { getContactRequests() },
-                onError = { Log.e(TAG, it.stackTraceToString()) }
-            )
-            .addTo(composite)
+        replyContactRequestUseCase.acceptReceivedRequest(requestHandle).subscribeToRequest()
     }
 
     fun ignoreRequest(requestHandle: Long) {
-        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { getContactRequests() },
-                onError = { Log.e(TAG, it.stackTraceToString()) }
-            )
-            .addTo(composite)
+        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle).subscribeToRequest()
     }
 
     fun declineRequest(requestHandle: Long) {
-        replyContactRequestUseCase.denyReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
+        replyContactRequestUseCase.denyReceivedRequest(requestHandle).subscribeToRequest()
+    }
+
+    fun reinviteRequest(requestHandle: Long) {
+        replyContactRequestUseCase.remindSentRequest(requestHandle).subscribeToRequest()
+    }
+
+    fun removeRequest(requestHandle: Long) {
+        replyContactRequestUseCase.deleteSentRequest(requestHandle).subscribeToRequest()
+    }
+
+    private fun Completable.subscribeToRequest() {
+        subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { getContactRequests() },

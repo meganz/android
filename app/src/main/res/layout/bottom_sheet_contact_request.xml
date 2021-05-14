@@ -129,4 +129,67 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider_ignore" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_received"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="btn_accept, divider_accept, btn_ignore, divider_ignore, btn_decline" />
+
+    <TextView
+        android:id="@+id/btn_reinvite"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawablePadding="32dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/contact_reinvite"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        android:textColor="@color/grey_alpha_087"
+        app:drawableStartCompat="@drawable/ic_reinvite"
+        app:drawableTint="@color/grey_alpha_054"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_header" />
+
+    <View
+        android:id="@+id/divider_reinvite"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:background="@color/grey_alpha_012"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_reinvite" />
+
+    <TextView
+        android:id="@+id/btn_remove"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawablePadding="32dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/general_remove"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        android:textColor="@color/red_600"
+        app:drawableStartCompat="@drawable/ic_remove"
+        app:drawableTint="@color/red_600"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_reinvite" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_sent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="btn_reinvite, divider_reinvite, btn_remove" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

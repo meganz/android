@@ -42,7 +42,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 addAll(megaApi.outgoingContactRequests)
             }
 
-            val contacts = contactRequests.sortedByDescending { it.modificationTime }.map { request ->
+            val contacts = contactRequests.sortedByDescending { it.creationTime }.map { request ->
                 var userImageUri: Uri? = null
                 var userName: String? = null
 

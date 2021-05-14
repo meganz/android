@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -44,13 +45,15 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getContactRequest(requestHandle).observe(viewLifecycleOwner) { item ->
-            requireNotNull(item)
+            requireNotNull(item) { "Contact request not found" }
 
             val isOutgoing = item.isOutgoing || item.name.isNullOrBlank()
             binding.txtTitle.text = if (isOutgoing) item.email else item.name
             binding.txtSubtitle.text = if (isOutgoing) item.createdTime else item.email
             binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(resources))
             binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
+            binding.groupReceived.isVisible = !item.isOutgoing
+            binding.groupSent.isVisible = item.isOutgoing
 
             binding.btnAccept.setOnClickListener {
                 viewModel.acceptRequest(requestHandle)
@@ -62,6 +65,14 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
             binding.btnDecline.setOnClickListener {
                 viewModel.declineRequest(requestHandle)
+                dismiss()
+            }
+            binding.btnReinvite.setOnClickListener {
+                viewModel.reinviteRequest(requestHandle)
+                dismiss()
+            }
+            binding.btnRemove.setOnClickListener {
+                viewModel.removeRequest(requestHandle)
                 dismiss()
             }
         }

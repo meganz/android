@@ -33,46 +33,54 @@ class ReplyContactRequestUseCase @Inject constructor(
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
-            megaApi.replyContactRequest(
-                contactRequest,
-                replyAction,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+            if (!contactRequest.isOutgoing) {
+                megaApi.replyContactRequest(
+                    contactRequest,
+                    replyAction,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
-                        if (error.errorCode == MegaError.API_OK) {
-                            emitter.onComplete()
-                        } else {
-                            emitter.onError(error.toThrowable())
+                            if (error.errorCode == MegaError.API_OK) {
+                                emitter.onComplete()
+                            } else {
+                                emitter.onError(error.toThrowable())
+                            }
+                        },
+                        onRequestTemporaryError = { _, error ->
+                            LogUtil.logError(error.toThrowable().stackTraceToString())
                         }
-                    },
-                    onRequestTemporaryError = { _, error ->
-                        LogUtil.logError(error.toThrowable().stackTraceToString())
-                    }
-                ))
+                    ))
+            } else {
+                emitter.onError(IllegalArgumentException("Not a received contact request"))
+            }
         }
 
     private fun replyToSentRequest(requestHandle: Long, replyAction: Int): Completable =
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
-            megaApi.inviteContact(
-                contactRequest.targetEmail,
-                null,
-                replyAction,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, error ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+            if (contactRequest.isOutgoing) {
+                megaApi.inviteContact(
+                    contactRequest.targetEmail,
+                    contactRequest.sourceMessage,
+                    replyAction,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
-                        if (error.errorCode == MegaError.API_OK) {
-                            emitter.onComplete()
-                        } else {
-                            emitter.onError(error.toThrowable())
+                            if (error.errorCode == MegaError.API_OK) {
+                                emitter.onComplete()
+                            } else {
+                                emitter.onError(error.toThrowable())
+                            }
+                        },
+                        onRequestTemporaryError = { _, error ->
+                            LogUtil.logError(error.toThrowable().stackTraceToString())
                         }
-                    },
-                    onRequestTemporaryError = { _, error ->
-                        LogUtil.logError(error.toThrowable().stackTraceToString())
-                    }
-                ))
+                    ))
+            } else {
+                emitter.onError(IllegalArgumentException("Not a sent contact request"))
+            }
         }
 }
