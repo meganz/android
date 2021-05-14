@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[B]沒有[/B][A]發送的連絡人邀請[/A]。</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]沒有[/B][A]收到的邀請[/A]。</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">傳輸</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">我的帳號</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">相機上傳</string>
@@ -304,7 +304,7 @@
     <string name="tab_outgoing_shares">傳出</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">連結</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">傳入的分享</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">傳入的共享─來自</string>
@@ -1804,7 +1804,7 @@
     <string name="file_properties_shared_folder_full_access">全權訪問</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">僅能閱讀</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">讀取與編輯</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">傳輸已暫停！</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">無效的條碼</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2468,7 +2468,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">刪除帳戶</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">停用</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">您的驗證設備不見了？</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2488,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">匯出你的還原金鑰後就完成了</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">雙重驗證應用程式</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">您想開啟Google Play來安裝身份驗證程式嗎？</string>
     <!-- Label Play Store -->
     <string name="play_store_label">應用商店</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3371,7 +3371,7 @@
     <string name="overall_usage_label">總使用量</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">傳輸</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">您無法以刪除聯絡人方式刪除%1$s，因為他們是您商業帳戶的成員之一。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您最近一次付款有問題。請使用電腦版瀏覽器登入MEGA以取得更多訊息。</string>
@@ -3834,5 +3834,5 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">檔案更新失敗。再試一次。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">檔案太大而無法開啟或預覽。</string>
 </resources>

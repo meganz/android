@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[A]발송된 요청[/A][B] 없음[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[A]수신된 요청[/A][B] 없음[/B]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">전송</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">내 계정</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">카메라 업로드</string>
@@ -304,7 +304,7 @@
     <string name="tab_outgoing_shares">나감</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">링크</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">들어오는 공유</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">다음과의 들어오는 공유</string>
@@ -1804,7 +1804,7 @@
     <string name="file_properties_shared_folder_full_access">완전 접근</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">읽기 전용</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">읽기와 쓰기</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">전송 일시정지됨!</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2468,7 +2468,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">계정 삭제</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">해제</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">인증기 장치를 잃어버렸나요?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2488,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">완료하려면 복구 키를 내보내세요</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">2단계 인증 앱</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">인증기 앱을 설치할 수 있도록 Google Play를 여시겠습니까?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3371,7 +3371,7 @@
     <string name="overall_usage_label">전체 사용량</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">전송</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">최근 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저로 MEGA에 접속하세요.</string>
@@ -3834,5 +3834,5 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">파일 업데이트 실패. 다시 시도하세요.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">파일이 너무 커서 열거나 미리 볼 수 없습니다.</string>
 </resources>
