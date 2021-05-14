@@ -678,8 +678,6 @@
     <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Last session</string>
-    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
-    <string name="my_account_connections">%1$d connections</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Changing password</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -3942,4 +3940,9 @@
     <string name="add_phone_number_action">Add phone number</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
     <string name="denied_write_permissions">MEGA needs write permissions to proceed with this action.</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
 </resources>
