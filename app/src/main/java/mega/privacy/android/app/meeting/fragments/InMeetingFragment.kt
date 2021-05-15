@@ -1359,7 +1359,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
 
             when {
-                bannerShouldBeShown && toolbar.isVisible -> {
+                bannerShouldBeShown -> {
                     it.background = ContextCompat.getDrawable(
                         context,
                         R.drawable.gradient_shape_callschat
@@ -1370,13 +1370,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.isVisible = false
                 }
             }
-
-            when (BottomSheetBehavior.STATE_EXPANDED) {
-                bottomFloatingPanelViewHolder.getState() -> {
-                    when {
-                        bannerInfoLayout.isVisible -> {
-                            bannerInfoLayout.alpha = 0f
-                        }
+            if(bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED || !toolbar.isVisible){
+                when {
+                    bannerInfoLayout.isVisible -> {
+                        bannerInfoLayout.alpha = 0f
                     }
                 }
             }
