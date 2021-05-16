@@ -135,7 +135,7 @@ class VideoListViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
             when (typeChange) {
-                Constants.TYPE_VIDEO -> it.checkVideOn(participant)
+                Constants.TYPE_VIDEO -> it.checkVideoOn(participant)
                 Constants.TYPE_AUDIO -> it.updateAudioIcon(participant)
             }
             return

@@ -35,8 +35,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
 
-    private var MAX_PARTICIPANTS_HIRES_GRID_VIEW = 4
-
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
 
     var isSpeakerSelectionAutomatic: Boolean = true
@@ -737,6 +735,8 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     /**
      * Method for updating participant privileges
+     *
+     * @return list of participants with changes
      */
     fun updateParticipantsPrivileges(): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
@@ -795,12 +795,12 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return speaker participant
      */
     private fun createSpeakerParticipant(participant: Participant): Participant {
-        var peerId = participant.peerId
-        var clientId = participant.clientId
-        var name = participant.name
-        var avatar = participant.avatar
-        var isAudioOn = participant.isAudioOn
-        var isVideoOn = participant.isVideoOn
+        val peerId = participant.peerId
+        val clientId = participant.clientId
+        val name = participant.name
+        val avatar = participant.avatar
+        val isAudioOn = participant.isAudioOn
+        val isVideoOn = participant.isVideoOn
 
         return Participant(
             peerId,
@@ -827,10 +827,114 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun createCurrentParticipants(list: MegaHandleList, status: String) {
         _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
         for (i in 0 until list.size()) {
-            getSession(list[i])?.let {
-                createParticipant(it, status)
+            getSession(list[i])?.let { session ->
+                createParticipant(session, status)?.let { participantCreated ->
+                    participants.value?.add(participantCreated)
+                }
             }
         }
+
+        participants.value = participants.value
+        logDebug("Num of participants:" + participants.value?.size)
+    }
+
+    /**
+     * Method for adding a participant to the list
+     *
+     * @param session MegaChatSession
+     * @return the position of the participant
+     */
+    fun addParticipant(session: MegaChatSession, status: String): Int? {
+        val participantCreated = createParticipant(session, status)
+        participantCreated?.let {
+            participants.value?.add(participantCreated)
+            participants.value = participants.value
+            logDebug("Num of participants:" + participants.value?.size)
+            return participants.value?.indexOf(participantCreated)
+        }
+
+        return INVALID_POSITION
+    }
+
+    /**
+     * Method for create a participant
+     *
+     * @param session MegaChatSession
+     * @return the position of the participant
+     */
+    private fun createParticipant(session: MegaChatSession, status: String): Participant? {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value?.let { listParticipants ->
+                val peer = listParticipants.filter { participant ->
+                    participant.peerId == session.peerid && participant.clientId == session.clientid
+                }
+
+                if (!peer.isNullOrEmpty()) {
+                    logDebug("Participants exists")
+                    return null
+                }
+            }
+
+            val isModerator = isParticipantModerator(session.peerid)
+            val isContact = isMyContact(session.peerid)
+            val hasHiRes = needHiRes(status)
+            val name = getParticipantName(session.peerid)
+            val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
+
+            val newParticipant = Participant(
+                session.peerid,
+                session.clientid,
+                name,
+                avatar,
+                false,
+                isModerator,
+                session.hasAudio(),
+                session.hasVideo(),
+                isContact,
+                false,
+                hasHiRes,
+                null
+            )
+
+            logDebug("Participant created")
+            return newParticipant
+        }
+
+        return null
+    }
+
+    /**
+     * Method for removing a participant
+     *
+     * @param session MegaChatSession
+     * @return the position of the participant
+     */
+    fun removeParticipant(session: MegaChatSession): Int? {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            val iterator = participants.value?.iterator()
+            iterator?.let { list ->
+                list.forEach {
+                    if (it.peerId == session.peerid && it.clientId == session.clientid) {
+                        if (it.isSpeaker) {
+                            it.isSpeaker = false
+                            assignMeAsSpeaker()
+                        }
+
+                        val position = participants.value?.indexOf(it)
+                        logDebug("Removed participant")
+                        if(it.isVideoOn){
+                            onCloseVideo(it)
+                        }
+                       list.remove()
+                        participants.value = participants.value
+                        logDebug("Num of participants:" + participants.value?.size)
+                        return position
+                    }
+                }
+            }
+        }
+
+        return INVALID_POSITION
     }
 
     /**
@@ -858,56 +962,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method for adding a participant
-     *
-     * @param session MegaChatSession
-     * @return the position of the participant
-     */
-    fun createParticipant(session: MegaChatSession, status: String): Int? {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val peer = listParticipants.filter { participant ->
-                    participant.peerId == session.peerid && participant.clientId == session.clientid
-                }
-
-                if (!peer.isNullOrEmpty()) {
-                    logDebug("Participants exists")
-                    return INVALID_POSITION
-                }
-            }
-
-            val isModerator = isParticipantModerator(session.peerid)
-            val isContact = isMyContact(session.peerid)
-            val hasHiRes = needHiRes(status)
-            val name = getParticipantName(session.peerid)
-            val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
-
-            val userPeer = Participant(
-                session.peerid,
-                session.clientid,
-                name,
-                avatar,
-                false,
-                isModerator,
-                session.hasAudio(),
-                session.hasVideo(),
-                isContact,
-                false,
-                hasHiRes,
-                null
-            )
-
-            logDebug("Created participant ")
-            participants.value?.add(userPeer)
-            participants.value = participants.value
-            logDebug("Num of participants:" + participants.value?.size)
-            return participants.value?.indexOf(userPeer)
-        }
-
-        return INVALID_POSITION
-    }
-
-    /**
      * Method for checking which participants need to change their resolution
      *
      * In Speaker view, the list of participants should have low res
@@ -923,24 +977,16 @@ class InMeetingViewModel @ViewModelInject constructor(
             val iterator = listParticipants.iterator()
             iterator.forEach {
                 if (status == TYPE_IN_SPEAKER_VIEW || listParticipants.size > MAX_PARTICIPANTS_HIRES_GRID_VIEW) {
-                    logDebug("Speaker View or Grid view with more than 4 participants -> low resolution")
+                    logDebug("Change to low resolution ")
                     if (it.hasHiRes) {
-                        if (it.isVideoOn) {
-                            onCloseVideo(it)
-                            it.videoListener = null
-                        }
                         it.hasHiRes = false
                         if (it.isVideoOn) {
                             listWithChanges.add(it)
                         }
                     }
                 } else {
-                    logDebug("Grid View with less than 5 participants -> high resolution")
+                    logDebug("Change to high resolution ")
                     if (!it.hasHiRes) {
-                        if (it.isVideoOn) {
-                            onCloseVideo(it)
-                            it.videoListener = null
-                        }
                         it.hasHiRes = true
                         if (it.isVideoOn) {
                             listWithChanges.add(it)
@@ -951,38 +997,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return listWithChanges
-    }
-
-    /**
-     * Method for removing a participant
-     *
-     * @param session MegaChatSession
-     * @return the position of the participant
-     */
-    fun removeParticipant(session: MegaChatSession): Int? {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            val iterator = participants.value?.iterator()
-            iterator?.let { participant ->
-                participant.forEach {
-                    if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                        if (it.isSpeaker) {
-                            it.isSpeaker = false
-                            assignMeAsSpeaker()
-                        }
-
-                        val position = participants.value?.indexOf(it)
-                        logDebug("Removed participant ")
-
-                        participant.remove()
-                        participants.value = participants.value
-                        logDebug("Num of participants:" + participants.value?.size)
-                        return position
-                    }
-                }
-            }
-        }
-
-        return INVALID_POSITION
     }
 
     fun removeSelected(peerId: Long, clientId: Long) {
@@ -1021,7 +1035,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         logDebug("Assign me as speaker")
         _speakerParticipant.value?.let { currentSpeaker ->
             onCloseVideo(currentSpeaker)
-            currentSpeaker.videoListener = null
         }
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
@@ -1407,7 +1420,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             getSession(participant.clientId)?.let {
                 when {
                     participant.hasHiRes -> {
-                        logDebug("Removing HiRes ")
+                        logDebug("Remove high resolution")
                         removeHiRes(
                             participant.videoListener!!,
                             it,
@@ -1415,7 +1428,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                         )
                     }
                     else -> {
-                        logDebug("Removing LowRes ")
+                        logDebug("Remove low resolution")
                         removeLowRes(
                             participant.videoListener!!,
                             it,
@@ -1464,6 +1477,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun onChangeResolution(participant: Participant) {
         if (participant.videoListener == null)
             return
+
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
                 if (participant.hasHiRes) {
@@ -1626,5 +1640,9 @@ class InMeetingViewModel @ViewModelInject constructor(
         listener: MegaChatRequestListenerInterface? = null
     ) {
         inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
+    }
+
+    companion object {
+        private var MAX_PARTICIPANTS_HIRES_GRID_VIEW = 5
     }
 }

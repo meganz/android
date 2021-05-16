@@ -346,8 +346,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 (parentFragment as InMeetingFragment).inMeetingViewModel.getChatId(),
                 it.videoListener
             )
-
-            it.videoListener = null
         }
     }
 
@@ -595,7 +593,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 adapter.updateRemoteResolution(it)
             }
         }
-
     }
 
     /**

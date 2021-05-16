@@ -114,11 +114,8 @@ class VideoMeetingViewHolder(
             dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
-        removeTextureView(participant)
-
-        logDebug("Init avatar")
         binding.avatar.setImageBitmap(participant.avatar)
-        binding.avatar.isVisible = true
+        removeTextureView(participant)
     }
 
     /**
@@ -130,7 +127,7 @@ class VideoMeetingViewHolder(
             when {
                 it.hasVideo() -> {
                     logDebug("Check if video should be on")
-                    checkVideOn(participant)
+                    checkVideoOn(participant)
                 }
                 else -> {
                     logDebug("Video should be off")
@@ -258,8 +255,9 @@ class VideoMeetingViewHolder(
      * @param participant
      */
     private fun closeVideo(participant: Participant) {
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId || participant.videoListener == null) return
+        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
+        logDebug("Close video")
         binding.parentTextureView.isVisible = false
 
         inMeetingViewModel.onCloseVideo(participant)
@@ -273,9 +271,9 @@ class VideoMeetingViewHolder(
                 binding.parentTextureView.removeAllViews()
             }
 
-            listener.textureView?.let { surfaceview ->
-                surfaceview.parent?.let { surfaceParent ->
-                    (surfaceParent as ViewGroup).removeView(surfaceview)
+            listener.textureView?.let { view ->
+                view.parent?.let { surfaceParent ->
+                    (surfaceParent as ViewGroup).removeView(view)
                 }
             }
 
@@ -344,7 +342,7 @@ class VideoMeetingViewHolder(
      *
      * @param participant
      */
-    fun checkVideOn(participant: Participant) {
+    fun checkVideoOn(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
 
@@ -410,7 +408,7 @@ class VideoMeetingViewHolder(
             }
             else -> {
                 logDebug("Call is not on hold")
-                checkVideOn(participant)
+                checkVideoOn(participant)
             }
         }
     }
@@ -431,7 +429,7 @@ class VideoMeetingViewHolder(
             }
             else -> {
                 logDebug("Session is not on hold")
-                checkVideOn(participant)
+                checkVideoOn(participant)
             }
         }
     }
@@ -467,7 +465,7 @@ class VideoMeetingViewHolder(
      */
     fun removeTextureView(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
-
+        logDebug("Removing texture view")
         inMeetingViewModel.onCloseVideo(participant)
 
         if (binding.parentTextureView.childCount > 0) {

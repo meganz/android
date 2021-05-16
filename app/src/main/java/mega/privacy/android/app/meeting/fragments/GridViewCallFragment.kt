@@ -5,34 +5,41 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.zhpan.bannerview.constants.IndicatorGravity
-import com.zhpan.indicator.enums.IndicatorStyle
-import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
-import mega.privacy.android.app.R
+import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
-import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
-import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatSession
 
-class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener  {
+class GridViewCallFragment : MeetingBaseFragment(),
+    MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
     private var maxWidth = 0
-
     private var maxHeight = 0
-    private var participants: MutableList<Participant> = mutableListOf()
+    private var isFirsTime = true
+    private var currentPage = 0
 
-    private var adapterPager: GridViewPagerAdapter? = null
+    private var participants: MutableList<Participant> = mutableListOf()
+    private var viewPagerData: List<List<Participant>> = mutableListOf()
+
+    private lateinit var adapterPager: GridViewPagerAdapter
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
-        viewDataBinding.gridViewPager.refreshData(sliceBy6(it))
+        if (isFirsTime) {
+            isFirsTime = false
+            val newData = sliceBy6(it)
+            adapterPager.let {
+                it.setNewData(newData)
+                it.notifyDataSetChanged()
+            }
+
+            viewPagerData = newData
+        }
     }
 
     override fun onCreateView(
@@ -52,6 +59,7 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
         maxHeight = outMetrics.heightPixels
 
         adapterPager = GridViewPagerAdapter(
+            viewPagerData,
             (parentFragment as InMeetingFragment).inMeetingViewModel,
             parentFragment,
             maxWidth,
@@ -59,32 +67,47 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
             this
         )
 
-        viewDataBinding.gridViewPager
-            .setScrollDuration(800)
-            .setAutoPlay(false)
-            .setIndicatorStyle(IndicatorStyle.CIRCLE)
-            .setIndicatorSliderGap(Util.dp2px(6f))
-            .setIndicatorSliderRadius(
-                Util.dp2px(3f),
-                Util.dp2px(3f)
-            )
-            .setIndicatorMargin(0, 0, 0, 170)
-            .setIndicatorGravity(IndicatorGravity.CENTER)
-            .setIndicatorSliderColor(
-                ContextCompat.getColor(requireContext(), R.color.grey_300_grey_600),
-                ContextCompat.getColor(requireContext(), R.color.white)
-            )
-            .setOnPageClickListener(null)
-            .setAdapter(
-                adapterPager
-            )
-            .create()
+        viewDataBinding.gridViewPager.offscreenPageLimit = 1
+        viewDataBinding.gridViewPager.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                currentPage = position
+                logDebug("New page selected $position")
+            }
+        })
 
-        // TODO test code start
+        viewDataBinding.gridViewPager.adapter = adapterPager
+
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
             participantsObserver
         )
-        // TODO test code end
+    }
+
+    /**
+     * Updating the participant who joined or left the call
+     *
+     * @param isAdded
+     * @param position
+     * @param participantList
+     */
+    fun peerAddedOrRemoved(
+        isAdded: Boolean,
+        position: Int,
+        participantList: MutableList<Participant>
+    ) {
+        val newData = sliceBy6(participantList)
+        adapterPager.let {
+            it.setNewData(newData)
+            if (isAdded) {
+                logDebug("New participant added")
+                it.participantAdded(viewPagerData, newData, position)
+            } else {
+                logDebug("New participant removed")
+                it.participantRemoved(viewPagerData, newData, position)
+            }
+        }
+        viewPagerData = newData
     }
 
     /**
@@ -95,7 +118,12 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
     fun updateCallOnHold(isCallOnHold: Boolean) {
         val iterator = participants.iterator()
         iterator.forEach {
-            adapterPager?.updateCallOnHold(it, isCallOnHold)
+            adapterPager.updateCallOnHold(
+                it,
+                isCallOnHold,
+                currentPage,
+                viewDataBinding.gridViewPager
+            )
         }
     }
 
@@ -109,7 +137,12 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
             session.peerid,
             session.clientid
         )?.let {
-            adapterPager?.updateOnHold(it, session.isOnHold)
+            adapterPager.updateSessionOnHold(
+                it,
+                session.isOnHold,
+                currentPage,
+                viewDataBinding.gridViewPager
+            )
         }
     }
 
@@ -124,14 +157,18 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
             session.peerid,
             session.clientid
         )?.let {
-            adapterPager?.updateParticipantAudioVideo(type, it)
+            adapterPager.updateParticipantAudioVideo(
+                type,
+                it,
+                currentPage,
+                viewDataBinding.gridViewPager
+            )
         }
     }
 
     /**
      * Check changes in resolution
      *
-     * @param isHiRes
      * @param session MegaChatSession
      */
     fun updateRemoteResolution(session: MegaChatSession) {
@@ -139,7 +176,7 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
             session.peerid,
             session.clientid
         )?.let {
-            adapterPager?.updateRemoteResolution(it)
+            adapterPager.updateRemoteResolution(it, currentPage, viewDataBinding.gridViewPager)
         }
     }
 
@@ -155,7 +192,7 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
                 peer.peerId,
                 peer.clientId
             )?.let {
-                adapterPager?.updateParticipantRes(it)
+                adapterPager.updateParticipantRes(it, currentPage, viewDataBinding.gridViewPager)
             }
         }
     }
@@ -172,7 +209,7 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
                 peer.peerId,
                 peer.clientId
             )?.let {
-                adapterPager?.updateParticipantName(it)
+                adapterPager.updateParticipantName(it, currentPage, viewDataBinding.gridViewPager)
             }
         }
     }
@@ -189,7 +226,11 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
                 peer.peerId,
                 peer.clientId
             )?.let {
-                adapterPager?.updateParticipantPrivileges(it)
+                adapterPager.updateParticipantPrivileges(
+                    it,
+                    currentPage,
+                    viewDataBinding.gridViewPager
+                )
             }
         }
     }
@@ -202,7 +243,7 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
      * @param heightPixels
      */
     fun updateLayout(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
-        adapterPager?.updateOrientation(newOrientation, widthPixels, heightPixels)
+        adapterPager.updateOrientation(newOrientation, widthPixels, heightPixels)
     }
 
     override fun resetSize(peerId: Long, clientId: Long) {
@@ -219,6 +260,16 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
         }
     }
 
+    /**
+     * Method to destroy the surfaceView.
+     */
+    private fun removeSurfaceView() {
+        val iterator = participants.iterator()
+        iterator.forEach {
+            adapterPager.removeSurfaceView(it, currentPage, viewDataBinding.gridViewPager)
+        }
+    }
+
     override fun onResume() {
         val iterator = participants.iterator()
         iterator.forEach { participant ->
@@ -230,18 +281,8 @@ class GridViewCallFragment : MeetingBaseFragment(), MegaSurfaceRendererGroup.Meg
         super.onResume()
     }
 
-    /**
-     * Method to destroy the surfaceView.
-     */
-    private fun removeSurfaceView() {
-        val iterator = participants.iterator()
-        iterator.forEach {
-            adapterPager?.removeSurfaceView(it)
-        }
-    }
-
     override fun onDestroyView() {
-       removeSurfaceView()
+        removeSurfaceView()
         super.onDestroyView()
     }
 
