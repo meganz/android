@@ -38,7 +38,6 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = BottomSheetContactRequestBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 

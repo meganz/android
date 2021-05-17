@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
+import mega.privacy.android.app.utils.notifyObserver
 
 class ContactListViewModel @ViewModelInject constructor(
     getContactsUseCase: GetContactsUseCase
@@ -22,6 +23,7 @@ class ContactListViewModel @ViewModelInject constructor(
     }
 
     private val contacts: MutableLiveData<List<ContactItem>> = MutableLiveData()
+    private var queryString: String? = null
 
     init {
         getContactsUseCase.get()
@@ -38,8 +40,26 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getContacts(): LiveData<List<ContactItem>> = contacts
+    fun getContacts(): LiveData<List<ContactItem>> =
+        contacts.map { items ->
+            if (queryString.isNullOrBlank()) {
+                items
+            } else {
+                items.filter { item -> item.name?.contains(queryString!!, true) == true }
+            }
+        }
 
-    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> = contacts
-        .map { contact -> contact.filter { it.isNew } }
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
+        contacts.map { items ->
+            if (queryString.isNullOrBlank()) {
+                items.filter { it.isNew }
+            } else {
+                emptyList()
+            }
+        }
+
+    fun setQuery(query: String?) {
+        queryString = query
+        contacts.notifyObserver()
+    }
 }

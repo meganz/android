@@ -2,9 +2,8 @@ package mega.privacy.android.app.contacts.list
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -40,12 +39,43 @@ class ContactListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentContactListBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_contact_list, menu)
+
+        menu.findItem(R.id.action_search)?.apply {
+            setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                    viewModel.setQuery(null)
+                    return true
+                }
+
+                override fun onMenuItemActionExpand(item: MenuItem?): Boolean = true
+            })
+            (actionView as SearchView?)?.apply {
+                setOnCloseListener {
+                    viewModel.setQuery(null)
+                    false
+                }
+                setOnQueryTextListener(object :
+                    SearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.setQuery(newText)
+                        return true
+                    }
+
+                    override fun onQueryTextSubmit(query: String?): Boolean = false
+                })
+            }
+        }
     }
 
     private fun setupView() {
