@@ -2507,7 +2507,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Next time you login to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
