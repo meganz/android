@@ -105,8 +105,9 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 R.anim.shake
             )
         )
-
         binding.answerAudioFab.setOnClickListener {
+            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
+
             answerCall(true, false)
         }
 
@@ -157,6 +158,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 override fun onAnimationEnd(animation: Animation) {
                     binding.videoLabel.isVisible = false
                     binding.answerVideoFab.hide()
+                    inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
                     answerCall(enableVideo = true)
                 }

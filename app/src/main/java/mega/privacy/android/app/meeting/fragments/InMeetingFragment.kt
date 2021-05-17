@@ -308,6 +308,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     )
                                 position?.let {
                                     if (position != INVALID_POSITION) {
+                                        checkChildFragments()
                                         participantAddedOfLeftMeeting(true, it)
                                     }
                                 }
@@ -318,18 +319,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     inMeetingViewModel.removeParticipant(callAndSession.second)
                                 position?.let {
                                     if (position != INVALID_POSITION) {
+                                        checkChildFragments()
                                         participantAddedOfLeftMeeting(false, it)
                                     }
                                 }
-                                if (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.amIAloneOnTheCall(
-                                        inMeetingViewModel.getChatId()
-                                    )
-                                ) {
-                                    checkChildFragments()
-                                }
                             }
                         }
-                    }
+                    } else -> checkChildFragments()
                 }
             } else {
                 checkAnotherCall()
@@ -1943,10 +1939,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onJoinedChat(chatId: Long, userHandle: Long) {
         if (chatId != MEGACHAT_INVALID_HANDLE) {
-            logDebug("Update chat id " + chatId)
+            logDebug("Update chat id $chatId")
             sharedModel.updateChatRoomId(chatId)
             inMeetingViewModel.setChatId(chatId)
         }
+
+        inMeetingViewModel.checkAnotherCallsInProgress(chatId)
 
         inMeetingViewModel.getCall()?.let {
             logDebug("Joined to chat, answer call")

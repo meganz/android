@@ -382,7 +382,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param chatId
      * @return MegaChatCall
      */
-    fun getAnotherCall(chatId: Long): MegaChatCall? {
+    private fun getAnotherCall(chatId: Long): MegaChatCall? {
         if (chatId == MEGACHAT_INVALID_HANDLE)
             return null
 
@@ -922,10 +922,10 @@ class InMeetingViewModel @ViewModelInject constructor(
 
                         val position = participants.value?.indexOf(it)
                         logDebug("Removed participant")
-                        if(it.isVideoOn){
+                        if (it.isVideoOn) {
                             onCloseVideo(it)
                         }
-                       list.remove()
+                        list.remove()
                         participants.value = participants.value
                         logDebug("Num of participants:" + participants.value?.size)
                         return position
@@ -1144,25 +1144,26 @@ class InMeetingViewModel @ViewModelInject constructor(
      * If there is another call, it must be put on hold.
      * If there are two other calls, the one in progress is hung up.
      *
-     * @param chatIdOfCallToJoin
+     * @param chatIdOfCurrentCall chat id of current call
      */
-    fun checkAnotherCallsInProgress(chatIdOfCallToJoin: Long) {
+    fun checkAnotherCallsInProgress(chatIdOfCurrentCall: Long) {
         val numCallsParticipating = CallUtil.getCallsParticipating()
         numCallsParticipating?.let {
-            if (numCallsParticipating.isEmpty())
+            if (numCallsParticipating.isEmpty()) {
                 return
+            }
 
             if (numCallsParticipating.size == 1) {
-                getAnotherCall(numCallsParticipating.get(0))?.let { anotherCall ->
-                    if (!anotherCall.isOnHold) {
+                getAnotherCall(numCallsParticipating[0])?.let { anotherCall ->
+                    if (chatIdOfCurrentCall != anotherCall.chatid && !anotherCall.isOnHold) {
                         logDebug("Another call on hold before join the meeting")
-                        setAnotherCallOnHold(chatIdOfCallToJoin, true)
+                        setAnotherCallOnHold(anotherCall.chatid, true)
                     }
                 }
             } else {
                 for (i in 0 until numCallsParticipating.size) {
-                    getAnotherCall(numCallsParticipating.get(i))?.let { anotherCall ->
-                        if (!anotherCall.isOnHold) {
+                    getAnotherCall(numCallsParticipating[i])?.let { anotherCall ->
+                        if (chatIdOfCurrentCall != anotherCall.chatid && !anotherCall.isOnHold) {
                             logDebug("Hang up one of the current calls in order to join the meeting")
                             hangUpSpecificCall(anotherCall.callId)
                         }
@@ -1186,7 +1187,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param callId
      */
-    fun hangUpSpecificCall(callId: Long) {
+    private fun hangUpSpecificCall(callId: Long) {
         inMeetingRepository.leaveMeeting(callId)
     }
 
@@ -1308,7 +1309,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Add High Resolution
      *
      */
-    fun addHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun addHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
             logDebug("Adding HiRes video")
             inMeetingRepository.addRemoteVideo(
