@@ -77,6 +77,13 @@ class GridViewCallFragment : MeetingBaseFragment(),
             }
         })
 
+        val newData = sliceBy6(participants)
+        adapterPager.let {
+            it.setNewData(newData)
+            it.notifyDataSetChanged()
+        }
+
+        viewPagerData = newData
         viewDataBinding.gridViewPager.adapter = adapterPager
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
