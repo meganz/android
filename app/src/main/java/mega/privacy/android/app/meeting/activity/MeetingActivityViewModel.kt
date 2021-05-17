@@ -228,8 +228,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun isChatCreated(): Boolean {
         _currentChatId.value?.let {
-            if(it != MEGACHAT_INVALID_HANDLE)
+            if(it != MEGACHAT_INVALID_HANDLE){
+                logDebug("Chat exists")
                 return true
+            }
         }
         return false
     }
@@ -238,6 +240,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method to initiate the call with the microphone on
      */
     fun micInitiallyOn() {
+        logDebug("Call with audio activated initially")
         _micLiveData.value = true
     }
 
@@ -245,6 +248,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method to initiate the call with the camera on
      */
     fun camInitiallyOn() {
+        logDebug("Call with video activated initially")
         _cameraLiveData.value = true
     }
 

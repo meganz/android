@@ -522,6 +522,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     fun updateOrientation(newOrientation: Int) {
         if (!isFloatingWindow) return
 
+        logDebug("Orientation changed")
         orientation = newOrientation
 
         val params = layout.layoutParams
@@ -578,6 +579,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     override fun onDestroyView() {
+        logDebug("View destroyed")
         closeVideo(this.peerId!!, this.clientId!!)
         vAvatar.setImageBitmap(null)
         super.onDestroyView()

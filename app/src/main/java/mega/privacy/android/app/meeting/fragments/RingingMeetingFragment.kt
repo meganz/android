@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatError
 import java.util.*
 
 
@@ -207,7 +208,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             }
 
             override fun onErrorAnsweredCall(errorCode: Int) {
-                showSnackBar("Answer call failed, error code: $errorCode")
+                if (errorCode == MegaChatError.ERROR_TOOMANY) {
+                    showSnackBar(StringResourcesUtils.getString(R.string.call_error_too_many_participants)
+                    )
+                } else {
+                    showSnackBar(StringResourcesUtils.getString(R.string.call_error),)
+                }
             }
         })
 

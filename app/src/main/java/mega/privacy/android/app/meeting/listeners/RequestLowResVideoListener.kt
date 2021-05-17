@@ -18,7 +18,7 @@ class RequestLowResVideoListener(context: Context?) : ChatBaseListener(context) 
         if (e.errorCode == MegaError.API_OK) {
             LogUtil.logDebug("Request low res video: chatId = "+request.chatHandle+", lowRes? "+request.flag+", clientId = "+request.userHandle)
         } else {
-            LogUtil.logError("Error Request low res video")
+            LogUtil.logError("Error Request low res video. Error code "+e.errorCode)
         }
     }
 }

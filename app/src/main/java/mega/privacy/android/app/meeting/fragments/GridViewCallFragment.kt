@@ -31,6 +31,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
         if (isFirsTime) {
+            logDebug("Participants changed")
             isFirsTime = false
             val newData = sliceBy6(it)
             adapterPager.let {
@@ -77,6 +78,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
             }
         })
 
+        logDebug("View created and participants added")
         val newData = sliceBy6(participants)
         adapterPager.let {
             it.setNewData(newData)
@@ -107,10 +109,10 @@ class GridViewCallFragment : MeetingBaseFragment(),
         adapterPager.let {
             it.setNewData(newData)
             if (isAdded) {
-                logDebug("New participant added")
+                logDebug("Participant added in $position")
                 it.participantAdded(viewPagerData, newData, position)
             } else {
-                logDebug("New participant removed")
+                logDebug("Participant removed in $position")
                 it.participantRemoved(viewPagerData, newData, position)
             }
         }
@@ -125,6 +127,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
     fun updateCallOnHold(isCallOnHold: Boolean) {
         val iterator = participants.iterator()
         iterator.forEach {
+            logDebug("Update call on hold status")
             adapterPager.updateCallOnHold(
                 it,
                 isCallOnHold,
@@ -144,6 +147,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
             session.peerid,
             session.clientid
         )?.let {
+            logDebug("Update session on hold status")
             adapterPager.updateSessionOnHold(
                 it,
                 session.isOnHold,
@@ -164,6 +168,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
             session.peerid,
             session.clientid
         )?.let {
+            logDebug("Update remote A/V")
             adapterPager.updateParticipantAudioVideo(
                 type,
                 it,
@@ -183,6 +188,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
             session.peerid,
             session.clientid
         )?.let {
+            logDebug("Update participant resolution")
             adapterPager.updateRemoteResolution(it, currentPage, viewDataBinding.gridViewPager)
         }
     }
@@ -199,6 +205,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
                 peer.peerId,
                 peer.clientId
             )?.let {
+                logDebug("Update participant resolution")
                 adapterPager.updateParticipantRes(it, currentPage, viewDataBinding.gridViewPager)
             }
         }
@@ -216,6 +223,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
                 peer.peerId,
                 peer.clientId
             )?.let {
+                logDebug("Update participant name")
                 adapterPager.updateParticipantName(it, currentPage, viewDataBinding.gridViewPager)
             }
         }
@@ -233,6 +241,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
                 peer.peerId,
                 peer.clientId
             )?.let {
+                logDebug("Update participant privileges")
                 adapterPager.updateParticipantPrivileges(
                     it,
                     currentPage,
@@ -253,6 +262,12 @@ class GridViewCallFragment : MeetingBaseFragment(),
         adapterPager.updateOrientation(newOrientation, widthPixels, heightPixels)
     }
 
+    /**
+     * Method for resizing the listener
+     *
+     * @param peerId
+     * @param clientId
+     */
     override fun resetSize(peerId: Long, clientId: Long) {
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
             peerId,
@@ -260,6 +275,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
         )?.let {
             if (it.isVideoOn) {
                 it.videoListener?.let {
+                    logDebug("Resize participant listener")
                     it.height = 0
                     it.width = 0
                 }
@@ -268,11 +284,12 @@ class GridViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
-     * Method to destroy the surfaceView.
+     * Method to delete the videos and texture views of participants
      */
     private fun removeSurfaceView() {
         val iterator = participants.iterator()
         iterator.forEach {
+            logDebug("Remove texture view")
             adapterPager.removeSurfaceView(it, currentPage, viewDataBinding.gridViewPager)
         }
     }
@@ -281,6 +298,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
         val iterator = participants.iterator()
         iterator.forEach { participant ->
             participant.videoListener?.let {
+                logDebug("Resize speaker listener")
                 it.height = 0
                 it.width = 0
             }
@@ -289,6 +307,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
     }
 
     override fun onDestroyView() {
+        logDebug("View destroyed")
         removeSurfaceView()
         super.onDestroyView()
     }

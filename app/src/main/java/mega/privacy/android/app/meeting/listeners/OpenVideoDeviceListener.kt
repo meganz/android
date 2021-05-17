@@ -28,7 +28,7 @@ class OpenVideoDeviceListener(context: Context?) : ChatBaseListener(context) {
             }
             callback?.onVideoDeviceOpened(isEnabled)
         } else {
-            LogUtil.logError("Error Opened Video Device")
+            LogUtil.logError("Error Opened Video Device. Error code "+e.errorCode)
         }
     }
 

@@ -67,8 +67,10 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchMic(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
         if (bOn) {
+            logDebug("Enable local audio")
             megaChatApi.enableAudio(chatId, listener)
         } else {
+            logDebug("Disable local audio")
             megaChatApi.disableAudio(chatId, listener)
         }
     }
@@ -81,8 +83,10 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchCameraBeforeStartMeeting(bOn: Boolean, listener: MegaChatRequestListenerInterface) {
         if (bOn) {
+            logDebug("Open video device")
             megaChatApi.openVideoDevice(listener)
         } else {
+            logDebug("Release video device")
             megaChatApi.releaseVideoDevice(listener)
         }
     }
@@ -96,8 +100,10 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchCamera(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
         if (bOn) {
+            logDebug("Enable video")
             megaChatApi.enableVideo(chatId, listener)
         } else {
+            logDebug("Disable video")
             megaChatApi.disableVideo(chatId, listener)
         }
     }
@@ -128,6 +134,7 @@ class MeetingActivityRepository @Inject constructor(
      *  Select the video device to be used in calls
      */
     fun setChatVideoInDevice(cameraDevice: String, listener: MegaChatRequestListenerInterface?) {
+        logDebug("Set chat video in device")
         megaChatApi.setChatVideoInDevice(cameraDevice, listener)
     }
 
@@ -138,6 +145,7 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
         if (MegaApplication.getInstance().audioManager != null) {
+            logDebug("Switch the speaker")
             MegaApplication.getInstance().audioManager.selectAudioDevice(
                 device,
                 false

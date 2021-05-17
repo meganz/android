@@ -657,9 +657,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         callInProgressLayout.setEnabled(true);
 
         if (errorCode == MegaChatError.ERROR_TOOMANY) {
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
+            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), -1);
         } else {
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
+            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), -1);
         }
     }
 

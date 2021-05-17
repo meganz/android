@@ -43,7 +43,7 @@ class VideoMeetingViewHolder(
 
     private var isGrid: Boolean = true
 
-    private var SIZE_AVATAR = 88
+    private var avatarSize = 88
     private var peerId: Long? = MEGACHAT_INVALID_HANDLE
     private var clientId: Long? = MEGACHAT_INVALID_HANDLE
 
@@ -68,7 +68,7 @@ class VideoMeetingViewHolder(
 
         when {
             isGrid -> {
-                SIZE_AVATAR = 88
+                avatarSize = 88
                 if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                     portraitLayout(isFirstPage, itemCount)
                 } else {
@@ -78,7 +78,7 @@ class VideoMeetingViewHolder(
                 binding.name.text = participant.name
             }
             else -> {
-                SIZE_AVATAR = 60
+                avatarSize = 60
                 val layoutParams = binding.root.layoutParams
                 layoutParams.width = dp2px(ITEM_WIDTH)
                 layoutParams.height = dp2px(ITEM_HEIGHT)
@@ -102,16 +102,16 @@ class VideoMeetingViewHolder(
     private fun initAvatar(participant: Participant) {
         val paramsAvatar = binding.avatar.layoutParams
         paramsAvatar.width =
-            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+            dp2px(avatarSize.toFloat(), MegaApplication.getInstance().displayMetrics)
         paramsAvatar.height =
-            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+            dp2px(avatarSize.toFloat(), MegaApplication.getInstance().displayMetrics)
         binding.avatar.layoutParams = paramsAvatar
 
         val paramsOnHoldIcon = binding.onHoldIcon.layoutParams
         paramsOnHoldIcon.width =
-            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+            dp2px(avatarSize.toFloat(), MegaApplication.getInstance().displayMetrics)
         paramsOnHoldIcon.height =
-            dp2px(SIZE_AVATAR.toFloat(), MegaApplication.getInstance().displayMetrics)
+            dp2px(avatarSize.toFloat(), MegaApplication.getInstance().displayMetrics)
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
         binding.avatar.setImageBitmap(participant.avatar)
@@ -345,7 +345,6 @@ class VideoMeetingViewHolder(
     fun checkVideoOn(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-
         if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
             logDebug("Video should be on")
             videoOnUI(participant)
@@ -474,12 +473,10 @@ class VideoMeetingViewHolder(
         }
 
         participant.videoListener?.let { listener ->
-            listener.textureView?.let { textureView ->
-                textureView.parent?.let { surfaceParent ->
-                    (surfaceParent as ViewGroup).removeView(textureView)
+            listener.textureView?.let { view ->
+                view.parent?.let { surfaceParent ->
+                    (surfaceParent as ViewGroup).removeView(view)
                 }
-
-                textureView.isVisible = false
             }
 
             participant.videoListener = null

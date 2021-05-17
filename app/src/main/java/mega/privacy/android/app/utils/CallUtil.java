@@ -19,7 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -69,6 +68,7 @@ public class CallUtil {
      * @param context Context*
      */
     public static void openMeetingToCreate(Context context) {
+        logDebug("Open create a meeting screen");
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_CREATE);
         context.startActivity(meetingIntent);
@@ -77,13 +77,13 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
-     * @param context Context
-     * @param chatId  chat ID
+     * @param context     Context
+     * @param chatId      chat ID
      * @param meetingName Meeting Name
-     * @param link Meeting's link
-     *
+     * @param link        Meeting's link
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
+        logDebug("Open join a meeting screen");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -101,6 +101,7 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingRinging(Context context, long chatId) {
+        logDebug("Open incoming call screen");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -118,17 +119,19 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask) {
+        logDebug("Open in progress call screen");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        if(isNewTask){
+        if (isNewTask) {
             MegaApplication.getInstance().openCallService(chatId);
         }
 
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-        if(isNewTask){
+        if (isNewTask) {
+            logDebug("New task");
             meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }else{
+        } else {
             meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
         context.startActivity(meetingIntent);
@@ -143,6 +146,7 @@ public class CallUtil {
      * @param isVideoEnable it the video is ON
      */
     public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable) {
+        logDebug("Open call with audio or video");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -160,9 +164,10 @@ public class CallUtil {
      * @param context     Context
      * @param meetingName Meeting Name
      * @param chatId      chat ID
-     * @param link Meeting's link
+     * @param link        Meeting's link
      */
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
+        logDebug("Open meeting in guest mode");
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
@@ -420,7 +425,6 @@ public class CallUtil {
     private static void createCallMenuItem(MegaChatCall call, final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem) {
         Context context = MegaApplication.getInstance().getBaseContext();
         int callStatus = call.getStatus();
-        //layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context, callStatus == MegaChatCall.CALL_STATUS_RECONNECTING ? R.drawable.reconnection_rounded : R.drawable.dark_rounded_chat_own_message));
         layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
 
         if (chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
@@ -585,35 +589,6 @@ public class CallUtil {
             }
         }
         return finalTime + minutesString + ":" + secondsString;
-    }
-
-    public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity) {
-        if (activity == null) {
-            return;
-        }
-
-        try {
-            MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-            dialogBuilder.setPositiveButton(
-                    activity.getString(android.R.string.ok),
-                    (dialog, which) -> {
-                        dialog.dismiss();
-                        if (finish) {
-                            activity.finishAndRemoveTask();
-                        }
-                    });
-            dialogBuilder.setOnCancelListener(dialog -> {
-                if (finish) {
-                    activity.finishAndRemoveTask();
-                }
-            });
-
-            AlertDialog dialog = dialogBuilder.create();
-            dialog.show();
-            brandAlertDialog(dialog);
-        } catch (Exception ex) {
-            showToast(activity, message);
-        }
     }
 
     public static String callStatusToString(int status) {
@@ -802,17 +777,6 @@ public class CallUtil {
         }
 
         return new ChatController(context).getParticipantFullName(peerId);
-    }
-
-    /**
-     * Method for finding out if the participant is me.
-     *
-     * @param peerId The Peer ID.
-     * @return True if it's me. Otherwise, False.
-     */
-    public static boolean isItMe(long chatId, long peerId, long clientId) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        return peerId == megaChatApi.getMyUserHandle() && clientId == megaChatApi.getMyClientidHandle(chatId);
     }
 
     /**

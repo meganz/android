@@ -6,15 +6,19 @@ import android.content.Intent;
 import org.jetbrains.annotations.Nullable;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatError;
+
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -158,7 +162,11 @@ public class CallNotificationIntentService extends IntentService implements Snac
 
     @Override
     public void onErrorAnsweredCall(int errorCode) {
-
+        if (errorCode == MegaChatError.ERROR_TOOMANY) {
+            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), -1);
+        } else {
+            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), -1);
+        }
     }
 
     @Override

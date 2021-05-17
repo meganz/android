@@ -204,8 +204,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
-	private static boolean wasLocalVideoEnable = false;
-	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
 	private static boolean arePreferenceCookiesEnabled = false;
@@ -222,7 +220,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private AppRTCAudioManager rtcAudioManagerRingInCall;
     private static MegaApplication singleApplicationInstance;
 	private PowerManager.WakeLock wakeLock;
-	//private CallListener callListener = new CallListener();
+
 	private MeetingListener meetingListener = new MeetingListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
@@ -567,21 +565,25 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if (callStatus == CALL_STATUS_USER_NO_PRESENT && isRinging) {
+					logDebug("Is incoming call");
 					incomingCall(listAllCalls, chatId, callStatus);
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
-						ongoingCall(chatId, (isOutgoing && isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING :AUDIO_MANAGER_CALL_IN_PROGRESS);
+					logDebug("Is ongoing call");
+					ongoingCall(chatId, (isOutgoing && isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+				logDebug("The user is no longer participating");
 				clearIncomingCallNotification(callId);
 				removeValues(chatId);
 				setRequestSentCall(callId, false);
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
+				logDebug("the call has ended");
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
@@ -599,6 +601,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return;
 		}
 		if (isRinging) {
+			logDebug("Is incoming call");
 			incomingCall(listAllCalls, call.getChatid(), callStatus);
 		}
 	};
@@ -607,6 +610,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaChatSession session = (MegaChatSession) sessionAndCall.second;
 		int sessionStatus = session.getStatus();
 		if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+			logDebug("Session is in progress");
 			long callId = (long) sessionAndCall.first;
 			setRequestSentCall(callId, false);
 			updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
@@ -621,7 +625,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * @param callStatus   Call Status
 	 */
 	private void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-		if(!megaApi.isChatNotifiable(chatId))
+		if (!megaApi.isChatNotifiable(chatId))
 			return;
 
 		logDebug("Incoming call");
@@ -632,20 +636,20 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	/**
 	 * Method that performs the necessary actions when there is an outgoing call or incoming call.
 	 *
-	 * @param chatId       Chat ID
+	 * @param chatId           Chat ID
 	 * @param typeAudioManager audio Manager type
 	 */
 	public void ongoingCall(long chatId, int typeAudioManager) {
-		if(rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
+		if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
 			return;
 
 		logDebug("Controlling outgoing/in progress call");
-		if(typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && isOpeningMeetingLink(chatId)){
+		if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && isOpeningMeetingLink(chatId)) {
 			clearIncomingCallNotification(chatId);
 			return;
 		}
 
-		if(!isCreatingMeeting(chatId)){
+		if (!isCreatingMeeting(chatId)) {
 			createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
 		}
 	}
@@ -796,7 +800,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
-
 
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
@@ -1548,7 +1551,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 			toIncomingCall(this, callToLaunch, megaChatApi);
 		} else {
-			if(!isOpeningMeetingLink(chatId)){
+			if (!isOpeningMeetingLink(chatId)) {
+				logDebug("The call screen should be displayed");
 				launchCallActivity(callToLaunch);
 			}
 		}
@@ -1579,7 +1583,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		if (callToLaunch != null) {
-			logDebug("Open call");
+			logDebug("The call screen should be displayed");
 			launchCallActivity(callToLaunch);
 		}
 	}
@@ -1624,17 +1628,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	private void removeStatusVideoAndSpeaker(long chatId){
+	private void removeStatusVideoAndSpeaker(long chatId) {
 		hashMapSpeaker.remove(chatId);
 		hashMapVideo.remove(chatId);
 	}
 
-	public AppRTCAudioManager getAudioManager(){
+	public AppRTCAudioManager getAudioManager() {
 		return rtcAudioManager;
 	}
 
-	public void createOrUpdateAudioManager(boolean isSpeakerOn, int type){
-		if(type == AUDIO_MANAGER_CALL_RINGING){
+	public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
+		logDebug("Create or update audio manager, type is " + type);
+		if (type == AUDIO_MANAGER_CALL_RINGING) {
 			if (rtcAudioManagerRingInCall != null) {
 				removeRTCAudioManagerRingIn();
 			}
@@ -1649,7 +1654,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 			logDebug("Creating RTC Audio Manager (ringing mode)");
 			rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, AUDIO_MANAGER_CALL_RINGING);
-		}else{
+		} else {
 			if (rtcAudioManager != null) {
 				rtcAudioManager.setTypeAudioManager(type);
 				return;
@@ -1657,7 +1662,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			logDebug("Creating RTC Audio Manager");
 			removeRTCAudioManagerRingIn();
-			this.isSpeakerOn = isSpeakerOn;
+			MegaApplication.isSpeakerOn = isSpeakerOn;
 			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
 			startProximitySensor();
 		}
@@ -1667,7 +1672,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * Remove the incoming call AppRTCAudioManager.
      */
     public void removeRTCAudioManagerRingIn() {
-
 		if (rtcAudioManagerRingInCall == null)
             return;
 
@@ -1784,7 +1788,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void launchCallActivity(MegaChatCall call) {
-		logDebug("Show the call screen: " + callStatusToString(call.getStatus())+", callId = "+ call.getCallId());
+		logDebug("Show the call screen: " + callStatusToString(call.getStatus()) + ", callId = " + call.getCallId());
 		openMeetingRinging(this, call.getChatid());
 	}
 

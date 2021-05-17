@@ -46,7 +46,7 @@ class DisableAudioVideoCallListener(context: Context?) : ChatBaseListener(contex
             }
             MegaChatError.ERROR_TOOMANY -> {
                 when (typeChange) {
-                    MegaChatRequest.AUDIO -> LogUtil.logError("There are too many participants in the call sending audio.")
+                    MegaChatRequest.AUDIO -> LogUtil.logError("There are too many participants in the call sending audio")
                     else -> LogUtil.logError("There are too many participants in the call sending video.")
                 }
             }

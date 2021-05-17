@@ -27,7 +27,7 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
             MegaApplication.setRequestSentCall(call.callId, false)
             callback?.onCallAnswered(request.chatHandle, request.flag)
         } else {
-            LogUtil.logError("Error answering the call")
+            LogUtil.logError("Error answering the call. Error code "+e.errorCode)
             callback?.onErrorAnsweredCall(e.errorCode)
         }
     }

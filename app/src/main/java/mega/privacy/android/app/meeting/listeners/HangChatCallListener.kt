@@ -26,7 +26,7 @@ class HangChatCallListener(context: Context?) : ChatBaseListener(context) {
             logDebug("Call hung up")
             callback?.onCallHungUp(request.chatHandle)
         } else {
-            LogUtil.logError("Error Hanging up the call")
+            LogUtil.logError("Error Hanging up the call. Error code "+e.errorCode)
         }
     }
 
