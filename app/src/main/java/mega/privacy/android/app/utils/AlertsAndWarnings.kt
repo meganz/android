@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +15,9 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 object AlertsAndWarnings {
@@ -52,13 +52,6 @@ object AlertsAndWarnings {
 
         if (app.currentActivity is OverDiskQuotaPaywallActivity) {
             return
-        }
-
-        if (app.currentActivity is ManagerActivityLollipop) {
-            val upAFL = (app.currentActivity as ManagerActivityLollipop).upgradeAccountFragment
-            if (upAFL != null && upAFL.isVisible) {
-                return
-            }
         }
 
         val intent = Intent(app.applicationContext, OverDiskQuotaPaywallActivity::class.java)
@@ -206,5 +199,32 @@ object AlertsAndWarnings {
     @JvmStatic
     fun dismissAlertDialogIfShown(dialog: AlertDialog?) {
         dialog?.dismiss()
+    }
+
+    @JvmStatic
+    fun askForCustomizedPlan(context: Context, myEmail:String, accountType: Int) {
+        LogUtil.logDebug("askForCustomizedPlan")
+        val body = StringBuilder()
+        body.append(getString(R.string.subject_mail_upgrade_plan))
+            .append("\n\n\n\n\n\n\n")
+            .append("""${getString(R.string.settings_about_app_version)} v${getString(R.string.app_version)}""")
+            .append(getString(R.string.user_account_feedback).toString() + "  " + myEmail)
+
+        when (accountType) {
+            0 -> body.append(" (" + getString(R.string.my_account_free) + ")")
+            1 -> body.append(" (" + getString(R.string.my_account_pro1) + ")")
+            2 -> body.append(" (" + getString(R.string.my_account_pro2) + ")")
+            3 -> body.append(" (" + getString(R.string.my_account_pro3) + ")")
+            4 -> body.append(" (" + getString(R.string.my_account_prolite_feedback_email) + ")")
+            else -> body.append(" (" + getString(R.string.my_account_free) + ")")
+        }
+
+        val emailAndroid = Constants.MAIL_SUPPORT
+        val subject = getString(R.string.title_mail_upgrade_plan)
+        val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$emailAndroid"))
+            .putExtra(Intent.EXTRA_SUBJECT, subject)
+            .putExtra(Intent.EXTRA_TEXT, body.toString())
+
+        context.startActivity(Intent.createChooser(emailIntent, " "))
     }
 }

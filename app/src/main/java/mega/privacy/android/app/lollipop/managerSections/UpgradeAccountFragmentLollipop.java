@@ -513,7 +513,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 	private void contactForCustomPlan() {
 		logDebug("Send Feedback");
-        ((ManagerActivityLollipop) context).askForCustomizedPlan();
 	}
 
 	@Override

@@ -187,7 +187,6 @@ import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLol
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
-import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -264,8 +263,10 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_PRICING;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
@@ -319,7 +320,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
 	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
-	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
@@ -479,7 +479,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES,
 		OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT,
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS,
 		TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
@@ -502,7 +502,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case COMPLETED_TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
 				case RECENT_CHAT: return "rChat";
 				case NOTIFICATIONS: return "notificFragment";
-				case UPGRADE_ACCOUNT: return "upAFL";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
@@ -645,7 +644,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
-	private UpgradeAccountFragmentLollipop upAFL;
 	private CameraUploadsFragment cuFragment;
 	private CameraUploadsFragment muFragment;
 	private RecentChatsFragmentLollipop rChatFL;
@@ -1121,11 +1119,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         mBillingManager.getInventory(skuList -> {
             mSkuDetailsList = skuList;
             myAccountInfo.setAvailableSkus(skuList);
-
-            upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-            if (upAFL != null) {
-                upAFL.setPricingInfo();
-            }
+			LiveEventBus.get(EVENT_UPDATE_PRICING).post(true);
         });
     }
 
@@ -1214,10 +1208,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		myAccountInfo.setLevelInventory(highest);
 		myAccountInfo.setInventoryFinished(true);
 
-		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-		if (upAFL != null) {
-			upAFL.setPricingInfo();
-		}
+		LiveEventBus.get(EVENT_UPDATE_PRICING).post(true);
 	}
 
 	/**
@@ -10310,12 +10301,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		};
 
-		final OnClickListener customPlanClickListener = new OnClickListener(){
-			public void onClick(View v) {
-				alertDialogStorageStatus.dismiss();
-				isStorageStatusDialogShown = false;
-				askForCustomizedPlan();
-			}
+		final OnClickListener customPlanClickListener = v -> {
+			alertDialogStorageStatus.dismiss();
+			isStorageStatusDialogShown = false;
+			askForCustomizedPlan(this, megaApi.getMyEmail(), myAccountInfo.getAccountType());
 		};
 
 		Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_dissmiss);
@@ -10403,52 +10392,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logWarning("Products haven't been initialized!");
 		}
 		return null;
-	}
-
-	public void askForCustomizedPlan(){
-		logDebug("askForCustomizedPlan");
-
-		StringBuilder body = new StringBuilder();
-		body.append(getString(R.string.subject_mail_upgrade_plan));
-		body.append("\n\n\n\n\n\n\n");
-		body.append(getString(R.string.settings_about_app_version)+" v"+getString(R.string.app_version)+"\n");
-		body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
-			body.append(" (" + getString(R.string.my_account_free) + ")");
-		} else {
-			switch (myAccountInfo.getAccountType()) {
-				case 0: {
-					body.append(" (" + getString(R.string.my_account_free) + ")");
-					break;
-				}
-				case 1: {
-					body.append(" (" + getString(R.string.my_account_pro1) + ")");
-					break;
-				}
-				case 2: {
-					body.append(" (" + getString(R.string.my_account_pro2) + ")");
-					break;
-				}
-				case 3: {
-					body.append(" (" + getString(R.string.my_account_pro3) + ")");
-					break;
-				}
-				case 4: {
-					body.append(" (" + getString(R.string.my_account_prolite_feedback_email) + ")");
-					break;
-				}
-			}
-		}
-
-		String emailAndroid = MAIL_SUPPORT;
-		String subject = getString(R.string.title_mail_upgrade_plan);
-
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-		emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-		emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-		startActivity(Intent.createChooser(emailIntent, " "));
-
 	}
 
 	private void refreshOfflineNodes() {
@@ -12462,10 +12405,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public MyAccountFragment getMyAccountFragment() {
 		return maF = (MyAccountFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-	}
-
-	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
-		return upAFL;
 	}
 
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {

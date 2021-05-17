@@ -12,14 +12,18 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_TRANSFER_LABEL
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
@@ -50,6 +54,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    private val updatePricingObserver = Observer<Boolean> { update ->
+        if (update) {
+            setPricingInfo()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,6 +74,8 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         super.onDestroy()
 
         unregisterReceiver(updateMyAccountReceiver)
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_PRICING, Boolean::class.java)
+            .removeObserver(updatePricingObserver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -136,7 +148,7 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         }
 
         binding.lblCustomPlan.setOnClickListener {
-
+            askForCustomizedPlan(this, megaApi.myEmail, viewModel.getAccountType())
         }
 
         checkScroll()
@@ -147,9 +159,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun setUpObservers() {
-        val filter = IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        filter.addAction(ACTION_STORAGE_STATE_CHANGED)
-        registerReceiver(updateMyAccountReceiver, filter)
+        registerReceiver(
+            updateMyAccountReceiver,
+            IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+        )
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_PRICING, Boolean::class.java)
+            .observeForever(updatePricingObserver)
     }
 
     override fun checkScroll() {
