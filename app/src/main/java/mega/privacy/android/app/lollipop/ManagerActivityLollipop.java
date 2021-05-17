@@ -80,7 +80,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -134,12 +133,12 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.myAccount.MyAccountActivity;
+import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -547,8 +546,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private int searchSharedTab = -1;
 	private DrawerItem searchDrawerItem = null;
 	private DrawerItem drawerItem;
-	DrawerItem drawerItemPreUpgradeAccount = null;
-	int accountFragmentPreUpgradeAccount = -1;
 	static MenuItem drawerMenuItem = null;
 	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
@@ -848,29 +845,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
-				if(actionType == UPDATE_GET_PRICING){
-					logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
-					//UPGRADE_ACCOUNT_FRAGMENT
-					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-					if(upAFL!=null){
-						upAFL.setPricingInfo();
-					}
-				}
-				else if(actionType == UPDATE_ACCOUNT_DETAILS){
+				if(actionType == UPDATE_ACCOUNT_DETAILS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
 					if (isFinishing()) {
 						return;
 					}
 
 					updateAccountDetailsVisibleInfo();
-
-					if (getUpgradeAccountFragment() != null) {
-						if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
-							closeUpgradeAccountFragment();
-						} else {
-							upAFL.showAvailableAccount();
-						}
-					}
 
 					if (megaApi.isBusinessAccount()) {
 						supportInvalidateOptionsMenu();
@@ -1527,9 +1508,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		outState.putInt("indexContacts", indexContacts);
 		outState.putString("pathNavigationOffline", pathNavigationOffline);
-		if(drawerItem==DrawerItem.ACCOUNT){
-			outState.putInt("accountFragment", accountFragment);
-		}
 
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
@@ -1565,8 +1543,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putInt("elevation", mElevationCause);
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
-		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
-		outState.putInt("accountFragmentPreUpgradeAccount", accountFragmentPreUpgradeAccount);
 		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 		outState.putBoolean("openLinkDialogIsShown", openLinkDialogIsShown);
 		if (openLinkDialogIsShown) {
@@ -1680,8 +1656,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			mElevationCause = savedInstanceState.getInt("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
-			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
-			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
 			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
 			isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
@@ -3705,19 +3679,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					MegaApplication.setRecentChatVisible(true);
 					break;
-				case ACCOUNT:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					setToolbarTitle();
-					try {
-						NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-						notificationManager.cancel(NOTIFICATION_STORAGE_OVERQUOTA);
-					}
-					catch (Exception e){
-						logError("Exception NotificationManager - remove all notifications", e);
-					}
 
-					break;
-				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 					break;
@@ -4534,19 +4496,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				firstNavigationLevel = true;
 				break;
 			}
-			case ACCOUNT:{
-				aB.setSubtitle(null);
-
-				if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
-					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
-					setFirstNavigationLevel(false);
-				} else {
-					aB.setTitle(null);
-					setFirstNavigationLevel(true);
-				}
-
-				break;
-			}
 			case TRANSFERS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.section_transfers).toUpperCase());
@@ -4631,7 +4580,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if(totalNotifications==0){
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
 					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 				}
@@ -4645,7 +4594,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else{
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
 					badgeDrawable.setProgress(1.0f);
 				}
@@ -4841,7 +4790,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CONTACTS:
 				case SETTINGS:
 				case SEARCH:
-				case ACCOUNT:
 				case TRANSFERS:
 				case MEDIA_UPLOADS:
 				case NOTIFICATIONS:
@@ -5054,31 +5002,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
-	public void selectDrawerItemAccount(){
-		if (myAccountInfo.getNumVersions() == -1) {
-			megaApi.getFolderInfo(megaApi.getRootNode(), this);
-		}
-
-		if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
-			showUpAF();
-		} else {
-			app.refreshAccountInfo();
-			accountFragment = MY_ACCOUNT_FRAGMENT;
-
-			if (getMyAccountFragment() == null) {
-				maF = new MyAccountFragment();
-			} else {
-				maF.expandPaymentInfoIfNeeded();
-			}
-
-			replaceFragment(maF, FragmentTag.MY_ACCOUNT.getTag());
-			checkScrollElevation();
-			setToolbarTitle();
-			supportInvalidateOptionsMenu();
-			showFabButton();
-		}
-	}
-
 	public void selectDrawerItemNotifications(){
 		logDebug("selectDrawerItemNotifications");
 
@@ -5227,9 +5150,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mShowAnyTabLayout = true;
 				break;
 			}
-			case ACCOUNT:
-				fragmentContainer.setVisibility(View.VISIBLE);
-				break;
 			case TRANSFERS: {
 				tabLayoutTransfers.setVisibility(View.VISIBLE);
 				viewPagerTransfers.setVisibility(View.VISIBLE);
@@ -5387,6 +5307,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	if (item == null) {
     		logWarning("The selected DrawerItem is NULL. Using latest or default value.");
     		item = drawerItem != null ? drawerItem : DrawerItem.CLOUD_DRIVE;
+		} else if (item == DrawerItem.ACCOUNT) {
+			showMyAccount();
+			return;
 		}
 
     	logDebug("Selected DrawerItem: " + item.name());
@@ -5626,16 +5549,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     			break;
     		}
-			case ACCOUNT:{
-				showMyAccount();
-//				showHideBottomNavigationView(true);
-//				logDebug("Case ACCOUNT: " + accountFragment);
-////    			tB.setVisibility(View.GONE);
-//				aB.setSubtitle(null);
-//				selectDrawerItemAccount();
-//				supportInvalidateOptionsMenu();
-				break;
-			}
     		case TRANSFERS:{
 				showHideBottomNavigationView(true);
 				aB.setSubtitle(null);
@@ -5898,12 +5811,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
                 break;
             }
-            case ACCOUNT: {
-            	if (getMyAccountFragment() != null) {
-            		maF.checkScroll();
-				}
-                break;
-            }
             case SEARCH: {
 				if (getSearchFragment() != null) {
                     sFLol.checkScroll();
@@ -5999,20 +5906,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showMyAccount(){
-		startActivity(new Intent(this, MyAccountActivity.class));
-//		drawerItem = DrawerItem.ACCOUNT;
-//		selectDrawerItemLollipop(drawerItem);
-	}
+		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
+			drawerLayout.closeDrawer(Gravity.LEFT);
+		}
 
-	public void showUpAF() {
-		logDebug("showUpAF");
-		accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-		setToolbarTitle();
-		upAFL = new UpgradeAccountFragmentLollipop();
-		replaceFragment(upAFL, FragmentTag.UPGRADE_ACCOUNT.getTag());
-		setTabsVisibility();
-		supportInvalidateOptionsMenu();
-		showFabButton();
+		startActivity(new Intent(this, MyAccountActivity.class));
 	}
 
 	private void closeSearchSection() {
@@ -6542,16 +6440,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch(id){
 			case android.R.id.home:{
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
-					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
 							|| drawerItem == DrawerItem.NOTIFICATIONS|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS) {
 						if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 							backToDrawerItem(CLOUD_DRIVE_BNV);
-						}
-						else if (drawerItem == DrawerItem.ACCOUNT && comesFromNotifications) {
-							comesFromNotifications = false;
-							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
-						}
-						else {
+						} else {
 							if (drawerItem == DrawerItem.SETTINGS) {
 								resetSettingsScrollIfNecessary();
 							}
@@ -6626,13 +6519,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 						selectDrawerItemLollipop(drawerItem);
 						return true;
-		    		}
-					else if (drawerItem == DrawerItem.ACCOUNT){
-						if (accountFragment == UPGRADE_ACCOUNT_FRAGMENT) {
-							closeUpgradeAccountFragment();
-							return true;
-						}
-					} else if (drawerItem == DrawerItem.HOMEPAGE) {
+		    		} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 							handleBackPressIfFullscreenOfflineFragmentOpened();
 						} else {
@@ -6983,13 +6870,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
-	        	accountFragmentPreUpgradeAccount = accountFragment;
-	        	drawerItemPreUpgradeAccount = drawerItem;
-	        	drawerItem = DrawerItem.ACCOUNT;
-	        	setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-				displayedAccountType = -1;
-				selectDrawerItemLollipop(drawerItem);
+	        	navigateToUpgradeAccount();
 				return true;
 	        }
 			case R.id.action_menu_forgot_pass:{
@@ -7377,29 +7258,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					backToDrawerItem(bottomNavigationCurrentItem);
 					break;
 			}
-		} else if (drawerItem == DrawerItem.ACCOUNT) {
-			logDebug("MyAccountSection");
-			logDebug("The accountFragment is: " + accountFragment);
-    		switch(accountFragment) {
-	    		case MY_ACCOUNT_FRAGMENT:
-					if (comesFromNotifications) {
-						comesFromNotifications = false;
-						selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
-					} else {
-						backToDrawerItem(bottomNavigationCurrentItem);
-					}
-
-	    			break;
-	    		case UPGRADE_ACCOUNT_FRAGMENT:
-					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");
-					closeUpgradeAccountFragment();
-	    			break;
-	    		case OVERQUOTA_ALERT:
-				default:
-	    			backToDrawerItem(bottomNavigationCurrentItem);
-	    			break;
-    		}
-    	} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
 			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 			if (cuFragment == null || cuFragment.onBackPressed() == 0){
@@ -7467,33 +7326,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			updateHomepageFabPosition();
 		}
-	}
-
-	private void closeUpgradeAccountFragment() {
-		setFirstNavigationLevel(true);
-		displayedAccountType = -1;
-
-		if (drawerItemPreUpgradeAccount != null) {
-			if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
-				if (accountFragmentPreUpgradeAccount == -1) {
-					accountFragment = MY_ACCOUNT_FRAGMENT;
-				} else {
-					accountFragment = accountFragmentPreUpgradeAccount;
-				}
-			}
-
-			drawerItem = drawerItemPreUpgradeAccount;
-		} else {
-			accountFragment = MY_ACCOUNT_FRAGMENT;
-			drawerItem = DrawerItem.ACCOUNT;
-		}
-
-		selectDrawerItemLollipop(drawerItem);
-
-        // Hide fragment (required to check if show ODQ Paywall)
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.hide(upAFL);
-        ft.commitNow();
 	}
 
 	public void backToDrawerItem(int item) {
@@ -9173,15 +9005,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void navigateToUpgradeAccount(){
-		logDebug("navigateToUpgradeAccount");
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
-		getProLayout.setVisibility(View.GONE);
-		drawerItemPreUpgradeAccount = drawerItem;
-		drawerItem = DrawerItem.ACCOUNT;
-		accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-		displayedAccountType = -1;
-		selectDrawerItemLollipop(drawerItem);
+		startActivity(new Intent(this, UpgradeAccountActivity.class));
 	}
 
 	public void navigateToAchievements(){
@@ -9257,9 +9081,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			case R.id.navigation_drawer_account_section:
 			case R.id.my_account_section: {
 				if (isOnline(this) && megaApi.getRootNode()!=null) {
-					sectionClicked = true;
-					drawerItem = DrawerItem.ACCOUNT;
-					accountFragment = MY_ACCOUNT_FRAGMENT;
+					showMyAccount();
 				}
 				break;
 			}
@@ -9300,12 +9122,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
-				sectionClicked = true;
-				drawerLayout.closeDrawer(Gravity.LEFT);
-				drawerItemPreUpgradeAccount = drawerItem;
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-				displayedAccountType = -1;
+				navigateToUpgradeAccount();
 				break;
 			}
 			case R.id.lost_authentication_device: {
@@ -10688,42 +10505,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		dissmisDialog();
 
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
-
-		if(drawerItem == DrawerItem.ACCOUNT){
-			if(infos!=null){
-				for (ShareInfo info : infos) {
-					String avatarPath = info.getFileAbsolutePath();
-					if(avatarPath!=null){
-						logDebug("Chosen picture to change the avatar");
-						File imgFile = new File(avatarPath);
-						File qrFile = buildQrFile(this, megaApi.getMyUser().getEmail() + QR_IMAGE_FILE_NAME);
-						File newFile = buildAvatarFile(this, megaApi.getMyUser().getEmail() + "Temp.jpg");
-
-
-						if (isFileAvailable(qrFile)) {
-							qrFile.delete();
-						}
-                        if (newFile != null) {
-                            MegaUtilsAndroid.createAvatar(imgFile,newFile);
-
-                            if (getMyAccountFragment() != null) {
-                                megaApi.setAvatar(newFile.getAbsolutePath(),this);
-                            }
-                        } else {
-							logError("ERROR! Destination PATH is NULL");
-                        }
-					}
-					else{
-						logError("The chosen avatar path is NULL");
-					}
-				}
-			}
-			else{
-				logWarning("infos is NULL");
-			}
-			return;
-		}
-
 		if(parentNode == null){
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1);
 			return;
@@ -12849,31 +12630,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
 	/**
-	 * Changes on My account fragment, the status bar and toolbar background colors depending on elevation.
-	 *
-	 * @param withElevation True if should set elevation, false otherwise.
-	 */
-	public void changeMyAccountAppBarElevation(boolean withElevation) {
-		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
-
-		if (withElevation) {
-			if (Util.isDarkMode(this)) {
-				ColorUtils.changeStatusBarColorForElevation(this, true);
-				toolbar.setBackgroundColor(ColorUtils.getColorForElevation(this, elevation));
-				abL.setElevation(0);
-			} else {
-				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
-				toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
-				abL.setElevation(elevation);
-			}
-		} else {
-			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
-			toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_020_grey_087));
-			abL.setElevation(0);
-		}
-	}
-
-	/**
 	 * This method is used to change the elevation of the AppBarLayout when
 	 * scrolling the RecyclerView
 	 * @param withElevation true if need elevation, false otherwise
@@ -13225,10 +12981,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return searchQuery != null && searchExpand;
 	}
 
-    public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
-		this.accountFragmentPreUpgradeAccount = accountFragment;
-	}
-
     private void refreshAddPhoneNumberButton(){
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
 
@@ -13292,9 +13044,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private void setCallWidget() {
 		setCallBadge();
 
-		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
-				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
-				drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
+		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.SEARCH
+				|| drawerItem == DrawerItem.TRANSFERS || drawerItem == DrawerItem.NOTIFICATIONS
+				|| drawerItem == DrawerItem.HOMEPAGE || !isScreenInPortrait(this)) {
 			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
 		}

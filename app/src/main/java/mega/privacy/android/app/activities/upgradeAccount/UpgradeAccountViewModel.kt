@@ -14,7 +14,8 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.PRO_LITE
-import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
+import mega.privacy.android.app.utils.DBUtil.callToPricing
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -41,13 +42,13 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
 
     fun refreshAccountInfo() {
         logDebug("Check the last call to callToPricing")
-        if (DBUtil.callToPricing()) {
+        if (callToPricing()) {
             logDebug("megaApi.getPricing SEND")
             MegaApplication.getInstance().askForPricing()
         }
 
         logDebug("Check the last call to callToPaymentMethods")
-        if (DBUtil.callToPaymentMethods()) {
+        if (callToPaymentMethods()) {
             logDebug("megaApi.getPaymentMethods SEND")
             MegaApplication.getInstance().askForPaymentMethods()
         }

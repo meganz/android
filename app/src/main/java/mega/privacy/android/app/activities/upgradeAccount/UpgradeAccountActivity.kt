@@ -1,5 +1,9 @@
 package mega.privacy.android.app.activities.upgradeAccount
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
@@ -13,6 +17,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_TRANSFER_LABEL
 import mega.privacy.android.app.components.ListenScrollChangesHelper
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
@@ -29,6 +34,22 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
     private var displayedAccountType = INVALID_VALUE
 
+    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (isFinishing) {
+                return
+            }
+
+            when (intent.getIntExtra(
+                BroadcastConstants.ACTION_TYPE,
+                BroadcastConstants.INVALID_ACTION
+            )) {
+                UPDATE_GET_PRICING -> setPricingInfo()
+                UPDATE_ACCOUNT_DETAILS -> showAvailableAccount()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,6 +57,13 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         setContentView(binding.root)
 
         setUpView()
+        setUpObservers()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        unregisterReceiver(updateMyAccountReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -116,6 +144,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         refreshAccountInfo()
         setPricingInfo()
         showAvailableAccount()
+    }
+
+    private fun setUpObservers() {
+        val filter = IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+        filter.addAction(ACTION_STORAGE_STATE_CHANGED)
+        registerReceiver(updateMyAccountReceiver, filter)
     }
 
     override fun checkScroll() {

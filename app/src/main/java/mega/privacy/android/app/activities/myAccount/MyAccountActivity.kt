@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.myAccount
 
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,6 +21,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
@@ -38,6 +40,8 @@ class MyAccountActivity : PasscodeActivity() {
 
     private val viewModel: MyAccountViewModel by viewModels()
 
+    private lateinit var myAccountFragment: MyAccountFragment
+
     private var menu: Menu? = null
 
     private var killSessionsConfirmationDialog: AlertDialog? = null
@@ -54,12 +58,10 @@ class MyAccountActivity : PasscodeActivity() {
             )
 
             when (actionType) {
-                UPDATE_ACCOUNT_DETAILS -> {
-                    //Update my account fragment info
+                UPDATE_ACCOUNT_DETAILS -> if (this@MyAccountActivity::myAccountFragment.isInitialized) {
+                    myAccountFragment.setUpAccountDetails()
                 }
-                UPDATE_CREDIT_CARD_SUBSCRIPTION -> {
-                    refreshMenuOptionsVisibility()
-                }
+                UPDATE_CREDIT_CARD_SUBSCRIPTION -> refreshMenuOptionsVisibility()
             }
         }
     }
@@ -72,8 +74,9 @@ class MyAccountActivity : PasscodeActivity() {
         setUpObservers()
 
         if (savedInstanceState == null) {
+            myAccountFragment = MyAccountFragment()
             supportFragmentManager.beginTransaction()
-                .add(R.id.container, MyAccountFragment())
+                .add(R.id.container, myAccountFragment)
                 .commit()
         } else {
             when {
@@ -114,6 +117,17 @@ class MyAccountActivity : PasscodeActivity() {
     override fun onResume() {
         super.onResume()
         app.refreshAccountInfo()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        try {
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(
+                NOTIFICATION_STORAGE_OVERQUOTA
+            )
+        } catch (e: Exception) {
+            LogUtil.logError("Exception NotificationManager - remove all notifications", e)
+        }
     }
 
     override fun onDestroy() {
