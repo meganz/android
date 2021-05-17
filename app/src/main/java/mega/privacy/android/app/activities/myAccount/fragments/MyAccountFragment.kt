@@ -534,7 +534,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
         }
 
         binding.contactsSubtitle.text = StringResourcesUtils.getQuantityString(
-            R.plurals.general_selection_num_contacts,
+            R.plurals.my_account_connections,
             visibleContacts.size,
             visibleContacts.size
         )
