@@ -3925,4 +3925,6 @@
 
     <!-- Section name for the “Requests” section.Preferably one word. There is little space for this word. -->
     <string name="section_requests">Requests</string>
+    <!-- Section name for the “Groups” section.Preferably one word. There is little space for this word. -->
+    <string name="section_groups">Groups</string>
 </resources>

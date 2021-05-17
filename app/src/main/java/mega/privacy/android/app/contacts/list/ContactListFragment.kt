@@ -91,6 +91,11 @@ class ContactListFragment : Fragment() {
         binding.btnRequests.setOnClickListener {
             findNavController().navigate(ContactListFragmentDirections.actionListToRequests())
         }
+
+        binding.btnGroups.setOnClickListener {
+            findNavController().navigate(ContactListFragmentDirections.actionListToGroups())
+        }
+
         binding.btnAddContact.setOnClickListener { openAddContactScreen() }
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.black)
