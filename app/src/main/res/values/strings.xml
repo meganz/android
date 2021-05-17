@@ -3929,17 +3929,17 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">File extension change</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">You may not be able to access this file if you change it from “.%1$s” to “.%2$s”</string>
+    <string name="file_extension_change_warning">You may not be able to access this file if you change the extension from “.%1$s” to “.%2$s”</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">You may not be able to access this file if you change it from empty to “.%1$s”</string>
+    <string name="file_extension_change_warning_old_empty">You may not be able to access this file if you add the “.%1$s” extension</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">You may not be able to access this file if you change it from “.%1$s” to empty</string>
+    <string name="file_extension_change_warning_new_empty">You may not be able to access this file if you remove the “.%1$s” extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Use empty</string>
+    <string name="action_use_empty_new_extension">Remove extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
     <string name="action_use_new_extension">Use .%1$s</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Keep empty</string>
+    <string name="action_keep_empty_old_extension">No extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
 </resources>
