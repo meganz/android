@@ -31,7 +31,7 @@ class ContactListViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-                    contacts.value = items
+                    contacts.value = items.toList()
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())
@@ -45,7 +45,7 @@ class ContactListViewModel @ViewModelInject constructor(
             if (queryString.isNullOrBlank()) {
                 items
             } else {
-                items.filter { item -> item.name?.contains(queryString!!, true) == true }
+                items.filter { it.matches(queryString!!) }
             }
         }
 

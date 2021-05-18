@@ -54,8 +54,8 @@ class ContactListAdapter constructor(
                 VIEW_TYPE_ITEM
             position == 0 ->
                 VIEW_TYPE_ITEM_WITH_HEADER
-            getItem(position).name?.firstOrNull()?.isLetter() == true &&
-                getItem(position - 1).name?.firstOrNull() != getItem(position).name?.firstOrNull() ->
+            getItem(position).firstName?.firstOrNull()?.isLetter() == true &&
+                getItem(position - 1).firstName?.firstOrNull() != getItem(position).firstName?.firstOrNull() ->
                 VIEW_TYPE_ITEM_WITH_HEADER
             else ->
                 VIEW_TYPE_ITEM

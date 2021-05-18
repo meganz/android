@@ -12,7 +12,9 @@ import mega.privacy.android.app.utils.view.TextDrawable
 data class ContactItem constructor(
     val handle: Long,
     val email: String,
-    val name: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val alias: String? = null,
     val status: Int? = null,
     @ColorRes val statusColor: Int? = null,
     var imageUri: Uri? = null,
@@ -22,10 +24,10 @@ data class ContactItem constructor(
 ) {
 
     fun getFirstCharacter(): String? =
-        name?.firstOrNull()?.toString()
+        firstName?.firstOrNull()?.toString()
 
     fun getPlaceholderDrawable(resources: Resources): Drawable? =
-        if (imageColor != null && !name.isNullOrBlank()) {
+        if (imageColor != null && !firstName.isNullOrBlank()) {
             TextDrawable.builder()
                 .beginConfig()
                 .fontSize(resources.getDimensionPixelSize(R.dimen.placeholder_contact_text_size))
@@ -36,6 +38,12 @@ data class ContactItem constructor(
         } else {
             null
         }
+
+    fun matches(queryString: String): Boolean =
+        firstName?.contains(queryString, true) == true ||
+                lastName?.contains(queryString, true) == true ||
+                alias?.contains(queryString, true) == true ||
+                email.contains(queryString, true)
 
     class DiffCallback : DiffUtil.ItemCallback<ContactItem>() {
 

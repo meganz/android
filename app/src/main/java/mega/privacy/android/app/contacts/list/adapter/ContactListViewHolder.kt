@@ -12,7 +12,7 @@ class ContactListViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactItem) {
-        binding.txtName.text = item.name
+        binding.txtName.text = item.firstName
         binding.txtHeader.text = item.getFirstCharacter()
         binding.txtLastSeen.text = item.lastSeen
         binding.chipNew.isVisible = item.isNew

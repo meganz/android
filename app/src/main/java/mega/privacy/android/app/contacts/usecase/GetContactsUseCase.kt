@@ -54,7 +54,7 @@ class GetContactsUseCase @Inject constructor(
                 ContactItem(
                     handle = megaUser.handle,
                     email = megaUser.email,
-                    name = userName,
+                    firstName = userName,
                     status = userStatus,
                     statusColor = getUserStatusColor(userStatus),
                     imageUri = userImageUri,
@@ -81,7 +81,15 @@ class GetContactsUseCase @Inject constructor(
                                     )
                                 USER_ATTR_FIRSTNAME ->
                                     contacts[index] = currentContact.copy(
-                                        name = request.text
+                                        firstName = request.text
+                                    )
+                                USER_ATTR_LASTNAME ->
+                                    contacts[index] = currentContact.copy(
+                                        lastName = request.text
+                                    )
+                                USER_ATTR_ALIAS ->
+                                    contacts[index] = currentContact.copy(
+                                        alias = request.text
                                     )
                             }
 
@@ -95,16 +103,6 @@ class GetContactsUseCase @Inject constructor(
                     logError(error.toThrowable().stackTraceToString())
                 }
             )
-
-            contacts.forEach { contact ->
-                val userImageFile = getUserImageFile(context, contact.email).absolutePath
-                megaApi.getUserAvatar(contact.email, userImageFile, userAttrsListener)
-                megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-
-                if (contact.status != STATUS_ONLINE) {
-                    megaChatApi.requestLastGreen(contact.handle, null)
-                }
-            }
 
             val chatListener = OptionalMegaChatListenerInterface(
                 onChatOnlineStatusUpdate = { userHandle, status, _ ->
@@ -143,6 +141,22 @@ class GetContactsUseCase @Inject constructor(
             )
 
             megaChatApi.addChatListener(chatListener)
+
+            contacts.forEach { contact ->
+                if (contact.imageUri == null) {
+                    val userImageFile = getUserImageFile(context, contact.email).absolutePath
+                    megaApi.getUserAvatar(contact.email, userImageFile, userAttrsListener)
+                }
+                if (contact.firstName.isNullOrBlank()) {
+                    megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                }
+                megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
+                megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
+
+                if (contact.status != STATUS_ONLINE) {
+                    megaChatApi.requestLastGreen(contact.handle, null)
+                }
+            }
 
             emitter.setDisposable(Disposable.fromAction {
                 megaChatApi.removeChatListener(chatListener)

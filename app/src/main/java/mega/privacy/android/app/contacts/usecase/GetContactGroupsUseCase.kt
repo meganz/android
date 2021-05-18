@@ -62,26 +62,30 @@ class GetContactGroupsUseCase @Inject constructor(
                 if (chatRoom.isGroup && chatRoom.peerCount > 0) {
                     val firstUserHandle = chatRoom.getPeerHandle(0)
                     val firstUserEmail = megaChatApi.getContactEmail(firstUserHandle)
-                    megaApi.getUserAvatar(
-                        firstUserEmail,
-                        MegaUserUtils.getUserImageFile(context, firstUserEmail).absolutePath,
-                        userAttrsListener
-                    )
+                    var firstImage: File? = MegaUserUtils.getUserImageFile(context, firstUserEmail)
+                    if (firstImage?.exists() == false) {
+                        megaApi.getUserAvatar(firstUserEmail, firstImage.absolutePath, userAttrsListener)
+                    } else {
+                        firstImage = null
+                    }
 
                     val lastUserHandle = chatRoom.getPeerHandle(chatRoom.peerCount - 1)
                     val lastUserEmail = megaChatApi.getContactEmail(lastUserHandle)
-                    megaApi.getUserAvatar(
-                        lastUserEmail,
-                        MegaUserUtils.getUserImageFile(context, lastUserEmail).absolutePath,
-                        userAttrsListener
-                    )
+                    var secondImage: File? = MegaUserUtils.getUserImageFile(context, lastUserEmail)
+                    if (secondImage?.exists() == false) {
+                        megaApi.getUserAvatar(firstUserEmail, secondImage.absolutePath, userAttrsListener)
+                    } else {
+                        secondImage = null
+                    }
 
                     groups.add(
                         GroupItem(
                             chatId = chatRoom.chatId,
                             title = chatRoom.title,
+                            firstImage = firstImage?.toUri(),
                             firstImageEmail = firstUserEmail,
                             secondImageEmail = lastUserEmail,
+                            secondImage = secondImage?.toUri(),
                             firstImageColor = firstUserHandle.getUserAvatarColor(),
                             secondImageColor = lastUserHandle.getUserAvatarColor(),
                             isPublic = chatRoom.isPublic
