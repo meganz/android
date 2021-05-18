@@ -326,7 +326,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 }
                             }
                         }
-                    } else -> checkChildFragments()
+                    }
+                    else -> checkChildFragments()
                 }
             } else {
                 checkAnotherCall()
@@ -719,7 +720,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             when {
                 it -> {
                     permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
-                        .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresCameraPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickCamera(true)
+                            }
+                        }
                         .setOnShowRationale { l -> onShowRationale(l) }
                         .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
                         .build().launch(false)
@@ -734,7 +741,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             ArrayList()
                         )
                     )
-                        .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresAudioPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickMic(true)
+                            }
+                        }
                         .setOnShowRationale { l -> onShowRationale(l) }
                         .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
                         .build().launch(false)
