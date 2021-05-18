@@ -1142,8 +1142,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 MegaPurchase purchase = purchases.get(0);
                 //payment may take time to process, we will not give privilege until it has been fully processed
                 String sku = purchase.getSku();
-                String subscriptionType = getSubscriptionType(this, sku);
-                String subscriptionRenewalType = getSubscriptionRenewalType(this, sku);
+                String subscriptionType = getSubscriptionType(sku);
+                String subscriptionRenewalType = getSubscriptionRenewalType(sku);
                 if (mBillingManager.isPurchased(purchase)) {
                     //payment has been processed
                     updateAccountInfo(purchases);
@@ -8996,6 +8996,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void navigateToUpgradeAccount(){
+		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
+			drawerLayout.closeDrawer(Gravity.LEFT);
+		}
+
 		startActivity(new Intent(this, UpgradeAccountActivity.class));
 	}
 

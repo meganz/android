@@ -8,6 +8,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
@@ -70,22 +71,21 @@ public class PaymentUtils {
     /**
      * Get renewal type of a certain sku item.
      *
-     * @param context Context
      * @param sku The id of the sku item.
      * @return The renewal type of the sku item, Monthly or Yearly.
      */
-    public static String getSubscriptionRenewalType(Context context, String sku) {
+    public static String getSubscriptionRenewalType(String sku) {
         switch (sku){
             case SKU_PRO_LITE_MONTH:
             case SKU_PRO_I_MONTH:
             case SKU_PRO_II_MONTH:
             case SKU_PRO_III_MONTH:
-                return context.getString(R.string.subscription_type_monthly);
+                return getString(R.string.subscription_type_monthly);
             case SKU_PRO_LITE_YEAR:
             case SKU_PRO_I_YEAR:
             case SKU_PRO_II_YEAR:
             case SKU_PRO_III_YEAR:
-                return context.getString(R.string.subscription_type_yearly);
+                return getString(R.string.subscription_type_yearly);
             default:
                 return "";
 
@@ -95,24 +95,23 @@ public class PaymentUtils {
     /**
      * Get type name of a certain sku item.
      *
-     * @param context Context
      * @param sku The id of the sku item.
      * @return The type name of the sku.
      */
-    public static String getSubscriptionType(Context context, String sku) {
+    public static String getSubscriptionType(String sku) {
         switch (sku) {
             case SKU_PRO_LITE_MONTH:
             case SKU_PRO_LITE_YEAR:
-                return context.getString(R.string.prolite_account);
+                return getString(R.string.prolite_account);
             case SKU_PRO_I_MONTH:
             case SKU_PRO_I_YEAR:
-                return context.getString(R.string.pro1_account);
+                return getString(R.string.pro1_account);
             case SKU_PRO_II_MONTH:
             case SKU_PRO_II_YEAR:
-                return context.getString(R.string.pro2_account);
+                return getString(R.string.pro2_account);
             case SKU_PRO_III_MONTH:
             case SKU_PRO_III_YEAR:
-                return context.getString(R.string.pro3_account);
+                return getString(R.string.pro3_account);
             default:
                 return "";
         }

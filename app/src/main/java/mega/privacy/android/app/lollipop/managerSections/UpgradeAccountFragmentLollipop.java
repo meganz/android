@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -103,7 +104,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 	private RadioButton billedMonthly;
 	private RadioButton billedYearly;
 	private LinearLayout layoutButtons;
-	private TextView buttonContinue;
+	private Button buttonContinue;
 
 	private final static int TYPE_STORAGE_LABEL = 0;
 	private final static int TYPE_TRANSFER_LABEL = 1;
@@ -418,9 +419,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			billedYearly.setOnClickListener(this);
 
 			layoutButtons = selectPaymentMethodClicked.findViewById(R.id.layout_buttons);
-			TextView buttonCancel = selectPaymentMethodClicked.findViewById(R.id.button_cancel);
+			Button buttonCancel = selectPaymentMethodClicked.findViewById(R.id.cancel_button);
 			buttonCancel.setOnClickListener(this);
-            buttonContinue = selectPaymentMethodClicked.findViewById(R.id.button_continue);
+            buttonContinue = selectPaymentMethodClicked.findViewById(R.id.continue_button);
             buttonContinue.setOnClickListener(this);
 
             buttonContinue.setEnabled(false);
@@ -522,7 +523,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		if (v.getId() == R.id.lbl_custom_plan) {
 			logDebug("Custom plan pressed");
 			contactForCustomPlan();
-		} else if (v.getId() == R.id.button_continue) {
+		} else if (v.getId() == R.id.continue_button) {
 			logDebug("Button continue pressed");
 			switch (parameterType) {
 				case PRO_I:
@@ -538,7 +539,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_LITE_MONTH : SKU_PRO_LITE_YEAR);
 					break;
 			}
-		} else if (v.getId() == R.id.button_cancel || v.getId() == R.id.semitransparent_layer) {
+		} else if (v.getId() == R.id.cancel_button || v.getId() == R.id.semitransparent_layer) {
 			logDebug("Button cancel pressed");
 			semitransparentLayer.setVisibility(View.GONE);
 			selectPaymentMethodLayoutLite.setVisibility(View.GONE);
