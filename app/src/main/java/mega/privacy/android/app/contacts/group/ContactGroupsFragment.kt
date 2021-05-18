@@ -16,6 +16,8 @@ import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
 import mega.privacy.android.app.contacts.group.data.GroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -67,7 +69,9 @@ class ContactGroupsFragment : Fragment() {
     }
 
     private fun onGroupClick(groupId: Long) {
-        // Do something
+        startActivity(Intent(context, GroupChatInfoActivityLollipop::class.java).apply {
+            putExtra(Constants.HANDLE, groupId)
+        })
     }
 
     private fun openCreateGroupScreen() {

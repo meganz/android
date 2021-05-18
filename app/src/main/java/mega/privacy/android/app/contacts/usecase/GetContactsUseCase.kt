@@ -161,5 +161,5 @@ class GetContactsUseCase @Inject constructor(
             emitter.setDisposable(Disposable.fromAction {
                 megaChatApi.removeChatListener(chatListener)
             })
-        }, BackpressureStrategy.BUFFER)
+        }, BackpressureStrategy.LATEST)
 }

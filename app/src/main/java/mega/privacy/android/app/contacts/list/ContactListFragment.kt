@@ -17,6 +17,8 @@ import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -96,7 +98,10 @@ class ContactListFragment : Fragment() {
             findNavController().navigate(ContactListFragmentDirections.actionListToGroups())
         }
 
-        binding.btnAddContact.setOnClickListener { openAddContactScreen() }
+        binding.btnAddContact.setOnClickListener {
+            startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java))
+        }
+
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.black)
             .formatColorTag(requireContext(), 'B', R.color.grey_300)
@@ -119,8 +124,10 @@ class ContactListFragment : Fragment() {
         recentlyAddedAdapter.submitList(items)
     }
 
-    private fun onContactClick(userHandle: Long) {
-        // Do something
+    private fun onContactClick(userEmail: String) {
+        startActivity(Intent(context, ContactInfoActivityLollipop::class.java).apply {
+            putExtra(Constants.NAME, userEmail)
+        })
     }
 
     private fun onContactMoreInfoClick(userHandle: Long) {

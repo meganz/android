@@ -9,7 +9,7 @@ import mega.privacy.android.app.databinding.ItemContactBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class ContactListAdapter constructor(
-    private val itemCallback: (Long) -> Unit,
+    private val itemCallback: (String) -> Unit,
     private val itemInfoCallback: (Long) -> Unit,
     private val enableHeaders: Boolean = true
 ) : ListAdapter<ContactItem, ContactListViewHolder>(ContactItem.DiffCallback()) {
@@ -30,7 +30,7 @@ class ContactListAdapter constructor(
             binding.txtHeader.isVisible = viewType == VIEW_TYPE_ITEM_WITH_HEADER
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {
-                    itemCallback.invoke(getItem(bindingAdapterPosition).handle)
+                    itemCallback.invoke(getItem(bindingAdapterPosition).email)
                 }
             }
             binding.btnMore.setOnClickListener {

@@ -2183,6 +2183,8 @@
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
