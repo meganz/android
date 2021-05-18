@@ -26,6 +26,7 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.service.iab.BillingManagerImpl.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -38,7 +39,6 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
-import mega.privacy.android.app.utils.billing.PaymentUtils.*
 import nz.mega.sdk.MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
 
 open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {

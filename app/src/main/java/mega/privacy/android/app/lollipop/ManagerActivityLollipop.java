@@ -311,7 +311,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		BillingUpdatesListener, ChatManagementCallback, ActionNodeCallback, SnackbarShower {
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -473,8 +473,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private String bonusStorageSMS = "GB";
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
-	private BillingManager mBillingManager;
-	private List<MegaSku> mSkuDetailsList;
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES,
@@ -1085,17 +1083,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
-    public void launchPayment(String productId) {
-        //start purchase/subscription flow
-        MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        MegaPurchase purchase = myAccountInfo.getActiveSubscription();
-        String oldSku = purchase == null ? null : purchase.getSku();
-        String token = purchase == null ? null : purchase.getToken();
-        if (mBillingManager != null) {
-            mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
-        }
-    }
-
 	private MegaSku getSkuDetails(List<MegaSku> list, String key) {
 		if (list == null || list.isEmpty()) {
 			return null;
@@ -1107,108 +1094,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		return null;
-	}
-
-    public void initGooglePlayPayments() {
-        mBillingManager = new BillingManagerImpl(this, this);
-    }
-
-	@Override
-    public void onBillingClientSetupFinished() {
-        logInfo("Billing client setup finished");
-        mBillingManager.getInventory(skuList -> {
-            mSkuDetailsList = skuList;
-            myAccountInfo.setAvailableSkus(skuList);
-			LiveEventBus.get(EVENT_UPDATE_PRICING).post(true);
-        });
-    }
-
-	@Override
-	public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
-		if (isFailed || purchases == null) {
-			logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
-			return;
-		}
-
-		updateAccountInfo(purchases);
-		updateSubscriptionLevel();
-	}
-
-	@Override
-	public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
-        if (!isFailed) {
-            String message;
-            if (purchases != null && !purchases.isEmpty()) {
-                MegaPurchase purchase = purchases.get(0);
-                //payment may take time to process, we will not give privilege until it has been fully processed
-                String sku = purchase.getSku();
-                String subscriptionType = getSubscriptionType(sku);
-                String subscriptionRenewalType = getSubscriptionRenewalType(sku);
-                if (mBillingManager.isPurchased(purchase)) {
-                    //payment has been processed
-                    updateAccountInfo(purchases);
-                    logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
-                    message = getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
-                    updateSubscriptionLevel();
-                } else {
-                    //payment is being processed or in unknown state
-                    logDebug("Purchase " + sku + " is being processed or in unknown state.");
-                    message = getString(R.string.message_user_payment_pending);
-                }
-            } else {
-                //down grade case
-                logDebug("Downgrade, the new subscription takes effect when the old one expires.");
-                message = getString(R.string.message_user_purchased_subscription_down_grade);
-            }
-            showAlert(this, message, null);
-            drawerItem = DrawerItem.CLOUD_DRIVE;
-            selectDrawerItemLollipop(drawerItem);
-        } else {
-            logWarning("Update purchase failed, with result code: " + resultCode);
-        }
-	}
-
-	private void updateAccountInfo(List<MegaPurchase> purchases) {
-		int highest = -1;
-		int temp = -1;
-		MegaPurchase max = null;
-		for (MegaPurchase purchase : purchases) {
-			switch (purchase.getSku()) {
-				case SKU_PRO_LITE_MONTH:
-				case SKU_PRO_LITE_YEAR:
-					temp = 0;
-					break;
-				case SKU_PRO_I_MONTH:
-				case SKU_PRO_I_YEAR:
-                    temp = 1;
-					break;
-				case SKU_PRO_II_MONTH:
-				case SKU_PRO_II_YEAR:
-                    temp = 2;
-					break;
-				case SKU_PRO_III_MONTH:
-				case SKU_PRO_III_YEAR:
-                    temp = 3;
-					break;
-			}
-
-			if(temp >= highest){
-			    highest = temp;
-			    max = purchase;
-            }
-		}
-
-        if(max != null ){
-            logDebug("Set current max subscription: " + max);
-            myAccountInfo.setActiveSubscription(max);
-        } else {
-            myAccountInfo.setActiveSubscription(null);
-        }
-
-		myAccountInfo.setLevelInventory(highest);
-		myAccountInfo.setInventoryFinished(true);
-
-		LiveEventBus.get(EVENT_UPDATE_PRICING).post(true);
 	}
 
 	/**
@@ -1225,28 +1110,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			setCallWidget();
 		} else {
 			supportInvalidateOptionsMenu();
-		}
-	}
-
-	private void updateSubscriptionLevel() {
-		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveSubscription();
-		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
-			return;
-		}
-
-		String json = highestGooglePlaySubscription.getReceipt();
-		logDebug("ORIGINAL JSON:" + json); //Print JSON in logs to help debug possible payments issues
-
-		MegaAttributes attributes = dbH.getAttributes();
-		long lastPublicHandle = attributes.getLastPublicHandle();
-
-		if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
-			if (lastPublicHandle == INVALID_HANDLE) {
-				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, this);
-			} else {
-				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
-						attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
-			}
 		}
 	}
 
@@ -2372,8 +2235,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			this.setDefaultAvatar();
 
 			this.setProfileAvatar();
-
-			initGooglePlayPayments();
 
 			megaApi.addGlobalListener(this);
 
@@ -4117,9 +3978,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         unregisterReceiver(updateCUSettingsReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
 
-		if (mBillingManager != null) {
-			mBillingManager.destroy();
-		}
 		cancelSearch();
         if(reconnectDialog != null) {
             reconnectDialog.cancel();
@@ -8789,7 +8647,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logWarning("usedSpaceLayout is NULL");
 		}
 
-		updateSubscriptionLevel();
+		updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
@@ -9682,21 +9540,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
             }
-        }
-		// for HMS purchase only
-        else if (requestCode == REQ_CODE_BUY) {
-            if (resultCode == Activity.RESULT_OK) {
-                int purchaseResult = mBillingManager.getPurchaseResult(intent);
-                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
-                    mBillingManager.updatePurchase();
-                } else {
-                    logWarning("Purchase failed, error code: " + purchaseResult);
-                }
-            } else {
-                logWarning("cancel subscribe");
-            }
-        }
-		else{
+        } else{
 			logWarning("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}

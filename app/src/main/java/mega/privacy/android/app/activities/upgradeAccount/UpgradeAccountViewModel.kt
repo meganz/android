@@ -16,14 +16,13 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_PRICING
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.BillingManager
 import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.middlelayer.iab.MegaSku
 import mega.privacy.android.app.service.iab.BillingManagerImpl
-import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
+import mega.privacy.android.app.service.iab.BillingManagerImpl.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
@@ -32,10 +31,11 @@ import mega.privacy.android.app.utils.DBUtil.callToPricing
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
-import mega.privacy.android.app.utils.billing.PaymentUtils.*
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
+import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError.API_OK
 import java.text.NumberFormat
 import java.util.*
 
@@ -245,12 +245,14 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
                 //payment has been processed
                 updateAccountInfo(purchases)
                 logDebug("Purchase $sku successfully, subscription type is: $subscriptionType, subscription renewal type is: $subscriptionRenewalType")
+
                 message = getString(
                     R.string.message_user_purchased_subscription,
                     subscriptionType,
                     subscriptionRenewalType
                 )
-                updateSubscriptionLevel()
+
+                updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
             } else {
                 //payment is being processed or in unknown state
                 logDebug("Purchase $sku is being processed or in unknown state.")
@@ -276,7 +278,7 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         }
 
         updateAccountInfo(purchases)
-        updateSubscriptionLevel()
+        updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
     }
 
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
@@ -310,40 +312,9 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_UPDATE_PRICING).post(true)
     }
 
-    private fun updateSubscriptionLevel() {
-        val highestGooglePlaySubscription = myAccountInfo.activeSubscription
-
-        if (!myAccountInfo.isAccountDetailsFinished || highestGooglePlaySubscription == null) {
-            return
-        }
-
-        val json = highestGooglePlaySubscription.receipt
-        logDebug("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
-
-        val attributes: MegaAttributes = dbH.attributes
-        val lastPublicHandle = attributes.lastPublicHandle
-        val listener = OptionalMegaRequestListenerInterface(
-            onRequestFinish = { _, error ->
-                if (error.errorCode == API_OK) {
-                    logError("PURCHASE WRONG: ${error.errorString} (${error.errorCode})")
-                }
-            }
-        )
-
-        if (myAccountInfo.levelInventory > myAccountInfo.levelAccountDetails) {
-            if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
-                megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
-            } else {
-                megaApi.submitPurchaseReceipt(
-                    PAYMENT_GATEWAY, json, lastPublicHandle,
-                    attributes.lastPublicHandleType, attributes.lastPublicHandleTimeStamp, listener
-                )
-            }
-        }
-    }
-
     fun manageActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
         if (requestCode == RequestCode.REQ_CODE_BUY) {
+            // For HMS purchase only
             if (resultCode != RESULT_OK) {
                 logWarning("Cancel subscribe")
                 return

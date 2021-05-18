@@ -40,6 +40,7 @@ import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -525,20 +526,6 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			contactForCustomPlan();
 		} else if (v.getId() == R.id.continue_button) {
 			logDebug("Button continue pressed");
-			switch (parameterType) {
-				case PRO_I:
-					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_I_MONTH : SKU_PRO_I_YEAR);
-					break;
-				case PRO_II:
-					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_II_MONTH : SKU_PRO_II_YEAR);
-					break;
-				case PRO_III:
-					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_III_MONTH : SKU_PRO_III_YEAR);
-					break;
-				case PRO_LITE:
-					((ManagerActivityLollipop) context).launchPayment(isMonthlyBillingPeriodSelected() ? SKU_PRO_LITE_MONTH : SKU_PRO_LITE_YEAR);
-					break;
-			}
 		} else if (v.getId() == R.id.cancel_button || v.getId() == R.id.semitransparent_layer) {
 			logDebug("Button cancel pressed");
 			semitransparentLayer.setVisibility(View.GONE);
