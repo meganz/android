@@ -10,10 +10,8 @@ import androidx.core.text.HtmlCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.*
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_PRICING
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.middlelayer.iab.BillingManager
@@ -51,14 +49,20 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
     }
 
     private val queryPurchasesMessage: MutableLiveData<String?> = MutableLiveData()
+    private val updatePricing: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var billingManager: BillingManager
     private lateinit var skuDetailsList: List<MegaSku>
 
     fun getQueryPurchasesMessage(): LiveData<String?> = queryPurchasesMessage
+    fun onUpdatePricing(): LiveData<Boolean> = updatePricing
 
     fun resetQueryPurchasesMessage() {
         queryPurchasesMessage.value = null
+    }
+
+    fun resetUpdatePricing() {
+        updatePricing.value = false
     }
 
     fun isGettingInfo(): Boolean =
@@ -218,7 +222,7 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         billingManager.getInventory { skuList ->
             skuDetailsList = skuList
             myAccountInfo.availableSkus = skuList
-            LiveEventBus.get(EVENT_UPDATE_PRICING).post(true)
+            updatePricing.value = true
         }
     }
 
@@ -309,7 +313,7 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
 
         myAccountInfo.levelInventory = highest
         myAccountInfo.isInventoryFinished = true
-        LiveEventBus.get(EVENT_UPDATE_PRICING).post(true)
+        updatePricing.value = true
     }
 
     fun manageActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {

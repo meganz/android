@@ -14,15 +14,12 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_TRANSFER_LABEL
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
@@ -48,16 +45,6 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
     private var displayedAccountType = INVALID_VALUE
 
-    private lateinit var selectPaymentMethod: TextView
-    private lateinit var googlePlayLayout: RelativeLayout
-    private lateinit var googlePlayLayer: RelativeLayout
-    private lateinit var optionsBilling: LinearLayout
-    private lateinit var billingPeriod: RadioGroup
-    private lateinit var billedMonthly: RadioButton
-    private lateinit var billedYearly: RadioButton
-    private lateinit var layoutButtons: LinearLayout
-    private lateinit var continueButton: TextView
-
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (isFinishing) {
@@ -71,12 +58,6 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
                 UPDATE_GET_PRICING -> setPricingInfo()
                 UPDATE_ACCOUNT_DETAILS -> showAvailableAccount()
             }
-        }
-    }
-
-    private val updatePricingObserver = Observer<Boolean> { update ->
-        if (update) {
-            setPricingInfo()
         }
     }
 
@@ -95,9 +76,6 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         super.onDestroy()
 
         unregisterReceiver(updateMyAccountReceiver)
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_PRICING, Boolean::class.java)
-            .removeObserver(updatePricingObserver)
-
         viewModel.destroyPayments()
     }
 
@@ -127,76 +105,36 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             checkScroll()
         }
 
-        binding.upgradeProliteLayout.setOnClickListener {
-            if (binding.prolite.selectPaymentsLayout.isVisible) {
-                binding.prolite.selectPaymentsLayout.isVisible = false
-                showSemiTransparentLayer(false)
-            } else {
-                binding.proI.selectPaymentsLayout.isVisible = false
-                binding.proIi.selectPaymentsLayout.isVisible = false
-                binding.proIii.selectPaymentsLayout.isVisible = false
-                onUpgradeClick(PRO_LITE)
-            }
-        }
-
-        binding.upgradeProILayout.setOnClickListener {
-            if (binding.proI.selectPaymentsLayout.isVisible) {
-                binding.proI.selectPaymentsLayout.isVisible = false
-            } else {
-                binding.prolite.selectPaymentsLayout.isVisible = false
-                binding.proIi.selectPaymentsLayout.isVisible = false
-                binding.proIii.selectPaymentsLayout.isVisible = false
-                showSemiTransparentLayer(false)
-                onUpgradeClick(PRO_I)
-            }
-        }
-
-        binding.upgradeProIiLayout.setOnClickListener {
-            if (binding.proIi.selectPaymentsLayout.isVisible) {
-                binding.proIi.selectPaymentsLayout.isVisible = false
-            } else {
-                binding.prolite.selectPaymentsLayout.isVisible = false
-                binding.proI.selectPaymentsLayout.isVisible = false
-                binding.proIii.selectPaymentsLayout.isVisible = false
-                showSemiTransparentLayer(false)
-                onUpgradeClick(PRO_II)
-            }
-        }
-
-        binding.upgradeProIiiLayout.setOnClickListener {
-            if (binding.proIii.selectPaymentsLayout.isVisible) {
-                binding.proIii.selectPaymentsLayout.isVisible = false
-            } else {
-                binding.prolite.selectPaymentsLayout.isVisible = false
-                binding.proI.selectPaymentsLayout.isVisible = false
-                binding.proIi.selectPaymentsLayout.isVisible = false
-                showSemiTransparentLayer(false)
-                onUpgradeClick(PRO_III)
-            }
-        }
+        binding.upgradeProliteLayout.setOnClickListener { onUpgradeClick(PRO_LITE) }
+        binding.upgradeProILayout.setOnClickListener { onUpgradeClick(PRO_I) }
+        binding.upgradeProIiLayout.setOnClickListener { onUpgradeClick(PRO_II) }
+        binding.upgradeProIiiLayout.setOnClickListener { onUpgradeClick(PRO_III) }
 
         binding.lblCustomPlan.setOnClickListener {
             askForCustomizedPlan(this, megaApi.myEmail, viewModel.getAccountType())
         }
 
-        binding.semitransparentLayer.setOnClickListener { cancelClick() }
+        binding.semitransparentLayer.apply {
+            setOnClickListener { cancelClick() }
+            isVisible = false
+        }
 
         setAccountDetails()
         refreshAccountInfo()
         setPricingInfo()
         showAvailableAccount()
-    }
-
-    private fun showSemiTransparentLayer(show: Boolean) {
-        binding.semitransparentLayer.isVisible = show
+        cancelClick()
     }
 
     private fun cancelClick() {
-        showSemiTransparentLayer(false)
-        binding.prolite.selectPaymentsLayout.isVisible = false
-        binding.proI.selectPaymentsLayout.isVisible = false
-        binding.proIi.selectPaymentsLayout.isVisible = false
-        binding.proIii.selectPaymentsLayout.isVisible = false
+        checkScroll()
+
+        if (!isDarkMode(this)) {
+            window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        }
+
+        binding.semitransparentLayer.isVisible = false
+        binding.availablePaymentMethods.isVisible = false
     }
 
     private fun setUpObservers() {
@@ -204,10 +142,9 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             updateMyAccountReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_PRICING, Boolean::class.java)
-            .observeForever(updatePricingObserver)
 
         viewModel.getQueryPurchasesMessage().observe(this, ::showQueryPurchasesResult)
+        viewModel.onUpdatePricing().observe(this, ::updatePricing)
     }
 
     private fun showQueryPurchasesResult(message: String?) {
@@ -217,6 +154,13 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
         showAlert(this, message, null)
         viewModel.resetQueryPurchasesMessage()
+    }
+
+    private fun updatePricing(update: Boolean) {
+        if (update) {
+            setPricingInfo()
+            viewModel.resetUpdatePricing()
+        }
     }
 
     override fun checkScroll() {
@@ -363,29 +307,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun onUpgradeClick(upgradeType: Int) {
-        val selectPaymentMethodClicked: ScrollView
-
-        when (upgradeType) {
-            PRO_LITE -> selectPaymentMethodClicked = binding.prolite.selectPaymentsLayout
-            PRO_I -> selectPaymentMethodClicked = binding.proI.selectPaymentsLayout
-            PRO_II -> selectPaymentMethodClicked = binding.proIi.selectPaymentsLayout
-            PRO_III -> selectPaymentMethodClicked = binding.proIii.selectPaymentsLayout
-            else -> {
-                displayedAccountType = INVALID_VALUE
-                return
-            }
-        }
-
         if (viewModel.getPaymentBitSet() == null) {
             logWarning("PaymentBitSet Null")
             return
         }
 
-        selectPaymentMethod =
-            selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_method)
-
-        val paymentTitle =
-            selectPaymentMethodClicked.findViewById<TextView>(R.id.payment_text_payment_title)
+        binding.availablePaymentMethods.isVisible = true
 
         var color = 0
         var title = 0
@@ -409,21 +336,14 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             }
         }
 
-        paymentTitle.setTextColor(ContextCompat.getColor(this, color))
-        paymentTitle.text = StringResourcesUtils.getString(title)
+        binding.paymentTextPaymentTitle.apply {
+            setTextColor(ContextCompat.getColor(this@UpgradeAccountActivity, color))
+            text = StringResourcesUtils.getString(title)
+        }
 
-        googlePlayLayout =
-            selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet)
+        binding.paymentMethodGoogleWalletLayer.isVisible = false
 
-        googlePlayLayer =
-            selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_layer)
-
-        googlePlayLayer.isVisible = false
-
-        val googleWalletText =
-            selectPaymentMethodClicked.findViewById<TextView>(R.id.payment_method_google_wallet_text)
-
-        var textGoogleWallet = StringResourcesUtils.getString(BillingManagerImpl.PAY_METHOD_RES_ID)
+        var textGoogleWallet = StringResourcesUtils.getString(PAY_METHOD_RES_ID)
 
         try {
             textGoogleWallet = textGoogleWallet.replace(
@@ -436,26 +356,18 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             LogUtil.logError("Exception formatting string", e)
         }
 
-        googleWalletText.text =
+        binding.paymentMethodGoogleWalletText.text =
             HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
-        selectPaymentMethodClicked.findViewById<ImageView>(R.id.payment_method_google_wallet_icon)
-            .setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID)
+        binding.paymentMethodGoogleWalletIcon.setImageResource(PAY_METHOD_ICON_RES_ID)
+        binding.options.isVisible = false
+        binding.layoutButtons.isVisible = false
 
-        optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options)
-        optionsBilling.isVisible = false
-        billingPeriod = selectPaymentMethodClicked.findViewById(R.id.billing_period)
-        billedMonthly = billingPeriod.findViewById(R.id.billed_monthly)
-        billedYearly = billingPeriod.findViewById(R.id.billed_yearly)
-        layoutButtons = selectPaymentMethodClicked.findViewById(R.id.layout_buttons)
-        layoutButtons.isVisible = false
-
-        selectPaymentMethodClicked.findViewById<Button>(R.id.cancel_button).setOnClickListener {
+        binding.cancelButton.setOnClickListener {
             cancelClick()
         }
 
-        continueButton = selectPaymentMethodClicked.findViewById(R.id.continue_button)
-        continueButton.apply {
+        binding.continueButton.apply {
             setOnClickListener {
                 when (displayedAccountType) {
                     PRO_I -> viewModel.launchPayment(
@@ -492,11 +404,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
         if (!viewModel.isInventoryFinished()) {
             logDebug("if (!myAccountInfo.isInventoryFinished())")
-            googlePlayLayout.isVisible = false
+            binding.paymentMethodGoogleWallet.isVisible = false
         }
 
-        selectPaymentMethodClicked.isVisible = true
-        showSemiTransparentLayer(true)
+        binding.paymentMethodGoogleWalletIcon.isVisible = true
+        binding.semitransparentLayer.isVisible = true
+        window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_white_020)
 
         when (upgradeType) {
             PRO_I -> Handler().post {
@@ -520,31 +433,35 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
         if (paymentBitSet == null) {
             logWarning("Not payment bit set received!!!")
-            selectPaymentMethod.text =
+            binding.paymentTextPaymentMethod.text =
                 StringResourcesUtils.getString(R.string.no_available_payment_method)
-            googlePlayLayout.isVisible = false
+            binding.paymentMethodGoogleWallet.isVisible = false
             return
         }
 
         if (!viewModel.isInventoryFinished()) {
             logDebug("if (!myAccountInfo.isInventoryFinished())")
-            googlePlayLayout.isVisible = false
+            binding.paymentMethodGoogleWallet.isVisible = false
         } else if (isPaymentMethodAvailable(paymentBitSet, PAYMENT_METHOD_GOOGLE_WALLET)) {
-            googlePlayLayout.isVisible = true
-            layoutButtons.isVisible = true
-            optionsBilling.isVisible = true
-            continueButton.isEnabled = true
-            continueButton.setTextColor(getThemeColor(this, R.attr.colorSecondary))
-            billedMonthly.isVisible = true
-            billedYearly.isVisible = true
-            selectPaymentMethod.text = StringResourcesUtils.getString(R.string.payment_method)
+            binding.paymentMethodGoogleWallet.isVisible = true
+            binding.layoutButtons.isVisible = true
+            binding.options.isVisible = true
+
+            binding.continueButton.apply {
+                isEnabled = true
+                setTextColor(getThemeColor(this@UpgradeAccountActivity, R.attr.colorSecondary))
+            }
+
+            binding.billedMonthly.isVisible = true
+            binding.billedYearly.isVisible = true
+            binding.paymentTextPaymentMethod.text = StringResourcesUtils.getString(R.string.payment_method)
         } else {
-            googlePlayLayout.isVisible = false
-            layoutButtons.isVisible = false
-            optionsBilling.isVisible = false
-            billedMonthly.isVisible = false
-            billedYearly.isVisible = false
-            selectPaymentMethod.text =
+            binding.paymentMethodGoogleWallet.isVisible = false
+            binding.layoutButtons.isVisible = false
+            binding.options.isVisible = false
+            binding.billedMonthly.isVisible = false
+            binding.billedYearly.isVisible = false
+            binding.paymentTextPaymentMethod.text =
                 StringResourcesUtils.getString(R.string.no_available_payment_method)
         }
     }
@@ -559,9 +476,9 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
                 val textToShow: Spanned = viewModel.getPriceString(this, account, false)
 
                 if (account.months == 1) {
-                    billedMonthly.text = textToShow
+                    binding.billedMonthly.text = textToShow
                 } else if (account.months == 12) {
-                    billedYearly.text = textToShow
+                    binding.billedYearly.text = textToShow
                 }
             }
         }
@@ -570,69 +487,69 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             PRO_I -> {
                 if (viewModel.isPurchasedAlready(SKU_PRO_I_MONTH)) {
                     if (isMonthlyBillingPeriodSelected()) {
-                        billedYearly.isChecked = true
+                        binding.billedYearly.isChecked = true
                     }
 
-                    billedMonthly.isVisible = false
+                    binding.billedMonthly.isVisible = false
                 }
 
                 if (viewModel.isPurchasedAlready(SKU_PRO_I_YEAR)) {
                     if (!isMonthlyBillingPeriodSelected()) {
-                        billedMonthly.isChecked = true
+                        binding.billedMonthly.isChecked = true
                     }
 
-                    billedYearly.isVisible = false
+                    binding.billedYearly.isVisible = false
                 }
             }
             PRO_II -> {
                 if (viewModel.isPurchasedAlready(SKU_PRO_II_MONTH)) {
                     if (isMonthlyBillingPeriodSelected()) {
-                        billedYearly.isChecked = true
+                        binding.billedYearly.isChecked = true
                     }
 
-                    billedMonthly.isVisible = false
+                    binding.billedMonthly.isVisible = false
                 }
 
                 if (viewModel.isPurchasedAlready(SKU_PRO_II_YEAR)) {
                     if (!isMonthlyBillingPeriodSelected()) {
-                        billedMonthly.isChecked = true
+                        binding.billedMonthly.isChecked = true
                     }
 
-                    billedYearly.isVisible = false
+                    binding.billedYearly.isVisible = false
                 }
             }
             PRO_III -> {
                 if (viewModel.isPurchasedAlready(SKU_PRO_III_MONTH)) {
                     if (isMonthlyBillingPeriodSelected()) {
-                        billedYearly.isChecked = true
+                        binding.billedYearly.isChecked = true
                     }
 
-                    billedMonthly.isVisible = false
+                    binding.billedMonthly.isVisible = false
                 }
 
                 if (viewModel.isPurchasedAlready(SKU_PRO_III_YEAR)) {
                     if (!isMonthlyBillingPeriodSelected()) {
-                        billedMonthly.isChecked = true
+                        binding.billedMonthly.isChecked = true
                     }
 
-                    billedYearly.isVisible = false
+                    binding.billedYearly.isVisible = false
                 }
             }
             PRO_LITE -> {
                 if (viewModel.isPurchasedAlready(SKU_PRO_LITE_MONTH)) {
                     if (isMonthlyBillingPeriodSelected()) {
-                        billedYearly.isChecked = true
+                        binding.billedYearly.isChecked = true
                     }
 
-                    billedMonthly.isVisible = false
+                    binding.billedMonthly.isVisible = false
                 }
 
                 if (viewModel.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
                     if (!isMonthlyBillingPeriodSelected()) {
-                        billedMonthly.isChecked = true
+                        binding.billedMonthly.isChecked = true
                     }
 
-                    billedYearly.isVisible = false
+                    binding.billedYearly.isVisible = false
                 }
             }
         }
@@ -644,6 +561,6 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
      * @return True if monthly billing period has been selected or false otherwise.
      */
     private fun isMonthlyBillingPeriodSelected(): Boolean {
-        return billingPeriod.checkedRadioButtonId == R.id.billed_monthly
+        return binding.billingPeriod.checkedRadioButtonId == R.id.billed_monthly
     }
 }
