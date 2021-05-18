@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
@@ -491,9 +492,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MEETING_ACTION_GUEST -> {
                 inMeetingViewModel.createEphemeralAccountAndJoinChat(
-                    args.chatId,
                     args.firstName,
-                    args.lastName
+                    args.lastName,
+                    object : BaseListener(MegaApplication.getInstance().applicationContext) {
+                        override fun onRequestFinish(
+                            api: MegaApiJava, request: MegaRequest,
+                            e: MegaError
+                        ) {
+                            if (e.errorCode != MegaError.API_OK) {
+
+                            }
+
+                            inMeetingViewModel.joinPublicChat(
+                                args.chatId,
+                                AutoJoinPublicChatListener(context, this@InMeetingFragment)
+                            )
+                        }
+                    }
                 )
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {

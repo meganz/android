@@ -24,7 +24,6 @@ import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
@@ -1524,25 +1523,12 @@ class InMeetingViewModel @ViewModelInject constructor(
         return hasOneModerator && participants.value?.isNotEmpty() == true && isModerator()
     }
 
-
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
         inMeetingRepository.joinPublicChat(chatId, listener)
     }
 
-    fun createEphemeralAccountAndJoinChat(chatId: Long, firstName: String, lastName: String) {
-        inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName,
-            object : BaseListener(MegaApplication.getInstance().applicationContext) {
-                override fun onRequestFinish(
-                    api: MegaApiJava, request: MegaRequest,
-                    e: MegaError
-                ) {
-                    if (e.errorCode != MegaError.API_OK) {
-
-                    }
-
-                    joinPublicChat(chatId, AutoJoinPublicChatListener(context))
-                }
-            })
+    fun createEphemeralAccountAndJoinChat(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
+        inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
     }
 
     /**
