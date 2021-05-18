@@ -21,14 +21,15 @@ class ContactsActivity : PasscodeActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        val navController = getNavController()
-        val configuration = AppBarConfiguration(navController.graph) {
-            onBackPressed()
-            true
-        }
         binding.toolbar.setupWithNavController(
-            navController,
-            configuration
+            getNavController(),
+            AppBarConfiguration(
+                topLevelDestinationIds = setOf(),
+                fallbackOnNavigateUpListener = {
+                    onBackPressed()
+                    true
+                }
+            )
         )
     }
 

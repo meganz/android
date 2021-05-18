@@ -15,10 +15,19 @@
         android:paddingTop="12dp"
         android:paddingRight="16dp"
         android:paddingBottom="12dp"
-        android:text="Requests"
+        android:text="@string/section_requests"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/divider_btn_requests"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/grey_alpha_012"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_requests" />
 
     <Button
         android:id="@+id/btn_groups"
@@ -30,10 +39,19 @@
         android:paddingTop="12dp"
         android:paddingRight="16dp"
         android:paddingBottom="12dp"
-        android:text="Groups"
+        android:text="@string/section_groups"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_requests" />
+        app:layout_constraintTop_toBottomOf="@id/divider_btn_requests" />
+
+    <View
+        android:id="@+id/divider_btn_groups"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/grey_alpha_012"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_groups" />
 
     <TextView
         android:id="@+id/txt_contacts"
@@ -48,7 +66,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_groups"
+        app:layout_constraintTop_toBottomOf="@id/divider_btn_groups"
         tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView

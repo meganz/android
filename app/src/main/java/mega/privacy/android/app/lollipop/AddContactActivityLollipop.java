@@ -126,6 +126,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     public static final String EXTRA_GROUP_CHAT = "groupChat";
     public static final String EXTRA_EKR = "EKR";
     public static final String EXTRA_CHAT_LINK = "chatLink";
+    public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;
     private MegaApplication app;
@@ -1552,7 +1553,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             if (comesFromChat) {
                 title = getIntent().getStringExtra("aBtitle");
             }
-            onlyCreateGroup = getIntent().getBooleanExtra("onlyCreateGroup", false);
+            onlyCreateGroup = getIntent().getBooleanExtra(EXTRA_ONLY_CREATE_GROUP, false);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH){
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
                 if(multipleSelectIntent==0){

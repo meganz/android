@@ -52,7 +52,12 @@ class ContactGroupsFragment : Fragment() {
             }
         )
 
-        binding.btnCreateGroup.setOnClickListener { openCreateGroupScreen() }
+        binding.btnCreateGroup.setOnClickListener {
+            startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
+                putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
+            })
+        }
+
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.black)
             .formatColorTag(requireContext(), 'B', R.color.grey_300)
@@ -72,9 +77,5 @@ class ContactGroupsFragment : Fragment() {
         startActivity(Intent(context, GroupChatInfoActivityLollipop::class.java).apply {
             putExtra(Constants.HANDLE, groupId)
         })
-    }
-
-    private fun openCreateGroupScreen() {
-        startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java))
     }
 }
