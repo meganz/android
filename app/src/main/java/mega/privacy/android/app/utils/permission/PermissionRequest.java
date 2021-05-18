@@ -6,6 +6,5 @@ package mega.privacy.android.app.utils.permission;
  */
 public interface PermissionRequest {
     void proceed();
-
     void cancel();
 }

@@ -164,7 +164,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             model.cameraPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
-                        .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresCameraPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickCamera(true)
+                            }
+                        }
                         .setOnShowRationale { l -> onShowRationale(l) }
                         .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
                         .build()
@@ -174,7 +180,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
                     permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
-                        .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
+                        .setOnRequiresPermission { l ->
+                            run {
+                                onRequiresAudioPermission(l)
+                                // Continue expected action after granted
+                                sharedModel.clickMic(true)
+                            }
+                        }
                         .setOnShowRationale { l -> onShowRationale(l) }
                         .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
                         .build()
