@@ -73,7 +73,7 @@ open class MeetingBaseFragment : BaseFragment() {
 
     private fun onCheckRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach() {
-            logDebug("user denies the permissions: $it")
+            logDebug("user check the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
                     sharedModel.setCameraPermission(true)
@@ -101,7 +101,7 @@ open class MeetingBaseFragment : BaseFragment() {
 
     protected fun onRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            logDebug("user requires the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
                     sharedModel.setCameraPermission(true)
@@ -152,7 +152,7 @@ open class MeetingBaseFragment : BaseFragment() {
 
     protected fun onNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            logDebug("user denies and never ask for the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
                     sharedModel.setCameraPermission(false)
@@ -166,7 +166,7 @@ open class MeetingBaseFragment : BaseFragment() {
 
     protected fun onRequiresAudioPermission(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            logDebug("user requires the Audio permissions: $it")
             when (it) {
                 Manifest.permission.RECORD_AUDIO -> {
                     sharedModel.setRecordAudioPermission(true)
@@ -177,7 +177,7 @@ open class MeetingBaseFragment : BaseFragment() {
 
     protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
         permissions.forEach {
-            logDebug("user denies the permissions: $it")
+            logDebug("user requires the Camera permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
                     sharedModel.setCameraPermission(true)
