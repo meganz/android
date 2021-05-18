@@ -222,7 +222,6 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         billingManager.getInventory { skuList ->
             skuDetailsList = skuList
             myAccountInfo.availableSkus = skuList
-            updatePricing.value = true
         }
     }
 

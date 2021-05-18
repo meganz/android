@@ -14,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import kotlinx.android.synthetic.main.activity_upgrade_account.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
@@ -22,7 +23,6 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.service.iab.BillingManagerImpl.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
@@ -114,16 +114,12 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
             askForCustomizedPlan(this, megaApi.myEmail, viewModel.getAccountType())
         }
 
-        binding.semitransparentLayer.apply {
-            setOnClickListener { cancelClick() }
-            isVisible = false
-        }
+        binding.semitransparentLayer.setOnClickListener { cancelClick() }
 
         setAccountDetails()
         refreshAccountInfo()
-        setPricingInfo()
         showAvailableAccount()
-        cancelClick()
+        checkScroll()
     }
 
     private fun cancelClick() {
@@ -170,13 +166,19 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
-        binding.appBarLayout.elevation = if (withElevation) elevation else 0f
         changeStatusBarColorForElevation(this, withElevation)
 
-        binding.toolbar.setBackgroundColor(
-            if (isDarkMode(this) && withElevation) getColorForElevation(this, elevation)
-            else ContextCompat.getColor(this, android.R.color.transparent)
-        )
+        binding.toolbar.apply {
+            setBackgroundColor(
+                if (isDarkMode(this@UpgradeAccountActivity) && withElevation) getColorForElevation(
+                    this@UpgradeAccountActivity,
+                    elevation
+                )
+                else ContextCompat.getColor(this@UpgradeAccountActivity, R.color.white_dark_grey)
+            )
+
+            setElevation(if (withElevation) elevation else 0f)
+        }
     }
 
     private fun setAccountDetails() {
@@ -410,21 +412,10 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         binding.paymentMethodGoogleWalletIcon.isVisible = true
         binding.semitransparentLayer.isVisible = true
         window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_white_020)
-
-        when (upgradeType) {
-            PRO_I -> Handler().post {
-                binding.scrollView.smoothScrollTo(0, binding.upgradeProILayout.top)
-            }
-            PRO_II -> Handler().post {
-                binding.scrollView.smoothScrollTo(0, binding.upgradeProIiLayout.top)
-            }
-            PRO_III -> Handler().post {
-                binding.scrollView.smoothScrollTo(0, binding.upgradeProIiiLayout.bottom)
-            }
-        }
-
+        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.white_dark_grey))
+        binding.toolbar.elevation = 0F
         displayedAccountType = upgradeType
-        showmyF()
+        showDisplayedAccount()
     }
 
     private fun showPaymentMethods() {
@@ -454,7 +445,8 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
             binding.billedMonthly.isVisible = true
             binding.billedYearly.isVisible = true
-            binding.paymentTextPaymentMethod.text = StringResourcesUtils.getString(R.string.payment_method)
+            binding.paymentTextPaymentMethod.text =
+                StringResourcesUtils.getString(R.string.payment_method)
         } else {
             binding.paymentMethodGoogleWallet.isVisible = false
             binding.layoutButtons.isVisible = false
@@ -466,7 +458,7 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun showmyF() {
+    private fun showDisplayedAccount() {
         val accounts = viewModel.checkProductAccounts() ?: return
 
         for (i in accounts.indices) {
