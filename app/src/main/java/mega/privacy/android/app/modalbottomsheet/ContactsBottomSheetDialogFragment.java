@@ -36,8 +36,17 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
+    private static final String EXTRA_EMAIL = "EXTRA_EMAIL";
     private MegaContactAdapter contact = null;
     private ContactController cC;
+
+    public static ContactsBottomSheetDialogFragment newInstance(String userEmail) {
+        ContactsBottomSheetDialogFragment fragment = new ContactsBottomSheetDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_EMAIL, userEmail);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,14 +56,10 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
         if (savedInstanceState != null) {
             String email = savedInstanceState.getString(EMAIL);
-            if (email != null) {
-                MegaUser megaUser = megaApi.getContact(email);
-                String fullName = getMegaUserNameDB(megaUser);
-                if (fullName == null) {
-                    fullName = megaUser.getEmail();
-                }
-                contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
-            }
+            getContactFromEmail(email);
+        } else if (getArguments() != null && getArguments().containsKey(EXTRA_EMAIL)) {
+            String email = getArguments().getString(EXTRA_EMAIL);
+            getContactFromEmail(email);
         } else if (context instanceof ManagerActivityLollipop) {
             contact = ((ManagerActivityLollipop) context).getSelectedUser();
         }
@@ -181,5 +186,16 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         super.onSaveInstanceState(outState);
         String email = contact.getMegaUser().getEmail();
         outState.putString(EMAIL, email);
+    }
+
+    private void getContactFromEmail(String email) {
+        if (email != null) {
+            MegaUser megaUser = megaApi.getContact(email);
+            String fullName = getMegaUserNameDB(megaUser);
+            if (fullName == null) {
+                fullName = megaUser.getEmail();
+            }
+            contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
+        }
     }
 }

@@ -18,6 +18,7 @@ import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop
+import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -130,11 +131,9 @@ class ContactListFragment : Fragment() {
         })
     }
 
-    private fun onContactMoreInfoClick(userHandle: Long) {
-        // Do something
-    }
-
-    private fun openAddContactScreen() {
-        startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java))
+    private fun onContactMoreInfoClick(userEmail: String) {
+        ContactsBottomSheetDialogFragment
+            .newInstance(userEmail)
+            .show(childFragmentManager, userEmail)
     }
 }
