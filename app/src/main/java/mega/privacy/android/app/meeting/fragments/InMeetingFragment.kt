@@ -1840,14 +1840,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Send share link
      */
     override fun onShareLink() {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic()) {
+        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isLinkVisible()) {
             logError("Error getting the link, it is a private chat")
             return
         }
 
         if (meetinglink.isEmpty()) {
             inMeetingViewModel.setWaitingForLink(true)
-            sharedModel.createChatLink(inMeetingViewModel.getChatId())
+            sharedModel.createChatLink(inMeetingViewModel.getChatId(), inMeetingViewModel.isModerator())
             logError("Error, the link doesn't exist")
             return
         }

@@ -157,6 +157,23 @@ class BottomFloatingPanelViewHolder(
             }
         })
 
+        initUpdaters()
+
+        // Set the half expanded ratio, to set the height for the `STATE_HALF_EXPANDED`
+        // if ratio is not between 0 and 1, will set to 0.001f
+        post {
+            val peekHeight =
+                context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
+
+            var ratio = peekHeight.toFloat() / binding.root.measuredHeight
+            if ((ratio <= 0) || (ratio >= 1)) {
+                ratio = 0.001f
+            }
+            bottomSheetBehavior.halfExpandedRatio = ratio
+        }
+    }
+
+    private fun initUpdaters() {
         propertyUpdaters.add(
             propertyUpdater(
                 binding.bottomFloatingPanel.backgroundMask,
@@ -188,19 +205,6 @@ class BottomFloatingPanelViewHolder(
 
         setupFabUpdater()
         setupFabLabelUpdater()
-
-        // Set the half expanded ratio, to set the height for the `STATE_HALF_EXPANDED`
-        // if ratio is not between 0 and 1, will set to 0.001f
-        post {
-            val peekHeight =
-                context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
-
-            var ratio = peekHeight.toFloat() / binding.root.measuredHeight
-            if ((ratio <= 0) || (ratio >= 1)) {
-                ratio = 0.001f
-            }
-            bottomSheetBehavior.halfExpandedRatio = ratio
-        }
     }
 
     /**
@@ -340,32 +344,6 @@ class BottomFloatingPanelViewHolder(
                     view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
                 }
             })
-    }
-
-    private fun <V : View> propertyUpdater(
-        view: V,
-        startP: Int,
-        endP: Int,
-        update: (view: V, value: Int) -> Unit
-    ): (Float) -> Unit {
-        return {
-            update(view, (startP + (endP - startP) * it).toInt())
-        }
-    }
-
-    private fun <V : View> propertyUpdater(
-        view: V,
-        startP: Float,
-        endP: Float,
-        update: (view: V, value: Float) -> Unit
-    ): (Float) -> Unit {
-        return {
-            update(view, startP + (endP - startP) * it)
-        }
-    }
-
-    private fun composeColor(component: Int): Int {
-        return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
     /**
@@ -513,6 +491,32 @@ class BottomFloatingPanelViewHolder(
                 participant.clientId
             )
         }
+    }
+
+    private fun <V : View> propertyUpdater(
+        view: V,
+        startP: Int,
+        endP: Int,
+        update: (view: V, value: Int) -> Unit
+    ): (Float) -> Unit {
+        return {
+            update(view, (startP + (endP - startP) * it).toInt())
+        }
+    }
+
+    private fun <V : View> propertyUpdater(
+        view: V,
+        startP: Float,
+        endP: Float,
+        update: (view: V, value: Float) -> Unit
+    ): (Float) -> Unit {
+        return {
+            update(view, startP + (endP - startP) * it)
+        }
+    }
+
+    private fun composeColor(component: Int): Int {
+        return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
 

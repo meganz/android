@@ -204,12 +204,19 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      *
      * @param chatId chat ID
      */
-    fun createChatLink(chatId: Long) {
+    fun createChatLink(chatId: Long, isModerator: Boolean = true) {
         //The chat doesn't exist
-        meetingActivityRepository.createChatLink(
-            chatId,
-            CreateGroupChatWithPublicLink()
-        )
+        if (isModerator){
+            meetingActivityRepository.createChatLink(
+                chatId,
+                CreateGroupChatWithPublicLink()
+            )
+        } else {
+            meetingActivityRepository.queryChatLink(
+                chatId,
+                CreateGroupChatWithPublicLink()
+            )
+        }
     }
 
     /**
