@@ -12146,7 +12146,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			else{
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					showOverquotaAlert(false);
+					if (megaApi.isForeignNode(request.getParentHandle())) {
+						showAlert(this, StringResourcesUtils.getString(R.string.warning_share_owner_storage_quota), null);
+					} else {
+						showOverquotaAlert(false);
+					}
 				}
 				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
 					logDebug("OVERQUOTA ERROR: " + e.getErrorCode());
