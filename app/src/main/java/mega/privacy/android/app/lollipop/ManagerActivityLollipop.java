@@ -8340,7 +8340,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			});
 			openLinkDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) ->
 					dismissOpenLinkDialog());
-		}catch (Exception e){}
+			openLinkDialog.setOnKeyListener((dialog, keyCode, event) -> {
+				if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+					dismissOpenLinkDialog();
+				}
+				return true;
+			});
+		} catch (Exception e) {
+			logError("Exception showing Open Link dialog", e);
+		}
 	}
 
 	public void showChatLink(String link) {
@@ -10295,6 +10303,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
                 } else {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_SAVE_TO_CLOUD);
+                    fileIntent.putExtra(FileExplorerActivityLollipop.EXTRA_PARENT_HANDLE, getCurrentParentHandle());
                 }
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
@@ -13845,6 +13854,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setSearchQuery(String searchQuery) {
 		this.searchQuery = searchQuery;
+		this.searchView.setQuery(searchQuery, false);
 	}
 
 	public long getParentHandleIncoming() {
