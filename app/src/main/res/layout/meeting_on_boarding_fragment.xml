@@ -17,6 +17,7 @@
         android:id="@+id/create_meeting"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/grey_700"
         tools:context=".meeting.fragments.CreateMeetingFragment">
         <SurfaceView
             android:id="@+id/localSurfaceView"
