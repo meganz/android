@@ -103,6 +103,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     private fun startOpenLinkActivity() {
         val intent = Intent(requireContext(), OpenLinkActivity::class.java)
+        intent.putExtra(ACTION_JOIN_AS_GUEST, "any")
         intent.data = Uri.parse(meetingLink)
         startActivity(intent)
     }
@@ -187,5 +188,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     companion object {
         const val TAG = "PasteMeetingLinkGuestDialog"
+
+        const val ACTION_JOIN_AS_GUEST = "action_join_as_guest"
     }
 }

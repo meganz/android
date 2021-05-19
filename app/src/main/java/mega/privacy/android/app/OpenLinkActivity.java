@@ -22,8 +22,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.meeting.GuestTool;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -179,9 +181,13 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						initResult = megaChatApi.initAnonymous();
 					}
 
-					if(initResult != MegaChatApi.INIT_ERROR){
-						megaChatApi.connect(new ConnectListener(this));
-					}
+                    if (initResult != MegaChatApi.INIT_ERROR) {
+                        if (intent.getStringExtra(PasteMeetingLinkGuestDialogFragment.ACTION_JOIN_AS_GUEST) != null) {
+                            GuestTool.INSTANCE.start(url);
+                        } else {
+                            megaChatApi.connect(new ConnectListener(this));
+                        }
+                    }
 					else{
 						logError("Open chat url:initAnonymous:INIT_ERROR");
 						setError(getString(R.string.error_chat_link_init_error));
@@ -419,8 +425,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		megaChatApi.checkChatLink(url, new ChatBaseListener(
-				OpenLinkActivity.this) {
+		megaChatApi.checkChatLink(url, new ChatBaseListener(OpenLinkActivity.this) {
+
 			@Override
 			public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
 				int errorCode = e.getErrorCode();
