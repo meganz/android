@@ -9,24 +9,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/empty_hint_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="148dp"
-            android:src="@drawable/ic_zero_data_cu"
-            tools:visibility="visible" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/empty_enable_cu_button">
 
-        <TextView
-            android:id="@+id/empty_hint_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/empty_hint_image"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
-            tools:text="@string/no_results_found" />
+            <ImageView
+                android:id="@+id/empty_hint_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_zero_data_cu"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/empty_hint_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/empty_hint_image"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
+                tools:text="@string/no_results_found" />
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/empty_enable_cu_button"
@@ -36,7 +44,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="40dp"
-            android:text="@string/settings_camera_upload_on"/>
+            android:text="@string/settings_camera_upload_on" />
 
     </RelativeLayout>
 

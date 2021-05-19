@@ -3924,4 +3924,6 @@
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
 </resources>

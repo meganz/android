@@ -72,6 +72,7 @@ import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
 import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
@@ -158,11 +159,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        if (mViewModel.isSelecting() || mBinding.cuList.canScrollVertically(-1)) {
-            mManagerActivity.changeAppBarElevation(true);
-        } else {
-            mManagerActivity.changeAppBarElevation(false);
-        }
+        mManagerActivity.changeAppBarElevation(mViewModel.isSelecting()
+                || mBinding.cuList.canScrollVertically(SCROLLING_UP_DIRECTION));
     }
 
     public void selectAll() {
@@ -367,9 +365,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
-                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)));
+                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
 
-        mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
+        mFirstLoginBinding.enableButton.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
             if (hasPermissions(context, permissions)) {
@@ -378,10 +376,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
-        });
-        mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
-            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-            skipInitialCUSetup();
         });
 
         return mFirstLoginBinding.getRoot();
