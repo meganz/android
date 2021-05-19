@@ -347,7 +347,7 @@ class MegaNodeDialogUtil {
                         getString(R.string.invalid_characters_defined)
                     )
                 }
-                nameAlreadyExists(typedString, dialogType, node) -> {
+                nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
                     showDialogError(
                         typeText,
                         errorText,
@@ -539,32 +539,35 @@ class MegaNodeDialogUtil {
         }
 
         /**
+         * Checks if exists a node with the typed name within the same parent folder:
+         * - If the action is rename, then gets the parent node.
+         * - If not:
+         *      * If the received node is null, then the parent node is the root.
+         *      * If not, then the received node is the parent.
          *
-         * @param typedString Typed text.
-         * @param dialogType  Indicates the type of dialog. It can be:
-         *                      - TYPE_RENAME:       Rename action.
-         *                      - TYPE_NEW_FOLDER:   Create new folder action.
-         *                      - TYPE_NEW_FILE:     Create new file action.
-         *                      - TYPE_NEW_URL_FILE: Create new URL file action.
-         * @param node        Node to rename or parent where new file should be created.
+         * @param typedString    Typed text to set as the new node name.
+         * @param isRenameAction True if the action is rename, false otherwise.
+         * @param node           Node to rename or parent where new file/folder should be created.
          */
         @JvmStatic
-        fun nameAlreadyExists(typedString: String, dialogType: Int, node: MegaNode?): Boolean {
+        fun nameAlreadyExists(
+            typedString: String,
+            isRenameAction: Boolean,
+            node: MegaNode?
+        ): Boolean {
             val megaApi = MegaApplication.getInstance().megaApi
 
-            val parent = when {
-                dialogType == TYPE_RENAME -> megaApi.getParentNode(node)
+            val parentNode = when {
+                isRenameAction -> megaApi.getParentNode(node)
                 node == null -> megaApi.rootNode
                 else -> node
             } ?: return false
 
-            val children = megaApi.getChildren(parent) ?: return false
-
-            for (child in children) {
-                if (child.name == typedString) return true
+            val existingNode = megaApi.getChildren(parentNode)?.find { childNode ->
+                childNode.name == typedString
             }
 
-            return false
+            return existingNode != null
         }
     }
 }
