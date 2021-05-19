@@ -1511,7 +1511,7 @@
         <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
         <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]and more are typing&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">More</string>
@@ -3922,4 +3922,6 @@
     <string name="file_update_failed">File update failed. Try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
 </resources>

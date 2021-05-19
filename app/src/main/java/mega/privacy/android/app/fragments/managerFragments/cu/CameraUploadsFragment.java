@@ -24,6 +24,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,7 +51,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
-import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -83,6 +84,7 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
@@ -450,12 +452,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void setupOtherViews() {
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBinding.emptyHintImage.setImageResource(R.drawable.empty_cu_landscape);
-        } else {
-            mBinding.emptyHintImage.setImageResource(R.drawable.empty_cu_portrait);
-        }
-
         if (mCamera == TYPE_CAMERA) {
             mBinding.turnOnCuButton.setText(
                     getString(R.string.settings_camera_upload_turn_on).toUpperCase(
@@ -466,21 +462,24 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                             Locale.getDefault()));
         }
 
-        mBinding.turnOnCuButton.setOnClickListener(v -> {
-            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+        mBinding.turnOnCuButton.setOnClickListener(v -> enableCUClick());
+        mBinding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
+    }
 
-            if (mCamera == TYPE_CAMERA) {
-                if (hasPermissions(context, permissions)) {
-                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
-                            BUSINESS_CU_FRAGMENT_CU, false);
-                } else {
-                    requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
-                }
+    private void enableCUClick() {
+        ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+        String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+
+        if (mCamera == TYPE_CAMERA) {
+            if (hasPermissions(context, permissions)) {
+                mManagerActivity.checkIfShouldShowBusinessCUAlert(
+                        BUSINESS_CU_FRAGMENT_CU, false);
             } else {
-                mManagerActivity.moveToSettingsSection();
+                requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
             }
-        });
+        } else {
+            mManagerActivity.moveToSettingsSection();
+        }
     }
 
     private void observeLiveData() {
@@ -499,31 +498,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             mBinding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             mBinding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             if (nodes.isEmpty()) {
-                mBinding.emptyHintImage.setVisibility(
-                        mViewModel.isSearchMode() ? View.GONE : View.VISIBLE);
                 if (mViewModel.isSearchMode()) {
                     mBinding.emptyHintText.setText(R.string.no_results_found);
                 } else {
-                    String textToShow = getString(R.string.context_empty_camera_uploads);
-                    try {
-                        textToShow = textToShow.replace(
-                                "[A]", "<font color=\'"
-                                        + ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                                        + "\'>"
-                        ).replace("[/A]", "</font>").replace(
-                                "[B]", "<font color=\'"
-                                        + ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                                        + "\'>"
-                        ).replace("[/B]", "</font>");
-                    } catch (Exception ignored) {
-                    }
-                    Spanned result;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
-                    mBinding.emptyHintText.setText(result);
+                    String textToShow = StringResourcesUtils.getString(R.string.photos_empty);
+                    mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
+                            formatEmptyScreenText(context, textToShow), HtmlCompat.FROM_HTML_MODE_LEGACY));
                 }
             }
         });
@@ -566,7 +546,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mViewModel.camSyncEnabled()
                 .observe(getViewLifecycleOwner(), enabled -> mBinding.turnOnCuButton.setVisibility(
-                        enabled ? View.GONE : View.VISIBLE));
+                        enabled || mAdapter.getItemCount() <= 0 ? View.GONE : View.VISIBLE));
 
         observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList, VIEWER_FROM_CUMU);
     }
