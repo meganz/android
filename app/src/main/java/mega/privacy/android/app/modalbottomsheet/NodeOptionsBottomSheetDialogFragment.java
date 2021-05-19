@@ -136,7 +136,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
 //      optionGallery
-        LinearLayout galleryLabel = contentView.findViewById(R.id.option_gallery_layout);
+        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
 //      counterSave
         TextView optionDownload = contentView.findViewById(R.id.download_option);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -163,7 +163,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
-        galleryLabel.setOnClickListener(this);
+        optionGallery.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -314,7 +314,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionFavourite.setVisibility(View.VISIBLE);
 
                 if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
-                    galleryLabel.setVisibility(View.VISIBLE);
+                    optionGallery.setVisibility(View.VISIBLE);
                 }
 
                 //Hide
@@ -1021,7 +1021,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 ((ManagerActivityLollipop) context).showNodeLabelsPanel(node);
                 break;
 
-            case R.id.option_gallery_layout:
+            case R.id.gallery_option:
                 ((ManagerActivityLollipop) context).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
