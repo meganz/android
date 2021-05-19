@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grey_alpha_087">
 
     <RelativeLayout
         android:id="@+id/layer"
@@ -12,7 +13,7 @@
         app:layout_constraintHeight_percent=".7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/grey_alpha_087" >
+        android:background="@color/grey_800">
 
         <RelativeLayout
             android:id="@+id/video_layout"
@@ -61,13 +62,6 @@
         android:src="@drawable/ic_mic_off_contact"
         app:layout_constraintBottom_toBottomOf="@id/layer"
         app:layout_constraintStart_toStartOf="parent" />
-
-<!--    <com.zhpan.bannerview.BannerViewPager-->
-<!--        android:id="@+id/list_view_pager"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/speaker_video" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/participants_horizontal_list"
