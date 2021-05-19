@@ -432,4 +432,6 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
+
+    <color name="bottom_panel_end">#52000000</color>
 </resources>
