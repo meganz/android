@@ -79,7 +79,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -134,7 +133,6 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -322,10 +320,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
-	private static final String BUSINESS_CU_FRAGMENT = "BUSINESS_CU_FRAGMENT";
 	public static final String BUSINESS_CU_FRAGMENT_SETTINGS = "BUSINESS_CU_FRAGMENT_SETTINGS";
 	public static final String BUSINESS_CU_FRAGMENT_CU = "BUSINESS_CU_FRAGMENT_CU";
-	private static final String BUSINESS_CU_FIRST_TIME = "BUSINESS_CU_FIRST_TIME";
 
 	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
@@ -784,8 +780,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
 	private AlertDialog businessCUAlert;
-	private String businessCUF;
-	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewHolder psaViewHolder;
@@ -1406,7 +1400,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             case REQUEST_CAMERA_UPLOAD:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_SETTINGS, false);
+                    checkIfShouldShowBusinessCUAlert();
                 } else {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
@@ -1416,7 +1410,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             case REQUEST_CAMERA_ON_OFF: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
+                    checkIfShouldShowBusinessCUAlert();
                 } else {
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
@@ -1428,7 +1422,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     return;
                 }
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
+                    checkIfShouldShowBusinessCUAlert();
                 } else {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])) {
                         cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
@@ -1596,8 +1590,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown);
 		if (isBusinessCUAlertShown) {
 			outState.putBoolean(BUSINESS_CU_ALERT_SHOWN, isBusinessCUAlertShown);
-			outState.putString(BUSINESS_CU_FRAGMENT, businessCUF);
-			outState.putBoolean(BUSINESS_CU_FIRST_TIME, businessCUFirstTime);
 		}
 
 		outState.putBoolean(TRANSFER_OVER_QUOTA_SHOWN, isTransferOverQuotaWarningShown);
@@ -1702,11 +1694,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
 			isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
 			isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false);
-			if (isBusinessCUAlertShown) {
-				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
-				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
-			}
-
 			isTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_SHOWN, false);
 			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
@@ -3064,9 +3051,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         isBusinessGraceAlertShown = true;
     }
 
-	public void checkIfShouldShowBusinessCUAlert(String f, boolean firstTime) {
-    	businessCUF = f;
-    	businessCUFirstTime = firstTime;
+	public void checkIfShouldShowBusinessCUAlert() {
 		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
 			showBusinessCUAlert();
 		} else {
@@ -3091,23 +3076,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         isBusinessCUAlertShown = true;
     }
 
-    private void enableCU() {
-		sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
+	private void enableCU() {
+		if (getCameraUploadFragment() == null) {
+			return;
+		}
 
-        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
-            cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
-					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-            if (cuFragment == null) {
-                return;
-            }
-
-            if (businessCUFirstTime) {
-				cuFragment.enableCuForBusinessFirstTime();
-            } else {
-				cuFragment.enableCuForBusiness();
-            }
-        }
-    }
+		cuFragment.enableCu();
+	}
 
 	private void openContactLink (long handle) {
     	if (handle == -1) {
@@ -4251,7 +4226,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	void refreshFragment (String fTag) {
+	public void refreshFragment (String fTag) {
 		Fragment f = getSupportFragmentManager().findFragmentByTag(fTag);
 		if (f != null) {
 			logDebug("Fragment " + fTag + " refreshing");
@@ -4604,6 +4579,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				aB.setSubtitle(null);
 				if(isSearchEnabled){
 					setFirstNavigationLevel(false);
+				} else if (getCameraUploadFragment() != null && cuFragment.isEnableCUFragmentShown()) {
+					setFirstNavigationLevel(false);
+					aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
 				} else {
 					setFirstNavigationLevel(true);
 					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
@@ -5575,6 +5553,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				abL.setVisibility(View.VISIBLE);
 				cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 						.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+
 				if (cuFragment == null) {
 					cuFragment = CameraUploadsFragment.newInstance(
 							CameraUploadsFragment.TYPE_CAMERA);
@@ -6732,9 +6711,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 		    		}
 					else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
-						cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
-								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-						if (cuFragment != null) {
+						if (getCameraUploadFragment() != null) {
+							if (cuFragment.isEnableCUFragmentShown()) {
+								cuFragment.onBackPressed();
+								return true;
+							}
+
 							cuFragment.setSearchDate(null, sortOrderManagement.getOrderCamera());
 							isSearchEnabled = false;
 							setToolbarTitle();
@@ -9082,6 +9064,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void skipInitialCUSetup() {
+		setFirstLogin(false);
 		drawerItem = DrawerItem.HOMEPAGE;
 		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 		selectDrawerItemLollipop(drawerItem);
@@ -9090,7 +9073,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void refreshCameraUpload(){
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-
+		setToolbarTitle();
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 

@@ -71,6 +71,15 @@ class CuViewModel extends BaseRxViewModel {
     private boolean mSelecting;
     private long[] mSearchDate;
     private int mRealNodeCount;
+    private boolean enableCUShown;
+
+    public boolean isEnableCUShown() {
+        return enableCUShown;
+    }
+
+    public void setEnableCUShown(boolean shown) {
+        enableCUShown = shown;
+    }
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
@@ -297,7 +306,7 @@ class CuViewModel extends BaseRxViewModel {
                 .subscribe(IGNORE, logErr("setCamSyncEnabled")));
     }
 
-    public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
+    public void enableCu(boolean enableCellularSync, boolean syncVideo) {
         add(Completable.fromCallable(
                 () -> {
                     File localFile =

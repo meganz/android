@@ -3,20 +3,11 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.text.Html;
-import android.text.Spanned;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,10 +19,6 @@ import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import java.io.File;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -39,7 +26,6 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
@@ -47,7 +33,6 @@ import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
@@ -58,8 +43,6 @@ import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
-import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
@@ -80,7 +63,6 @@ import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
 import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
 import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
-import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
@@ -102,9 +84,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Inject
     SortOrderManagement sortOrderManagement;
 
-    // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
+    // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 5.
     private static final int SPAN_LARGE_GRID = 3;
-    private static final int SPAN_SMALL_GRID = 7;
+    private static final int SPAN_SMALL_GRID = 5;
 
     private int mCamera = TYPE_CAMERA;
 
@@ -168,14 +150,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public int onBackPressed() {
-        if (mManagerActivity.getFirstLogin()) {
-            mViewModel.setCamSyncEnabled(false);
-            mManagerActivity.setFirstLogin(false);
-            mManagerActivity.refreshMenu();
-        }
-
         if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
+        } else if (isEnableCUFragmentShown()) {
+            skipCUSetup();
+            return 1;
         } else {
             reloadNodes(sortOrderManagement.getOrderCamera());
 
@@ -190,13 +169,19 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void onStoragePermissionRefused() {
         showSnackbar(context, getString(R.string.on_refuse_storage_permission));
-        skipInitialCUSetup();
+        skipCUSetup();
     }
 
-    private void skipInitialCUSetup() {
+    private void skipCUSetup() {
+        mViewModel.setEnableCUShown(false);
         mViewModel.setCamSyncEnabled(false);
-        mManagerActivity.setFirstLogin(false);
-        mManagerActivity.skipInitialCUSetup();
+        mManagerActivity.setFirstNavigationLevel(false);
+
+        if (mManagerActivity.isFirstLogin()) {
+            mManagerActivity.skipInitialCUSetup();
+        } else {
+            mManagerActivity.refreshCameraUpload();
+        }
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
@@ -204,105 +189,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 requestCode);
     }
 
-    public void enableCuForBusinessFirstTime() {
+    public void enableCu() {
         if (mFirstLoginBinding == null) {
             return;
         }
 
-        boolean enableCellularSync = mFirstLoginBinding.cellularConnectionSwitch.isChecked();
-        boolean syncVideo = mFirstLoginBinding.uploadVideosSwitch.isChecked();
-
-        mViewModel.enableCuForBusinessFirstTime(enableCellularSync, syncVideo);
+        mViewModel.enableCu(mFirstLoginBinding.cellularConnectionSwitch.isChecked(),
+                mFirstLoginBinding.uploadVideosSwitch.isChecked());
 
         mManagerActivity.setFirstLogin(false);
+        mViewModel.setEnableCUShown(false);
         startCU();
-    }
-
-    /**
-     * This function is kept almost the same as it was in CameraUploadFragmentLollipop#cameraOnOff.
-     */
-    public void enableCuForBusiness() {
-        MegaPreferences prefs = dbH.getPreferences();
-        boolean isEnabled = false;
-        if (prefs != null) {
-            if (prefs.getCamSyncEnabled() != null) {
-                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
-                    isEnabled = true;
-                }
-            }
-        }
-
-        if (isEnabled) {
-            resetCUTimestampsAndCache();
-            dbH.setCamSyncEnabled(false);
-            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
-            stopRunningCameraUploadService(context);
-            mManagerActivity.refreshCameraUpload();
-        } else {
-            prefs = dbH.getPreferences();
-            if (prefs != null &&
-                    !TextUtils.isEmpty(prefs.getCamSyncLocalPath()) &&
-                    !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
-                    !TextUtils.isEmpty(prefs.getCamSyncWifi())
-            ) {
-                resetCUTimestampsAndCache();
-                dbH.setCamSyncEnabled(true);
-                dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
-
-                //video quality
-                saveCompressionSettings();
-                startCU();
-
-                return;
-            }
-
-            final ListAdapter adapter =
-                    new ArrayAdapter<>(context, R.layout.select_dialog_singlechoice,
-                            android.R.id.text1,
-                            new String[] {
-                                    getResources().getString(R.string.cam_sync_wifi),
-                                    getResources().getString(R.string.cam_sync_data)
-                            });
-            new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                    .setTitle(getString(R.string.section_photo_sync))
-                    .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
-                        resetCUTimestampsAndCache();
-                        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-                        File localFile =
-                                Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_DCIM);
-                        String localPath = localFile.getAbsolutePath();
-                        dbH.setCamSyncLocalPath(localPath);
-                        dbH.setCameraFolderExternalSDCard(false);
-                        // After target and local folder setup, then enable CU.
-                        dbH.setCamSyncEnabled(true);
-
-                        switch (which) {
-                            case 0: {
-                                dbH.setCamSyncWifi(true);
-                                break;
-                            }
-                            case 1: {
-                                dbH.setCamSyncWifi(false);
-                                break;
-                            }
-                        }
-
-                        startCU();
-                        dialog.dismiss();
-                    })
-                    .setPositiveButton(context.getString(R.string.general_cancel),
-                            (dialog, which) -> dialog.dismiss())
-                    .create()
-                    .show();
-        }
-    }
-
-    private void saveCompressionSettings() {
-        dbH.setCameraUploadVideoQuality(MEDIUM);
-        dbH.setConversionOnCharging(true);
-
-        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
     }
 
     private void startCU() {
@@ -347,7 +244,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
+        if (mCamera == TYPE_CAMERA && (mManagerActivity.getFirstLogin() || mViewModel.isEnableCUShown())) {
+            mViewModel.setEnableCUShown(true);
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             mBinding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
@@ -368,11 +266,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                         .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
 
         mFirstLoginBinding.enableButton.setOnClickListener(v -> {
-            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            MegaApplication.getInstance().sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
             if (hasPermissions(context, permissions)) {
-                mManagerActivity.checkIfShouldShowBusinessCUAlert(
-                        BUSINESS_CU_FRAGMENT_CU, true);
+                mManagerActivity.checkIfShouldShowBusinessCUAlert();
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
@@ -466,8 +363,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         if (mCamera == TYPE_CAMERA) {
             if (hasPermissions(context, permissions)) {
-                mManagerActivity.checkIfShouldShowBusinessCUAlert(
-                        BUSINESS_CU_FRAGMENT_CU, false);
+                mViewModel.setEnableCUShown(true);
+                mManagerActivity.refreshCameraUpload();
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
             }
@@ -539,8 +436,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         });
 
         mViewModel.camSyncEnabled()
-                .observe(getViewLifecycleOwner(), enabled -> mBinding.turnOnCuButton.setVisibility(
-                        enabled || mAdapter.getItemCount() <= 0 ? View.GONE : View.VISIBLE));
+                .observe(getViewLifecycleOwner(), enabled -> {
+                            boolean empty = mAdapter.getItemCount() <= 0;
+                            mBinding.turnOnCuButton.setVisibility(!enabled && !empty ? View.VISIBLE : View.GONE);
+                            mBinding.emptyEnableCuButton.setVisibility(!enabled && empty ? View.VISIBLE : View.GONE);
+                        }
+                );
 
         observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList, VIEWER_FROM_CUMU);
     }
@@ -550,19 +451,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_CAMERA_ON_OFF: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
-                            BUSINESS_CU_FRAGMENT_CU, false);
-                }
-                break;
-            }
+            case REQUEST_CAMERA_ON_OFF:
             case REQUEST_CAMERA_ON_OFF_FIRST_TIME: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
-                            BUSINESS_CU_FRAGMENT_CU, true);
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert();
                 }
                 break;
             }
@@ -668,5 +561,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @Override public void onNodeLongClicked(int position, CuNode node) {
         mViewModel.onNodeLongClicked(position, node);
+    }
+
+    public boolean isEnableCUFragmentShown() {
+        return mViewModel.isEnableCUShown();
     }
 }
