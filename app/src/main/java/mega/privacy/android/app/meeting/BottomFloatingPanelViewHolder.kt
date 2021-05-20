@@ -1,11 +1,14 @@
 package mega.privacy.android.app.meeting
 
+import android.animation.ArgbEvaluator
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -111,7 +114,14 @@ class BottomFloatingPanelViewHolder(
      */
     fun setParticipants(participants: MutableList<Participant>, myOwnInfo: Participant) {
         participants.add(myOwnInfo)
-        participantsAdapter.submitList(participants.sortedWith(compareBy({ !it.isModerator }, { !it.isMe }, { it.name })).toMutableList())
+        participantsAdapter.submitList(
+            participants.sortedWith(
+                compareBy(
+                    { !it.isModerator },
+                    { !it.isMe },
+                    { it.name })
+            ).toMutableList()
+        )
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
         )
@@ -147,23 +157,7 @@ class BottomFloatingPanelViewHolder(
             }
         })
 
-        propertyUpdaters.add(
-            propertyUpdater(
-                binding.bottomFloatingPanel.backgroundMask,
-                BOTTOM_PANEL_MIN_ALPHA, 1F
-            ) { view, value -> view.alpha = value })
-
-        val indicatorColorStart = 0x4F
-        val indicatorColorEnd = 0xBD
-        propertyUpdaters.add(
-            propertyUpdater(
-                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
-            ) { view, value ->
-                view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
-            })
-
-        setupFabUpdater()
-        setupFabLabelUpdater()
+        initUpdaters()
 
         // Set the half expanded ratio, to set the height for the `STATE_HALF_EXPANDED`
         // if ratio is not between 0 and 1, will set to 0.001f
@@ -177,6 +171,40 @@ class BottomFloatingPanelViewHolder(
             }
             bottomSheetBehavior.halfExpandedRatio = ratio
         }
+    }
+
+    private fun initUpdaters() {
+        propertyUpdaters.add(
+            propertyUpdater(
+                binding.bottomFloatingPanel.backgroundMask,
+                BOTTOM_PANEL_MIN_ALPHA, 1F
+            ) { view, value ->
+                run {
+                    val argbEvaluator = ArgbEvaluator()
+                    val background = argbEvaluator.evaluate(
+                        value,
+                        ContextCompat.getColor(context, R.color.bottom_panel_end),
+                        ContextCompat.getColor(context, R.color.white_grey_900)
+                    ) as Int
+
+                    val grad: GradientDrawable = view.background as GradientDrawable
+                    grad.setColor(background)
+
+                    view.background = grad
+                }
+            })
+
+        val indicatorColorStart = 0x4F
+        val indicatorColorEnd = 0xBD
+        propertyUpdaters.add(
+            propertyUpdater(
+                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
+            ) { view, value ->
+                view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
+            })
+
+        setupFabUpdater()
+        setupFabLabelUpdater()
     }
 
     /**
@@ -318,32 +346,6 @@ class BottomFloatingPanelViewHolder(
             })
     }
 
-    private fun <V : View> propertyUpdater(
-        view: V,
-        startP: Int,
-        endP: Int,
-        update: (view: V, value: Int) -> Unit
-    ): (Float) -> Unit {
-        return {
-            update(view, (startP + (endP - startP) * it).toInt())
-        }
-    }
-
-    private fun <V : View> propertyUpdater(
-        view: V,
-        startP: Float,
-        endP: Float,
-        update: (view: V, value: Float) -> Unit
-    ): (Float) -> Unit {
-        return {
-            update(view, startP + (endP - startP) * it)
-        }
-    }
-
-    private fun composeColor(component: Int): Int {
-        return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
-    }
-
     /**
      * Collapse the bottom sheet
      *
@@ -357,7 +359,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Get current state
      */
-    fun getState():Int{
+    fun getState(): Int {
         return bottomSheetBehavior.state
     }
 
@@ -377,6 +379,7 @@ class BottomFloatingPanelViewHolder(
      * @param micOn
      */
     fun updateMicIcon(micOn: Boolean) {
+        savedMicState = micOn
         floatingPanelView.fabMic.isOn = micOn
         participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
     }
@@ -387,6 +390,7 @@ class BottomFloatingPanelViewHolder(
      * @param micOn
      */
     fun updateCamIcon(camOn: Boolean) {
+        savedCamState = camOn
         floatingPanelView.fabCam.isOn = camOn
         participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
@@ -397,19 +401,19 @@ class BottomFloatingPanelViewHolder(
     }
 
     fun changeOnHoldIcon(isAnotherCallOnHold: Boolean) {
-        if(isAnotherCallOnHold){
+        if (isAnotherCallOnHold) {
             changeOnHoldIconDrawable(true)
             floatingPanelView.fabHold.isOn = true
-        }else{
+        } else {
             floatingPanelView.fabHold.isOn = false
             changeOnHoldIconDrawable(false)
         }
     }
 
-    fun changeOnHoldIconDrawable(existsAnotherCallOnHold:Boolean){
-        if(existsAnotherCallOnHold){
+    fun changeOnHoldIconDrawable(existsAnotherCallOnHold: Boolean) {
+        if (existsAnotherCallOnHold) {
             floatingPanelView.fabHold.setOnIcon(R.drawable.ic_call_swap)
-        }else{
+        } else {
             floatingPanelView.fabHold.setOnIcon(R.drawable.ic_transfers_pause)
         }
     }
@@ -464,7 +468,10 @@ class BottomFloatingPanelViewHolder(
      * @param ownPrivileges current privilege
      */
     fun updatePrivilege(ownPrivileges: Int) {
-        participantsAdapter.updateIcon(ParticipantsAdapter.MODERATOR, ownPrivileges == MegaChatRoom.PRIV_MODERATOR)
+        participantsAdapter.updateIcon(
+            ParticipantsAdapter.MODERATOR,
+            ownPrivileges == MegaChatRoom.PRIV_MODERATOR
+        )
         updateShareAndInviteButton()
     }
 
@@ -479,13 +486,42 @@ class BottomFloatingPanelViewHolder(
 
     fun updateRemotePrivileges(updateParticipantsPrivileges: MutableSet<Participant>) {
         updateParticipantsPrivileges.forEach { participant ->
-            participantsAdapter.updateParticipantPermission(participant.peerId, participant.clientId)
+            participantsAdapter.updateParticipantPermission(
+                participant.peerId,
+                participant.clientId
+            )
         }
+    }
+
+    private fun <V : View> propertyUpdater(
+        view: V,
+        startP: Int,
+        endP: Int,
+        update: (view: V, value: Int) -> Unit
+    ): (Float) -> Unit {
+        return {
+            update(view, (startP + (endP - startP) * it).toInt())
+        }
+    }
+
+    private fun <V : View> propertyUpdater(
+        view: V,
+        startP: Float,
+        endP: Float,
+        update: (view: V, value: Float) -> Unit
+    ): (Float) -> Unit {
+        return {
+            update(view, startP + (endP - startP) * it)
+        }
+    }
+
+    private fun composeColor(component: Int): Int {
+        return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
 
     companion object {
-        private const val BOTTOM_PANEL_MIN_ALPHA = 0.66F
+        private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F
     }
 }

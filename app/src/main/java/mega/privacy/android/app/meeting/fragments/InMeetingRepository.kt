@@ -437,7 +437,7 @@ class InMeetingRepository @Inject constructor(
         return Participant(
             megaChatApi.myUserHandle,
             MEGACHAT_INVALID_HANDLE,
-            megaChatApi.myFullname,
+            megaChatApi.myFullname ?: "",
             null, true, moderator, audio, video
         )
     }
