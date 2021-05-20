@@ -265,6 +265,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
@@ -12146,8 +12147,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			else{
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					if (megaApi.isForeignNode(request.getParentHandle())) {
-						showAlert(this, StringResourcesUtils.getString(R.string.warning_share_owner_storage_quota), null);
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
 					} else {
 						showOverquotaAlert(false);
 					}

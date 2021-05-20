@@ -84,6 +84,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1320,6 +1321,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				if (api.isForeignNode(request.getParentHandle())) {
+					showForeignStorageOverQuotaWarningDialog(this);
+					return;
+				}
+
 				logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_OVERQUOTA_STORAGE);
