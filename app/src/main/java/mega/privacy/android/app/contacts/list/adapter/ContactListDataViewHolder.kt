@@ -5,18 +5,17 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.list.data.ContactItem
-import mega.privacy.android.app.databinding.ItemContactBinding
+import mega.privacy.android.app.databinding.ItemContactDataBinding
 
-class ContactListViewHolder(
-    private val binding: ItemContactBinding
+class ContactListDataViewHolder(
+    private val binding: ItemContactDataBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: ContactItem) {
-        binding.txtName.text = item.firstName
-        binding.txtHeader.text = item.getFirstCharacter()
+    fun bind(item: ContactItem.Data) {
+        binding.txtName.text = item.getTitle()
         binding.txtLastSeen.text = item.lastSeen
         binding.chipNew.isVisible = item.isNew
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(itemView.resources))
+        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(itemView.context))
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
         item.statusColor?.let { binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, it)) }
     }

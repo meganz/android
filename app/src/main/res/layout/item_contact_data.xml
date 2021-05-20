@@ -9,20 +9,6 @@
     android:paddingEnd="16dp"
     android:paddingBottom="16dp">
 
-    <TextView
-        android:id="@+id/txt_header"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="A"
-        tools:visibility="visible" />
-
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail"
         android:layout_width="40dp"
@@ -30,7 +16,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_header"
+        app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
@@ -44,7 +30,7 @@
         android:textAppearance="@style/TextAppearance.Mega.Body1"
         app:emojiSize="14sp"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail"
-        app:layout_constraintTop_toBottomOf="@id/txt_header"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
 
     <ImageView

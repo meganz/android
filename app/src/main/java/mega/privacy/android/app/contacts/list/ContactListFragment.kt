@@ -29,11 +29,12 @@ class ContactListFragment : Fragment() {
     private lateinit var binding: FragmentContactListBinding
 
     private val viewModel by viewModels<ContactListViewModel>()
+
     private val recentlyAddedAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick, false)
+        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
     }
     private val contactsAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick, true)
+        ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
     }
 
     override fun onCreateView(
@@ -110,19 +111,24 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.getContacts().observe(viewLifecycleOwner, ::showContacts)
         viewModel.getRecentlyAddedContacts().observe(viewLifecycleOwner, ::showRecentlyAddedContacts)
+        viewModel.getContacts().observe(viewLifecycleOwner, ::showContacts)
     }
 
-    private fun showContacts(items: List<ContactItem>) {
-        binding.txtContacts.isVisible = items.isNotEmpty()
+    private fun showRecentlyAddedContacts(items: List<ContactItem.Data>) {
+        val headerTitle = getString(R.string.section_recently_added)
+        recentlyAddedAdapter.submitDataItems(items, headerTitle, false)
+    }
+
+    private fun showContacts(items: List<ContactItem.Data>) {
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
-        contactsAdapter.submitList(items)
-    }
 
-    private fun showRecentlyAddedContacts(items: List<ContactItem>) {
-        binding.txtContacts.isVisible = items.isNotEmpty()
-        recentlyAddedAdapter.submitList(items)
+        var headerTitle: String? = null
+        if (viewModel.getRecentlyAddedContacts().value?.isNullOrEmpty() != true) {
+            headerTitle = getString(R.string.section_contacts)
+        }
+
+        contactsAdapter.submitDataItems(items, headerTitle, true)
     }
 
     private fun onContactClick(userEmail: String) {

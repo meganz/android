@@ -38,10 +38,11 @@ class GetContactsUseCase @Inject constructor(
         private const val NOT_FOUND = -1
     }
 
-    fun get(): Flowable<List<ContactItem>> =
-        Flowable.create({ emitter: FlowableEmitter<List<ContactItem>> ->
+    fun get(): Flowable<List<ContactItem.Data>> =
+        Flowable.create({ emitter: FlowableEmitter<List<ContactItem.Data>> ->
             val contacts = megaApi.contacts.map { megaUser ->
-                val userName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
+                val firstName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
+                val lastName = megaChatApi.getUserLastnameFromCache(megaUser.handle)
                 val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
                 val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
                 val userImageFile = getUserImageFile(context, megaUser.email)
@@ -51,10 +52,11 @@ class GetContactsUseCase @Inject constructor(
                     null
                 }
 
-                ContactItem(
+                ContactItem.Data(
                     handle = megaUser.handle,
                     email = megaUser.email,
-                    firstName = userName,
+                    firstName = firstName,
+                    lastName = lastName,
                     status = userStatus,
                     statusColor = getUserStatusColor(userStatus),
                     imageUri = userImageUri,
@@ -63,7 +65,7 @@ class GetContactsUseCase @Inject constructor(
                 )
             }.toMutableList()
 
-            emitter.onNext(contacts)
+            emitter.onNext(contacts.sortedBy(ContactItem.Data::getFirstCharacter))
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -93,7 +95,7 @@ class GetContactsUseCase @Inject constructor(
                                     )
                             }
 
-                            emitter.onNext(contacts)
+                            emitter.onNext(contacts.sortedBy { it.firstName ?: it.email })
                         }
                     } else {
                         logError(error.toThrowable().stackTraceToString())
@@ -122,7 +124,7 @@ class GetContactsUseCase @Inject constructor(
                             }
                         )
 
-                        emitter.onNext(contacts)
+                        emitter.onNext(contacts.sortedBy(ContactItem.Data::getFirstCharacter))
                     }
                 },
                 onChatPresenceLastGreen = { userHandle, lastGreen ->
@@ -135,7 +137,7 @@ class GetContactsUseCase @Inject constructor(
                             lastSeen = TimeUtils.unformattedLastGreenDate(context, lastGreen)
                         )
 
-                        emitter.onNext(contacts)
+                        emitter.onNext(contacts.sortedBy(ContactItem.Data::getFirstCharacter))
                     }
                 }
             )
@@ -150,7 +152,9 @@ class GetContactsUseCase @Inject constructor(
                 if (contact.firstName.isNullOrBlank()) {
                     megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
                 }
-                megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
+                if (contact.lastName.isNullOrBlank()) {
+                    megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
+                }
                 megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
 
                 if (contact.status != STATUS_ONLINE) {

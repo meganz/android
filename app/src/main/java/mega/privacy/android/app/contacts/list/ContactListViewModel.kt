@@ -22,7 +22,7 @@ class ContactListViewModel @ViewModelInject constructor(
         private const val TAG = "ContactListViewModel"
     }
 
-    private val contacts: MutableLiveData<List<ContactItem>> = MutableLiveData()
+    private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
     private var queryString: String? = null
 
     init {
@@ -31,7 +31,7 @@ class ContactListViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-                    contacts.postValue(items.toList())
+                    contacts.value = items.toList()
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())
@@ -40,7 +40,7 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getContacts(): LiveData<List<ContactItem>> =
+    fun getContacts(): LiveData<List<ContactItem.Data>> =
         contacts.map { items ->
             if (queryString.isNullOrBlank()) {
                 items
@@ -49,7 +49,7 @@ class ContactListViewModel @ViewModelInject constructor(
             }
         }
 
-    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem.Data>> =
         contacts.map { items ->
             if (queryString.isNullOrBlank()) {
                 items.filter { it.isNew }

@@ -291,6 +291,8 @@
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Contacts [A](%1$d)[/A]</string>
+    <!-- Section name for the “Recently Added Contacts” section.Preferably one word. There is little space for this word. -->
+    <string name="section_recently_added">Recently Added</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]No [/B][A]sent requests[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
