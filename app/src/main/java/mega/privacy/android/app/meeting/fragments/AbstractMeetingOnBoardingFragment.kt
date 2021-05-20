@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -31,8 +30,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionRequest
-import mega.privacy.android.app.utils.permission.PermissionsRequester
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -111,7 +108,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding.sharedviewmodel = sharedModel
 
         initViewModel()
-//        checkMeetingPermissions(permissions)
+
         permissionsRequester.launch(true)
     }
 
@@ -294,9 +291,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             true -> {
                 // Always try to start the video using the front camera
                 sharedModel.setChatVideoInDevice(null)
+                // Hide avatar when camera open
+                meeting_thumbnail.visibility = View.GONE
                 activateVideo()
             }
             false -> {
+                // Show avatar when camera close
+                meeting_thumbnail.visibility = View.VISIBLE
                 deactivateVideo()
             }
         }

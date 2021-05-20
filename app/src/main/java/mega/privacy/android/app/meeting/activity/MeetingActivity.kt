@@ -17,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -144,7 +143,7 @@ class MeetingActivity : PasscodeActivity() {
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
 
-        if(meetingAction == MEETING_ACTION_IN){
+        if (meetingAction == MEETING_ACTION_IN) {
             bundle.putBoolean(
                 MEETING_AUDIO_ENABLE, intent.getBooleanExtra(
                     MEETING_AUDIO_ENABLE,

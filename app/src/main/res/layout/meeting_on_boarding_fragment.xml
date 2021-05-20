@@ -17,8 +17,21 @@
         android:id="@+id/create_meeting"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_700"
+        android:background="@color/grey_900"
         tools:context=".meeting.fragments.CreateMeetingFragment">
+
+        <LinearLayout
+            android:id="@+id/main_bk"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/grey_700"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/edit_first_name" />
+
         <SurfaceView
             android:id="@+id/localSurfaceView"
             android:layout_width="0dp"
@@ -49,10 +62,10 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textColorHint="#9B9B9B"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/meeting_thumbnail"
@@ -60,14 +73,14 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:scaleType="fitCenter"
-            app:border_width="3dp"
+            app:border_width="4dp"
             app:corner_radius="60dp"
-            app:border_color="@color/grey_700"
+            app:border_color="@color/dark_grey_border_color"
             app:layout_constraintVertical_bias="0.2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
-            app:layout_constraintTop_toBottomOf="@id/type_meeting_edit_text" />
+            app:layout_constraintTop_toBottomOf="@id/guideline" />
 
         <View
             android:id="@+id/fab_tip_location"
@@ -146,6 +159,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="100dp"/>
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
