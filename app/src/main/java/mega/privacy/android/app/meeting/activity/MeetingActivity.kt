@@ -1,6 +1,8 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
@@ -103,7 +105,12 @@ class MeetingActivity : PasscodeActivity() {
         actionBar.title = ""
 
         when (meetAction) {
-            MEETING_ACTION_JOIN, MEETING_ACTION_CREATE, MEETING_ACTION_GUEST
+            MEETING_ACTION_CREATE -> {
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+                // Toolbar should be set to TRANSPARENT in "Create Meeting"
+                actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+            MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
