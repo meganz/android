@@ -211,7 +211,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+        viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

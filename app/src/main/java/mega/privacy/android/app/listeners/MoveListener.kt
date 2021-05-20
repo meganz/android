@@ -18,17 +18,19 @@ class MoveListener(
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_MOVE) {
-            snackbarShower?.showSnackbar(
-                getString(
-                    if (e.errorCode == API_OK) R.string.context_correctly_moved
-                    else R.string.context_no_moved
-                )
-            )
-
-            onFinish?.invoke(
-                e.errorCode == API_OK,
+            val isForeignOverQuota =
                 e.errorCode == API_EOVERQUOTA && api.isForeignNode(request.parentHandle)
-            )
+
+            if (!isForeignOverQuota) {
+                snackbarShower?.showSnackbar(
+                    getString(
+                        if (e.errorCode == API_OK) R.string.context_correctly_moved
+                        else R.string.context_no_moved
+                    )
+                )
+            }
+
+            onFinish?.invoke(e.errorCode == API_OK, isForeignOverQuota)
         }
     }
 }

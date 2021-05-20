@@ -1084,14 +1084,14 @@ object MegaNodeUtil {
         val megaApi = megaApp.megaApi
 
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
-        if (megaApi.isForeignNode(toHandle)) {
-            showForeignStorageOverQuotaWarningDialog(context)
-            return emptyList()
-        }
-
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveListener(snackbarShower)
+        val listener = MoveListener(snackbarShower) { _, isForeignOverQuota ->
+            if (isForeignOverQuota) {
+                showForeignStorageOverQuotaWarningDialog(context)
+            }
+        }
+
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1128,15 +1128,20 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
+     * @param context          Current Context.
+     * @param requestCode      RequestCode parameter of onActivityResult
+     * @param resultCode       ResultCode parameter of onActivityResult
+     * @param data             Data parameter of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
      */
     @JvmStatic
     fun handleSelectFolderToCopyResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower,
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
         activityLauncher: ActivityLauncher
     ): Boolean {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -1157,7 +1162,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
-        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, context)
 
         for (handle in copyHandles) {
             val node = megaApi.getNodeByHandle(handle)
