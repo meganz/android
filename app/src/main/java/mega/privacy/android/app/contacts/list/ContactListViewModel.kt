@@ -40,16 +40,24 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getContacts(): LiveData<List<ContactItem.Data>> =
+    fun getContacts(): LiveData<List<ContactItem>> =
         contacts.map { items ->
-            if (queryString.isNullOrBlank()) {
-                items
-            } else {
-                items.filter { it.matches(queryString!!) }
+            val itemsWithHeaders = mutableListOf<ContactItem>()
+            items?.forEachIndexed { index, item ->
+                if (item.matches(queryString)) {
+                    when {
+                        index == 0 ->
+                            itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
+                        items[index - 1].getFirstCharacter() != items[index].getFirstCharacter() ->
+                            itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
+                    }
+                    itemsWithHeaders.add(item)
+                }
             }
+            itemsWithHeaders
         }
 
-    fun getRecentlyAddedContacts(): LiveData<List<ContactItem.Data>> =
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
         contacts.map { items ->
             if (queryString.isNullOrBlank()) {
                 items.filter { it.isNew }

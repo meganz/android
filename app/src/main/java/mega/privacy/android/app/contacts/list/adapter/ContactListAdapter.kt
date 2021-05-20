@@ -68,32 +68,18 @@ class ContactListAdapter(
             is ContactItem.Data -> VIEW_TYPE_DATA
         }
 
-    fun submitDataItems(
-        items: List<ContactItem.Data>?,
-        mainHeaderTitle: String?,
-        enableSubheaders: Boolean
+    fun submitList(
+        items: List<ContactItem>?,
+        mainHeaderTitle: String,
+        commitCallback: Runnable? = null
     ) {
-        val itemsWithHeaders = mutableListOf<ContactItem>()
+        val itemsWithHeader = mutableListOf<ContactItem>()
 
-        if (!mainHeaderTitle.isNullOrBlank() && !items.isNullOrEmpty()) {
-            itemsWithHeaders.add(ContactItem.Header(mainHeaderTitle))
+        if (!items.isNullOrEmpty()) {
+            itemsWithHeader.add(ContactItem.Header(mainHeaderTitle))
+            itemsWithHeader.addAll(items)
         }
 
-        if (enableSubheaders) {
-            items?.forEachIndexed { index, item ->
-                when {
-                    index == 0 ->
-                        itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
-                    items[index - 1].getFirstCharacter() != items[index].getFirstCharacter() ->
-                        itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
-                    else ->
-                        itemsWithHeaders.add(item)
-                }
-            }
-        } else if (!items.isNullOrEmpty()) {
-            itemsWithHeaders.addAll(items)
-        }
-
-        submitList(itemsWithHeaders)
+        submitList(itemsWithHeader, commitCallback)
     }
 }

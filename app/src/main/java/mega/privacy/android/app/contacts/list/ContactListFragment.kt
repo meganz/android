@@ -115,20 +115,19 @@ class ContactListFragment : Fragment() {
         viewModel.getContacts().observe(viewLifecycleOwner, ::showContacts)
     }
 
-    private fun showRecentlyAddedContacts(items: List<ContactItem.Data>) {
+    private fun showRecentlyAddedContacts(items: List<ContactItem>) {
         val headerTitle = getString(R.string.section_recently_added)
-        recentlyAddedAdapter.submitDataItems(items, headerTitle, false)
+        recentlyAddedAdapter.submitList(items, headerTitle,)
     }
 
-    private fun showContacts(items: List<ContactItem.Data>) {
+    private fun showContacts(items: List<ContactItem>) {
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
 
-        var headerTitle: String? = null
         if (viewModel.getRecentlyAddedContacts().value?.isNullOrEmpty() != true) {
-            headerTitle = getString(R.string.section_contacts)
+            contactsAdapter.submitList(items, getString(R.string.section_contacts))
+        } else {
+            contactsAdapter.submitList(items)
         }
-
-        contactsAdapter.submitDataItems(items, headerTitle, true)
     }
 
     private fun onContactClick(userEmail: String) {
