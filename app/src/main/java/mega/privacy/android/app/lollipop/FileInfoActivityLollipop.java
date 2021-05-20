@@ -1767,6 +1767,8 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
                 sendBroadcast(intent);
                 finish();
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                showForeignStorageOverQuotaWarningDialog(this);
             } else{
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
             }

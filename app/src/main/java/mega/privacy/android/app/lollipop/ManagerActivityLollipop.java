@@ -11999,6 +11999,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 			}
 			else {
+				if (e.getErrorCode() == MegaError.API_EOVERQUOTA
+						&& api.isForeignNode(request.getParentHandle())) {
+					showForeignStorageOverQuotaWarningDialog(this);
+
+					if (restoreFromRubbish) restoreFromRubbish = false;
+					else moveToRubbish = false;
+
+					return;
+				}
+
 				if(restoreFromRubbish){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_restored), -1);
 					restoreFromRubbish = false;

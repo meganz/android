@@ -1308,7 +1308,9 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
-            } else {
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
         } else if (request.getType() == MegaRequest.TYPE_COPY) {

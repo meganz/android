@@ -1008,35 +1008,26 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			} catch (Exception ex) {
 			}
 
-			if (moveToRubbish) {
+			if (cflF != null && cflF.isVisible()) {
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
+			}
+
+			if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else if (moveToRubbish) {
 				logDebug("Finish move to Rubbish!");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
-					}
-				} else {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
 				}
 			} else {
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
 				} else {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
 				}
 			}
+
 			moveToRubbish = false;
 			logDebug("Move request finished");
 		}

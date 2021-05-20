@@ -1658,34 +1658,25 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			} catch (Exception ex) {
 			}
 
-			if (moveToRubbish) {
+			if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+				sharedFoldersFragment.clearSelections();
+				sharedFoldersFragment.hideMultipleSelect();
+			}
+
+			if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else if (moveToRubbish) {
 				logDebug("Finish move to Rubbish!");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
-						sharedFoldersFragment.clearSelections();
-						sharedFoldersFragment.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
 				} else {
-					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
-						sharedFoldersFragment.clearSelections();
-						sharedFoldersFragment.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 			} else {
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
-						sharedFoldersFragment.clearSelections();
-						sharedFoldersFragment.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
 				} else {
-					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
-						sharedFoldersFragment.clearSelections();
-						sharedFoldersFragment.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 			}
 			moveToRubbish = false;

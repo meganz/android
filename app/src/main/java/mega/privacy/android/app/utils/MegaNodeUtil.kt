@@ -43,6 +43,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -1053,14 +1054,19 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
+     * @param context        Current Context.
+     * @param requestCode    RequestCode parameter of onActivityResult
+     * @param resultCode     ResultCode parameter of onActivityResult
+     * @param data           Data parameter of onActivityResult
+     * @param snackbarShower Interface to show snackbar
      */
     @JvmStatic
     fun handleSelectFolderToMoveResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower
     ): List<Long> {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
             || resultCode != RESULT_OK || data == null
@@ -1078,6 +1084,11 @@ object MegaNodeUtil {
         val megaApi = megaApp.megaApi
 
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+        if (megaApi.isForeignNode(toHandle)) {
+            showForeignStorageOverQuotaWarningDialog(context)
+            return emptyList()
+        }
+
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
         val listener = MoveListener(snackbarShower)
