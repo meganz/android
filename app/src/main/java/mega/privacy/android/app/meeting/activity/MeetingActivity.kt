@@ -1,6 +1,8 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
@@ -15,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -103,7 +104,12 @@ class MeetingActivity : PasscodeActivity() {
         actionBar.title = ""
 
         when (meetAction) {
-            MEETING_ACTION_JOIN, MEETING_ACTION_CREATE, MEETING_ACTION_GUEST
+            MEETING_ACTION_CREATE -> {
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
+                // Toolbar should be set to TRANSPARENT in "Create Meeting"
+                actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+            MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
@@ -137,7 +143,7 @@ class MeetingActivity : PasscodeActivity() {
             bundle.putString(MEETING_NAME, intent.getStringExtra(MEETING_NAME))
         }
 
-        if(meetingAction == MEETING_ACTION_IN){
+        if (meetingAction == MEETING_ACTION_IN) {
             bundle.putBoolean(
                 MEETING_AUDIO_ENABLE, intent.getBooleanExtra(
                     MEETING_AUDIO_ENABLE,

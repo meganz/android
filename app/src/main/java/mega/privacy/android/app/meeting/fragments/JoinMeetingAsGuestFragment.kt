@@ -56,6 +56,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        main_bk.visibility = View.VISIBLE
         edit_first_name.visibility = View.VISIBLE
         edit_last_name.visibility = View.VISIBLE
         btn_start_join_meeting.setText(R.string.btn_join_meeting_as_guest)

@@ -104,7 +104,6 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
         updateSpeakerIcon(savedSpeakerState)
-        floatingPanelView.fabEnd.setImageResource(R.drawable.ic_remove)
     }
 
     /**
@@ -183,7 +182,7 @@ class BottomFloatingPanelViewHolder(
                     val argbEvaluator = ArgbEvaluator()
                     val background = argbEvaluator.evaluate(
                         value,
-                        ContextCompat.getColor(context, R.color.bottom_panel_end),
+                        ContextCompat.getColor(context, R.color.grey_alpha_070),
                         ContextCompat.getColor(context, R.color.white_grey_900)
                     ) as Int
 
