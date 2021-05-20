@@ -88,7 +88,7 @@ class ParticipantViewHolder(
     }
 
     private fun initAvatar(participant: Participant) {
-        inMeetingViewModel.getChat().let {
+        inMeetingViewModel.getChat()?.let {
             var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
             if (avatar == null) {
                 avatar = CallUtil.getDefaultAvatarCall(

@@ -18,6 +18,7 @@ import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
+import mega.privacy.android.app.meeting.GuestTool
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.*
@@ -129,7 +130,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatCall
      */
     fun getCall(): MegaChatCall? {
+        GuestTool.log("Current chat id: $currentChatId, ${inMeetingRepository.getChatRoom(currentChatId)}")
         inMeetingRepository.getChatRoom(currentChatId)?.let {
+            GuestTool.log("Call is: ${inMeetingRepository.getMeeting(it.chatId)}")
             return inMeetingRepository.getMeeting(it.chatId)
         }
 

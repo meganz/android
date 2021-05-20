@@ -15,7 +15,7 @@
         android:layout_marginTop="30dp"
         android:singleLine="true"
         android:textSize="16sp"
-        android:text="https://mega.nz/chat/kQVCAIxS#ISSDW-QGSWpC50PAv7CR_A"
+        android:text="https://mega.co.nz/chat/8uR2nSJR#ppmhrkkwgkBnwJHtQgOmeQ"
         android:hint="@string/meeting_link"/>
 
     <RelativeLayout

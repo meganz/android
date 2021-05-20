@@ -41,7 +41,7 @@ object GuestTool {
                         val initResult = chatApi.init(null)
                         log("Chat init result: $initResult")
 
-                        megaApi.createEphemeralAccountPlusPlus("The Anonymous: ", "Ash Wu", object : BaseListener(application) {
+                        megaApi.createEphemeralAccountPlusPlus("${System.currentTimeMillis()}", "Ash", object : BaseListener(application) {
 
                             override fun onRequestFinish(
                                 api: MegaApiJava,
@@ -86,6 +86,7 @@ object GuestTool {
                                                                 e: MegaChatError
                                                             ) {
                                                                 log("[${request.requestString}] -> Error code: ${e.errorCode} [${e.errorString}]")
+                                                                log("${request.chatHandle}, ${request.userHandle}")
                                                             }
                                                         })
                                                     }

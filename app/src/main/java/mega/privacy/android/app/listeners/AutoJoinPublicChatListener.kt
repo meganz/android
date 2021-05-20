@@ -1,6 +1,7 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
+import mega.privacy.android.app.meeting.GuestTool
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -25,6 +26,7 @@ class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) 
 
         if (e.errorCode == MegaError.API_OK) {
             LogUtil.logDebug("Joined chat correctly")
+            GuestTool.log("${request.chatHandle}, ${request.userHandle}")
             callback?.onJoinedChat(request.chatHandle, request.userHandle)
         } else {
             LogUtil.logError("Error Joining the chat = e.errorCode " + e.errorCode)
