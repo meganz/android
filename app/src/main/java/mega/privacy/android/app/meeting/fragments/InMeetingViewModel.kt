@@ -14,8 +14,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -1523,13 +1521,26 @@ class InMeetingViewModel @ViewModelInject constructor(
         return hasOneModerator && participants.value?.isNotEmpty() == true && isModerator()
     }
 
-    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        inMeetingRepository.joinPublicChat(chatId, listener)
-    }
 
-    fun createEphemeralAccountAndJoinChat(firstName: String, lastName: String, listener: MegaRequestListenerInterface) {
-        inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
-    }
+    // For "join as guest" start
+    fun chatLogout(listener: MegaChatRequestListenerInterface) = inMeetingRepository.chatLogout(listener)
+
+    fun createEphemeralAccountAndJoinChat(
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface
+    ) = inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+
+    fun fetchNodes(listener: MegaRequestListenerInterface) = inMeetingRepository.fetchNodes(listener)
+
+    fun chatConnect(listener: MegaChatRequestListenerInterface) = inMeetingRepository.chatConnect(listener)
+
+    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
+        inMeetingRepository.openChatPreview(link, listener)
+
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) = inMeetingRepository.joinPublicChat(chatId, listener)
+
+    // // For join as guest end
 
     /**
      * Method for answer a call

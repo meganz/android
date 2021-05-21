@@ -1,24 +1,14 @@
 package mega.privacy.android.app.meeting.adapter
 
-import android.graphics.Bitmap
 import android.graphics.PorterDuff
-import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
-import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiAndroid
 import java.util.*
 
 /**
