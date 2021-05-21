@@ -27,20 +27,32 @@
             android:background="@color/grey_700"
             android:orientation="vertical"
             android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/edit_first_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/edit_first_name" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <SurfaceView
             android:id="@+id/localSurfaceView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/mask"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/grey_alpha_060"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/type_meeting_edit_text"
@@ -53,19 +65,19 @@
             android:gravity="center"
             android:hint="@string/type_meeting_name"
             android:inputType="text"
-            android:maxLines="1"
             android:maxLength="100"
+            android:maxLines="1"
             android:minWidth="100dp"
             android:singleLine="true"
-            android:textAlignment="center"
             android:text="@={createviewmodel.meetingName}"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="14sp"
             android:textColorHint="#9B9B9B"
+            android:textSize="14sp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/meeting_thumbnail"
@@ -73,72 +85,83 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:scaleType="fitCenter"
+            app:border_color="@color/dark_grey_border_color"
             app:border_width="4dp"
             app:corner_radius="60dp"
-            app:border_color="@color/dark_grey_border_color"
-            app:layout_constraintVertical_bias="0.2"
+            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:layout_constraintVertical_bias="0.2" />
+
+        <View
+            android:id="@+id/up_location"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
-            app:layout_constraintTop_toBottomOf="@id/guideline" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:layout_constraintVertical_bias="0.25" />
 
         <View
             android:id="@+id/fab_tip_location"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="1dp"
             app:layout_constraintBottom_toTopOf="@id/on_off_fab"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintVertical_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/meeting_thumbnail" />
+            app:layout_constraintTop_toBottomOf="@+id/up_location"
+            app:layout_constraintVertical_bias="0.5" />
 
         <include
             android:id="@+id/on_off_fab"
+            layout="@layout/meeting_component_onofffab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/edit_first_name"
             android:layout_marginBottom="24dp"
-            bind:viewmodelFab="@{sharedviewmodel}"
-            layout="@layout/meeting_component_onofffab"/>
+            app:layout_constraintBottom_toTopOf="@id/edit_first_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            bind:viewmodelFab="@{sharedviewmodel}" />
 
         <EditText
             android:id="@+id/edit_first_name"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@id/guideline2"
-            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
             android:layout_marginEnd="8dp"
-            android:paddingVertical="16dp"
-            android:hint="@string/first_name_text"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:singleLine="true"
-            android:maxLength="50"
-            android:textColorHint="#9B9B9B"
-            android:visibility="gone"
+            android:background="@android:color/transparent"
             android:gravity="center"
-            android:background="@android:color/transparent" />
+            android:hint="@string/first_name_text"
+            android:maxLength="50"
+            android:paddingVertical="16dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="#9B9B9B"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+            app:layout_constraintEnd_toStartOf="@id/guideline2" />
 
         <EditText
             android:id="@+id/edit_last_name"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/guideline2"
-            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
             android:layout_marginStart="8dp"
-            android:paddingVertical="16dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
             android:hint="@string/lastname_text"
             android:maxLength="50"
-            android:gravity="center"
+            android:paddingVertical="16dp"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="14sp"
             android:textColorHint="#9B9B9B"
+            android:textSize="14sp"
             android:visibility="gone"
-            android:background="@android:color/transparent" />
+            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+            app:layout_constraintStart_toEndOf="@id/guideline2" />
 
         <Button
             android:id="@+id/btn_start_join_meeting"
@@ -146,8 +169,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="10dp"
             android:backgroundTint="@color/drawer_upgrade_button_background_selector"
             android:gravity="center"
@@ -164,13 +187,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="100dp"/>
+            app:layout_constraintGuide_begin="100dp" />
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5"/>
+            app:layout_constraintGuide_percent="0.5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
