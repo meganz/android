@@ -20,7 +20,7 @@
         app:border_width="4dp"
         app:corner_radius="60dp"
         app:border_color="@color/dark_grey_border_color"
-        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintVertical_bias="0.25"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

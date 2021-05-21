@@ -8,9 +8,12 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +23,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
+import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -48,6 +52,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected var meetingName = ""
     protected var chatId: Long = MEGACHAT_INVALID_HANDLE
     protected var meetingLink = ""
+
+    // Views
+    lateinit var toolbar: MaterialToolbar
+    private var toolbarTitle: EmojiTextView? = null
+    private var toolbarSubtitle: TextView? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -91,9 +100,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             ) + Util.dp2px(16f)
         )
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            title = meetingName
-            subtitle = meetingLink
+        meetingActivity.toolbar?.apply {
+            meetingActivity.title_toolbar?.text = meetingName
+            meetingActivity.subtitle_toolbar?.text = meetingLink
         }
     }
 
@@ -160,7 +169,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             model.cameraPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
-                    permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
+                    permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList())
+                    )
                         .setOnRequiresPermission { l ->
                             run {
                                 onRequiresCameraPermission(l)
@@ -176,7 +187,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
             model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                 if (it) {
-                    permissionsRequester = permissionsBuilder(arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList()))
+                    permissionsRequester = permissionsBuilder(
+                        arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList())
+                    )
                         .setOnRequiresPermission { l ->
                             run {
                                 onRequiresAudioPermission(l)
@@ -291,11 +304,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             true -> {
                 // Always try to start the video using the front camera
                 sharedModel.setChatVideoInDevice(null)
+                mask.visibility = View.VISIBLE
                 // Hide avatar when camera open
                 meeting_thumbnail.visibility = View.GONE
                 activateVideo()
             }
             false -> {
+                mask.visibility = View.GONE
                 // Show avatar when camera close
                 meeting_thumbnail.visibility = View.VISIBLE
                 deactivateVideo()
