@@ -126,6 +126,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     public static final String EXTRA_GROUP_CHAT = "groupChat";
     public static final String EXTRA_EKR = "EKR";
     public static final String EXTRA_CHAT_LINK = "chatLink";
+    public static final String EXTRA_CONTACT_TYPE = "contactType";
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;

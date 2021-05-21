@@ -4,14 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    android:minHeight="72dp"
-    android:padding="16dp">
+    android:minHeight="56dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/img_thumbnail"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/img_thumbnail_last"
+        android:layout_width="@dimen/image_group_size"
+        android:layout_height="26dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="21dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundAsCircle="true"
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/img_thumbnail_first"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="9dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
@@ -22,13 +33,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body1"
         app:emojiSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/img_private"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/img_thumbnail"
+        app:layout_constraintStart_toEndOf="@id/img_thumbnail_last"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
 

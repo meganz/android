@@ -54,6 +54,7 @@ class ContactGroupsFragment : Fragment() {
 
         binding.btnCreateGroup.setOnClickListener {
             startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
+                putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
             })
         }

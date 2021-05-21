@@ -4,15 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    android:minHeight="72dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="16dp">
+    android:minHeight="72dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/image_contact_size"
+        android:layout_height="@dimen/image_contact_size"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +56,7 @@
         android:id="@+id/btn_more"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
         android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/ic_dots_vertical_grey"
         app:layout_constraintBottom_toBottomOf="@id/txt_last_seen"
@@ -74,5 +73,15 @@
         app:layout_constraintEnd_toStartOf="@id/btn_more"
         app:layout_constraintTop_toTopOf="@id/txt_name"
         tools:visibility="visible" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/grey_alpha_012"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txt_last_seen"
+        app:layout_constraintTop_toBottomOf="@id/txt_last_seen" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,7 +26,7 @@ object MegaUserUtils {
         }
 
     @JvmStatic
-    fun getUserImageFile(context: Context, userEmail: String): File =
+    fun getUserAvatarFile(context: Context, userEmail: String): File? =
         CacheFolderManager.buildAvatarFile(context, "$userEmail.jpg")
 
     @JvmStatic

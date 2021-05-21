@@ -1,20 +1,25 @@
 package mega.privacy.android.app.contacts.usecase
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.format.DateUtils.getRelativeTimeSpanString
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaUserUtils.getUserImageFile
+import mega.privacy.android.app.utils.MegaUserUtils.getUserAvatarFile
+import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
@@ -44,25 +49,22 @@ class GetContactRequestsUseCase @Inject constructor(
 
             val contacts = contactRequests.sortedByDescending { it.creationTime }.map { request ->
                 var userImageUri: Uri? = null
-                var userName: String? = null
 
                 val userEmail = if (request.isOutgoing) request.targetEmail else request.sourceEmail
+                val userName = megaChatApi.getUserFirstnameFromCache(request.handle)
                 val userImageColor = megaApi.getUserAvatarColor(request.handle.toString()).toColorInt()
-                val userImageFile = getUserImageFile(context, userEmail)
-                if (userImageFile.exists()) {
+                val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
+                val userImageFile = getUserAvatarFile(context, userEmail)
+                if (userImageFile?.exists() == true) {
                     userImageUri = userImageFile.toUri()
-                }
-
-                if (!request.isOutgoing) {
-                    userName = megaChatApi.getUserFirstnameFromCache(request.handle)
                 }
 
                 ContactRequestItem(
                     handle = request.handle,
                     email = userEmail,
                     name = userName,
-                    imageUri = userImageUri,
-                    imageColor = userImageColor,
+                    avatarUri = userImageUri,
+                    placeholder = placeholder,
                     isOutgoing = request.isOutgoing,
                     createdTime = getRelativeTimeSpanString(request.creationTime * 1000).toString()
                 )
@@ -82,7 +84,7 @@ class GetContactRequestsUseCase @Inject constructor(
                             when (request.paramType) {
                                 USER_ATTR_AVATAR ->
                                     contacts[index] = currentContact.copy(
-                                        imageUri = File(request.file).toUri()
+                                        avatarUri = File(request.file).toUri()
                                     )
                                 USER_ATTR_FIRSTNAME ->
                                     contacts[index] = currentContact.copy(
@@ -102,9 +104,21 @@ class GetContactRequestsUseCase @Inject constructor(
             )
 
             contacts.forEach { request ->
-                val userImageFile = getUserImageFile(context, request.email!!).absolutePath
+                val userImageFile = getUserAvatarFile(context, request.email!!)?.absolutePath
                 megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
                 megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
             }
         }, BackpressureStrategy.BUFFER)
+
+    private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
+        TextDrawable.builder()
+            .beginConfig()
+            .width(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
+            .height(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
+            .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_contact_text_size))
+            .textColor(ContextCompat.getColor(context, R.color.white))
+            .bold()
+            .toUpperCase()
+            .endConfig()
+            .buildRound(title.first().toString(), color)
 }

@@ -1,18 +1,18 @@
 package mega.privacy.android.app.contacts.group.data
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
-import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.DiffUtil
 
 data class GroupItem constructor(
     val chatId: Long,
     val title: String,
-    val firstImageEmail: String,
-    val firstImage: Uri? = null,
-    @ColorInt val firstImageColor: Int,
-    val secondImageEmail: String,
-    val secondImage: Uri? = null,
-    @ColorInt val secondImageColor: Int,
+    val firstUserEmail: String,
+    val firstUserAvatar: Uri? = null,
+    val firstUserPlaceholder: Drawable,
+    val lastUserEmail: String,
+    val lastUserAvatar: Uri? = null,
+    val lastUserPlaceholder: Drawable,
     val isPublic: Boolean
 ) {
 

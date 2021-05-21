@@ -1,19 +1,23 @@
 package mega.privacy.android.app.contacts.usecase
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.GroupItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaUserUtils
+import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
 import java.io.File
 import javax.inject.Inject
@@ -37,14 +41,14 @@ class GetContactGroupsUseCase @Inject constructor(
                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
 
                     if (error.errorCode == MegaError.API_OK) {
-                        val index = groups.indexOfFirst { request.email in it.firstImageEmail..it.secondImageEmail }
+                        val index = groups.indexOfFirst { request.email in it.firstUserEmail..it.lastUserEmail }
                         if (index != NOT_FOUND) {
                             val imageFile = File(request.file).toUri()
                             val currentGroup = groups[index]
-                            if (request.email == currentGroup.firstImageEmail) {
-                                groups[index] = currentGroup.copy(firstImage = imageFile)
+                            if (request.email == currentGroup.firstUserEmail) {
+                                groups[index] = currentGroup.copy(firstUserAvatar = imageFile)
                             } else {
-                                groups[index] = currentGroup.copy(secondImage = imageFile)
+                                groups[index] = currentGroup.copy(lastUserAvatar = imageFile)
                             }
 
                             emitter.onNext(groups)
@@ -62,7 +66,10 @@ class GetContactGroupsUseCase @Inject constructor(
                 if (chatRoom.isGroup && chatRoom.peerCount > 0) {
                     val firstUserHandle = chatRoom.getPeerHandle(0)
                     val firstUserEmail = megaChatApi.getContactEmail(firstUserHandle)
-                    var firstImage: File? = MegaUserUtils.getUserImageFile(context, firstUserEmail)
+                    val firstUserName = megaChatApi.getUserFirstnameFromCache(firstUserHandle)
+                    val firstUserColor = megaApi.getUserAvatarColor(toString()).toColorInt()
+                    val firstUserPlaceholder = getImagePlaceholder(firstUserName ?: firstUserEmail, firstUserColor)
+                    var firstImage = MegaUserUtils.getUserAvatarFile(context, firstUserEmail)
                     if (firstImage?.exists() == false) {
                         megaApi.getUserAvatar(firstUserEmail, firstImage.absolutePath, userAttrsListener)
                     } else {
@@ -71,9 +78,12 @@ class GetContactGroupsUseCase @Inject constructor(
 
                     val lastUserHandle = chatRoom.getPeerHandle(chatRoom.peerCount - 1)
                     val lastUserEmail = megaChatApi.getContactEmail(lastUserHandle)
-                    var secondImage: File? = MegaUserUtils.getUserImageFile(context, lastUserEmail)
+                    val lastUserName = megaChatApi.getUserFirstnameFromCache(lastUserHandle)
+                    val lastUserColor = megaApi.getUserAvatarColor(toString()).toColorInt()
+                    val lastUserPlaceholder = getImagePlaceholder(lastUserName ?: lastUserEmail, lastUserColor)
+                    var secondImage = MegaUserUtils.getUserAvatarFile(context, lastUserEmail)
                     if (secondImage?.exists() == false) {
-                        megaApi.getUserAvatar(firstUserEmail, secondImage.absolutePath, userAttrsListener)
+                        megaApi.getUserAvatar(lastUserEmail, secondImage.absolutePath, userAttrsListener)
                     } else {
                         secondImage = null
                     }
@@ -82,12 +92,12 @@ class GetContactGroupsUseCase @Inject constructor(
                         GroupItem(
                             chatId = chatRoom.chatId,
                             title = chatRoom.title,
-                            firstImage = firstImage?.toUri(),
-                            firstImageEmail = firstUserEmail,
-                            secondImageEmail = lastUserEmail,
-                            secondImage = secondImage?.toUri(),
-                            firstImageColor = firstUserHandle.getUserAvatarColor(),
-                            secondImageColor = lastUserHandle.getUserAvatarColor(),
+                            firstUserAvatar = firstImage?.toUri(),
+                            firstUserEmail = firstUserEmail,
+                            firstUserPlaceholder = firstUserPlaceholder,
+                            lastUserEmail = lastUserEmail,
+                            lastUserAvatar = secondImage?.toUri(),
+                            lastUserPlaceholder = lastUserPlaceholder,
                             isPublic = chatRoom.isPublic
                         )
                     )
@@ -97,7 +107,16 @@ class GetContactGroupsUseCase @Inject constructor(
             emitter.onNext(groups)
         }, BackpressureStrategy.BUFFER)
 
-    @ColorInt
-    private fun Long.getUserAvatarColor(): Int =
-        megaApi.getUserAvatarColor(toString()).toColorInt()
+    private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
+        TextDrawable.builder()
+            .beginConfig()
+            .width(context.resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .height(context.resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_group_text_size))
+            .withBorder(context.resources.getDimensionPixelSize(R.dimen.image_group_border_size))
+            .borderColor(ContextCompat.getColor(context, R.color.white))
+            .bold()
+            .toUpperCase()
+            .endConfig()
+            .buildRound(title.first().toString(), color)
 }

@@ -49,8 +49,8 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val isOutgoing = item.isOutgoing || item.name.isNullOrBlank()
             binding.txtTitle.text = if (isOutgoing) item.email else item.name
             binding.txtSubtitle.text = if (isOutgoing) item.createdTime else item.email
-            binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(resources))
-            binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
+            binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
+            binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.avatarUri))
             binding.groupReceived.isVisible = !item.isOutgoing
             binding.groupSent.isVisible = item.isOutgoing
 

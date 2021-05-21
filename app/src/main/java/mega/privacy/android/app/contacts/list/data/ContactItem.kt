@@ -1,14 +1,9 @@
 package mega.privacy.android.app.contacts.list.data
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
-import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.view.TextDrawable
 import java.util.*
 
 sealed class ContactItem(val id: Long) {
@@ -21,8 +16,8 @@ sealed class ContactItem(val id: Long) {
         val alias: String? = null,
         val status: Int? = null,
         @ColorRes val statusColor: Int? = null,
-        var imageUri: Uri? = null,
-        @ColorInt val imageColor: Int? = null,
+        var avatarUri: Uri? = null,
+        val placeholder: Drawable,
         val lastSeen: String? = null,
         val isNew: Boolean = false
     ) : ContactItem(handle) {
@@ -32,18 +27,6 @@ sealed class ContactItem(val id: Long) {
 
         fun getFirstCharacter(): String =
             getTitle().first().toString().toUpperCase(Locale.getDefault())
-
-        fun getPlaceholderDrawable(context: Context): Drawable =
-            TextDrawable.builder()
-                .beginConfig()
-                .fontSize(context.resources.getDimensionPixelSize(R.dimen.placeholder_contact_text_size))
-                .bold()
-                .toUpperCase()
-                .endConfig()
-                .buildRound(
-                    getFirstCharacter(),
-                    imageColor ?: getThemeColor(context, R.attr.colorSecondary)
-                )
 
         fun matches(queryString: String?): Boolean =
             queryString.isNullOrBlank() ||

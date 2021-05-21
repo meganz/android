@@ -123,5 +123,9 @@
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
 
-    <dimen name="placeholder_contact_text_size">20sp</dimen>
+    <dimen name="image_contact_size">40dp</dimen>
+    <dimen name="image_contact_text_size">20sp</dimen>
+    <dimen name="image_group_size">26dp</dimen>
+    <dimen name="image_group_text_size">15sp</dimen>
+    <dimen name="image_group_border_size">1dp</dimen>
 </resources>

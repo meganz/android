@@ -15,8 +15,8 @@ class ContactListDataViewHolder(
         binding.txtName.text = item.getTitle()
         binding.txtLastSeen.text = item.lastSeen
         binding.chipNew.isVisible = item.isNew
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.getPlaceholderDrawable(itemView.context))
-        binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.imageUri))
+        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
+        binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.avatarUri))
         item.statusColor?.let { binding.imgState.setColorFilter(ContextCompat.getColor(itemView.context, it)) }
     }
 }

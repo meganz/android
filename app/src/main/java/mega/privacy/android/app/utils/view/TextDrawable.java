@@ -1,3 +1,26 @@
+/*
+    The MIT License (MIT)
+
+    Copyright (c) 2014 Amulya Khare
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+ */
 package mega.privacy.android.app.utils.view;
 
 import android.graphics.Canvas;
@@ -24,6 +47,7 @@ public class TextDrawable extends ShapeDrawable {
     private static final float SHADE_FACTOR = 0.9f;
     private final String text;
     private final int color;
+    private final int borderColor;
     private final RectShape shape;
     private final int height;
     private final int width;
@@ -43,6 +67,7 @@ public class TextDrawable extends ShapeDrawable {
         // text and color
         text = builder.toUpperCase ? builder.text.toUpperCase() : builder.text;
         color = builder.color;
+        borderColor = builder.borderColor;
 
         // text paint settings
         fontSize = builder.fontSize;
@@ -58,7 +83,7 @@ public class TextDrawable extends ShapeDrawable {
         // border paint settings
         borderThickness = builder.borderThickness;
         borderPaint = new Paint();
-        borderPaint.setColor(getDarkerShade(color));
+        borderPaint.setColor(borderColor);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(borderThickness);
 
@@ -149,6 +174,8 @@ public class TextDrawable extends ShapeDrawable {
 
         private int borderThickness;
 
+        private int borderColor;
+
         private int width;
 
         private int height;
@@ -171,6 +198,7 @@ public class TextDrawable extends ShapeDrawable {
             text = "";
             color = Color.GRAY;
             textColor = Color.WHITE;
+            borderColor = Color.WHITE;
             borderThickness = 0;
             width = -1;
             height = -1;
@@ -198,6 +226,11 @@ public class TextDrawable extends ShapeDrawable {
 
         public IConfigBuilder withBorder(int thickness) {
             this.borderThickness = thickness;
+            return this;
+        }
+
+        public IConfigBuilder borderColor(int color) {
+            this.textColor = color;
             return this;
         }
 
@@ -285,6 +318,8 @@ public class TextDrawable extends ShapeDrawable {
         public IConfigBuilder textColor(int color);
 
         public IConfigBuilder withBorder(int thickness);
+
+        public IConfigBuilder borderColor(int color);
 
         public IConfigBuilder useFont(Typeface font);
 
