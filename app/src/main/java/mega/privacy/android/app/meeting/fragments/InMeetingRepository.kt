@@ -10,7 +10,9 @@ import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.LogUtil.*
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -419,19 +421,32 @@ class InMeetingRepository @Inject constructor(
         return -1
     }
 
-    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
-        megaChatApi.openChatPreview(link, listener)
-
-    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
-        megaChatApi.autojoinPublicChat(chatId, listener)
+    fun chatLogout(listener: MegaChatRequestListenerInterface) = megaChatApi.logout(listener)
 
     fun createEphemeralAccountPlusPlus(
         firstName: String,
         lastName: String,
         listener: MegaRequestListenerInterface
     ) {
-        megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+        // INIT_WAITING_NEW_SESSION    = 1,    /// No \c sid provided at init() --> force a login+fetchnodes
+        val initResult = megaChatApi.init(null)
+
+        if (initResult == INIT_WAITING_NEW_SESSION) {
+            megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+        } else {
+            logWarning("Init chat failed, result: $initResult")
+        }
     }
+
+    fun fetchNodes(listener: MegaRequestListenerInterface) = megaApi.fetchNodes(listener)
+
+    fun chatConnect(listener: MegaChatRequestListenerInterface) = megaChatApi.connect(listener)
+
+    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
+        megaChatApi.openChatPreview(link, listener)
+
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
+        megaChatApi.autojoinPublicChat(chatId, listener)
 
     fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
         return Participant(
@@ -449,6 +464,21 @@ class InMeetingRepository @Inject constructor(
             peerId,
             MegaChatRoom.PRIV_MODERATOR,
             listener
+        )
+    }
+
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        val mail = ChatController(context).getParticipantEmail(
+                peerId
+            )
+        val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
+        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
+        if (userHandleString == myUserHandleEncoded) {
+            return AvatarUtil.getAvatarBitmap(mail)
+        }
+        return if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+            userHandleString,
+            mail
         )
     }
 }

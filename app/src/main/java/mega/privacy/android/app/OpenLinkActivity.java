@@ -3,7 +3,6 @@ package mega.privacy.android.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ConnectListener;
@@ -19,7 +19,6 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
@@ -38,8 +37,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.decodeURL;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener {
@@ -175,17 +177,17 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				else{
 					logDebug("Not logged");
 					int initResult = megaChatApi.getInitState();
-					if(initResult<MegaChatApi.INIT_WAITING_NEW_SESSION){
+					if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
 						initResult = megaChatApi.initAnonymous();
+						logDebug("Chat init anonymous result: " + initResult);
 					}
 
-					if(initResult != MegaChatApi.INIT_ERROR){
+					if (initResult != MegaChatApi.INIT_ERROR) {
 						megaChatApi.connect(new ConnectListener(this));
-					}
-					else{
-						logError("Open chat url:initAnonymous:INIT_ERROR");
-						setError(getString(R.string.error_chat_link_init_error));
-					}
+                    } else {
+                        logError("Open chat url:initAnonymous:INIT_ERROR");
+                        setError(getString(R.string.error_chat_link_init_error));
+                    }
 				}
 			}
 			return;
@@ -419,13 +421,14 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		megaChatApi.checkChatLink(url, new ChatBaseListener(
-				OpenLinkActivity.this) {
+		megaChatApi.checkChatLink(url, new ChatBaseListener(OpenLinkActivity.this) {
+
 			@Override
 			public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
 				int errorCode = e.getErrorCode();
 				boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
 				boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
+				logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
 
 				if (codeError || linkInvalid) {
 					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
@@ -439,7 +442,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						MegaHandleList list = request.getMegaHandleList();
 
 						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-							logDebug("It's a meeting, open join call");
+							logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
 							goToMeetingActivity(request.getChatHandle(), request.getText());
 						} else {
 							logDebug("It's a meeting, open dialog: Meeting has ended");

@@ -1,18 +1,13 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.PorterDuff
-import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.util.*
 
@@ -88,16 +83,6 @@ class ParticipantViewHolder(
     }
 
     private fun initAvatar(participant: Participant) {
-        inMeetingViewModel.getChat().let {
-            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
-            if (avatar == null) {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    participant.peerId
-                )
-            }
-
-            binding.avatar.setImageBitmap(avatar)
-        }
+        binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 }

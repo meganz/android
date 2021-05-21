@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
@@ -111,6 +112,8 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 
         backgroundTintList =
             ColorStateList.valueOf(if (!enable) onBackgroundTint else if (isOn) onBackgroundTint else offBackgroundTint)
+
+        compatElevation = if (enable && !isOn) 7.0f else 0.0f
 
         onChangeCallback?.invoke()
     }

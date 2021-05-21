@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting
+package mega.privacy.android.app.meeting.fragments
 
 import android.animation.ArgbEvaluator
 import android.content.res.ColorStateList
@@ -17,11 +17,9 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
@@ -76,10 +74,8 @@ class BottomFloatingPanelViewHolder(
      * Expanded bottom sheet when the meeting is group chat
      * If the meeting is one-to-one chat, just show the control button, and would not let user drag the bottom panel
      */
-    private fun updatePanel() {
-        if (isGroup) {
-            expand()
-        } else {
+    private fun updatePanel(shouldExpand: Boolean = true) {
+        if (shouldExpand) {
             collapse()
         }
 
@@ -136,7 +132,8 @@ class BottomFloatingPanelViewHolder(
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 Log.d("bottomSheetBehavior", "newState:$newState")
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
-                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup
+                    || newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -172,39 +169,7 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
-    private fun initUpdaters() {
-        propertyUpdaters.add(
-            propertyUpdater(
-                binding.bottomFloatingPanel.backgroundMask,
-                BOTTOM_PANEL_MIN_ALPHA, 1F
-            ) { view, value ->
-                run {
-                    val argbEvaluator = ArgbEvaluator()
-                    val background = argbEvaluator.evaluate(
-                        value,
-                        ContextCompat.getColor(context, R.color.grey_alpha_070),
-                        ContextCompat.getColor(context, R.color.white_grey_900)
-                    ) as Int
 
-                    val grad: GradientDrawable = view.background as GradientDrawable
-                    grad.setColor(background)
-
-                    view.background = grad
-                }
-            })
-
-        val indicatorColorStart = 0x4F
-        val indicatorColorEnd = 0xBD
-        propertyUpdaters.add(
-            propertyUpdater(
-                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
-            ) { view, value ->
-                view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
-            })
-
-        setupFabUpdater()
-        setupFabLabelUpdater()
-    }
 
     /**
      * Init listener for all the button
@@ -269,7 +234,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateMeetingType(group: Boolean) {
         isGroup = group
-        updatePanel()
+        updatePanel(false)
     }
 
     /**
@@ -304,6 +269,40 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    private fun initUpdaters() {
+        propertyUpdaters.add(
+            propertyUpdater(
+                binding.bottomFloatingPanel.backgroundMask,
+                BOTTOM_PANEL_MIN_ALPHA, 1F
+            ) { view, value ->
+                run {
+                    val argbEvaluator = ArgbEvaluator()
+                    val background = argbEvaluator.evaluate(
+                        value,
+                        ContextCompat.getColor(context, R.color.grey_alpha_070),
+                        ContextCompat.getColor(context, R.color.white_grey_900)
+                    ) as Int
+
+                    val grad: GradientDrawable = view.background as GradientDrawable
+                    grad.setColor(background)
+
+                    view.background = grad
+                }
+            })
+
+        val indicatorColorStart = 0x4F
+        val indicatorColorEnd = 0xBD
+        propertyUpdaters.add(
+            propertyUpdater(
+                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
+            ) { view, value ->
+                view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
+            })
+
+        setupFabUpdater()
+        setupFabLabelUpdater()
+    }
+
     private fun setupFabLabelUpdater() {
         setupFabLabelUpdater(binding.bottomFloatingPanel.fabMicLabel)
         setupFabLabelUpdater(binding.bottomFloatingPanel.fabCamLabel)
@@ -331,16 +330,21 @@ class BottomFloatingPanelViewHolder(
     }
 
     private fun setupFabBackgroundTintUpdater(fab: OnOffFab) {
-        val isDarkMode = Util.isDarkMode(context)
-        val fabBackgroundTintStart = if (isDarkMode) 0x6C else 0x4F
-        val fabBackgroundTintEnd = if (isDarkMode) 0x6C else 0x75
-
         propertyUpdaters.add(
             propertyUpdater(
-                fab, fabBackgroundTintStart, fabBackgroundTintEnd
+                fab, 0.0f, 1.0f
             ) { view, value ->
-                if (view.isOn) {
-                    view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
+                if (view.isOn || !view.enable) {
+                    run {
+                        val argbEvaluator = ArgbEvaluator()
+                        val background = argbEvaluator.evaluate(
+                            value,
+                            ContextCompat.getColor(context, R.color.grey_alpha_032),
+                            ContextCompat.getColor(context, R.color.grey_alpha_060)
+                        ) as Int
+
+                        view.backgroundTintList = ColorStateList.valueOf(background)
+                    }
                 }
             })
     }
@@ -517,7 +521,6 @@ class BottomFloatingPanelViewHolder(
     private fun composeColor(component: Int): Int {
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
-
 
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F

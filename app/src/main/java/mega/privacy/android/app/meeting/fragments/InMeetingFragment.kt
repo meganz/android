@@ -32,7 +32,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
@@ -40,8 +39,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
-import mega.privacy.android.app.meeting.BottomFloatingPanelListener
-import mega.privacy.android.app.meeting.BottomFloatingPanelViewHolder
+import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.AssignModeratorBottomFragment
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
@@ -57,13 +55,11 @@ import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OWN_PRIV
-import kotlin.math.log
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
@@ -492,25 +488,42 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 )
             }
             MEETING_ACTION_GUEST -> {
-                inMeetingViewModel.createEphemeralAccountAndJoinChat(
-                    args.firstName,
-                    args.lastName,
-                    object : BaseListener(MegaApplication.getInstance().applicationContext) {
-                        override fun onRequestFinish(
-                            api: MegaApiJava, request: MegaRequest,
-                            e: MegaError
-                        ) {
-                            if (e.errorCode != MegaError.API_OK) {
+                inMeetingViewModel.chatLogout(ChatRequestListener(onSuccess = { _, _, _ ->
+                    inMeetingViewModel.createEphemeralAccountAndJoinChat(
+                        args.firstName,
+                        args.lastName,
+                        MegaRequestListener(onSuccess = { _, _, _ ->
+                            inMeetingViewModel.fetchNodes(MegaRequestListener(onSuccess = { _, _, _ ->
 
-                            }
+                                inMeetingViewModel.chatConnect(ChatRequestListener(onSuccess = { _, _, _ ->
+                                    inMeetingViewModel.openChatPreview(
+                                        meetinglink,
+                                        ChatRequestListener(onSuccess = { _, request, _ ->
+                                            logDebug(
+                                                "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                                    request.megaHandleList?.get(
+                                                        0
+                                                    )
+                                                }"
+                                            )
 
-                            inMeetingViewModel.joinPublicChat(
-                                args.chatId,
-                                AutoJoinPublicChatListener(context, this@InMeetingFragment)
-                            )
-                        }
-                    }
-                )
+                                            // Delay 5s then join.
+                                            RunOnUIThreadUtils.runDelay(5000) {
+                                                inMeetingViewModel.joinPublicChat(
+                                                    args.chatId,
+                                                    AutoJoinPublicChatListener(
+                                                        context,
+                                                        this@InMeetingFragment
+                                                    )
+                                                )
+                                            }
+                                        })
+                                    )
+                                }))
+                            }))
+                        })
+                    )
+                }))
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 sharedModel.micInitiallyOn()
@@ -719,7 +732,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             when {
                 it -> {
-                    permissionsBuilder(arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList()))
+                    permissionsBuilder(
+                        arrayOf(Manifest.permission.CAMERA).toCollection(
+                            ArrayList()
+                        )
+                    )
                         .setOnRequiresPermission { l ->
                             run {
                                 onRequiresCameraPermission(l)
@@ -1236,7 +1253,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 CallUtil.activateChrono(false, meetingChrono, null)
                 toolbarSubtitle?.let {
-                    toolbarSubtitle?.text = StringResourcesUtils.getString(R.string.chat_connecting)
+                    toolbarSubtitle?.text =
+                        StringResourcesUtils.getString(R.string.chat_connecting)
                 }
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
@@ -1642,12 +1660,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Participant was added or left the meeting in $position")
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                it.peerAddedOrRemoved(isAdded, position, inMeetingViewModel.participants.value!!)
+                it.peerAddedOrRemoved(
+                    isAdded,
+                    position,
+                    inMeetingViewModel.participants.value!!
+                )
             }
         }
         gridViewCallFragment?.let {
             if (it.isAdded) {
-                it.peerAddedOrRemoved(isAdded, position, inMeetingViewModel.participants.value!!)
+                it.peerAddedOrRemoved(
+                    isAdded,
+                    position,
+                    inMeetingViewModel.participants.value!!
+                )
             }
         }
 
@@ -1847,7 +1873,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         if (meetinglink.isEmpty()) {
             inMeetingViewModel.setWaitingForLink(true)
-            sharedModel.createChatLink(inMeetingViewModel.getChatId(), inMeetingViewModel.isModerator())
+            sharedModel.createChatLink(
+                inMeetingViewModel.getChatId(),
+                inMeetingViewModel.isModerator()
+            )
             logError("Error, the link doesn't exist")
             return
         }
@@ -1947,7 +1976,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun onErrorAnsweredCall(errorCode: Int) {
-        logDebug("Error answering the meeting so close it")
+        logDebug("Error answering the meeting so close it: $errorCode")
         if (errorCode == MegaChatError.ERROR_TOOMANY) {
             showSnackbar(
                 SNACKBAR_TYPE,
@@ -2015,6 +2044,103 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             logDebug("Show another call")
             CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
             finishActivity()
+        }
+    }
+
+    class ChatRequestListener(
+        private val onSuccess: (
+            api: MegaChatApiJava,
+            request: MegaChatRequest,
+            e: MegaChatError
+        ) -> Unit,
+        private val onFail: (
+            api: MegaChatApiJava,
+            request: MegaChatRequest,
+            e: MegaChatError
+        ) -> Unit = { _, request, e ->
+            logWarning("[${request.requestString}] -> Error code: ${e.errorCode} [${e.errorString}]")
+        },
+        private val isSuccess: (
+            request: MegaChatRequest,
+            e: MegaChatError
+        ) -> Boolean = { _, e ->
+            e.errorCode == MegaChatError.ERROR_OK
+        }
+    ) : MegaChatRequestListenerInterface {
+
+        override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
+            logDebug("Start [${request.requestString}]")
+        }
+
+        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest) {
+
+        }
+
+        override fun onRequestFinish(
+            api: MegaChatApiJava,
+            request: MegaChatRequest,
+            e: MegaChatError
+        ) {
+            if (isSuccess(request, e)) {
+                logDebug("[${request.requestString}] -> is successful")
+                onSuccess(api, request, e)
+            } else {
+                onFail(api, request, e)
+            }
+        }
+
+        override fun onRequestTemporaryError(
+            api: MegaChatApiJava?,
+            request: MegaChatRequest?,
+            e: MegaChatError?
+        ) {
+
+        }
+    }
+
+    class MegaRequestListener(
+        private val onSuccess: (
+            api: MegaApiJava,
+            request: MegaRequest,
+            e: MegaError
+        ) -> Unit,
+        private val onFail: (
+            api: MegaApiJava,
+            request: MegaRequest,
+            e: MegaError
+        ) -> Unit = { _, request, e ->
+            logWarning("[${request.requestString}] -> Error code: ${e.errorCode} [${e.errorString}]")
+        },
+        private val isSuccess: (
+            request: MegaRequest,
+            e: MegaError
+        ) -> Boolean = { _, e ->
+            e.errorCode == MegaError.API_OK
+        }
+    ) : MegaRequestListenerInterface {
+
+        override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+            logDebug("Start [${request.requestString}]")
+        }
+
+        override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+
+        }
+
+        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+            if (isSuccess(request, e)) {
+                logDebug("[${request.requestString}] -> is successful")
+                onSuccess(api, request, e)
+            } else {
+                onFail(api, request, e)
+            }
+        }
+
+        override fun onRequestTemporaryError(
+            api: MegaApiJava,
+            request: MegaRequest,
+            e: MegaError?
+        ) {
         }
     }
 }

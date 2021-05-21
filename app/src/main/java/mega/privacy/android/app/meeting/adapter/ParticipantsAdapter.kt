@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
-import mega.privacy.android.app.meeting.BottomFloatingPanelListener
+import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 
 class ParticipantsAdapter(
