@@ -46,21 +46,6 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
         ChatController(context).getParticipantEmail(it)
     } ?: ""
 
-
-    fun getImageAvatarCall(peerId: Long): Bitmap? {
-        val mail = getEmail()
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
-        val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
-        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
-        if (userHandleString == myUserHandleEncoded) {
-            return AvatarUtil.getAvatarBitmap(mail)
-        }
-        return if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
-            userHandleString,
-            mail
-        )
-    }
-
     /**
      * Determine if show the `Add Contact` item
      *

@@ -25,7 +25,7 @@
         android:id="@+id/indicator"
         android:layout_width="22dp"
         android:layout_height="4dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/meeting_bottom_panel_indicator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,24 +34,15 @@
 
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_mic"
-        android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
+        style="@style/BottomSheetIcon"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="26dp"
-        android:background="@null"
-        app:borderWidth="0dp"
+        android:layout_marginTop="40dp"
         app:disable_icon="@drawable/ic_mic_disable"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        app:is_on="false"
+        app:is_on="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:off_background_tint="@color/white"
         app:off_icon="@drawable/ic_meeting_mute"
-        app:off_icon_tint="@color/red_600"
-        app:on_background_tint="@color/grey_700_grey_600"
         app:on_icon="@drawable/ic_mic_on"
-        app:on_icon_tint="@color/white"
-        app:pressedTranslationZ="12dp"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -67,24 +58,15 @@
 
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_cam"
-        android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:background="@null"
-        app:borderWidth="0dp"
+        style="@style/BottomSheetIcon"
         app:disable_icon="@drawable/ic_video_disable"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        app:is_on="false"
+        app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_hold"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_mic"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_background_tint="@color/white"
         app:off_icon="@drawable/ic_meeting_video_off"
-        app:off_icon_tint="@color/red_600"
-        app:on_background_tint="@color/grey_700_grey_600"
         app:on_icon="@drawable/ic_meeting_video_filled"
-        app:on_icon_tint="@color/white"
-        app:pressedTranslationZ="12dp"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -100,24 +82,15 @@
 
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_hold"
-        android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:background="@null"
-        app:borderWidth="0dp"
+        style="@style/BottomSheetIcon"
         app:disable_icon="@drawable/ic_transfers_pause_disable"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_cam"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_speaker"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_background_tint="@color/white"
         app:off_icon="@drawable/ic_transfers_pause"
-        app:off_icon_tint="@color/red_600"
-        app:on_background_tint="@color/grey_700_grey_600"
         app:on_icon="@drawable/ic_transfers_pause"
-        app:on_icon_tint="@color/white"
-        app:pressedTranslationZ="12dp"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -133,22 +106,13 @@
 
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_speaker"
-        android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:background="@null"
-        app:borderWidth="0dp"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+        style="@style/BottomSheetIcon"
         app:layout_constraintEnd_toStartOf="@id/fab_end"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_hold"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_background_tint="@color/white"
         app:off_icon="@drawable/ic_speaker_off"
-        app:off_icon_tint="@color/red_600"
-        app:on_background_tint="@color/grey_700_grey_600"
         app:on_icon="@drawable/ic_speaker_on"
-        app:on_icon_tint="@color/white"
-        app:pressedTranslationZ="12dp"
         tools:ignore="ContentDescription"
         tools:is_on="false" />
 
@@ -167,12 +131,13 @@
         android:id="@+id/fab_end"
         android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_marginEnd="20dp"
         android:background="@null"
+        app:borderWidth="0dp"
+        app:elevation="0dp"
+        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+        android:layout_marginEnd="20dp"
         android:src="@drawable/ic_meeting_end"
         app:backgroundTint="@color/red_600"
-        app:borderWidth="0dp"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
         app:pressedTranslationZ="12dp"
@@ -203,13 +168,13 @@
     <Button
         android:id="@+id/share_link"
         style="?attr/materialButtonStyle"
-        android:stateListAnimator="@null"
         android:layout_width="0dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="6dp"
         android:backgroundTint="@color/grey_020"
         android:drawableTop="@drawable/ic_social_share_white"
+        android:stateListAnimator="@null"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
         android:textColor="@color/grey_600"
@@ -217,24 +182,24 @@
         app:layout_constraintEnd_toStartOf="@id/invite"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider"/>
+        app:layout_constraintTop_toBottomOf="@id/divider" />
 
     <Button
         android:id="@+id/invite"
         style="?attr/materialButtonStyle"
         android:layout_width="0dp"
-        android:stateListAnimator="@null"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="15dp"
         android:backgroundTint="@color/grey_020"
         android:drawableTop="@drawable/ic_invite_contact"
+        android:stateListAnimator="@null"
         android:text="@string/invite_participants"
         android:textAllCaps="false"
         android:textColor="@color/grey_600"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/share_link"
-        app:layout_constraintTop_toTopOf="@id/share_link"/>
+        app:layout_constraintTop_toTopOf="@id/share_link" />
 
     <TextView
         android:id="@+id/participants_num"

@@ -6,23 +6,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.controllers.ContactController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -207,15 +202,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun initAvatar(participant: Participant) {
-        var avatar = bottomViewModel.getImageAvatarCall(participantItem.peerId)
-        if (avatar == null) {
-            avatar = CallUtil.getDefaultAvatarCall(
-                MegaApplication.getInstance().applicationContext,
-                participant.peerId
-            )
-        }
-
-        binding.avatar.setImageBitmap(avatar)
+        binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 
     companion object {

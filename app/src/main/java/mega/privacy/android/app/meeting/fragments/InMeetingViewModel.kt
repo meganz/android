@@ -1629,6 +1629,10 @@ class InMeetingViewModel @ViewModelInject constructor(
         inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
     }
 
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        return inMeetingRepository.getAvatarBitmapByPeerId(peerId)
+    }
+
     companion object {
         private var MAX_PARTICIPANTS_HIRES_GRID_VIEW = 5
     }

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting
+package mega.privacy.android.app.meeting.adapter
 
 import android.view.View
 import android.widget.TextView

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting
+package mega.privacy.android.app.meeting.listeners
 
 import mega.privacy.android.app.meeting.adapter.Participant
 
