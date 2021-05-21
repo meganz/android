@@ -20,10 +20,13 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.TextureView;
+
 import org.webrtc.Logging;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -32,8 +35,9 @@ import java.util.List;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class MegaSurfaceRenderer implements Callback {
+public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTextureListener {
 
     private final static String TAG = "WEBRTC";
     private Paint paint;
@@ -53,17 +57,34 @@ public class MegaSurfaceRenderer implements Callback {
     private RectF dstRectf = new RectF();
     private boolean isSmallCamera;
     private DisplayMetrics outMetrics;
+    private long peerId = MEGACHAT_INVALID_HANDLE;
+    private long clientId = MEGACHAT_INVALID_HANDLE;
+    private TextureView myTexture = null;
+    protected List<MegaSurfaceRendererListener> listeners;
 
     public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
             return;
+
         surfaceHolder.addCallback(this);
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.isSmallCamera = isSmallCamera;
         this.outMetrics = outMetrics;
+    }
+
+    public MegaSurfaceRenderer(TextureView view, long peerId, long clientId) {
+        this.myTexture = view;
+        myTexture.setSurfaceTextureListener(this);
+        bitmap = myTexture.getBitmap();
+        paint = new Paint();
+        modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
+        modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        this.peerId = peerId;
+        this.clientId = clientId;
+        listeners = new ArrayList<>();
     }
 
     // surfaceChanged and surfaceCreated share this function
@@ -130,44 +151,18 @@ public class MegaSurfaceRenderer implements Callback {
         Rect dst = surfaceHolder.getSurfaceFrame();
         if (dst != null) {
             changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
-            Logging.d(TAG, "ViESurfaceRender::surfaceCreated" +
-                    " dst.left:" + dst.left +
-                    " dst.top:" + dst.top +
-                    " dst.right:" + dst.right +
-                    " dst.bottom:" + dst.bottom +
-                    " srcRect.left:" + srcRect.left +
-                    " srcRect.top:" + srcRect.top +
-                    " srcRect.right:" + srcRect.right +
-                    " srcRect.bottom:" + srcRect.bottom +
-                    " dstRect.left:" + dstRect.left +
-                    " dstRect.top:" + dstRect.top +
-                    " dstRect.right:" + dstRect.right +
-                    " dstRect.bottom:" + dstRect.bottom);
         }
 
+        logDebug("Surface created");
         surfaceHolder.unlockCanvasAndPost(canvas);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
-
-        Logging.d(TAG, "ViESurfaceRender::surfaceChanged" +
-                " in_width:" + in_width + " in_height:" + in_height +
-                " srcRect.left:" + srcRect.left +
-                " srcRect.top:" + srcRect.top +
-                " srcRect.right:" + srcRect.right +
-                " srcRect.bottom:" + srcRect.bottom +
-                " dstRect.left:" + dstRect.left +
-                " dstRect.top:" + dstRect.top +
-                " dstRect.right:" + dstRect.right +
-                " dstRect.bottom:" + dstRect.bottom);
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        logDebug("surfaceDestroyed()");
-
-        Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
+        logDebug("Surface destroyed");
         bitmap = null;
         byteBuffer = null;
         surfaceWidth = 0;
@@ -179,8 +174,10 @@ public class MegaSurfaceRenderer implements Callback {
             try {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
             } catch (Exception e) {
+                logError("Exception "+e);
             }
         }
+
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         srcRect.left = 0;
         srcRect.top = 0;
@@ -190,16 +187,18 @@ public class MegaSurfaceRenderer implements Callback {
         return bitmap;
     }
 
-
     /**
      * Draw video frames.
      *
      * @param isLocal Indicates if the frames are from the local camera.
      */
-    public void drawBitmap(boolean isLocal) {
-        if (bitmap == null || surfaceHolder == null) return;
-        Canvas canvas = surfaceHolder.lockCanvas();
+    public void drawBitmap(boolean isLocal, boolean isGroup) {
+        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null)) return;
+
+        Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
+
         if (canvas == null) return;
+
         if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
@@ -212,7 +211,64 @@ public class MegaSurfaceRenderer implements Callback {
         } else {
             paint = null;
         }
+
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-        surfaceHolder.unlockCanvasAndPost(canvas);
+
+        if (isGroup) {
+            myTexture.unlockCanvasAndPost(canvas);
+        } else {
+            surfaceHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    private void notifyStateToAll() {
+        for (MegaSurfaceRendererListener listener : listeners) {
+            notifyState(listener);
+        }
+    }
+
+    public void addListener(MegaSurfaceRendererListener l) {
+        listeners.add(l);
+    }
+
+    private void notifyState(MegaSurfaceRendererListener listener) {
+        if (listener == null)
+            return;
+
+        listener.resetSize(peerId, clientId);
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int in_width, int in_height) {
+        Bitmap textureViewBitmap = myTexture.getBitmap();
+        Canvas canvas = new Canvas(textureViewBitmap);
+        if (canvas == null) return;
+
+        logDebug("TextureView Available");
+        notifyStateToAll();
+        changeDestRect(in_width, in_height);
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int in_width, int in_height) {
+        changeDestRect(in_width, in_height);
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+        logDebug("TextureView destroyed");
+        bitmap = null;
+        byteBuffer = null;
+        surfaceWidth = 0;
+        surfaceHeight = 0;
+        return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+    }
+
+    public interface MegaSurfaceRendererListener {
+        void resetSize(long peerId, long clientId);
     }
 }

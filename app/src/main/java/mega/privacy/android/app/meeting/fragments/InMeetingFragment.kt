@@ -340,7 +340,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
                     val isVideoChange =
                         inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
-                    logDebug("Changes in AV flags. audio change " + isAudioChange + ", video chagne " + isVideoChange)
+                    logDebug("Changes in AV flags. audio change $isAudioChange, video change $isVideoChange")
                     updateRemoteAVFlags(callAndSession.second, isAudioChange, isVideoChange)
                 }
             }
@@ -1019,7 +1019,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkChildFragments() {
         logDebug("Check child fragments")
-
         when {
             inMeetingViewModel.isOneToOneCall() -> {
                 logDebug("One to one call")
@@ -1070,7 +1069,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun waitingForConnection(chatId: Long) {
         if (status == TYPE_WAITING_CONNECTION) return
 
-        logDebug("Waiting for connection call")
+        logDebug("Waiting for connection call UI")
         status = TYPE_WAITING_CONNECTION
 
         individualCallFragment = IndividualCallFragment.newInstance(
@@ -1145,10 +1144,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(status)
-        )
-
+        inMeetingViewModel.removeParticipantResolution(status)
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1177,9 +1173,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 GridViewCallFragment.TAG
             )
         }
-        updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(status)
-        )
+
+        inMeetingViewModel.removeParticipantResolution(status)
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1196,10 +1191,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (!isManualModeView) {
             inMeetingViewModel.getCall()?.let {
                 if (it.numParticipants <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC) {
+                    logDebug("Automatic mode - Grid view")
                     initGridViewMode()
                 } else {
+                    logDebug("Automatic mode - Speaker view")
                     initSpeakerViewMode()
                 }
+            }
+        } else{
+            if(status == TYPE_IN_SPEAKER_VIEW){
+                logDebug("Manual mode - Speaker view")
+                initSpeakerViewMode()
+            }else{
+                logDebug("Manual mode - Grid view")
+                initGridViewMode()
             }
         }
     }
@@ -1605,15 +1610,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateLowOrHiResolution(isHiRes: Boolean, session: MegaChatSession) {
         logDebug("The resolution of a participant needs to be updated")
-        gridViewCallFragment?.let {
-            if (it.isAdded) {
-                it.updateRemoteResolution(session)
-            }
+        inMeetingViewModel.getParticipant(session.peerid, session.clientid)?.let {
+            inMeetingViewModel.onActivateVideo(it, false)
         }
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                it.updateRemoteResolution(isHiRes, session)
+                it.updateRemoteResolutionOfSpeaker(isHiRes, session)
             }
         }
     }
@@ -1660,47 +1663,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Participant was added or left the meeting in $position")
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                it.peerAddedOrRemoved(
-                    isAdded,
-                    position,
-                    inMeetingViewModel.participants.value!!
-                )
+                it.peerAddedOrRemoved(isAdded, position)
             }
         }
+
         gridViewCallFragment?.let {
             if (it.isAdded) {
-                it.peerAddedOrRemoved(
-                    isAdded,
-                    position,
-                    inMeetingViewModel.participants.value!!
-                )
+                it.peerAddedOrRemoved(isAdded, position)
             }
         }
 
-        updateParticipantRes(
-            inMeetingViewModel.checkParticipantsResolution(status)
-        )
-    }
-
-    /**
-     * Method that checks if several participants resolution has changed and updates the UI
-     *
-     * @param listParticipants list of participants with changes
-     */
-    private fun updateParticipantRes(listParticipants: MutableSet<Participant>) {
-        if (listParticipants.isNotEmpty()) {
-            logDebug("Participant's resolution has changed")
-            gridViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateRes(listParticipants)
-                }
-            }
-            speakerViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateRes(listParticipants)
-                }
-            }
-        }
+        inMeetingViewModel.checkParticipantsResolution(status)
     }
 
     /**
@@ -1960,7 +1933,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun onDestroy() {
-        logDebug("Destroy fragment")
+        logDebug("Fragment destroyed")
         CallUtil.activateChrono(false, meetingChrono, null)
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()

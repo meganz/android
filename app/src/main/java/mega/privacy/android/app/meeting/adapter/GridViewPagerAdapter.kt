@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -22,7 +22,7 @@ class GridViewPagerAdapter(
     private val fragment: Fragment?,
     private var maxWidth: Int,
     private var maxHeight: Int,
-    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
 ) : RecyclerView.Adapter<GridViewPagerAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -58,7 +58,8 @@ class GridViewPagerAdapter(
                     setOnTouchCallback {
                         (fragment as InMeetingFragment).onPageClick()
                     }
-
+                    clipToPadding = true
+                    setHasFixedSize(true)
                     setParamsForGridView(position, participantsForPage, this)
                     setColumnWidth(position, this, participantsForPage.size, orientation)
                 }
@@ -71,12 +72,12 @@ class GridViewPagerAdapter(
                 maxHeight,
                 position,
                 orientation,
-                participantsForPage.size,
                 listenerRenderer
             )
 
             adapter.submitList(null)
             adapter.submitList(participantsForPage)
+
             if (adapterList.isNotEmpty() && adapterList.size > position) {
                 adapterList.removeAt(position)
             }
@@ -91,123 +92,22 @@ class GridViewPagerAdapter(
     }
 
     fun setNewData(newData: List<List<Participant>>) {
-        data = newData
-    }
-
-    /**
-     * Control when a participant is removed
-     *
-     * @param previousList the previous list of participants
-     * @param currentList the current list of participants
-     * @param position the position that has changed
-     */
-    fun participantRemoved(
-        previousList: List<List<Participant>>,
-        currentList: List<List<Participant>>,
-        position: Int
-    ) {
-        val lastPageNum = previousList.size - 1
-        var removePage = false
-        if (currentList.size - previousList.size == -1) {
-            removePage = true
+        if (data != null && data.isNotEmpty()) {
+            data = newData
+        } else {
+            data = newData
+            notifyDataSetChanged()
         }
-        val pageWithChange = position / PARTICIPANTS_PER_PAGE
-        logDebug("The current page is $pageWithChange. The last page is $lastPageNum")
 
-        when {
-            removePage -> {
-                logDebug("This page should be deleted $pageWithChange")
-                notifyItemRemoved(lastPageNum)
-                if (adapterList.isNotEmpty() && adapterList.size > lastPageNum) {
-                    adapterList.removeAt(lastPageNum)
-                }
-
-                if (pageWithChange != lastPageNum) {
-                    checkPagesToUpdate(position, pageWithChange, lastPageNum)
-                }
-            }
-            pageWithChange == (currentList.size - 1) -> {
-                logDebug("There is only the page with the change")
-                updatePageWithChange(pageWithChange, position)
-            }
-            else -> {
-                checkPagesToUpdate(position, pageWithChange, currentList.size)
-            }
-        }
-    }
-
-    /**
-     * Method to check which pages need to be updated
-     *
-     * @param position Position of the change
-     * @param numPage num of the page with the change
-     * @param lastPage the last page
-     */
-    private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
-        logDebug("Checking the rest of the pages to be updated ... ")
-        for (i in numPage until lastPage) {
-            if (i == numPage) {
-                logDebug("Update the page with the participant removed")
-                updatePageWithChange(numPage, position)
-            } else {
-                logDebug("Completely update the page $i")
-                val participantsForPage = data[i]
-                if (adapterList.isNotEmpty() && adapterList.size > i) {
-                    adapterList[i]?.let {
-                        it.submitList(participantsForPage)
-                        it.updateNumParticipants(participantsForPage.size, i)
-                    }
-                }
-
-                notifyItemChanged(i)
-            }
-        }
-    }
-
-    /**
-     * Method for updating the page on which the participant has been deleted
-     *
-     * @param numPage num of the Page
-     * @param position position of participant removed
-     */
-    private fun updatePageWithChange(numPage: Int, position: Int) {
-        val participantsForPage = data[numPage]
-        adapterList[numPage]?.let {
-            it.submitList(participantsForPage)
-            it.updateNumParticipants(participantsForPage.size, numPage)
-            when (numPage) {
-                0 -> {
-                    when {
-                        participantsForPage.size <= 2 -> {
-                            logDebug("First page, update only the adapter in the pager")
-                            it.notifyDataSetChanged()
-                        }
-                        participantsForPage.size == 3 -> {
-                            logDebug("First page, update the current page")
-                            notifyItemChanged(numPage)
-                        }
-                        position == 0 -> {
-                            logDebug("First page, update the current page")
-                            notifyItemChanged(numPage)
-                        }
-                        else -> {
-                            logDebug("First page, update position only")
-                            var rangeToUpdate = position
-                            if (position == 5) {
-                                rangeToUpdate = position - 1
-                            }
-                            it.notifyItemRemoved(position)
-                            it.notifyItemRangeRemoved(
-                                rangeToUpdate,
-                                participantsForPage.size
-                            )
+        if (data != null && data.isNotEmpty() && adapterList.isNotEmpty()) {
+            for (i in 0 until adapterList.size) {
+                if (data.size > i) {
+                    val participantsForPage = data[i]
+                    if (participantsForPage != null && participantsForPage.isNotEmpty()) {
+                        adapterList[i]?.let {
+                            it.submitList(participantsForPage)
                         }
                     }
-                }
-                else -> {
-                    logDebug("Another page, update the item removed")
-                    it.notifyItemRemoved(position)
-                    it.notifyItemRangeChanged(position, participantsForPage.size)
                 }
             }
         }
@@ -237,41 +137,172 @@ class GridViewPagerAdapter(
             return
         }
 
-        val currentPage = position / PARTICIPANTS_PER_PAGE
-        logDebug("Update the currentPage : $currentPage")
-        val participantsForPage = data[currentPage]
-        adapterList[currentPage]?.let {
-            it.submitList(participantsForPage)
-            it.updateNumParticipants(participantsForPage.size, currentPage)
-            when (currentPage) {
-                0 -> {
-                    when {
-                        participantsForPage.size <= 3 -> {
-                            logDebug("Update only the adapter in the pager")
-                            it.notifyDataSetChanged()
-                        }
-                        participantsForPage.size == 4 -> {
-                            logDebug("Update the current page")
-                            notifyItemChanged(currentPage)
-                        }
-                        participantsForPage.size == 5 -> {
-                            logDebug("Update position only")
-                            it.notifyItemInserted(position)
+        val pageWithChange = position / PARTICIPANTS_PER_PAGE
+        logDebug("Update the currentPage : $pageWithChange")
+        if (adapterList.isNotEmpty() && adapterList.size > pageWithChange) {
+            val participantsInPage = currentList[pageWithChange]
+            adapterList[pageWithChange]?.let {
+                it.submitList(participantsInPage) {
+                    when (pageWithChange) {
+                        0 -> {
+                            when {
+                                it.currentList.size <= 3 -> {
+                                    logDebug("Update only the adapter in the pager")
+                                    it.notifyDataSetChanged()
+                                }
+                                it.currentList.size == 4 -> {
+                                    logDebug("Update the current page, as the number of columns must be updated.")
+                                    notifyItemChanged(pageWithChange)
+                                }
+                                it.currentList.size == 5 -> {
+                                    logDebug("Update position only")
+                                    it.notifyItemInserted(position)
+                                }
+                                else -> {
+                                    logDebug("update the position and the previous position")
+                                    it.notifyItemInserted(position)
+                                    it.notifyItemRangeChanged(position - 1, it.currentList.size)
+                                }
+                            }
                         }
                         else -> {
-                            logDebug("update the position and the previous position")
-                            it.notifyItemInserted(position)
-                            it.notifyItemRangeChanged(position - 1, participantsForPage.size)
+                            logDebug("Update position only")
+                            val positionInPage = position - (PARTICIPANTS_PER_PAGE * pageWithChange)
+                            it.notifyItemInserted(positionInPage)
                         }
                     }
-                }
-                else -> {
-                    logDebug("Update position only")
-                    it.notifyItemInserted(position)
                 }
             }
         }
     }
+
+    /**
+     * Control when a participant is removed
+     *
+     * @param previousList the previous list of participants
+     * @param currentList the current list of participants
+     * @param position the position that has changed
+     */
+    fun participantRemoved(
+        previousList: List<List<Participant>>,
+        currentList: List<List<Participant>>,
+        position: Int
+    ) {
+        val lastPageNum = previousList.size - 1
+        var removePage = false
+        if (currentList.size - previousList.size == -1) {
+            removePage = true
+        }
+
+        val pageWithChange = position / PARTICIPANTS_PER_PAGE
+        logDebug("The current page is $pageWithChange. The last page is $lastPageNum")
+
+        if (removePage) {
+            logDebug("This page should be deleted $pageWithChange")
+            if (adapterList.isNotEmpty() && adapterList.size > lastPageNum) {
+                adapterList[lastPageNum]?.let {
+                    it.submitList(null)
+                }
+
+                notifyItemRemoved(lastPageNum)
+            }
+
+            if (pageWithChange != lastPageNum) {
+                logDebug("Checking pages to update")
+                checkPagesToUpdate(position, pageWithChange, lastPageNum)
+            }
+        } else if (pageWithChange == (currentList.size - 1)) {
+            logDebug("There is only the page with the change")
+            updatePageWithChange(pageWithChange, position)
+        } else {
+            logDebug("Checking pages to update")
+            checkPagesToUpdate(position, pageWithChange, lastPageNum)
+        }
+    }
+
+    /**
+     * Method to check which pages need to be updated
+     *
+     * @param position Position of the change
+     * @param numPage num of the page with the change
+     * @param lastPage the last page
+     */
+    private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
+        logDebug("Checking the rest of the pages to be updated ... ")
+        for (i in numPage until lastPage) {
+            if (i == numPage) {
+                logDebug("Update the page with the participant removed")
+                updatePageWithChange(numPage, position)
+            } else {
+                if (data != null && data.isNotEmpty() && data.size > i) {
+                    val participantsForPage = data[i]
+                    if (adapterList.isNotEmpty() && adapterList.size > i) {
+                        adapterList[i]?.let {
+                            logDebug("Completely update the page $i")
+                            it.submitList(participantsForPage) {
+                                it.notifyDataSetChanged()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method for updating the page on which the participant has been deleted
+     *
+     * @param pageWithChange num of the Page
+     * @param position position of participant removed
+     */
+    private fun updatePageWithChange(pageWithChange: Int, position: Int) {
+        val participantsForPage = data[pageWithChange]
+        adapterList[pageWithChange]?.let {
+            it.submitList(participantsForPage) {
+                when (pageWithChange) {
+                    0 -> {
+                        when {
+                            it.currentList.size <= 2 -> {
+                                logDebug("Update only the adapter in the pager")
+                                it.notifyDataSetChanged()
+                            }
+                            it.currentList.size == 3 -> {
+                                logDebug("Update the current page, as the number of columns must be updated.")
+                                notifyItemChanged(pageWithChange)
+                            }
+                            else -> {
+                                when (position) {
+                                    0 -> {
+                                        logDebug("First page, update the current page")
+                                        notifyItemChanged(pageWithChange)
+                                    }
+                                    else -> {
+                                        logDebug("First page, update position only")
+                                        var rangeToUpdate = position
+                                        if (participantsForPage.size <= 5 && position == 5) {
+                                            rangeToUpdate = position - 1
+                                        }
+                                        it.notifyItemRemoved(position)
+                                        it.notifyItemRangeRemoved(
+                                            rangeToUpdate,
+                                            it.currentList.size
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        val positionInPage = position - (PARTICIPANTS_PER_PAGE * pageWithChange)
+                        logDebug("Another page, update the item removed")
+                        it.notifyItemRemoved(positionInPage)
+                        it.notifyItemRangeChanged(positionInPage, it.currentList.size)
+                    }
+                }
+            }
+        }
+    }
+
 
     fun getHolder(currentPage: Int, pager: ViewPager2): ViewHolder? {
         (pager[0] as RecyclerView).findViewHolderForAdapterPosition(currentPage)?.let {
@@ -291,26 +322,6 @@ class GridViewPagerAdapter(
                 for (i in 0 until adapterList.size) {
                     adapterList[i]?.let {
                         it.updateParticipantPrivileges(participant)
-                    }
-                }
-
-            }
-            return
-        }
-
-        notifyItemChanged(currentPage)
-    }
-
-    fun updateParticipantRes(participant: Participant, currentPage: Int, pager: ViewPager2) {
-        val holder = getHolder(currentPage, pager)
-        holder?.let {
-            adapterList.let {
-                if (adapterList.isEmpty())
-                    return
-
-                for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateParticipantRes(participant)
                     }
                 }
 
@@ -416,30 +427,10 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
-    fun updateRemoteResolution(participant: Participant, currentPage: Int, pager: ViewPager2) {
-        val holder = getHolder(currentPage, pager)
-        holder?.let {
-            adapterList.let {
-                if (adapterList.isEmpty())
-                    return
-
-                for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateRemoteResolution(participant)
-                    }
-                }
-
-            }
-            return
-        }
-
-        notifyItemChanged(currentPage)
-    }
-
     /**
-     * Method to destroy the surfaceView.
+     * Method to destroy the texture view
      */
-    fun removeSurfaceView(participant: Participant, currentPage: Int, pager: ViewPager2) {
+    fun removeTextureView(participant: Participant, currentPage: Int, pager: ViewPager2) {
         val holder = getHolder(currentPage, pager)
         holder?.let {
             adapterList.let {
@@ -448,15 +439,13 @@ class GridViewPagerAdapter(
 
                 for (i in 0 until adapterList.size) {
                     adapterList[i]?.let {
-                        it.removeSurfaceView(participant)
+                        it.removeTextureView(participant)
                     }
                 }
 
             }
             return
         }
-
-        notifyItemChanged(currentPage)
     }
 
     /**

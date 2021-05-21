@@ -2,7 +2,7 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.graphics.Bitmap
 import android.view.TextureView
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatVideoListenerInterface
@@ -20,7 +20,7 @@ class GroupVideoListener(
     private var bitmap: Bitmap? = null
     var textureView: TextureView? = null
     private var isLocal = false
-    var localRenderer: MegaSurfaceRendererGroup? = null
+    var localRenderer: MegaSurfaceRenderer? = null
 
     override fun onChatVideoData(
         api: MegaChatApiJava,
@@ -51,7 +51,7 @@ class GroupVideoListener(
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
 
         if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
-            localRenderer!!.drawBitmap(isLocal)
+            localRenderer!!.drawBitmap(isLocal, true)
         }
     }
 
@@ -60,6 +60,6 @@ class GroupVideoListener(
         this.height = 0
         this.textureView = textureView
         this.isLocal = isMe
-        this.localRenderer = MegaSurfaceRendererGroup(textureView, peerId, clientId)
+        this.localRenderer = MegaSurfaceRenderer(textureView, peerId, clientId)
     }
 }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -33,7 +33,7 @@ class VideoMeetingViewHolder(
     private val screenHeight: Int,
     private val orientation: Int,
     private val isTypeGridViewHolder: Boolean,
-    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -115,7 +115,11 @@ class VideoMeetingViewHolder(
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
         binding.avatar.setImageBitmap(participant.avatar)
-        removeTextureView(participant)
+        if (isGrid || isDrawing) {
+            logDebug("Remove the video initially")
+            inMeetingViewModel.onCloseVideo(participant)
+            removeTextureView(participant)
+        }
     }
 
     /**
@@ -200,8 +204,7 @@ class VideoMeetingViewHolder(
                 it.addListener(listenerRenderer)
             }
 
-            inMeetingViewModel.onActivateVideo(participant)
-
+            inMeetingViewModel.onActivateVideo(participant, false)
         } else {
             logDebug("Active video when listener is not null")
             if (binding.parentTextureView.childCount > 0) {
@@ -267,6 +270,7 @@ class VideoMeetingViewHolder(
                 it.addListener(null)
             }
 
+            logDebug("Removing texture view of $clientId")
             if (binding.parentTextureView.childCount > 0) {
                 binding.parentTextureView.removeAllViews()
             }
@@ -313,19 +317,6 @@ class VideoMeetingViewHolder(
     }
 
     /**
-     * Method that controls when we have lost the video in the resolution we were receiving it.
-     * Need to close video and activate it again
-     *
-     * @param participant
-     */
-    fun updateResolution(participant: Participant) {
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
-
-        logDebug("Update resolution")
-        inMeetingViewModel.onActivateVideo(participant)
-    }
-
-    /**
      * Check if mute icon should be visible
      *
      * @param participant
@@ -365,18 +356,6 @@ class VideoMeetingViewHolder(
 
         logDebug("Update privilege icon participant")
         binding.moderatorIcon.isVisible = participant.isModerator
-    }
-
-    /**
-     * Update resolution
-     *
-     * @param participant
-     */
-    fun updateRes(participant: Participant) {
-        if (participant.peerId != this.peerId || participant.clientId != this.clientId || !participant.isVideoOn) return
-
-        logDebug("Update resolution")
-        inMeetingViewModel.onChangeResolution(participant)
     }
 
     /**
@@ -464,15 +443,17 @@ class VideoMeetingViewHolder(
      */
     fun removeTextureView(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
-        logDebug("Removing texture view")
-        inMeetingViewModel.onCloseVideo(participant)
 
+        logDebug("Removing texture view of $clientId")
         if (binding.parentTextureView.childCount > 0) {
             binding.parentTextureView.removeAllViews()
             binding.parentTextureView.removeAllViewsInLayout()
         }
 
         participant.videoListener?.let { listener ->
+            listener.localRenderer?.let {
+                it.addListener(null)
+            }
             listener.textureView?.let { view ->
                 view.parent?.let { surfaceParent ->
                     (surfaceParent as ViewGroup).removeView(view)
@@ -619,10 +600,16 @@ class VideoMeetingViewHolder(
             return
 
         isDrawing = false
+        inMeetingViewModel.getParticipant(peerId!!, clientId!!)?.let {
+            if (it.isVideoOn) {
+                logDebug("Remove the video when participant is not visible")
+                inMeetingViewModel.onCloseVideo(it)
+                removeTextureView(it)
+            }
+        }
     }
 
     companion object {
-
         const val ITEM_WIDTH = 90f
         const val ITEM_HEIGHT = 90f
     }

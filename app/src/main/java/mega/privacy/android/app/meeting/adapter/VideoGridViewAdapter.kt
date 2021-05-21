@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -17,8 +17,7 @@ class VideoGridViewAdapter(
     private val screenHeight: Int,
     private var pagePosition: Int,
     private val orientation: Int,
-    private var numParticipants: Int,
-    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
@@ -26,7 +25,7 @@ class VideoGridViewAdapter(
 
     override fun onBindViewHolder(gridHolder: VideoMeetingViewHolder, position: Int) {
         logDebug("Bind view holder position $position")
-        gridHolder.bind(inMeetingViewModel, getItem(position), numParticipants, pagePosition == 0)
+        gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
@@ -39,16 +38,6 @@ class VideoGridViewAdapter(
             true,
             listenerRenderer
         )
-    }
-
-    /**
-     * Method for updating the number of participants
-     * @param newNum num of participants
-     * @param page num of page
-     */
-    fun updateNumParticipants(newNum: Int, page: Int) {
-        numParticipants = newNum
-        pagePosition = page
     }
 
     fun getHolder(position: Int): VideoMeetingViewHolder? {
@@ -91,42 +80,6 @@ class VideoGridViewAdapter(
 
         getHolder(position)?.let {
             it.updateName(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Update participant resolution
-     *
-     * @param participant
-     */
-    fun updateParticipantRes(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        if (position == INVALID_POSITION)
-            return
-
-        getHolder(position)?.let {
-            it.updateRes(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Update participant video resolution
-     *
-     * @param participant
-     */
-    fun updateRemoteResolution(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        if (position == INVALID_POSITION)
-            return
-
-        getHolder(position)?.let {
-            it.updateResolution(participant)
             return
         }
 
@@ -202,7 +155,7 @@ class VideoGridViewAdapter(
      *
      * @param participant
      */
-    fun removeSurfaceView(participant: Participant) {
+    fun removeTextureView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return

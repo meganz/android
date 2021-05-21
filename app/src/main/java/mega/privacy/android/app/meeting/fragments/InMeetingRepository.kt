@@ -295,23 +295,6 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chatId
      * @param clientId client ID
      * @param hiRes If it's has High resolution
-     * @param listener GroupVideoListener
-     */
-    fun addRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: GroupVideoListener
-    ) {
-        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
-     * Method of obtaining the remote video
-     *
-     * @param chatId chatId
-     * @param clientId client ID
-     * @param hiRes If it's has High resolution
      * @param listener MeetingVideoListener
      */
     fun addRemoteVideoOneToOneCall(
@@ -320,6 +303,43 @@ class InMeetingRepository @Inject constructor(
         hiRes: Boolean,
         listener: MeetingVideoListener
     ) {
+        logDebug("Add Chat remote video listener of $clientId")
+        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of remove the remote video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener MeetingVideoListener
+     */
+    fun removeRemoteVideoOneToOneCall(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: MeetingVideoListener
+    ) {
+        logDebug("Remove chat video listener of $clientId")
+        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+    }
+
+    /**
+     * Method of obtaining the remote video
+     *
+     * @param chatId chatId
+     * @param clientId client ID
+     * @param hiRes If it's has High resolution
+     * @param listener GroupVideoListener
+     */
+    fun addRemoteVideo(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+        listener: GroupVideoListener
+    ) {
+        logDebug("Add Chat remote video listener of client $clientId")
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -337,54 +357,72 @@ class InMeetingRepository @Inject constructor(
         hiRes: Boolean,
         listener: GroupVideoListener
     ) {
+        logDebug("Remove Chat remote video listener of client $clientId")
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
 
     /**
-     * Method of remove the remote video
+     * Method for requesting the video in high quality
      *
      * @param chatId chatId
      * @param clientId client ID
-     * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener MegaChatRequestListenerInterface
      */
-    fun removeRemoteVideoOneToOneCall(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: MeetingVideoListener
-    ) {
-        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
-    }
-
     fun requestHiResVideo(
         chatId: Long,
         clientId: Long,
         listener: MegaChatRequestListenerInterface
     ) {
+        logDebug("Request HiRes video of client $clientId")
         megaChatApi.requestHiResVideo(chatId, clientId, listener)
     }
 
-    fun stopHiResVideo(chatId: Long, clientId: MegaHandleList, listener: MegaChatRequestListenerInterface) {
+    /**
+     * Method to stop receiving the video in high quality
+     *
+     * @param chatId chatId
+     * @param clientId List with clients ID
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun stopHiResVideo(
+        chatId: Long,
+        clientId: MegaHandleList,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        logDebug("Stop HiRes video of client  ${clientId[0]}")
         megaChatApi.stopHiResVideo(chatId, clientId, listener)
     }
 
+    /**
+     * Method for requesting the video in low quality
+     *
+     * @param chatId chatId
+     * @param clientId List with clients ID
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun requestLowResVideo(
         chatId: Long,
         clientId: MegaHandleList,
         listener: MegaChatRequestListenerInterface
     ) {
+        logDebug("Request LowRes video of client ${clientId[0]}")
         megaChatApi.requestLowResVideo(chatId, clientId, listener)
-
     }
 
+    /**
+     * Method to stop receiving the video in low quality
+     *
+     * @param chatId chatId
+     * @param clientId List with clients ID
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun stopLowResVideo(
         chatId: Long,
         clientId: MegaHandleList,
         listener: MegaChatRequestListenerInterface
     ) {
+        logDebug("Stop LowRes video of client  ${clientId[0]}")
         megaChatApi.stopLowResVideo(chatId, clientId, listener)
-
     }
 
     /**
@@ -457,8 +495,10 @@ class InMeetingRepository @Inject constructor(
         )
     }
 
-    fun updateChatPermissions(chatId: Long, peerId: Long,
-            listener: MegaChatRequestListenerInterface?){
+    fun updateChatPermissions(
+        chatId: Long, peerId: Long,
+        listener: MegaChatRequestListenerInterface?
+    ) {
         megaChatApi.updateChatPermissions(
             chatId,
             peerId,
@@ -469,8 +509,8 @@ class InMeetingRepository @Inject constructor(
 
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
         val mail = ChatController(context).getParticipantEmail(
-                peerId
-            )
+            peerId
+        )
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
         if (userHandleString == myUserHandleEncoded) {

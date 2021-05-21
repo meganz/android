@@ -78,7 +78,7 @@ class MeetingVideoListener(
 
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
         if (VideoCaptureUtils.isVideoAllowed()) {
-            renderer.drawBitmap(isLocal)
+            renderer.drawBitmap(isLocal, false)
         }
     }
 

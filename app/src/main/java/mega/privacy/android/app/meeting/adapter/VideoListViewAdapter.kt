@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -14,7 +14,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 class VideoListViewAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
     private val listView: RecyclerView,
-    private val listenerRenderer: MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
@@ -82,21 +82,6 @@ class VideoListViewAdapter(
     }
 
     /**
-     * Update participant video resolution
-     *
-     * @param participant
-     */
-    fun updateRemoteResolution(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let {
-            it.updateResolution(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
      * Update participant that is speaking
      *
      * @param participant
@@ -105,21 +90,6 @@ class VideoListViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
             it.updatePeerSelected(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Update participant resolution
-     *
-     * @param participant
-     */
-    fun updateParticipantRes(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let {
-            it.updateRes(participant)
             return
         }
 

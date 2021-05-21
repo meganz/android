@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRendererGroup
+import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
 class GridViewCallFragment : MeetingBaseFragment(),
-    MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
+    MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -30,17 +30,18 @@ class GridViewCallFragment : MeetingBaseFragment(),
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
+        val newData = sliceBy6(it)
         if (isFirsTime) {
             logDebug("Participants changed")
             isFirsTime = false
-            val newData = sliceBy6(it)
             adapterPager.let {
                 it.setNewData(newData)
                 it.notifyDataSetChanged()
             }
-
             viewPagerData = newData
         }
+
+        updateVisibleParticipantsGrid(newData)
     }
 
     override fun onCreateView(
@@ -73,8 +74,18 @@ class GridViewCallFragment : MeetingBaseFragment(),
             ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                currentPage = position
-                logDebug("New page selected $position")
+                if (currentPage != position) {
+                    currentPage = position
+
+                    logDebug("New page selected $position")
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.removeVisibleParticipants()
+
+                    val data = sliceBy6(participants)
+                    updateVisibleParticipantsGrid(data)
+
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.requestVideosWhenScroll()
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.stopVideosWhenScroll()
+                }
             }
         })
 
@@ -94,20 +105,37 @@ class GridViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Method that updates the number of participants visible on the current page.
+     *
+     * @param data The list of participants on each page
+     */
+    fun updateVisibleParticipantsGrid(data: List<List<Participant>>) {
+        if (data.isNullOrEmpty())
+            return
+
+        if (data.size > currentPage) {
+            val dataInPage = data[currentPage]
+            (parentFragment as InMeetingFragment).inMeetingViewModel.updateVisibleParticipants(
+                dataInPage
+            )
+        } else {
+            (parentFragment as InMeetingFragment).inMeetingViewModel.removeVisibleParticipants()
+        }
+    }
+
+    /**
      * Updating the participant who joined or left the call
      *
      * @param isAdded
      * @param position
-     * @param participantList
      */
     fun peerAddedOrRemoved(
         isAdded: Boolean,
         position: Int,
-        participantList: MutableList<Participant>
     ) {
-        val newData = sliceBy6(participantList)
+        val newData = sliceBy6(participants)
         adapterPager.let {
-            it.setNewData(newData)
+            adapterPager.setNewData(newData)
             if (isAdded) {
                 logDebug("Participant added in $position")
                 it.participantAdded(viewPagerData, newData, position)
@@ -175,39 +203,6 @@ class GridViewCallFragment : MeetingBaseFragment(),
                 currentPage,
                 viewDataBinding.gridViewPager
             )
-        }
-    }
-
-    /**
-     * Check changes in resolution
-     *
-     * @param session MegaChatSession
-     */
-    fun updateRemoteResolution(session: MegaChatSession) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-            session.peerid,
-            session.clientid
-        )?.let {
-            logDebug("Update participant resolution")
-            adapterPager.updateRemoteResolution(it, currentPage, viewDataBinding.gridViewPager)
-        }
-    }
-
-    /**
-     * Check changes in resolution
-     *
-     * @param listPeers List of participants with changes
-     */
-    fun updateRes(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-                peer.peerId,
-                peer.clientId
-            )?.let {
-                logDebug("Update participant resolution")
-                adapterPager.updateParticipantRes(it, currentPage, viewDataBinding.gridViewPager)
-            }
         }
     }
 
@@ -286,11 +281,12 @@ class GridViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to delete the videos and texture views of participants
      */
-    private fun removeSurfaceView() {
+    private fun removeTextureView() {
         val iterator = participants.iterator()
         iterator.forEach {
+            (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(it)
             logDebug("Remove texture view")
-            adapterPager.removeSurfaceView(it, currentPage, viewDataBinding.gridViewPager)
+            adapterPager.removeTextureView(it, currentPage, viewDataBinding.gridViewPager)
         }
     }
 
@@ -308,7 +304,7 @@ class GridViewCallFragment : MeetingBaseFragment(),
 
     override fun onDestroyView() {
         logDebug("View destroyed")
-        removeSurfaceView()
+        removeTextureView()
         super.onDestroyView()
     }
 
