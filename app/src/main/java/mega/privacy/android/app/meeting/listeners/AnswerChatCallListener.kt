@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.listeners
 import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.meeting.GuestTool
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.*
 
@@ -29,7 +28,6 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
             callback?.onCallAnswered(request.chatHandle, request.flag)
         } else {
             LogUtil.logError("Error answering the call. Error code "+e.errorCode)
-            GuestTool.log("Error answering the call. Error code "+e.errorCode)
             callback?.onErrorAnsweredCall(e.errorCode)
         }
     }

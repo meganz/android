@@ -8,10 +8,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import org.jetbrains.annotations.NotNull;
 
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ConnectListener;
@@ -20,13 +19,10 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.meeting.GuestTool;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -41,8 +37,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.decodeURL;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener {
@@ -178,69 +177,13 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				else{
 					logDebug("Not logged");
 					int initResult = megaChatApi.getInitState();
-					if(initResult<MegaChatApi.INIT_WAITING_NEW_SESSION){
-                        GuestTool.INSTANCE.log("Chat init result: " + initResult);
+					if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
 						initResult = megaChatApi.initAnonymous();
-						GuestTool.INSTANCE.log("Chat init anonymous result: " + initResult);
+						logDebug("Chat init anonymous result: " + initResult);
 					}
 
-                    if (initResult != MegaChatApi.INIT_ERROR) {
-//                        if (intent.getStringExtra(PasteMeetingLinkGuestDialogFragment.ACTION_JOIN_AS_GUEST) != null) {
-//                            GuestTool.INSTANCE.start(url);
-//                        } else {
-//                            megaChatApi.connect(new ConnectListener(this));
-//                        }
-
-                        megaChatApi.openChatPreview(url, new ChatBaseListener(this) {
-
-                            @Override
-                            public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
-                                int errorCode = e.getErrorCode();
-                                boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
-                                boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
-                                GuestTool.INSTANCE.log("Link is: " + request.getLink() + ", chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
-
-                                if (codeError || linkInvalid) {
-                                    setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
-                                    return;
-                                }
-
-                                if (request.getParamType() == LINK_IS_FOR_MEETING) {
-                                    logDebug("It's a meeting");
-
-                                    if (request.getFlag()) {
-                                        MegaHandleList list = request.getMegaHandleList();
-
-                                        if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                                            GuestTool.INSTANCE.log("Call id: " + list.get(0));
-                                            logDebug("It's a meeting, open join call");
-                                            goToMeetingActivity(request.getChatHandle(), request.getText());
-                                        } else {
-                                            logDebug("It's a meeting, open dialog: Meeting has ended");
-                                            GuestTool.INSTANCE.log("It's a meeting, open dialog: Meeting has ended");
-                                            new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-                                                @Override
-                                                public void onViewMeetingChat() {
-                                                    goToChatActivity();
-                                                }
-
-                                                @Override
-                                                public void onLeave() {
-                                                    goToGuestLeaveMeetingActivity();
-                                                }
-                                            }).show(getSupportFragmentManager(),
-                                                    MeetingHasEndedDialogFragment.TAG);
-                                        }
-                                    } else {
-                                        logDebug("It's a meeting, open chat preview");
-                                        api.openChatPreview(url, this);
-                                    }
-                                } else {
-                                    // Normal Chat Link
-                                    goToChatActivity();
-                                }
-                            }
-                        });
+					if (initResult != MegaChatApi.INIT_ERROR) {
+						megaChatApi.connect(new ConnectListener(this));
                     } else {
                         logError("Open chat url:initAnonymous:INIT_ERROR");
                         setError(getString(R.string.error_chat_link_init_error));
@@ -485,7 +428,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				int errorCode = e.getErrorCode();
 				boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
 				boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
-				GuestTool.INSTANCE.log("Link is: " + request.getLink() + ", chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
+				logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
 
 				if (codeError || linkInvalid) {
 					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
@@ -499,12 +442,10 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						MegaHandleList list = request.getMegaHandleList();
 
 						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-						    GuestTool.INSTANCE.log("Call id: " + list.get(0));
-							logDebug("It's a meeting, open join call");
+							logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
 							goToMeetingActivity(request.getChatHandle(), request.getText());
 						} else {
 							logDebug("It's a meeting, open dialog: Meeting has ended");
-							GuestTool.INSTANCE.log("It's a meeting, open dialog: Meeting has ended");
 							new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
 								@Override
 								public void onViewMeetingChat() {
