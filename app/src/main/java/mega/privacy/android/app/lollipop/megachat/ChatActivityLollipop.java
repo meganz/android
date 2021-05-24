@@ -414,6 +414,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     private long chatIdBanner;
     private TextView callInProgressText;
     private Chronometer callInProgressChrono;
+    private LinearLayout microOffLayout;
+    private LinearLayout videoOnLayout;
     private boolean startVideo = false;
 
     private EmojiEditText textChat;
@@ -1086,6 +1088,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
+        microOffLayout = findViewById(R.id.micro_off_layout);
+        videoOnLayout = findViewById(R.id.video_on_layout);
 
         returnCallOnHoldButton = findViewById(R.id.call_on_hold_layout);
         returnCallOnHoldButtonIcon = findViewById(R.id.call_on_hold_icon);
@@ -1621,7 +1625,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void updateUserNameInChat() {
-        if (chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
@@ -8803,6 +8807,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             callInProgressText.setText(text);
         }
 
+        showHideMicroAndVideoIcons(call, microOffLayout, videoOnLayout);
+
         if (shouldChronoShown) {
             startChronometers(call);
         } else {
@@ -8828,7 +8834,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
         }
 
-        activateChrono(true, callInProgressChrono, call);
+        activateChrono(true, callInProgressChrono, call, true);
         callInProgressChrono.setOnChronometerTickListener(chronometer -> {
             if (subtitleChronoCall == null) {
                 return;

@@ -2,17 +2,14 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -25,7 +22,6 @@ import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +36,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -47,7 +44,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,14 +53,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -192,10 +187,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             rkSaved = savedInstanceState.getBoolean("rkSaved", false);
             seed = savedInstanceState.getString("seed");
             arraySeed = savedInstanceState.getStringArrayList("arraySeed");
-            byte[] qrByteArray = savedInstanceState.getByteArray("qr");
-            if (qrByteArray != null){
-                qr = BitmapFactory.decodeByteArray(qrByteArray, 0, qrByteArray.length);
-            }
             isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
             isHelpDialogShown = savedInstanceState.getBoolean("isHelpDialogShown", false);
         }
@@ -219,6 +210,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
         SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
         Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_question_mark);
+        questionMarck.setColorFilter(ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary), PorterDuff.Mode.SRC_IN);
         questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
         ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
         text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
@@ -501,87 +493,14 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb1.width = scaleWidthPx(25, outMetrics);
-        }
-        firstPin.setLayoutParams(paramsb1);
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        firstPin.setLayoutParams(textParams);
-
-        secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb2.width = scaleWidthPx(25, outMetrics);
-        }
-        secondPin.setLayoutParams(paramsb2);
-        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
-        thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb3.width = scaleWidthPx(25, outMetrics);
-        }
-        thirdPin.setLayoutParams(paramsb3);
-        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-        thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
-        fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb4.width = scaleWidthPx(25, outMetrics);
-        }
-        fourthPin.setLayoutParams(paramsb4);
-        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
-        fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb5.width = scaleWidthPx(25, outMetrics);
-        }
-        fifthPin.setLayoutParams(paramsb5);
-        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
-        sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb6.width = scaleWidthPx(25, outMetrics);
-        }
-        sixthPin.setLayoutParams(paramsb6);
-        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-        textParams.setMargins(0, 0, 0, 0);
-        sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
 
         suggestionRK = (TextView) findViewById(R.id.recommendation_2fa_enabled);
@@ -597,6 +516,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         else if (confirm2FAIsShown){
             qrSeedContainer.setVisibility(View.GONE);
             confirmContainer.setVisibility(View.VISIBLE);
+            scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT);
             scrollContainer2FA.setVisibility(View.GONE);
             scrollContainerVerify.setVisibility(View.VISIBLE);
             scrollContainer2FAEnabled.setVisibility(View.GONE);
@@ -632,6 +552,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         confirmContainer.setVisibility(View.GONE);
         scrollContainer2FA.setVisibility(View.GONE);
         scrollContainerVerify.setVisibility(View.VISIBLE);
+        scrollContainerVerify.setBackgroundColor(ContextCompat.getColor(this,R.color.white_grey_700));
         scrollContainer2FAEnabled.setVisibility(View.GONE);
         if (seed != null){
             logDebug("Seed not null");
@@ -692,7 +613,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
     void update2FASetting () {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
-        intent.putExtra("enabled", true);
+        intent.putExtra(INTENT_EXTRA_KEY_ENABLED, true);
         sendBroadcast(intent);
     }
 
@@ -781,11 +702,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         url = null;
         String myEmail = megaApi.getMyEmail();
-//        String myEmail = "aw+@mega.nz";
-//        String myEmail = "";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@yopmail.com";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
-//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
 
         if (myEmail != null & seed != null){
             url = getString(R.string.url_qr_2fa, myEmail, seed);
@@ -807,57 +723,49 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             int width = (w * WIDTH) / FACTOR;
 
             qr = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+            int colorBackground = ContextCompat.getColor(this,R.color.white_grey_700);
+            int colorCode = ContextCompat.getColor(this,R.color.dark_grey);
+
             Canvas c = new Canvas(qr);
             Paint paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setColor(WHITE);
+            paint.setColor(colorBackground);
             c.drawRect(0, 0, width, width, paint);
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
 
             float size = w - 12;
 
             for (int y = 0; y < h; y++) {
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
-                    pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
-                    if (pixels[offset + x] == BLACK){
+                    pixels[offset + x] = bitMatrix.get(x, y) ? colorCode : colorBackground;
+                    if (pixels[offset + x] == colorCode){
                         c.drawCircle(x*RESIZE, y*RESIZE, 3.5f, paint);
                     }
                 }
             }
 
 //            8.5 width
-            paint.setColor(WHITE);
+            paint.setColor(colorBackground);
             c.drawRect(3*RESIZE, 3*RESIZE, 11.5f*RESIZE, 11.5f*RESIZE, paint);
             c.drawRect(size*RESIZE, 3*RESIZE, (size+8.5f)*RESIZE, 11.5f*RESIZE, paint);
             c.drawRect(3*RESIZE, size*RESIZE, 11.5f*RESIZE, (size+8.5f)*RESIZE, paint);
 
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
 
-            if (Build.VERSION.SDK_INT >= 21) {
-                c.drawRoundRect(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+            c.drawRoundRect(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE, 15, 15, paint);
 //                7 width, 0.75 more than last
-                c.drawRoundRect((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE, 15, 15, paint);
-                c.drawRoundRect(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE, 15, 15, paint);
+            c.drawRoundRect((size + 0.75f) * RESIZE, 3.75f * RESIZE, (size + 0.75f + 7f) * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+            c.drawRoundRect(3.75f * RESIZE, (size + 0.75f) * RESIZE, 10.75f * RESIZE, (size + 0.75f + 7f) * RESIZE, 15, 15, paint);
 
-                paint.setColor(WHITE);
-                c.drawRoundRect(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+            paint.setColor(colorBackground);
+            c.drawRoundRect(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
 //                5 width, 1.75 more than first
-                c.drawRoundRect((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
-                c.drawRoundRect(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE, 12.5f, 12.5f, paint);
-            }
-            else {
-                c.drawRoundRect(new RectF(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE), 15, 15, paint);
-                c.drawRoundRect(new RectF((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE), 15, 15, paint);
-                c.drawRoundRect(new RectF(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE), 15, 15, paint);
+            c.drawRoundRect((size + 1.75f) * RESIZE, 4.75f * RESIZE, (size + 1.75f + 5f) * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+            c.drawRoundRect(4.75f * RESIZE, (size + 1.75f) * RESIZE, 9.75f * RESIZE, (size + 1.75f + 5f) * RESIZE, 12.5f, 12.5f, paint);
 
-                paint.setColor(WHITE);
-                c.drawRoundRect(new RectF(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
-                c.drawRoundRect(new RectF((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
-                c.drawRoundRect(new RectF(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE), 12.5f, 12.5f, paint);
-            }
 
-            paint.setColor(BLACK);
+            paint.setColor(colorCode);
             c.drawCircle(7.25f*RESIZE, 7.25f*RESIZE, 12f, paint);
 //            4.25 more than first
             c.drawCircle((size+4.25f)*RESIZE, 7.25f*RESIZE, 12f, paint);
@@ -889,13 +797,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         if (scanOrCopyIsShown){
             logDebug("scanOrCopyIsShown");
-            if (qr != null) {
-                logDebug("QR not null");
-                ByteArrayOutputStream qrOutputStream = new ByteArrayOutputStream();
-                qr.compress(Bitmap.CompressFormat.JPEG, 100, qrOutputStream);
-                byte[] qrByteArray = qrOutputStream.toByteArray();
-                outState.putByteArray("qr", qrByteArray);
-            }
             outState.putString("seed", seed);
             outState.putStringArrayList("arraySeed", arraySeed);
         }
@@ -938,6 +839,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 confirmContainer.setVisibility(View.VISIBLE);
                 scrollContainer2FA.setVisibility(View.GONE);
                 scrollContainerVerify.setVisibility(View.VISIBLE);
+                scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT);
                 scrollContainer2FAEnabled.setVisibility(View.GONE);
                 firstPin.requestFocus();
                 imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
@@ -1028,7 +930,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     void showAlertHelp () {
         logDebug("showAlertHelp");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_2fa_help, null);
         builder.setView(v);
@@ -1040,15 +942,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         helpDialog = builder.create();
         helpDialog.setCanceledOnTouchOutside(false);
-        helpDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isHelpDialogShown = false;
-            }
-        });
+        helpDialog.setOnDismissListener(dialog -> isHelpDialogShown = false);
         try {
             helpDialog.show();
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         isHelpDialogShown = true;
     }
@@ -1056,7 +955,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     void showAlertNotAppAvailable () {
         logDebug("showAlertNotAppAvailable");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_no_authentication_apps, null);
         builder.setView(v);
@@ -1068,15 +967,12 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         noAppsDialog = builder.create();
         noAppsDialog.setCanceledOnTouchOutside(false);
-        noAppsDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isNoAppsDialogShown = false;
-            }
-        });
+        noAppsDialog.setOnDismissListener(dialog -> isNoAppsDialogShown = false);
         try {
             noAppsDialog.show();
-        }catch (Exception e){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         isNoAppsDialogShown = true;
     }

@@ -206,7 +206,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
 
-        // Add an invisible  full screen Psa web browser fragment to the activity.
+        // Add an invisible full screen Psa web browser fragment to the activity.
         // Then show or hide it for browsing the PSA.
         addPsaWebBrowser();
         LiveEventBus.get(EVENT_PSA, Psa.class).observeStickyForever(psaObserver);

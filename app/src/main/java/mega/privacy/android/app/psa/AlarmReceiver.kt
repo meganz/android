@@ -63,11 +63,7 @@ class AlarmReceiver : BroadcastReceiver() {
             cancelAlarm(context)
 
             callback = cb
-            var delay = delayMs
-            if (delay < 0) {
-                delay = 0;
-            }
-            val time = System.currentTimeMillis() + delay
+            val time = System.currentTimeMillis() + delayMs
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             /* fire the broadcast */

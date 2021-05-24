@@ -262,7 +262,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             if (counter == 3) {
                 Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
-                intent.putExtra("logout", isLogout());
+                intent.putExtra(ChangePasswordActivityLollipop.KEY_IS_LOGOUT, isLogout());
                 startActivity(intent);
                 onBackPressed();
             }
