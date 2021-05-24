@@ -273,7 +273,7 @@ class InMeetingRepository @Inject constructor(
      * @return True, if it's. False, otherwise.
      */
     fun isMyContact(peerId: Long): Boolean {
-        val email: String = ChatController(context).getParticipantEmail(peerId)
+        val email = ChatController(context).getParticipantEmail(peerId)
         val contact = megaApi.getContact(email)
 
         return contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE
