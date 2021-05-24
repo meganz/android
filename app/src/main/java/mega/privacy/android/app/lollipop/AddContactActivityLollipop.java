@@ -10,9 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -1082,14 +1079,14 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private void setMegaAdapterContacts (ArrayList<MegaContactAdapter> contacts, int adapter) {
         if (onNewGroup){
-            adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, null, contacts, newGroupRecyclerView, adapter);
+            adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, contacts, newGroupRecyclerView, adapter);
 
             adapterMEGA.setPositionClicked(-1);
             newGroupRecyclerView.setAdapter(adapterMEGA);
         }
         else {
             if (adapterMEGA == null) {
-                adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, null, contacts, recyclerViewList, adapter);
+                adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, contacts, recyclerViewList, adapter);
             } else {
                 adapterMEGA.setAdapterType(adapter);
                 adapterMEGA.setContacts(contacts);

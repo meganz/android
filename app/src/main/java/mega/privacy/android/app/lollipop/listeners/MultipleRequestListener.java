@@ -171,7 +171,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         message = context.getString(R.string.number_contact_removed, max_items);
                     }
 
-                    ((ManagerActivityLollipop) context).updateContactsView(true, false, false);
                     break;
                 }
                 case MegaRequest.TYPE_COPY:{

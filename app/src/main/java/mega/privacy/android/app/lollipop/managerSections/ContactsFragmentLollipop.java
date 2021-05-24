@@ -60,7 +60,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
@@ -894,7 +893,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
@@ -985,7 +984,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
@@ -1173,9 +1172,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (adapter == null) {
 				if (((ManagerActivityLollipop) context).isList()) {
 					logDebug("isList");
-					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+					adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				} else {
-					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+					adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				}
 			} else {
 				adapter.notifyItemChanged(positionVisibleContacts);
@@ -1191,10 +1190,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if(adapter == null){
 			if (((ManagerActivityLollipop)context).isList()) {
 				logDebug("isList");
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaContactsLollipopAdapter(context, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 		}
 		else{

@@ -160,7 +160,6 @@ import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
-import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.TransfersPageAdapter;
@@ -170,7 +169,6 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -479,7 +477,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private List<MegaSku> mSkuDetailsList;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -491,7 +489,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case INBOX: return "iFLol";
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
-				case CONTACTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 0;
 				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
 				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
 				case SETTINGS: return "sttF";
@@ -570,7 +567,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	//Tabs in Contacts
 	private TabLayout tabLayoutContacts;
-	private ContactsPageAdapter contactsPageAdapter;
 	private CustomViewPager viewPagerContacts;
 
 	//Tabs in My Account
@@ -648,7 +644,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
 	private LinksFragment lF;
-	private ContactsFragmentLollipop cFLol;
 	private ReceivedRequestsFragmentLollipop rRFLol;
 	private SentRequestsFragmentLollipop sRFLol;
 	private MyAccountFragmentLollipop maFLol;
@@ -1019,9 +1014,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
 					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
 					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
-				if (getContactsFragment() != null) {
-					cFLol.updateContact(userHandle);
-				}
 
 				if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 					inSFLol.updateContact(userHandle);
@@ -1030,8 +1022,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
 					outSFLol.updateContact(userHandle);
 				}
-			} else if (intent.getAction().equals(ACTION_UPDATE_CREDENTIALS) && getContactsFragment() != null) {
-				cFLol.updateContact(userHandle);
 			}
 		}
 	};
@@ -4975,133 +4965,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void selectDrawerItemContacts (){
-		logDebug("selectDrawerItemContacts");
-		abL.setVisibility(View.VISIBLE);
-
-		try {
-			ContactsAdvancedNotificationBuilder notificationBuilder;
-			notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-			notificationBuilder.removeAllIncomingContactNotifications();
-			notificationBuilder.removeAllAcceptanceContactNotifications();
-		}
-		catch (Exception e){
-			logError("Exception NotificationManager - remove all CONTACT notifications", e);
-		}
-
-		if (aB == null){
-			aB = getSupportActionBar();
-		}
-		setToolbarTitle();
-
-		if (contactsPageAdapter == null){
-			logWarning("contactsPageAdapter == null");
-			contactsPageAdapter = new ContactsPageAdapter(getSupportFragmentManager(),this);
-			viewPagerContacts.setAdapter(contactsPageAdapter);
-			tabLayoutContacts.setupWithViewPager(viewPagerContacts);
-
-			logDebug("The index of the TAB CONTACTS is: " + indexContacts);
-			if(indexContacts==-1) {
-				logWarning("The index os contacts is -1");
-				ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
-				if(requests!=null) {
-					int pendingRequest = requests.size();
-					if (pendingRequest != 0) {
-						indexContacts = 2;
-					}
-				}
-			}
-
-			if (viewPagerContacts != null) {
-				switch (indexContacts){
-					case SENT_REQUESTS_TAB:{
-						viewPagerContacts.setCurrentItem(SENT_REQUESTS_TAB);
-						logDebug("Select Sent Requests TAB");
-						break;
-					}
-					case RECEIVED_REQUESTS_TAB:{
-						viewPagerContacts.setCurrentItem(RECEIVED_REQUESTS_TAB);
-						logDebug("Select Received Request TAB");
-						break;
-					}
-					default:{
-						viewPagerContacts.setCurrentItem(CONTACTS_TAB);
-						logDebug("Select Contacts TAB");
-						break;
-					}
-				}
-			}
-		}
-		else {
-			logDebug("contactsPageAdapter NOT null");
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
-
-			logDebug("The index of the TAB CONTACTS is: " + indexContacts);
-			if (viewPagerContacts != null) {
-				switch (indexContacts) {
-					case SENT_REQUESTS_TAB: {
-						viewPagerContacts.setCurrentItem(SENT_REQUESTS_TAB);
-						logDebug("Select Sent Requests TAB");
-						break;
-					}
-					case RECEIVED_REQUESTS_TAB: {
-						viewPagerContacts.setCurrentItem(RECEIVED_REQUESTS_TAB);
-						logDebug("Select Received Request TAB");
-						break;
-					}
-					default: {
-						viewPagerContacts.setCurrentItem(CONTACTS_TAB);
-						logDebug("Select Contacts TAB");
-						break;
-					}
-				}
-			}
-		}
-
-		viewPagerContacts.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-				indexContacts = position;
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				logDebug("onPageSelected");
-				checkScrollElevation();
-				indexContacts = position;
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-				if(cFLol!=null){
-					cFLol.hideMultipleSelect();
-					cFLol.clearSelectionsNoAnimations();
-				}
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
-				if(sRFLol!=null){
-					sRFLol.clearSelections();
-					sRFLol.hideMultipleSelect();
-				}
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
-				if(rRFLol!=null){
-					rRFLol.clearSelections();
-					rRFLol.hideMultipleSelect();
-				}
-				supportInvalidateOptionsMenu();
-				showFabButton();
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-
-			}
-		});
-
-		supportInvalidateOptionsMenu();
-		drawerLayout.closeDrawer(Gravity.LEFT);
-	}
-
 	public void selectDrawerItemAccount(){
 
 		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
@@ -5391,10 +5254,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			case CONTACTS:
 				switch (currentTab) {
-					case CONTACTS_TAB:
-						if (!isContactsAdded()) return;
-						else break;
-
 					case SENT_REQUESTS_TAB:
 						if (!isSentRequestAdded()) return;
 						else break;
@@ -5663,10 +5522,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     			break;
     		}
     		case CONTACTS:{
+				showHideBottomNavigationView(true);
 				startActivity(new Intent(this, ContactsActivity.class));
-//				showHideBottomNavigationView(true);
-//				selectDrawerItemContacts();
-//				showFabButton();
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -5879,10 +5736,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         return fbFLol != null && fbFLol.isAdded();
     }
 
-	private boolean isContactsAdded() {
-		return getContactsFragment() != null && cFLol.isAdded();
-	}
-
 	private boolean isSentRequestAdded() {
 		return getSentRequestFragment() != null && sRFLol.isAdded();
 	}
@@ -5974,21 +5827,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             	if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) inSFLol.checkScroll();
             	else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) outSFLol.checkScroll();
             	else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) lF.checkScroll();
-                break;
-            }
-            case CONTACTS: {
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
-                if (getTabItemContacts() == CONTACTS_TAB && cFLol != null) {
-                    cFLol.checkScroll();
-                }
-                else if (getTabItemContacts() == SENT_REQUESTS_TAB && sRFLol != null) {
-                    sRFLol.checkScroll();
-                }
-                else if (getTabItemContacts() == RECEIVED_REQUESTS_TAB && rRFLol != null) {
-                    rRFLol.checkScroll();
-                }
                 break;
             }
             case SETTINGS: {
@@ -6446,17 +6284,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (getTabItemContacts() == CONTACTS_TAB) {
 						scanQRcodeMenuItem.setVisible(true);
 						addContactMenuItem.setVisible(true);
-
-						if (getContactsFragment() != null && cFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							sortByMenuItem.setVisible(true);
-
-						}
-
-						if (handleInviteContact != -1 && cFLol != null) {
-							cFLol.invite(handleInviteContact);
-						}
 					} else if (getTabItemContacts() == SENT_REQUESTS_TAB) {
 						addContactMenuItem.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
@@ -6956,29 +6783,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						break;
 
-					case CONTACTS:
-						switch(getTabItemContacts()){
-							case CONTACTS_TAB:{
-								if (getContactsFragment() != null){
-									cFLol.selectAll();
-								}
-								break;
-							}
-							case SENT_REQUESTS_TAB:{
-								if (getSentRequestFragment() != null){
-									sRFLol.selectAll();
-								}
-								break;
-							}
-							case RECEIVED_REQUESTS_TAB:{
-								if (getReceivedRequestFragment() != null){
-									rRFLol.selectAll();
-								}
-								break;
-							}
-						}
-						break;
-
 					case SHARED_ITEMS:
 						switch (getTabItemShares()) {
 							case INCOMING_TAB:
@@ -7288,13 +7092,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
-        //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
-        refreshFragment(FragmentTag.CONTACTS.getTag());
-
-        if (contactsPageAdapter != null) {
-            contactsPageAdapter.notifyDataSetChanged();
-        }
-
         //Refresh shares section
         refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
 
@@ -7599,21 +7396,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		} else if (drawerItem == DrawerItem.CHAT) {
 			backToDrawerItem(-1);
-		} else if (drawerItem == DrawerItem.CONTACTS) {
-			switch (getTabItemContacts()) {
-				case CONTACTS_TAB:
-		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager()
-							.findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		    		if (cFLol == null || cFLol.onBackPressed() == 0) {
-						backToDrawerItem(bottomNavigationCurrentItem);
-		    		}
-					break;
-				case SENT_REQUESTS_TAB:
-				case RECEIVED_REQUESTS_TAB:
-				default:
-					backToDrawerItem(bottomNavigationCurrentItem);
-					break;
-			}
 		} else if (drawerItem == DrawerItem.ACCOUNT) {
 			logDebug("MyAccountSection");
 			logDebug("The accountFragment is: " + accountFragment);
@@ -9335,12 +9117,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         usedSpacePB.setProgressDrawable(drawable);
 	}
 
-	public void refreshContactsOrder() {
-		if (getContactsFragment() != null) {
-			cFLol.sortBy();
-		}
-	}
-
 	public void refreshCloudDrive() {
         if (rootNode == null) {
             rootNode = megaApi.getRootNode();
@@ -9619,9 +9395,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 			}
 			case R.id.contacts_section: {
+				sectionClicked = true;
+				drawerItem = DrawerItem.CONTACTS;
 				startActivity(new Intent(this, ContactsActivity.class));
-//				sectionClicked = true;
-//				drawerItem = DrawerItem.CONTACTS;
 				break;
 			}
 			case R.id.notifications_section: {
@@ -9941,12 +9717,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
-			}
-
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if(cFLol!=null && cFLol.isMultipleselect()){
-				cFLol.hideMultipleSelect();
-				cFLol.clearSelectionsNoAnimations();
 			}
 
 			nodeAttacher.handleSelectFileResult(intent, this);
@@ -11096,37 +10866,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void updateContactsView(boolean contacts, boolean sentRequests, boolean receivedRequests){
-		logDebug("updateContactsView");
-
-		if(contacts){
-			logDebug("Update Contacts Fragment");
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if (cFLol != null){
-				cFLol.hideMultipleSelect();
-				cFLol.updateView();
-			}
-		}
-
-		if(sentRequests){
-			logDebug("Update SentRequests Fragment");
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
-			if (sRFLol != null){
-				sRFLol.hideMultipleSelect();
-				sRFLol.updateView();
-			}
-		}
-
-		if(receivedRequests){
-			logDebug("Update ReceivedRequest Fragment");
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
-			if (rRFLol != null){
-				rRFLol.hideMultipleSelect();
-				rRFLol.updateView();
-			}
-		}
-	}
-
 	/*
 	 * Handle processed upload intent
 	 */
@@ -11871,7 +11610,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logError("Error deleting contact");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_not_removed), -1);
 			}
-			updateContactsView(true, false, false);
 		}
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
 			logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
@@ -11944,11 +11682,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if(contactDB==null){
 							logWarning("Contact " + contactRequest.getHandle() + " not found! Will be added to DB!");
 							cC.addContactDB(contactRequest.getSourceEmail());
-						}
-						//Update view to get avatar
-						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-						if (cFLol != null){
-							cFLol.updateView();
 						}
 					}
 					else{
@@ -12359,15 +12092,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                                 String destinationPath = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg").getAbsolutePath();
 								megaApi.getUserAvatar(megaApi.getMyUser(),destinationPath,this);
 							}
-							else {
-								logDebug("Update de ContactsFragment");
-								cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-								if (cFLol != null) {
-									if (drawerItem == DrawerItem.CONTACTS) {
-										cFLol.updateView();
-									}
-								}
-							}
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
@@ -12393,10 +12117,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							}
 						}
 
-						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-						if(cFLol!=null){
-							updateContactsView(true, false, false);
-						}
 						//When last contact changes avatar, update view.
 						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 						if(maFLol != null) {
@@ -12631,15 +12351,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		if(updateContacts){
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if (cFLol != null){
-				logDebug("Incoming update - update contacts section");
-				cFLol.updateShares();
-			}
-		}
-
-
 		onNodesCloudDriveUpdate();
 
 		onNodesSearchUpdate();
@@ -12696,7 +12407,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
 						cC.addContactDB(req.getTargetEmail());
 					}
-					updateContactsView(true, true, false);
 				}
 				else{
 					logDebug("RECEIVED REQUEST");
@@ -12705,7 +12415,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
 						cC.addContactDB(req.getSourceEmail());
 					}
-					updateContactsView(true, false, true);
 				}
 			}
 		}
@@ -13215,10 +12924,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 
-	public ContactsFragmentLollipop getContactsFragment() {
-		return cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-	}
-
 	public MyAccountFragmentLollipop getMyAccountFragment() {
 		return maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 	}
@@ -13229,10 +12934,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
 		return upAFL;
-	}
-
-	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
-		this.cFLol = cFLol;
 	}
 
 	public SettingsFragmentLollipop getSettingsFragment() {
@@ -13330,12 +13031,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logDebug("Update Recent chats view");
 					rChatFL.contactStatusUpdate(userHandle, status);
 				}
-
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-				if (cFLol != null) {
-					logDebug("Update Contacts view");
-					cFLol.contactPresenceUpdate(userHandle, status);
-				}
 			}
 		}
 	}
@@ -13367,12 +13062,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 		logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
-
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		if(cFLol!=null){
-			logDebug("Update Contacts view");
-			cFLol.contactLastGreenUpdate(userhandle, lastGreen);
-		}
     }
 
 	public void copyError(){

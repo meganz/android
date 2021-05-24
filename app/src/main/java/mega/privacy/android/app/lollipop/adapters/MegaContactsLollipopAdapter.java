@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -21,9 +17,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -35,20 +35,32 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
-import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.setContactLastGreen;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE_GRID;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_GRID_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_GRID_PORT;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PORT;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedRectBitmap;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 
 public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -66,15 +78,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private boolean multipleSelect;
 	private DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
-	private ContactsFragmentLollipop fragment;
 	private int adapterType;
 
 	DisplayMetrics outMetrics;
 
-	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
+	public MegaContactsLollipopAdapter(Context _context, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
 		this.context = _context;
 		this.contacts = _contacts;
-		this.fragment = _fragment;
 		this.positionClicked = -1;
 		this.adapterType = adapterType;
 		
@@ -687,9 +697,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 					@Override
 					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-						}
 						if (delete) {
 							notifyItemChanged(pos);
 						}
@@ -703,9 +710,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				view.imageView.startAnimation(flipAnimation);
 			}
 			else{
-				if (selectedItems.size() <= 0){
-					((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-				}
 				notifyItemChanged(pos);
 			}
 		}
@@ -729,9 +733,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 					@Override
 					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-						}
 						notifyItemChanged(pos);
 					}
 
@@ -743,9 +744,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				view.contactSelectedIcon.startAnimation(flipAnimation);
 			}
 			else{
-				if (selectedItems.size() <= 0){
-					((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-				}
 				notifyItemChanged(pos);
 			}
 		}
@@ -861,12 +859,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					case R.id.contact_list_three_dots_layout:
 					case R.id.contact_grid_three_dots:{
 						logDebug("click contact three dots!");
-						if(multipleSelect){
-							if (fragment != null){
-								fragment.itemClick(currentPosition);
-							}
-						}
-						else{
+						if (!multipleSelect) {
 							((ManagerActivityLollipop) context).showContactOptionsPanel(c);
 						}
 
@@ -875,9 +868,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					case R.id.contact_list_item_layout:
 					case R.id.contact_grid_item_layout:{
 						logDebug("contact_item_layout");
-						if (fragment != null){
-							fragment.itemClick(currentPosition);
-						}
 						break;
 					}
 				}
@@ -893,9 +883,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		ViewHolderContacts holder = (ViewHolderContacts) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
-
-		fragment.activateActionMode();
-		fragment.itemClick(currentPosition);
 
 		return true;
 	}

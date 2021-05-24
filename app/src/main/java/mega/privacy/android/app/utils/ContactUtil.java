@@ -230,23 +230,12 @@ public class ContactUtil {
         return visibleContacts;
     }
 
-    private static void updateView(Context context) {
-        if (context != null && context instanceof ManagerActivityLollipop) {
-            ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
-            if (cFLol != null) {
-                cFLol.updateView();
-            }
-        }
-    }
-
-    public static void updateFirstName(Context context, String name, String email) {
+    public static void updateFirstName(String name, String email) {
         MegaApplication.getInstance().getDbH().setContactName(name, email);
-        updateView(context);
     }
 
-    public static void updateLastName(Context context, String lastName, String email) {
+    public static void updateLastName(String lastName, String email) {
         MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
-        updateView(context);
     }
 
     /**
