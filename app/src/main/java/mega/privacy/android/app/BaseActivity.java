@@ -205,7 +205,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
         }
 
-
         // Add an invisible full screen Psa web browser fragment to the activity.
         // Then show or hide it for browsing the PSA.
         addPsaWebBrowser();
@@ -285,9 +284,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
-
-        // Execute after the web browser fragment has been added
-        uiHandler.post(PsaManager.INSTANCE::displayPendingPsa);
     }
 
     /**
