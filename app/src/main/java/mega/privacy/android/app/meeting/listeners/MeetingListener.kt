@@ -73,7 +73,7 @@ class MeetingListener : MegaChatCallListenerInterface {
     }
 
     override fun onChatSessionUpdate(
-        api: MegaChatApiJava?,
+        api: MegaChatApiJava,
         chatid: Long,
         callid: Long,
         session: MegaChatSession?
@@ -83,11 +83,9 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
-        api?.let { megachatapi ->
-            val call:MegaChatCall = megachatapi.getChatCallByCallId(callid)
-            call?.let {
-                sendCallEvent(EVENT_UPDATE_CALL, it)
-            }
+        val call = api.getChatCallByCallId(callid)
+        call?.let {
+            sendCallEvent(EVENT_UPDATE_CALL, it)
         }
 
         // Session status has changed

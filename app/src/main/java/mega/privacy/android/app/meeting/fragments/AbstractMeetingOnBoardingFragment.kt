@@ -8,9 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.android.synthetic.main.activity_meeting.*
@@ -23,7 +21,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
-import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -55,8 +52,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     // Views
     lateinit var toolbar: MaterialToolbar
-    private var toolbarTitle: EmojiTextView? = null
-    private var toolbarSubtitle: TextView? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -303,14 +298,16 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         when (bOn) {
             true -> {
                 // Always try to start the video using the front camera
-                sharedModel.setChatVideoInDevice(null)
                 mask.visibility = View.VISIBLE
+
+                sharedModel.setChatVideoInDevice(null)
                 // Hide avatar when camera open
                 meeting_thumbnail.visibility = View.GONE
                 activateVideo()
             }
             false -> {
                 mask.visibility = View.GONE
+
                 // Show avatar when camera close
                 meeting_thumbnail.visibility = View.VISIBLE
                 deactivateVideo()
