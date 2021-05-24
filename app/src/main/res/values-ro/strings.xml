@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -&gt; Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -&gt; Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -&gt; Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -&gt; MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA, serviciul de stocare în cloud cu confidențialitate puternică mereu activă.</string>
     <!-- PRO Lite account -->
@@ -1225,8 +1225,8 @@
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
         <item quantity="one">1 cerere</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d cereri</item>
+        <item quantity="few">%1$d cereri</item>
+        <item quantity="other">%1$d de cereri</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1259,8 +1259,8 @@
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 element</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d elemente</item>
+        <item quantity="few">%1$d elemente</item>
+        <item quantity="other">%1$d de elemente</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">Contul de utilizator asociat a fost desființat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului nostru.</string>
@@ -1496,8 +1496,8 @@
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d contacte</item>
+        <item quantity="few">%1$d contacte</item>
+        <item quantity="other">%1$d de contacte</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
     <string name="error_sharing_folder">Eroare la partajarea folderului. Te rugăm să încerci din nou.</string>
@@ -1690,8 +1690,9 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 file already uploaded</item>
-        <item quantity="other">%1$d files already uploaded</item>
+        <item quantity="one">1 fișier deja încărcat</item>
+        <item quantity="few">%1$d fișiere deja încărcate</item>
+        <item quantity="other">%1$d de fișiere deja încărcate</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
@@ -1710,14 +1711,14 @@
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
         <item quantity="one">%1$d fișier copiat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere copiate</item>
+        <item quantity="few">%1$d fișiere copiate</item>
+        <item quantity="other">%1$d de fișiere copiate</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
         <item quantity="one">%1$d fișier descărcat anterior</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere descărcate anterior</item>
+        <item quantity="few">%1$d fișiere descărcate anterior</item>
+        <item quantity="other">%1$d de fișiere descărcate anterior</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
@@ -1804,7 +1805,7 @@
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
         <item quantity="other">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
@@ -2090,7 +2091,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Please name your file before proceeding</item>
@@ -2442,8 +2443,8 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s mesaj necitit</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$s mesaje necitite</item>
+        <item quantity="few">%1$s mesaje necitite</item>
+        <item quantity="other">%1$s de mesaje necitite</item>
     </plurals>
     <!-- Notification title to show the number of unread chats, unread messages -->
     <plurals name="plural_number_messages_chat_notification">
@@ -2556,7 +2557,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când te autentifici în contul ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Ia în considerare exportarea <b>cheii de recuperare</b> în cazul în care pierzi accesul la aplicație sau vrei ca în viitor să dezactivezi autentificarea cu doi factori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3042,14 +3043,14 @@
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d fișiere</item>
+        <item quantity="few">%d fișiere</item>
+        <item quantity="other">%d de fișiere</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d folder</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d foldere</item>
+        <item quantity="few">%d foldere</item>
+        <item quantity="other">%d de foldere</item>
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
@@ -3439,8 +3440,8 @@
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="one">%d fișier în așteptare.</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d fișiere în așteptare.</item>
+        <item quantity="few">%d fișiere în așteptare.</item>
+        <item quantity="other">%d de fișiere în așteptare.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Autentifică-te pe MEGA</string>
@@ -3657,8 +3658,8 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="one">1 zi</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d zile</item>
+        <item quantity="few">%d zile</item>
+        <item quantity="other">%d de zile</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_hours">%dh</string>
@@ -3814,13 +3815,15 @@
     <string name="retention_time_picker_year">an</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 hour</item>
-        <item quantity="other">%1$d hours</item>
+        <item quantity="one">1 oră</item>
+        <item quantity="few">%1$d ore</item>
+        <item quantity="other">%1$d de ore</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 week</item>
-        <item quantity="other">%1$d weeks</item>
+        <item quantity="one">1 săptămână</item>
+        <item quantity="few">%1$d săptămâni</item>
+        <item quantity="other">%1$d de săptămâni</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
