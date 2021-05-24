@@ -35,11 +35,11 @@
   <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
   <string name="api_esid">Slechte sessie ID</string>
   <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">Niet toegangelijk door ToS/AUP schending</string>
+  <string name="api_eblocked_ec_import_ec_download">Niet toegangelijk door Algemene Voorwaarden schending</string>
   <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
   <string name="api_eblocked">Geblokkeerd</string>
   <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">Tegoed over</string>
+  <string name="api_eoverquota">Over tegoed</string>
   <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
   <string name="api_etempunavail">Tijdelijk niet beschikbaar</string>
   <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->

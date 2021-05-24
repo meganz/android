@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -&gt; Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -&gt; Neem een foto en upload je foto’s naar MEGA \nREAD_CONTACTS -&gt; Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -&gt; MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA is een Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
     <!-- PRO Lite account -->
@@ -420,7 +420,7 @@
     <string name="context_remove_link_warning_text">Deze koppeling is niet meer publiekelijk beschikbaar.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Deze koppeling is niet meer publiekelijk beschikbaar.</item>
+        <item quantity="one">Deze link is niet meer publiekelijk beschikbaar.</item>
         <item quantity="other">Deze links zijn niet meer openbaar beschikbaar.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1476,9 +1476,9 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Gekopieerd naar het klembord</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chat Fout!</string>
+    <string name="chat_error_open_title">Gespreksfout!</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">De chat kon niet correct geopend worden</string>
+    <string name="chat_error_open_message">Het gesprek kon niet correct geopend worden</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_choose_contact">Kies contact</string>
     <!-- Title of the contact list -->
@@ -1599,7 +1599,7 @@
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
         <item quantity="one">%1$d of %2$d bestand</item>
-        <item quantity="other">%1$d of %2$d bestanden</item>
+        <item quantity="other">%1$d van %2$d bestanden</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
     <string name="label_process_finishing">Het proces is afgelopen &#8230;</string>
@@ -1643,8 +1643,8 @@
     <string name="completed_transfers_empty">Geen voltooide overdrachten</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
-        <item quantity="one">Uploaden van %1$d of %2$d bestand</item>
-        <item quantity="other">Uploaden van %1$d of %2$d bestanden</item>
+        <item quantity="one">Uploaden %1$d van %2$d bestand</item>
+        <item quantity="other">Uploaden %1$d van %2$d bestanden</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
@@ -1654,7 +1654,7 @@
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
         <item quantity="one">%1$d Uploaden van %2$d map</item>
-        <item quantity="other">%1$d Uploaden van %2$d mappen</item>
+        <item quantity="other">Uploaden %1$d van %2$d mappen</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
@@ -1663,8 +1663,8 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
-        <item quantity="one">Bestand %1$d geupload</item>
-        <item quantity="other">Bestanden %1$d geupload</item>
+        <item quantity="one">%1$d bestand geüpload</item>
+        <item quantity="other">%1$d bestanden geüpload</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
@@ -1681,7 +1681,7 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="one">Bestand %1$d niet geupload</item>
-        <item quantity="other">Bestanden %1$d niet geupload</item>
+        <item quantity="other">%1$d  bestanden niet geüpload</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
@@ -1695,8 +1695,8 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
-        <item quantity="one">Bestand %1$d gedownload</item>
-        <item quantity="other">Bestanden %1$d gedownload</item>
+        <item quantity="one">%1$d bestand gedownload</item>
+        <item quantity="other">%1$d bestanden gedownload</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
@@ -1705,13 +1705,13 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
-        <item quantity="one">Bestand %1$d niet gedownload</item>
-        <item quantity="other">Bestanden %1$d niet gedownload</item>
+        <item quantity="one">%1$d bestand niet gedownload</item>
+        <item quantity="other">%1$d bestanden niet gedownload</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
         <item quantity="one">Downloaden van %1$d of %2$d bestand</item>
-        <item quantity="other">Downloaden van %1$d of %2$d bestanden</item>
+        <item quantity="other">Downloaden %1$d van %2$d bestanden</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
@@ -2277,7 +2277,7 @@
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="one">Vorige versie</item>
-        <item quantity="other">Vorige Versies</item>
+        <item quantity="other">Vorige versies</item>
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">Terugkeren</string>
@@ -2339,7 +2339,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Open Android apparaat [A]Instellingen[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Applicaties &amp; Notificaties[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Applicaties &amp; meldingen[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Selecteer [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2509,7 +2509,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Overweeg om uw <b>Herstelsleutel</b> te exporteren voor het geval u de toegang tot uw applicatie verliest of Twee-Factorenauthenticatie in de toekomst wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Ongeldige code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2523,7 +2523,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Verwijder account</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">Uitschakelen</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Bent u uw Authenticatie apparaat verloren?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2543,9 +2543,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Exporteer uw Herstelsleutel om te voltooien</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Twee-Factor Authenticatie Applicatie</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een Authenticatie Applicatie kunt installeren?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3171,11 +3171,11 @@
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
         <item quantity="one">%d contact is niet verzonden naar %d gesprekken</item>
-        <item quantity="other">%d contacten waren niet verzonen naar %d gesprekken</item>
+        <item quantity="other">%d contacten waren niet verstuurd naar %d gesprekken</item>
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
-        <item quantity="one">%bericht was niet verzonden naar %d gesprekken</item>
+        <item quantity="one">%d bericht was niet verzonden naar %d gesprekken</item>
         <item quantity="other">%d berichten waren niet verzonden naar %d gesprekken</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
@@ -3740,7 +3740,7 @@
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="one">1 uur</item>
-        <item quantity="other">%1$d uur</item>
+        <item quantity="other">%1$d uren</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
@@ -3915,11 +3915,11 @@
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Bestand opgeslagen in %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het opnieuw.</string>
+    <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het nogmaals.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Bestand bijgewerkt</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Bestandsupdate is mislukt. Probeer het opnieuw.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">Het bestand is te groot en kan niet geopend of weergegeven worden.</string>
 </resources>
