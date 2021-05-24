@@ -98,10 +98,10 @@
 
     </ScrollView>
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="103dp"
         android:layout_alignParentBottom="true"
         android:background="@color/grey_020_grey_800">
 
@@ -109,23 +109,21 @@
             android:id="@+id/no_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="14dp"
             android:text="@string/onboarding_no_mega_account"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant.18" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant" />
 
         <TextView
             android:id="@+id/join_meeting_as_guest"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/no_account"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal"
             android:paddingHorizontal="8dp"
-            android:paddingVertical="8dp"
+            android:paddingVertical="10dp"
+            android:layout_marginTop="52dp"
             android:text="@string/join_meeting_as_guest"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AccentColor" />
-    </RelativeLayout>
+    </FrameLayout>
 
 </RelativeLayout>

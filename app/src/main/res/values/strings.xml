@@ -3106,7 +3106,7 @@
     <string name="duration_meeting" context="Subtitle of the meeting screen ">Duration</string>
 
     <string name="onboarding_no_mega_account" context="The question in on-boarding screen asking if the user don't have a mega account">Don\'t have a MEGA account?</string>
-    <string name="join_meeting_as_guest" context="The question in on-boarding screen asking if the user is going to join meeting as guest">Join meeting as guest?</string>
+    <string name="join_meeting_as_guest" context="The question in on-boarding screen asking if the user is going to join meeting as guest">Join meeting as guest</string>
 
     <string name="paste_meeting_link_dialog_title">Please paste your meeting link to join </string>
     <string name="paste_meeting_link_guest_dialog_title" context="The title of the paste meeting link dialog for guest"> You are invited to a meeting</string>
