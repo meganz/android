@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.contacts.group.data.GroupItem
+import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.usecase.GetContactGroupsUseCase
 
 class ContactGroupsViewModel @ViewModelInject constructor(
@@ -20,7 +20,7 @@ class ContactGroupsViewModel @ViewModelInject constructor(
         private const val TAG = "ContactGroupsViewModel"
     }
 
-    private val groups: MutableLiveData<List<GroupItem>> = MutableLiveData()
+    private val groups: MutableLiveData<List<ContactGroupItem>> = MutableLiveData()
 
     init {
         getContactGroupsUseCase.get()
@@ -37,6 +37,6 @@ class ContactGroupsViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getGroups(): LiveData<List<GroupItem>> =
+    fun getGroups(): LiveData<List<ContactGroupItem>> =
         groups
 }

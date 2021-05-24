@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.NavigationUI
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -21,7 +21,8 @@ class ContactsActivity : PasscodeActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        binding.toolbar.setupWithNavController(
+        NavigationUI.setupActionBarWithNavController(
+            this,
             getNavController(),
             AppBarConfiguration(
                 topLevelDestinationIds = setOf(),

@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
-import mega.privacy.android.app.contacts.group.data.GroupItem
+import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
@@ -69,7 +69,7 @@ class ContactGroupsFragment : Fragment() {
         viewModel.getGroups().observe(viewLifecycleOwner, ::showGroups)
     }
 
-    private fun showGroups(items: List<GroupItem>) {
+    private fun showGroups(items: List<ContactGroupItem>) {
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
         groupsAdapter.submitList(items)
     }

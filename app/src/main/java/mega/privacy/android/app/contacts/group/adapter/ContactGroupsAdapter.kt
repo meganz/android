@@ -3,13 +3,13 @@ package mega.privacy.android.app.contacts.group.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.contacts.group.data.GroupItem
+import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.ItemGroupBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class ContactGroupsAdapter constructor(
     private val itemCallback: (Long) -> Unit
-) : ListAdapter<GroupItem, ContactGroupsViewHolder>(GroupItem.DiffCallback()) {
+) : ListAdapter<ContactGroupItem, ContactGroupsViewHolder>(ContactGroupItem.DiffCallback()) {
 
     init {
         setHasStableIds(true)

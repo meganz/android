@@ -511,7 +511,6 @@
 
         <activity
             android:name="mega.privacy.android.app.contacts.ContactsActivity"
-            android:label="@string/section_contacts"
             android:launchMode="singleTop" />
 
         <service

@@ -9,23 +9,27 @@
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail_last"
         android:layout_width="@dimen/image_group_size"
-        android:layout_height="26dp"
+        android:layout_height="@dimen/image_group_size"
         android:layout_marginStart="29dp"
         android:layout_marginTop="21dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail_first"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
+        android:layout_width="@dimen/image_group_size"
+        android:layout_height="@dimen/image_group_size"
         android:layout_marginStart="17dp"
         android:layout_marginTop="9dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -46,8 +50,8 @@
 
     <ImageView
         android:id="@+id/img_private"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_ekr"
         app:layout_constraintBottom_toBottomOf="parent"
