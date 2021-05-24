@@ -69,7 +69,6 @@ class CuViewModel extends BaseRxViewModel {
     private final MegaRequestListenerInterface mCreateThumbnailRequest;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
     private boolean mSelecting;
-    private long[] mSearchDate;
     private int mRealNodeCount;
     private boolean enableCUShown;
 
@@ -83,13 +82,12 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context, int type, long[] cuSearchDate) {
+                       MegaNodeRepo repo, Context context, int type) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mAppContext = context.getApplicationContext();
         mType = type;
-        mSearchDate = cuSearchDate;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
@@ -134,17 +132,12 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void setSearchDate(long[] searchDate, int orderBy) {
-        this.mSearchDate = searchDate;
         loadCuNodes(orderBy);
-    }
-
-    public boolean isSearchMode() {
-        return mSearchDate != null;
     }
 
     public long[] getSearchResultNodeHandles() {
         List<CuNode> nodes = mCuNodes.getValue();
-        if (!isSearchMode() || nodes == null || nodes.isEmpty()) {
+        if (nodes == null || nodes.isEmpty()) {
             return new long[0];
         }
 
@@ -361,11 +354,6 @@ class CuViewModel extends BaseRxViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(nodes -> {
                     mCuNodes.setValue(nodes);
-
-                    String actionBarTitleWhenSearch = getSearchDateTitle(mSearchDate);
-                    if (!TextUtils.isEmpty(actionBarTitleWhenSearch)) {
-                        mActionBarTitle.setValue(actionBarTitleWhenSearch);
-                    }
                 }, logErr("loadCuNodes")));
     }
 
@@ -374,7 +362,7 @@ class CuViewModel extends BaseRxViewModel {
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
         LocalDate lastModifyDate = null;
-        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(mType, orderBy, mSearchDate);
+        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(mType, orderBy, null);
         for (Pair<Integer, MegaNode> pair : realNodes) {
             MegaNode node = pair.second;
             File thumbnail =

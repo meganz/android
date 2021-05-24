@@ -100,7 +100,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private CuViewModel mViewModel;
 
     private static final String AD_SLOT = "and3";
-    private static long[] cuSearchDate = null;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -118,18 +117,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void setOrderBy(int orderBy) {
         reloadNodes(orderBy);
-    }
-
-    /**
-     * Search the media of camera
-     * @param searchDate the date or date range for searching
-     * @param orderBy The order of sort
-     */
-    public void setSearchDate(long[] searchDate, int orderBy) {
-        cuSearchDate = searchDate;
-        if (mViewModel != null) {
-            mViewModel.setSearchDate(searchDate, orderBy);
-        }
     }
 
     public void reloadNodes(int orderBy) {
@@ -157,11 +144,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return 1;
         } else {
             reloadNodes(sortOrderManagement.getOrderCamera());
-
-            // When press back, reload all files.
-            setSearchDate(null, sortOrderManagement.getOrderCamera());
             mManagerActivity.invalidateOptionsMenu();
-            mManagerActivity.setIsSearchEnabled(false);
             mManagerActivity.setToolbarTitle();
             return 1;
         }
@@ -234,7 +217,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera, cuSearchDate);
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         initAdsLoader(AD_SLOT, true);
@@ -389,13 +372,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             mBinding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             mBinding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             if (nodes.isEmpty()) {
-                if (mViewModel.isSearchMode()) {
-                    mBinding.emptyHintText.setText(R.string.no_results_found);
-                } else {
-                    String textToShow = StringResourcesUtils.getString(R.string.photos_empty);
-                    mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
-                            formatEmptyScreenText(context, textToShow), HtmlCompat.FROM_HTML_MODE_LEGACY));
-                }
+                String textToShow = StringResourcesUtils.getString(R.string.photos_empty);
+                mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
+                        formatEmptyScreenText(context, textToShow), HtmlCompat.FROM_HTML_MODE_LEGACY));
             }
         });
 
@@ -413,7 +392,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mViewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
             ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
-            if (actionBar != null && mViewModel.isSearchMode()) {
+            if (actionBar != null) {
                 actionBar.setTitle(title);
             }
         });
@@ -521,25 +500,16 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void putExtras(Intent intent, int indexForViewer, int position, MegaNode node) {
-        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera());
-
-        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-
         MegaNode parentNode = megaApi.getParentNode(node);
-        if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
-            intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE);
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNode.getHandle());
-        }
 
-        if (mViewModel.isSearchMode()) {
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER);
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                    mViewModel.getSearchResultNodeHandles());
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
-        }
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer)
+                .putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera())
+                .putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle())
+                .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                        parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT
+                                ? INVALID_HANDLE
+                                : parentNode.getHandle())
+                .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
 
         putThumbnailLocation(intent, mBinding.cuList, position, VIEWER_FROM_CUMU, mAdapter);
     }

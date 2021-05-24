@@ -38,7 +38,6 @@ public class Constants {
     public static final int REQUEST_SEND_CONTACTS = 1021;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
-    public static final int ACTION_SEARCH_BY_DATE = 1024;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;

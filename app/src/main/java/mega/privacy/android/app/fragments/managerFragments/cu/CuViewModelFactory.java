@@ -14,22 +14,20 @@ class CuViewModelFactory implements ViewModelProvider.Factory {
     private final MegaNodeRepo mRepo;
     private final Context mContext;
     private final int mType;
-    private final long[] mCuSearchDate;
 
     CuViewModelFactory(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-            Context context, int type, long[] cuSearchDate ) {
+            Context context, int type ) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mContext = context;
         mType = type;
-        mCuSearchDate = cuSearchDate;
     }
 
     @SuppressWarnings("unchecked")
     @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(CuViewModel.class)) {
-            return (T) new CuViewModel(mMegaApi, mDbHandler, mRepo, mContext, mType, mCuSearchDate);
+            return (T) new CuViewModel(mMegaApi, mDbHandler, mRepo, mContext, mType);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

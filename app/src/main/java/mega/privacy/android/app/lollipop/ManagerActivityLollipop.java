@@ -401,8 +401,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
 			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
-	long[] searchDate = null;
-
 	private AndroidCompletedTransfer selectedTransfer;
 	MegaNode selectedNode;
 	MegaOffline selectedOfflineNode;
@@ -622,7 +620,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private long parentHandleRubbish;
 	private long parentHandleIncoming;
 	private long parentHandleLinks;
-	private boolean isSearchEnabled;
 	private long parentHandleOutgoing;
 	private long parentHandleSearch;
 	private long parentHandleInbox;
@@ -1503,9 +1500,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
-
-		outState.putBoolean("isSearchEnabled", isSearchEnabled);
-		outState.putLongArray("searchDate",searchDate);
 		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
@@ -1644,10 +1638,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
-			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
-			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
@@ -1709,7 +1701,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			parentHandleIncoming = -1;
 			parentHandleOutgoing = -1;
 			parentHandleLinks = INVALID_HANDLE;
-			isSearchEnabled= false;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
 			indexContacts = -1;
@@ -4576,9 +4567,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case CAMERA_UPLOADS:{
 				aB.setSubtitle(null);
-				if(isSearchEnabled){
-					setFirstNavigationLevel(false);
-				} else if (getCameraUploadFragment() != null && cuFragment.isEnableCUFragmentShown()) {
+				if (getCameraUploadFragment() != null && cuFragment.isEnableCUFragmentShown()) {
 					setFirstNavigationLevel(false);
 					aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
 				} else {
@@ -4589,12 +4578,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case MEDIA_UPLOADS:{
 				aB.setSubtitle(null);
-				if(isSearchEnabled){
-					setFirstNavigationLevel(false);
-				}
-				else{
-					setFirstNavigationLevel(true);
-				}
+				setFirstNavigationLevel(true);
 				aB.setTitle(getString(R.string.section_secondary_media_uploads).toUpperCase());
 				break;
 			}
@@ -5561,14 +5545,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
-				if (isSearchEnabled && searchDate != null) {
-					cuFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
-					invalidateOptionsMenu();
-					setToolbarTitle();
-				} else {
-					setToolbarTitle();
-					supportInvalidateOptionsMenu();
-				}
+				setToolbarTitle();
+				supportInvalidateOptionsMenu();
 				showFabButton();
 				showHideBottomNavigationView(false);
 				if (!comesFromNotifications) {
@@ -6711,18 +6689,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								return true;
 							}
 
-							cuFragment.setSearchDate(null, sortOrderManagement.getOrderCamera());
-							isSearchEnabled = false;
 							setToolbarTitle();
 							invalidateOptionsMenu();
 							return true;
 						}
 					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-						muFragment = (CameraUploadsFragment) getSupportFragmentManager()
-								.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-						if (muFragment != null) {
-							muFragment.setSearchDate(null, sortOrderManagement.getOrderCamera());
-							isSearchEnabled = false;
+						if (getMediaUploadFragment() != null) {
 							setToolbarTitle();
 							invalidateOptionsMenu();
 							return true;
@@ -9918,29 +9890,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			nodeAttacher.handleSelectFileResult(intent, this);
 		}
-		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK) {
-			if (intent == null) {
-				logWarning("Intent NULL");
-				return;
-			}
-			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
-
-			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
-					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-			if (cuFragment != null && searchDate != null) {
-				cuFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
-				isSearchEnabled = true;
-				setToolbarTitle();
-			}
-
-			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
-					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			if (muFragment != null && searchDate != null) {
-				muFragment.setSearchDate(searchDate, sortOrderManagement.getOrderCamera());
-				isSearchEnabled = true;
-				setToolbarTitle();
-			}
-		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_FOLDER");
 
@@ -12479,17 +12428,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if(maFLol!=null){
 			maFLol.updateMailView(email);
 		}
-	}
-
-	public long[] getTypeOfSearch(){
-		return  searchDate;
-	}
-
-	public boolean getIsSearchEnabled(){
-		return  isSearchEnabled;
-	}
-	public void setIsSearchEnabled(boolean isSearchEnabled){
-		this.isSearchEnabled = isSearchEnabled;
 	}
 
 	public void onNodesCloudDriveUpdate() {
