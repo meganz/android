@@ -178,7 +178,7 @@ function createMEGABindings
 {
     echo "* Creating MEGA Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk -o bindings/megasdk.cpp -DHAVE_LIBUV -DENABLE_CHAT -DMEGA_USE_C_ARES mega/sdk/bindings/megaapi.i &>> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk -o bindings/megasdk.cpp -DHAVE_LIBUV -DENABLE_CHAT mega/sdk/bindings/megaapi.i &>> ${LOG_FILE}
 }
 
 function createMEGAchatBindings
