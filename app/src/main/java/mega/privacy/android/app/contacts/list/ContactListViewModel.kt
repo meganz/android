@@ -15,7 +15,7 @@ import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactListViewModel @ViewModelInject constructor(
-    getContactsUseCase: GetContactsUseCase
+    private val getContactsUseCase: GetContactsUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -26,6 +26,11 @@ class ContactListViewModel @ViewModelInject constructor(
     private var queryString: String? = null
 
     init {
+        updateContacts()
+    }
+
+    fun updateContacts() {
+        composite.clear()
         getContactsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

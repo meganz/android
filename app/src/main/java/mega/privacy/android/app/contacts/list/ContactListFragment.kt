@@ -1,6 +1,9 @@
 package mega.privacy.android.app.contacts.list
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -11,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
@@ -26,6 +30,13 @@ class ContactListFragment : Fragment() {
     private lateinit var binding: FragmentContactListBinding
 
     private val viewModel by viewModels<ContactListViewModel>()
+    private val receiver: BroadcastReceiver by lazy {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                viewModel.updateContacts()
+            }
+        }
+    }
 
     private val recentlyAddedAdapter by lazy {
         ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
@@ -47,6 +58,12 @@ class ContactListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+        setupReceivers()
+    }
+
+    override fun onDestroyView() {
+        activity?.unregisterReceiver(receiver)
+        super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -112,6 +129,16 @@ class ContactListFragment : Fragment() {
                 binding.viewEmpty.isVisible = items.isNullOrEmpty()
                 contactsAdapter.submitList(items)
             }
+    }
+
+    private fun setupReceivers() {
+        val intentFilter = IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE).apply {
+            addAction(ACTION_UPDATE_NICKNAME)
+            addAction(ACTION_UPDATE_FIRST_NAME)
+            addAction(ACTION_UPDATE_LAST_NAME)
+            addAction(ACTION_UPDATE_CREDENTIALS)
+        }
+        activity?.registerReceiver(receiver, intentFilter)
     }
 
     private fun onContactClick(userEmail: String) {
