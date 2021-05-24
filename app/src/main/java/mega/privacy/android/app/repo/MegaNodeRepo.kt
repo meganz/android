@@ -1,13 +1,11 @@
 package mega.privacy.android.app.repo
 
 import android.content.Context
-import android.text.TextUtils
 import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
@@ -18,11 +16,13 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import java.io.File
 import java.time.YearMonth
 import java.util.*
 import java.util.function.Function
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class MegaNodeRepo @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -33,7 +33,6 @@ class MegaNodeRepo @Inject constructor(
     /**
      * Get children of CU/MU, with the given order, and filter nodes by date (optional).
      *
-     * @param type CU_TYPE_CAMERA or CU_TYPE_MEDIA
      * @param orderBy order
      * @param filter search filter
      * filter[0] is the search type:
@@ -45,58 +44,47 @@ class MegaNodeRepo @Inject constructor(
      * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
      */
     fun getCuChildren(
-        type: Int,
         orderBy: Int,
         filter: LongArray?
     ): List<Pair<Int, MegaNode>> {
-        var cuHandle: Long = INVALID_HANDLE
+        var cuNode: MegaNode? = null
+        var muNode: MegaNode? = null
         val pref = dbHandler.preferences
 
-        if (type == CU_TYPE_CAMERA) {
-            if (pref != null && pref.camSyncHandle != null) {
-                try {
-                    cuHandle = pref.camSyncHandle.toLong()
-                } catch (e: NumberFormatException) {
-                    logError("parse getCamSyncHandle error $e")
-                }
-
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = INVALID_HANDLE
-                }
-            }
-            if (cuHandle == INVALID_HANDLE) {
-                for (node in megaApi.getChildren(megaApi.rootNode)) {
-                    if (node.isFolder && TextUtils.equals(
-                            context.getString(R.string.section_photo_sync),
-                            node.name
-                        )
-                    ) {
-                        cuHandle = node.handle
-                        dbHandler.setCamSyncHandle(cuHandle)
-                        break
-                    }
-                }
-            }
-        } else {
-            if (pref != null && pref.megaHandleSecondaryFolder != null) {
-                try {
-                    cuHandle = pref.megaHandleSecondaryFolder.toLong()
-                } catch (e: NumberFormatException) {
-                    logError("parse MegaHandleSecondaryFolder error $e")
-                }
-
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = INVALID_HANDLE
-                }
+        if (pref?.camSyncHandle != null) {
+            try {
+                val cuHandle = pref.camSyncHandle.toLong()
+                cuNode = megaApi.getNodeByHandle(cuHandle)
+            } catch (e: NumberFormatException) {
+                logError("parse getCamSyncHandle error $e")
             }
         }
 
-        if (cuHandle == INVALID_HANDLE) {
+        if (pref?.megaHandleSecondaryFolder != null) {
+            try {
+                val muHandle = pref.megaHandleSecondaryFolder.toLong()
+                muNode = megaApi.getNodeByHandle(muHandle)
+            } catch (e: NumberFormatException) {
+                logError("parse MegaHandleSecondaryFolder error $e")
+            }
+        }
+
+        if (cuNode == null && muNode == null) {
             return emptyList()
         }
 
-        val children: List<MegaNode> =
-            megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy)
+        val nodeList = MegaNodeList.createInstance()
+
+        if (cuNode != null) {
+            nodeList.addNode(cuNode)
+        }
+
+        if (muNode != null) {
+            nodeList.addNode(muNode)
+        }
+
+        val children: List<MegaNode> = megaApi.getChildren(nodeList, orderBy)
+
         val nodes = ArrayList<Pair<Int, MegaNode>>()
 
         for ((index, node) in children.withIndex()) {

@@ -55,7 +55,6 @@ class CuViewModel extends BaseRxViewModel {
     private final DatabaseHandler mDbHandler;
     private final MegaNodeRepo mRepo;
     private final Context mAppContext;
-    private final int mType;
 
     private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
@@ -82,12 +81,11 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context, int type) {
+                       MegaNodeRepo repo, Context context) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mAppContext = context.getApplicationContext();
-        mType = type;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
@@ -362,7 +360,7 @@ class CuViewModel extends BaseRxViewModel {
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
         LocalDate lastModifyDate = null;
-        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(mType, orderBy, null);
+        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(orderBy, null);
         for (Pair<Integer, MegaNode> pair : realNodes) {
             MegaNode node = pair.second;
             File thumbnail =

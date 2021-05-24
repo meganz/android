@@ -88,8 +88,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID = 5;
 
-    private int mCamera = TYPE_CAMERA;
-
     private ManagerActivityLollipop mManagerActivity;
 
     private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
@@ -100,16 +98,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private CuViewModel mViewModel;
 
     private static final String AD_SLOT = "and3";
-
-    public static CameraUploadsFragment newInstance(int type) {
-        CameraUploadsFragment fragment = new CameraUploadsFragment();
-
-        Bundle args = new Bundle();
-        args.putInt(ARG_TYPE, type);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
 
     public int getItemCount() {
         return mAdapter == null ? 0 : mAdapter.getItemCount();
@@ -208,16 +196,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            mCamera = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
-        }
-
         mManagerActivity = (ManagerActivityLollipop) context;
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
+                        new MegaNodeRepo(context, megaApi, dbH), context);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         initAdsLoader(AD_SLOT, true);
@@ -227,7 +210,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        if (mCamera == TYPE_CAMERA && (mManagerActivity.getFirstLogin() || mViewModel.isEnableCUShown())) {
+        if (mManagerActivity.getFirstLogin() || mViewModel.isEnableCUShown()) {
             mViewModel.setEnableCUShown(true);
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
@@ -326,16 +309,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void setupOtherViews() {
-        if (mCamera == TYPE_CAMERA) {
-            mBinding.turnOnCuButton.setText(
-                    getString(R.string.settings_camera_upload_turn_on).toUpperCase(
-                            Locale.getDefault()));
-        } else {
-            mBinding.turnOnCuButton.setText(
-                    getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
-                            Locale.getDefault()));
-        }
-
         mBinding.turnOnCuButton.setOnClickListener(v -> enableCUClick());
         mBinding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
     }
@@ -344,15 +317,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
         String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
 
-        if (mCamera == TYPE_CAMERA) {
-            if (hasPermissions(context, permissions)) {
-                mViewModel.setEnableCUShown(true);
-                mManagerActivity.refreshCameraUpload();
-            } else {
-                requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
-            }
+        if (hasPermissions(context, permissions)) {
+            mViewModel.setEnableCUShown(true);
+            mManagerActivity.refreshCameraUpload();
         } else {
-            mManagerActivity.moveToSettingsSection();
+            requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
         }
     }
 

@@ -5520,8 +5520,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				abL.setVisibility(View.VISIBLE);
 
 				if (getCameraUploadFragment() == null) {
-					cuFragment = CameraUploadsFragment.newInstance(
-							CameraUploadsFragment.TYPE_CAMERA);
+					cuFragment = new CameraUploadsFragment();
 				} else {
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
