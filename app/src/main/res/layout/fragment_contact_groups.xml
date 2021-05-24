@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_group" />
+        tools:listitem="@layout/item_contact_group" />
 
     <TextView
         android:id="@+id/view_empty"

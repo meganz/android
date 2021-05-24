@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
-import mega.privacy.android.app.databinding.ItemGroupBinding
+import mega.privacy.android.app.databinding.ItemContactGroupBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class ContactGroupsAdapter constructor(
@@ -17,7 +17,7 @@ class ContactGroupsAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactGroupsViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemGroupBinding.inflate(layoutInflater, parent, false)
+        val binding = ItemContactGroupBinding.inflate(layoutInflater, parent, false)
         return ContactGroupsViewHolder(binding).apply {
             binding.root.setOnClickListener {
                 if (isValidPosition(bindingAdapterPosition)) {

@@ -28,9 +28,8 @@ sealed class ContactItem(val id: Long) {
         fun getFirstCharacter(): String =
             getTitle().first().toString().toUpperCase(Locale.getDefault())
 
-        fun matches(queryString: String?): Boolean =
-            queryString.isNullOrBlank() ||
-                    firstName?.contains(queryString, true) == true ||
+        fun matches(queryString: String): Boolean =
+            firstName?.contains(queryString, true) == true ||
                     lastName?.contains(queryString, true) == true ||
                     alias?.contains(queryString, true) == true ||
                     email.contains(queryString, true)

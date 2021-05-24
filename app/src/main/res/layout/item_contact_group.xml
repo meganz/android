@@ -38,14 +38,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body1"
         app:emojiSize="14sp"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/img_private"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail_last"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="16dp"
         tools:text="@tools:sample/full_names" />
 
     <ImageView

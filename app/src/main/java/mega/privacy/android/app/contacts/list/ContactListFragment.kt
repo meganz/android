@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
-import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop
@@ -67,8 +66,7 @@ class ContactListFragment : Fragment() {
                     viewModel.setQuery(null)
                     false
                 }
-                setOnQueryTextListener(object :
-                    SearchView.OnQueryTextListener {
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextChange(newText: String?): Boolean {
                         viewModel.setQuery(newText)
                         return true
@@ -104,23 +102,16 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.getRecentlyAddedContacts().observe(viewLifecycleOwner, ::showRecentlyAddedContacts)
-        viewModel.getContacts().observe(viewLifecycleOwner, ::showContacts)
-    }
+        viewModel.getRecentlyAddedContacts(getString(R.string.section_recently_added))
+            .observe(viewLifecycleOwner) { items ->
+                recentlyAddedAdapter.submitList(items)
+            }
 
-    private fun showRecentlyAddedContacts(items: List<ContactItem>) {
-        val headerTitle = getString(R.string.section_recently_added)
-        recentlyAddedAdapter.submitList(items, headerTitle,)
-    }
-
-    private fun showContacts(items: List<ContactItem>) {
-        binding.viewEmpty.isVisible = items.isNullOrEmpty()
-
-        if (viewModel.getRecentlyAddedContacts().value?.isNullOrEmpty() != true) {
-            contactsAdapter.submitList(items, getString(R.string.section_contacts))
-        } else {
-            contactsAdapter.submitList(items)
-        }
+        viewModel.getContacts(getString(R.string.section_contacts))
+            .observe(viewLifecycleOwner) { items ->
+                binding.viewEmpty.isVisible = items.isNullOrEmpty()
+                contactsAdapter.submitList(items)
+            }
     }
 
     private fun onContactClick(userEmail: String) {
@@ -130,8 +121,7 @@ class ContactListFragment : Fragment() {
     }
 
     private fun onContactMoreInfoClick(userEmail: String) {
-        ContactsBottomSheetDialogFragment
-            .newInstance(userEmail)
+        ContactsBottomSheetDialogFragment.newInstance(userEmail)
             .show(childFragmentManager, userEmail)
     }
 }

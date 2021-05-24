@@ -67,19 +67,4 @@ class ContactListAdapter(
             is ContactItem.Header -> VIEW_TYPE_HEADER
             is ContactItem.Data -> VIEW_TYPE_DATA
         }
-
-    fun submitList(
-        items: List<ContactItem>?,
-        mainHeaderTitle: String,
-        commitCallback: Runnable? = null
-    ) {
-        val itemsWithHeader = mutableListOf<ContactItem>()
-
-        if (!items.isNullOrEmpty()) {
-            itemsWithHeader.add(ContactItem.Header(mainHeaderTitle))
-            itemsWithHeader.addAll(items)
-        }
-
-        submitList(itemsWithHeader, commitCallback)
-    }
 }

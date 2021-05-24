@@ -40,27 +40,37 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getContacts(): LiveData<List<ContactItem>> =
+    fun getContacts(headerTitle: String): LiveData<List<ContactItem>> =
         contacts.map { items ->
             val itemsWithHeaders = mutableListOf<ContactItem>()
             items?.forEachIndexed { index, item ->
-                if (item.matches(queryString)) {
+                if (queryString.isNullOrBlank()) {
                     when {
-                        index == 0 ->
+                        index == 0 -> {
+                            if (items.firstOrNull { it.isNew } != null) {
+                                itemsWithHeaders.add(ContactItem.Header(headerTitle))
+                            }
                             itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
-                        items[index - 1].getFirstCharacter() != items[index].getFirstCharacter() ->
+                        }
+                        items[index - 1].getFirstCharacter() != items[index].getFirstCharacter() -> {
                             itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
+                        }
                     }
+                    itemsWithHeaders.add(item)
+                } else if (item.matches(queryString!!)) {
                     itemsWithHeaders.add(item)
                 }
             }
             itemsWithHeaders
         }
 
-    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
+    fun getRecentlyAddedContacts(headerTitle: String): LiveData<List<ContactItem>> =
         contacts.map { items ->
-            if (queryString.isNullOrBlank()) {
-                items.filter { it.isNew }
+            if (queryString.isNullOrBlank() && items.firstOrNull { it.isNew } != null) {
+                val itemsWithHeaders = mutableListOf<ContactItem>()
+                itemsWithHeaders.add(ContactItem.Header(headerTitle))
+                itemsWithHeaders.addAll(items.filter { it.isNew })
+                itemsWithHeaders
             } else {
                 emptyList()
             }

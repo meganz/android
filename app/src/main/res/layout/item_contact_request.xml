@@ -5,15 +5,12 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:minHeight="72dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="16dp">
+    android:padding="16dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,10 +22,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body1"
         app:emojiSize="14sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/img_thumbnail"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
@@ -39,6 +39,8 @@
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/txt_title"
         app:layout_constraintTop_toBottomOf="@id/txt_title"
         tools:text="Last seen Yesterday at 11:45" />

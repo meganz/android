@@ -4,10 +4,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
-import mega.privacy.android.app.databinding.ItemGroupBinding
+import mega.privacy.android.app.databinding.ItemContactGroupBinding
 
 class ContactGroupsViewHolder(
-    private val binding: ItemGroupBinding
+    private val binding: ItemContactGroupBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactGroupItem) {
