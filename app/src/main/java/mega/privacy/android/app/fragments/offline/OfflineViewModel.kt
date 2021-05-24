@@ -18,8 +18,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
@@ -504,11 +503,7 @@ class OfflineViewModel @ViewModelInject constructor(
         return if (file.isDirectory) {
             getFileFolderInfo(file)
         } else {
-            String.format(
-                "%s . %s",
-                getSizeString(file.length()),
-                formatLongDateTime(file.lastModified() / 1000)
-            )
+            getFileInfo(file)
         }
     }
 

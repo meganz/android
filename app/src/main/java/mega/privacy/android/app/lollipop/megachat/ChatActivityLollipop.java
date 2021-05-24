@@ -1621,7 +1621,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void updateUserNameInChat() {
-        if (chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
@@ -5193,6 +5193,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                                             openWith(this, node);
                                         }
                                         overridePendingTransition(0,0);
+                                    } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                                        manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
                                     } else {
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
                                         openWith(this, node);
@@ -9330,19 +9332,21 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private void createSpeakerAudioManger(){
         rtcAudioManager = app.getAudioManager();
-        if(rtcAudioManager != null) {
+
+        if(rtcAudioManager == null){
+            speakerWasActivated = true;
+            rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
+        }else{
             activateSpeaker();
-            return;
         }
 
-        speakerWasActivated = true;
-        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_CALL_STATUS);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
                 if(!speakerWasActivated && !isNear){
                     adapter.pausePlaybackInProgress();
                 }else if(speakerWasActivated && isNear){
+                    adapter.refreshVoiceClipPlayback();
                     speakerWasActivated = false;
                 }
             }
@@ -9375,12 +9379,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void stopProximitySensor(){
-        if(rtcAudioManager == null) return;
+        if(rtcAudioManager == null || participatingInACall()) return;
 
-        if(!participatingInACall()){
-            activateSpeaker();
-        }
-
+        activateSpeaker();
         rtcAudioManager.unregisterProximitySensor();
         destroySpeakerAudioManger();
     }

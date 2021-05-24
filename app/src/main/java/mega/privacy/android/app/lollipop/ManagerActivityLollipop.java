@@ -25,7 +25,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
@@ -87,7 +86,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -97,7 +95,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -128,7 +125,6 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -154,8 +150,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
-import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
@@ -271,8 +265,12 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -687,6 +685,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
+	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -1620,6 +1619,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
 
+		checkNewTextFileDialogState(newTextFileDialog, outState);
+
 		nodeAttacher.saveState(outState);
 		nodeSaver.saveState(outState);
 	}
@@ -1832,15 +1833,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
-
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
 
 	    if (dbH.getEphemeral() != null){
             Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -2968,6 +2960,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
 
 		PsaManager.INSTANCE.startChecking();
+
+		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+			showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+		}
 
 		logDebug("END onCreate");
 	}
@@ -4236,6 +4232,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         if (confirmationTransfersDialog != null) {
             confirmationTransfersDialog.dismiss();
         }
+
+        if (newTextFileDialog != null) {
+        	newTextFileDialog.dismiss();
+		}
 
         if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.onDestroy();
@@ -9095,6 +9095,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
+	@Override
+	public void showNewTextFileDialog(String typedName) {
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
+				getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+				drawerItem == DrawerItem.HOMEPAGE);
+	}
+
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();
@@ -9491,7 +9498,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 							return;
 						}
-						nC.removeLink(finalNode, new ExportListener(managerActivity, ACTION_REMOVE_LINK, 1));
+						nC.removeLink(finalNode, new ExportListener(managerActivity, 1));
 					} else {
 						nC.removeLinks(nodes);
 					}
@@ -9723,8 +9730,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	/**
+	 * Shows the GENERAL_UPLOAD upload bottom sheet fragment.
+	 */
 	public void showUploadPanel() {
-		logDebug("showUploadPanel");
+		showUploadPanel(drawerItem == DrawerItem.HOMEPAGE ? HOMEPAGE_UPLOAD : GENERAL_UPLOAD);
+	}
+
+	/**
+	 * Shows the upload bottom sheet fragment taking into account the upload type received as param.
+	 *
+	 * @param uploadType Indicates the type of upload:
+	 *                   - GENERAL_UPLOAD if nothing special has to be taken into account.
+	 *                   - DOCUMENTS_UPLOAD if an upload from Documents section.
+	 */
+	public void showUploadPanel(int uploadType) {
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 			return;
@@ -9732,8 +9752,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-        bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(uploadType);
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void updateAccountDetailsVisibleInfo(){
@@ -10796,7 +10816,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
                 } else {
-                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_SAVE_TO_CLOUD);
                 }
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
@@ -13779,50 +13799,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
-		logDebug("openAdvancedDevices");
-//		handleToDownload = handle;
-		String externalPath = getExternalCardPath();
-
-		if(externalPath!=null){
-			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
-			if(node!=null){
-
-//				File newFile =  new File(externalPath+"/"+node.getName());
-				File newFile =  new File(node.getName());
-				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-
-				// Filter to only show results that can be "opened", such as
-				// a file (as opposed to a list of contacts or timezones).
-				intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-				// Create a file with the requested MIME type.
-				String mimeType = MimeTypeList.getMimeType(newFile);
-				logDebug("Mimetype: " + mimeType);
-				intent.setType(mimeType);
-				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
-				intent.putExtra("handleToDownload", handleToDownload);
-				intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
-
-				try{
-					startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);
-				}
-				catch(Exception e){
-					logError("Exception in External SDCARD", e);
-					Environment.getExternalStorageDirectory();
-					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-					toast.show();
-				}
-			}
-		}
-		else{
-			logWarning("No external SD card");
-			Environment.getExternalStorageDirectory();
-			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-			toast.show();
-		}
-	}
-
 	public AndroidCompletedTransfer getSelectedTransfer() {
 		return selectedTransfer;
 	}
@@ -14172,103 +14148,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		callBadge.setVisibility(View.VISIBLE);
-	}
-
-	public void showEvaluatedAppDialog(){
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
-
-		final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
-		rateAppCheck.setText(getString(R.string.rate_the_app_panel));
-		rateAppCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		rateAppCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
-		rateAppMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
-		sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
-		sendFeedbackCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		sendFeedbackCheck.setCompoundDrawablePadding(scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
-		sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setView(dialoglayout);
-
-		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
-		evaluateAppDialog = builder.create();
-
-		evaluateAppDialog.show();
-
-		rateAppCheck.setOnClickListener(v -> {
-			logDebug("Rate the app");
-			//Rate the app option:
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL) ) );
-
-			if (evaluateAppDialog!= null){
-				evaluateAppDialog.dismiss();
-			}
-		});
-
-		sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				logDebug("Send Feedback");
-
-				//Send feedback option:
-				StringBuilder body = new StringBuilder();
-				body.append(getString(R.string.setting_feedback_body));
-				body.append("\n\n\n\n\n\n\n\n\n\n\n");
-				body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
-				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
-				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
-						body.append(" ("+getString(R.string.my_account_free)+")");
-					}
-					else{
-						switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
-							case 0:{
-								body.append(" ("+getString(R.string.my_account_free)+")");
-								break;
-							}
-							case 1:{
-								body.append(" ("+getString(R.string.my_account_pro1)+")");
-								break;
-							}
-							case 2:{
-								body.append(" ("+getString(R.string.my_account_pro2)+")");
-								break;
-							}
-							case 3:{
-								body.append(" ("+getString(R.string.my_account_pro3)+")");
-								break;
-							}
-							case 4:{
-								body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
-								break;
-							}
-						}
-					}
-				}
-
-				String emailAndroid = MAIL_ANDROID;
-				String versionApp = (getString(R.string.app_version));
-				String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
-
-				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-				emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-				startActivity(Intent.createChooser(emailIntent, " "));
-
-				if (evaluateAppDialog != null){
-					evaluateAppDialog.dismiss();
-				}
-			}
-		});
-
 	}
 
 	public String getDeviceName() {

@@ -1,23 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">クロップ</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">スキャンを保存</string>
-    <string name="scan_action_add" context="button">追加</string>
-    <string name="scan_action_save" context="Action of a button to save something">保存</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">撮り直す</string>
-    <string name="scan_file_name" context="Document scanner file name">ファイル名</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">ファイルの種類</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">品質</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">保存先</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">高</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">中</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">低</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">スキャンを破棄しますか？</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">現在のスキャンは失われます</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">すべてのスキャンを破棄しますか？　</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">現在のドキュメントは失われます</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">破棄する</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">現在のスキャンを削除しますか？　</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">ドキュメントをスキャンするにはカメラの権限が必要です</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">入力が無効です</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">クロップ</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">スキャンを保存</string>
+  <!-- button -->
+  <string name="scan_action_add" context="button">追加</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save" context="Action of a button to save something">保存</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">撮り直す</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name" context="Document scanner file name">ファイル名</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">ファイルの種類</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">品質</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">保存先</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high" context="Document scanner high quality option">高</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium" context="Document scanner medium quality option">中</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low" context="Document scanner low quality option">低</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">スキャンを破棄しますか？</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">現在のスキャンは失われます</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">すべてのスキャンを破棄しますか？　</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">現在のドキュメントは失われます</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">破棄する</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">現在のスキャンを削除しますか？　</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">ドキュメントをスキャンするにはカメラの権限が必要です</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name" context="Error text for incorrect name">名前が間違っています</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters" context="Error text for invalid characters">無効な文字です</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">先に進む前にファイル名を修正してください</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress" context="Dialog message showing file progress">%1$sを準備しています。お待ちください&#x2026;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters" context="Error shown when the user writes a character not allowed">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
 </resources>

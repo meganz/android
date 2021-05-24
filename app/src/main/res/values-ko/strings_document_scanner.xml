@@ -1,23 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">자르기</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">스캔 저장</string>
-    <string name="scan_action_add" context="button">추가</string>
-    <string name="scan_action_save" context="Action of a button to save something">저장</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">다시 찍기</string>
-    <string name="scan_file_name" context="Document scanner file name">파일 이름</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">파일 유형</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">품질</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">대상</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">높음</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">중간</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">낮음</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">스캔을 취소할까요?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">현재 스캔을 잃게 됩니다</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">모든 스캔을 취소할까요?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">현재 문서를 잃게 됩니다</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">취소</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">현재 스캔을 삭제할까요?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">문서를 스캔하려면 카메라 권한이 필요합니다</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">잘못된 입력</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">자르기</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">스캔 저장</string>
+  <!-- button -->
+  <string name="scan_action_add" context="button">추가</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save" context="Action of a button to save something">저장</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">다시 찍기</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name" context="Document scanner file name">파일 이름</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">파일 유형</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">품질</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">대상</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high" context="Document scanner high quality option">높음</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium" context="Document scanner medium quality option">중간</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low" context="Document scanner low quality option">낮음</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">스캔을 취소할까요?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">현재 스캔을 잃게 됩니다</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">모든 스캔을 취소할까요?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">현재 문서를 잃게 됩니다</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">취소</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">현재 스캔을 삭제할까요?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">문서를 스캔하려면 카메라 권한이 필요합니다</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name" context="Error text for incorrect name">잘못된 이름</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters" context="Error text for invalid characters">잘못된 글자</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">진행하기 전 파일 이름을 수정하세요</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress" context="Dialog message showing file progress">%1$s 준비중. 잠시 기다리세요&#x2026;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters" context="Error shown when the user writes a character not allowed">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
 </resources>

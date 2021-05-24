@@ -65,7 +65,9 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.textFileEditor.TextFileEditorActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -1546,7 +1548,7 @@ public class ChatUtil {
             }
 
             logDebug("Node is not exported, so export Node");
-            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, ACTION_SHARE_MSG, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
+            MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
         }
     }
 
@@ -1584,7 +1586,7 @@ public class ChatUtil {
 
         ArrayList<MegaNode> arrayNodesNotExported = getNotExportedNodes(listNodes);
         if (!arrayNodesNotExported.isEmpty()) {
-            ExportListener exportListener = new ExportListener(context, ACTION_SHARE_MSG, arrayNodesNotExported.size(), links,
+            ExportListener exportListener = new ExportListener(context, arrayNodesNotExported.size(), links,
                     new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
 
             for (MegaNode nodeNotExported : arrayNodesNotExported) {
@@ -1645,6 +1647,31 @@ public class ChatUtil {
     }
 
     /**
+     * Authorizes the node if the chat is on preview mode.
+     *
+     * @param node        Node to authorize.
+     * @param megaChatApi MegaChatApiAndroid instance.
+     * @param megaApi     MegaApiAndroid instance.
+     * @param chatId      Chat identifier to check.
+     * @return The authorized node if preview, same node otherwise.
+     */
+    public static MegaNode authorizeNodeIfPreview(MegaNode node, MegaChatApiAndroid megaChatApi,
+                                                  MegaApiAndroid megaApi, long chatId) {
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+
+        if (chatRoom != null && chatRoom.isPreview()) {
+            MegaNode nodeAuthorized = megaApi.authorizeChatNode(node, chatRoom.getAuthorizationToken());
+
+            if (nodeAuthorized != null) {
+                logDebug("Authorized");
+                return nodeAuthorized;
+            }
+        }
+
+        return node;
+    }
+
+    /**
      * Remove an attachment message from chat.
      *
      * @param activity Android activity
@@ -1659,8 +1686,21 @@ public class ChatUtil {
                     new ChatController(activity).deleteMessage(message, chatId);
                     activity.finish();
                 })
-                .setNegativeButton(getString(R.string.general_cancel), null)
-                .show();
+                .setNegativeButton(getString(R.string.general_cancel), null);
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context Current context.
+     * @param msgId   Message identifier.
+     * @param chatId  Chat identifier.
+     */
+    public static void manageTextFileIntent(Context context, long msgId, long chatId) {
+        context.startActivity(new Intent(context, TextFileEditorActivity.class)
+                .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+                .putExtra(MESSAGE_ID, msgId)
+                .putExtra(CHAT_ID, chatId));
     }
 
     /**

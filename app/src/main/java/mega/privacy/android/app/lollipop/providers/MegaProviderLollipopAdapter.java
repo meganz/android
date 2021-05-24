@@ -38,6 +38,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -213,8 +214,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		} else {
 			holder.permissionsIcon.setVisibility(View.GONE);
 
-			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(getSizeString(nodeSize));
+			holder.textViewFileSize.setText(getFileInfo(node));
 
 			if (isMultipleSelect() && isItemChecked(position)) {
 				params.height = params.width = dp2px(ICON_SIZE_DP);

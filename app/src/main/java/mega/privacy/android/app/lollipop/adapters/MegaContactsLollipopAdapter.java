@@ -309,7 +309,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		if (multipleSelect && isItemChecked(position)) {
 				holder.itemLayout.setBackgroundResource(R.drawable.background_item_grid_selected);
-				holder.contactSelectedIcon.setImageResource(R.drawable.ic_select_folder);
+				holder.contactSelectedIcon.setImageResource(R.drawable.ic_chat_avatar_select);
 				holder.contactSelectedIcon.setVisibility(View.VISIBLE);
 		} else {
 			holder.itemLayout.setBackgroundResource(R.drawable.background_item_grid);
@@ -370,7 +370,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.textViewContactName.setText(contact.getFullName());
 
 		if (contact.isSelected()) {
-			holder.imageView.setImageResource(R.drawable.ic_select_folder);
+			holder.imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 		} else {
 
 			Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaUser().getHandle()), contact.getMegaUser().getEmail());
@@ -483,7 +483,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_folder);
+				holder.imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 			}
 			else{
 				createDefaultAvatar(holder, contact);

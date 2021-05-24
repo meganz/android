@@ -67,7 +67,7 @@ class MegaNodeSaving(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
-        snackbarShower: SnackbarShower,
+        snackbarShower: SnackbarShower?,
     ): AutoPlayInfo {
         val app = MegaApplication.getInstance()
         val api = if (isFolderLink) megaApiFolder else megaApi
@@ -186,7 +186,7 @@ class MegaNodeSaving(
             )
         }
 
-        snackbarShower.showSnackbar(message)
+        snackbarShower?.showSnackbar(message)
 
         if (nodes.size != 1 || nodes[0].isFolder || numberOfNodesAlreadyDownloaded != 1) {
             return AutoPlayInfo.NO_AUTO_PLAY

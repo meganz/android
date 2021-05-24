@@ -1,23 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Przytnij</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Zapisz skan</string>
-    <string name="scan_action_add" context="button">Dodaj</string>
-    <string name="scan_action_save" context="Action of a button to save something">Zapisz</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Ponów</string>
-    <string name="scan_file_name" context="Document scanner file name">Nazwa pliku</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Rodzaj pliku</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Jakość</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Miejsce docelowe</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">Wysoka</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">Średnia</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">Niska</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Anulować skan?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Bieżące skanowanie zostanie utracone.</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Odrzucić wszystkie skany?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Bieżący dokument zostanie utracony.</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Odrzuć</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Skasować bieżące skanowanie?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Do skanowania dokumentów potrzebne są uprawnienia kamery</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Nieprawidłowe dane wejściowe</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Przytnij</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Zapisz skan</string>
+  <!-- button -->
+  <string name="scan_action_add" context="button">Dodaj</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save" context="Action of a button to save something">Zapisz</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Ponów</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name" context="Document scanner file name">Nazwa pliku</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Rodzaj pliku</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Jakość</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Miejsce docelowe</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high" context="Document scanner high quality option">Wysoka</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium" context="Document scanner medium quality option">Średnia</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low" context="Document scanner low quality option">Niska</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Anulować skan?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Bieżące skanowanie zostanie utracone.</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Odrzucić wszystkie skany?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Bieżący dokument zostanie utracony.</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Odrzuć</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Skasować bieżące skanowanie?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Do skanowania dokumentów potrzebne są uprawnienia kamery</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name" context="Error text for incorrect name">Nieprawidłowa nazwa</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters" context="Error text for invalid characters">Nieprawidłowe znaki</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name" context="Snackbar text for incorrect name">Przed kontynuacją popraw nazwę pliku</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress" context="Dialog message showing file progress">Preparing %1$s. Please wait&#8230;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters" context="Error shown when the user writes a character not allowed">Następujące znaki są niedozwolone: ” * / : &lt; &gt; ? \ |</string>
 </resources>
