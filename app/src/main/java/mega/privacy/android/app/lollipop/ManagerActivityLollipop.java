@@ -702,7 +702,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem changePass;
 	private MenuItem exportMK;
 	private MenuItem takePicture;
-	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
 	private MenuItem killAllSessions;
 	private MenuItem cancelAllTransfersMenuItem;
@@ -6292,7 +6291,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
-		searchByDate = menu.findItem(R.id.action_search_by_date);
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
@@ -6617,10 +6615,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				&& getMediaUploadFragment() != null
 				&& muFragment.getItemCount() > 0)) {
 			sortByMenuItem.setVisible(true);
-
-			if (firstNavigationLevel) {
-				searchByDate.setVisible(true);
-			}
 
 			setCuThumbnailTypeIcon();
 			gridSmallLargeMenuItem.setVisible(true);
@@ -7114,11 +7108,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showNewSortByPanel(orderType);
 	        	return true;
 	        }
-			case R.id.action_search_by_date:{
-				Intent intent = new Intent(this, SearchByDateActivityLollipop.class);
-				startActivityForResult(intent, ACTION_SEARCH_BY_DATE);
-				return  true;
-			}
 	        case R.id.action_menu_help:{
 	        	Intent intent = new Intent();
 	            intent.setAction(Intent.ACTION_VIEW);
@@ -7623,14 +7612,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 			if (cuFragment == null || cuFragment.onBackPressed() == 0){
-				visibilitySearch(false);
 				backToDrawerItem(-1);
 			}
     	} else if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 			if (muFragment == null || muFragment.onBackPressed() == 0){
-				visibilitySearch(false);
 				backToDrawerItem(CLOUD_DRIVE_BNV);
     		}
     	} else if (drawerItem == DrawerItem.SEARCH) {
@@ -13234,10 +13221,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public MegaOffline getSelectedOfflineNode() {
 		return selectedOfflineNode;
-	}
-
-	public void visibilitySearch(boolean visibility){
-		searchByDate.setVisible(visibility);
 	}
 
 	public void setSelectedAccountType(int selectedAccountType) {
