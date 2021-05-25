@@ -5,12 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.ItemAssignModeratorBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.CallUtil
 
 class AssignParticipantsAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -48,7 +46,7 @@ class AssignParticipantsAdapter(
             binding.name.text = participant.name
 
             if (participant.isChosenForAssign) {
-                binding.avatar.setActualImageResource(R.drawable.ic_select_folder)
+                binding.avatar.setImageResource(R.drawable.ic_select_folder)
             } else {
                 // Set actual avatar
                 initAvatar(participant, binding.avatar)
@@ -60,18 +58,8 @@ class AssignParticipantsAdapter(
         }
     }
 
-    private fun initAvatar(participant: Participant, avatarView: SimpleDraweeView) {
-        inMeetingViewModel.getChat().let {
-            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
-            if (avatar == null) {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    participant.peerId
-                )
-            }
-
-            avatarView.setImageBitmap(avatar)
-        }
+    private fun initAvatar(participant: Participant, avatarView: RoundedImageView) {
+        avatarView.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 }
 

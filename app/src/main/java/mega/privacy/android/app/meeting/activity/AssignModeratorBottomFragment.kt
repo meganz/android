@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.activity
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -11,13 +10,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityAssignModeratorBinding
-import mega.privacy.android.app.meeting.TestTool
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-
 
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting

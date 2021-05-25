@@ -2,16 +2,11 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
+import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.ItemSelectedParticipantBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.CallUtil
 
 class SelectedParticipantsAdapter(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -48,17 +43,7 @@ class SelectedParticipantsAdapter(
         }
     }
 
-    private fun initAvatar(participant: Participant, avatarView: SimpleDraweeView) {
-        inMeetingViewModel.getChat().let {
-            var avatar = CallUtil.getImageAvatarCall(it, participant.peerId)
-            if (avatar == null) {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    participant.peerId
-                )
-            }
-
-            avatarView.setImageBitmap(avatar)
-        }
+    private fun initAvatar(participant: Participant, avatarView: RoundedImageView) {
+        avatarView.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 }

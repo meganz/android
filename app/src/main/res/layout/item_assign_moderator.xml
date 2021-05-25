@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="56dp">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"

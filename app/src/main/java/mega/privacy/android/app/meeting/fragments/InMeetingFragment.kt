@@ -771,6 +771,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        sharedModel.snackBarLiveData.observe(viewLifecycleOwner){
+            (requireActivity() as MeetingActivity).showSnackbar(it)
+        }
     }
 
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
@@ -829,6 +833,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     fun onPageClick() {
+        // If the tips is showing, can not hide the toolbar and panel
+        if (bottomFloatingPanelViewHolder.isPopWindowShowing()) return
+
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < TAP_THRESHOLD) return
 

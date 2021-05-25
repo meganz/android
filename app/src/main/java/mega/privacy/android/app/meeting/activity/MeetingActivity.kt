@@ -198,6 +198,10 @@ class MeetingActivity : PasscodeActivity() {
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
+    fun showSnackbar(content: String) {
+        showSnackbar(binding.navHostFragment, content)
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         finish()

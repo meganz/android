@@ -93,6 +93,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _meetingLinkLiveData: MutableLiveData<String> = MutableLiveData<String>()
     val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
 
+    // Show snack bar
+    private val _snackBarLiveData: MutableLiveData<String> = MutableLiveData<String>()
+    val snackBarLiveData: LiveData<String> = _snackBarLiveData
+
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
             if (_speakerLiveData.value != it) {
@@ -514,6 +518,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             if (contactsData != null) {
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
+                    _snackBarLiveData.value = context.getString(R.string.invitation_send)
                 }
             }
         } else {

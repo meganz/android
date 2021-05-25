@@ -5,9 +5,11 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +27,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
+
 
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
@@ -50,6 +53,8 @@ class BottomFloatingPanelViewHolder(
     private var expandedTop = 0
     private var collapsedTop = 0
 
+    private var popWindow: PopupWindow? = null
+
     /**
      * Save the Mic & Cam state, for revering state when hold state changed
      */
@@ -68,6 +73,63 @@ class BottomFloatingPanelViewHolder(
         updateShareAndInviteButton()
 
         updatePanel()
+
+        floatingPanelView.backgroundMask.post {
+            if (inMeetingViewModel.shouldShowTips()) {
+                initPopWindow(floatingPanelView.backgroundMask)
+            }
+        }
+    }
+
+
+    /**
+     * Determine if the tips is showing
+     */
+    fun isPopWindowShowing(): Boolean = popWindow != null && popWindow?.isShowing == true
+
+    /**
+     * Dismiss the tips window
+     */
+    fun dismissPopWindow(){
+        popWindow?.dismiss()
+        inMeetingViewModel.updateShowTips()
+    }
+
+    /**
+     * Init the tips window
+     *
+     * @param anchor the anchor view, the tips widow should show base on it's location
+     */
+    fun initPopWindow(anchor: View) {
+        val view: View = LayoutInflater.from(context)
+            .inflate(R.layout.view_tip_meeting_bottom_panel, null, false)
+        popWindow = PopupWindow(
+            view,
+            context.resources.getDimension(R.dimen.bottom_sheet_tip_width).toInt(),
+            context.resources.getDimension(R.dimen.bottom_sheet_tip_height).toInt(),
+            true
+        ).apply {
+            isFocusable = false
+            isOutsideTouchable = false
+            setBackgroundDrawable(null)
+        }
+
+        val confirm = view.findViewById<Button>(R.id.bt_ok)
+        confirm.setOnClickListener {
+            dismissPopWindow()
+        }
+
+        val location = intArrayOf(0, 0)
+        anchor.getLocationOnScreen(location)
+
+        popWindow?.let {
+            it.showAtLocation(
+                anchor,
+                Gravity.NO_GRAVITY,
+                (location[0] + anchor.width / 2) - it.width / 2,
+                location[1] - it.height
+            )
+        }
     }
 
     /**
@@ -90,7 +152,10 @@ class BottomFloatingPanelViewHolder(
     fun updateShareAndInviteButton() {
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
-        floatingPanelView.guestShareLink.isVisible = inMeetingViewModel.isGuest()
+        floatingPanelView.guestShareLink.apply {
+            isVisible = inMeetingViewModel.isGuestLinkVisible()
+            text = inMeetingViewModel.getGuestLinkTitle()
+        }
     }
 
     /**
@@ -133,7 +198,8 @@ class BottomFloatingPanelViewHolder(
                 Log.d("bottomSheetBehavior", "newState:$newState")
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
                 if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup
-                    || newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                    || newState == BottomSheetBehavior.STATE_HALF_EXPANDED
+                ) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -150,6 +216,9 @@ class BottomFloatingPanelViewHolder(
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 Log.d("bottomSheetBehavior", "onSlide")
                 onBottomFloatingPanelSlide(slideOffset)
+                if (slideOffset > 0.1f){
+                    popWindow?.dismiss()
+                }
             }
         })
 
@@ -168,7 +237,6 @@ class BottomFloatingPanelViewHolder(
             bottomSheetBehavior.halfExpandedRatio = ratio
         }
     }
-
 
 
     /**
@@ -218,7 +286,11 @@ class BottomFloatingPanelViewHolder(
             }
 
             guestShareLink.setOnClickListener {
-                listener.onShareLink()
+                if (inMeetingViewModel.isModeratorOfPrivateRoom()) {
+                    listener.onInviteParticipants()
+                } else {
+                    listener.onShareLink()
+                }
             }
 
             invite.setOnClickListener {

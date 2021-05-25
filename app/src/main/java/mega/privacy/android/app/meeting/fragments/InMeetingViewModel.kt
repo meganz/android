@@ -26,6 +26,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
@@ -1837,8 +1838,28 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return
      */
-    fun isLinkVisible(): Boolean = isChatRoomPublic() ||
-            (!isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR)
+    fun isLinkVisible(): Boolean = isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+
+    /**
+     * Determine if should hide or show the guest share link button
+     *
+     * @return
+     */
+    fun isGuestLinkVisible(): Boolean = if (isChatRoomPublic()) {
+        getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
+    } else {
+        getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+    }
+
+    fun getGuestLinkTitle(): String = if (isModeratorOfPrivateRoom()) {
+        MegaApplication.getInstance().applicationContext.getString(R.string.invite_participants)
+    } else {
+        MegaApplication.getInstance().applicationContext.getString(R.string.context_get_link)
+    }
+
+    fun isModeratorOfPrivateRoom(): Boolean =
+        !isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+
 
     /**
      * Determine if I am a guest
@@ -1880,5 +1901,22 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
         return inMeetingRepository.getAvatarBitmapByPeerId(peerId)
+    }
+
+    fun shouldShowTips():Boolean {
+        val sharedPreferences =
+            MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+        return !sharedPreferences.getBoolean(IS_SHOWED_TIPS, false)
+    }
+
+    fun updateShowTips() {
+        val sharedPreferences =
+            MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(IS_SHOWED_TIPS, true).commit()
+    }
+
+    companion object {
+        const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
     }
 }
