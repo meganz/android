@@ -3134,7 +3134,8 @@
 
     <string name="view_meeting_chat" context="The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting">View meeting chat</string>
     <string name="error_invalid_guest_name" context="Error message when user clicks join meeting as guest with empty first and last names">Please input first and last name</string>
-    <string name="tip_invite_more_participants" context="When the user uses the meeting first time, show this tip to alert them the bottom panel can swipe up">Invite more participants to the \nmeeting. Swipe up to invite.</string>
-    <string name="invitation_send" context="When the user send the invitation to others, show the snack bar">Invitation sent.\nSee status on Sent Requests Tab.</string>
+    <string name="tip_invite_more_participants" context="the content of tips when the user uses the meeting first time">Invite more participants to the \nmeeting. Swipe up to invite.</string>
+    <string name="invitation_send" context="the content of snack bar when the user send the invitation to others">Invitation sent.\nSee status on Sent Requests Tab.</string>
+    <string name="be_new_moderator" context="the content of snack bar when the user be the new moderator">You are the new meeting moderator now!</string>
 </resources>
 
