@@ -16,15 +16,6 @@
         android:background="@color/grey_800">
 
         <RelativeLayout
-            android:id="@+id/video_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:visibility="gone"/>
-
-        <RelativeLayout
             android:id="@+id/parent_surface_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

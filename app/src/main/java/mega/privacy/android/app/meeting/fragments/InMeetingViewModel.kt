@@ -63,9 +63,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val _speakerParticipant = MutableLiveData<Participant>(null)
     val speakerParticipant: LiveData<Participant> = _speakerParticipant
 
-    //TODO test code start
-    val frames: MutableLiveData<MutableList<Bitmap>> = MutableLiveData(mutableListOf())
-
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -768,22 +765,18 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun updatePeerSelected(peerId: Long, clientId: Long): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == peerId && it.clientId == clientId) {
-                        logDebug("New speaker selected found ${it.clientId}")
-                        it.isSpeaker = true
-                        _speakerParticipant.value = createSpeakerParticipant(it)
-                        listWithChanges.add(it)
-                    } else {
-                        if (it.isSpeaker) {
-                            logDebug("Remove the last speaker ${it.clientId}")
-                            it.isSpeaker = false
-                            listWithChanges.add(it)
-                        }
-                    }
+
+        participants.value?.forEach {
+            if (it.peerId == peerId && it.clientId == clientId) {
+                logDebug("New speaker selected found ${it.clientId}")
+                it.isSpeaker = true
+                _speakerParticipant.value = createSpeakerParticipant(it)
+                listWithChanges.add(it)
+            } else {
+                if (it.isSpeaker) {
+                    logDebug("Remove the last speaker ${it.clientId}")
+                    it.isSpeaker = false
+                    listWithChanges.add(it)
                 }
             }
         }
@@ -1069,13 +1062,13 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun assignMeAsSpeaker() {
         logDebug("Assign me as speaker")
-        _speakerParticipant.value?.let { currentSpeaker ->
-            if (getSession(currentSpeaker.clientId) == null) {
-                logDebug("The participant with clientId ${currentSpeaker.clientId} doesn't have session")
-                removeVideoOfParticipantRemoved(currentChatId, currentSpeaker)
+        _speakerParticipant.value?.let {
+            if (getSession(it.clientId) == null) {
+                logDebug("The participant with clientId ${it.clientId} doesn't have session")
+                removeVideoOfParticipantRemoved(currentChatId, it)
             } else {
-                logDebug("The participant with clientId ${currentSpeaker.clientId} has session")
-                onCloseVideo(currentSpeaker)
+                logDebug("The participant with clientId ${it.clientId} has session")
+                onCloseVideo(it)
             }
         }
 
@@ -1092,11 +1085,12 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun getParticipant(peerId: Long, clientId: Long): Participant? {
         participants.value?.let { list ->
-            val participant = list.filter {
+            val participants = list.filter {
                 it.peerId == peerId && it.clientId == clientId
             }
-            if (participant.isNotEmpty()) {
-                return participant[0]
+
+            if (participants.isNotEmpty()) {
+                return participants[0]
             }
         }
 
@@ -1477,40 +1471,39 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param participant
      */
     fun onActivateVideo(participant: Participant, isSpeaker: Boolean) {
-        inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
-            getSession(participant.clientId)?.let {
-                if (participant.videoListener != null) {
-                    val isVisible = isParticipantVisible(participant)
-                    if ((!isVisible && !isSpeaker) || participant.videoListener == null) {
-                        logDebug("No activate video, the participant with clientId ${participant.clientId} is not visible")
-                        return
-                    }
-                    logDebug("Activate video, the participant with clientId ${participant.clientId} is visible")
-                    if (participant.hasHiRes) {
-                        if (!isSpeaker) {
-                            removeLowRes(participant.videoListener!!, it, chat.chatId)
-                        }
+        val session =  getSession(participant.clientId)
 
-                        logDebug("Add high resolution ")
-                        addHiRes(
-                            participant.videoListener!!,
-                            it,
-                            chat.chatId
-                        )
-                    } else {
-                        if (!isSpeaker) {
-                            removeHiRes(participant.videoListener!!, it, chat.chatId)
-                        }
+        if(session == null || participant.videoListener == null) return
 
-                        logDebug("Add low resolution ")
-                        addLowRes(
-                            participant.videoListener!!,
-                            it,
-                            chat.chatId
-                        )
-                    }
-                }
+        val isVisible = isParticipantVisible(participant)
+        if ((!isVisible && !isSpeaker) || participant.videoListener == null) {
+            logDebug("No activate video, the participant with clientId ${participant.clientId} is not visible")
+            return
+        }
+
+        logDebug("Activate video, the participant with clientId ${participant.clientId} is visible")
+        if (participant.hasHiRes) {
+            if (!isSpeaker) {
+                removeLowRes(participant.videoListener!!, session, currentChatId)
             }
+
+            logDebug("Add high resolution")
+            addHiRes(
+                participant.videoListener!!,
+                session,
+                currentChatId
+            )
+        } else {
+            if (!isSpeaker) {
+                removeHiRes(participant.videoListener!!, session, currentChatId)
+            }
+
+            logDebug("Add low resolution")
+            addLowRes(
+                participant.videoListener!!,
+                session,
+                currentChatId
+            )
         }
     }
 
@@ -1781,8 +1774,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
-
-    // // For join as guest end
+   // For join as guest end
 
     /**
      * Method for answer a call
