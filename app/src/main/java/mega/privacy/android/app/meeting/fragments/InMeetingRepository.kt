@@ -512,17 +512,27 @@ class InMeetingRepository @Inject constructor(
     }
 
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
-        val mail = ChatController(context).getParticipantEmail(
-            peerId
-        )
+        var bitmap: Bitmap?
+        val mail = ChatController(context).getParticipantEmail(peerId)
+
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
-        if (userHandleString == myUserHandleEncoded) {
-            return AvatarUtil.getAvatarBitmap(mail)
+        bitmap = if (userHandleString == myUserHandleEncoded) {
+            AvatarUtil.getAvatarBitmap(mail)
+        } else {
+            if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+                userHandleString,
+                mail
+            )
         }
-        return if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
-            userHandleString,
-            mail
-        )
+        
+        if (bitmap == null){
+            bitmap = CallUtil.getDefaultAvatarCall(
+                MegaApplication.getInstance().applicationContext,
+                peerId
+            )
+        }
+
+        return bitmap
     }
 }
