@@ -356,7 +356,7 @@ class CuViewModel extends BaseRxViewModel {
             if (lastModifyDate == null
                     || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
                 lastModifyDate = modifyDate;
-                nodes.add(new CuNode(null, -1, null, CuNode.TYPE_TITLE, dateString, false));
+                nodes.add(new CuNode(dateString));
             }
 
             nodes.add(new CuNode(node, pair.first, thumbnail.exists() ? thumbnail : null,

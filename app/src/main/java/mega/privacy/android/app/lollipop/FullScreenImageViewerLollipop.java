@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -63,6 +64,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1026,13 +1028,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			// TODO: use constants
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
+		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
-					case FILE_BROWSER_ADAPTER:{
-						parentNode = megaApi.getRootNode();
-						break;
-					}
 					case RUBBISH_BIN_ADAPTER:{
 						parentNode = megaApi.getRubbishNode();
 						break;
@@ -1092,7 +1092,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		}
 	}
 
-	private void getImageHandles(ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState) {
 		int imageNumber = 0;
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);

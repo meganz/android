@@ -3,8 +3,10 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 import java.io.File;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+
 public class CuNode {
-    public static final int TYPE_TITLE = 1;
+    public static final int TYPE_HEADER = 1;
     public static final int TYPE_IMAGE = 2;
     public static final int TYPE_VIDEO = 3;
 
@@ -24,6 +26,15 @@ public class CuNode {
         mType = type;
         mModifyDate = modifyDate;
         mSelected = selected;
+    }
+
+    public CuNode(String modifyDate) {
+        mNode = null;
+        mIndexForViewer = INVALID_VALUE;
+        mThumbnail = null;
+        mType = TYPE_HEADER;
+        mModifyDate = modifyDate;
+        mSelected = false;
     }
 
     public MegaNode getNode() {

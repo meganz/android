@@ -1,9 +1,8 @@
 package mega.privacy.android.app.repo
 
-import android.content.Context
 import android.util.Pair
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.di.MegaApi
@@ -25,28 +24,11 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class MegaNodeRepo @Inject constructor(
-    @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler
 ) {
 
-    /**
-     * Get children of CU/MU, with the given order, and filter nodes by date (optional).
-     *
-     * @param orderBy order
-     * @param filter search filter
-     * filter[0] is the search type:
-     * 1 means search for nodes in one day, then filter[1] is the day in millis.
-     * 2 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
-     * 3 means search for nodes between two days, filter[3] and filter[4] are start and end day in
-     * millis.
-     * @return list of pairs, whose first value is index used for
-     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
-     */
-    fun getCuChildren(
-        orderBy: Int,
-        filter: LongArray?
-    ): List<Pair<Int, MegaNode>> {
+    fun getCuChildren(orderBy: Int): List<MegaNode> {
         var cuNode: MegaNode? = null
         var muNode: MegaNode? = null
         val pref = dbHandler.preferences
@@ -83,8 +65,27 @@ class MegaNodeRepo @Inject constructor(
             nodeList.addNode(muNode)
         }
 
-        val children: List<MegaNode> = megaApi.getChildren(nodeList, orderBy)
+        return megaApi.getChildren(nodeList, orderBy)
+    }
 
+    /**
+     * Get children of CU/MU, with the given order, and filter nodes by date (optional).
+     *
+     * @param orderBy order
+     * @param filter search filter
+     * filter[0] is the search type:
+     * 1 means search for nodes in one day, then filter[1] is the day in millis.
+     * 2 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
+     * 3 means search for nodes between two days, filter[3] and filter[4] are start and end day in
+     * millis.
+     * @return list of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
+     */
+    fun getCuChildren(
+        orderBy: Int,
+        filter: LongArray?
+    ): List<Pair<Int, MegaNode>> {
+        val children = getCuChildren(orderBy)
         val nodes = ArrayList<Pair<Int, MegaNode>>()
 
         for ((index, node) in children.withIndex()) {
@@ -202,7 +203,7 @@ class MegaNodeRepo @Inject constructor(
             }
 
             if (node.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) &&
-                FileUtil.isFileAvailable(getOfflineFile(context, node))
+                FileUtil.isFileAvailable(getOfflineFile(MegaApplication.getInstance(), node))
             ) {
                 result.add(node)
             }

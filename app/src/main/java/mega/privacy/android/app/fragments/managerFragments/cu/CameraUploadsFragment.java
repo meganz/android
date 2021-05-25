@@ -192,7 +192,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context, sortOrderManagement);
+                        new MegaNodeRepo(megaApi, dbH), context, sortOrderManagement);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         initAdsLoader(AD_SLOT, true);
